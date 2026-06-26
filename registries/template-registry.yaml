@@ -1,0 +1,64 @@
+# Template Registry — all templates/ artifacts
+# Schema: id, path, required_sections, used_by_workflows
+version: 1
+templates:
+  - id: adr
+    path: templates/adr.template.md
+    required_sections: [Context, Decision, Consequences]
+    used_by: [architecture/propose-decision, architecture/record-adr]
+  - id: project-plan
+    path: templates/project-plan.template.md
+    required_sections: ["MVP First", "Proposed File Structure", "Open Questions", "Acceptance Criteria"]
+    used_by: [feature/01-plan]
+  - id: feature-spec
+    path: templates/feature-spec.template.md
+    required_sections: [Problem, Scope, "Functional Requirements", "Open Questions"]
+    used_by: [feature/01-plan]
+  - id: architecture-review
+    path: templates/architecture-review.template.md
+    required_sections: [Components, "Data Flow", "Scalability Considerations", Tradeoffs]
+    used_by: [feature/02-design, architecture/review-architecture]
+  - id: code-review
+    path: templates/code-review.template.md
+    required_sections: ["Findings by Severity", Approval]
+    used_by: [feature/04-review]
+  - id: bug-report
+    path: templates/bug-report.template.md
+    required_sections: ["Steps to Reproduce", "Expected Behavior", "Actual Behavior"]
+    used_by: [debugging/01-symptom-capture]
+  - id: debugging-session
+    path: templates/debugging-session.template.md
+    required_sections: ["Hypotheses (ranked)", "Diagnostics Performed", "Root Cause", Verification]
+    used_by: [debugging/*]
+  - id: daily-log
+    path: templates/daily-log.template.md
+    required_sections: ["What I Built", "What I Learned", "ملخص عربي (Arabic Summary)"]
+    used_by: [feature/06-reflect]
+  - id: weekly-review
+    path: templates/weekly-review.template.md
+    required_sections: ["Self-Assessment (1–10)", "Next Week Plan", "ملخص عربي (Arabic Summary)"]
+    used_by: [feature/06-reflect]
+  - id: monthly-review
+    path: templates/monthly-review.template.md
+    required_sections: ["The 30-Day Rule", "Next Month Focus", "ملخص عربي (Arabic Summary)"]
+    used_by: []
+  - id: source-doc
+    path: templates/source-doc.template.md
+    required_sections: ["Key Concepts (confirmed)", "My Inferences (not stated, my interpretation)", "Link to Project Task", "ملخص عربي (Arabic Summary)"]
+    used_by: [learning/learn-from-docs]
+  - id: source-repo
+    path: templates/source-repo.template.md
+    required_sections: ["Patterns Worth Adopting", "Link to Project Task", "ملخص عربي (Arabic Summary)"]
+    used_by: [learning/learn-from-repo]
+  - id: source-book
+    path: templates/source-book.template.md
+    required_sections: ["Core Ideas (confirmed)", "Link to Project Task", "ملخص عربي (Arabic Summary)"]
+    used_by: [learning/learn-from-book]
+  - id: source-notebook
+    path: templates/source-notebook.template.md
+    required_sections: ["What It Demonstrates (confirmed)", "Link to Project Task", "ملخص عربي (Arabic Summary)"]
+    used_by: [learning/learn-from-notebook]
+  - id: evaluation-report
+    path: templates/evaluation-report.template.md
+    required_sections: [Metrics, Failures, Decision]
+    used_by: [evaluation/*]

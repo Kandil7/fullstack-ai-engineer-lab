@@ -1,0 +1,68 @@
+# Skills Registry — reusable capabilities (skills) shared across roles
+# Schema: id, name, purpose, reusable_by (roles), inputs, outputs, failure_modes, test_strategy
+version: 1
+skills:
+  - id: scope-decomposition
+    name: Scope Decomposition
+    purpose: Break a feature/task into MVP + ordered tasks with dependencies
+    reusable_by: [role.project-planner, role.system-architect, role.pair-programmer]
+    inputs: [feature-description]
+    outputs: [task-tree]
+    failure_modes: [vague-scope]
+    test_strategy: golden-planning-cases
+  - id: architecture-framing
+    name: Architecture Framing
+    purpose: Design components, data flow, risks, tradeoffs
+    reusable_by: [role.system-architect, role.principal-system-designer]
+    inputs: [requirements]
+    outputs: [components, risks, tradeoffs]
+    failure_modes: [over-design]
+    test_strategy: architecture-fixtures
+  - id: guided-teaching
+    name: Guided Teaching
+    purpose: Socratic, recall-driven learning tied to projects
+    reusable_by: [role.learning-coach, role.source-learning-agent]
+    inputs: [topic, source]
+    outputs: [explanation, exercise]
+    failure_modes: [too-much-solutioning]
+    test_strategy: output-rubric
+  - id: code-review-analysis
+    name: Code Review Analysis
+    purpose: Inspect code for quality, security, maintainability with severities
+    reusable_by: [role.code-reviewer]
+    inputs: [code, diff]
+    outputs: [findings, severity]
+    failure_modes: [vague-findings]
+    test_strategy: review-snapshots
+  - id: debugging-triage
+    name: Debugging Triage
+    purpose: Symptom to ranked hypotheses to diagnostics
+    reusable_by: [role.debugging-specialist]
+    inputs: [symptoms, logs]
+    outputs: [ranked-hypotheses]
+    failure_modes: [premature-conclusion]
+    test_strategy: seeded-bug-cases
+  - id: source-extraction
+    name: Source Extraction
+    purpose: Turn a source into structured concepts + exercise
+    reusable_by: [role.source-learning-agent]
+    inputs: [source-material]
+    outputs: [summary, concepts, exercise]
+    failure_modes: [shallow-extraction]
+    test_strategy: source-based-goldens
+  - id: evaluation-planning
+    name: Evaluation Planning
+    purpose: Define metrics, cases, and risks for an AI feature/system
+    reusable_by: [role.system-architect, role.principal-system-designer]
+    inputs: [feature-context]
+    outputs: [eval-plan]
+    failure_modes: [missing-measurable-criteria]
+    test_strategy: metric-presence-checks
+  - id: adr-writing
+    name: ADR Writing
+    purpose: Capture a decision with context, options, consequences
+    reusable_by: [role.system-architect, role.project-planner]
+    inputs: [design-decision]
+    outputs: [adr-doc]
+    failure_modes: [weak-rationale]
+    test_strategy: adr-rubric

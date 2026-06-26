@@ -27,11 +27,16 @@ versioned **engineering artifacts**.
 
 ## Learning Strategy
 
-- **Build first**, learn just-in-time (70% build / 20% review / 10% theory).
-- Use AI as **mentor, reviewer, and debugger** — never as a copy-paste author.
-- Every feature flows: `plan → design → build → review → fix → reflect`.
-- Every bug is documented; every studied source yields an actionable artifact.
-- **Rule:** never accept AI-written code you cannot explain from memory an hour later.
+**Write code yourself first**, then use AI as assistant — not replacement.
+
+- **70% build** / 20% review / 10% theory
+- Use AI for: quick explanations, code review, architecture hints, boilerplate
+- Don't use AI for: writing entire systems you can't explain
+- Every feature flows: `plan → design → build → review → fix → reflect`
+- **Golden rule:** if you can't explain the code an hour later, AI wrote it for you, not with you
+
+See [`docs/product/learning-strategy.md`](docs/product/learning-strategy.md) for the complete 5-axis resource system.
+See [`docs/product/ai-learning-operating-manual.md`](docs/product/ai-learning-operating-manual.md) for the complete AI agent usage guide.
 
 ---
 
@@ -80,13 +85,29 @@ full tree and rationale.
 
 ## Progress Tracker
 
+### Workspace Build (Complete ✅)
 - [x] Phase 0 — Foundations (repo skeleton, templates, prompts, registries)
 - [x] Phase 1 — Core MVP (one end-to-end feature on `auth-service`)
-- [ ] Phase 2 — Reliability (learning workflows on real sources, tests)
-- [ ] Phase 3 — Scale (scaffolding scripts, repo validation, deep dives)
-- [ ] Phase 4 — Advanced (RAG eval harness, capstone build)
+- [x] Phase 2 — Reliability (learning workflows, source templates, tests)
+- [x] Phase 3 — Scale (scaffolding scripts, repo validation, deep dives)
+- [x] Phase 4 — Advanced (RAG eval harness, capstone structure, operating manual)
+
+### Learning Journey (In Progress)
+- [ ] **Phase 0 — Foundations** ← YOU ARE HERE (Months 1–3)
+  - [x] Week 1 scaffold: Exercise 01 + 02 created
+  - [ ] Go Tour completion
+  - [ ] HTML/CSS/JS portfolio
+  - [ ] Git workflow mastery
+- [ ] Phase 1 — Backend (Go + PostgreSQL)
+- [ ] Phase 2 — Frontend (Flutter/Next.js)
+- [ ] Phase 3 — AI Fundamentals
+- [ ] Phase 4 — RAG Systems
+- [ ] Phase 5 — AI Agents
+- [ ] Phase 6 — System Design + DevOps
+- [ ] Phase 7 — Capstone (ThanaweyaGPT)
 
 See [`ROADMAP.md`](ROADMAP.md) for the full phase breakdown.
+See [`docs/product/12-month-plan.md`](docs/product/12-month-plan.md) for the 12-month timeline.
 
 ---
 

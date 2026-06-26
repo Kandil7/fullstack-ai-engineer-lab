@@ -1,0 +1,73 @@
+# ============================================================
+# Qdrant Configuration — Development Environment
+# Full-Stack AI Engineer Lab
+# ============================================================
+# Vector database for RAG (Retrieval-Augmented Generation)
+# Mounted into the qdrant container.
+# Usage: docker compose up qdrant
+# ============================================================
+
+storage:
+  # Storage path inside the container
+  storage_path: /qdrant/storage
+
+  # Snapshots directory
+  snapshots_path: /qdrant/snapshots
+
+  # WAL (Write-Ahead Log) settings
+  wal:
+    # WAL segment size in bytes (32KB default, good for dev)
+    wal_segments_ahead: 0
+
+  # Optimizer settings — tuned for development (small datasets)
+  optimizers:
+    # Number of segments to optimize per indexing pass
+    deleted_threshold: 0.2
+    indexing_threshold: 20000
+    # Flush interval for optimization
+    flush_interval_sec: 5
+    # Max number of segments before forced optimization
+    max_optimization_threads: 1
+
+  # Performance settings
+  performance:
+    # Max search parallelism (lower for dev to save resources)
+    max_search_threads: 2
+    # Max indexing threads
+    max_optimization_threads: 1
+
+  # Resource limits
+  resources:
+    # Max memory for indexing (0 = unlimited)
+    optimizer_cpu_budget: 0
+
+service:
+  # HTTP port
+  http_port: 6333
+  # gRPC port
+  grpc_port: 6334
+  # Listen on all interfaces (required for Docker)
+  host: 0.0.0.0
+
+  # Request timeout
+  timeout: 60
+
+  # Enable CORS for development
+  cors:
+    allow_origins:
+      - "*"
+    allow_methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "OPTIONS"
+    allow_headers:
+      - "*"
+
+# Logging
+log_level: INFO
+
+# Telemetry (disabled for dev)
+telemetry:
+  disabled: true

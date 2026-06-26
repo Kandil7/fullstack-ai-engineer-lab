@@ -1,0 +1,156 @@
+# Workflow Registry — all .ai/workflows step files
+# Schema: id, path, entry_point, prompts_used, template_used, produces (artifact paths), exit_criteria
+version: 1
+workflows:
+  feature:
+    - id: feature/01-plan
+      path: .ai/workflows/feature/01-plan.md
+      entry_point: true
+      prompts_used: [role.project-planner]
+      template_used: project-plan.template.md
+      produces: ["projects/<path>/plan.md"]
+      exit_criteria: "plan.md with MVP, file structure, acceptance criteria, open questions"
+    - id: feature/02-design
+      path: .ai/workflows/feature/02-design.md
+      entry_point: false
+      prompts_used: [role.system-architect, critic.architecture-validator, task.adr-writer]
+      template_used: architecture-review.template.md
+      produces: ["projects/<path>/architecture-review.md", "docs/decisions/NNNN-*.md"]
+      exit_criteria: "architecture accepted; ADR candidates recorded"
+    - id: feature/03-build
+      path: .ai/workflows/feature/03-build.md
+      entry_point: false
+      prompts_used: [role.pair-programmer, task.feature-builder]
+      template_used: null
+      produces: ["projects/<path>/src/*", "projects/<path>/tests/*", "projects/<path>/notes.md"]
+      exit_criteria: "MVP implemented; tests run; explainable from memory"
+    - id: feature/04-review
+      path: .ai/workflows/feature/04-review.md
+      entry_point: false
+      prompts_used: [role.code-reviewer, critic.code-quality-validator]
+      template_used: code-review.template.md
+      produces: ["projects/<path>/ai-review.md"]
+      exit_criteria: "ai-review.md with severities and a decision"
+    - id: feature/05-fix
+      path: .ai/workflows/feature/05-fix.md
+      entry_point: false
+      prompts_used: [task.review-summarizer, role.pair-programmer]
+      template_used: null
+      produces: ["projects/<path>/mistakes.md"]
+      exit_criteria: "no open Critical/High; tests green"
+    - id: feature/06-reflect
+      path: .ai/workflows/feature/06-reflect.md
+      entry_point: false
+      prompts_used: [role.learning-coach]
+      template_used: daily-log.template.md
+      produces: ["docs/learning/notes/weekly/<date>.md"]
+      exit_criteria: "reflection captured; next step queued"
+  debugging:
+    - id: debugging/01-symptom-capture
+      path: .ai/workflows/debugging/01-symptom-capture.md
+      entry_point: true
+      prompts_used: [role.debugging-specialist]
+      template_used: bug-report.template.md
+      produces: ["bug-report.md", "debugging-session.md"]
+      exit_criteria: "symptoms + reproduction documented"
+    - id: debugging/02-hypothesis-ranking
+      path: .ai/workflows/debugging/02-hypothesis-ranking.md
+      entry_point: false
+      prompts_used: [role.debugging-specialist]
+      template_used: debugging-session.template.md
+      produces: ["debugging-session.md (ranked hypotheses)"]
+      exit_criteria: "2-3 ranked hypotheses with evidence"
+    - id: debugging/03-diagnostics
+      path: .ai/workflows/debugging/03-diagnostics.md
+      entry_point: false
+      prompts_used: [role.debugging-specialist]
+      template_used: debugging-session.template.md
+      produces: ["debugging-session.md (root cause)"]
+      exit_criteria: "root cause confirmed with evidence"
+    - id: debugging/04-fix-verification
+      path: .ai/workflows/debugging/04-fix-verification.md
+      entry_point: false
+      prompts_used: [role.debugging-specialist, role.pair-programmer]
+      template_used: debugging-session.template.md
+      produces: ["regression test", "mistakes.md"]
+      exit_criteria: "bug no longer reproduces; regression test added"
+  learning:
+    - id: learning/learn-from-docs
+      path: .ai/workflows/learning/learn-from-docs.md
+      entry_point: true
+      prompts_used: [role.source-learning-agent, task.source-extractor]
+      template_used: source-doc.template.md
+      produces: ["docs/learning/source-summaries/<slug>.md"]
+      exit_criteria: "summary links to project task; confirmed vs inferred separated"
+    - id: learning/learn-from-repo
+      path: .ai/workflows/learning/learn-from-repo.md
+      entry_point: true
+      prompts_used: [role.source-learning-agent]
+      template_used: source-repo.template.md
+      produces: ["docs/learning/source-summaries/<slug>.md"]
+      exit_criteria: "adoptable pattern linked to project task"
+    - id: learning/learn-from-book
+      path: .ai/workflows/learning/learn-from-book.md
+      entry_point: true
+      prompts_used: [role.source-learning-agent]
+      template_used: source-book.template.md
+      produces: ["docs/learning/source-summaries/<slug>.md"]
+      exit_criteria: "mental model tied to a decision"
+    - id: learning/learn-from-notebook
+      path: .ai/workflows/learning/learn-from-notebook.md
+      entry_point: true
+      prompts_used: [role.source-learning-agent]
+      template_used: source-notebook.template.md
+      produces: ["docs/learning/source-summaries/<slug>.md"]
+      exit_criteria: "notebook reproduced; one variation tested"
+    - id: learning/source-to-exercise
+      path: .ai/workflows/learning/source-to-exercise.md
+      entry_point: false
+      prompts_used: [role.learning-coach, role.source-learning-agent]
+      template_used: null
+      produces: ["exercise appended to summary", "projects/* code"]
+      exit_criteria: "exercise completed and tied to project code"
+  architecture:
+    - id: architecture/propose-decision
+      path: .ai/workflows/architecture/propose-decision.md
+      entry_point: true
+      prompts_used: [role.system-architect, task.adr-writer]
+      template_used: adr.template.md
+      produces: ["draft ADR"]
+      exit_criteria: "draft ADR with non-empty Consequences"
+    - id: architecture/record-adr
+      path: .ai/workflows/architecture/record-adr.md
+      entry_point: false
+      prompts_used: [task.adr-writer]
+      template_used: adr.template.md
+      produces: ["docs/decisions/NNNN-*.md", "registries/decision-log.yaml"]
+      exit_criteria: "ADR accepted, numbered, indexed"
+    - id: architecture/review-architecture
+      path: .ai/workflows/architecture/review-architecture.md
+      entry_point: true
+      prompts_used: [role.principal-system-designer, critic.architecture-validator]
+      template_used: architecture-review.template.md
+      produces: ["architecture-review.md"]
+      exit_criteria: "review complete; complexity justified"
+  evaluation:
+    - id: evaluation/ai-feature-eval
+      path: .ai/workflows/evaluation/ai-feature-eval.md
+      entry_point: true
+      prompts_used: [role.principal-system-designer, role.code-reviewer]
+      template_used: evaluation-report.template.md
+      produces: ["evaluations/projects/<system>/<date>-report.md"]
+      exit_criteria: "metrics measured; accept/reject decision"
+    - id: evaluation/prompt-regression
+      path: .ai/workflows/evaluation/prompt-regression.md
+      entry_point: true
+      prompts_used: [critic.prompt-auditor]
+      template_used: evaluation-report.template.md
+      produces: ["evaluations/prompts/regressions/<prompt-id>-<date>.md"]
+      exit_criteria: "prompt passes golden set"
+    - id: evaluation/rag-quality-check
+      path: .ai/workflows/evaluation/rag-quality-check.md
+      entry_point: true
+      prompts_used: [role.principal-system-designer]
+      template_used: evaluation-report.template.md
+      produces: ["evaluations/rag/reports/<date>-report.md"]
+      exit_criteria: "metrics vs baseline; failures categorized"
