@@ -1,0 +1,202 @@
+# Prompt Registry — inventory, ownership, and versioning for all .ai/prompts
+# Schema: id, path, owner, version, status, layer, used_by (workflows), constraints, last_reviewed
+version: 1
+prompts:
+  # --- system ---
+  - id: sys.workspace-governor
+    path: .ai/prompts/system/workspace-governor.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: system
+    used_by: [all]
+    constraints: [repo-first, no-invented-scope, mvp-first]
+    last_reviewed: 2026-06-26
+  - id: sys.output-format-rules
+    path: .ai/prompts/system/output-format-rules.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: system
+    used_by: [all]
+    constraints: [bounded, anti-hallucination]
+    last_reviewed: 2026-06-26
+
+  # --- roles ---
+  - id: role.learning-coach
+    path: .ai/prompts/roles/learning-coach.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: role
+    used_by: [learning/*, feature/06-reflect]
+    constraints: [socratic, no-full-solutions, force-active-recall]
+    last_reviewed: 2026-06-26
+  - id: role.project-planner
+    path: .ai/prompts/roles/project-planner.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: role
+    used_by: [feature/01-plan]
+    constraints: [mvp-first, mark-open-questions, no-code]
+    last_reviewed: 2026-06-26
+  - id: role.system-architect
+    path: .ai/prompts/roles/system-architect.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: role
+    used_by: [feature/02-design, architecture/review-architecture]
+    constraints: [no-code, no-unstated-infra, mvp-first]
+    last_reviewed: 2026-06-26
+  - id: role.pair-programmer
+    path: .ai/prompts/roles/pair-programmer.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: role
+    used_by: [feature/03-build, feature/05-fix]
+    constraints: [step-by-step, wait-for-confirmation, hints-before-code]
+    last_reviewed: 2026-06-26
+  - id: role.code-reviewer
+    path: .ai/prompts/roles/code-reviewer.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: role
+    used_by: [feature/04-review]
+    constraints: [severity-required, no-rewrite-by-default, cite-exact-files]
+    last_reviewed: 2026-06-26
+  - id: role.debugging-specialist
+    path: .ai/prompts/roles/debugging-specialist.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: role
+    used_by: [debugging/*]
+    constraints: [rank-hypotheses-before-fix, require-evidence, no-premature-conclusion]
+    last_reviewed: 2026-06-26
+  - id: role.source-learning-agent
+    path: .ai/prompts/roles/source-learning-agent.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: role
+    used_by: [learning/*]
+    constraints: [source-grounded, separate-confirmed-vs-inferred, link-to-project]
+    last_reviewed: 2026-06-26
+  - id: role.principal-system-designer
+    path: .ai/prompts/roles/principal-system-designer.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: role
+    used_by: [architecture/*, evaluation/*]
+    constraints: [no-code, scale-aware, tradeoff-explicit]
+    last_reviewed: 2026-06-26
+
+  # --- tasks ---
+  - id: task.feature-builder
+    path: .ai/prompts/tasks/feature-builder.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: task
+    used_by: [feature/03-build]
+    constraints: [mvp-first, ordered-steps]
+    last_reviewed: 2026-06-26
+  - id: task.adr-writer
+    path: .ai/prompts/tasks/adr-writer.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: task
+    used_by: [architecture/propose-decision, architecture/record-adr]
+    constraints: [consequences-required, options-compared]
+    last_reviewed: 2026-06-26
+  - id: task.source-extractor
+    path: .ai/prompts/tasks/source-extractor.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: task
+    used_by: [learning/*]
+    constraints: [source-grounded, one-exercise]
+    last_reviewed: 2026-06-26
+  - id: task.implementation-planner
+    path: .ai/prompts/tasks/implementation-planner.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: task
+    used_by: [feature/01-plan]
+    constraints: [mvp-first, file-structure-required]
+    last_reviewed: 2026-06-26
+  - id: task.review-summarizer
+    path: .ai/prompts/tasks/review-summarizer.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: task
+    used_by: [feature/05-fix]
+    constraints: [preserve-severity, actionable]
+    last_reviewed: 2026-06-26
+
+  # --- critics ---
+  - id: critic.architecture-validator
+    path: .ai/prompts/critics/architecture-validator.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: critic
+    used_by: [feature/02-design, architecture/review-architecture]
+    constraints: [flag-overengineering, require-tradeoffs]
+    last_reviewed: 2026-06-26
+  - id: critic.code-quality-validator
+    path: .ai/prompts/critics/code-quality-validator.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: critic
+    used_by: [feature/04-review]
+    constraints: [severity-required, no-rewrite]
+    last_reviewed: 2026-06-26
+  - id: critic.prompt-auditor
+    path: .ai/prompts/critics/prompt-auditor.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: critic
+    used_by: [evaluation/prompt-regression]
+    constraints: [scope-focus, detect-sprawl]
+    last_reviewed: 2026-06-26
+
+  # --- repair ---
+  - id: repair.retry-with-missing-context
+    path: .ai/prompts/repair/retry-with-missing-context.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: repair
+    used_by: [all]
+    constraints: [no-speculation]
+    last_reviewed: 2026-06-26
+  - id: repair.simplify-overengineered-plan
+    path: .ai/prompts/repair/simplify-overengineered-plan.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: repair
+    used_by: [feature/02-design, architecture/*]
+    constraints: [preserve-scope, yagni]
+    last_reviewed: 2026-06-26
+  - id: repair.fix-output-format
+    path: .ai/prompts/repair/fix-output-format.md
+    owner: workspace
+    version: 1.0.0
+    status: active
+    layer: repair
+    used_by: [all]
+    constraints: [preserve-substance]
+    last_reviewed: 2026-06-26

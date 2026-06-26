@@ -1,0 +1,25 @@
+# Decision Log — index of all ADRs (mirrors docs/decisions/)
+# Schema: id, title, status, date, path, supersedes, superseded_by
+version: 1
+decisions:
+  - id: "0001"
+    title: Repo-centric agentic workspace
+    status: Accepted
+    date: 2026-06-26
+    path: docs/decisions/0001-repo-centric-workspace.md
+    supersedes: null
+    superseded_by: null
+  - id: "0002"
+    title: Prompt modularization and .ai namespace
+    status: Accepted
+    date: 2026-06-26
+    path: docs/decisions/0002-prompt-modularization.md
+    supersedes: null
+    superseded_by: null
+  - id: "0003"
+    title: Hybrid stack — Go core + FastAPI AI layer
+    status: Accepted
+    date: 2026-06-26
+    path: docs/decisions/0003-hybrid-stack-go-fastapi.md
+    supersedes: null
+    superseded_by: null

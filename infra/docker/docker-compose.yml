@@ -1,0 +1,196 @@
+# Full-Stack AI Engineer Lab — Docker Compose
+# Production-quality local development infrastructure
+#
+# Services: PostgreSQL, Redis, Qdrant
+# Profiles: dev-tools (pgadmin, redis-commander, qdrant-dashboard)
+#
+# Usage:
+#   docker compose up -d                    # Core services only
+#   docker compose --profile dev-tools up -d # Include dev tools
+#   docker compose down -v                   # Stop and remove volumes
+
+services:
+  # ──────────────────────────────────────────────
+  # PostgreSQL — Primary relational database
+  # ──────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: fslab-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: fslab
+      POSTGRES_USER: fslab
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fslab_dev_2026}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+      - ./postgres/postgres.conf:/etc/postgresql/postgresql.conf:ro
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    networks:
+      - fslab-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fslab -d fslab"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ──────────────────────────────────────────────
+  # Redis — Cache, sessions, rate limiting
+  # ──────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: fslab-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server /etc/redis/redis.conf
+    volumes:
+      - redis-data:/data
+      - ./redis/redis.conf:/etc/redis/redis.conf:ro
+    networks:
+      - fslab-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis-dev-password", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+          cpus: "0.5"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ──────────────────────────────────────────────
+  # Qdrant — Vector database for RAG
+  # ──────────────────────────────────────────────
+  qdrant:
+    image: qdrant/qdrant:v1.12.1
+    container_name: fslab-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"   # REST API
+      - "6334:6334"   # gRPC
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: "6334"
+      QDRANT__SERVICE__HTTP_PORT: "6333"
+      QDRANT__SERVICE__HOST: "0.0.0.0"
+    volumes:
+      - qdrant-data:/qdrant/storage
+      - ./qdrant/config:/qdrant/config:ro
+    networks:
+      - fslab-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:6333/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ──────────────────────────────────────────────
+  # Dev Tools (profile: dev-tools)
+  # ──────────────────────────────────────────────
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: fslab-pgadmin
+    restart: unless-stopped
+    profiles:
+      - dev-tools
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@fslab.local
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - fslab-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:80/misc/ping || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: fslab-redis-commander
+    restart: unless-stopped
+    profiles:
+      - dev-tools
+    ports:
+      - "8081:8081"
+    environment:
+      REDIS_HOSTS: "local:redis:6379"
+    networks:
+      - fslab-net
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: "0.25"
+
+# ──────────────────────────────────────────────
+# Volumes
+# ──────────────────────────────────────────────
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+  qdrant-data:
+    driver: local
+  pgadmin-data:
+    driver: local
+
+# ──────────────────────────────────────────────
+# Networks
+# ──────────────────────────────────────────────
+networks:
+  fslab-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
