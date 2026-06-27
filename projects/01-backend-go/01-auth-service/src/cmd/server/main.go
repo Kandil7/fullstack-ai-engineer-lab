@@ -26,7 +26,7 @@ func main() {
 	// Structured logging
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
-	}))
+	})))
 
 	// Load configuration
 	cfg := config.Load()
