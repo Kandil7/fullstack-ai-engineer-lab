@@ -44,6 +44,9 @@ Complete Python exercise scripts covering all fundamental topics from the W3Scho
 | 36 | `36-polymorphism.py` | Python Polymorphism | [Link](https://www.w3schools.com/python/python_polymorphism.asp) |
 | 37 | `37-encapsulation.py` | Python Encapsulation | [Link](https://www.w3schools.com/python/python_encapsulation.asp) |
 | 38 | `38-file-handling.py` | Python File Handling | [Link](https://www.w3schools.com/python/python_file_handling.asp) |
+| 39 | `39-pip.py` | Python PIP | [Link](https://www.w3schools.com/python/python_pip.asp) |
+| 40 | `40-virtualenv.py` | Python VirtualEnv | [Link](https://www.w3schools.com/python/python_virtualenv.asp) |
+| 41 | `41-inner-classes.py` | Inner Classes | [Link](https://www.w3schools.com/python/python_class_inner.asp) |
 
 ## 🚀 How to Run
 
