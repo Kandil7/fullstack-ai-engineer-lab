@@ -33,9 +33,9 @@ x_fine = np.linspace(0, 10, 300)
 
 # Different interpolation methods
 methods = {
-    "Linear":     interpolate.interp1d(x_data, y_data, kind="linear"),
-    "Cubic":      interpolate.interp1d(x_data, y_data, kind="cubic"),
-    "Quadratic":  interpolate.interp1d(x_data, y_data, kind="quadratic"),
+    "Linear":     interpolate.interp1d(x_data, y_data, kind="linear", fill_value="extrapolate"),
+    "Cubic":      interpolate.interp1d(x_data, y_data, kind="cubic", fill_value="extrapolate"),
+    "Quadratic":  interpolate.interp1d(x_data, y_data, kind="quadratic", fill_value="extrapolate"),
 }
 
 fig, ax = plt.subplots(figsize=(10, 5))
@@ -226,7 +226,7 @@ values_irregular = np.sin(t_irregular) + 0.3 * np.random.randn(n_samples)
 
 # Resample to regular time grid
 t_regular = np.linspace(0, 10, 200)
-interp_func = interpolate.interp1d(t_irregular, values_irregular, kind="cubic")
+interp_func = interpolate.interp1d(t_irregular, values_irregular, kind="cubic", fill_value="extrapolate")
 values_regular = interp_func(t_regular)
 
 fig, ax = plt.subplots(figsize=(10, 4))

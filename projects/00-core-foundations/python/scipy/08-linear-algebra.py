@@ -208,8 +208,8 @@ A_qr = np.random.randn(5, 3)
 Q, R = linalg.qr(A_qr)
 print(f"\nQR Decomposition:")
 print(f"  A shape: {A_qr.shape}, Q shape: {Q.shape}, R shape: {R.shape}")
-print(f"  Q orthogonal check: |Q^T·Q - I| = {np.max(np.abs(Q.T @ Q - np.eye(3))):.2e}")
-print(f"  Reconstruction: |Q·R - A| = {np.max(np.abs(Q @ R - A_qr)):.2e}")
+print(f"  Q orthogonal check: |Q^T*Q - I| = {np.max(np.abs(Q.T @ Q - np.eye(Q.shape[1]))):.2e}")
+print(f"  Reconstruction: |Q*R - A| = {np.max(np.abs(Q @ R - A_qr)):.2e}")
 
 # --- Matrix Exponential ---
 A_exp = np.array([
@@ -219,7 +219,7 @@ A_exp = np.array([
 exp_A = linalg.expm(A_exp)
 print(f"\nMatrix exponential exp(A) for A = [[0,1],[-1,0]]:")
 print(f"  exp(A) =\n{exp_A}")
-print(f"  This is a rotation matrix (cos θ, sin θ; -sin θ, cos θ)")
+print(f"  This is a rotation matrix (cos theta, sin theta; -sin theta, cos theta)")
 
 # Visualize matrix exponential effect
 fig, ax = plt.subplots(figsize=(6, 6))

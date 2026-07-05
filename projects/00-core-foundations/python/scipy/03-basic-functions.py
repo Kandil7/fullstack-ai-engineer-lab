@@ -74,7 +74,17 @@ print("\n" + "=" * 60)
 print("Example 2: Numerical Differentiation")
 print("=" * 60)
 
-from scipy.misc import derivative
+from scipy.optimize import approx_fprime
+
+# Custom numerical derivative using finite differences (replaces deprecated scipy.misc.derivative)
+def numerical_derivative(func, x0, dx=1e-5, n=1):
+    """Compute nth derivative using central finite differences."""
+    if n == 1:
+        return (func(x0 + dx) - func(x0 - dx)) / (2 * dx)
+    elif n == 2:
+        return (func(x0 + dx) - 2 * func(x0) + func(x0 - dx)) / (dx**2)
+    else:
+        raise ValueError(f"Only n=1,2 supported, got n={n}")
 
 # Compute derivatives of f(x) = sin(x)
 def g(x):
@@ -83,20 +93,20 @@ def g(x):
 x0 = np.pi / 4  # 45 degrees
 
 # First derivative of sin(x) = cos(x)
-d1 = derivative(g, x0, dx=1e-5, n=1)
+d1 = numerical_derivative(g, x0, dx=1e-5, n=1)
 print(f"First derivative of sin(x) at x=pi/4:")
 print(f"  Numerical:  {d1:.6f}")
 print(f"  Analytical: {np.cos(x0):.6f}")
 
 # Second derivative of sin(x) = -sin(x)
-d2 = derivative(g, x0, dx=1e-5, n=2)
+d2 = numerical_derivative(g, x0, dx=1e-5, n=2)
 print(f"\nSecond derivative of sin(x) at x=pi/4:")
 print(f"  Numerical:  {d2:.6f}")
 print(f"  Analytical: {-np.sin(x0):.6f}")
 
 # Compare derivatives at multiple points
 x_pts = np.linspace(0, 2*np.pi, 200)
-numerical_d1 = [derivative(g, x, dx=1e-6, n=1) for x in x_pts]
+numerical_d1 = [numerical_derivative(g, x, dx=1e-6, n=1) for x in x_pts]
 
 fig, ax = plt.subplots(figsize=(8, 4))
 ax.plot(x_pts, np.sin(x_pts), "b-", label="sin(x)", linewidth=2)

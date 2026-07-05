@@ -96,7 +96,6 @@ noise = 0.2 * np.random.randn(len(t))
 signal_psd = chirp + tone + noise
 
 # Compute PSD using Welch's method (via scipy.signal)
-from scipy.signal import welnberg_welch as _  # Fallback if unavailable
 # Use manual periodogram if welch not available
 fft_result = sp_fft.fft(signal_psd)
 freqs_full = sp_fft.fftfreq(len(t), 1/fs)
@@ -207,7 +206,7 @@ print("=" * 60)
 from scipy.signal import windows
 
 # Compare different window functions
-window_names = ["hanning", "hamming", "blackman", "kaiser"]
+window_names = ["hann", "hamming", "blackman", "kaiser"]
 N = 256
 
 fig, axes = plt.subplots(2, 2, figsize=(12, 8))
