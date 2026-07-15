@@ -148,7 +148,6 @@ def set_mode(mode: Literal["read", "write", "append"]) -> str:
 
 
 MAX_RETRIES: Final = 3
-TypeAlias = TypeAlias
 Vector: TypeAlias = List[float]
 
 
