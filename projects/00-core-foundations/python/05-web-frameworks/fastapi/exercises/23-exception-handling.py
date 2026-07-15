@@ -14,426 +14,438 @@ Estimated time: 45-60 minutes
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-from typing import Optional, Any
-from enum import Enum
+from fastapi.exceptions import RequestValidationError
+from pydantic import BaseModel, Field
+from typing import Optional
+from datetime import datetime
+import logging
+import traceback
+import time
+import asyncio
+import random
 
 app = FastAPI(title="Exception Handling Exercises")
+
 
 # ============================================================
 # Exercise 23.1: Custom Exception Classes
 # ============================================================
-"""
-Problem:
-    Create a hierarchy of custom exceptions for a banking application.
 
-Exception hierarchy:
-    BankingError (base)
-        InsufficientFundsError(amount, available, required)
-        AccountNotFoundError(account_id)
-        AccountFrozenError(account_id, reason)
-        TransactionLimitError(limit, attempted)
-        AuthenticationError(message)
-        AuthorizationError(action, role)
+class BankingError(Exception):
+    """Base exception for all banking errors."""
+    status_code: int = 500
+    error_code: str = "BANKING_ERROR"
+    message: str = "An unexpected banking error occurred"
 
-Requirements:
-    1. Each exception stores relevant context data
-    2. Each exception has a unique error code
-    3. Each exception has a user-friendly message
-    4. Exceptions include HTTP status codes
+    def __init__(self, message: str = None, **context):
+        self.message = message or self.__class__.message
+        self.context = context
+        super().__init__(self.message)
 
-Exception skeleton:
-    class BankingError(Exception):
-        status_code: int = 500
-        error_code: str = "BANKING_ERROR"
-        message: str = "An unexpected banking error occurred"
+    def __str__(self):
+        return f"[{self.error_code}] {self.message}"
 
-        def __init__(self, message: str = None, **context):
-            self.message = message or self.__class__.message
-            self.context = context
-            super().__init__(self.message)
 
-    class InsufficientFundsError(BankingError):
-        status_code: int = 400
-        error_code: str = "INSUFFICIENT_FUNDS"
-        message: str = "Insufficient funds for this transaction"
+class InsufficientFundsError(BankingError):
+    status_code: int = 400
+    error_code: str = "INSUFFICIENT_FUNDS"
+    message: str = "Insufficient funds for this transaction"
 
-        def __init__(self, amount: float, available: float):
-            self.amount = amount
-            self.available = available
-            self.required = amount - available
-            super().__init__(
-                message=f"Need ${self.required:.2f} more",
-                amount=amount, available=available
-            )
+    def __init__(self, amount: float, available: float):
+        self.amount = amount
+        self.available = available
+        self.required = amount - available
+        super().__init__(
+            message=f"Need ${self.required:.2f} more",
+            amount=amount, available=available, required=self.required
+        )
 
-Hints:
-    - Inherit from Exception for custom exceptions
-    - Override __init__ to store context data
-    - Use class-level attributes for defaults
-    - Include __str__ for readable error messages
-    - Consider using dataclasses for exception data
 
-Test cases:
-    # Insufficient funds
-    raise InsufficientFundsError(amount=100, available=50)
-    -> message: "Need $50.00 more"
-    -> status_code: 400
-    -> error_code: "INSUFFICIENT_FUNDS"
+class AccountNotFoundError(BankingError):
+    status_code: int = 404
+    error_code: str = "ACCOUNT_NOT_FOUND"
+    message: str = "Account not found"
 
-    # Account not found
-    raise AccountNotFoundError(account_id="ACC-123")
-    -> message: "Account ACC-123 not found"
-    -> status_code: 404
+    def __init__(self, account_id: str):
+        self.account_id = account_id
+        super().__init__(message=f"Account {account_id} not found", account_id=account_id)
 
-    # Account frozen
-    raise AccountFrozenError(account_id="ACC-456", reason="Suspicious activity")
-    -> message: "Account ACC-456 is frozen: Suspicious activity"
-    -> status_code: 403
-"""
 
-# TODO: Define your exception classes below
+class AccountFrozenError(BankingError):
+    status_code: int = 403
+    error_code: str = "ACCOUNT_FROZEN"
+    message: str = "Account is frozen"
+
+    def __init__(self, account_id: str, reason: str):
+        self.account_id = account_id
+        self.reason = reason
+        super().__init__(
+            message=f"Account {account_id} is frozen: {reason}",
+            account_id=account_id, reason=reason
+        )
+
+
+class TransactionLimitError(BankingError):
+    status_code: int = 400
+    error_code: str = "TRANSACTION_LIMIT"
+    message: str = "Transaction exceeds limit"
+
+    def __init__(self, limit: float, attempted: float):
+        self.limit = limit
+        self.attempted = attempted
+        super().__init__(
+            message=f"Transaction ${attempted:.2f} exceeds limit of ${limit:.2f}",
+            limit=limit, attempted=attempted
+        )
+
+
+class AuthenticationError(BankingError):
+    status_code: int = 401
+    error_code: str = "AUTHENTICATION_ERROR"
+    message: str = "Authentication failed"
+
+    def __init__(self, message: str = None):
+        super().__init__(message=message or "Authentication failed")
+
+
+class AuthorizationError(BankingError):
+    status_code: int = 403
+    error_code: str = "AUTHORIZATION_ERROR"
+    message: str = "Not authorized"
+
+    def __init__(self, action: str, role: str):
+        self.action = action
+        self.role = role
+        super().__init__(
+            message=f"Role '{role}' cannot perform '{action}'",
+            action=action, role=role
+        )
 
 
 # ============================================================
 # Exercise 23.2: Exception Handler Registration
 # ============================================================
-"""
-Problem:
-    Register global exception handlers for your custom exceptions.
 
-Requirements:
-    1. Register handlers for each custom exception
-    2. Return consistent JSON error responses
-    3. Include error codes for client-side handling
-    4. Log errors with appropriate severity
-    5. Handle unexpected exceptions gracefully
-
-Error response format:
-    {
-        "error": {
-            "code": "INSUFFICIENT_FUNDS",
-            "message": "Need $50.00 more",
-            "details": {
-                "amount": 100,
-                "available": 50,
-                "required": 50
-            },
-            "status": 400,
-            "timestamp": "2024-01-15T10:30:00Z",
-            "request_id": "req-abc-123"
-        }
-    }
-
-Handler registration:
-    @app.exception_handler(BankingError)
-    async def banking_error_handler(request: Request, exc: BankingError):
-        return JSONResponse(
-            status_code=exc.status_code,
-            content={
-                "error": {
-                    "code": exc.error_code,
-                    "message": exc.message,
-                    "details": exc.context,
-                    "status": exc.status_code,
-                }
+@app.exception_handler(BankingError)
+async def banking_error_handler(request: Request, exc: BankingError):
+    """Handle all BankingError subclasses with a consistent format."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": {
+                "code": exc.error_code,
+                "message": exc.message,
+                "details": exc.context,
+                "status": exc.status_code,
+                "timestamp": datetime.utcnow().isoformat(),
+                "request_id": request.headers.get("x-request-id", "unknown"),
             }
-        )
-
-    @app.exception_handler(Exception)
-    async def generic_error_handler(request: Request, exc: Exception):
-        # Log the full error for debugging
-        # Return a generic message to the client
-        pass
-
-Hints:
-    - Use @app.exception_handler(ExceptionClass) decorator
-    - Return JSONResponse with appropriate status_code
-    - Use datetime.utcnow().isoformat() for timestamps
-    - For generic errors, log exc details but don't expose internals
-    - Consider adding request ID middleware for tracing
-
-Test cases:
-    # Custom exception returns formatted error
-    GET /bank/withdraw
-    -> 400 {
-        "error": {
-            "code": "INSUFFICIENT_FUNDS",
-            "message": "Need $50.00 more",
-            "details": {"amount": 100, "available": 50},
-            "status": 400
         }
-    }
+    )
 
-    # Generic exception returns safe error
-    GET /bank/crash
-    -> 500 {
-        "error": {
-            "code": "INTERNAL_ERROR",
-            "message": "An unexpected error occurred",
-            "status": 500
+
+@app.exception_handler(Exception)
+async def generic_error_handler(request: Request, exc: Exception):
+    """Handle unexpected exceptions gracefully without exposing internals."""
+    # Log full error for debugging
+    print(f"[CRITICAL] Unhandled exception: {type(exc).__name__}: {exc}")
+    traceback.print_exc()
+
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": {
+                "code": "INTERNAL_ERROR",
+                "message": "An unexpected error occurred",
+                "status": 500,
+                "timestamp": datetime.utcnow().isoformat(),
+            }
         }
-    }
-"""
-
-# TODO: Register your exception handlers below
+    )
 
 
 # ============================================================
 # Exercise 23.3: Validation Error Formatting
 # ============================================================
-"""
-Problem:
-    Customize Pydantic validation error responses.
 
-Default Pydantic errors look like:
-    {"detail": [{"loc": ["body", "field"], "msg": "...", "type": "..."}]}
+class UserRegistration(BaseModel):
+    username: str = Field(..., min_length=3, pattern=r"^[a-zA-Z0-9_]+$")
+    email: str = Field(..., pattern=r"^[\w\.-]+@[\w\.-]+\.\w+$")
+    age: int = Field(..., ge=0, le=150)
+    password: str = Field(..., min_length=8)
+    bio: Optional[str] = Field(None, max_length=500)
 
-Create a better format:
-    {
-        "error": {
-            "code": "VALIDATION_ERROR",
-            "message": "Request validation failed",
-            "status": 422,
-            "fields": {
-                "email": "Invalid email format",
-                "age": "Must be between 0 and 150",
-                "name": "Field required"
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, exc: RequestValidationError):
+    """Custom validation error handler with user-friendly field messages."""
+    errors = {}
+    for error in exc.errors():
+        # Extract field name from loc tuple
+        field_parts = [str(loc) for loc in error["loc"] if loc not in ("body", "query", "path", "header")]
+        field = ".".join(field_parts) if field_parts else str(error["loc"][-1])
+
+        # Convert error type to user-friendly message
+        error_type = error.get("type", "")
+        msg = error.get("msg", "Invalid value")
+
+        errors[field] = msg
+
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error": {
+                "code": "VALIDATION_ERROR",
+                "message": "Request validation failed",
+                "fields": errors,
+                "status": 422,
+                "timestamp": datetime.utcnow().isoformat(),
             }
         }
-    }
+    )
 
-Requirements:
-    1. Catch RequestValidationError (from fastapi.exceptions)
-    2. Convert field errors to user-friendly messages
-    3. Group errors by field name
-    4. Handle both body and query param errors
-    5. Handle missing fields gracefully
 
-Request model for testing:
-    class UserRegistration(BaseModel):
-        username: str          # min 3 chars, alphanumeric
-        email: str             # valid email format
-        age: int               # 0-150
-        password: str          # min 8 chars
-        bio: Optional[str] = None  # max 500 chars
-
-Handler:
-    from fastapi.exceptions import RequestValidationError
-
-    @app.exception_handler(RequestValidationError)
-    async def validation_error_handler(request: Request, exc: RequestValidationError):
-        errors = {}
-        for error in exc.errors():
-            field = " -> ".join(str(loc) for loc in error["loc"])
-            message = error["msg"]
-            # Simplify field name (remove "body." prefix)
-            field = field.replace("body.", "")
-            errors[field] = message
-        return JSONResponse(
-            status_code=422,
-            content={
-                "error": {
-                    "code": "VALIDATION_ERROR",
-                    "message": "Request validation failed",
-                    "fields": errors,
-                    "status": 422
-                }
-            }
-        )
-
-Hints:
-    - from fastapi.exceptions import RequestValidationError
-    - exc.errors() returns list of error dicts
-    - Each error has: loc, msg, type, ctx (optional)
-    - loc is a tuple like ("body", "field") or ("query", "param")
-    - Use error["type"] to create contextual messages
-
-Test cases:
-    # Missing required fields
-    POST /users/register {}
-    -> 422 {
-        "error": {
-            "code": "VALIDATION_ERROR",
-            "fields": {
-                "username": "Field required",
-                "email": "Field required",
-                "age": "Field required",
-                "password": "Field required"
-            }
+@app.post("/users/register")
+async def register_user(user: UserRegistration):
+    """Register a new user with validation."""
+    return {
+        "message": "User registered successfully",
+        "user": {
+            "username": user.username,
+            "email": user.email,
+            "age": user.age,
         }
     }
-
-    # Invalid field values
-    POST /users/register {"username": "ab", "email": "bad", "age": -5, "password": "short"}
-    -> 422 {
-        "error": {
-            "fields": {
-                "username": "String should have at least 3 characters",
-                "email": "Invalid email format",
-                "age": "Must be between 0 and 150",
-                "password": "String should have at least 8 characters"
-            }
-        }
-    }
-"""
-
-# TODO: Register validation error handler below
-# TODO: Create the UserRegistration model
 
 
 # ============================================================
 # Exercise 23.4: Error Recovery Patterns
 # ============================================================
-"""
-Problem:
-    Implement error recovery patterns for common failure scenarios.
 
-Patterns to implement:
+# --- Retry with Fallback ---
+async def unstable_operation() -> dict:
+    """Simulate an operation that fails 60% of the time."""
+    await asyncio.sleep(0.1)
+    if random.random() < 0.6:
+        raise ConnectionError("Service temporarily unavailable")
+    return {"status": "success", "data": "Operation completed"}
 
-    1. Retry with fallback:
-       - Try operation up to N times
-       - On failure, try fallback operation
-       - Return best available result
 
-    2. Circuit breaker:
-       - Track failure counts per service
-       - Open circuit after N failures
-       - Reset after timeout
-       - Return degraded response when open
+async def fallback_operation() -> dict:
+    """Fallback that always succeeds."""
+    await asyncio.sleep(0.2)
+    return {"status": "fallback", "data": "Fallback data used"}
 
-    3. Graceful degradation:
-       - Try best quality response
-       - Fall back to cached response
-       - Fall back to default response
-       - Never fail completely
 
-Endpoints:
-    GET /resilient/data         - Uses retry pattern
-    GET /resilient/circuit      - Uses circuit breaker
-    GET /resilient/degraded     - Uses graceful degradation
+@app.get("/resilient/retry")
+async def retry_with_fallback():
+    """Try operation up to 3 times, then use fallback."""
+    max_retries = 3
+    last_error = None
 
-Circuit breaker skeleton:
-    class CircuitBreaker:
-        def __init__(self, failure_threshold: int = 5, reset_timeout: int = 60):
-            self.failure_count = 0
-            self.failure_threshold = failure_threshold
-            self.reset_timeout = reset_timeout
-            self.last_failure_time = None
-            self.state = "closed"  # closed, open, half-open
+    for attempt in range(max_retries):
+        try:
+            result = await unstable_operation()
+            return {**result, "attempts": attempt + 1, "strategy": "primary"}
+        except Exception as e:
+            last_error = str(e)
+            await asyncio.sleep(0.1 * (attempt + 1))  # Exponential backoff
 
-        async def call(self, func, *args, **kwargs):
-            if self.state == "open":
-                if time.time() - self.last_failure_time > self.reset_timeout:
-                    self.state = "half-open"
-                else:
-                    raise HTTPException(503, "Service temporarily unavailable")
-            try:
-                result = await func(*args, **kwargs)
-                if self.state == "half-open":
-                    self.state = "closed"
-                    self.failure_count = 0
-                return result
-            except Exception as e:
-                self.failure_count += 1
-                self.last_failure_time = time.time()
-                if self.failure_count >= self.failure_threshold:
-                    self.state = "open"
-                raise
+    # Fallback
+    fallback = await fallback_operation()
+    return {**fallback, "error": last_error, "attempts": max_retries, "strategy": "fallback"}
 
-Hints:
-    - Use asyncio.sleep() for retry delays
-    - Use time.time() for circuit breaker timing
-    - Cache responses with TTL (time-to-live)
-    - Log state transitions for debugging
-    - Consider using tenacity library for production retry logic
 
-Test cases:
-    # Retry succeeds after transient failure
-    GET /resilient/data
-    -> 200 {"data": "...", "retries": 2}
+# --- Circuit Breaker ---
+class CircuitBreaker:
+    """Simple circuit breaker pattern implementation."""
 
-    # Circuit breaker opens after failures
-    (trigger 5 failures)
-    GET /resilient/circuit
-    -> 503 {"detail": "Service temporarily unavailable", "circuit_state": "open"}
+    def __init__(self, failure_threshold: int = 3, reset_timeout: int = 30):
+        self.failure_count = 0
+        self.failure_threshold = failure_threshold
+        self.reset_timeout = reset_timeout
+        self.last_failure_time: Optional[float] = None
+        self.state = "closed"  # closed, open, half-open
 
-    # Graceful degradation returns cached data
-    GET /resilient/degraded
-    (with service down)
-    -> 200 {"data": "cached", "quality": "degraded", "source": "cache"}
-"""
+    async def call(self, func, *args, **kwargs):
+        now = time.time()
 
-# TODO: Write resilience patterns below
+        if self.state == "open":
+            if self.last_failure_time and (now - self.last_failure_time) > self.reset_timeout:
+                self.state = "half-open"
+                print(f"[CircuitBreaker] State: closed -> half-open (timeout elapsed)")
+            else:
+                raise HTTPException(
+                    status_code=503,
+                    detail={
+                        "message": "Service temporarily unavailable",
+                        "circuit_state": "open",
+                        "retry_after_seconds": int(self.reset_timeout - (now - self.last_failure_time)) if self.last_failure_time else self.reset_timeout
+                    }
+                )
+
+        try:
+            result = await func(*args, **kwargs)
+            if self.state == "half-open":
+                self.state = "closed"
+                self.failure_count = 0
+                print(f"[CircuitBreaker] State: half-open -> closed (success)")
+            return result
+        except Exception as e:
+            self.failure_count += 1
+            self.last_failure_time = time.time()
+            if self.failure_count >= self.failure_threshold:
+                self.state = "open"
+                print(f"[CircuitBreaker] State: closed -> open (failures: {self.failure_count})")
+            raise
+
+
+circuit_breaker = CircuitBreaker(failure_threshold=3, reset_timeout=30)
+
+
+async def fragile_service() -> dict:
+    """Simulate a service that fails frequently."""
+    await asyncio.sleep(0.1)
+    if random.random() < 0.7:  # 70% failure rate
+        raise RuntimeError("Service failure")
+    return {"status": "ok", "data": "from fragile service"}
+
+
+@app.get("/resilient/circuit")
+async def circuit_breaker_endpoint():
+    """Endpoint protected by circuit breaker."""
+    try:
+        result = await circuit_breaker.call(fragile_service)
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# --- Graceful Degradation ---
+cache_store: dict = {}
+
+
+def get_cached_response(key: str) -> Optional[dict]:
+    """Get cached response if available and not expired."""
+    cached = cache_store.get(key)
+    if cached:
+        if time.time() < cached.get("expires_at", 0):
+            return cached["data"]
+    return None
+
+
+def set_cached_response(key: str, data: dict, ttl: int = 60):
+    """Cache a response with TTL."""
+    cache_store[key] = {
+        "data": data,
+        "expires_at": time.time() + ttl
+    }
+
+
+@app.get("/resilient/degraded")
+async def graceful_degradation():
+    """Try best quality, fall back to cache, then default."""
+    cache_key = "resilient_data"
+
+    # Try primary source
+    try:
+        result = await unstable_operation()
+        set_cached_response(cache_key, result)
+        return {**result, "quality": "full", "source": "primary"}
+    except Exception:
+        pass
+
+    # Try cache
+    cached = get_cached_response(cache_key)
+    if cached:
+        return {**cached, "quality": "degraded", "source": "cache"}
+
+    # Default response
+    return {
+        "status": "default",
+        "data": "Default fallback data",
+        "quality": "minimal",
+        "source": "default"
+    }
 
 
 # ============================================================
 # Exercise 23.5: Structured Error Logging
 # ============================================================
-"""
-Problem:
-    Implement structured error logging with context.
 
-Requirements:
-    1. Create a structured logger for API errors
-    2. Include request context (path, method, client IP)
-    3. Include user context (authenticated user ID)
-    4. Include error context (stack trace, custom data)
-    5. Different log levels for different error types
+# Configure structured logger
+logger = logging.getLogger("api.errors")
+logger.setLevel(logging.DEBUG)
 
-Logger skeleton:
-    import logging
-    import traceback
+# Add console handler with formatting
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter(
+    '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+)
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
 
-    logger = logging.getLogger("api.errors")
 
-    def log_error(
-        error: Exception,
-        request: Request,
-        user_id: str = None,
-        extra_context: dict = None
-    ):
-        log_data = {
-            "error_type": type(error).__name__,
-            "error_message": str(error),
-            "path": request.url.path,
-            "method": request.method,
-            "client_ip": request.client.host,
-            "user_id": user_id,
-            "traceback": traceback.format_exc(),
-            **(extra_context or {})
-        }
-        logger.error("API Error", extra={"data": log_data})
+def log_error(
+    error: Exception,
+    request: Request = None,
+    user_id: str = None,
+    extra_context: dict = None
+) -> dict:
+    """Create structured error log entry with context."""
+    log_data = {
+        "error_type": type(error).__name__,
+        "error_message": str(error),
+        "path": request.url.path if request else "unknown",
+        "method": request.method if request else "unknown",
+        "client_ip": request.client.host if request and request.client else "unknown",
+        "user_id": user_id or "anonymous",
+        "timestamp": datetime.utcnow().isoformat(),
+        **(extra_context or {})
+    }
+    return log_data
 
-Log levels:
-    - DEBUG: Validation errors (expected)
-    - WARNING: Business logic errors (insufficient funds)
-    - ERROR: Unexpected errors (system failures)
-    - CRITICAL: Security errors (authentication bypass attempts)
 
-Endpoints:
-    GET /test/validation  - Returns validation error (DEBUG level)
-    GET /test/business    - Returns business error (WARNING level)
-    GET /test/system      - Returns system error (ERROR level)
-    GET /test/security    - Returns security error (CRITICAL level)
+@app.get("/test/validation")
+async def test_validation(field: str = "default"):
+    """Returns a validation error (logged at DEBUG level)."""
+    if field == "bad":
+        error = ValueError("Invalid field value")
+        data = log_error(error, extra_context={"field": field})
+        logger.debug(f"Validation error: {data}")
+        raise HTTPException(status_code=400, detail=str(error))
+    return {"field": field, "status": "valid"}
 
-Hints:
-    - Use Python's logging module
-    - Use extra={} to attach custom data to log records
-    - Use json.dumps() for structured log output
-    - Consider using structlog library for production
-    - Log correlation IDs for request tracing
 
-Test cases:
-    # Validation error logged at DEBUG
-    GET /test/validation?field=bad
-    -> 400 (response)
-    Log: DEBUG validation error, field=bad
+@app.get("/test/business")
+async def test_business(account: str = "ACC-001"):
+    """Returns a business logic error (logged at WARNING level)."""
+    error = InsufficientFundsError(amount=100, available=30)
+    data = log_error(error, extra_context={"account": account})
+    logger.warning(f"Business error: {data}")
+    raise error
 
-    # Security error logged at CRITICAL
-    GET /test/security?token=invalid
-    -> 401 (response)
-    Log: CRITICAL security error, token=invalid
-"""
 
-# TODO: Write structured logging code below
+@app.get("/test/system")
+async def test_system():
+    """Returns a system error (logged at ERROR level)."""
+    try:
+        raise RuntimeError("Database connection pool exhausted")
+    except Exception as e:
+        data = log_error(e, extra_context={"db_pool_size": 10, "active_connections": 10})
+        logger.error(f"System error: {data}")
+        raise HTTPException(status_code=500, detail="Internal system error")
+
+
+@app.get("/test/security")
+async def test_security(token: str = Header(default="")):
+    """Returns a security error (logged at CRITICAL level)."""
+    if not token or token == "invalid":
+        error = AuthenticationError("Invalid authentication token")
+        data = log_error(error, extra_context={"token_preview": token[:10] + "..." if token else "empty"})
+        logger.critical(f"Security error: {data}")
+        raise error
+    return {"status": "authenticated", "token_valid": True}

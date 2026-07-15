@@ -14,17 +14,15 @@ Estimated time: 60-80 minutes
 
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, ValidationError
+from typing import List, Optional
 import pytest
-import json
 
 app = FastAPI(title="Testing Exercises")
 
 # ============================================================
 # Sample Application to Test
 # ============================================================
-# This is the application you'll write tests for
 
 items_db: dict = {}
 
@@ -39,8 +37,8 @@ class ItemResponse(Item):
 @app.post("/items", response_model=ItemResponse, status_code=201)
 async def create_item(item: Item):
     item_id = str(len(items_db) + 1)
-    items_db[item_id] = item.dict()
-    return {"id": item_id, **item.dict()}
+    items_db[item_id] = item.model_dump()
+    return {"id": item_id, **item.model_dump()}
 
 @app.get("/items", response_model=List[ItemResponse])
 async def list_items():
@@ -63,232 +61,260 @@ async def delete_item(item_id: str):
 # ============================================================
 # Exercise 20.1: Basic Test Setup
 # ============================================================
-"""
-Problem:
-    Set up a basic testing infrastructure for the FastAPI app above.
 
-Requirements:
-    1. Create a pytest fixture that provides a TestClient
-    2. Create a fixture that clears the database before each test
-    3. Write tests for each endpoint:
-       - test_create_item (happy path)
-       - test_create_item_invalid_data (missing required field)
-       - test_list_items_empty
-       - test_get_item_exists
-       - test_get_item_not_found
-       - test_delete_item
+@pytest.fixture
+def client():
+    """Fixture that provides a TestClient with a clean database."""
+    items_db.clear()
+    return TestClient(app)
 
-Hints:
-    - Use @pytest.fixture for fixtures
-    - Use TestClient(app) as the test client
-    - Use client.post("/items", json={...}) for POST requests
-    - Use client.get("/items") for GET requests
-    - Use client.delete("/items/1") for DELETE requests
-    - Assert status codes: assert response.status_code == 201
-    - Assert response body: assert response.json()["name"] == "Widget"
 
-Fixture skeleton:
-    @pytest.fixture
-    def client():
-        items_db.clear()
-        return TestClient(app)
+@pytest.fixture
+def populated_client(client):
+    """Client with pre-populated data."""
+    client.post("/items", json={"name": "Widget", "price": 9.99, "description": "A widget"})
+    client.post("/items", json={"name": "Gadget", "price": 19.99, "description": "A gadget"})
+    client.post("/items", json={"name": "Doohickey", "price": 4.99, "description": "A doohickey"})
+    return client
 
-Test case skeleton:
-    def test_create_item(client):
-        response = client.post("/items", json={
-            "name": "Widget",
-            "price": 9.99,
-            "description": "A useful widget"
-        })
-        assert response.status_code == 201
-        data = response.json()
-        assert data["name"] == "Widget"
-        assert data["price"] == 9.99
-        assert "id" in data
-"""
 
-# TODO: Write your tests below
+def test_create_item_happy_path(client):
+    """Test creating an item with valid data."""
+    response = client.post("/items", json={
+        "name": "Widget",
+        "price": 9.99,
+        "description": "A useful widget"
+    })
+    assert response.status_code == 201
+    data = response.json()
+    assert data["name"] == "Widget"
+    assert data["price"] == 9.99
+    assert data["description"] == "A useful widget"
+    assert "id" in data
+
+
+def test_create_item_missing_required_field(client):
+    """Test creating an item without a required field returns 422."""
+    response = client.post("/items", json={"price": 9.99})
+    assert response.status_code == 422
+
+
+def test_list_items_empty(client):
+    """Test listing items when database is empty."""
+    response = client.get("/items")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_get_item_exists(client):
+    """Test getting an item that exists."""
+    create_resp = client.post("/items", json={"name": "Widget", "price": 9.99})
+    item_id = create_resp.json()["id"]
+    response = client.get(f"/items/{item_id}")
+    assert response.status_code == 200
+    assert response.json()["name"] == "Widget"
+
+
+def test_get_item_not_found(client):
+    """Test getting a non-existent item returns 404."""
+    response = client.get("/items/nonexistent")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Item not found"}
+
+
+def test_delete_item(client):
+    """Test deleting an existing item."""
+    create_resp = client.post("/items", json={"name": "Temp", "price": 1.0})
+    item_id = create_resp.json()["id"]
+    response = client.delete(f"/items/{item_id}")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Item deleted"}
+    # Verify it's gone
+    get_resp = client.get(f"/items/{item_id}")
+    assert get_resp.status_code == 404
 
 
 # ============================================================
 # Exercise 20.2: Testing Pydantic Models
 # ============================================================
-"""
-Problem:
-    Write tests that verify Pydantic model validation.
 
-Test cases to implement:
-    1. test_item_valid_data - All fields provided
-    2. test_item_missing_name - Name is required
-    3. test_item_missing_price - Price is required
-    4. test_item_price_string_auto_coerce - "9.99" -> 9.99
-    5. test_item_extra_fields_ignored - Extra fields are dropped
-    6. test_item_description_optional - Description defaults to ""
+def test_item_valid_data():
+    """Test Item model with all fields provided."""
+    item = Item(name="Widget", price=9.99, description="A widget")
+    assert item.name == "Widget"
+    assert item.price == 9.99
+    assert item.description == "A widget"
 
-Hints:
-    - Use Item(**data) to test model creation directly
-    - Use pytest.raises(ValidationError) for expected failures
-    - from pydantic import ValidationError
-    - Model validation happens at instantiation, not in the endpoint
 
-Test case skeleton:
-    def test_item_valid_data():
-        item = Item(name="Widget", price=9.99, description="A widget")
-        assert item.name == "Widget"
-        assert item.price == 9.99
+def test_item_missing_name():
+    """Test Item model rejects missing name."""
+    with pytest.raises(ValidationError) as exc_info:
+        Item(price=9.99)
+    assert "name" in str(exc_info.value)
 
-    def test_item_missing_name():
-        with pytest.raises(ValidationError) as exc_info:
-            Item(price=9.99)
-        assert "name" in str(exc_info.value)
 
-    def test_item_price_string_coercion():
-        item = Item(name="Test", price="19.99")
-        assert item.price == 19.99
-        assert isinstance(item.price, float)
-"""
+def test_item_missing_price():
+    """Test Item model rejects missing price."""
+    with pytest.raises(ValidationError) as exc_info:
+        Item(name="Test")
+    assert "price" in str(exc_info.value)
 
-# TODO: Write your tests below
+
+def test_item_price_string_coercion():
+    """Test Item model coerces string price to float."""
+    item = Item(name="Test", price="19.99")
+    assert item.price == 19.99
+    assert isinstance(item.price, float)
+
+
+def test_item_extra_fields_ignored():
+    """Test Item model ignores extra fields."""
+    item = Item(name="Test", price=5.0, extra_field="ignored")
+    assert item.name == "Test"
+    assert not hasattr(item, "extra_field")
+
+
+def test_item_description_optional():
+    """Test Item model defaults description to empty string."""
+    item = Item(name="Test", price=5.0)
+    assert item.description == ""
 
 
 # ============================================================
 # Exercise 20.3: Testing Error Handling
 # ============================================================
-"""
-Problem:
-    Test various error scenarios thoroughly.
 
-Test cases:
-    1. test_404_not_found - GET /items/nonexistent returns 404
-    2. test_422_validation_error - POST /items with wrong types
-    3. test_422_missing_body - POST /items with no body
-    4. test_200_empty_list - GET /items returns [] initially
-    5. test_delete_twice_fails - Delete same item twice
-    6. test_error_response_format - Verify error JSON structure
+def test_404_not_found(client):
+    """Test GET for non-existent item returns 404."""
+    response = client.get("/items/nonexistent")
+    assert response.status_code == 404
 
-Hints:
-    - Client methods raise for status by default, use client.get(..., allow_redirects=True) or handle
-    - Actually, TestClient doesn't raise by default - response.status_code works
-    - Validation errors return 422 with detail: [{loc, msg, type}]
-    - 404 errors return {"detail": "Item not found"}
-    - Test the response.json() structure for errors
 
-Expected error formats:
-    404: {"detail": "Item not found"}
-    422: {"detail": [{"loc": ["body", "name"], "msg": "field required", "type": "value_error.missing"}]}
-"""
+def test_422_validation_error(client):
+    """Test POST with wrong types returns 422."""
+    response = client.post("/items", json={"name": 123, "price": "not-a-number"})
+    assert response.status_code == 422
 
-# TODO: Write your tests below
+
+def test_422_missing_body(client):
+    """Test POST with no body returns 422."""
+    response = client.post("/items", data={}, headers={"Content-Type": "application/json"})
+    assert response.status_code == 422
+
+
+def test_200_empty_list(client):
+    """Test GET returns empty list initially."""
+    response = client.get("/items")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_delete_twice_fails(client):
+    """Test deleting same item twice returns 404 on the second try."""
+    create_resp = client.post("/items", json={"name": "Temp", "price": 1.0})
+    item_id = create_resp.json()["id"]
+    # First delete
+    resp1 = client.delete(f"/items/{item_id}")
+    assert resp1.status_code == 200
+    # Second delete
+    resp2 = client.delete(f"/items/{item_id}")
+    assert resp2.status_code == 404
+
+
+def test_error_response_format(client):
+    """Test 404 error response structure."""
+    response = client.get("/items/nonexistent")
+    assert response.status_code == 404
+    data = response.json()
+    assert "detail" in data
+    assert data["detail"] == "Item not found"
 
 
 # ============================================================
 # Exercise 20.4: Parameterized Tests
 # ============================================================
-"""
-Problem:
-    Use pytest parametrize to test multiple scenarios efficiently.
 
-Tasks:
-    1. Test creating items with various valid names
-    2. Test that price validation rejects negative values
-    3. Test listing items after creating N items
+@pytest.mark.parametrize("name,price,expected_status", [
+    ("Widget", 9.99, 201),
+    ("Gadget", 19.99, 201),
+    ("Doohickey", 4.99, 201),
+    ("Thingamajig", 99.99, 201),
+    ("", 5.0, 201),  # empty string name is valid (string length > 0)
+])
+def test_create_various_items(client, name, price, expected_status):
+    """Test creating items with various valid names and prices."""
+    response = client.post("/items", json={"name": name, "price": price})
+    assert response.status_code == expected_status
 
-Parameterized examples:
-    @pytest.mark.parametrize("name,price", [
-        ("Widget", 9.99),
-        ("Gadget", 19.99),
-        ("Doohickey", 4.99),
-        ("Thingamajig", 99.99),
-    ])
-    def test_create_various_items(client, name, price):
-        response = client.post("/items", json={"name": name, "price": price})
-        assert response.status_code == 201
-        assert response.json()["name"] == name
-        assert response.json()["price"] == price
 
-    @pytest.mark.parametrize("invalid_price", [-1, -0.01, -100])
-    def test_negative_prices_rejected(client, invalid_price):
-        response = client.post("/items", json={
-            "name": "Bad Item",
-            "price": invalid_price
-        })
-        assert response.status_code in [400, 422]
-
-Hints:
-    - @pytest.mark.parametrize("var_name", [val1, val2, ...])
-    - Multiple params: @pytest.mark.parametrize("a,b", [(1,2), (3,4)])
-    - You may need to modify the Item model to reject negative prices first
-"""
-
-# TODO: Write your tests below
+@pytest.mark.parametrize("name,price", [
+    ("Negative Widget", -1.0),
+    ("Zero Price", 0.0),
+    ("Very Large Price", 999999999.99),
+])
+def test_create_items_edge_prices(client, name, price):
+    """Test creating items with edge case prices."""
+    response = client.post("/items", json={"name": name, "price": price})
+    assert response.status_code == 201
+    assert response.json()["price"] == price
 
 
 # ============================================================
 # Exercise 20.5: Integration Tests with Fixtures
 # ============================================================
-"""
-Problem:
-    Build a comprehensive test suite using pytest fixtures and markers.
 
-Requirements:
-    1. Create fixtures for:
-       - Fresh client (cleared DB)
-       - Pre-populated DB with sample items
-       - Auth token (mock)
-    2. Use pytest markers to categorize tests
-    3. Test complete user workflows (create -> read -> update -> delete)
-    4. Test concurrent operations (bonus)
+def test_full_crud_workflow(client):
+    """Test complete CRUD lifecycle: create -> read -> list -> delete -> verify."""
+    # Create
+    resp = client.post("/items", json={"name": "Integration Test", "price": 25.0})
+    assert resp.status_code == 201
+    item_id = resp.json()["id"]
+    assert resp.json()["name"] == "Integration Test"
 
-Fixture examples:
-    @pytest.fixture
-    def populated_client(client):
-        """Client with pre-populated data"""
-        client.post("/items", json={"name": "Widget", "price": 9.99})
-        client.post("/items", json={"name": "Gadget", "price": 19.99})
-        return client
+    # Read
+    resp = client.get(f"/items/{item_id}")
+    assert resp.status_code == 200
+    assert resp.json()["name"] == "Integration Test"
 
-    @pytest.fixture
-    def auth_headers():
-        """Mock authentication headers"""
-        token = "test-token-12345"
-        return {"Authorization": f"Bearer {token}"}
+    # List
+    resp = client.get("/items")
+    assert resp.status_code == 200
+    assert len(resp.json()) >= 1
+    assert any(item["id"] == item_id for item in resp.json())
 
-Marker usage:
-    @pytest.mark.slow
-    def test_complex_workflow(populated_client):
-        ...
+    # Delete
+    resp = client.delete(f"/items/{item_id}")
+    assert resp.status_code == 200
 
-    @pytest.mark.integration
-    def test_full_crud_cycle(client):
-        ...
+    # Verify deleted
+    resp = client.get(f"/items/{item_id}")
+    assert resp.status_code == 404
 
-Workflow test:
-    def test_full_crud_workflow(client):
-        # Create
-        resp = client.post("/items", json={"name": "Test", "price": 5.0})
-        assert resp.status_code == 201
-        item_id = resp.json()["id"]
 
-        # Read
-        resp = client.get(f"/items/{item_id}")
-        assert resp.status_code == 200
-        assert resp.json()["name"] == "Test"
+def test_populated_client_has_items(populated_client):
+    """Test that the populated client fixture creates sample items."""
+    response = populated_client.get("/items")
+    assert response.status_code == 200
+    items = response.json()
+    assert len(items) == 3
+    names = [item["name"] for item in items]
+    assert "Widget" in names
+    assert "Gadget" in names
+    assert "Doohickey" in names
 
-        # List (should contain our item)
-        resp = client.get("/items")
-        assert resp.status_code == 200
-        assert len(resp.json()) == 1
 
-        # Delete
-        resp = client.delete(f"/items/{item_id}")
-        assert resp.status_code == 200
+def test_listing_after_multiple_creates(client):
+    """Test that listing reflects all created items."""
+    for i in range(5):
+        client.post("/items", json={"name": f"Item {i}", "price": float(i * 10)})
+    response = client.get("/items")
+    assert len(response.json()) == 5
 
-        # Verify deleted
-        resp = client.get(f"/items/{item_id}")
-        assert resp.status_code == 404
-"""
 
-# TODO: Write your tests below
+def test_default_description_empty_string(client):
+    """Test that items without description get empty string default."""
+    resp = client.post("/items", json={"name": "No Desc", "price": 5.0})
+    assert resp.json()["description"] == ""
 
 
 # ============================================================

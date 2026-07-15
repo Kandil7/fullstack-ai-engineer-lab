@@ -3,197 +3,171 @@ FastAPI Exercise 03 - Path Parameters
 ======================================
 
 Topics covered:
-- Defining path parameters
-- Type conversion (int, float, str, bool, uuid)
-- Path parameter validation
-- Using Pydantic models for complex paths
+- Path parameter types and validation
+- Built-in validators (Path, int, float)
+- Multiple path parameters
+- Enum path parameters
 
 Requirements:
-    pip install fastapi uvicorn pydantic
+    pip install fastapi uvicorn
 
-Run any exercise:
-    uvicorn 03-path-parameters:app1 --reload
-    uvicorn 03-path-parameters:app2 --reload
-    uvicorn 03-path-parameters:app3 --reload
+Run:
+    uvicorn 03-path-parameters:app --reload
 """
 
-from fastapi import FastAPI, Path
-from pydantic import BaseModel
-from uuid import UUID
+from enum import Enum
+from fastapi import FastAPI, HTTPException, Path
+
+app = FastAPI(title="Path Parameters Exercise")
 
 
 # =============================================================================
 # Exercise 1: Basic Path Parameters
 # =============================================================================
-# Create an app with these routes:
-#   GET /users/{user_id}          -> {"user_id": <int>, "type": "regular"}
-#   GET /products/{product_id}    -> {"product_id": <int>, "type": "product"}
-#   GET /greetings/{name}         -> {"greeting": "Hello, {name}!"}
-#   GET /prices/{price}           -> {"price": <float>, "formatted": "$<price>"}
+# Create endpoints that use path parameters with different types:
+#   GET /users/{user_id}       -> {"user_id": user_id, "type": "regular"}
+#   GET /products/{product_id} -> {"product_id": product_id, "type": "product"}
+#   GET /hello/{name}          -> {"greeting": f"Hello, {name}!"}
+#   GET /price/{price}         -> {"price": price, "formatted": f"${price}"}
 #
 # Hints:
-#   - Type hints convert path params: user_id: int
-#   - If conversion fails, FastAPI returns 422 error automatically
-#   - Use f-strings for formatted responses
-#
-# Expected behavior:
-#   GET /users/123       -> {"user_id": 123, "type": "regular"}
-#   GET /products/456    -> {"product_id": 456, "type": "product"}
-#   GET /greetings/Alice -> {"greeting": "Hello, Alice!"}
-#   GET /prices/19.99    -> {"price": 19.99, "formatted": "$19.99"}
-#
-# Test with:
-#   curl http://localhost:8000/users/123
-#   curl http://localhost:8000/products/456
-#   curl http://localhost:8000/greetings/Alice
-#   curl http://localhost:8000/prices/19.99
+#   - Path parameters are defined in the route path with {param_name}
+#   - FastAPI automatically converts to the declared type
+#   - Use type hints: int, str, float
 # =============================================================================
 
-app1 = FastAPI(title="Exercise 3.1 - Basic Path Parameters")
 
-
-@app1.get("/users/{user_id}")
+@app.get("/users/{user_id}")
 def get_user(user_id: int):
-    pass  # TODO: Return {"user_id": user_id, "type": "regular"}
+    """Return user info based on path parameter."""
+    return {"user_id": user_id, "type": "regular"}
 
 
-@app1.get("/products/{product_id}")
+@app.get("/products/{product_id}")
 def get_product(product_id: int):
-    pass  # TODO: Return {"product_id": product_id, "type": "product"}
+    """Return product info based on path parameter."""
+    return {"product_id": product_id, "type": "product"}
 
 
-@app1.get("/greetings/{name}")
-def greet(name: str):
-    pass  # TODO: Return {"greeting": f"Hello, {name}!"}
+@app.get("/hello/{name}")
+def hello_user(name: str):
+    """Return a personalized greeting."""
+    return {"greeting": f"Hello, {name}!"}
 
 
-@app1.get("/prices/{price}")
+@app.get("/price/{price}")
 def get_price(price: float):
-    pass  # TODO: Return {"price": price, "formatted": f"${price}"}
+    """Return price info with formatted string."""
+    return {"price": price, "formatted": f"${price}"}
 
 
 # =============================================================================
-# Exercise 2: Path Parameter Validation with Path()
+# Exercise 2: Path Validation
 # =============================================================================
-# Create an app with validated path parameters:
-#   GET /scores/{score}
-#       - score must be between 0 and 100
-#       - Return {"score": score, "grade": <grade>}
-#       - Grade: 90-100="A", 80-89="B", 70-79="C", 60-69="D", <60="F"
-#
-#   GET /users/{user_id}/posts/{post_id}
-#       - user_id must be >= 1
-#       - post_id must be >= 1
-#       - Return {"user_id": user_id, "post_id": post_id}
+# Create endpoints with path validation using Path() from FastAPI:
+#   GET /grade/{score} -> Validate score is between 0 and 100, return grade
+#     Score >= 90: A, >= 80: B, >= 70: C, >= 60: D, else: F
+#   GET /users/{user_id}/posts/{post_id} -> Two path parameters
 #
 # Hints:
-#   - Use Path(ge=0, le=100) for range validation
-#   - Use Path(ge=1) for minimum value validation
-#   - Multiple path params in one route: /users/{user_id}/posts/{post_id}
-#   - Grade logic: use if/elif/else or a helper function
-#
-# Expected behavior:
-#   GET /scores/95      -> {"score": 95, "grade": "A"}
-#   GET /scores/85      -> {"score": 85, "grade": "B"}
-#   GET /scores/55      -> {"score": 55, "grade": "F"}
-#   GET /scores/101     -> 422 error (score must be <= 100)
-#   GET /scores/-1      -> 422 error (score must be >= 0)
-#   GET /users/1/posts/5 -> {"user_id": 1, "post_id": 5}
-#   GET /users/0/posts/5 -> 422 error (user_id must be >= 1)
-#
-# Test with:
-#   curl http://localhost:8000/scores/95
-#   curl http://localhost:8000/scores/101  # should fail
-#   curl http://localhost:8000/users/1/posts/5
+#   - Use Path(ge=0, le=100) for score validation
+#   - Multiple path params work by adding more {params}
 # =============================================================================
 
-app2 = FastAPI(title="Exercise 3.2 - Path Validation")
+
+@app.get("/grade/{score}")
+def get_grade(score: int = Path(ge=0, le=100, description="Score between 0 and 100")):
+    """Calculate letter grade from score with validation."""
+    if score >= 90:
+        grade = "A"
+    elif score >= 80:
+        grade = "B"
+    elif score >= 70:
+        grade = "C"
+    elif score >= 60:
+        grade = "D"
+    else:
+        grade = "F"
+    return {"score": score, "grade": grade}
 
 
-def calculate_grade(score: int) -> str:
-    """Calculate letter grade from numeric score."""
-    pass  # TODO: Implement grade calculation
+@app.get("/users/{user_id}/posts/{post_id}")
+def get_user_post(user_id: int, post_id: int):
+    """Return info about a specific user's post."""
+    return {"user_id": user_id, "post_id": post_id}
 
 
-@app2.get("/scores/{score}")
-def get_score(score: int = Path(ge=0, le=100)):
-    pass  # TODO: Return {"score": score, "grade": calculate_grade(score)}
+# =============================================================================
+# Exercise 3: Enum Path Parameters
+# =============================================================================
+# Use Enum for path parameters with a fixed set of valid values:
+#   GET /items/{category} where category is one of: books, electronics, clothing, food
+#   Return category info or 404 if invalid
+#
+# Hints:
+#   - Create an Enum class with the valid categories
+#   - Use the Enum as the type hint for the path parameter
+#   - FastAPI auto-validates and returns 422 for invalid values
+# =============================================================================
 
 
-@app2.get("/users/{user_id}/posts/{post_id}")
-def get_user_post(
-    user_id: int = Path(ge=1),
-    post_id: int = Path(ge=1),
+class ItemCategory(str, Enum):
+    """Valid item categories."""
+    BOOKS = "books"
+    ELECTRONICS = "electronics"
+    CLOTHING = "clothing"
+    FOOD = "food"
+
+
+ITEMS_BY_CATEGORY = {
+    ItemCategory.BOOKS: ["Python 101", "FastAPI Guide", "Data Science Handbook"],
+    ItemCategory.ELECTRONICS: ["Laptop", "Mouse", "Keyboard"],
+    ItemCategory.CLOTHING: ["T-Shirt", "Jeans", "Jacket"],
+    ItemCategory.FOOD: ["Apple", "Bread", "Cheese"],
+}
+
+
+@app.get("/items/{category}")
+def get_items_by_category(category: ItemCategory):
+    """Return items for a given category. Invalid categories get 422 auto-validation."""
+    return {"category": category.value, "items": ITEMS_BY_CATEGORY[category]}
+
+
+# =============================================================================
+# Exercise 4: Path Parameters with Length Validation
+# =============================================================================
+# Use Path() to add length constraints on string path parameters:
+#   GET /codes/{code} -> code must be exactly 6 characters
+#   GET /tags/{tag} -> tag must be 2-10 characters
+#
+# Hints:
+#   - Use min_length and max_length in Path()
+#   - Or use pattern (regex) for exact length matching
+# =============================================================================
+
+
+@app.get("/codes/{code}")
+def get_code(
+    code: str = Path(min_length=6, max_length=6, description="Code must be exactly 6 characters")
 ):
-    pass  # TODO: Return {"user_id": user_id, "post_id": post_id}
+    """Validate code is exactly 6 characters."""
+    return {"code": code, "valid": True}
 
 
-# =============================================================================
-# Exercise 3: UUID Path Parameters and Enum-like Patterns
-# =============================================================================
-# Create an app that handles:
-#   GET /items/{item_id}
-#       - item_id is a UUID
-#       - Return {"item_id": str(item_id), "exists": true}
-#
-#   GET /categories/{category_name}
-#       - category_name must be one of: "electronics", "books", "clothing"
-#       - If valid: {"category": category_name, "valid": true}
-#       - If invalid: return 400 with {"error": "Invalid category"}
-#
-# Hints:
-#   - For UUID: item_id: UUID (from uuid import UUID)
-#   - FastAPI auto-validates UUID format
-#   - For enum-like: use a list of valid values and check manually
-#   - Or use: from enum import Enum; class Category(str, Enum): ...
-#
-# Expected behavior:
-#   GET /items/550e8400-e29b-41d4-a716-446655440000
-#       -> {"item_id": "550e8400-e29b-41d4-a716-446655440000", "exists": true}
-#   GET /items/not-a-uuid -> 422 error (invalid UUID)
-#   GET /categories/electronics -> {"category": "electronics", "valid": true}
-#   GET /categories/food -> 400 error
-#
-# Test with:
-#   curl http://localhost:8000/items/550e8400-e29b-41d4-a716-446655440000
-#   curl http://localhost:8000/categories/electronics
-#   curl http://localhost:8000/categories/food  # should fail
-# =============================================================================
-
-from enum import Enum
-
-app3 = FastAPI(title="Exercise 3.3 - UUID and Enum Patterns")
-
-
-@app3.get("/items/{item_id}")
-def get_item_by_uuid(item_id: UUID):
-    pass  # TODO: Return {"item_id": str(item_id), "exists": True}
-
-
-VALID_CATEGORIES = ["electronics", "books", "clothing"]
-
-
-@app3.get("/categories/{category_name}")
-def get_category(category_name: str):
-    pass  # TODO: Validate category and return appropriate response
+@app.get("/tags/{tag}")
+def get_tag(
+    tag: str = Path(min_length=2, max_length=10, description="Tag must be 2-10 characters")
+):
+    """Validate tag length (2-10 characters)."""
+    return {"tag": tag, "length": len(tag), "valid": True}
 
 
 # =============================================================================
 # VERIFICATION CHECKLIST
 # =============================================================================
-# After completing the exercises:
-#
-# 1. Run: uvicorn 03-path-parameters:app1 --reload
-#    - Verify type conversion works (int, float, str)
-#    - Try invalid types (e.g., /users/abc) - should return 422
-#
-# 2. Run: uvicorn 03-path-parameters:app2 --reload
-#    - Test score validation (0-100 range)
-#    - Verify grade calculation is correct
-#    - Test multiple path params in one route
-#
-# 3. Run: uvicorn 03-path-parameters:app3 --reload
-#    - Test UUID parsing
-#    - Test category validation
-#    - Verify error responses for invalid inputs
+# 1. Run: uvicorn 03-path-parameters:app --reload
+# 2. Test: GET /users/42, /products/7, /hello/World, /price/19.99
+# 3. Test validation: GET /grade/85 (valid), /grade/150 (should fail)
+# 4. Test enum: GET /items/books (valid), /items/cars (should return 422)
+# 5. Test length validation: GET /codes/ABC123 (valid), /codes/AB (should fail)
 # =============================================================================

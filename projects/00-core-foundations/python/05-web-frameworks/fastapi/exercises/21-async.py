@@ -12,339 +12,341 @@ Prerequisites:
 Estimated time: 60-80 minutes
 """
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Header
 from pydantic import BaseModel
-from typing import Optional
+from typing import List
 import asyncio
 import time
-import httpx
+import uuid
 from datetime import datetime
 
 app = FastAPI(title="Async Programming Exercises")
 
+
 # ============================================================
 # Exercise 21.1: Sync vs Async Endpoints
 # ============================================================
-"""
-Problem:
-    Create both sync and async versions of the same endpoint
-    and understand the differences.
 
-Requirements:
-    1. Create GET /sync/slow - synchronous endpoint that "blocks" for 2 seconds
-    2. Create GET /async/slow - async endpoint that awaits for 2 seconds
-    3. Create GET /sync/fast - synchronous endpoint that returns immediately
-    4. Create GET /async/fast - async endpoint that returns immediately
-    5. Create GET /compare - endpoint that calls all four and measures time
+@app.get("/sync/slow")
+def sync_slow():
+    """Synchronous endpoint that blocks the thread for 2 seconds."""
+    time.sleep(2)
+    return {"type": "sync", "duration": 2, "message": "I blocked the thread!"}
 
-Sync blocking endpoint:
-    @app.get("/sync/slow")
-    def sync_slow():
-        time.sleep(2)  # Blocks the thread!
-        return {"type": "sync", "duration": 2}
 
-Async non-blocking endpoint:
-    @app.get("/async/slow")
-    async def async_slow():
-        await asyncio.sleep(2)  # Yields control, doesn't block
-        return {"type": "async", "duration": 2}
+@app.get("/async/slow")
+async def async_slow():
+    """Async endpoint that yields control for 2 seconds (non-blocking)."""
+    await asyncio.sleep(2)
+    return {"type": "async", "duration": 2, "message": "I didn't block the thread!"}
 
-Compare endpoint should show:
-    {
-        "sync_sequential": ~8.0,  # 4 endpoints x 2s each
-        "async_concurrent": ~2.0,  # all run in parallel
-        "sync_results": [...],
-        "async_results": [...]
+
+@app.get("/sync/fast")
+def sync_fast():
+    """Synchronous endpoint returning immediately."""
+    return {"type": "sync", "duration": 0, "message": "Fast and synchronous"}
+
+
+@app.get("/async/fast")
+async def async_fast():
+    """Async endpoint returning immediately."""
+    return {"type": "async", "duration": 0, "message": "Fast and async"}
+
+
+@app.get("/compare")
+async def compare():
+    """Compare sync sequential vs async concurrent execution."""
+    # Sync sequential (calling async functions directly)
+    start_sync = time.time()
+    # Run sync endpoints sequentially
+    sync_results = []
+    sync_results.append(await async_slow())
+    sync_results.append(await async_slow())
+    sync_results.append(await async_slow())
+    sync_results.append(await async_slow())
+    sync_duration = time.time() - start_sync
+
+    # Async concurrent using asyncio.gather
+    start_async = time.time()
+    tasks = [async_slow() for _ in range(4)]
+    async_results = await asyncio.gather(*tasks)
+    async_duration = time.time() - start_async
+
+    return {
+        "sync_sequential": round(sync_duration, 2),
+        "async_concurrent": round(async_duration, 2),
+        "sync_results": sync_results,
+        "async_results": async_results
     }
-
-Hints:
-    - time.sleep() blocks the thread (bad for async)
-    - asyncio.sleep() yields control (good for async)
-    - Use asyncio.gather() to run async functions concurrently
-    - Use time.time() to measure execution time
-    - Test with: curl timing or pytest with multiple requests
-
-Test cases:
-    # Sync slow takes ~2 seconds
-    GET /sync/slow
-    -> 200 {"type": "sync", "duration": 2}  (takes ~2s)
-
-    # Async slow also takes ~2 seconds but doesn't block other requests
-    GET /async/slow
-    -> 200 {"type": "async", "duration": 2}  (takes ~2s)
-
-    # Compare shows sync is sequential, async is parallel
-    GET /compare
-    -> 200 {"sync_sequential": >6, "async_concurrent": <3}
-"""
-
-# TODO: Write your code below
 
 
 # ============================================================
 # Exercise 21.2: Async Dependencies
 # ============================================================
-"""
-Problem:
-    Create async dependencies that perform I/O operations.
 
-Requirements:
-    1. Create an async dependency that simulates fetching user from DB
-    2. Create an async dependency that simulates checking permissions
-    3. Create an async dependency that simulates rate limit checking
-    4. Chain multiple async dependencies together
+MOCK_USERS = {
+    1: {"id": 1, "name": "Alice", "role": "admin"},
+    2: {"id": 2, "name": "Bob", "role": "user"},
+    3: {"id": 3, "name": "Charlie", "role": "user"},
+}
 
-Async dependency pattern:
-    async def get_current_user(user_id: int = Header(...)):
-        await asyncio.sleep(0.1)  # Simulate DB lookup
-        return {"id": user_id, "name": "Alice", "role": "admin"}
 
-    async def check_permissions(user: dict = Depends(get_current_user)):
-        await asyncio.sleep(0.05)  # Simulate permission check
-        if user["role"] != "admin":
-            raise HTTPException(status_code=403, detail="Forbidden")
-        return user
+async def get_current_user(user_id: int = Header(alias="X-User-Id")):
+    """Async dependency that simulates fetching user from DB."""
+    await asyncio.sleep(0.1)  # Simulate DB lookup
+    user = MOCK_USERS.get(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
-Endpoints using dependencies:
-    GET /admin/dashboard - requires admin user
-    GET /admin/users - requires admin user with rate limit check
 
-Hints:
-    - Dependencies can be async: async def my_dep() -> dict:
-    - Use Depends() to inject dependencies
-    - Dependencies can depend on other dependencies
-    - FastAPI resolves dependencies in dependency order
-    - Async dependencies run concurrently when possible
+async def get_admin_user(user: dict = Depends(get_current_user)):
+    """Async dependency that checks for admin role."""
+    await asyncio.sleep(0.05)  # Simulate permission check
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden: admin access required")
+    return user
 
-Test cases:
-    # Valid admin request
-    GET /admin/dashboard
-    Headers: X-User-Id: 1
-    -> 200 {"user": "Alice", "dashboard": {...}}
 
-    # Non-admin user
-    GET /admin/dashboard
-    Headers: X-User-Id: 2 (role=user)
-    -> 403 {"detail": "Forbidden"}
+async def check_rate_limit(user: dict = Depends(get_current_user)):
+    """Async dependency that simulates rate limit checking."""
+    await asyncio.sleep(0.02)  # Simulate rate limit check
+    # Always allow in this demo
+    return user
 
-    # Missing user header
-    GET /admin/dashboard
-    -> 422 Validation Error
-"""
 
-# TODO: Write your code below
+@app.get("/admin/dashboard")
+async def admin_dashboard(user: dict = Depends(get_admin_user)):
+    """Admin-only dashboard endpoint."""
+    return {
+        "user": user["name"],
+        "dashboard": {
+            "total_users": len(MOCK_USERS),
+            "active_sessions": 42,
+            "system_health": "good"
+        }
+    }
+
+
+@app.get("/admin/users")
+async def admin_list_users(
+    user: dict = Depends(get_admin_user),
+    rate_ok: dict = Depends(check_rate_limit)
+):
+    """Admin-only users list with rate limiting."""
+    return {
+        "admin": user["name"],
+        "users": [
+            {"id": uid, "name": u["name"], "role": u["role"]}
+            for uid, u in MOCK_USERS.items()
+        ]
+    }
+
+
+@app.get("/profile")
+async def get_profile(user: dict = Depends(get_current_user)):
+    """Get current user's profile (any authenticated user)."""
+    return {"user": user}
 
 
 # ============================================================
 # Exercise 21.3: Concurrent HTTP Requests
 # ============================================================
-"""
-Problem:
-    Build endpoints that make concurrent external API calls.
 
-Endpoints:
-    GET /weather/{city}       - Fetch weather for a city
-    GET /weather/batch        - Fetch weather for multiple cities concurrently
-    GET /prices/{symbol}      - Fetch stock price
-    GET /portfolio/{symbols}  - Fetch multiple stock prices concurrently
+# Simulated external API functions
+async def fetch_weather(city: str) -> dict:
+    """Simulate fetching weather data for a city."""
+    await asyncio.sleep(0.5)  # Simulate API latency
+    conditions = {
+        "london": {"temp": 15.2, "condition": "cloudy", "humidity": 72},
+        "paris": {"temp": 22.5, "condition": "sunny", "humidity": 55},
+        "tokyo": {"temp": 28.0, "condition": "clear", "humidity": 60},
+        "ny": {"temp": 18.3, "condition": "rainy", "humidity": 85},
+        "sydney": {"temp": 30.1, "condition": "sunny", "humidity": 45},
+    }
+    data = conditions.get(city.lower(), {"temp": 20.0, "condition": "unknown", "humidity": 50})
+    return {"city": city, **data}
 
-Simulated external APIs (use asyncio.sleep to simulate latency):
-    async def fetch_weather(city: str) -> dict:
-        await asyncio.sleep(0.5)  # Simulate API latency
-        return {
-            "city": city,
-            "temp": 22.5,
-            "condition": "sunny",
-            "humidity": 65
-        }
 
-    async def fetch_stock_price(symbol: str) -> dict:
-        await asyncio.sleep(0.3)  # Simulate API latency
-        return {
-            "symbol": symbol,
-            "price": 150.25,
-            "change": +2.3
-        }
+async def fetch_stock_price(symbol: str) -> dict:
+    """Simulate fetching stock price."""
+    await asyncio.sleep(0.3)
+    prices = {
+        "AAPL": {"price": 150.25, "change": 2.3},
+        "GOOGL": {"price": 2750.50, "change": -1.2},
+        "MSFT": {"price": 338.10, "change": 0.8},
+        "AMZN": {"price": 3450.00, "change": 1.5},
+    }
+    data = prices.get(symbol.upper(), {"price": 100.0, "change": 0.0})
+    return {"symbol": symbol.upper(), **data}
 
-Batch endpoint should:
-    1. Accept a list of cities in the request body
-    2. Use asyncio.gather() to fetch all concurrently
-    3. Return results as soon as all complete
-    4. Handle individual failures gracefully
 
-Request model:
-    class BatchWeatherRequest(BaseModel):
-        cities: list[str]
+@app.get("/weather/{city}")
+async def get_weather(city: str):
+    """Get weather for a single city."""
+    result = await fetch_weather(city)
+    return result
 
-Hints:
-    - Use httpx.AsyncClient for real HTTP calls
-    - Use asyncio.gather(*tasks, return_exceptions=True)
-    - Filter out exceptions from results
-    - Use asyncio.create_task() for independent fetches
-    - Consider using TaskGroup in Python 3.11+
 
-Test cases:
-    # Single city
-    GET /weather/london
-    -> 200 {"city": "london", "temp": 22.5, ...}
+class BatchWeatherRequest(BaseModel):
+    cities: List[str]
 
-    # Batch (should complete in ~0.5s, not 2.5s)
-    POST /weather/batch {"cities": ["london", "paris", "tokyo", "ny", "sydney"]}
-    -> 200 {"results": [...5 cities...], "duration_ms": <600}
 
-    # Portfolio (single request for multiple stocks)
-    GET /portfolio/AAPL,GOOGL,MSFT
-    -> 200 {"prices": [...], "duration_ms": <400}
-"""
+@app.post("/weather/batch")
+async def batch_weather(req: BatchWeatherRequest):
+    """Fetch weather for multiple cities concurrently."""
+    start = time.time()
+    tasks = [fetch_weather(city) for city in req.cities]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
 
-# TODO: Write your code below
+    # Filter out any exceptions
+    valid_results = [r for r in results if not isinstance(r, Exception)]
+    duration_ms = round((time.time() - start) * 1000)
+
+    return {"results": valid_results, "duration_ms": duration_ms}
+
+
+@app.get("/portfolio/{symbols}")
+async def get_portfolio(symbols: str):
+    """Fetch stock prices for multiple symbols concurrently."""
+    symbol_list = [s.strip() for s in symbols.split(",")]
+    start = time.time()
+    tasks = [fetch_stock_price(sym) for sym in symbol_list]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    valid_results = [r for r in results if not isinstance(r, Exception)]
+    duration_ms = round((time.time() - start) * 1000)
+    return {"prices": valid_results, "duration_ms": duration_ms}
 
 
 # ============================================================
 # Exercise 21.4: Async Background Tasks
 # ============================================================
-"""
-Problem:
-    Implement async background task processing.
 
-Endpoints:
-    POST /process           - Start async processing, return job ID
-    GET /process/{job_id}   - Check job status
-    POST /process/{job_id}/cancel - Cancel a running job
+jobs: dict[str, dict] = {}
 
-Job states: pending -> running -> completed/failed/cancelled
 
-Requirements:
-    1. Jobs run in the background using asyncio.create_task()
-    2. Job status is tracked in memory (dict)
-    3. Jobs can be cancelled mid-execution
-    4. Failed jobs include error messages
+async def process_job(job_id: str, data: dict):
+    """Background job processing function."""
+    try:
+        jobs[job_id]["status"] = "running"
+        total_steps = 10
+        for i in range(total_steps):
+            # Check if cancelled
+            if jobs[job_id].get("cancelled"):
+                jobs[job_id]["status"] = "cancelled"
+                jobs[job_id]["progress"] = 100
+                return
+            await asyncio.sleep(0.5)  # Simulate work
+            jobs[job_id]["progress"] = ((i + 1) / total_steps) * 100
+        jobs[job_id]["status"] = "completed"
+        jobs[job_id]["progress"] = 100
+        jobs[job_id]["result"] = {"processed": True, "input": data}
+    except Exception as e:
+        jobs[job_id]["status"] = "failed"
+        jobs[job_id]["error"] = str(e)
 
-Async job pattern:
-    jobs: dict[str, dict] = {}
 
-    async def process_job(job_id: str, data: dict):
-        try:
-            jobs[job_id]["status"] = "running"
-            for i in range(10):
-                if jobs[job_id].get("cancelled"):
-                    jobs[job_id]["status"] = "cancelled"
-                    return
-                await asyncio.sleep(1)  # Simulate work
-                jobs[job_id]["progress"] = (i + 1) * 10
-            jobs[job_id]["status"] = "completed"
-            jobs[job_id]["result"] = {"processed": True}
-        except Exception as e:
-            jobs[job_id]["status"] = "failed"
-            jobs[job_id]["error"] = str(e)
+@app.post("/process", status_code=202)
+async def start_processing(data: dict):
+    """Start async processing and return job ID."""
+    job_id = str(uuid.uuid4())
+    jobs[job_id] = {
+        "status": "pending",
+        "progress": 0,
+        "created_at": datetime.utcnow().isoformat()
+    }
+    asyncio.create_task(process_job(job_id, data))
+    return {"job_id": job_id, "status": "pending"}
 
-    @app.post("/process")
-    async def start_processing(data: dict):
-        job_id = str(uuid.uuid4())
-        jobs[job_id] = {"status": "pending", "progress": 0}
-        asyncio.create_task(process_job(job_id, data))
-        return {"job_id": job_id, "status": "pending"}
 
-Hints:
-    - Use asyncio.create_task() for fire-and-forget background work
-    - Use a dict to store job status (in production, use Redis/DB)
-    - Check for cancellation flag in your processing loop
-    - Return job ID immediately, let client poll for status
-    - Consider using FastAPI BackgroundTasks for simpler cases
+@app.get("/process/{job_id}")
+async def get_job_status(job_id: str):
+    """Check job status."""
+    job = jobs.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return {
+        "job_id": job_id,
+        "status": job["status"],
+        "progress": job.get("progress", 0),
+        "result": job.get("result"),
+        "error": job.get("error")
+    }
 
-Test cases:
-    # Start processing
-    POST /process {"data": "process this"}
-    -> 202 {"job_id": "abc-123", "status": "pending"}
 
-    # Check status (initially pending/running)
-    GET /process/abc-123
-    -> 200 {"status": "running", "progress": 30}
-
-    # Cancel job
-    POST /process/abc-123/cancel
-    -> 200 {"status": "cancelled"}
-
-    # Check cancelled job
-    GET /process/abc-123
-    -> 200 {"status": "cancelled"}
-"""
-
-# TODO: Write your code below
+@app.post("/process/{job_id}/cancel")
+async def cancel_job(job_id: str):
+    """Cancel a running job."""
+    job = jobs.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    if job["status"] == "completed":
+        return {"status": "already_completed"}
+    job["cancelled"] = True
+    job["status"] = "cancelled"
+    return {"status": "cancelled"}
 
 
 # ============================================================
 # Exercise 21.5: Async Rate Limiter (Advanced)
 # ============================================================
-"""
-Problem:
-    Build an async rate limiter using a sliding window algorithm.
 
-Requirements:
-    1. Track request counts per API key
-    2. Use sliding window (last 60 seconds)
-    3. Allow 100 requests per minute per API key
-    4. Return 429 Too Many Requests with retry-after header
-    5. Rate limiter must be async-safe (concurrent requests)
+class AsyncRateLimiter:
+    """Sliding window rate limiter using asyncio.Lock for thread safety."""
 
-Sliding window implementation:
-    - Store timestamps of recent requests per key
-    - On each request, remove timestamps older than 60s
-    - Count remaining timestamps
-    - If count >= limit, reject with 429
+    def __init__(self, limit: int = 10, window: int = 60):
+        self.limit = limit
+        self.window = window
+        self.requests: dict[str, list[float]] = {}
+        self._lock = asyncio.Lock()
 
-    class AsyncRateLimiter:
-        def __init__(self, limit: int = 100, window: int = 60):
-            self.limit = limit
-            self.window = window
-            self.requests: dict[str, list[float]] = {}
-
-        async def check(self, key: str) -> tuple[bool, int]:
-            """Returns (allowed, remaining)"""
+    async def check(self, key: str) -> tuple[bool, int]:
+        """
+        Check if request is allowed.
+        Returns (allowed: bool, remaining_or_retry_after: int).
+        """
+        async with self._lock:
             now = time.time()
             if key not in self.requests:
                 self.requests[key] = []
-            # Remove old timestamps
+
+            # Remove old timestamps outside the window
             self.requests[key] = [
                 t for t in self.requests[key]
                 if now - t < self.window
             ]
+
             remaining = self.limit - len(self.requests[key])
             if remaining <= 0:
+                # Calculate retry-after (seconds until oldest request expires)
                 oldest = self.requests[key][0]
                 retry_after = int(self.window - (now - oldest)) + 1
                 return False, retry_after
+
             self.requests[key].append(now)
             return True, remaining - 1
 
-Endpoints:
-    GET /rate-limited/data - Rate limited data endpoint
 
-Response headers:
-    X-RateLimit-Limit: 100
-    X-RateLimit-Remaining: 95
-    X-RateLimit-Reset: 1693000060
-    Retry-After: 30  (only on 429)
+rate_limiter = AsyncRateLimiter(limit=10, window=60)
 
-Hints:
-    - Use asyncio.Lock() to prevent race conditions
-    - Use time.time() for timestamps
-    - Add rate limit headers to every response
-    - Consider using a sorted list for efficient sliding window
-    - In production, use Redis for distributed rate limiting
 
-Test cases:
-    # Normal request
-    GET /rate-limited/data
-    Headers: X-Api-Key: test-key
-    -> 200 {"data": "..."}
-    Headers: X-RateLimit-Remaining: 99
+@app.get("/rate-limited/data")
+async def rate_limited_data(x_api_key: str = Header(default="default")):
+    """Rate-limited data endpoint."""
+    allowed, info = await rate_limiter.check(x_api_key)
 
-    # After many requests
-    (make 100 requests)
-    GET /rate-limited/data
-    -> 429 {"detail": "Rate limit exceeded"}
-    Headers: Retry-After: 30
-"""
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded",
+            headers={"Retry-After": str(info)}
+        )
 
-# TODO: Write your code below
+    return {
+        "data": "This is rate-limited content",
+        "rate_limit": {
+            "limit": rate_limiter.limit,
+            "remaining": info,
+            "window_seconds": rate_limiter.window
+        }
+    }

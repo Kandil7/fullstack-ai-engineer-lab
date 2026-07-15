@@ -14,248 +14,277 @@ Estimated time: 60-90 minutes
 
 from fastapi import FastAPI, Depends, HTTPException, Query
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 import sqlite3
 import os
+import time
+import re
 
 app = FastAPI(title="Database Integration Exercises")
 
 DATABASE_URL = "exercises_18.db"
 
+
 # ============================================================
 # Exercise 18.1: Basic Database Connection & Setup
 # ============================================================
-"""
-Problem:
-    Create a FastAPI application that manages a "tasks" table in SQLite.
-    Implement a startup event to create the table and a dependency
-    to get database connections.
 
-Table schema:
-    CREATE TABLE tasks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        description TEXT,
-        completed BOOLEAN DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
+def get_db():
+    """Dependency that yields a database connection, auto-closing after request."""
+    conn = sqlite3.connect(DATABASE_URL)
+    conn.row_factory = sqlite3.Row
+    try:
+        yield conn
+    finally:
+        conn.close()
 
-Requirements:
-    1. Create the table on application startup
-    2. Write a get_db() dependency that yields a connection
-    3. Write a get_db_cursor() dependency that yields a cursor
-    4. Ensure connections are properly closed after each request
-    5. Implement a GET /health endpoint that verifies DB connectivity
 
-Hints:
-    - Use @app.on_event("startup") for table creation
-    - Use yield dependencies for automatic cleanup
-    - Connection.cursor() returns a cursor from the connection
-    - cursor.execute("SELECT 1") can verify connectivity
+def get_db_cursor(db: sqlite3.Connection = Depends(get_db)):
+    """Dependency that yields a database cursor."""
+    return db.cursor()
 
-Expected behavior:
-    GET /health -> {"status": "ok", "database": "connected"}
-    GET /health (DB down) -> 500 Internal Server Error
-"""
 
-# TODO: Write your code below
+# Note: get_db_cursor is available but not used in these exercises.
+# To use it: cursor = Depends(get_db_cursor)
+
+
+@app.on_event("startup")
+async def startup():
+    """Create tasks table on application startup."""
+    conn = sqlite3.connect(DATABASE_URL)
+    try:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                description TEXT,
+                completed BOOLEAN DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+    finally:
+        conn.close()
+
+
+@app.get("/health")
+async def health_check(db: sqlite3.Connection = Depends(get_db)):
+    """Verify database connectivity."""
+    try:
+        cursor = db.execute("SELECT 1")
+        cursor.fetchone()
+        return {"status": "ok", "database": "connected"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database connection failed: {str(e)}")
 
 
 # ============================================================
 # Exercise 18.2: CRUD Operations for Tasks
 # ============================================================
-"""
-Problem:
-    Implement full CRUD (Create, Read, Update, Delete) for tasks.
 
-Endpoints to implement:
-    POST   /tasks          - Create a new task
-    GET    /tasks          - List all tasks (with optional filter)
-    GET    /tasks/{id}     - Get a single task by ID
-    PUT    /tasks/{id}     - Update a task
-    DELETE /tasks/{id}     - Delete a task
+class TaskCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
 
-Request/Response Models:
-    TaskCreate:  title (required), description (optional)
-    TaskUpdate:  title (optional), description (optional), completed (optional)
-    TaskResponse: id, title, description, completed, created_at
 
-Hints:
-    - Use cursor.execute("INSERT INTO tasks ...") for creation
-    - cursor.lastrowid gives you the auto-incremented ID
-    - Use cursor.fetchall() for list operations
-    - Convert sqlite3.Row objects to dicts with dict(row)
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    completed: Optional[bool] = None
 
-Test cases:
-    # Create a task
-    POST /tasks {"title": "Learn FastAPI"}
-    -> 201 {"id": 1, "title": "Learn FastAPI", "completed": false}
 
-    # List tasks
-    GET /tasks
-    -> 200 [{"id": 1, "title": "Learn FastAPI", ...}]
+class TaskResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    completed: bool
+    created_at: str
 
-    # Get single task
-    GET /tasks/1
-    -> 200 {"id": 1, "title": "Learn FastAPI", ...}
 
-    # Get non-existent task
-    GET /tasks/999
-    -> 404 {"detail": "Task not found"}
+@app.post("/tasks", response_model=TaskResponse, status_code=201)
+async def create_task(task: TaskCreate, db: sqlite3.Connection = Depends(get_db)):
+    cursor = db.execute(
+        "INSERT INTO tasks (title, description) VALUES (?, ?)",
+        (task.title, task.description)
+    )
+    db.commit()
+    task_id = cursor.lastrowid
+    row = db.execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    return TaskResponse(**dict(row))
 
-    # Delete task
-    DELETE /tasks/1
-    -> 200 {"message": "Task deleted"}
-"""
 
-# TODO: Write your code below
+@app.get("/tasks", response_model=List[TaskResponse])
+async def list_tasks(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=100),
+    completed: Optional[bool] = None,
+    search: Optional[str] = None,
+    db: sqlite3.Connection = Depends(get_db)
+):
+    query = "SELECT * FROM tasks WHERE 1=1"
+    params = []
+
+    if completed is not None:
+        query += " AND completed = ?"
+        params.append(1 if completed else 0)
+
+    if search:
+        query += " AND (title LIKE ? OR description LIKE ?)"
+        params.extend([f"%{search}%", f"%{search}%"])
+
+    # Get total count
+    count_query = query.replace("SELECT *", "SELECT COUNT(*)")
+    total = db.execute(count_query, params).fetchone()[0]
+
+    # Get paginated results
+    query += " ORDER BY created_at DESC LIMIT ? OFFSET ?"
+    params.extend([limit, skip])
+
+    rows = db.execute(query, params).fetchall()
+    return [TaskResponse(**dict(r)) for r in rows]
+
+
+@app.get("/tasks/{task_id}", response_model=TaskResponse)
+async def get_task(task_id: int, db: sqlite3.Connection = Depends(get_db)):
+    row = db.execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return TaskResponse(**dict(row))
+
+
+@app.put("/tasks/{task_id}", response_model=TaskResponse)
+async def update_task(task_id: int, task: TaskUpdate, db: sqlite3.Connection = Depends(get_db)):
+    existing = db.execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    if existing is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    # Build dynamic UPDATE statement
+    updates = {}
+    if task.title is not None:
+        updates["title"] = task.title
+    if task.description is not None:
+        updates["description"] = task.description
+    if task.completed is not None:
+        updates["completed"] = 1 if task.completed else 0
+
+    if not updates:
+        return TaskResponse(**dict(existing))
+
+    set_clause = ", ".join(f"{k} = ?" for k in updates)
+    values = list(updates.values()) + [task_id]
+    db.execute(f"UPDATE tasks SET {set_clause} WHERE id = ?", values)
+    db.commit()
+
+    row = db.execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    return TaskResponse(**dict(row))
+
+
+@app.delete("/tasks/{task_id}")
+async def delete_task(task_id: int, db: sqlite3.Connection = Depends(get_db)):
+    existing = db.execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    if existing is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    db.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+    db.commit()
+    return {"message": "Task deleted"}
 
 
 # ============================================================
 # Exercise 18.3: Pagination and Filtering
 # ============================================================
-"""
-Problem:
-    Add pagination and filtering to the tasks list endpoint.
-
-New GET /tasks parameters:
-    - skip: int = 0 (offset for pagination)
-    - limit: int = 10 (max items per page)
-    - completed: Optional[bool] = None (filter by status)
-    - search: Optional[str] = None (search in title)
-
-Response format:
-    {
-        "tasks": [...],
-        "total": 15,
-        "skip": 0,
-        "limit": 10,
-        "has_more": true
-    }
-
-Hints:
-    - Use SQL WHERE clauses for filtering
-    - Use LIMIT and OFFSET for pagination
-    - Use COUNT(*) for total count
-    - Use LIKE '%search%' for text search
-    - has_more = (skip + limit) < total
-
-Test cases:
-    # Paginate
-    GET /tasks?skip=0&limit=2
-    -> {"tasks": [...2 items...], "total": 15, "has_more": true}
-
-    # Filter by completed
-    GET /tasks?completed=true
-    -> {"tasks": [only completed tasks], ...}
-
-    # Search
-    GET /tasks?search=FastAPI
-    -> {"tasks": [tasks with "FastAPI" in title], ...}
-
-    # Combined
-    GET /tasks?completed=false&search=learn&limit=5
-"""
-
-# TODO: Write your code below
+# (Already integrated into list_tasks endpoint above)
 
 
 # ============================================================
 # Exercise 18.4: Transactions and Bulk Operations
 # ============================================================
-"""
-Problem:
-    Implement endpoints that use database transactions.
 
-Endpoints:
-    POST /tasks/bulk          - Create multiple tasks in one transaction
-    POST /tasks/{id}/complete - Mark task and all its subtasks as complete
+class BulkTaskCreate(BaseModel):
+    tasks: List[TaskCreate]
 
-Requirements:
-    1. /tasks/bulk accepts a list of tasks, inserts all atomically
-    2. If any insert fails, roll back the entire batch
-    3. /tasks/{id}/complete marks the task completed atomically
-    4. Return proper status codes for partial failures
 
-Request models:
-    BulkTaskCreate: tasks: list[TaskCreate]
-    BulkTaskResponse: created: list[TaskResponse], count: int
+class BulkTaskResponse(BaseModel):
+    created: List[TaskResponse]
+    count: int
 
-Hints:
-    - connection.commit() finalizes a transaction
-    - connection.rollback() undoes all changes in current transaction
-    - Use try/except around database operations
-    - cursor.executemany() inserts multiple rows at once
 
-Test cases:
-    # Bulk create
-    POST /tasks/bulk {"tasks": [{"title": "Task 1"}, {"title": "Task 2"}]}
-    -> 201 {"created": [...], "count": 2}
+@app.post("/tasks/bulk", response_model=BulkTaskResponse, status_code=201)
+async def bulk_create_tasks(bulk: BulkTaskCreate, db: sqlite3.Connection = Depends(get_db)):
+    created = []
+    try:
+        for task in bulk.tasks:
+            if not task.title.strip():
+                raise ValueError("Task title cannot be empty")
+            cursor = db.execute(
+                "INSERT INTO tasks (title, description) VALUES (?, ?)",
+                (task.title, task.description)
+            )
+            task_id = cursor.lastrowid
+            row = db.execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+            created.append(TaskResponse(**dict(row)))
+        db.commit()
+        return BulkTaskResponse(created=created, count=len(created))
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Bulk insert failed, no tasks were created: {str(e)}")
 
-    # Bulk create with failure (empty title)
-    POST /tasks/bulk {"tasks": [{"title": "OK"}, {"title": ""}]}
-    -> 400 {"detail": "Bulk insert failed, no tasks were created"}
 
-    # Complete task (should also complete subtasks if any)
-    POST /tasks/1/complete
-    -> 200 {"id": 1, "completed": true}
-"""
-
-# TODO: Write your code below
+@app.post("/tasks/{task_id}/complete", response_model=TaskResponse)
+async def complete_task(task_id: int, db: sqlite3.Connection = Depends(get_db)):
+    existing = db.execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    if existing is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    db.execute("UPDATE tasks SET completed = 1 WHERE id = ?", (task_id,))
+    db.commit()
+    row = db.execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
+    return TaskResponse(**dict(row))
 
 
 # ============================================================
 # Exercise 18.5: Raw Query Endpoint (Advanced)
 # ============================================================
-"""
-Problem:
-    Build a safe, limited SQL query endpoint for admin use.
 
-Endpoint:
-    POST /admin/query
+class QueryRequest(BaseModel):
+    query: str
+    params: List = []
 
-Request:
-    {
-        "query": "SELECT * FROM tasks WHERE completed = 1",
-        "params": []
-    }
 
-Requirements:
-    1. Only allow SELECT queries (block INSERT, UPDATE, DELETE, DROP, etc.)
-    2. Limit query execution time to 5 seconds
-    3. Limit result set to 1000 rows
-    4. Log all queries for audit
-    5. Return results as list of dicts
+class QueryResponse(BaseModel):
+    results: List[dict]
+    row_count: int
 
-Security considerations:
-    - Parse SQL to check it starts with SELECT
-    - Block dangerous keywords: DROP, DELETE, UPDATE, INSERT, ALTER, CREATE
-    - Never return connection or table schema info
 
-Hints:
-    - Use sqlparse library to properly parse SQL (pip install sqlparse)
-    - Or use simple string checking: query.strip().upper().startswith("SELECT")
-    - Check for dangerous keywords with regex or string matching
-    - Use cursor.fetchmany(1000) to limit results
-    - Use time.time() for timeout enforcement
+@app.post("/admin/query", response_model=QueryResponse)
+async def admin_query(
+    query_req: QueryRequest,
+    db: sqlite3.Connection = Depends(get_db)
+):
+    sql = query_req.query.strip().upper()
 
-Test cases:
-    # Valid query
-    POST /admin/query {"query": "SELECT COUNT(*) as total FROM tasks"}
-    -> 200 [{"total": 15}]
+    # Only allow SELECT queries
+    if not sql.startswith("SELECT"):
+        raise HTTPException(status_code=400, detail="Only SELECT queries are allowed")
 
-    # Dangerous query
-    POST /admin/query {"query": "DROP TABLE tasks"}
-    -> 400 {"detail": "Only SELECT queries are allowed"}
+    # Block dangerous keywords
+    dangerous = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE", "EXEC"]
+    for keyword in dangerous:
+        if re.search(rf"\b{keyword}\b", sql):
+            raise HTTPException(status_code=400, detail=f"Dangerous keyword '{keyword}' not allowed")
 
-    # SELECT with params
-    POST /admin/query {
-        "query": "SELECT * FROM tasks WHERE title LIKE ?",
-        "params": ["%FastAPI%"]
-    }
-    -> 200 [matching tasks]
+    try:
+        start = time.time()
+        cursor = db.execute(query_req.query, query_req.params)
 
-    # Invalid SQL
-    POST /admin/query {"query": "SELCT * FORM tasks"}
-    -> 400 {"detail": "Invalid SQL query"}
-"""
+        # Limit results to 1000 rows
+        rows = cursor.fetchmany(1000)
+        duration = time.time() - start
+
+        if duration > 5:
+            raise HTTPException(status_code=408, detail="Query timeout")
+
+        results = [dict(row) for row in rows]
+        return QueryResponse(results=results, row_count=len(results))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid SQL query: {str(e)}")

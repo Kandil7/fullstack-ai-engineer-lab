@@ -1,241 +1,138 @@
 """
 FastAPI Exercise 05 - Request Body
-===================================
+====================================
 
 Topics covered:
-- Defining request body with Pydantic models
-- Body validation and default values
+- Pydantic request models
 - Nested models
-- Multiple body parameters
+- Optional fields with defaults
+- Request body + path parameters
+- Request body + query parameters
 
-Requirements:
-    pip install fastapi uvicorn pydantic
-
-Run any exercise:
-    uvicorn 05-request-body:app1 --reload
-    uvicorn 05-request-body:app2 --reload
-    uvicorn 05-request-body:app3 --reload
+Run:
+    uvicorn 05-request-body:app --reload
 """
 
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 from typing import Optional
 
+app = FastAPI(title="Request Body Exercise")
+
+# In-memory stores
+users_db: dict[int, dict] = {}
+products_db: dict[int, dict] = {}
+next_user_id = 1
+next_product_id = 1
+
 
 # =============================================================================
-# Exercise 1: Basic Pydantic Request Body
+# Exercise 1: Basic Request Body
 # =============================================================================
-# Create an app with POST endpoints:
-#   POST /users
-#       - Body: {"name": str, "email": str, "age": int}
-#       - Return: {"id": 1, "name": ..., "email": ..., "age": ..., "created": true}
-#
-#   POST /products
-#       - Body: {"name": str, "price": float, "description": str (optional)}
-#       - Return: {"id": 1, "name": ..., "price": ..., "description": ...}
-#
-# Hints:
-#   - Create Pydantic models: class User(BaseModel): name: str; ...
-#   - Use the model as the function parameter type
-#   - Optional fields: description: Optional[str] = None
-#   - You can use Field for extra validation: price: float = Field(gt=0)
-#
-# Expected behavior:
-#   POST /users with {"name": "Alice", "email": "alice@example.com", "age": 30}
-#       -> {"id": 1, "name": "Alice", "email": "alice@example.com", "age": 30, "created": true}
-#   POST /users with {"name": "Bob"}
-#       -> 422 (missing required fields)
-#
-# Test with:
-#   curl -X POST http://localhost:8000/users \
-#     -H "Content-Type: application/json" \
-#     -d '{"name": "Alice", "email": "alice@example.com", "age": 30}'
-# =============================================================================
-
-app1 = FastAPI(title="Exercise 5.1 - Basic Request Body")
-
-
 class UserCreate(BaseModel):
-    name: str
-    email: str
-    age: int
+    """User creation model."""
+    name: str = Field(..., min_length=1, max_length=100)
+    email: str = Field(..., pattern=r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
+    age: int = Field(ge=0, le=150, default=18)
 
 
 class ProductCreate(BaseModel):
-    name: str
-    price: float = Field(gt=0)
-    description: Optional[str] = None
+    """Product creation model."""
+    name: str = Field(..., min_length=1, max_length=200)
+    price: float = Field(gt=0, description="Price must be positive")
+    in_stock: bool = True
 
 
-@app1.post("/users")
+@app.post("/users", status_code=201)
 def create_user(user: UserCreate):
-    pass  # TODO: Return {"id": 1, **user.model_dump(), "created": True}
+    """Create a new user from request body."""
+    global next_user_id
+    user_data = {"id": next_user_id, **user.model_dump(), "created": True}
+    users_db[next_user_id] = user_data
+    next_user_id += 1
+    return {"id": next_user_id - 1, **user.model_dump(), "created": True}
 
 
-@app1.post("/products")
+@app.post("/products", status_code=201)
 def create_product(product: ProductCreate):
-    pass  # TODO: Return {"id": 1, **product.model_dump()}
+    """Create a new product from request body."""
+    global next_product_id
+    product_data = {"id": next_product_id, **product.model_dump()}
+    products_db[next_product_id] = product_data
+    next_product_id += 1
+    return {"id": next_product_id - 1, **product.model_dump()}
 
 
 # =============================================================================
-# Exercise 2: Nested Pydantic Models
+# Exercise 2: Nested Models
 # =============================================================================
-# Create an app with nested request bodies:
-#   POST /orders
-#       - Body: {
-#           "customer_name": str,
-#           "items": [{"name": str, "quantity": int, "price": float}],
-#           "shipping_address": {
-#               "street": str,
-#               "city": str,
-#               "zip_code": str
-#           }
-#       }
-#       - Return: {
-#           "order_id": 1,
-#           "customer_name": ...,
-#           "total": <sum of quantity * price>,
-#           "item_count": <len(items)>
-#       }
-#
-# Hints:
-#   - Create Address(BaseModel): street, city, zip_code
-#   - Create OrderItem(BaseModel): name, quantity, price
-#   - Create Order(BaseModel): customer_name, items: list[OrderItem], shipping_address: Address
-#   - Calculate total: sum(item.quantity * item.price for item in order.items)
-#
-# Expected behavior:
-#   POST /orders with valid body -> {"order_id": 1, "total": 59.97, "item_count": 2}
-#   POST /orders with missing fields -> 422 validation error
-#
-# Test with:
-#   curl -X POST http://localhost:8000/orders \
-#     -H "Content-Type: application/json" \
-#     -d '{
-#       "customer_name": "Alice",
-#       "items": [
-#         {"name": "Widget", "quantity": 2, "price": 9.99},
-#         {"name": "Gadget", "quantity": 1, "price": 39.99}
-#       ],
-#       "shipping_address": {
-#         "street": "123 Main St",
-#         "city": "Springfield",
-#         "zip_code": "62701"
-#       }
-#     }'
-# =============================================================================
-
-app2 = FastAPI(title="Exercise 5.2 - Nested Models")
-
-
-class Address(BaseModel):
-    street: str
-    city: str
-    zip_code: str
-
-
 class OrderItem(BaseModel):
-    name: str
-    quantity: int = Field(gt=0)
-    price: float = Field(gt=0)
+    """Item within an order."""
+    product_id: int
+    quantity: int = Field(ge=1, le=100)
+    unit_price: float = Field(gt=0)
 
 
-class Order(BaseModel):
-    customer_name: str
-    items: list[OrderItem]
-    shipping_address: Address
+class OrderCreate(BaseModel):
+    """Order creation with nested items."""
+    customer_name: str = Field(..., min_length=1)
+    items: list[OrderItem] = Field(..., min_length=1)
+    shipping_address: str
 
 
-@app2.post("/orders")
-def create_order(order: Order):
-    pass  # TODO: Calculate total and return order summary
+@app.post("/orders", status_code=201)
+def create_order(order: OrderCreate):
+    """Create an order with nested items."""
+    total = sum(item.quantity * item.unit_price for item in order.items)
+    return {
+        "order_id": 1,
+        "customer": order.customer_name,
+        "items_count": len(order.items),
+        "total": round(total, 2),
+        "shipping_to": order.shipping_address,
+        "status": "confirmed",
+    }
 
 
 # =============================================================================
-# Exercise 3: Body with Path/Query + Body
+# Exercise 3: Body + Path + Query Parameters
 # =============================================================================
-# Create an app combining path params, query params, and body:
-#   PUT /users/{user_id}
-#       - Path: user_id: int
-#       - Body: {"name": str, "email": str}
-#       - Query: notify: bool = False
-#       - Return: {"user_id": ..., "name": ..., "email": ..., "notify": ...}
-#
-#   POST /items/{item_id}/reviews
-#       - Path: item_id: int
-#       - Body: {"rating": int, "comment": str}
-#       - Return: {"item_id": ..., "review": {...}, "average_rating": ...}
-#
-# Hints:
-#   - FastAPI distinguishes path, query, and body params by type
-#   - Path params use type hint without default
-#   - Query params use Query(...)
-#   - Body params use Pydantic model or Body(...)
-#   - You can have one Pydantic body + other params
-#
-# Expected behavior:
-#   PUT /users/42?notify=true with {"name": "Bob", "email": "bob@test.com"}
-#       -> {"user_id": 42, "name": "Bob", "email": "bob@test.com", "notify": true}
-#   POST /items/100/reviews with {"rating": 5, "comment": "Great!"}
-#       -> {"item_id": 100, "review": {...}, "average_rating": 5.0}
-#
-# Test with:
-#   curl -X PUT "http://localhost:8000/users/42?notify=true" \
-#     -H "Content-Type: application/json" \
-#     -d '{"name": "Bob", "email": "bob@test.com"}'
-#   curl -X POST http://localhost:8000/items/100/reviews \
-#     -H "Content-Type: application/json" \
-#     -d '{"rating": 5, "comment": "Great!"}'
-# =============================================================================
-
-app3 = FastAPI(title="Exercise 5.3 - Path + Query + Body")
+class UserProfile(BaseModel):
+    """User profile update model."""
+    name: Optional[str] = None
+    email: Optional[str] = None
+    notify: bool = True
 
 
-class UserUpdate(BaseModel):
-    name: str
-    email: str
-
-
-class Review(BaseModel):
+class ReviewCreate(BaseModel):
+    """Product review model."""
     rating: int = Field(ge=1, le=5)
-    comment: str = Field(min_length=1, max_length=500)
+    comment: str = Field(..., min_length=1, max_length=1000)
 
 
-# In-memory storage for average rating calculation
-reviews_store: dict[int, list[int]] = {}
+@app.put("/users/{user_id}")
+def update_user(user_id: int, user: UserProfile):
+    """Update user with body + path parameter."""
+    if user_id not in users_db:
+        raise HTTPException(status_code=404, detail="User not found")
+    update_data = {k: v for k, v in user.model_dump().items() if v is not None}
+    users_db[user_id].update(update_data)
+    return {
+        "user_id": user_id,
+        "name": user.name or users_db[user_id].get("name"),
+        "email": user.email or users_db[user_id].get("email"),
+        "notify": user.notify,
+    }
 
 
-@app3.put("/users/{user_id}")
-def update_user(
-    user_id: int,
-    user: UserUpdate,
-    notify: bool = False,
-):
-    pass  # TODO: Return {"user_id": user_id, "name": user.name, "email": user.email, "notify": notify}
-
-
-@app3.post("/items/{item_id}/reviews")
-def create_review(item_id: int, review: Review):
-    pass  # TODO: Store review, calculate average, return result
-
-
-# =============================================================================
-# VERIFICATION CHECKLIST
-# =============================================================================
-# After completing the exercises:
-#
-# 1. Run: uvicorn 05-request-body:app1 --reload
-#    - Test POST with valid body
-#    - Test POST with missing fields (should return 422)
-#    - Verify optional fields work
-#
-# 2. Run: uvicorn 05-request-body:app2 --reload
-#    - Test nested model validation
-#    - Verify total calculation
-#    - Test with invalid nested data
-#
-# 3. Run: uvicorn 05-request-body:app3 --reload
-#    - Test path + query + body combination
-#    - Verify all three param types work together
-#    - Test review rating validation (1-5 range)
-# =============================================================================
+@app.post("/products/{product_id}/reviews", status_code=201)
+def create_review(product_id: int, review: ReviewCreate):
+    """Create a review for a product with path parameter."""
+    if product_id not in products_db:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return {
+        "product_id": product_id,
+        "rating": review.rating,
+        "comment": review.comment,
+        "submitted": True,
+    }

@@ -12,339 +12,343 @@ Prerequisites:
 Estimated time: 30-45 minutes
 """
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Optional
-
-app = FastAPI(title="CORS Exercises")
+from typing import List
+import re
+import time
+import uuid
 
 # ============================================================
 # Exercise 22.1: Basic CORS Setup
 # ============================================================
-"""
-Problem:
-    Configure CORS for a web application with multiple frontend origins.
 
-Requirements:
-    1. Allow requests from these origins:
-       - http://localhost:3000 (development React app)
-       - http://localhost:5173 (Vite dev server)
-       - https://myapp.example.com (production)
-    2. Allow all HTTP methods (GET, POST, PUT, DELETE, PATCH, OPTIONS)
-    3. Allow common headers (Authorization, Content-Type, X-Requested-With)
-    4. Allow credentials (cookies, auth headers)
-    5. Set max age for preflight caching to 3600 seconds
+app1 = FastAPI(title="Exercise 1 - Basic CORS")
 
-CORS middleware setup:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[...],
-        allow_credentials=True,
-        allow_methods=[...],
-        allow_headers=[...],
-        max_age=3600,
-    )
+# Configure CORS middleware
+app1.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://myapp.example.com",
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Requested-With", "X-Client-Id"],
+    expose_headers=["X-Request-Id", "X-Response-Time"],
+    max_age=3600,
+)
 
-Endpoints to protect:
-    GET  /api/profile    - Returns user profile (requires auth)
-    POST /api/data       - Accepts data submissions
 
-Hints:
-    - CORSMiddleware must be added before other middleware
-    - allow_origins=["*"] allows ALL origins (not recommended for production)
-    - allow_credentials=True requires explicit origins (not "*")
-    - max_age controls how long browsers cache preflight responses
-    - Use expose_headers to make custom headers available to JS
+@app1.get("/api/profile")
+async def get_profile(request: Request):
+    """Return user profile (cors-protected)."""
+    origin = request.headers.get("origin", "unknown")
+    return {
+        "profile": {
+            "id": 1,
+            "name": "Alice",
+            "email": "alice@example.com"
+        },
+        "request_origin": origin
+    }
 
-Test cases:
-    # Preflight request
-    OPTIONS /api/profile
-    Origin: http://localhost:3000
-    Access-Control-Request-Method: GET
-    Access-Control-Request-Headers: Authorization
-    -> 200 with Access-Control-Allow-* headers
 
-    # Actual request
-    GET /api/profile
-    Origin: http://localhost:3000
-    Authorization: Bearer token123
-    -> 200 with data + Access-Control-Allow-Origin header
-
-    # Blocked origin
-    GET /api/profile
-    Origin: https://evil-site.com
-    -> 200 (no CORS headers, browser blocks response)
-
-    # Cross-origin with credentials
-    GET /api/profile
-    Origin: http://localhost:3000
-    -> 200 + Access-Control-Allow-Credentials: true
-"""
-
-# TODO: Configure CORS middleware below
-# TODO: Create the protected endpoints
+@app1.post("/api/data")
+async def post_data(data: dict, request: Request):
+    """Accept data submissions (cors-protected)."""
+    return {"received": data, "origin": request.headers.get("origin")}
 
 
 # ============================================================
 # Exercise 22.2: Dynamic CORS Origins
 # ============================================================
-"""
-Problem:
-    Build a CORS system that dynamically checks allowed origins.
 
-Requirements:
-    1. Store allowed origins in a database/config (use a dict for this exercise)
-    2. Check incoming Origin header against allowed list
-    3. Support wildcard subdomains (*.example.com)
-    4. Support regex patterns for complex matching
-    5. Log rejected origins for security monitoring
+app2 = FastAPI(title="Exercise 2 - Dynamic CORS")
 
-Origin configuration:
-    ALLOWED_ORIGINS = {
-        "exact": ["http://localhost:3000", "https://myapp.example.com"],
-        "wildcard": ["*.example.com"],           # matches any subdomain
-        "regex": [r"https://.*\.dev\.local:\d+"], # dev servers with any port
-    }
+ALLOWED_ORIGINS_CONFIG = {
+    "exact": [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://myapp.example.com",
+    ],
+    "wildcard": ["*.example.com"],
+    "regex": [r"https://.*\.dev\.local:\d+"],
+}
 
-Dynamic CORS class:
-    class DynamicCORS:
-        def __init__(self, config: dict):
-            self.config = config
 
-        def is_origin_allowed(self, origin: str) -> bool:
-            # Check exact matches
-            # Check wildcard subdomains
-            # Check regex patterns
-            # Log if rejected
-            pass
+class DynamicCORS:
+    """Dynamic CORS checker with wildcard and regex support."""
 
-Hints:
-    - Wildcard: origin.endswith(".example.com") or origin == "https://example.com"
-    - Regex: import re; re.match(pattern, origin)
-    - Parse origin header: "https://myapp.example.com" -> scheme + domain
-    - Log with: print(f"[CORS] Rejected origin: {origin}")
+    def __init__(self, config: dict):
+        self.config = config
 
-Test cases:
-    # Exact match
-    is_origin_allowed("http://localhost:3000") -> True
+    def is_origin_allowed(self, origin: str) -> bool:
+        # Check exact matches
+        if origin in self.config.get("exact", []):
+            return True
 
-    # Wildcard subdomain
-    is_origin_allowed("https://api.example.com") -> True
-    is_origin_allowed("https://admin.example.com") -> True
+        # Check wildcard subdomains
+        for wildcard in self.config.get("wildcard", []):
+            if wildcard.startswith("*."):
+                domain_suffix = wildcard[1:]  # e.g., ".example.com"
+                if origin.endswith(domain_suffix):
+                    # Also check that it's a subdomain, not the bare domain
+                    # e.g., *.example.com matches https://api.example.com but not https://example.com
+                    import urllib.parse
+                    parsed = urllib.parse.urlparse(origin)
+                    hostname = parsed.hostname or ""
+                    if hostname.endswith(domain_suffix[1:]):
+                        return True
 
-    # Regex match
-    is_origin_allowed("https://app.dev.local:5173") -> True
+        # Check regex patterns
+        for pattern in self.config.get("regex", []):
+            if re.match(pattern, origin):
+                return True
 
-    # No match
-    is_origin_allowed("https://evil.com") -> False
+        # Log rejected origin
+        print(f"[CORS] Rejected origin: {origin}")
+        return False
 
-    # Rejected origin logged
-    is_origin_allowed("https://evil.com")
-    # Output: [CORS] Rejected origin: https://evil.com
-"""
 
-# TODO: Write dynamic CORS code below
+dynamic_cors = DynamicCORS(ALLOWED_ORIGINS_CONFIG)
+
+
+@app2.middleware("http")
+async def dynamic_cors_middleware(request: Request, call_next):
+    """Custom middleware that applies dynamic CORS checking."""
+    origin = request.headers.get("origin")
+    response = await call_next(request)
+
+    if origin and dynamic_cors.is_origin_allowed(origin):
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Max-Age"] = "3600"
+
+    return response
+
+
+@app2.get("/api/data")
+async def get_data():
+    return {"message": "Dynamic CORS protected data"}
 
 
 # ============================================================
 # Exercise 22.3: Per-Route CORS Configuration
 # ============================================================
-"""
-Problem:
-    Apply different CORS policies to different route groups.
 
-Route groups:
-    /public/*  - Wide open (any origin, no credentials)
-    /api/*     - Restricted (specific origins, with credentials)
-    /admin/*   - Locked down (same-origin only, no CORS)
+app3 = FastAPI(title="Exercise 3 - Per-Route CORS")
 
-Implementation approach:
-    1. Create a custom middleware that checks the request path
-    2. Apply appropriate CORS headers based on path prefix
-    3. Handle preflight requests for each group
 
-Custom middleware pattern:
-    class PerRouteCORS:
-        def __init__(self, app):
-            self.app = app
+class PerRouteCORSMiddleware:
+    """Custom middleware that applies CORS rules based on request path."""
 
-        async def __call__(self, scope, receive, send):
-            if scope["type"] == "http":
-                path = scope["path"]
-                headers = self.get_cors_headers(path)
-                # Add headers to response
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
             return await self.app(scope, receive, send)
 
-Endpoints:
-    GET /public/info          - Public information (any origin)
-    GET /api/data             - Protected data (specific origins)
-    GET /admin/settings       - Admin only (same-origin)
+        path = scope.get("path", "")
+        headers = []
 
-Hints:
-    - path.startswith("/public") for public routes
-    - path.startswith("/admin") for admin routes
-    - Use Starlette middleware pattern: __call__(self, scope, receive, send)
-    - scope["path"] gives you the request path
-    - scope["headers"] contains request headers as list of tuples
+        if path.startswith("/public"):
+            # Wide open - any origin
+            headers = [
+                (b"access-control-allow-origin", b"*"),
+                (b"access-control-allow-methods", b"GET, POST"),
+                (b"access-control-allow-headers", b"*"),
+            ]
+        elif path.startswith("/api"):
+            # Restricted - specific origins (we'll set based on request)
+            # This is set below by reading the request origin
+            pass
+        elif path.startswith("/admin"):
+            # Locked down - no CORS headers
+            pass
 
-Test cases:
-    # Public endpoint - any origin allowed
-    GET /public/info
-    Origin: https://any-site.com
-    -> 200 with Access-Control-Allow-Origin: *
+        # We need to wrap the send to add CORS headers
+        # For simplicity, use a different approach with send wrapper
+        original_send = send
 
-    # API endpoint - restricted origins
-    GET /api/data
-    Origin: https://myapp.example.com
-    -> 200 with proper CORS headers
+        async def send_with_cors(message):
+            if message["type"] == "http.response.start":
+                existing_headers = dict(message.get("headers", []))
+                new_headers = list(message.get("headers", []))
 
-    # API endpoint - wrong origin
-    GET /api/data
-    Origin: https://evil.com
-    -> 200 (no CORS headers, browser blocks)
+                if path.startswith("/public"):
+                    new_headers = list(set(new_headers) - {
+                        h for h in new_headers if h[0] == b"access-control-allow-origin"
+                    })
+                    new_headers.append((b"access-control-allow-origin", b"*"))
+                    new_headers.append((b"access-control-allow-methods", b"GET, POST"))
+                elif path.startswith("/api"):
+                    # Check request origin
+                    req_headers = dict(scope.get("headers", []))
+                    origin = req_headers.get(b"origin", b"").decode()
+                    allowed = ["http://localhost:3000", "https://myapp.example.com"]
+                    if origin in allowed:
+                        new_headers.append((b"access-control-allow-origin", origin.encode()))
+                        new_headers.append((b"access-control-allow-credentials", b"true"))
 
-    # Admin endpoint - no CORS
-    GET /admin/settings
-    Origin: http://localhost:3000
-    -> 200 (no Access-Control-Allow-Origin header)
-"""
+                message = dict(message)
+                message["headers"] = new_headers
+            await original_send(message)
 
-# TODO: Write per-route CORS code below
+        return await self.app(scope, receive, send_with_cors)
+
+
+app3.add_middleware(PerRouteCORSMiddleware)
+
+
+@app3.get("/public/info")
+async def public_info():
+    return {"message": "Public information - accessible from any origin"}
+
+
+@app3.get("/api/data")
+async def api_data():
+    return {"message": "Protected data - restricted origins"}
+
+
+@app3.get("/admin/settings")
+async def admin_settings():
+    return {"settings": {"feature_x": True, "max_users": 100}}
 
 
 # ============================================================
 # Exercise 22.4: CORS with Custom Headers
 # ============================================================
-"""
-Problem:
-    Configure CORS to expose custom response headers to the browser.
 
-Requirements:
-    1. API returns custom headers:
-       - X-Total-Count: total number of items
-       - X-Request-Id: unique request identifier
-       - X-Rate-Limit-Remaining: rate limit info
-       - X-API-Version: API version
-    2. Configure CORS to expose these headers
-    3. Allow clients to read all custom headers
-    4. Support preflight for custom request headers
+app4 = FastAPI(title="Exercise 4 - CORS with Custom Headers")
 
-CORS configuration:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
-        expose_headers=[
-            "X-Total-Count",
-            "X-Request-Id",
-            "X-Rate-Limit-Remaining",
-            "X-API-Version",
-        ],
-        allow_headers=["*"],
+app4.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    expose_headers=[
+        "X-Total-Count",
+        "X-Request-Id",
+        "X-Rate-Limit-Remaining",
+        "X-API-Version",
+        "X-Response-Time",
+    ],
+    allow_headers=["*"],
+)
+
+
+@app4.get("/api/items")
+async def list_items():
+    """Return items with custom headers exposed to JS."""
+    items = [{"id": 1, "name": "Widget"}, {"id": 2, "name": "Gadget"}]
+    return JSONResponse(
+        content=items,
+        headers={
+            "X-Total-Count": str(len(items)),
+            "X-Request-Id": str(uuid.uuid4()),
+            "X-Rate-Limit-Remaining": "98",
+            "X-API-Version": "v2.1",
+            "X-Response-Time": "0.003s",
+        }
     )
 
-Endpoints:
-    GET /api/items - Returns items with custom headers
-    POST /api/items - Accepts X-Client-Id custom header
 
-Hints:
-    - Use Response(headers={...}) to add custom headers
-    - Or use from starlette.responses import JSONResponse
-    - expose_headers tells browsers which headers JS can access
-    - allow_headers must include any headers the client sends
-    - Without expose_headers, JS can only read "simple" headers
-
-Test cases:
-    # Get items with custom headers
-    GET /api/items
-    Origin: http://localhost:3000
-    -> 200
-    Headers:
-        X-Total-Count: 42
-        X-Request-Id: abc-123
-        X-Rate-Limit-Remaining: 98
-        X-API-Version: v2.1
-        Access-Control-Expose-Headers: X-Total-Count, X-Request-Id, ...
-
-    # JS can read exposed headers
-    # const count = response.headers.get('X-Total-Count'); // works!
-
-    # Send custom header
-    POST /api/items
-    Origin: http://localhost:3000
-    X-Client-Id: frontend-app
-    -> 201 Created
-"""
-
-# TODO: Write custom headers CORS code below
+@app4.post("/api/items", status_code=201)
+async def create_item(item: dict, request: Request):
+    """Accept custom header X-Client-Id from clients."""
+    client_id = request.headers.get("x-client-id", "unknown")
+    return JSONResponse(
+        content={"created": True, "item": item, "client": client_id},
+        headers={"X-Request-Id": str(uuid.uuid4())}
+    )
 
 
 # ============================================================
 # Exercise 22.5: CORS Security Hardening
 # ============================================================
-"""
-Problem:
-    Implement CORS security best practices.
 
-Security requirements:
-    1. Never use allow_origins=["*"] with allow_credentials=True
-    2. Validate Origin header strictly against allowlist
-    3. Reject requests with suspicious origins
-    4. Add security headers alongside CORS
-    5. Log all CORS rejections
+app5 = FastAPI(title="Exercise 5 - Secure CORS")
 
-Security middleware:
-    class SecureCORS:
-        def __init__(self, app, allowed_origins: list[str]):
-            self.app = app
-            self.allowed_origins = set(allowed_origins)
+SECURE_ALLOWED_ORIGINS = [
+    "https://myapp.example.com",
+    "https://admin.myapp.example.com",
+]
 
-        async def __call__(self, scope, receive, send):
-            # Check origin
-            # Reject if not in allowlist
-            # Add security headers
-            # Log rejections
-            pass
+REJECTED_ORIGINS_LOG: List[str] = []
 
-Security headers to add:
-    X-Content-Type-Options: nosniff
-    X-Frame-Options: DENY
-    X-XSS-Protection: 1; mode=block
-    Strict-Transport-Security: max-age=31536000; includeSubDomains
 
-Suspicious origin patterns to block:
-    - Null origin (used by some attacks)
-    - Localhost from non-dev environments
-    - IP addresses (should use domains)
-    - Missing scheme (http/https)
+@app5.middleware("http")
+async def secure_cors_middleware(request: Request, call_next):
+    """Middleware implementing CORS security best practices."""
+    origin = request.headers.get("origin", "").strip()
 
-Hints:
-    - Check if Origin header exists (some requests don't have it)
-    - "null" origin is used by sandboxed iframes (usually suspicious)
-    - Use urllib.parse to parse origin URLs
-    - Always prefer explicit allowlist over pattern matching
-    - In production, use environment variables for allowed origins
+    response = await call_next(request)
 
-Test cases:
-    # Valid origin
-    GET /secure/data
-    Origin: https://myapp.example.com
-    -> 200 with all security headers
+    if not origin:
+        # Server-to-server request, no CORS needed
+        return response
 
-    # Blocked suspicious origin
-    GET /secure/data
-    Origin: null
-    -> 403 {"detail": "Origin not allowed"}
+    # Reject null origin (used by some attacks)
+    if origin.lower() == "null":
+        REJECTED_ORIGINS_LOG.append(f"Rejected null origin from {request.client.host}")
+        raise HTTPException(status_code=403, detail="Origin not allowed")
 
-    # Missing origin (server-to-server, OK)
-    GET /secure/data
-    (no Origin header)
-    -> 200 (no CORS headers needed, not a browser request)
+    # Validate origin
+    import urllib.parse
+    try:
+        parsed = urllib.parse.urlparse(origin)
+        hostname = parsed.hostname or ""
 
-    # Blocked IP address origin
-    GET /secure/data
-    Origin: http://192.168.1.100:3000
-    -> 403 {"detail": "Origin not allowed"}
-"""
+        # Reject IP addresses
+        if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", hostname):
+            REJECTED_ORIGINS_LOG.append(f"Rejected IP origin: {origin}")
+            raise HTTPException(status_code=403, detail="Origin not allowed")
 
-# TODO: Write CORS security code below
+        # Reject missing scheme
+        if not parsed.scheme:
+            REJECTED_ORIGINS_LOG.append(f"Rejected scheme-less origin: {origin}")
+            raise HTTPException(status_code=403, detail="Origin not allowed")
+
+        # Check allowlist
+        if origin not in SECURE_ALLOWED_ORIGINS:
+            REJECTED_ORIGINS_LOG.append(f"Rejected unknown origin: {origin}")
+            raise HTTPException(status_code=403, detail="Origin not allowed")
+
+    except HTTPException:
+        raise
+    except Exception:
+        REJECTED_ORIGINS_LOG.append(f"Rejected malformed origin: {origin}")
+        raise HTTPException(status_code=403, detail="Origin not allowed")
+
+    # Add CORS headers for allowed origins
+    response.headers["Access-Control-Allow-Origin"] = origin
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+    response.headers["Access-Control-Max-Age"] = "3600"
+    response.headers["Vary"] = "Origin"
+
+    # Security headers
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+    return response
+
+
+@app5.get("/secure/data")
+async def secure_data():
+    """CORS-hardened endpoint with security headers."""
+    return {"message": "This is securely served with strict CORS and security headers"}
+
+
+@app5.get("/secure/rejected-log")
+async def get_rejected_log():
+    """View rejected origins for security monitoring."""
+    return {"rejected_origins": REJECTED_ORIGINS_LOG[-50:]}

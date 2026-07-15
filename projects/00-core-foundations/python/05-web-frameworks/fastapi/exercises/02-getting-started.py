@@ -1,203 +1,180 @@
 """
-FastAPI Exercise 02 - Getting Started
-======================================
+FastAPI Exercise 02 - Getting Started with FastAPI
+===================================================
 
 Topics covered:
-- HTTP methods (GET, POST, PUT, DELETE)
-- Response status codes
-- Request and Response objects
-- Running with uvicorn
+- CRUD operations with HTTP methods
+- Status codes for different scenarios
+- Request/Response cycle understanding
 
 Requirements:
     pip install fastapi uvicorn
 
-Run any exercise:
-    uvicorn 02-getting-started:app1 --reload
-    uvicorn 02-getting-started:app2 --reload
-    uvicorn 02-getting-started:app3 --reload
+Run:
+    uvicorn 02-getting-started:app --reload
 """
 
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, HTTPException, Request
+
+app = FastAPI(title="CRUD Exercise")
+
+# In-memory data store
+items_db: dict[int, dict] = {}
 
 
 # =============================================================================
-# Exercise 1: HTTP Methods
+# Exercise 1: Basic CRUD Operations
 # =============================================================================
-# Create an app with CRUD-style routes for "items":
-#   GET    /items        -> {"items": [], "count": 0}
-#   POST   /items        -> status 201, body: {"created": true}
-#   PUT    /items/{id}   -> {"updated": true, "id": <id>}
-#   DELETE /items/{id}   -> {"deleted": true, "id": <id>}
+# Implement a simple item management API:
+#   GET    /items       -> List all items
+#   POST   /items       -> Create a new item
+#   PUT    /items/{id}  -> Update an existing item
+#   DELETE /items/{id}  -> Delete an item
 #
 # Hints:
-#   - Use @app.post(), @app.put(), @app.delete() decorators
-#   - For POST, return status_code=201 (Created)
-#   - For PUT/DELETE, use path parameter {id}
-#   - You can return status code via Response(status_code=...) or
-#     by returning a tuple: (dict, status_code)
-#
-# Expected behavior:
-#   GET  /items       -> 200, {"items": [], "count": 0}
-#   POST /items       -> 201, {"created": true}
-#   PUT  /items/42    -> 200, {"updated": true, "id": 42}
-#   DELETE /items/42  -> 200, {"deleted": true, "id": 42}
-#
-# Test with:
-#   curl -X GET http://localhost:8000/items
-#   curl -X POST http://localhost:8000/items
-#   curl -X PUT http://localhost:8000/items/42
-#   curl -X DELETE http://localhost:8000/items/42
+#   - Use @app.get, @app.post, @app.put, @app.delete decorators
+#   - POST typically returns status 201
+#   - DELETE typically returns status 204 (no content)
+#   - Use a simple auto-incrementing ID counter
 # =============================================================================
 
-app1 = FastAPI(title="Exercise 2.1 - HTTP Methods")
+next_id = 1
 
 
-@app1.get("/items")
+@app.get("/items")
 def list_items():
-    pass  # TODO: Return {"items": [], "count": 0}
+    """Return all items with count."""
+    return {"items": list(items_db.values()), "count": len(items_db)}
 
 
-@app1.post("/items", status_code=201)
-def create_item():
-    pass  # TODO: Return {"created": true}
+@app.post("/items", status_code=201)
+def create_item(item: dict):
+    """Create a new item and return it with its assigned ID."""
+    global next_id
+    item_id = next_id
+    next_id += 1
+    items_db[item_id] = {"id": item_id, **item}
+    return {"created": True, "id": item_id, "item": items_db[item_id]}
 
 
-@app1.put("/items/{item_id}")
-def update_item(item_id: int):
-    pass  # TODO: Return {"updated": true, "id": item_id}
+@app.put("/items/{item_id}")
+def update_item(item_id: int, item: dict):
+    """Update an existing item by ID."""
+    if item_id not in items_db:
+        raise HTTPException(status_code=404, detail="Item not found")
+    items_db[item_id] = {"id": item_id, **item}
+    return {"updated": True, "id": item_id, "item": items_db[item_id]}
 
 
-@app1.delete("/items/{item_id}")
+@app.delete("/items/{item_id}", status_code=204)
 def delete_item(item_id: int):
-    pass  # TODO: Return {"deleted": true, "id": item_id}
+    """Delete an item by ID. Returns no content."""
+    if item_id not in items_db:
+        raise HTTPException(status_code=404, detail="Item not found")
+    del items_db[item_id]
 
 
 # =============================================================================
-# Exercise 2: Custom Status Codes
+# Exercise 2: Status Code Practice
 # =============================================================================
-# Create an app that demonstrates various HTTP status codes:
-#   GET /ok           -> 200 with {"status": "ok"}
-#   GET /created      -> 201 with {"status": "created"}
-#   GET /no-content   -> 204 with NO body
-#   GET /not-found    -> 404 with {"error": "resource not found"}
-#   GET /forbidden    -> 403 with {"error": "access denied"}
-#   GET /server-error -> 500 with {"error": "internal server error"}
+# Create endpoints that demonstrate different HTTP status codes:
+#   GET /status/200  -> {"status": "ok"}            (OK)
+#   GET /status/201  -> {"status": "created"}        (Created)
+#   GET /status/204  -> no body                      (No Content)
+#   GET /status/404  -> {"error": "resource not found"}  (Not Found)
+#   GET /status/403  -> {"error": "access denied"}       (Forbidden)
+#   GET /status/500  -> {"error": "internal server error"} (Server Error)
 #
 # Hints:
-#   - Use Response(status_code=204) for no content
-#   - For error codes, return dict + status_code as tuple
-#   - You can also use: from fastapi.responses import JSONResponse
-#
-# Expected behavior:
-#   GET /ok           -> 200, {"status": "ok"}
-#   GET /created      -> 201, {"status": "created"}
-#   GET /no-content   -> 204, (empty body)
-#   GET /not-found    -> 404, {"error": "resource not found"}
-#   GET /forbidden    -> 403, {"error": "access denied"}
-#   GET /server-error -> 500, {"error": "internal server error"}
-#
-# Test with:
-#   curl -i http://localhost:8000/ok
-#   curl -i http://localhost:8000/no-content
-#   curl -i http://localhost:8000/not-found
+#   - Use status_code parameter in the decorator or return Response directly
+#   - 204 responses should have no body
+#   - 4xx and 5xx errors should raise HTTPException
 # =============================================================================
 
-app2 = FastAPI(title="Exercise 2.2 - Status Codes")
+
+@app.get("/status/200")
+def status_ok():
+    """Return 200 OK with a status message."""
+    return {"status": "ok"}
 
 
-@app2.get("/ok")
-def get_ok():
-    pass  # TODO: Return 200 with {"status": "ok"}
+@app.get("/status/201", status_code=201)
+def status_created():
+    """Return 201 Created with a status message."""
+    return {"status": "created"}
 
 
-@app2.get("/created")
-def get_created():
-    pass  # TODO: Return 201 with {"status": "created"}
+@app.get("/status/204", status_code=204)
+def status_no_content():
+    """Return 204 No Content with empty body."""
+    return None  # FastAPI will send empty body for 204
 
 
-@app2.get("/no-content")
-def get_no_content(response: Response):
-    pass  # TODO: Return 204 with empty body
-    # Hint: Use response.status_code = 204 and return Response(status_code=204)
+@app.get("/status/404")
+def status_not_found():
+    """Return 404 Not Found."""
+    raise HTTPException(status_code=404, detail={"error": "resource not found"})
 
 
-@app2.get("/not-found")
-def get_not_found():
-    pass  # TODO: Return 404 with {"error": "resource not found"}
+@app.get("/status/403")
+def status_forbidden():
+    """Return 403 Forbidden."""
+    raise HTTPException(status_code=403, detail={"error": "access denied"})
 
 
-@app2.get("/forbidden")
-def get_forbidden():
-    pass  # TODO: Return 403 with {"error": "access denied"}
-
-
-@app2.get("/server-error")
-def get_server_error():
-    pass  # TODO: Return 500 with {"error": "internal server error"}
+@app.get("/status/500")
+def status_server_error():
+    """Return 500 Internal Server Error."""
+    raise HTTPException(status_code=500, detail={"error": "internal server error"})
 
 
 # =============================================================================
-# Exercise 3: Reading Request Details
+# Exercise 3: Request Inspection
 # =============================================================================
-# Create an app that reads and returns request information:
-#   GET /request-info  -> returns a dict with:
-#     {
-#       "method": <HTTP method>,
-#       "path": <request path>,
-#       "headers": {"host": ..., "user-agent": ...},
-#       "query_params": <dict of query params>
-#     }
-#
-#   GET /echo?name=<name>&age=<age> -> returns:
-#     {"name": <name>, "age": <age>}
+# Create an endpoint that inspects and returns request details:
+#   GET /inspect?name=John&age=30  -> {
+#       "method": "GET",
+#       "path": "/inspect",
+#       "headers": {...},
+#       "query_params": {"name": "John", "age": "30"}
+#   }
+#   POST /inspect with body {"name": "John", "age": 30} -> {
+#       "method": "POST",
+#       "path": "/inspect",
+#       "headers": {...},
+#       "body": {"name": "John", "age": 30}
+#   }
 #
 # Hints:
-#   - Use from starlette.requests import Request
-#   - request.method, request.url.path, request.headers, request.query_params
-#   - For /echo, use Query parameters (covered more in exercise 04)
-#   - For query params: name: str = Query(default=...)
-#
-# Expected behavior:
-#   GET /request-info -> 200 with request details dict
-#   GET /echo?name=alice&age=30 -> 200, {"name": "alice", "age": "30"}
-#
-# Test with:
-#   curl http://localhost:8000/request-info
-#   curl "http://localhost:8000/echo?name=alice&age=30"
+#   - Use the Request object from Starlette (FastAPI's underlying framework)
+#   - Import: from starlette.requests import Request
+#   - Access request.method, request.url.path, request.headers
+#   - Use await request.json() for POST body
 # =============================================================================
 
-from fastapi import Query
-from starlette.requests import Request
-
-app3 = FastAPI(title="Exercise 2.3 - Request Details")
-
-
-@app3.get("/request-info")
-async def request_info(request: Request):
-    pass  # TODO: Return request method, path, headers, and query params
-
-
-@app3.get("/echo")
-async def echo(name: str = Query(default=""), age: str = Query(default="")):
-    pass  # TODO: Return {"name": name, "age": age}
+@app.api_route("/inspect", methods=["GET", "POST"])
+async def inspect_request(request: Request):
+    """Inspect and return details about the incoming request."""
+    info = {
+        "method": request.method,
+        "path": request.url.path,
+        "headers": dict(request.headers),
+        "query_params": dict(request.query_params),
+    }
+    if request.method == "POST":
+        try:
+            body = await request.json()
+            info["body"] = body
+        except Exception:
+            info["body"] = None
+    return info
 
 
 # =============================================================================
 # VERIFICATION CHECKLIST
 # =============================================================================
-# After completing the exercises:
-#
-# 1. Run: uvicorn 02-getting-started:app1 --reload
-#    - Test GET /items (should return empty list)
-#    - Test POST /items (should return 201)
-#    - Test PUT /items/42 (should return id: 42)
-#    - Test DELETE /items/42 (should return id: 42)
-#
-# 2. Run: uvicorn 02-getting-started:app2 --reload
-#    - Test all status code endpoints
-#    - Verify /no-content returns 204 with empty body
-#
-# 3. Run: uvicorn 02-getting-started:app3 --reload
-#    - Verify /request-info returns request details
-#    - Verify /echo echoes back query params
+# 1. Run: uvicorn 02-getting-started:app --reload
+# 2. Test CRUD: POST /items, GET /items, PUT /items/1, DELETE /items/1
+# 3. Test all /status/* endpoints
+# 4. Test the /inspect endpoint with GET and POST
 # =============================================================================

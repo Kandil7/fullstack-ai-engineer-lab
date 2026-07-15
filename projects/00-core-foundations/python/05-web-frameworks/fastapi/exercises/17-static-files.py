@@ -20,8 +20,8 @@ Note: Create directories and files before running:
     mkdir -p static/css static/js static/images
 """
 
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import HTMLResponse, FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import os
@@ -30,29 +30,12 @@ import os
 # =============================================================================
 # Exercise 1: Basic Static File Serving
 # =============================================================================
-# Mount static files directory:
-#   - Serve files from "./static" at path "/static"
-#   - GET /static/css/style.css should return the CSS file
-#   - GET /static/js/app.js should return the JS file
-#
-# Hints:
-#   - Use app.mount("/static", StaticFiles(directory="static"))
-#   - Files are served at their relative path
-#   - Ensure the static/ directory exists before running
-#
-# Expected behavior:
-#   GET http://localhost:8000/static/css/style.css -> CSS content
-#   GET http://localhost:8000/static/js/app.js -> JS content
-#   GET http://localhost:8000/static/images/logo.png -> Image
-#
-# Test with:
-#   curl http://localhost:8000/static/css/style.css
-#   Open browser: http://localhost:8000/static/css/style.css
-# =============================================================================
 
 app1 = FastAPI(title="Exercise 1 - Basic Static Files")
 
-# TODO: Mount static files directory
+# Mount static files directory (create ./static/ with some files first)
+os.makedirs("static", exist_ok=True)
+app1.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app1.get("/", response_class=HTMLResponse)
@@ -60,10 +43,16 @@ async def root():
     return """
     <html>
     <head>
-        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="stylesheet" href="/static/style.css">
     </head>
     <body>
         <h1>Static Files Exercise</h1>
+        <p>Static files are served from /static/ directory.</p>
+        <ul>
+            <li><a href="/static/style.css">CSS file</a></li>
+            <li><a href="/static/app.js">JS file</a></li>
+            <li><a href="/static/logo.png">Image file</a></li>
+        </ul>
     </body>
     </html>
     """
@@ -72,30 +61,17 @@ async def root():
 # =============================================================================
 # Exercise 2: Multiple Static Directories
 # =============================================================================
-# Serve multiple static directories:
-#   - "./static" at "/static"
-#   - "./uploads" at "/uploads"
-#   - "./media" at "/media"
-#   - Each directory serves different content types
-#
-# Hints:
-#   - Mount each directory separately
-#   - Order matters: mount after all routes
-#   - Create directories if they don't exist
-#
-# Expected behavior:
-#   GET /static/style.css -> from static/ directory
-#   GET /uploads/document.pdf -> from uploads/ directory
-#   GET /media/video.mp4 -> from media/ directory
-#
-# Test with:
-#   curl http://localhost:8000/static/style.css
-#   curl http://localhost:8000/uploads/document.pdf
-# =============================================================================
 
 app2 = FastAPI(title="Exercise 2 - Multiple Static Directories")
 
-# TODO: Mount multiple static directories
+# Mount multiple static directories
+os.makedirs("static", exist_ok=True)
+os.makedirs("uploads", exist_ok=True)
+os.makedirs("media", exist_ok=True)
+
+app2.mount("/static", StaticFiles(directory="static"), name="static_files")
+app2.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+app2.mount("/media", StaticFiles(directory="media"), name="media")
 
 
 @app2.get("/", response_class=HTMLResponse)
@@ -107,8 +83,11 @@ async def index():
     </head>
     <body>
         <h1>Multiple Static Directories</h1>
-        <a href="/uploads/doc.pdf">Download Document</a>
-        <img src="/media/logo.png" alt="Logo">
+        <ul>
+            <li><a href="/static/style.css">Static file</a></li>
+            <li><a href="/uploads/doc.pdf">Uploads file</a></li>
+            <li><a href="/media/logo.png">Media file</a></li>
+        </ul>
     </body>
     </html>
     """
@@ -117,109 +96,116 @@ async def index():
 # =============================================================================
 # Exercise 3: Dynamic File Download
 # =============================================================================
-# Create file download endpoints:
-#   - GET /download/{filename} serves files from downloads/ directory
-#   - Validate filename (no path traversal)
-#   - Return 404 if file not found
-#   - Add Content-Disposition header for download
-#
-# Hints:
-#   - Use FileResponse for file serving
-#   - Validate: filename should not contain ".." or "/"
-#   - Set headers: {"Content-Disposition": f"attachment; filename={filename}"}
-#
-# Expected behavior:
-#   GET /download/report.pdf -> Downloads the PDF file
-#   GET /download/../../../etc/passwd -> 400 Bad Request
-#   GET /download/missing.txt -> 404 Not Found
-#
-# Test with:
-#   curl -O http://localhost:8000/download/report.pdf
-#   curl http://localhost:8000/download/../../../etc/passwd
-# =============================================================================
 
 app3 = FastAPI(title="Exercise 3 - Dynamic File Download")
+
+DOWNLOAD_DIR = "downloads"
+os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 
 @app3.get("/download/{filename}")
 async def download_file(filename: str):
-    # TODO: Validate filename and serve file
-    pass
+    # Validate filename - no path traversal
+    if ".." in filename or "/" in filename or "\\" in filename:
+        raise HTTPException(status_code=400, detail="Invalid filename: path traversal detected")
+
+    filepath = os.path.join(DOWNLOAD_DIR, filename)
+    # Ensure the resolved path is within the download directory
+    resolved = os.path.normpath(os.path.join(os.getcwd(), filepath))
+    if not resolved.startswith(os.path.normpath(os.path.join(os.getcwd(), DOWNLOAD_DIR))):
+        raise HTTPException(status_code=400, detail="Invalid filename: path traversal detected")
+
+    if not os.path.isfile(filepath):
+        raise HTTPException(status_code=404, detail=f"File '{filename}' not found")
+
+    return FileResponse(
+        filepath,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+    )
 
 
 # =============================================================================
 # Exercise 4: Static Files with Templates
 # =============================================================================
-# Combine static files with Jinja2 templates:
-#   - Serve CSS/JS from static/ directory
-#   - Templates reference static files
-#   - Create a complete HTML page with:
-#     * Linked CSS stylesheet
-#     * Linked JavaScript file
-#     * Image from static/images/
-#
-# Hints:
-#   - In templates, use: <link rel="stylesheet" href="/static/css/style.css">
-#   - Use url_for for dynamic URLs: url_for('static', path='css/style.css')
-#   - Mount static AFTER defining routes
-#
-# Expected behavior:
-#   GET http://localhost:8000/ -> Full HTML page with styled content
-#   CSS and JS load correctly
-#   Images display properly
-#
-# Test with:
-#   curl http://localhost:8000/
-#   Open browser: http://localhost:8000/
-# =============================================================================
 
 app4 = FastAPI(title="Exercise 4 - Static Files with Templates")
+os.makedirs("static", exist_ok=True)
+app4.mount("/static", StaticFiles(directory="static"), name="static_assets")
 templates = Jinja2Templates(directory="templates")
 
 
 @app4.get("/", response_class=HTMLResponse)
 async def styled_page(request: Request):
-    # TODO: Render template that uses static files
-    pass
+    try:
+        return templates.TemplateResponse(
+            "styled.html",
+            {"request": request, "title": "Styled Page"}
+        )
+    except Exception:
+        return HTMLResponse("""
+        <html>
+        <head>
+            <link rel="stylesheet" href="/static/style.css">
+            <title>Styled Page</title>
+        </head>
+        <body>
+            <h1>Styled Page</h1>
+            <p>This page loads CSS from /static/style.css and JS from /static/app.js</p>
+            <script src="/static/app.js"></script>
+        </body>
+        </html>
+        """)
 
 
 # =============================================================================
 # Exercise 5: Favicon and Robots.txt
 # =============================================================================
-# Serve standard web files:
-#   - GET /favicon.ico serves favicon
-#   - GET /robots.txt serves robots file
-#   - GET /sitemap.xml serves sitemap
-#   - Return proper content types
-#
-# Hints:
-#   - Use FileResponse with media_type
-#   - Or mount static at root with specific paths
-#   - Consider using StaticFiles for /favicon.ico specifically
-#
-# Expected behavior:
-#   GET http://localhost:8000/favicon.ico -> favicon image
-#   GET http://localhost:8000/robots.txt -> robots.txt content
-#   GET http://localhost:8000/sitemap.xml -> XML sitemap
-#
-# Test with:
-#   curl http://localhost:8000/robots.txt
-#   curl http://localhost:8000/favicon.ico
-# =============================================================================
 
 app5 = FastAPI(title="Exercise 5 - Standard Web Files")
 
 
-@app5.get("/robots.txt")
+@app5.get("/robots.txt", response_class=PlainTextResponse)
 async def robots():
-    # TODO: Serve robots.txt
-    pass
+    return """User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /private/
+
+Sitemap: https://example.com/sitemap.xml
+"""
 
 
-@app5.get("/sitemap.xml")
+@app5.get("/sitemap.xml", response_class=PlainTextResponse)
 async def sitemap():
-    # TODO: Serve sitemap.xml
-    pass
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://example.com/</loc>
+    <lastmod>2024-01-15</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://example.com/about</loc>
+    <lastmod>2024-01-15</lastmod>
+    <priority>0.8</priority>
+  </url>
+</urlset>
+"""
+
+
+@app5.get("/favicon.ico")
+async def favicon():
+    favicon_path = os.path.join("static", "favicon.ico")
+    if os.path.isfile(favicon_path):
+        return FileResponse(favicon_path, media_type="image/x-icon")
+    # Return a simple SVG favicon as fallback
+    return PlainTextResponse(
+        content="""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+        <rect width="16" height="16" rx="3" fill="#4A90D9"/>
+        <text x="8" y="12" text-anchor="middle" fill="white" font-size="10" font-family="Arial">F</text>
+        </svg>""",
+        media_type="image/svg+xml"
+    )
 
 
 # =============================================================================

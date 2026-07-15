@@ -12,474 +12,479 @@ Prerequisites:
 Estimated time: 45-60 minutes
 """
 
-from fastapi import FastAPI, BackgroundTasks, Request
+from fastapi import FastAPI, BackgroundTasks, Request, HTTPException
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List, Any, Callable
 from contextlib import asynccontextmanager
 from datetime import datetime
 import asyncio
 import time
+import uuid
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("events")
+
 
 # ============================================================
 # Exercise 25.1: Startup and Shutdown Events
 # ============================================================
-"""
-Problem:
-    Implement proper application lifecycle management.
 
-Requirements:
-    1. Initialize resources on startup (DB connection, cache, etc.)
-    2. Clean up resources on shutdown (close connections, flush buffers)
-    3. Log lifecycle events with timestamps
-    4. Track application state (ready, shutting down)
-    5. Handle initialization failures gracefully
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Modern lifespan context manager for startup/shutdown."""
+    # Startup
+    app.state.db = {"connected": True, "pool_size": 10}
+    app.state.cache = {}
+    app.state.start_time = time.time()
+    app.state.ready = True
+    app.state.request_count = 0
+    logger.info(f"Application started at {datetime.utcnow().isoformat()}")
 
-Startup/shutdown pattern (legacy):
-    app = FastAPI()
+    yield
 
-    @app.on_event("startup")
-    async def startup_event():
-        print("Starting up...")
-        app.state.db = await create_db_connection()
-        app.state.cache = {}
-        app.state.start_time = time.time()
-        app.state.ready = True
+    # Shutdown
+    app.state.ready = False
+    app.state.db = {"connected": False}
+    uptime = time.time() - app.state.start_time
+    logger.info(f"Application shutting down. Uptime: {uptime:.1f}s, Requests handled: {app.state.request_count}")
 
-    @app.on_event("shutdown")
-    async def shutdown_event():
-        print("Shutting down...")
-        app.state.ready = False
-        await app.state.db.close()
-        print(f"Uptime: {time.time() - app.state.start_time:.1f}s")
 
-Modern lifespan pattern (Python 3.10+):
-    @asynccontextmanager
-    async def lifespan(app: FastAPI):
-        # Startup
-        app.state.db = await create_db_connection()
-        app.state.cache = {}
-        app.state.start_time = time.time()
-        app.state.ready = True
-        print("Application started")
-        yield
-        # Shutdown
-        app.state.ready = False
-        await app.state.db.close()
-        print(f"Uptime: {time.time() - app.state.start_time:.1f}s")
+app = FastAPI(title="Events & Lifespan Exercises", lifespan=lifespan)
 
-    app = FastAPI(lifespan=lifespan)
 
-Endpoints:
-    GET /health      - Health check with startup status
-    GET /status      - Detailed application status
-    GET /uptime      - Application uptime
+@app.get("/health")
+async def health_check(request: Request):
+    """Basic health check with startup status."""
+    ready = request.app.state.ready
+    if not ready:
+        raise HTTPException(status_code=503, detail="Service is shutting down")
+    return {"status": "healthy", "ready": ready, "timestamp": datetime.utcnow().isoformat()}
 
-Hints:
-    - Use app.state to store application-level data
-    - asynccontextmanager for the lifespan function
-    - yield separates startup from shutdown code
-    - app.state.ready flag prevents requests during shutdown
-    - Handle exceptions in startup to prevent partial initialization
 
-Test cases:
-    # Health check
-    GET /health
-    -> 200 {"status": "healthy", "ready": true}
-
-    # Application status
-    GET /status
-    -> 200 {
-        "ready": true,
-        "uptime_seconds": 125.3,
-        "initialized": true
+@app.get("/status")
+async def application_status(request: Request):
+    """Detailed application status."""
+    uptime = time.time() - request.app.state.start_time
+    return {
+        "ready": request.app.state.ready,
+        "uptime_seconds": round(uptime, 1),
+        "database": "connected" if request.app.state.db.get("connected") else "disconnected",
+        "cache_items": len(request.app.state.cache),
+        "requests_handled": request.app.state.request_count,
     }
 
-    # During shutdown (simulate)
-    GET /health
-    -> 503 {"status": "shutting_down", "ready": false}
-"""
 
-# TODO: Write lifecycle management code below
+@app.get("/uptime")
+async def get_uptime(request: Request):
+    """Application uptime."""
+    uptime = time.time() - request.app.state.start_time
+    return {"uptime_seconds": round(uptime, 1), "started_at": datetime.fromtimestamp(request.app.state.start_time).isoformat()}
 
 
 # ============================================================
 # Exercise 25.2: Background Tasks
 # ============================================================
-"""
-Problem:
-    Implement FastAPI BackgroundTasks for deferred processing.
 
-Endpoints with background tasks:
-    POST /orders          - Create order + send confirmation email in background
-    POST /reports         - Generate report + send notification when done
-    POST /analytics       - Track event + process analytics asynchronously
+orders_for_background: List[dict] = []
+reports_store: dict = {}
 
-Background task patterns:
 
-    1. Email sending (fire-and-forget):
-        @app.post("/orders")
-        async def create_order(order: OrderCreate, background_tasks: BackgroundTasks):
-            # Create order (fast)
-            db_order = create_order_in_db(order)
-            # Send email in background (slow, but doesn't block response)
-            background_tasks.add_task(
-                send_confirmation_email,
-                email=order.email,
-                order_id=db_order.id
-            )
-            return db_order
+async def send_confirmation_email(email: str, order_id: int, item: str):
+    """Simulate sending a confirmation email in the background."""
+    await asyncio.sleep(1)  # Simulate email sending
+    logger.info(f"Email sent to {email} for order #{order_id}: {item}")
 
-    2. Report generation (with notification):
-        @app.post("/reports")
-        async def generate_report(
-            report_request: ReportRequest,
-            background_tasks: BackgroundTasks
-        ):
-            report_id = str(uuid.uuid4())
-            reports[report_id] = {"status": "processing"}
-            background_tasks.add_task(
-                process_report, report_id, report_request
-            )
-            return {"report_id": report_id, "status": "processing"}
 
-    3. Analytics tracking:
-        @app.post("/analytics")
-        async def track_event(
-            event: AnalyticsEvent,
-            background_tasks: BackgroundTasks
-        ):
-            background_tasks.add_task(
-                process_analytics, event.dict()
-            )
-            return {"status": "tracked"}
+class OrderCreate(BaseModel):
+    item: str
+    email: str
 
-Background functions:
-    async def send_confirmation_email(email: str, order_id: int):
-        await asyncio.sleep(1)  # Simulate email sending
-        print(f"Email sent to {email} for order {order_id}")
 
-    async def process_report(report_id: str, request: ReportRequest):
-        # Simulate long-running report generation
-        for i in range(10):
-            await asyncio.sleep(1)
-            reports[report_id]["progress"] = (i + 1) * 10
-        reports[report_id]["status"] = "completed"
-        reports[report_id]["url"] = f"/reports/{report_id}/download"
+@app.post("/orders", status_code=201)
+async def create_order(order: OrderCreate, background_tasks: BackgroundTasks):
+    """Create an order and send confirmation email in background."""
+    order_id = len(orders_for_background) + 1
+    orders_for_background.append({"id": order_id, **order.model_dump()})
 
-Hints:
-    - BackgroundTasks is injected automatically by FastAPI
-    - background_tasks.add_task(func, *args, **kwargs)
-    - Tasks run after the response is sent
-    - Tasks share the same database session (if using dependency injection)
-    - For truly async tasks, use Celery, ARQ, or asyncio.create_task()
+    background_tasks.add_task(
+        send_confirmation_email,
+        email=order.email,
+        order_id=order_id,
+        item=order.item
+    )
 
-Test cases:
-    # Create order (email sent in background)
-    POST /orders {"item": "Widget", "email": "alice@example.com"}
-    -> 201 {"id": 1, "item": "Widget"}
-    (background: email sent to alice@example.com)
+    return {"id": order_id, "item": order.item, "status": "created"}
 
-    # Generate report
-    POST /reports {"type": "sales", "date_range": "2024-01"}
-    -> 202 {"report_id": "abc-123", "status": "processing"}
 
-    # Check report status
-    GET /reports/abc-123
-    -> 200 {"status": "completed", "progress": 100, "url": "/reports/abc-123/download"}
-"""
+class ReportRequest(BaseModel):
+    type: str
+    date_range: str
 
-# TODO: Write background tasks code below
+
+async def process_report(report_id: str, request_data: ReportRequest):
+    """Generate a report in the background with progress updates."""
+    reports_store[report_id] = {"status": "processing", "progress": 0}
+
+    total_steps = 10
+    for i in range(total_steps):
+        await asyncio.sleep(0.3)
+        reports_store[report_id]["progress"] = ((i + 1) / total_steps) * 100
+
+    reports_store[report_id]["status"] = "completed"
+    reports_store[report_id]["progress"] = 100
+    reports_store[report_id]["url"] = f"/reports/{report_id}/download"
+    logger.info(f"Report {report_id} completed")
+
+
+@app.post("/reports", status_code=202)
+async def generate_report(report_request: ReportRequest, background_tasks: BackgroundTasks):
+    """Generate a report asynchronously."""
+    report_id = str(uuid.uuid4())[:8]
+    background_tasks.add_task(process_report, report_id, report_request)
+    return {"report_id": report_id, "status": "processing"}
+
+
+@app.get("/reports/{report_id}")
+async def get_report_status(report_id: str):
+    """Check report generation status."""
+    report = reports_store.get(report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    return {"report_id": report_id, **report}
+
+
+class AnalyticsEvent(BaseModel):
+    event_type: str
+    user_id: str
+    properties: dict = {}
+
+
+async def process_analytics(event: dict):
+    """Process analytics event in background."""
+    await asyncio.sleep(0.2)
+    logger.info(f"Analytics processed: {event['event_type']} for user {event['user_id']}")
+
+
+@app.post("/analytics")
+async def track_event(event: AnalyticsEvent, background_tasks: BackgroundTasks):
+    """Track analytics event asynchronously."""
+    background_tasks.add_task(process_analytics, event.model_dump())
+    return {"status": "tracked", "event_type": event.event_type}
 
 
 # ============================================================
 # Exercise 25.3: Application State Management
 # ============================================================
-"""
-Problem:
-    Build a robust application state management system.
 
-State categories:
-    1. Configuration (immutable after startup)
-    2. Runtime state (changes during operation)
-    3. Metrics (accumulated statistics)
-    4. Cache (temporary data)
+class AppState:
+    """Robust application state management system."""
 
-State manager:
-    class AppState:
-        def __init__(self):
-            # Configuration (set on startup)
-            self.config: dict = {}
-            # Runtime state
-            self.status: str = "initializing"
-            self.start_time: float = 0
-            # Metrics
-            self.metrics = {
-                "requests_total": 0,
-                "errors_total": 0,
-                "active_connections": 0
-            }
-            # Cache
-            self.cache: dict = {}
-            self.cache_ttl: dict = {}
+    def __init__(self):
+        # Configuration (immutable after startup)
+        self.config: dict = {
+            "app_name": "FastAPI Events Demo",
+            "version": "1.0.0",
+            "debug": False,
+            "max_requests_per_minute": 100,
+        }
+        # Runtime state
+        self.status: str = "initializing"
+        self.start_time: float = time.time()
+        # Metrics
+        self.metrics = {
+            "requests_total": 0,
+            "errors_total": 0,
+            "active_connections": 0,
+        }
+        # Cache
+        self.cache: dict = {}
+        self.cache_ttl: dict = {}
 
-        def increment_requests(self):
-            self.metrics["requests_total"] += 1
+    def increment_requests(self):
+        self.metrics["requests_total"] += 1
 
-        def increment_errors(self):
-            self.metrics["errors_total"] += 1
+    def increment_errors(self):
+        self.metrics["errors_total"] += 1
 
-        def cache_set(self, key: str, value: Any, ttl: int = 300):
-            self.cache[key] = value
-            self.cache_ttl[key] = time.time() + ttl
+    def cache_set(self, key: str, value: Any, ttl: int = 300):
+        self.cache[key] = value
+        self.cache_ttl[key] = time.time() + ttl
 
-        def cache_get(self, key: str):
-            if key in self.cache:
-                if time.time() < self.cache_ttl.get(key, 0):
-                    return self.cache[key]
-                del self.cache[key]
-            return None
+    def cache_get(self, key: str) -> Optional[Any]:
+        if key in self.cache:
+            if time.time() < self.cache_ttl.get(key, 0):
+                return self.cache[key]
+            del self.cache[key]
+            del self.cache_ttl[key]
+        return None
 
-Endpoints:
-    GET  /state/config    - Get application configuration
-    GET  /state/metrics   - Get current metrics
-    POST /state/config    - Update configuration (admin only)
-    GET  /state/cache/{key} - Get cached value
-    POST /state/cache/{key} - Set cached value
 
-Hints:
-    - Store AppState instance in app.state
-    - Middleware can update metrics on each request
-    - Use atomic operations for concurrent metric updates
-    - Consider using dataclasses or Pydantic for state validation
-    - Thread-safe state for multi-worker deployments
+app_state = AppState()
 
-Test cases:
-    # Get configuration
-    GET /state/config
-    -> 200 {"app_name": "MyApp", "version": "1.0", "debug": false}
 
-    # Get metrics
-    GET /state/metrics
-    -> 200 {"requests_total": 42, "errors_total": 3, "active_connections": 5}
+@app.on_event("startup")
+async def start_state():
+    app_state.status = "running"
 
-    # Cache operations
-    POST /state/cache/user:1 {"value": {"name": "Alice"}, "ttl": 60}
-    -> 200 {"cached": true, "expires_in": 60}
 
-    GET /state/cache/user:1
-    -> 200 {"value": {"name": "Alice"}}
-"""
+@app.get("/state/config")
+async def get_config():
+    """Get application configuration."""
+    return app_state.config
 
-# TODO: Write application state management below
+
+@app.get("/state/metrics")
+async def get_metrics():
+    """Get current metrics."""
+    return {
+        **app_state.metrics,
+        "uptime_seconds": round(time.time() - app_state.start_time, 1),
+        "cache_size": len(app_state.cache),
+    }
+
+
+@app.post("/state/config")
+async def update_config(config: dict):
+    """Update configuration (admin only)."""
+    app_state.config.update(config)
+    return {"updated": True, "config": app_state.config}
+
+
+@app.get("/state/cache/{key}")
+async def get_cached_value(key: str):
+    """Get cached value by key."""
+    value = app_state.cache_get(key)
+    if value is None:
+        raise HTTPException(status_code=404, detail="Cache miss")
+    return {"key": key, "value": value, "source": "cache"}
+
+
+class CacheSetRequest(BaseModel):
+    value: Any
+    ttl: int = 60
+
+
+@app.post("/state/cache/{key}")
+async def set_cached_value(key: str, req: CacheSetRequest):
+    """Set a cached value with TTL."""
+    app_state.cache_set(key, req.value, req.ttl)
+    return {"cached": True, "key": key, "expires_in": req.ttl}
+
+
+# Middleware to track metrics
+@app.middleware("http")
+async def track_metrics(request: Request, call_next):
+    """Middleware that tracks request metrics."""
+    app_state.increment_requests()
+    request.app.state.request_count += 1
+    response = await call_next(request)
+    if response.status_code >= 400:
+        app_state.increment_errors()
+    return response
 
 
 # ============================================================
 # Exercise 25.4: Health Check System
 # ============================================================
-"""
-Problem:
-    Build a comprehensive health check system.
 
-Health check types:
-    1. Basic liveness check (is the app running?)
-    2. Readiness check (can the app serve traffic?)
-    3. Detailed dependency checks (DB, cache, external APIs)
-    4. Kubernetes-compatible probes
+async def check_database() -> dict:
+    """Check database connectivity."""
+    try:
+        start = time.time()
+        await asyncio.sleep(0.002)  # Simulate DB ping
+        latency = (time.time() - start) * 1000
+        return {"status": "healthy", "latency_ms": round(latency, 1)}
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}
 
-Endpoints:
-    GET /health              - Basic liveness (returns 200 if running)
-    GET /health/ready       - Readiness (returns 200 if ready to serve)
-    GET /health/live        - Kubernetes liveness probe
-    GET /health/detailed    - Full health report with dependencies
 
-Health response:
-    {
+async def check_cache() -> dict:
+    """Check cache connectivity."""
+    try:
+        start = time.time()
+        await asyncio.sleep(0.0005)  # Simulate cache ping
+        latency = (time.time() - start) * 1000
+        return {"status": "healthy", "latency_ms": round(latency, 1)}
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}
+
+
+async def check_disk_space() -> dict:
+    """Check available disk space."""
+    import shutil
+    try:
+        total, used, free = shutil.disk_usage(".")
+        free_gb = free / (1024 ** 3)
+        status = "healthy" if free_gb > 1.0 else "degraded" if free_gb > 0.1 else "unhealthy"
+        return {"status": status, "free_gb": round(free_gb, 1)}
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}
+
+
+@app.get("/health/live")
+async def liveness_probe():
+    """Kubernetes liveness probe - checks if app is running."""
+    return {"status": "alive"}
+
+
+@app.get("/health/ready")
+async def readiness_probe(request: Request):
+    """Kubernetes readiness probe - checks if app is ready to serve traffic."""
+    if not request.app.state.ready:
+        raise HTTPException(status_code=503, detail="Service not ready")
+    return {"status": "ready"}
+
+
+@app.get("/health/detailed")
+async def detailed_health():
+    """Full health report with dependency checks."""
+    checks = await asyncio.gather(
+        check_database(),
+        check_cache(),
+        check_disk_space(),
+    )
+
+    health_data = {
         "status": "healthy",
-        "timestamp": "2024-01-15T10:30:00Z",
-        "uptime_seconds": 125.3,
+        "timestamp": datetime.utcnow().isoformat(),
+        "uptime_seconds": round(time.time() - app_state.start_time, 1),
         "checks": {
-            "database": {"status": "healthy", "latency_ms": 2.3},
-            "cache": {"status": "healthy", "latency_ms": 0.5},
-            "external_api": {"status": "degraded", "latency_ms": 1500.0},
-            "disk_space": {"status": "healthy", "free_gb": 45.2}
+            "database": checks[0],
+            "cache": checks[1],
+            "disk_space": checks[2],
         },
-        "version": "1.2.3",
-        "environment": "production"
+        "version": app_state.config.get("version", "unknown"),
+        "environment": "development",
     }
 
-Health check implementation:
-    async def check_database() -> dict:
-        try:
-            start = time.time()
-            # Simulate DB ping
-            await asyncio.sleep(0.002)
-            latency = (time.time() - start) * 1000
-            return {"status": "healthy", "latency_ms": round(latency, 1)}
-        except Exception as e:
-            return {"status": "unhealthy", "error": str(e)}
+    # Determine overall status
+    statuses = [c["status"] for c in checks]
+    if "unhealthy" in statuses:
+        health_data["status"] = "unhealthy"
+    elif "degraded" in statuses:
+        health_data["status"] = "degraded"
 
-    async def check_cache() -> dict:
-        try:
-            start = time.time()
-            # Simulate cache ping
-            await asyncio.sleep(0.0005)
-            latency = (time.time() - start) * 1000
-            return {"status": "healthy", "latency_ms": round(latency, 1)}
-        except Exception as e:
-            return {"status": "unhealthy", "error": str(e)}
+    if health_data["status"] != "healthy":
+        return JSONResponse(status_code=503, content=health_data)
 
-Kubernetes probe endpoints:
-    GET /health/live   -> 200 (app is alive)
-    GET /health/ready  -> 200 (app is ready)
-                       -> 503 (app is not ready)
-
-Hints:
-    - Liveness: just check if app is running (minimal check)
-    - Readiness: check all critical dependencies
-    - Use asyncio.gather() for parallel health checks
-    - Cache health check results for 5 seconds
-    - Return 503 for unhealthy, 200 for healthy
-    - Consider adding version info for rolling deployments
-
-Test cases:
-    # Liveness probe
-    GET /health/live
-    -> 200 {"status": "alive"}
-
-    # Readiness probe
-    GET /health/ready
-    -> 200 {"status": "ready"}
-
-    # Detailed health
-    GET /health/detailed
-    -> 200 {
-        "status": "healthy",
-        "checks": {
-            "database": {"status": "healthy", "latency_ms": 2.3},
-            "cache": {"status": "healthy", "latency_ms": 0.5}
-        }
-    }
-
-    # Unhealthy (simulate DB failure)
-    GET /health/detailed
-    -> 503 {
-        "status": "unhealthy",
-        "checks": {
-            "database": {"status": "unhealthy", "error": "Connection refused"}
-        }
-    }
-"""
-
-# TODO: Write health check system below
+    return health_data
 
 
 # ============================================================
 # Exercise 25.5: Event-Driven Architecture (Advanced)
 # ============================================================
-"""
-Problem:
-    Build a simple in-process event system for decoupled components.
 
-Requirements:
-    1. Create an EventBus class for publish/subscribe pattern
-    2. Events are processed asynchronously
-    3. Support multiple subscribers per event
-    4. Include error handling and retry logic
-    5. Events are logged for debugging
+class EventBus:
+    """Simple in-process publish/subscribe event system."""
 
-EventBus:
-    class EventBus:
-        def __init__(self):
-            self.subscribers: dict[str, list[Callable]] = {}
-            self.event_log: list[dict] = []
+    def __init__(self):
+        self.subscribers: dict[str, list[Callable]] = {}
+        self.event_log: list[dict] = []
+        self._event_counter = 0
 
-        def subscribe(self, event_type: str, handler: Callable):
-            if event_type not in self.subscribers:
-                self.subscribers[event_type] = []
-            self.subscribers[event_type].append(handler)
+    def subscribe(self, event_type: str, handler: Callable):
+        """Register a handler for an event type."""
+        if event_type not in self.subscribers:
+            self.subscribers[event_type] = []
+        self.subscribers[event_type].append(handler)
+        logger.info(f"Subscribed handler '{handler.__name__}' to event '{event_type}'")
 
-        async def publish(self, event_type: str, data: dict):
-            # Log the event
-            self.event_log.append({
-                "event": event_type,
-                "data": data,
-                "timestamp": datetime.utcnow().isoformat()
-            })
-            # Notify all subscribers
-            if event_type in self.subscribers:
-                for handler in self.subscribers[event_type]:
-                    try:
-                        await handler(data)
-                    except Exception as e:
-                        print(f"Handler error: {e}")
+    async def publish(self, event_type: str, data: dict) -> str:
+        """Publish an event and notify all subscribers."""
+        self._event_counter += 1
+        event_id = f"evt-{self._event_counter}"
 
-Usage:
-    event_bus = EventBus()
+        # Log the event
+        event_entry = {
+            "event_id": event_id,
+            "type": event_type,
+            "data": data,
+            "timestamp": datetime.utcnow().isoformat(),
+        }
+        self.event_log.append(event_entry)
 
-    # Subscribe to events
-    async def send_welcome_email(data: dict):
-        print(f"Sending welcome email to {data['email']}")
+        # Notify all subscribers
+        if event_type in self.subscribers:
+            for handler in self.subscribers[event_type]:
+                try:
+                    await handler(data)
+                except Exception as e:
+                    logger.error(f"Handler '{handler.__name__}' failed for event '{event_type}': {e}")
 
-    async def create_default_workspace(data: dict):
-        print(f"Creating workspace for user {data['user_id']}")
-
-    event_bus.subscribe("user.created", send_welcome_email)
-    event_bus.subscribe("user.created", create_default_workspace)
-
-    # Publish event (both handlers run)
-    await event_bus.publish("user.created", {
-        "user_id": 1,
-        "email": "alice@example.com"
-    })
-
-Endpoints:
-    POST /events            - Publish an event
-    GET  /events            - List recent events
-    POST /events/subscribe  - Subscribe to events (for demo)
-
-Events to support:
-    - user.created    -> Send welcome email, create workspace
-    - order.placed    -> Update inventory, send notification
-    - payment.received -> Update order status, generate invoice
-    - report.ready    -> Send download link
-
-Hints:
-    - Use Callable type for handlers
-    - Use asyncio.create_task() for fire-and-forget publishing
-    - Store event log for debugging and replay
-    - Consider using Redis Pub/Sub for distributed events
-    - Add event IDs for tracking and deduplication
-
-Test cases:
-    # Publish event
-    POST /events {"type": "user.created", "data": {"email": "alice@test.com"}}
-    -> 202 {"event_id": "evt-123", "type": "user.created"}
-
-    # List events
-    GET /events
-    -> 200 {"events": [{"event_id": "evt-123", "type": "user.created", ...}]}
-
-    # Subscribe and receive events
-    POST /events/subscribe {"event_type": "order.placed"}
-    -> 200 {"subscriber_id": "sub-1"}
-"""
-
-# TODO: Write event-driven architecture code below
+        return event_id
 
 
-# ============================================================
-# Running the Application
-# ============================================================
-"""
-To run any exercise file:
-    cd projects/00-core-foundations/python/fastapi/exercises
-    uvicorn 25-events:app --reload --port 8000
+event_bus = EventBus()
 
-Test with curl:
-    curl http://localhost:8000/health
-    curl http://localhost:8000/status
 
-View API docs:
-    http://localhost:8000/docs
-    http://localhost:8000/redoc
-"""
+# Define some event handlers
+async def send_welcome_email(data: dict):
+    """Handler: Send welcome email on user.created."""
+    await asyncio.sleep(0.1)
+    logger.info(f"Welcome email sent to {data.get('email', 'unknown')}")
+
+
+async def create_default_workspace(data: dict):
+    """Handler: Create default workspace on user.created."""
+    await asyncio.sleep(0.2)
+    logger.info(f"Default workspace created for user {data.get('user_id', 'unknown')}")
+
+
+async def update_inventory(data: dict):
+    """Handler: Update inventory on order.placed."""
+    await asyncio.sleep(0.15)
+    logger.info(f"Inventory updated for order {data.get('order_id', 'unknown')}")
+
+
+async def send_order_notification(data: dict):
+    """Handler: Send order notification on order.placed."""
+    await asyncio.sleep(0.1)
+    logger.info(f"Order notification sent for order {data.get('order_id', 'unknown')}")
+
+
+# Subscribe handlers to events
+event_bus.subscribe("user.created", send_welcome_email)
+event_bus.subscribe("user.created", create_default_workspace)
+event_bus.subscribe("order.placed", update_inventory)
+event_bus.subscribe("order.placed", send_order_notification)
+
+
+class PublishEventRequest(BaseModel):
+    type: str
+    data: dict = {}
+
+
+@app.post("/events", status_code=202)
+async def publish_event(event: PublishEventRequest):
+    """Publish an event to the event bus."""
+    event_id = await event_bus.publish(event.type, event.data)
+    return {"event_id": event_id, "type": event.type}
+
+
+@app.get("/events")
+async def list_events(limit: int = 10):
+    """List recent events from the event log."""
+    recent = event_bus.event_log[-limit:]
+    return {"events": recent, "total": len(event_bus.event_log)}
+
+
+class SubscribeRequest(BaseModel):
+    event_type: str
+
+
+subscribers_db: dict = {}
+
+
+@app.post("/events/subscribe")
+async def subscribe_to_event(req: SubscribeRequest):
+    """Register a dynamic subscriber for demo purposes."""
+    sub_id = f"sub-{len(subscribers_db) + 1}"
+    subscribers_db[sub_id] = req.event_type
+
+    async def dynamic_handler(data: dict):
+        logger.info(f"[Dynamic subscriber {sub_id}] Event '{req.event_type}': {data}")
+
+    event_bus.subscribe(req.event_type, dynamic_handler)
+    return {"subscriber_id": sub_id, "event_type": req.event_type}

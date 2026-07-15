@@ -1,190 +1,119 @@
 """
 FastAPI Exercise 15 - WebSockets
-=================================
+==================================
 
 Topics covered:
 - WebSocket connections in FastAPI
-- Bidirectional communication
-- WebSocket rooms/channels
-- Real-time data streaming
+- Echo server
+- Chat room implementation
+- Broadcasting messages
 
 Requirements:
     pip install fastapi uvicorn websockets
 
-Run any exercise:
-    uvicorn 15-websockets:app1 --reload
-    uvicorn 15-websockets:app2 --reload
-    uvicorn 15-websockets:app3 --reload
+Run:
+    uvicorn 15-websockets:app --reload
 """
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel
-from typing import List
+from typing import Optional
 import json
 
-
-# =============================================================================
-# Exercise 1: Basic WebSocket Echo
-# =============================================================================
-# Create a WebSocket endpoint that:
-#   - Accepts connection at /ws/echo
-#   - Echoes back any message received
-#   - Adds "[Echo]" prefix to message
-#   - Handles connection/disconnection gracefully
-#
-# Hints:
-#   - Use @app.websocket("/ws/echo")
-#   - Use websocket.accept() to accept connection
-#   - Use await websocket.receive_text() to receive messages
-#   - Use await websocket.send_text() to send messages
-#   - Handle WebSocketDisconnect exception
-#
-# Expected behavior:
-#   Client connects to ws://localhost:8000/ws/echo
-#   Client sends: "Hello"
-#   Server responds: "[Echo] Hello"
-#
-# Test with (using websocat or similar):
-#   websocat ws://localhost:8000/ws/echo
-#   > Hello
-#   < [Echo] Hello
-# =============================================================================
-
-app1 = FastAPI(title="Exercise 1 - WebSocket Echo")
-
-
-@app1.websocket("/ws/echo")
-async def websocket_echo(websocket: WebSocket):
-    # TODO: Implement echo WebSocket
-    pass
+app = FastAPI(title="WebSocket Exercise")
 
 
 # =============================================================================
-# Exercise 2: WebSocket Chat Room
-# =============================================================================
-# Create a simple chat room:
-#   - WebSocket at /ws/chat/{room_name}
-#   - Each room has multiple clients
-#   - When a client sends a message, broadcast to ALL clients in same room
-#   - Messages format: {"username": "...", "message": "..."}
-#   - Notify room when user joins/leaves
-#
-# Hints:
-#   - Create a ChatRoomManager class to track connections
-#   - Store active connections by room name
-#   - Use asyncio for concurrent message handling
-#   - Broadcast to all connections in a room
-#
-# Expected behavior:
-#   Client 1 connects to /ws/chat/general
-#   Client 2 connects to /ws/chat/general
-#   Client 1 sends {"username": "Alice", "message": "Hi!"}
-#   Both clients receive the message
-#   Client 2 sends {"username": "Bob", "message": "Hello!"}
-#   Both clients receive the message
-#
-# Test with multiple websocat terminals:
-#   Terminal 1: websocat ws://localhost:8000/ws/chat/general
-#   Terminal 2: websocat ws://localhost:8000/ws/chat/general
+# Exercise 1: Echo WebSocket
 # =============================================================================
 
-app2 = FastAPI(title="Exercise 2 - WebSocket Chat Room")
+@app.websocket("/echo")
+async def echo_websocket(websocket: WebSocket):
+    """Echo WebSocket - receives messages and sends them back."""
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Echo: {data}")
+    except WebSocketDisconnect:
+        print("  Client disconnected from echo")
 
 
-class ChatRoomManager:
+# =============================================================================
+# Exercise 2: Chat Room
+# =============================================================================
+
+class ConnectionManager:
+    """Manages WebSocket connections for chat rooms."""
+
     def __init__(self):
-        # TODO: Initialize connection storage
-        pass
+        self.active_connections: dict[str, list[WebSocket]] = {}
 
-    async def connect(self, websocket: WebSocket, room: str, username: str):
-        # TODO: Accept connection and add to room
-        pass
+    async def connect(self, websocket: WebSocket, room: str):
+        await websocket.accept()
+        if room not in self.active_connections:
+            self.active_connections[room] = []
+        self.active_connections[room].append(websocket)
 
     def disconnect(self, websocket: WebSocket, room: str):
-        # TODO: Remove connection from room
-        pass
+        if room in self.active_connections:
+            self.active_connections[room].remove(websocket)
+            if not self.active_connections[room]:
+                del self.active_connections[room]
 
-    async def broadcast(self, message: str, room: str):
-        # TODO: Send message to all clients in room
-        pass
-
-
-chat_manager = ChatRoomManager()
-
-
-@app2.websocket("/ws/chat/{room}")
-async def websocket_chat(websocket: WebSocket, room: str):
-    # TODO: Handle chat room connection
-    pass
+    async def send_to_room(self, room: str, message: str, sender: Optional[str] = None):
+        if room in self.active_connections:
+            for connection in self.active_connections[room]:
+                data = {"sender": sender or "system", "message": message, "room": room}
+                await connection.send_text(json.dumps(data))
 
 
-# =============================================================================
-# Exercise 3: Real-time Notifications
-# =============================================================================
-# Create a notification system:
-#   - WebSocket at /ws/notifications
-#   - Server can push notifications to connected clients
-#   - POST /notify sends a notification to ALL connected clients
-#   - Notifications have types: "info", "warning", "error"
-#   - Client receives: {"type": "...", "message": "...", "timestamp": "..."}
-#
-# Hints:
-#   - Store active WebSocket connections in a list
-#   - POST endpoint iterates over connections and sends
-#   - Add timestamp using datetime
-#   - Handle disconnections when sending
-#
-# Expected behavior:
-#   Client connects to /ws/notifications
-#   POST http://localhost:8000/notify {"type": "info", "message": "New update!"}
-#   Client receives: {"type": "info", "message": "New update!", "timestamp": "..."}
-#
-# Test with:
-#   Terminal 1: websocat ws://localhost:8000/ws/notifications
-#   Terminal 2: curl -X POST http://localhost:8000/notify \
-#     -H "Content-Type: application/json" \
-#     -d '{"type": "info", "message": "Hello everyone!"}'
-# =============================================================================
-
-app3 = FastAPI(title="Exercise 3 - Real-time Notifications")
-
-# TODO: Create a list to store active notification connections
-active_connections: List[WebSocket] = []
+manager = ConnectionManager()
 
 
-class Notification(BaseModel):
-    type: str
-    message: str
-
-
-@app3.websocket("/ws/notifications")
-async def websocket_notifications(websocket: WebSocket):
-    # TODO: Handle notification subscription
-    pass
-
-
-@app3.post("/notify")
-async def send_notification(notification: Notification):
-    # TODO: Broadcast notification to all connected clients
-    pass
+@app.websocket("/chat/{room}")
+async def chat_websocket(websocket: WebSocket, room: str):
+    """Chat room WebSocket - users can join rooms and send messages."""
+    await manager.connect(websocket, room)
+    try:
+        await manager.send_to_room(room, f"New user joined {room}")
+        while True:
+            data = await websocket.receive_text()
+            await manager.send_to_room(room, data, sender="user")
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, room)
+        await manager.send_to_room(room, "User left the room")
 
 
 # =============================================================================
-# VERIFICATION CHECKLIST
+# Exercise 3: Notification Broadcasting
 # =============================================================================
-# After completing the exercises:
-#
-# 1. Run: uvicorn 15-websockets:app1 --reload
-#    - Connect with websocat
-#    - Verify messages are echoed with [Echo] prefix
-#
-# 2. Run: uvicorn 15-websockets:app2 --reload
-#    - Open two terminals with websocat
-#    - Send messages from both, verify both receive
-#    - Test different rooms (isolated)
-#
-# 3. Run: uvicorn 15-websockets:app3 --reload
-#    - Connect multiple clients
-#    - Send POST /notify from curl
-#    - Verify all clients receive notification
-# =============================================================================
+
+notification_connections: list[WebSocket] = []
+
+
+@app.websocket("/notifications")
+async def notification_websocket(websocket: WebSocket):
+    """Notification WebSocket - subscribes to broadcast notifications."""
+    await websocket.accept()
+    notification_connections.append(websocket)
+    try:
+        await websocket.send_text(json.dumps({"type": "connected", "message": "You are subscribed to notifications"}))
+        while True:
+            # Keep connection alive and listen for any client messages
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        notification_connections.remove(websocket)
+
+
+@app.post("/broadcast")
+async def broadcast_notification(message: str):
+    """Broadcast a notification to all connected WebSocket clients."""
+    disconnected = []
+    for connection in notification_connections:
+        try:
+            await connection.send_text(json.dumps({"type": "notification", "message": message}))
+        except Exception:
+            disconnected.append(connection)
+    for conn in disconnected:
+        notification_connections.remove(conn)
+    return {"broadcast": True, "recipients": len(notification_connections)}

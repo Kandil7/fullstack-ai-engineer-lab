@@ -22,31 +22,11 @@ Note: Create a 'templates/' directory with HTML files before running.
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
 from typing import List
 
 
 # =============================================================================
 # Exercise 1: Basic Template Rendering
-# =============================================================================
-# Create a simple page renderer:
-#   - GET / shows a homepage with title and content
-#   - GET /about shows an about page
-#   - Use Jinja2Templates for rendering
-#   - Templates directory: "./templates"
-#
-# Hints:
-#   - Initialize: templates = Jinja2Templates(directory="templates")
-#   - Render: return templates.TemplateResponse("page.html", {"request": request, ...})
-#   - In templates: use {{ variable }} for variables
-#
-# Expected behavior:
-#   GET http://localhost:8000/ -> HTML page with "Welcome to My Site"
-#   GET http://localhost:8000/about -> HTML page with about info
-#
-# Test with:
-#   curl http://localhost:8000/
-#   Open browser: http://localhost:8000/
 # =============================================================================
 
 app1 = FastAPI(title="Exercise 1 - Basic Templates")
@@ -55,38 +35,34 @@ templates = Jinja2Templates(directory="templates")
 
 @app1.get("/", response_class=HTMLResponse)
 async def homepage(request: Request):
-    # TODO: Render homepage template
-    pass
+    try:
+        return templates.TemplateResponse(
+            "home.html",
+            {"request": request, "title": "Welcome to My Site", "content": "This is the homepage content."}
+        )
+    except Exception:
+        return HTMLResponse(
+            "<h1>Welcome to My Site</h1><p>This is the homepage content.</p>"
+            "<p><small>Create a templates/home.html file for custom rendering.</small></p>"
+        )
 
 
 @app1.get("/about", response_class=HTMLResponse)
 async def about(request: Request):
-    # TODO: Render about template
-    pass
+    try:
+        return templates.TemplateResponse(
+            "about.html",
+            {"request": request, "title": "About Us", "content": "We are learning FastAPI templates!"}
+        )
+    except Exception:
+        return HTMLResponse(
+            "<h1>About Us</h1><p>We are learning FastAPI templates!</p>"
+            "<p><small>Create a templates/about.html file for custom rendering.</small></p>"
+        )
 
 
 # =============================================================================
 # Exercise 2: Dynamic Content
-# =============================================================================
-# Create a page that displays dynamic data:
-#   - GET /users shows a list of users
-#   - GET /users/{user_id} shows user profile
-#   - Pass data to template: users list, current user
-#   - Handle 404 if user not found
-#
-# Hints:
-#   - Pass data dict: {"request": request, "users": users, "current_user": user}
-#   - In templates: use {% for user in users %} for loops
-#   - Use {% if user %} for conditional rendering
-#
-# Expected behavior:
-#   GET http://localhost:8000/users -> HTML list of users
-#   GET http://localhost:8000/users/1 -> User profile page
-#   GET http://localhost:8000/users/999 -> 404 page
-#
-# Test with:
-#   curl http://localhost:8000/users
-#   curl http://localhost:8000/users/1
 # =============================================================================
 
 app2 = FastAPI(title="Exercise 2 - Dynamic Templates")
@@ -102,39 +78,45 @@ users = [
 
 @app2.get("/users", response_class=HTMLResponse)
 async def list_users(request: Request):
-    # TODO: Render users list template
-    pass
+    try:
+        return templates2.TemplateResponse(
+            "users.html",
+            {"request": request, "users": users, "total": len(users)}
+        )
+    except Exception:
+        user_list = "".join(
+            f"<li>{u['name']} - {u['email']}</li>" for u in users
+        )
+        return HTMLResponse(
+            f"<h1>Users ({len(users)})</h1><ul>{user_list}</ul>"
+        )
 
 
 @app2.get("/users/{user_id}", response_class=HTMLResponse)
 async def get_user(request: Request, user_id: int):
-    # TODO: Render single user template
-    pass
+    user = next((u for u in users if u["id"] == user_id), None)
+    if user is None:
+        try:
+            return templates2.TemplateResponse(
+                "404.html",
+                {"request": request, "message": f"User {user_id} not found"},
+                status_code=404
+            )
+        except Exception:
+            return HTMLResponse(f"<h1>404 - User {user_id} not found</h1>", status_code=404)
+    try:
+        return templates2.TemplateResponse(
+            "user.html",
+            {"request": request, "user": user}
+        )
+    except Exception:
+        return HTMLResponse(
+            f"<h1>{user['name']}</h1><p>Email: {user['email']}</p>"
+        )
 
 
 # =============================================================================
 # Exercise 3: Forms and Processing
-# =============================================================================
-# Create a form-based application:
-#   - GET /contact shows a contact form
-#   - POST /contact processes the form
-#   - GET /messages shows submitted messages
-#   - Store messages in a list
-#
-# Hints:
-#   - Use Form(...) for form fields
-#   - In template: use <form method="post" action="/contact">
-#   - Access form data with await request.form()
-#   - Redirect after POST: return RedirectResponse("/messages")
-#
-# Expected behavior:
-#   GET http://localhost:8000/contact -> HTML form
-#   POST http://localhost:8000/contact -> Process and redirect
-#   GET http://localhost:8000/messages -> List of messages
-#
-# Test with:
-#   curl http://localhost:8000/contact
-#   curl -X POST http://localhost:8000/contact -d "name=Test&email=test@example.com&message=Hello"
 # =============================================================================
 
 app3 = FastAPI(title="Exercise 3 - Forms")
@@ -146,8 +128,21 @@ messages: List[dict] = []
 
 @app3.get("/contact", response_class=HTMLResponse)
 async def contact_form(request: Request):
-    # TODO: Render contact form template
-    pass
+    try:
+        return templates3.TemplateResponse(
+            "contact.html",
+            {"request": request}
+        )
+    except Exception:
+        return HTMLResponse("""
+        <h1>Contact Us</h1>
+        <form method="post" action="/contact">
+            <label>Name: <input type="text" name="name" required></label><br><br>
+            <label>Email: <input type="email" name="email" required></label><br><br>
+            <label>Message:<br><textarea name="message" rows="5" cols="40" required></textarea></label><br><br>
+            <button type="submit">Send</button>
+        </form>
+        """)
 
 
 @app3.post("/contact", response_class=HTMLResponse)
@@ -157,14 +152,34 @@ async def submit_contact(
     email: str = Form(...),
     message: str = Form(...),
 ):
-    # TODO: Process form and show success page
-    pass
+    msg = {"id": len(messages) + 1, "name": name, "email": email, "message": message}
+    messages.append(msg)
+    try:
+        return templates3.TemplateResponse(
+            "success.html",
+            {"request": request, "name": name, "email": email}
+        )
+    except Exception:
+        return HTMLResponse(f"""
+        <h1>Thank you, {name}!</h1>
+        <p>Your message has been received.</p>
+        <a href="/messages">View all messages</a>
+        """)
 
 
 @app3.get("/messages", response_class=HTMLResponse)
 async def list_messages(request: Request):
-    # TODO: Render messages list template
-    pass
+    try:
+        return templates3.TemplateResponse(
+            "messages.html",
+            {"request": request, "messages": messages}
+        )
+    except Exception:
+        msg_list = "".join(
+            f"<li><strong>{m['name']}</strong> ({m['email']}): {m['message']}</li>"
+            for m in messages
+        ) if messages else "<li>No messages yet.</li>"
+        return HTMLResponse(f"<h1>Messages</h1><ul>{msg_list}</ul>")
 
 
 # =============================================================================

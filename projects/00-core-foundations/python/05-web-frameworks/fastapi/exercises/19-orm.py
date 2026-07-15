@@ -12,254 +12,451 @@ Prerequisites:
 Estimated time: 75-100 minutes
 """
 
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException, Query, Header
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
+from sqlalchemy import (
+    create_engine, Column, Integer, String, Text, Boolean,
+    DateTime, ForeignKey, func, or_
+)
+from sqlalchemy.orm import (
+    declarative_base, Session, sessionmaker,
+    relationship, joinedload, selectinload
+)
 
 app = FastAPI(title="ORM Exercises")
+
+SQLALCHEMY_DATABASE_URL = "sqlite:///./exercises_19.db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
 
 # ============================================================
 # Exercise 19.1: SQLAlchemy Model Definitions
 # ============================================================
-"""
-Problem:
-    Define SQLAlchemy ORM models for a blog application.
 
-Models to create:
-    User:
-        - id: Integer, primary key
-        - username: String(50), unique, not null
-        - email: String(100), unique, not null
-        - hashed_password: String(200), not null
-        - is_active: Boolean, default True
-        - created_at: DateTime, default now
-        - relationship: posts (one-to-many with Post)
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(100), unique=True, nullable=False, index=True)
+    hashed_password = Column(String(200), nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
-    Post:
-        - id: Integer, primary key
-        - title: String(200), not null
-        - content: Text, not null
-        - published: Boolean, default False
-        - created_at: DateTime, default now
-        - updated_at: DateTime, nullable
-        - author_id: Integer, foreign key to users.id
-        - relationship: author (many-to-one with User)
-        - relationship: comments (one-to-many with Comment)
+    posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
 
-    Comment:
-        - id: Integer, primary key
-        - content: Text, not null
-        - created_at: DateTime, default now
-        - author_id: Integer, foreign key to users.id
-        - post_id: Integer, foreign key to posts.id
-        - relationship: author (many-to-one with User)
-        - relationship: post (many-to-one with Post)
+    def __repr__(self):
+        return f"<User(id={self.id}, username='{self.username}')>"
 
-Hints:
-    - Use declarative_base() for model base class
-    - Use Column(), String(), Integer(), etc. from sqlalchemy
-    - Use ForeignKey("users.id") for relationships
-    - Use relationship("User", back_populates="posts") for back-references
-    - Define __tablename__ for each model
 
-Expected behavior:
-    Models should be importable and usable with SQLAlchemy sessions.
-    Relationships should be lazy-loaded by default.
+class Post(Base):
+    __tablename__ = "posts"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(200), nullable=False)
+    content = Column(Text, nullable=False)
+    published = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=True, onupdate=datetime.utcnow)
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
 
-TODO:
-    - Define all three models with proper relationships
-    - Add appropriate indexes on frequently queried columns
-    - Define __repr__ methods for debugging
-"""
+    author = relationship("User", back_populates="posts")
+    comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
 
-# TODO: Import SQLAlchemy components
-# TODO: Create Base class
-# TODO: Define User, Post, Comment models
+    def __repr__(self):
+        return f"<Post(id={self.id}, title='{self.title}')>"
+
+
+class Comment(Base):
+    __tablename__ = "comments"
+    id = Column(Integer, primary_key=True, index=True)
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    post_id = Column(Integer, ForeignKey("posts.id"), nullable=False, index=True)
+
+    author = relationship("User")
+    post = relationship("Post", back_populates="comments")
+
+    def __repr__(self):
+        return f"<Comment(id={self.id}, post_id={self.post_id})>"
 
 
 # ============================================================
 # Exercise 19.2: Database Session Management
 # ============================================================
-"""
-Problem:
-    Create a robust database session management system.
 
-Requirements:
-    1. Create get_db() dependency that yields SQLAlchemy sessions
-    2. Implement session cleanup on request completion
-    3. Handle session errors gracefully
-    4. Support both sync and async sessions (bonus)
-    5. Create init_db() function to create all tables
+Base.metadata.create_all(bind=engine)
 
-Architecture:
-    - Use SessionLocal for synchronous sessions
-    - Use AsyncSession for async operations (bonus)
-    - Sessions should auto-rollback on exceptions
-    - Connections should be returned to pool after each request
 
-Hints:
-    - from sqlalchemy.orm import Session, sessionmaker
-    - from sqlalchemy import create_engine
-    - SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    - Use yield in FastAPI dependencies for automatic cleanup
-    - try/finally ensures session.close() is called
+def get_db():
+    """Dependency that yields SQLAlchemy sessions, auto-closing after request."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-Test cases:
-    # Session works normally
-    GET /users
-    -> 200 [list of users]
 
-    # Session rolls back on error
-    POST /users (invalid data)
-    -> 400 (database unchanged)
+# ============================================================
+# Pydantic Models
+# ============================================================
 
-    # Database initialized
-    GET /health
-    -> 200 {"database": "ready"}
-"""
+class UserCreate(BaseModel):
+    username: str
+    email: str
+    password: str
 
-# TODO: Write database session management code
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    is_active: bool
+    created_at: datetime
+    post_count: int = 0
+
+    class Config:
+        from_attributes = True
+
+
+class PostCreate(BaseModel):
+    title: str
+    content: str
+    published: bool = False
+
+
+class PostResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    published: bool
+    created_at: datetime
+    author_id: int
+
+    class Config:
+        from_attributes = True
+
+
+class CommentCreate(BaseModel):
+    content: str
+
+
+class CommentResponse(BaseModel):
+    id: int
+    content: str
+    created_at: datetime
+    author_id: int
+    post_id: int
+
+    class Config:
+        from_attributes = True
+
+
+class PostDetail(PostResponse):
+    comments: List[CommentResponse] = []
+    author: Optional[UserResponse] = None
+
+
+class UserPublic(BaseModel):
+    id: int
+    username: str
+    email: str
+
+    class Config:
+        from_attributes = True
 
 
 # ============================================================
 # Exercise 19.3: CRUD with ORM
 # ============================================================
-"""
-Problem:
-    Implement CRUD operations using SQLAlchemy ORM.
 
-User Endpoints:
-    POST   /users          - Create user (hash password)
-    GET    /users          - List users (paginated)
-    GET    /users/{id}     - Get user with posts count
-    PUT    /users/{id}     - Update user
-    DELETE /users/{id}     - Delete user and all their posts/comments
+def fake_hash_password(password: str) -> str:
+    """Simulate password hashing for demo purposes."""
+    return f"hashed_{password}"
 
-Post Endpoints:
-    POST   /users/{id}/posts   - Create post for user
-    GET    /users/{id}/posts   - List user's posts
-    GET    /posts              - List all published posts
-    GET    /posts/{id}         - Get post with comments
-    PUT    /posts/{id}         - Update post (only by author)
-    DELETE /posts/{id}         - Delete post
 
-Request/Response Models:
-    UserCreate:  username, email, password
-    UserResponse: id, username, email, is_active, created_at, post_count
-    PostCreate:  title, content, published (optional, default False)
-    PostResponse: id, title, content, published, created_at, author_id
-    PostDetail:  PostResponse + comments: list[CommentResponse]
-    CommentCreate: content
+@app.post("/users", response_model=UserResponse, status_code=201)
+async def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(
+        (User.username == user.username) | (User.email == user.email)
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Username or email already exists")
+    db_user = User(
+        username=user.username,
+        email=user.email,
+        hashed_password=fake_hash_password(user.password)
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return UserResponse(
+        id=db_user.id,
+        username=db_user.username,
+        email=db_user.email,
+        is_active=db_user.is_active,
+        created_at=db_user.created_at,
+        post_count=0
+    )
 
-Hints:
-    - Use db.query(User).filter(User.id == user_id).first()
-    - Use db.add(), db.commit(), db.refresh() for creates
-    - Use db.delete() and db.commit() for deletes
-    - Use db.query(User).count() for totals
-    - Use .options(joinedload(User.posts)) for eager loading
-    - Use db.query(Post).filter(Post.published == True)
 
-Test cases:
-    # Create user
-    POST /users {"username": "alice", "email": "alice@example.com", "password": "secret"}
-    -> 201 {"id": 1, "username": "alice", ...}
+@app.get("/users", response_model=List[UserResponse])
+async def list_users(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=100),
+    db: Session = Depends(get_db)
+):
+    users = db.query(User).offset(skip).limit(limit).all()
+    result = []
+    for user in users:
+        post_count = db.query(func.count(Post.id)).filter(Post.author_id == user.id).scalar()
+        result.append(UserResponse(
+            id=user.id,
+            username=user.username,
+            email=user.email,
+            is_active=user.is_active,
+            created_at=user.created_at,
+            post_count=post_count or 0
+        ))
+    return result
 
-    # Create post
-    POST /users/1/posts {"title": "My Post", "content": "Hello world"}
-    -> 201 {"id": 1, "title": "My Post", "author_id": 1}
 
-    # Get post with comments
-    GET /posts/1
-    -> 200 {"id": 1, "title": "My Post", "comments": []}
+@app.get("/users/{user_id}", response_model=UserResponse)
+async def get_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    post_count = db.query(func.count(Post.id)).filter(Post.author_id == user_id).scalar()
+    return UserResponse(
+        id=user.id,
+        username=user.username,
+        email=user.email,
+        is_active=user.is_active,
+        created_at=user.created_at,
+        post_count=post_count or 0
+    )
 
-    # Delete user (cascades to posts and comments)
-    DELETE /users/1
-    -> 200 {"message": "User deleted with all content"}
-"""
 
-# TODO: Write CRUD endpoint code
+@app.put("/users/{user_id}", response_model=UserResponse)
+async def update_user(user_id: int, user_update: UserCreate, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db_user.username = user_update.username
+    db_user.email = user_update.email
+    if user_update.password:
+        db_user.hashed_password = fake_hash_password(user_update.password)
+    db.commit()
+    db.refresh(db_user)
+    post_count = db.query(func.count(Post.id)).filter(Post.author_id == user_id).scalar()
+    return UserResponse(
+        id=db_user.id,
+        username=db_user.username,
+        email=db_user.email,
+        is_active=db_user.is_active,
+        created_at=db_user.created_at,
+        post_count=post_count or 0
+    )
+
+
+@app.delete("/users/{user_id}")
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(db_user)
+    db.commit()
+    return {"message": "User deleted with all content"}
+
+
+# Post endpoints
+
+@app.post("/users/{user_id}/posts", response_model=PostResponse, status_code=201)
+async def create_post(user_id: int, post: PostCreate, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db_post = Post(**post.model_dump(), author_id=user_id)
+    db.add(db_post)
+    db.commit()
+    db.refresh(db_post)
+    return PostResponse(**{c: getattr(db_post, c) for c in PostResponse.model_fields})
+
+
+@app.get("/users/{user_id}/posts", response_model=List[PostResponse])
+async def list_user_posts(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    posts = db.query(Post).filter(Post.author_id == user_id).all()
+    return [PostResponse(**{c: getattr(p, c) for c in PostResponse.model_fields}) for p in posts]
+
+
+@app.get("/posts", response_model=List[PostResponse])
+async def list_published_posts(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db)
+):
+    posts = db.query(Post).filter(Post.published == True).offset(skip).limit(limit).all()
+    return [PostResponse(**{c: getattr(p, c) for c in PostResponse.model_fields}) for p in posts]
+
+
+@app.get("/posts/{post_id}", response_model=PostDetail)
+async def get_post(post_id: int, db: Session = Depends(get_db)):
+    post = db.query(Post).options(
+        joinedload(Post.author),
+        selectinload(Post.comments)
+    ).filter(Post.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    author = UserPublic(id=post.author.id, username=post.author.username, email=post.author.email) if post.author else None
+    comments = [CommentResponse(**{c: getattr(cm, c) for c in CommentResponse.model_fields}) for cm in post.comments]
+
+    return PostDetail(
+        **{c: getattr(post, c) for c in PostResponse.model_fields},
+        author=author,
+        comments=comments
+    )
+
+
+@app.put("/posts/{post_id}", response_model=PostResponse)
+async def update_post(
+    post_id: int,
+    post_update: PostCreate,
+    user_id: int = Header(alias="X-User-Id"),
+    db: Session = Depends(get_db)
+):
+    db_post = db.query(Post).filter(Post.id == post_id).first()
+    if not db_post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    if db_post.author_id != user_id:
+        raise HTTPException(status_code=403, detail="Only the author can update this post")
+    db_post.title = post_update.title
+    db_post.content = post_update.content
+    db_post.published = post_update.published
+    db.commit()
+    db.refresh(db_post)
+    return PostResponse(**{c: getattr(db_post, c) for c in PostResponse.model_fields})
+
+
+@app.delete("/posts/{post_id}")
+async def delete_post(
+    post_id: int,
+    user_id: int = Header(alias="X-User-Id"),
+    db: Session = Depends(get_db)
+):
+    db_post = db.query(Post).filter(Post.id == post_id).first()
+    if not db_post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    if db_post.author_id != user_id:
+        raise HTTPException(status_code=403, detail="Only the author can delete this post")
+    db.delete(db_post)
+    db.commit()
+    return {"message": "Post deleted"}
+
+
+# Comment endpoints
+
+@app.post("/posts/{post_id}/comments", response_model=CommentResponse, status_code=201)
+async def create_comment(
+    post_id: int,
+    comment: CommentCreate,
+    user_id: int = Header(alias="X-User-Id"),
+    db: Session = Depends(get_db)
+):
+    post = db.query(Post).filter(Post.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db_comment = Comment(content=comment.content, author_id=user_id, post_id=post_id)
+    db.add(db_comment)
+    db.commit()
+    db.refresh(db_comment)
+    return CommentResponse(**{c: getattr(db_comment, c) for c in CommentResponse.model_fields})
 
 
 # ============================================================
 # Exercise 19.4: Query Optimization with Joins
 # ============================================================
-"""
-Problem:
-    Implement optimized queries that avoid N+1 problems.
 
-Endpoints:
-    GET /feed          - Get latest 20 published posts with author info
-    GET /posts/{id}    - Get post with author and all comments (eager loaded)
-    GET /stats         - Get blog statistics (user count, post count, comment count)
-    GET /search        - Search posts by title/content
+@app.get("/feed", response_model=List[PostDetail])
+async def get_feed(db: Session = Depends(get_db)):
+    """Get latest 20 published posts with author info (eager loaded)."""
+    posts = db.query(Post).options(
+        joinedload(Post.author),
+        selectinload(Post.comments)
+    ).filter(
+        Post.published == True
+    ).order_by(
+        Post.created_at.desc()
+    ).limit(20).all()
 
-Requirements:
-    1. Use eager loading (joinedload) to avoid N+1 queries
-    2. Use subqueries for statistics
-    3. Use full-text search simulation (LIKE with multiple terms)
-    4. Profile queries (bonus: use SQLAlchemy's query logging)
+    result = []
+    for post in posts:
+        author = UserPublic(id=post.author.id, username=post.author.username, email=post.author.email) if post.author else None
+        comments = [CommentResponse(**{c: getattr(cm, c) for c in CommentResponse.model_fields}) for cm in post.comments]
+        result.append(PostDetail(
+            **{c: getattr(post, c) for c in PostResponse.model_fields},
+            author=author,
+            comments=comments
+        ))
+    return result
 
-Hints:
-    - from sqlalchemy.orm import joinedload, selectinload
-    - .options(joinedload(Post.author), selectinload(Post.comments))
-    - Use func.count() for aggregates
-    - Use or_(Post.title.contains(term), Post.content.contains(term))
-    - Feed endpoint: Post.published == True, order_by(Post.created_at.desc())
 
-Test cases:
-    # Feed with author info (single query, no N+1)
-    GET /feed
-    -> 200 [{"id": 1, "title": "...", "author": {"username": "alice"}, ...}]
+@app.get("/stats")
+async def get_stats(db: Session = Depends(get_db)):
+    """Get blog statistics."""
+    user_count = db.query(func.count(User.id)).scalar()
+    post_count = db.query(func.count(Post.id)).scalar()
+    comment_count = db.query(func.count(Comment.id)).scalar()
+    return {"users": user_count or 0, "posts": post_count or 0, "comments": comment_count or 0}
 
-    # Statistics
-    GET /stats
-    -> 200 {"users": 5, "posts": 23, "comments": 142}
 
-    # Search
-    GET /search?q=python+fastapi
-    -> 200 [matching posts with highlights]
-"""
-
-# TODO: Write optimized query code
+@app.get("/search", response_model=List[PostResponse])
+async def search_posts(q: str = Query(..., min_length=1), db: Session = Depends(get_db)):
+    """Search posts by title/content using multiple terms."""
+    terms = q.split()
+    conditions = [
+        or_(
+            Post.title.contains(term),
+            Post.content.contains(term)
+        )
+        for term in terms
+    ]
+    posts = db.query(Post).filter(
+        Post.published == True,
+        or_(*conditions)
+    ).order_by(Post.created_at.desc()).limit(20).all()
+    return [PostResponse(**{c: getattr(p, c) for c in PostResponse.model_fields}) for p in posts]
 
 
 # ============================================================
 # Exercise 19.5: Async SQLAlchemy (Bonus)
 # ============================================================
-"""
-Problem:
-    Convert the application to use async SQLAlchemy.
+# Note: To use async SQLAlchemy, install aiosqlite:
+#   pip install aiosqlite sqlalchemy[asyncio]
+#
+# Then use:
+#   from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+#   async_engine = create_async_engine("sqlite+aiosqlite:///./exercises_19.db")
+#   async_session = async_sessionmaker(async_engine, expire_on_commit=False)
+#
+# For this exercise file, the sync version above is the primary implementation.
+# Uncomment and adapt the code below for async support:
 
-Requirements:
-    1. Use AsyncSession and create_async_engine
-    2. Implement async get_db() dependency
-    3. Convert all CRUD operations to async
-    4. Handle async context managers properly
-
-Async architecture:
-    - engine = create_async_engine(DATABASE_URL, echo=True)
-    - async_session = async_sessionmaker(engine, expire_on_commit=False)
-    - async def get_async_db():
-          async with async_session() as session:
-              yield session
-
-Hints:
-    - pip install aiosqlite  (for async SQLite)
-    - pip install sqlalchemy[asyncio]
-    - Use: "sqlite+aiosqlite:///./database.db"
-    - Use: await db.execute(select(User).where(...))
-    - Use: result.scalars().all() to get list
-    - Use: await db.commit()
-
-Test cases:
-    # Async user creation
-    POST /async/users {"username": "bob", "email": "bob@test.com", "password": "pass"}
-    -> 201 {"id": 1, "username": "bob"}
-
-    # Async listing
-    GET /async/users
-    -> 200 [users with async response times]
-"""
-
-# TODO: Write async SQLAlchemy code (bonus exercise)
+# from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+#
+# ASYNC_DATABASE_URL = "sqlite+aiosqlite:///./exercises_19.db"
+# async_engine = create_async_engine(ASYNC_DATABASE_URL, echo=True)
+# async_session = async_sessionmaker(async_engine, expire_on_commit=False)
+#
+# async def get_async_db():
+#     async with async_session() as session:
+#         yield session

@@ -20,28 +20,12 @@ Run any exercise:
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import time
+import uuid
+from collections import defaultdict
 
 
 # =============================================================================
 # Exercise 1: Basic Request Logging Middleware
-# =============================================================================
-# Create a middleware that logs:
-#   - Request method
-#   - Request path
-#   - Response status code
-#   - Time taken (in milliseconds)
-#
-# Hints:
-#   - Use @app.middleware("http") decorator
-#   - Call await call_next(request) to continue the request chain
-#   - Time the request using time.time()
-#
-# Expected behavior:
-#   GET http://localhost:8000/hello
-#   Console output: "GET /hello - 200 - 12.34ms"
-#
-# Test with:
-#   curl http://localhost:8000/hello
 # =============================================================================
 
 app1 = FastAPI(title="Exercise 1 - Logging Middleware")
@@ -49,12 +33,12 @@ app1 = FastAPI(title="Exercise 1 - Logging Middleware")
 
 @app1.middleware("http")
 async def log_requests(request: Request, call_next):
-    # TODO: Implement logging middleware
-    # 1. Record start time
-    # 2. Call call_next(request)
-    # 3. Record end time
-    # 4. Log method, path, status, and duration
-    pass
+    """Log request method, path, status code, and duration."""
+    start = time.time()
+    response = await call_next(request)
+    elapsed = (time.time() - start) * 1000
+    print(f"  {request.method} {request.url.path} - {response.status_code} - {elapsed:.2f}ms")
+    return response
 
 
 @app1.get("/hello")
@@ -65,32 +49,17 @@ def hello():
 # =============================================================================
 # Exercise 2: Custom Header Injection Middleware
 # =============================================================================
-# Create a middleware that adds these headers to EVERY response:
-#   - X-App-Version: "1.0.0"
-#   - X-Request-ID: a unique ID for each request
-#
-# Hints:
-#   - Use uuid.uuid4() to generate unique request IDs
-#   - Modify response.headers after calling call_next()
-#   - Headers are case-insensitive
-#
-# Expected behavior:
-#   GET http://localhost:8000/data
-#   Response headers include:
-#     X-App-Version: 1.0.0
-#     X-Request-ID: <unique-uuid>
-#
-# Test with:
-#   curl -v http://localhost:8000/data
-# =============================================================================
 
 app2 = FastAPI(title="Exercise 2 - Header Injection Middleware")
 
 
 @app2.middleware("http")
 async def add_headers(request: Request, call_next):
-    # TODO: Implement header injection middleware
-    pass
+    """Add custom headers to every response."""
+    response = await call_next(request)
+    response.headers["X-App-Version"] = "1.0.0"
+    response.headers["X-Request-ID"] = str(uuid.uuid4())
+    return response
 
 
 @app2.get("/data")
@@ -101,33 +70,43 @@ def get_data():
 # =============================================================================
 # Exercise 3: Rate Limiting Middleware
 # =============================================================================
-# Create a middleware that limits requests:
-#   - Allow maximum 5 requests per minute per client IP
-#   - Return 429 "Too Many Requests" if limit exceeded
-#   - Include X-RateLimit-Remaining header with remaining count
-#
-# Hints:
-#   - Use a dict to track requests: {ip: [timestamps]}
-#   - Clean up old timestamps (> 60 seconds old)
-#   - Client IP is in request.client.host
-#
-# Expected behavior:
-#   GET http://localhost:8000/api/resource (1st-5th) -> 200 OK
-#   GET http://localhost:8000/api/resource (6th) -> 429 Too Many Requests
-#
-# Test with:
-#   for i in {1..6}; do curl http://localhost:8000/api/resource; done
-# =============================================================================
 
 app3 = FastAPI(title="Exercise 3 - Rate Limiting Middleware")
 
-# TODO: Create a storage for rate limiting
+# Track requests: {ip: [(timestamp,), ...]}
+rate_limit_store: dict[str, list] = defaultdict(list)
+MAX_REQUESTS = 5
+WINDOW_SECONDS = 60
 
 
 @app3.middleware("http")
 async def rate_limit(request: Request, call_next):
-    # TODO: Implement rate limiting logic
-    pass
+    """Limit requests to 5 per minute per client IP."""
+    client_ip = request.client.host if request.client else "unknown"
+    now = time.time()
+
+    # Clean up old timestamps
+    rate_limit_store[client_ip] = [
+        t for t in rate_limit_store[client_ip]
+        if now - t < WINDOW_SECONDS
+    ]
+
+    # Check limit
+    if len(rate_limit_store[client_ip]) >= MAX_REQUESTS:
+        remaining = 0
+        return JSONResponse(
+            status_code=429,
+            content={"detail": "Too Many Requests", "retry_after": WINDOW_SECONDS},
+            headers={"X-RateLimit-Remaining": str(remaining)},
+        )
+
+    # Record request and compute remaining
+    rate_limit_store[client_ip].append(now)
+    remaining = MAX_REQUESTS - len(rate_limit_store[client_ip])
+
+    response = await call_next(request)
+    response.headers["X-RateLimit-Remaining"] = str(remaining)
+    return response
 
 
 @app3.get("/api/resource")
@@ -138,65 +117,34 @@ def get_resource():
 # =============================================================================
 # Exercise 4: Exception Handling Middleware
 # =============================================================================
-# Create a middleware that catches ALL exceptions and returns a
-# standardized JSON error response:
-#   {
-#     "error": true,
-#     "message": "<exception message>",
-#     "type": "<exception type name>"
-#   }
-#
-# Hints:
-#   - Wrap call_next in a try/except block
-#   - Return JSONResponse with status_code=500
-#   - Use exception.__class__.__name__ for type
-#
-# Expected behavior:
-#   GET http://localhost:8000/crash
-#   Response: {"error": true, "message": "...", "type": "ValueError"}
-#   Status code: 500
-#
-# Test with:
-#   curl http://localhost:8000/crash
-# =============================================================================
 
 app4 = FastAPI(title="Exercise 4 - Exception Handling Middleware")
 
 
 @app4.middleware("http")
 async def catch_errors(request: Request, call_next):
-    # TODO: Implement exception handling middleware
-    pass
+    """Catch all exceptions and return standardized JSON error response."""
+    try:
+        response = await call_next(request)
+        return response
+    except Exception as exc:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": True,
+                "message": str(exc),
+                "type": exc.__class__.__name__,
+            },
+        )
 
 
 @app4.get("/crash")
 def crash():
+    """Endpoint that raises an exception to test error handling."""
     raise ValueError("Something went wrong!")
 
 
 @app4.get("/ok")
 def ok():
+    """Normal endpoint that should work with error handling middleware."""
     return {"status": "ok"}
-
-
-# =============================================================================
-# VERIFICATION CHECKLIST
-# =============================================================================
-# After completing the exercises:
-#
-# 1. Run: uvicorn 10-middleware:app1 --reload
-#    - Check console output for request logging
-#    - Verify method, path, status, and time are logged
-#
-# 2. Run: uvicorn 10-middleware:app2 --reload
-#    - Use curl -v to verify custom headers are present
-#    - Verify X-Request-ID is unique for each request
-#
-# 3. Run: uvicorn 10-middleware:app3 --reload
-#    - Send 6 rapid requests; 6th should be 429
-#    - Wait 60s and verify counter resets
-#
-# 4. Run: uvicorn 10-middleware:app4 --reload
-#    - GET /crash should return standardized error JSON
-#    - GET /ok should work normally
-# =============================================================================

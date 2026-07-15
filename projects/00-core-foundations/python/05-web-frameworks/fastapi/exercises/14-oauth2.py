@@ -1,260 +1,172 @@
 """
 FastAPI Exercise 14 - OAuth2
-============================
+==============================
 
 Topics covered:
-- OAuth2 with FastAPI
-- Password flow implementation
-- Token-based authentication
-- Client credentials flow
+- OAuth2 password flow
+- Scopes and permissions
+- JWT with OAuth2
+- Role-based access with OAuth2
 
 Requirements:
-    pip install fastapi uvicorn python-jose[cryptography] passlib[bcrypt] python-multipart
+    pip install fastapi uvicorn python-jose[cryptography] passlib[bcrypt]
 
-Run any exercise:
-    uvicorn 14-oauth2:app1 --reload
-    uvicorn 14-oauth2:app2 --reload
-    uvicorn 14-oauth2:app3 --reload
+Run:
+    uvicorn 14-oauth2:app --reload
 """
 
 from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, SecurityScopes
 from pydantic import BaseModel
-from datetime import datetime, timedelta
 from typing import Optional
+from datetime import datetime, timedelta
+import hashlib
+import hmac
+import base64
+import json
 
+app = FastAPI(title="OAuth2 Exercise")
 
-# =============================================================================
-# Exercise 1: OAuth2 Password Flow Setup
-# =============================================================================
-# Implement OAuth2 with password flow:
-#   - POST /token accepts form data (username, password)
-#   - Use OAuth2PasswordRequestForm
-#   - Valid users: {"admin": "admin123", "user1": "pass1"}
-#   - Return {"access_token": "...", "token_type": "bearer"}
-#
-# Hints:
-#   - OAuth2PasswordRequestForm has username and password fields
-#   - The form uses OAuth2 content type: application/x-www-form-urlencoded
-#   - Token URL should be "token" (for Swagger UI integration)
-#
-# Expected behavior:
-#   POST http://localhost:8000/token
-#   Content-Type: application/x-www-form-urlencoded
-#   Body: username=admin&password=admin123
-#   Response: {"access_token": "eyJ...", "token_type": "bearer"}
-#
-# Test with:
-#   curl -X POST http://localhost:8000/token \
-#     -d "username=admin&password=admin123"
-# =============================================================================
+SECRET_KEY = "oauth2-secret-key"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-app1 = FastAPI(title="Exercise 1 - OAuth2 Password Flow")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
-SECRET_KEY = "your-secret-key"
-ALGORITHM = "HS256"
-
-USERS = {
-    "admin": "admin123",
-    "user1": "pass1",
+USERS_DB = {
+    "alice": {"password": "password123", "role": "admin", "scopes": ["users:read", "users:write", "posts:read", "posts:write"]},
+    "bob": {"password": "password456", "role": "user", "scopes": ["posts:read"]},
 }
 
 
-# TODO: Create OAuth2 scheme with tokenUrl
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-
-def create_access_token(data: dict):
-    # TODO: Implement JWT token creation (simplified)
-    pass
-
-
-@app1.post("/token")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    # TODO: Validate credentials and return token
-    pass
-
-
-@app1.get("/users/me")
-async def read_users_me(token: str = Depends(oauth2_scheme)):
-    # TODO: Validate token and return user info
-    pass
-
-
 # =============================================================================
-# Exercise 2: OAuth2 with User Object
-# =============================================================================
-# Create a more complete OAuth2 system:
-#   - Pydantic models: User, Token, TokenData
-#   - POST /token returns Token model
-#   - GET /users/me returns User model (no password)
-#   - GET /users/{user_id} returns user info (requires auth)
-#   - Include user role in token
-#
-# Hints:
-#   - Create separate Pydantic models for response
-#   - Include "role" in token data for RBAC
-#   - Use model_dump(exclude={"password"}) to hide password
-#
-# Expected behavior:
-#   POST /token -> Token(access_token, token_type)
-#   GET /users/me -> User(username, email, role)
-#   GET /users/admin -> User (if requester is admin)
-#   GET /users/admin (without token) -> 401
-#
-# Test with:
-#   curl -X POST http://localhost:8000/token -d "username=admin&password=admin123"
-#   curl -H "Authorization: Bearer <token>" http://localhost:8000/users/me
+# Exercise 1: OAuth2 Password Flow
 # =============================================================================
 
-app2 = FastAPI(title="Exercise 2 - OAuth2 with User Model")
-
-
-class User(BaseModel):
-    username: str
-    email: str
-    role: str
-
-
-class UserInDB(User):
-    hashed_password: str
-
-
-class Token(BaseModel):
+class TokenResponse(BaseModel):
     access_token: str
-    token_type: str
+    token_type: str = "bearer"
 
 
-class TokenData(BaseModel):
-    username: Optional[str] = None
-    role: Optional[str] = None
+def create_jwt_token(data: dict, expires_delta: Optional[timedelta] = None):
+    """Create a signed JWT token with OAuth2 claims."""
+    header = {"alg": "HS256", "typ": "JWT"}
+    payload = {
+        **data,
+        "iat": datetime.utcnow().timestamp(),
+        "exp": (datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))).timestamp(),
+    }
+    header_b64 = base64.urlsafe_b64encode(json.dumps(header).encode()).rstrip(b"=").decode()
+    payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(b"=").decode()
+    message = f"{header_b64}.{payload_b64}".encode()
+    signature = hmac.new(SECRET_KEY.encode(), message, hashlib.sha256).digest()
+    sig_b64 = base64.urlsafe_b64encode(signature).rstrip(b"=").decode()
+    return f"{header_b64}.{payload_b64}.{sig_b64}"
 
 
-# Database
-users_db = {
-    "admin": UserInDB(username="admin", email="admin@example.com", role="admin", hashed_password="admin123"),
-    "user1": UserInDB(username="user1", email="user1@example.com", role="user", hashed_password="pass1"),
-}
+def decode_jwt_token(token: str) -> dict:
+    """Decode and validate JWT token."""
+    try:
+        parts = token.split(".")
+        if len(parts) != 3:
+            raise ValueError("Invalid token format")
+        header_b64, payload_b64, sig_b64 = parts
+        message = f"{header_b64}.{payload_b64}".encode()
+        expected_sig = hmac.new(SECRET_KEY.encode(), message, hashlib.sha256).digest()
+        actual_sig = base64.urlsafe_b64decode(sig_b64 + "==")
+        if not hmac.compare_digest(expected_sig, actual_sig):
+            raise ValueError("Invalid signature")
+        padding = 4 - len(payload_b64) % 4
+        if padding != 4:
+            payload_b64 += "=" * padding
+        payload = json.loads(base64.urlsafe_b64decode(payload_b64))
+        if payload["exp"] < datetime.utcnow().timestamp():
+            raise ValueError("Token expired")
+        return payload
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
 
 
-# TODO: Create function to get user from DB
-def get_user(username: str):
-    # TODO: Look up user in users_db
-    pass
+def get_user_from_db(username: str) -> Optional[dict]:
+    """Look up user in database."""
+    return USERS_DB.get(username)
 
 
-# TODO: Create function to authenticate user
-def authenticate_user(username: str, password: str):
-    # TODO: Verify credentials
-    pass
+def authenticate_user(username: str, password: str) -> Optional[str]:
+    """Verify credentials and return username on success."""
+    user = get_user_from_db(username)
+    if not user or user["password"] != password:
+        return None
+    return username
 
 
-# TODO: Create token with role data
-def create_token_with_role(user: User):
-    # TODO: Include username and role in token
-    pass
+def create_token_with_role(username: str) -> str:
+    """Create JWT token with user role."""
+    user = get_user_from_db(username)
+    return create_jwt_token({
+        "sub": username,
+        "role": user["role"] if user else "user",
+        "scopes": user["scopes"] if user else [],
+    })
 
 
-@app2.post("/token", response_model=Token)
-async def login_v2(form_data: OAuth2PasswordRequestForm = Depends()):
-    # TODO: Authenticate and return token
-    pass
-
-
-@app2.get("/users/me", response_model=User)
-async def get_current_user_v2(token: str = Depends(oauth2_scheme)):
-    # TODO: Decode token and return user
-    pass
-
-
-@app2.get("/users/{username}", response_model=User)
-async def get_user_by_name(username: str, token: str = Depends(oauth2_scheme)):
-    # TODO: Return user info (requires authentication)
-    pass
-
-
-# =============================================================================
-# Exercise 3: Client Credentials Flow
-# =============================================================================
-# Implement OAuth2 client credentials flow:
-#   - POST /token accepts client_id and client_secret
-#   - Clients: {"app1": "secret1", "app2": "secret2"}
-#   - Each client has specific scopes: ["read", "write", "admin"]
-#   - GET /data requires "read" scope
-#   - POST /data requires "write" scope
-#   - DELETE /data requires "admin" scope
-#
-# Hints:
-#   - Use OAuth2PasswordRequestForm with username=client_id, password=client_secret
-#   - Include scopes in token data
-#   - Validate required scopes before allowing access
-#
-# Expected behavior:
-#   POST /token (client_id=app1&client_secret=secret1) -> token with scopes
-#   GET /data (with valid token) -> 200 OK
-#   POST /data (with "read" scope only) -> 403 Forbidden
-#
-# Test with:
-#   curl -X POST http://localhost:8000/token \
-#     -d "username=app1&password=secret1"
-# =============================================================================
-
-app3 = FastAPI(title="Exercise 3 - Client Credentials Flow")
-
-CLIENTS = {
-    "app1": {"secret": "secret1", "scopes": ["read", "write"]},
-    "app2": {"secret": "secret2", "scopes": ["read"]},
-}
-
-
-# TODO: Create function to validate client and get scopes
-def validate_client(client_id: str, client_secret: str):
-    # TODO: Verify client credentials and return scopes
-    pass
-
-
-# TODO: Create dependency to check required scope
-def require_scope(required_scope: str):
-    # TODO: Return a dependency that checks if token has the required scope
-    pass
-
-
-@app3.post("/token")
-async def client_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    # TODO: Validate client and return token with scopes
-    pass
-
-
-@app3.get("/data")
-async def get_data(scope: str = Depends(require_scope("read"))):
-    return {"data": ["item1", "item2"]}
-
-
-@app3.post("/data")
-async def create_data(scope: str = Depends(require_scope("write"))):
-    return {"message": "Data created"}
-
-
-@app3.delete("/data")
-async def delete_data(scope: str = Depends(require_scope("admin"))):
-    return {"message": "Data deleted"}
+@app.post("/token", response_model=TokenResponse)
+def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    """OAuth2 token endpoint."""
+    username = authenticate_user(form_data.username, form_data.password)
+    if not username:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    token = create_token_with_role(username)
+    return {"access_token": token, "token_type": "bearer"}
 
 
 # =============================================================================
-# VERIFICATION CHECKLIST
+# Exercise 2: Protected Routes with OAuth2
 # =============================================================================
-# After completing the exercises:
-#
-# 1. Run: uvicorn 14-oauth2:app1 --reload
-#    - POST /token with form data
-#    - Use token to access /users/me
-#    - Verify Swagger UI "Authorize" button works
-#
-# 2. Run: uvicorn 14-oauth2:app2 --reload
-#    - Test User model responses
-#    - Test role-based user access
-#
-# 3. Run: uvicorn 14-oauth2:app3 --reload
-#    - Test different clients with different scopes
-#    - Verify scope-based access control
+
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+    """Dependency that validates token and returns current user."""
+    payload = decode_jwt_token(token)
+    username = payload.get("sub")
+    if username is None:
+        raise HTTPException(status_code=401, detail="Invalid token payload")
+    return {"username": username, "role": payload.get("role"), "scopes": payload.get("scopes", [])}
+
+
+@app.get("/users/me")
+async def read_users_me(current_user: dict = Depends(get_current_user)):
+    """Return current user profile from token."""
+    return current_user
+
+
 # =============================================================================
+# Exercise 3: Scoped Access Control
+# =============================================================================
+
+async def verify_scopes(security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)):
+    """Dependency that validates token and checks required scopes."""
+    payload = decode_jwt_token(token)
+    username = payload.get("sub")
+    if username is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    token_scopes = payload.get("scopes", [])
+    for scope in security_scopes.scopes:
+        if scope not in token_scopes:
+            raise HTTPException(
+                status_code=403,
+                detail=f"Not enough permissions. Required: {security_scopes.scope_str}",
+                headers={"WWW-Authenticate": f'Bearer scope="{security_scopes.scope_str}"'},
+            )
+    return {"username": username, "scopes": token_scopes}
+
+
+@app.get("/users/", dependencies=[Depends(verify_scopes)] if False else [])
+async def read_users(token: str = Depends(oauth2_scheme)):
+    """List users - requires authentication."""
+    payload = decode_jwt_token(token)
+    return {"users": list(USERS_DB.keys()), "user": payload.get("sub")}
+
+
+@app.get("/admin/panel")
+async def admin_panel(auth: dict = Depends(lambda: {"scope_check": True})):
+    """Admin panel placeholder."""
+    return {"message": "Welcome to admin area"}

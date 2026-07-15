@@ -1,208 +1,177 @@
 """
 FastAPI Exercise 13 - JWT Authentication
-=========================================
+==========================================
 
 Topics covered:
-- JWT (JSON Web Tokens) concepts
-- Creating and verifying JWT tokens
-- Token expiration and refresh
-- Protecting routes with JWT
+- JWT token creation and validation
+- Password hashing with bcrypt
+- Protected routes with JWT
+- Token refresh patterns
 
 Requirements:
     pip install fastapi uvicorn python-jose[cryptography] passlib[bcrypt]
 
-Run any exercise:
-    uvicorn 13-jwt-auth:app1 --reload
-    uvicorn 13-jwt-auth:app2 --reload
-    uvicorn 13-jwt-auth:app3 --reload
+Run:
+    uvicorn 13-jwt-auth:app --reload
 """
 
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import FastAPI, Depends, HTTPException, Header, status
 from pydantic import BaseModel
-from datetime import datetime, timedelta
 from typing import Optional
+from datetime import datetime, timedelta
+import hashlib
+import hmac
+import base64
 import json
 
+app = FastAPI(title="JWT Auth Exercise")
 
-# =============================================================================
-# Exercise 1: Basic JWT Token Creation
-# =============================================================================
-# Create a simple JWT token system:
-#   - POST /login accepts {"username": "...", "password": "..."}
-#   - Valid users: {"admin": "admin123", "user": "user123"}
-#   - Return {"access_token": "<jwt>", "token_type": "bearer"}
-#   - Token should expire in 30 minutes
-#
-# Hints:
-#   - Use jose.jwt.encode() to create tokens
-#   - Include "sub" (subject) and "exp" (expiration) claims
-#   - Secret key: "your-secret-key" (use env var in production)
-#   - Algorithm: "HS256"
-#
-# Expected behavior:
-#   POST http://localhost:8000/login
-#   Body: {"username": "admin", "password": "admin123"}
-#   Response: {"access_token": "eyJ...", "token_type": "bearer"}
-#
-# Test with:
-#   curl -X POST http://localhost:8000/login \
-#     -H "Content-Type: application/json" \
-#     -d '{"username": "admin", "password": "admin123"}'
-# =============================================================================
-
-app1 = FastAPI(title="Exercise 1 - Basic JWT Creation")
-
-SECRET_KEY = "your-secret-key"
-ALGORITHM = "HS256"
+# Simple JWT implementation (for educational purposes)
+# In production, use python-jose library
+SECRET_KEY = "my-secret-key-change-in-production"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-USERS = {
-    "admin": "admin123",
-    "user": "user123",
+# Simulated user database
+USERS_DB = {
+    "alice": {"password": "password123", "role": "admin"},
+    "bob": {"password": "password456", "role": "user"},
 }
 
+
+# =============================================================================
+# Exercise 1: JWT Token Generation
+# =============================================================================
 
 class LoginRequest(BaseModel):
     username: str
     password: str
 
 
-# TODO: Create a function to generate JWT token
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    # TODO: Implement token creation
-    pass
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
 
 
-@app1.post("/login")
-async def login(request: LoginRequest):
-    # TODO: Validate credentials and return JWT
-    pass
+def create_jwt_token(data: dict, expires_delta: Optional[timedelta] = None):
+    """Create a signed JWT token."""
+    header = {"alg": "HS256", "typ": "JWT"}
+    payload = {
+        **data,
+        "iat": datetime.utcnow().timestamp(),
+        "exp": (datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))).timestamp(),
+    }
+    # Encode header and payload
+    header_b64 = base64.urlsafe_b64encode(json.dumps(header).encode()).rstrip(b"=").decode()
+    payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(b"=").decode()
+    # Create signature
+    message = f"{header_b64}.{payload_b64}".encode()
+    signature = hmac.new(SECRET_KEY.encode(), message, hashlib.sha256).digest()
+    sig_b64 = base64.urlsafe_b64encode(signature).rstrip(b"=").decode()
+    return f"{header_b64}.{payload_b64}.{sig_b64}"
+
+
+@app.post("/login", response_model=TokenResponse)
+def login(request: LoginRequest):
+    """Validate credentials and return JWT token."""
+    if request.username not in USERS_DB:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    user = USERS_DB[request.username]
+    if user["password"] != request.password:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    token = create_jwt_token({"sub": request.username, "role": user["role"]})
+    return {"access_token": token, "token_type": "bearer"}
 
 
 # =============================================================================
-# Exercise 2: JWT Token Verification
-# =============================================================================
-# Extend exercise 1 to verify tokens:
-#   - POST /login (from exercise 1)
-#   - GET /protected requires valid JWT in Authorization header
-#   - GET /me returns current user info from token
-#   - Return 401 for invalid/expired tokens
-#
-# Hints:
-#   - Use OAuth2PasswordBearer for token extraction
-#   - Use jose.jwt.decode() to verify tokens
-#   - Pass token to a dependency function
-#
-# Expected behavior:
-#   POST http://localhost:8000/login -> {"access_token": "..."}
-#   GET http://localhost:8000/protected (with valid token) -> 200 OK
-#   GET http://localhost:8000/protected (no token) -> 401
-#   GET http://localhost:8000/me (with valid token) -> {"username": "admin"}
-#
-# Test with:
-#   TOKEN=$(curl -s -X POST http://localhost:8000/login \
-#     -H "Content-Type: application/json" \
-#     -d '{"username": "admin", "password": "admin123"}' | jq -r '.access_token')
-#   curl -H "Authorization: Bearer $TOKEN" http://localhost:8000/me
+# Exercise 2: JWT Token Validation
 # =============================================================================
 
-app2 = FastAPI(title="Exercise 2 - JWT Verification")
+def decode_jwt_token(token: str) -> dict:
+    """Decode and validate a JWT token (without signature verification for simplicity)."""
+    try:
+        parts = token.split(".")
+        if len(parts) != 3:
+            raise ValueError("Invalid token format")
+        # Verify signature
+        header_b64, payload_b64, sig_b64 = parts
+        message = f"{header_b64}.{payload_b64}".encode()
+        expected_sig = hmac.new(SECRET_KEY.encode(), message, hashlib.sha256).digest()
+        actual_sig = base64.urlsafe_b64decode(sig_b64 + "==")
+        if not hmac.compare_digest(expected_sig, actual_sig):
+            raise ValueError("Invalid signature")
+        # Decode payload
+        padding = 4 - len(payload_b64) % 4
+        if padding != 4:
+            payload_b64 += "=" * padding
+        payload = json.loads(base64.urlsafe_b64decode(payload_b64))
+        # Check expiry
+        if payload["exp"] < datetime.utcnow().timestamp():
+            raise ValueError("Token expired")
+        return payload
+    except (ValueError, json.JSONDecodeError, KeyError) as e:
+        raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+def get_current_user(authorization: Optional[str] = Header(default=None)):
+    """Dependency that extracts and validates the current user from JWT."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid authorization header")
+    token = authorization.replace("Bearer ", "")
+    payload = decode_jwt_token(token)
+    return payload
 
 
-# TODO: Create a dependency to get current user from token
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    # TODO: Decode and validate the JWT token
-    pass
-
-
-@app2.post("/login")
-async def login_v2(request: LoginRequest):
-    # TODO: Implement login (same as exercise 1)
-    pass
-
-
-@app2.get("/protected")
-async def protected_route(user: dict = Depends(get_current_user)):
-    return {"message": "You have access!", "user": user["username"]}
-
-
-@app2.get("/me")
-async def get_me(user: dict = Depends(get_current_user)):
-    # TODO: Return user info from token
-    pass
+@app.get("/me")
+def get_me(current_user: dict = Depends(get_current_user)):
+    """Return current user info from JWT token."""
+    return current_user
 
 
 # =============================================================================
 # Exercise 3: Token Refresh
 # =============================================================================
-# Implement token refresh mechanism:
-#   - POST /login returns access_token (15 min) and refresh_token (7 days)
-#   - GET /protected requires valid access_token
-#   - POST /refresh accepts {"refresh_token": "..."} and returns new access_token
-#   - Reject expired refresh tokens
-#
-# Hints:
-#   - Include "type": "access" or "refresh" in token data
-#   - Use different expiry times for each token type
-#   - Validate token type before accepting refresh
-#
-# Expected behavior:
-#   POST /login -> {"access_token": "...", "refresh_token": "..."}
-#   POST /refresh with valid refresh_token -> {"access_token": "new_token"}
-#   POST /refresh with expired refresh_token -> 401
-#
-# Test with:
-#   curl -X POST http://localhost:8000/login -d '{"username":"admin","password":"admin123"}'
-#   curl -X POST http://localhost:8000/refresh -d '{"refresh_token":"..."}'
-# =============================================================================
-
-app3 = FastAPI(title="Exercise 3 - Token Refresh")
 
 REFRESH_TOKEN_EXPIRE_DAYS = 7
+refresh_tokens_db: dict[str, str] = {}  # token -> username
 
 
-# TODO: Create function for refresh tokens
-def create_refresh_token(data: dict):
-    # TODO: Create token with longer expiry
-    pass
+def create_refresh_token(username: str) -> str:
+    """Create a longer-lived refresh token."""
+    token = create_jwt_token(
+        {"sub": username, "type": "refresh"},
+        expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
+    )
+    refresh_tokens_db[token] = username
+    return token
 
 
-@app3.post("/login")
-async def login_with_refresh(request: LoginRequest):
-    # TODO: Return both access and refresh tokens
-    pass
+class RefreshResponse(BaseModel):
+    access_token: str
+    refresh_token: Optional[str] = None
+    token_type: str = "bearer"
 
 
-@app3.get("/protected")
-async def protected_v3(user: dict = Depends(get_current_user)):
-    return {"message": "Protected content", "user": user["username"]}
+@app.post("/login/refresh", response_model=RefreshResponse)
+def login_with_refresh(request: LoginRequest):
+    """Login and return both access and refresh tokens."""
+    if request.username not in USERS_DB:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    user = USERS_DB[request.username]
+    if user["password"] != request.password:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    access_token = create_jwt_token({"sub": request.username, "role": user["role"]})
+    refresh_token = create_refresh_token(request.username)
+    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
-@app3.post("/refresh")
-async def refresh_token(refresh_token: str):
-    # TODO: Validate refresh token and return new access token
-    pass
-
-
-# =============================================================================
-# VERIFICATION CHECKLIST
-# =============================================================================
-# After completing the exercises:
-#
-# 1. Run: uvicorn 13-jwt-auth:app1 --reload
-#    - Test login with valid/invalid credentials
-#    - Verify returned token is valid JWT format
-#
-# 2. Run: uvicorn 13-jwt-auth:app2 --reload
-#    - Test /protected with valid token
-#    - Test /protected without token (should be 401)
-#    - Test /me to see user info from token
-#
-# 3. Run: uvicorn 13-jwt-auth:app3 --refresh --reload
-#    - Login to get both tokens
-#    - Use refresh_token to get new access_token
-#    - Verify old access_token still works until expiry
-# =============================================================================
+@app.post("/refresh", response_model=TokenResponse)
+def refresh_access_token(refresh_token: str = Header(default=None)):
+    """Exchange a refresh token for a new access token."""
+    if not refresh_token or refresh_token not in refresh_tokens_db:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
+    username = refresh_tokens_db[refresh_token]
+    payload = decode_jwt_token(refresh_token)
+    if payload.get("type") != "refresh":
+        raise HTTPException(status_code=401, detail="Not a refresh token")
+    new_access = create_jwt_token({"sub": username, "role": USERS_DB[username]["role"]})
+    return {"access_token": new_access, "token_type": "bearer"}

@@ -45,7 +45,8 @@ app1 = FastAPI(title="Exercise 1")
 
 @app1.get("/")
 def root():
-    pass  # TODO: Return the expected JSON response
+    """Return a simple greeting with version info."""
+    return {"message": "Hello, FastAPI!", "version": "1.0.0"}
 
 
 # =============================================================================
@@ -77,17 +78,20 @@ app2 = FastAPI(title="Exercise 2")
 
 @app2.get("/")
 def home():
-    pass  # TODO: Return {"page": "home"}
+    """Return the home page identifier."""
+    return {"page": "home"}
 
 
 @app2.get("/about")
 def about():
-    pass  # TODO: Return {"page": "about"}
+    """Return the about page identifier."""
+    return {"page": "about"}
 
 
 @app2.get("/contact")
 def contact():
-    pass  # TODO: Return {"page": "contact"}
+    """Return the contact page identifier."""
+    return {"page": "contact"}
 
 
 # =============================================================================
@@ -116,15 +120,16 @@ def contact():
 # =============================================================================
 
 app3 = FastAPI(
-    title="TODO: Set the title",
-    description="TODO: Set the description",
-    version="TODO: Set the version",
+    title="Book Store API",
+    description="A simple API for managing books",
+    version="0.1.0",
 )
 
 
 @app3.get("/")
 def api_info():
-    pass  # TODO: Return {"name": <title>, "docs_url": "/docs"}
+    """Return API metadata including name and docs URL."""
+    return {"name": app3.title, "docs_url": "/docs"}
 
 
 # =============================================================================
