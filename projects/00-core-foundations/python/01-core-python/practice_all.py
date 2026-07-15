@@ -549,6 +549,9 @@ def problem_49():
 def problem_50():
     """Remove consecutive duplicate characters from a string."""
     text = input("Enter text: ")
+    if not text:
+        print("Result: (empty)")
+        return
     result = text[0]
     for char in text[1:]:
         if char != result[-1]:

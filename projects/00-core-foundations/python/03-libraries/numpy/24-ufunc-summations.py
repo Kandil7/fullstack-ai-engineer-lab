@@ -110,20 +110,21 @@ arr2 = np.array([-5, 10, -15, 20, -25])
 print("\nArray:", arr2)
 print("Sum positives:", np.sum(arr2, where=arr2 > 0))  # 30
 
-# Cumulative sum with initial
-print("\ncumsum with initial=0:", np.cumsum(arr, initial=0))
-# [  0   1   3   6  10  15]
+# Cumulative sum with a leading zero (prepend manually; cumsum has no initial)
+print("\ncumsum with leading 0:", np.concatenate([[0], np.cumsum(arr)]))
+# [  0  10  30  60 100 150]
 
-# Sum with axis and initial
+# Cumulative sum along an axis
 arr2d = np.array([[1, 2], [3, 4], [5, 6]])
 print("\n2D Array:\n", arr2d)
-print("cumsum(axis=1, initial=0):\n", np.cumsum(arr2d, axis=1, initial=0))
-# [[ 0  1  3]
-#  [ 0  3  7]
-#  [ 0  5 11]]
+print("cumsum(axis=1):\n", np.cumsum(arr2d, axis=1))
+# [[ 1  3]
+#  [ 3  7]
+#  [ 5 11]]
 # Output:
 # Sum with initial=100: 250
 # Sum positives: 30
+# cumsum with leading 0: [  0  10  30  60 100 150]
 
 # ============================================================
 # Example 5: Practical Summation Examples

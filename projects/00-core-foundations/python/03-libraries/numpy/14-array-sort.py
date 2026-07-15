@@ -74,10 +74,10 @@ print("\nAscending:", asc)
 desc = np.sort(arr)[::-1]
 print("Descending:", desc)
 
-# Or use negative values for numeric arrays
-arr_neg = np.array([-3, -1, -4, -1, -5, -9, -2, -6])
-desc_neg = np.sort(arr_neg)[::-1]
-print("Descending via neg:", -desc_neg)
+# Or use the negation trick for descending on numeric arrays
+arr_nums = np.array([3, 1, 4, 1, 5, 9, 2, 6])
+desc_neg = -np.sort(-arr_nums)
+print("Descending via neg:", desc_neg)
 
 # For string arrays
 arr_str = np.array(["banana", "apple", "cherry", "date"])
@@ -103,11 +103,12 @@ print("Mergesort:", np.sort(arr, kind='mergesort'))
 print("Heapsort:", np.sort(arr, kind='heapsort'))
 
 # Stable sort preserves order of equal elements
-arr2 = np.array([('Alice', 25), ('Bob', 20), ('Charlie', 25)])
+arr2 = np.array([('Alice', 25), ('Bob', 20), ('Charlie', 25)],
+                dtype=[('name', 'U10'), ('age', int)])
 # Sort by age (stable)
 sorted_by_age = np.sort(arr2, order='age')
 print("\nStable sort by age:", sorted_by_age)
-# Output: [('Alice', 25) ('Charlie', 25) ('Bob', 20)]
+# Output: [('Bob', 20) ('Alice', 25) ('Charlie', 25)]
 
 # ============================================================
 # Example 5: argsort and lexsort

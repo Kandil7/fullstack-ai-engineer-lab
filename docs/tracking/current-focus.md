@@ -1,7 +1,8 @@
 # Current Focus — Execution Window
 
 > What to work on RIGHT NOW. Update weekly. Be specific — this replaces decision fatigue.
-> Last updated: 2026-06-26
+
+**Last updated:** 2026-06-26
 
 ---
 
@@ -11,13 +12,16 @@
 
 **Phase:** Phase 0 — Foundations (Months 1–3)
 
-### Main Goal
+## Main Goal
+
 Complete Go Tour basics (tour.golang.org) + write Exercise 1 (Hello World + types) and Exercise 2 (Structs + interfaces).
 
-### Secondary Goal
+## Secondary Goal
+
 Scaffold HTML/CSS/JS portfolio with 3 pages in `projects/00-core-foundations/`.
 
-### Today's Task
+## Today's Tasks
+
 1. Go to **tour.golang.org**
 2. Complete "Basics" section (variables, types, imports)
 3. Complete "Flow control" section (for, if, switch)
@@ -26,12 +30,14 @@ Scaffold HTML/CSS/JS portfolio with 3 pages in `projects/00-core-foundations/`.
 6. Run `go run .` to test
 7. Write tests in `main_test.go` and run `go test -v`
 
-### Exercise Files
+## Exercise Files
+
 - `projects/00-core-foundations/go/exercise01/main.go` — Hello World + basic types
 - `projects/00-core-foundations/go/exercise01/main_test.go` — Tests to write
 - `projects/00-core-foundations/go/exercise02-structs/main.go` — Structs + interfaces (Day 2)
 
-### Do Not Work On
+## Do Not Work On
+
 - ❌ Backend APIs (auth-service) — wait for Go basics
 - ❌ Frontend frameworks (Flutter/Next.js) — Phase 2
 - ❌ AI/ML work — Phase 3

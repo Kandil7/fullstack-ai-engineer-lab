@@ -254,8 +254,8 @@ if __name__ == "__main__":
     print("\n--- Validation Descriptors ---")
     product = Product("Laptop", 999.99, 10)
     print(f"  {product}")
-    print(f"  Total value: ${product.total_value():,.2f}")
-    print(f"  Total value (cached): ${product.total_value():,.2f}")
+    print(f"  Total value: ${product.total_value:,.2f}")
+    print(f"  Total value (cached): ${product.total_value:,.2f}")
 
     try:
         bad_product = Product("", -100, 5)

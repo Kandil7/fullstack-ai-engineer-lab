@@ -387,19 +387,29 @@ print(f"'Dev 1' is ancestor of 'CEO': {is_ancestor(root, 'Dev 1', 'CEO')}")
 
 def lowest_common_ancestor(root, p, q):
     """Find lowest common ancestor. O(n)"""
-    if not root or root.data == p or root.data == q:
+    if root is None:
+        return None
+    if root.data == p or root.data == q:
         return root
 
-    for child in root.children:
-        result = lowest_common_ancestor(child, p, q)
-        if result:
-            if result.data == p or result.data == q:
-                if any(c.data == (q if result.data == p else p)
-                       for c in child.children):
-                    return result
-                return result
-            return result
-    return None
+    matches = [lowest_common_ancestor(child, p, q) for child in root.children]
+    found = [m for m in matches if m is not None]
+    if len(found) >= 2:
+        return root
+    return found[0] if found else None
+
+print("\n=== Lowest Common Ancestor ===")
+lca_root = TreeNode("CEO")
+lca_vp1 = TreeNode("VP1")
+lca_vp2 = TreeNode("VP2")
+lca_d1 = TreeNode("D1")
+lca_d2 = TreeNode("D2")
+lca_root.add_child(lca_vp1)
+lca_root.add_child(lca_vp2)
+lca_vp1.add_child(lca_d1)
+lca_vp1.add_child(lca_d2)
+print(f"LCA(D1, D2): {lowest_common_ancestor(lca_root, 'D1', 'D2')}")  # VP1
+print(f"LCA(D1, VP2): {lowest_common_ancestor(lca_root, 'D1', 'VP2')}")  # CEO
 
 
 # =============================================================================

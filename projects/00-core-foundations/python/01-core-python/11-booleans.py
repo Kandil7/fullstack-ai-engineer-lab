@@ -35,7 +35,8 @@ print(f"bool(-1) = {bool(-1)}")         # True (negative int)
 print(f"bool(3.14) = {bool(3.14)}")     # True (non-zero float)
 print(f"bool('hello') = {bool('hello')}")  # True (non-empty string)
 print(f"bool([1,2]) = {bool([1,2])}")   # True (non-empty list)
-print(f"bool({'a': 1}) = {bool({'a': 1})}")  # True (non-empty dict)
+d = {'a': 1}
+print(f"bool(d) = {bool(d)}")  # True (non-empty dict)
 
 # These evaluate to False:
 print(f"bool(0) = {bool(0)}")           # False (zero)
@@ -43,7 +44,8 @@ print(f"bool(0.0) = {bool(0.0)}")       # False (zero float)
 print(f"bool('') = {bool('')}")         # False (empty string)
 print(f"bool([]) = {bool([])}")         # False (empty list)
 print(f"bool(()) = {bool(())}")         # False (empty tuple)
-print(f"bool({{}}) = {bool({{}})}")     # False (empty dict)
+d = {}
+print(f"bool(d) = {bool(d)}")     # False (empty dict)
 print(f"bool(set()) = {bool(set())}")   # False (empty set)
 print(f"bool(None) = {bool(None)}")     # False (None)
 

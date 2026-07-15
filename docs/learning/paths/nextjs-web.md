@@ -1,5 +1,7 @@
 # Learning Path: Next.js Web Dashboard
 
+**Last updated:** 2026-06-26
+
 **Goal:** build a full-featured web dashboard with Next.js App Router, connecting to the
 Go/FastAPI backend with proper auth, server components, and a polished UI.
 

@@ -22,7 +22,7 @@ print("Example 1: Line Plot")
 print("=" * 60)
 
 np.random.seed(42)
-dates = pd.date_range("2024-01-01", periods=12, freq="M")
+dates = pd.date_range("2024-01-01", periods=12, freq="ME")
 df_stock = pd.DataFrame({
     "Date": dates,
     "Stock_A": np.cumsum(np.random.randn(12)) + 100,
@@ -136,7 +136,6 @@ df_box.plot.box(ax=axes[1, 0], patch_artist=True,
 axes[1, 0].set_title("Score Distribution")
 
 # Panel 4: Histogram
-np.random.normal(75, 15, 500).round(0).astype(int)
 data = np.random.normal(75, 15, 500)
 axes[1, 1].hist(data, bins=25, color="steelblue", edgecolor="white", alpha=0.8)
 axes[1, 1].set_title("Score Distribution (Histogram)")
@@ -161,7 +160,7 @@ print("Example 5: Dual-Axis Plot")
 print("=" * 60)
 
 df_dual = pd.DataFrame({
-    "Month": pd.date_range("2024-01-01", periods=6, freq="M"),
+    "Month": pd.date_range("2024-01-01", periods=6, freq="ME"),
     "Revenue": [100, 120, 110, 140, 160, 175],
     "Profit_Margin": [0.15, 0.18, 0.12, 0.20, 0.22, 0.25],
 }).set_index("Month")

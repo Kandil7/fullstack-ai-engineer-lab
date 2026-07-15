@@ -149,17 +149,31 @@ def find_projection(collection, query, projection):
         
         if match:
             if projection:
-                projected = {}
-                for field, include in projection.items():
-                    if include == 1 and field in doc:
-                        projected[field] = doc[field]
-                # Always include _id unless explicitly excluded
-                if "_id" not in projection or projection.get("_id") != 0:
-                    projected["_id"] = doc["_id"]
+                # Determine mode from non-_id fields (MongoDB forbids mixing
+                # inclusion and exclusion, except for _id which can be excluded
+                # in either mode).
+                modes = [v for field, v in projection.items() if field != "_id"]
+                is_exclusion = any(v == 0 for v in modes)
+
+                if is_exclusion:
+                    # Exclusion: copy the whole document, drop listed fields.
+                    projected = dict(doc)
+                    for field, exclude in projection.items():
+                        if exclude == 0:
+                            projected.pop(field, None)
+                else:
+                    # Inclusion: keep only the listed fields.
+                    projected = {}
+                    for field, include in projection.items():
+                        if include == 1 and field in doc:
+                            projected[field] = doc[field]
+                    # _id is included by default unless explicitly excluded.
+                    if projection.get("_id") != 0:
+                        projected["_id"] = doc["_id"]
                 results.append(projected)
             else:
                 results.append(doc)
-    
+
     return results
 
 # Include only name and email
@@ -168,11 +182,11 @@ print("\nProjection (name, email):")
 for user in name_email:
     print(f"  {user}")
 
-# Example 8: Exclude specific fields
-# MongoDB equivalent: db.users.find({}, {"password": 0})
+# Example 8: Exclude specific fields (all other fields are returned)
+# MongoDB equivalent: db.users.find({}, {"password": 0, "_id": 0})
 
 no_password_users = find_projection(users, {}, {"password": 0, "_id": 0})
-print("\nExclude password and _id:")
+print("\nUsers without password (all other fields kept):")
 for user in no_password_users:
     print(f"  {user}")
 

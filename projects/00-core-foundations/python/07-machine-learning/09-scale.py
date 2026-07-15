@@ -81,8 +81,8 @@ print("Original data stats:")
 print(f"  Mean: {data_with_outliers.mean(axis=0)}")
 print(f"  Std: {data_with_outliers.std(axis=0)}")
 print("\nRobust-scaled data stats:")
-print(f"  Mean: {data_robust.mean(axis=0):.2f}")
-print(f"  Std: {data_robust.std(axis=0):.2f}")
+print(f"  Mean: {np.round(data_robust.mean(axis=0), 2)}")
+print(f"  Std: {np.round(data_robust.std(axis=0), 2)}")
 
 # ============================================================
 # When to Use Each Scaler

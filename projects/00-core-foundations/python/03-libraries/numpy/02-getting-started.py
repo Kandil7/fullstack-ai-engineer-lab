@@ -17,7 +17,7 @@ import numpy as np
 # import numpy as np
 
 print("NumPy version:", np.__version__)
-# Output: NumPy version: 1.24.0
+# Output: NumPy version: <your installed version, e.g. 2.x.x>
 
 # ============================================================
 # Example 2: Creating Your First Array
@@ -64,7 +64,7 @@ print("Linspace (0 to 1, 5 points):", arr_linspace)
 
 # Integer array
 arr_int = np.array([1, 2, 3])
-print("\nInteger array dtype:", arr_int.dtype)  # int64
+print("\nInteger array dtype:", arr_int.dtype)  # int64 on Linux/macOS, int32 on Windows (platform-dependent)
 
 # Float array
 arr_float = np.array([1.0, 2.0, 3.0])

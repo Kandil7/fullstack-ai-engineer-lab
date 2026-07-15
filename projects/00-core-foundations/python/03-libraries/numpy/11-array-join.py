@@ -127,7 +127,7 @@ print("Shape:", arr_cstack.shape)  # (3, 2)
 # Shape: (3, 2)
 
 # Row stack - stack as rows
-arr_rstack = np.row_stack((arr1, arr2))
+arr_rstack = np.vstack((arr1, arr2))
 print("\nRow stack:\n", arr_rstack)
 print("Shape:", arr_rstack.shape)  # (2, 3)
 # Output:
@@ -141,7 +141,7 @@ arr1 = np.array([[1, 2], [3, 4]])
 arr2 = np.array([[5, 6], [7, 8]])
 
 print("\nColumn stack 2D:\n", np.column_stack((arr1, arr2)))
-print("\nRow stack 2D:\n", np.row_stack((arr1, arr2)))
+print("\nRow stack 2D:\n", np.vstack((arr1, arr2)))
 # Output:
 # Column stack 2D:
 #  [[1 2 5 6]

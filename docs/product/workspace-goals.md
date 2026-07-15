@@ -1,5 +1,7 @@
 # Workspace Goals
 
+**Last updated:** 2026-06-26
+
 ## Overview
 
 This repository serves as a **repo-centric learning OS** — a self-contained workspace where learning, experimentation, and project execution happen in one place. The workspace is designed to be explored, extended, and iterated upon, not just consumed.

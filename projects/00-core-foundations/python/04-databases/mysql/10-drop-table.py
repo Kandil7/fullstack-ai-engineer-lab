@@ -70,6 +70,7 @@ print()
 print("=== DROP Multiple Tables ===")
 tables = ["table_a", "table_b", "table_c"]
 for table in tables:
+    # Table/column identifiers can't be parameterized — only ever interpolate whitelisted literal names, NEVER user input.
     cursor.execute(f"CREATE TABLE {table} (id INTEGER PRIMARY KEY)")
     cursor.execute(f"INSERT INTO {table} (id) VALUES (1)")
 conn.commit()

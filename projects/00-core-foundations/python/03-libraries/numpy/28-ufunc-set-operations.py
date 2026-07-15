@@ -144,9 +144,9 @@ print(f"Unique to each: {np.setxor1d(team_a, team_b)}")
 arr = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 test_values = np.array([2, 5, 11])
 
-# in1d (deprecated, use isin)
-mask = np.in1d(arr, test_values)
-print("\nin1d:", mask)  # [False True False False True False False False False False]
+# in1d (deprecated) has been replaced by isin; use isin instead
+mask = np.isin(arr, test_values)
+print("\nin1d (now isin):", mask)  # [False True False False True False False False False False]
 print("Matches:", arr[mask])  # [2 5]
 
 # isin (modern version)

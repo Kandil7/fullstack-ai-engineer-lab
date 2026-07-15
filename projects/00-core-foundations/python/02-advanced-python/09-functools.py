@@ -96,7 +96,7 @@ def demo_lru_cache():
 
     # Cache info
     info = fibonacci.cache_info()
-    print(f"  Cache info: hits={info.hits}, misses={info.misses}, size={info.size}")
+    print(f"  Cache info: hits={info.hits}, misses={info.misses}, currsize={info.currsize}")
 
     # Expensive computation
     start = time.perf_counter()

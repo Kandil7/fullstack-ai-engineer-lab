@@ -252,8 +252,8 @@ B) `/swagger-ui`
 C) `/docs`
 D) All of the above
 
-**Correct Answer:** D
-**Explanation:** FastAPI provides `/docs` (Swagger UI) and `/redoc` (ReDoc) for interactive API documentation by default. `/swagger-ui` also works as an alias.
+**Correct Answer:** C
+**Explanation:** FastAPI serves only `/docs` (Swagger UI) and `/redoc` (ReDoc) by default. `/api/docs` and `/swagger-ui` are not served unless you explicitly reconfigure the docs URLs.
 
 ---
 

@@ -66,7 +66,7 @@ print("=" * 60)
 
 print("Column names and their sums:")
 for col_name, col_data in df.items():
-    if col_data.dtype in [np.int64, np.float64]:
+    if pd.api.types.is_numeric_dtype(col_data):
         print(f"  {col_name}: sum={col_data.sum()}, mean={col_data.mean():.1f}")
     else:
         print(f"  {col_name}: {len(col_data)} values")

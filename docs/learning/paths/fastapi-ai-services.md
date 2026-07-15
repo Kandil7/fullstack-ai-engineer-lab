@@ -1,5 +1,7 @@
 # Learning Path: FastAPI AI Services
 
+**Last updated:** 2026-06-26
+
 **Goal:** build the Python AI layer (RAG, embeddings, agents) that the Go core calls over HTTP.
 
 **Primary project:** `projects/04-ai-engineering/rag-system`

@@ -129,8 +129,8 @@ print("=" * 60)
 
 from scipy.spatial.distance import cdist, pdist, squareform
 
-# 2D points
-points_A = np.array([[0, 0], [1, 0], [0, 1], [1, 1]])
+# 2D points (all nonzero so cosine/correlation metrics stay defined)
+points_A = np.array([[1, 1], [1, 0], [0, 1], [2, 3]])
 points_B = np.array([[0.5, 0.5], [2, 2]])
 
 # Euclidean distances between A and B

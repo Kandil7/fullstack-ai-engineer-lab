@@ -5,7 +5,7 @@ ABCs define interfaces and enforce implementation requirements
 for subclasses.
 """
 
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 from typing import List, Optional
 from dataclasses import dataclass
 

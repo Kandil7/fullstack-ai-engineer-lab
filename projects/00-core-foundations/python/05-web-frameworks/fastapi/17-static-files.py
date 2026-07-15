@@ -10,7 +10,7 @@ Run: uvicorn 17-static-files:app --reload
 
 import os
 from datetime import datetime
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.middleware.gzip import GZipMiddleware
@@ -88,15 +88,29 @@ def home():
 
 
 # ----- Serve individual file with FileResponse -----
+DOWNLOADS_DIR = "static/downloads"
+
+
 @app.get("/files/{filename}")
 def download_file(filename: str):
     """Serve a specific file with proper headers."""
-    file_path = os.path.join("static/downloads", filename)
+    # Prevent path traversal: strip any directory components from the
+    # client-supplied name, then confirm the resolved path stays inside
+    # DOWNLOADS_DIR before serving it.
+    safe_name = os.path.basename(filename)
+    if not safe_name or safe_name in ("..", "."):
+        raise HTTPException(status_code=400, detail="Invalid filename")
+
+    downloads_root = os.path.realpath(DOWNLOADS_DIR)
+    file_path = os.path.realpath(os.path.join(downloads_root, safe_name))
+    if os.path.commonpath([downloads_root, file_path]) != downloads_root:
+        raise HTTPException(status_code=400, detail="Invalid filename")
+
     if not os.path.exists(file_path):
-        return HTMLResponse(content=f"<h1>File not found: {filename}</h1>", status_code=404)
+        raise HTTPException(status_code=404, detail=f"File not found: {safe_name}")
     return FileResponse(
         path=file_path,
-        filename=filename,
+        filename=safe_name,
         media_type="application/octet-stream",
     )
 
@@ -153,7 +167,9 @@ def file_info(filename: str):
                 "modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
                 "download_url": f"/static/{os.path.relpath(filepath, 'static')}",
             }
-    return {"error": f"File '{filename}' not found"}, 404
+    # Returning a (dict, int) tuple would serialize as a 200 JSON array, not a
+    # 404. Raise HTTPException so FastAPI emits the correct status + error body.
+    raise HTTPException(status_code=404, detail=f"File '{filename}' not found")
 
 
 # Note: GZipMiddleware is added in 10-middleware.py

@@ -87,6 +87,7 @@ conn.commit()
 
 print("=== Tables Created ===")
 for table in ["customers_us", "customers_eu", "products_a", "products_b"]:
+    # Table/column identifiers can't be parameterized — only ever interpolate whitelisted literal names, NEVER user input.
     cursor.execute(f"SELECT * FROM {table}")
     rows = cursor.fetchall()
     print(f"{table}: {len(rows)} rows")

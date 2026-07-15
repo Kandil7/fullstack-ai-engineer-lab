@@ -36,7 +36,7 @@ def exercise_02():
     data = [np.random.normal(50 + i * 8, 10 + i * 2, 80) for i in range(4)]
 
     plt.figure(figsize=(8, 5))
-    plt.boxplot(data, tick_labels=categories, vert=False, patch_artist=True,
+    plt.boxplot(data, tick_labels=categories, orientation="horizontal", patch_artist=True,
                 boxprops=dict(facecolor="lightblue"))
     plt.title("Exercise 2: Horizontal Box Plot")
     plt.xlabel("Response")
@@ -49,7 +49,7 @@ def exercise_02():
 def exercise_03():
     """Customize box colors, whisker caps, and median styles."""
     np.random.seed(42)
-    data = [np.random.normal(0, 1, 100) for _ in range(5)]
+    data = [np.random.normal(i, 1, 100) for i in range(5)]
     labels = ["μ=0", "μ=1", "μ=2", "μ=3", "μ=4"]
     colors = plt.cm.Pastel1(np.linspace(0, 1, 5))
 

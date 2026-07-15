@@ -220,6 +220,7 @@ print()
 # Example 12: Drop all created tables
 tables_to_drop = ["customers", "orders", "products", "settings", "usernames", "employees", "logs", "enrollment"]
 for table in tables_to_drop:
+    # Table/column identifiers can't be parameterized — only ever interpolate whitelisted literal names, NEVER user input.
     cursor.execute(f"DROP TABLE IF EXISTS {table}")
 conn.commit()
 print("All tables dropped for cleanup.")

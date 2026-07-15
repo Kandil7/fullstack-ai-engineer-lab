@@ -3,6 +3,8 @@
 > Track skill levels across the 12-month journey. Update monthly.
 > Scale: 1 (beginner) → 10 (expert). Target levels set per roadmap phase.
 
+**Last updated:** 2026-06-26
+
 ---
 
 ## Skills Tracking

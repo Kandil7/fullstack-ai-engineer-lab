@@ -3,6 +3,8 @@
 > Trackable milestones with evidence. Update status at weekly reviews.
 > Statuses: `Planned` · `In Progress` · `Blocked` · `Review` · `Done` · `Deferred`
 
+**Last updated:** 2026-06-26
+
 ---
 
 ## Phase 0 — Foundations (Months 1–3)

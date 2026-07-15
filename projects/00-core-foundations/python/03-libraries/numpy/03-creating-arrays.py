@@ -140,4 +140,4 @@ print("Normal distribution:", arr_normal)
 # Empty array (uninitialized values)
 arr_empty = np.empty(5)
 print("\nEmpty array:", arr_empty)  # Contains garbage values
-# Output: Empty array: [0. 0. 0. 0. 0.]
+# Output: Empty array: [<uninitialized/arbitrary values — varies per run>]

@@ -172,7 +172,7 @@ print(classification_report(y_true, y_pred, output_dict=True)['weighted avg']['f
 - **C)** 0.70
 - **D)** 0.75
 
-**Correct Answer: B** — With 6 positives and 4 negatives, the weighted average F1 considers class sizes. The result is approximately 0.65.
+**Correct Answer: C** — With 6 positives and 4 negatives, the weighted average F1 considers class sizes. Class 0 F1 = 0.667 (support 4) and class 1 F1 = 0.727 (support 6), so (0.667×4 + 0.727×6)/10 ≈ 0.70.
 
 ---
 
@@ -225,7 +225,7 @@ print(classification_report(y_true, y_pred, output_dict=True)['weighted avg']['f
 | 3 | A | 13 | B |
 | 4 | B | 14 | A |
 | 5 | A | 15 | B |
-| 6 | B | 16 | B |
+| 6 | B | 16 | C |
 | 7 | B | 17 | B |
 | 8 | B | 18 | B |
 | 9 | B | 19 | B |

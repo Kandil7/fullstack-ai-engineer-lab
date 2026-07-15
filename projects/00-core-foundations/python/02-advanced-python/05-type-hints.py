@@ -23,8 +23,18 @@ def greet(name: str) -> str:
 
 def calculate(a: float, b: float, operation: str = "add") -> float:
     """Calculator with type hints."""
-    operations = {"add": a + b, "sub": a - b, "mul": a * b, "div": a / b}
-    return operations.get(operation, 0.0)
+    # Compute only the selected operation (avoids eager div-by-zero)
+    match operation:
+        case "add":
+            return a + b
+        case "sub":
+            return a - b
+        case "mul":
+            return a * b
+        case "div":
+            return a / b
+        case _:
+            raise ValueError(f"Unknown operation: {operation}")
 
 
 def process_items(items: List[str], uppercase: bool = False) -> Dict[str, int]:

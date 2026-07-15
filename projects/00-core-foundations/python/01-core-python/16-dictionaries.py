@@ -122,8 +122,9 @@ print(f"After pop('phone'): {person}, removed: {phone}")
 last = person.popitem()
 print(f"After popitem(): {person}, removed: {last}")
 
-# del - remove by key
-del person["city"]
+# Use list() to snapshot remaining keys before deletion
+if "city" in person:
+    del person["city"]
 print(f"After del: {person}")
 
 # clear() - remove all items

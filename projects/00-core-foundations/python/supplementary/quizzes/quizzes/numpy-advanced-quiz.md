@@ -71,8 +71,8 @@ B) `np.linalg.solve(A, b)`
 C) `A.inverse() @ b`
 D) Both A and B
 
-**Correct Answer:** D
-**Explanation:** Both `np.linalg.solve()` and `np.solve()` solve the system `Ax = b`. Using the inverse is numerically less stable and slower for large systems.
+**Correct Answer:** B
+**Explanation:** `np.linalg.solve(A, b)` solves the system `Ax = b`. Note that `np.solve` is not a real function — calling it raises an `AttributeError`. Using the inverse (`A.inverse() @ b`) is numerically less stable and slower for large systems, and `A.inverse()` is not a valid NumPy method either.
 
 ---
 
@@ -298,7 +298,7 @@ D) Computing tensor norms
 | 1 | C |
 | 2 | B |
 | 3 | B |
-| 4 | D |
+| 4 | B |
 | 5 | B |
 | 6 | D |
 | 7 | D |

@@ -40,7 +40,7 @@ def exercise_02():
     # Overlay the true PDF
     x = np.linspace(-2, 12, 200)
     pdf = (1 / (2 * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - 5) / 2) ** 2)
-    plt.plot(x, pdf / 2, "k--", linewidth=2, label="True PDF")
+    plt.plot(x, pdf, "k--", linewidth=2, label="True PDF")
     plt.legend()
     plt.title("Exercise 2: Normalized Histogram")
     plt.xlabel("Value")

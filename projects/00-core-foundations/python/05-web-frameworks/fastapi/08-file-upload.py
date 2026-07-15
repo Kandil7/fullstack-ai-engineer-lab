@@ -21,6 +21,26 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
+def safe_upload_path(base_dir: str, client_name: str) -> str:
+    """
+    Build a safe on-disk path from a client-supplied filename.
+
+    Prevents path traversal: an attacker could send filenames like
+    "../../etc/passwd" to escape the upload directory. We strip directory
+    components with os.path.basename, reject empty/relative names, then
+    confirm the resolved realpath is still inside base_dir before returning.
+    """
+    safe_name = os.path.basename(client_name or "")
+    if not safe_name or safe_name in ("..", "."):
+        raise HTTPException(status_code=400, detail="Invalid filename")
+
+    base_root = os.path.realpath(base_dir)
+    full_path = os.path.realpath(os.path.join(base_root, safe_name))
+    if os.path.commonpath([base_root, full_path]) != base_root:
+        raise HTTPException(status_code=400, detail="Invalid filename")
+    return full_path
+
+
 class FileMetadata(BaseModel):
     filename: str
     content_type: str
@@ -43,8 +63,8 @@ async def upload_file(file: UploadFile = File(...)):
     size = len(content)
     md5 = hashlib.md5(content).hexdigest()
 
-    # Save to disk
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    # Save to disk — sanitize the client filename to prevent path traversal
+    file_path = safe_upload_path(UPLOAD_DIR, file.filename)
     with open(file_path, "wb") as f:
         f.write(content)
 
@@ -76,7 +96,15 @@ async def upload_image(file: UploadFile = File(...)):
     if len(content) > max_size:
         raise HTTPException(status_code=400, detail="File too large. Max 5MB.")
 
-    file_path = os.path.join(UPLOAD_DIR, f"image_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}")
+    # Sanitize the client filename before embedding it in the saved name
+    # (prevents path traversal via names like "../../evil.png").
+    safe_name = os.path.basename(file.filename or "")
+    if not safe_name or safe_name in ("..", "."):
+        raise HTTPException(status_code=400, detail="Invalid filename")
+    file_path = safe_upload_path(
+        UPLOAD_DIR,
+        f"image_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{safe_name}",
+    )
     with open(file_path, "wb") as f:
         f.write(content)
 
@@ -95,7 +123,8 @@ async def upload_multiple(files: list[UploadFile] = File(...)):
     results = []
     for file in files:
         content = await file.read()
-        file_path = os.path.join(UPLOAD_DIR, file.filename)
+        # Sanitize each client filename to prevent path traversal
+        file_path = safe_upload_path(UPLOAD_DIR, file.filename)
         with open(file_path, "wb") as f:
             f.write(content)
         results.append({
@@ -120,11 +149,16 @@ async def upload_document(
     """Upload file with additional metadata fields."""
     content = await file.read()
 
-    # Organize by category
-    category_dir = os.path.join(UPLOAD_DIR, category)
+    # Organize by category. Both `category` and the filename are client
+    # controlled, so sanitize both to prevent path traversal (e.g. a
+    # category of "../../etc" escaping the upload root).
+    safe_category = os.path.basename(category or "")
+    if not safe_category or safe_category in ("..", "."):
+        raise HTTPException(status_code=400, detail="Invalid category")
+    category_dir = safe_upload_path(UPLOAD_DIR, safe_category)
     os.makedirs(category_dir, exist_ok=True)
 
-    file_path = os.path.join(category_dir, file.filename)
+    file_path = safe_upload_path(category_dir, file.filename)
     with open(file_path, "wb") as f:
         f.write(content)
 
@@ -148,7 +182,8 @@ async def upload_large_file(file: UploadFile = File(...)):
     chunk_size = 1024 * 1024  # 1MB chunks
     total_size = 0
     md5_hash = hashlib.md5()
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    # Sanitize the client filename to prevent path traversal
+    file_path = safe_upload_path(UPLOAD_DIR, file.filename)
 
     with open(file_path, "wb") as f:
         while chunk := await file.read(chunk_size):

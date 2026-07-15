@@ -58,7 +58,7 @@ def exercise_02():
 
 # ── Exercise 3: Wireframe Color Mapping ──────────────────────────────────────
 def exercise_03():
-    """Color wireframe lines by height using a colormap."""
+    """Color a surface by height using a colormap with a colorbar."""
     x = np.linspace(-2, 2, 40)
     y = np.linspace(-2, 2, 40)
     X, Y = np.meshgrid(x, y)
@@ -66,10 +66,10 @@ def exercise_03():
 
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(111, projection="3d")
-    surf = ax.plot_wireframe(X, Y, Z, rstride=3, cstride=3, linewidth=0.7,
-                             cmap="coolwarm", edgecolor="none")
+    # A wireframe has no scalar array for a colorbar, so use a surface plot
+    surf = ax.plot_surface(X, Y, Z, cmap="coolwarm")
     fig.colorbar(surf, ax=ax, shrink=0.5, label="Z value")
-    ax.set_title("Exercise 3: Color-Mapped Wireframe")
+    ax.set_title("Exercise 3: Color-Mapped Surface")
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
     ax.set_zlabel("Z")

@@ -145,8 +145,9 @@ model_multi = LinearRegression()
 model_multi.fit(X_multi, y_multi)
 
 r2_multi = model_multi.score(X_multi, y_multi)
-p_multi = X_multi.shape[1]
-adj_r2_multi = 1 - (1 - r2_multi) * (n - 1) / (n - p_multi - 1)
+n_multi = len(X_multi)  # 100 samples (model was fit/scored on the full X_multi)
+p_multi = X_multi.shape[1]  # 10 features
+adj_r2_multi = 1 - (1 - r2_multi) * (n_multi - 1) / (n_multi - p_multi - 1)
 
 print(f"With 10 features (only 1 meaningful):")
 print(f"R-squared:       {r2_multi:.4f}")

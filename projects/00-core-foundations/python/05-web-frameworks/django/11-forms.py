@@ -131,7 +131,7 @@ class PostForm(forms.ModelForm):
 
 # Boolean:
 # forms.BooleanField()                    # Checkbox
-# forms.NullBooleanField()                # None/True/False
+# forms.BooleanField(null=True)           # None/True/False (NullBooleanField is deprecated)
 
 # Choice fields:
 # forms.ChoiceField(choices=[('a', 'Option A'), ('b', 'Option B')])

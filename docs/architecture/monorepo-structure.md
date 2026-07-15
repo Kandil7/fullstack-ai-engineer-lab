@@ -14,10 +14,14 @@ fullstack-ai-engineer-lab/
 
   docs/
     architecture/       # overview, monorepo-structure, ai-workspace-architecture
-    decisions/          # ADR index + numbered ADRs
-    learning/           # paths/ deep-dives/ notes/{weekly,monthly}/ source-summaries/
-    product/            # workspace-goals, scope-definition, feature-priorities
+    decisions/          # ADR index + numbered ADRs (0001-0003)
+    learning/           # paths/ deep-dives/ source-summaries/
+    product/            # workspace-goals, scope-definition, feature-priorities, learning-strategy
     cheat-sheets/       # git, docker, postgres, qdrant, prompt-design
+    plan/               # executive summary, builder progress
+    roadmap/            # master-roadmap, milestones, progress-dashboard, skills-matrix
+    tracking/           # current-focus (what to work on right now)
+    reviews/            # weekly/ and monthly/ review templates
 
   learning-sources/     # source-index + books/ repos/ notebooks/ official-docs/
 
@@ -27,17 +31,17 @@ fullstack-ai-engineer-lab/
     projects/ auth-service/ rag-system/ capstone/
 
   projects/
-    00-core-foundations/  go/ git-linux/ ds-algo/
+    00-core-foundations/  go/ git-linux/ ds-algo/ python/
     01-backend-go/        01-auth-service/ 02-user-service/ 03-chat-service/
     02-frontend/          flutter-app/ nextjs-web/
     03-databases/         postgres-design/ redis-cache/ qdrant-rag/
-    04-ai-engineering/    prompt-engineering/ embeddings/ rag-system/ agents/
+    04-ai-engineering/    prompt-engineering/ embeddings/ rag-system/ agents/ ai-automation/ security/
     05-system-design/
     06-devops/            docker/ ci-cd/ deployment/
     07-capstone/          thanaweyagpt/ backend/ frontend/ ai/ infra/ docs/
 
   infra/
-    docker/   docker-compose.yml + postgres/ redis/ qdrant/
+    docker/   docker-compose.yml + postgres/ redis/
     scripts/  setup.ps1 dev-run.ps1 seed-db.ps1 new-adr.ps1 new-review.ps1 new-source-note.ps1
 
   tests/
@@ -46,13 +50,31 @@ fullstack-ai-engineer-lab/
 
 ## Naming Conventions
 
-- ADRs: `NNNN-kebab-title.md` (4-digit, zero-padded).
-- Source summaries: `<type>-<slug>.md` under `docs/learning/source-summaries/`.
-- Project artifacts: `feature-spec.md`, `plan.md`, `architecture-review.md`, `ai-review.md`,
-  `notes.md`, `mistakes.md` inside each project folder.
-- Prompts: `<layer>.<name>` ids; workflows: `<group>/<NN-step>` ids.
+| Artifact | Pattern | Example |
+|----------|---------|---------|
+| ADRs | `NNNN-kebab-title.md` (4-digit, zero-padded) | `0001-repo-centric-workspace.md` |
+| Source summaries | `<type>-<slug>.md` | `go-stdlib-http-package.md` |
+| Project artifacts | Standard filenames inside project folders | `plan.md`, `ai-review.md`, `notes.md`, `mistakes.md` |
+| Prompts | `<layer>.<name>` ids | `system.workspace-governor`, `roles.project-planner` |
+| Workflows | `<group>/<NN-step>` ids | `feature/01-plan`, `debugging/01-symptom-capture` |
 
 ## Why `.ai/` (not `99-ai-workflow/`)
 
 See [ADR-0002](../decisions/0002-prompt-modularization.md). `.ai/` is concise, sorts to the top,
-and signals "machine/AI workspace" distinct from human docs in `docs/`.
+and signals "machine/AI workspace" distinct from human docs in `docs/`. It follows the
+convention established by projects like .github/ and .vscode/.
+
+## Directory Roles
+
+| Directory | Purpose |
+|-----------|---------|
+| `docs/` | Human-readable documentation — architecture, decisions, learning, product |
+| `.ai/` | AI operating instructions — prompts, workflows, critics |
+| `templates/` | Standardized artifact shapes for reuse |
+| `registries/` | YAML inventories of all workspace assets |
+| `projects/` | Actual code — organized by skill area |
+| `infra/` | Infrastructure — Docker, scripts |
+| `evaluations/` | Quality metrics — prompt evals, RAG evals, project release gates |
+| `learning-sources/` | External reference materials indexed and summarized |
+
+*Last updated: 2026-06-26*

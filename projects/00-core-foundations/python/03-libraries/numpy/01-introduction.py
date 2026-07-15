@@ -147,9 +147,9 @@ print("\nArray:\n", arr)
 print("Shape:", arr.shape)      # (2, 5) - 2 rows, 5 columns
 print("Size:", arr.size)        # 10 - total elements
 print("ndim:", arr.ndim)        # 2 - number of dimensions
-print("Dtype:", arr.dtype)     # int64 - data type
-print("Item size:", arr.itemsize)  # 8 - bytes per element
-print("Nbytes:", arr.nbytes)   # 80 - total bytes
+print("Dtype:", arr.dtype)     # int64 on Linux/macOS, int32 on Windows (platform-dependent)
+print("Item size:", arr.itemsize)  # 8 on Linux/macOS, 4 on Windows (platform-dependent)
+print("Nbytes:", arr.nbytes)   # 80 on Linux/macOS, 40 on Windows (platform-dependent)
 # Output:
 # Array:
 #  [[ 1  2  3  4  5]

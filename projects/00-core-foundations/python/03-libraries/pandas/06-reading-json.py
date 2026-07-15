@@ -8,6 +8,7 @@ parse JSON data.
 """
 import pandas as pd
 import json
+import io
 import os
 import tempfile
 
@@ -138,7 +139,7 @@ print("Example 5: Inline JSON String")
 print("=" * 60)
 
 json_str = '[{"city":"Rome","pop":2873000},{"city":"Berlin","pop":3645000}]'
-df_cities = pd.read_json(json_str)
+df_cities = pd.read_json(io.StringIO(json_str))
 print("Cities from inline JSON:")
 print(df_cities)
 print()

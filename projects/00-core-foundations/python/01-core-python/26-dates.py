@@ -26,13 +26,13 @@ print(f"datetime.now(): {now}")
 today = date.today()
 print(f"date.today(): {today}")
 
-current_time = time.today()
-print(f"time.today(): {current_time}")
+current_time = datetime.now().time()
+print(f"datetime.now().time(): {current_time}")
 
 # Output:
 # datetime.now(): 2024-01-15 14:30:45.123456
 # date.today(): 2024-01-15
-# time.today(): 14:30:45.123456
+# datetime.now().time(): 14:30:45.123456
 
 # ============================================================
 # Creating Date Objects

@@ -15,6 +15,8 @@ Properties:
 - Maximum nodes in tree of height h: 2^(h+1) - 1
 """
 
+from collections import deque
+
 # =============================================================================
 # 1. BINARY TREE IMPLEMENTATION
 # =============================================================================
@@ -44,11 +46,11 @@ class BinaryTree:
             return None
 
         root = TreeNode(arr[0])
-        queue = [root]
+        queue = deque([root])
         i = 1
 
         while i < len(arr):
-            node = queue.pop(0)
+            node = queue.popleft()
 
             if i < len(arr) and arr[i] is not None:
                 node.left = TreeNode(arr[i])
@@ -101,10 +103,10 @@ class BinaryTree:
             return []
 
         result = []
-        queue = [self.root]
+        queue = deque([self.root])
 
         while queue:
-            node = queue.pop(0)
+            node = queue.popleft()
             result.append(node.data)
             if node.left:
                 queue.append(node.left)
@@ -114,22 +116,27 @@ class BinaryTree:
         return result
 
     def reverse_level_order(self):
-        """Reverse BFS (bottom to top). O(n)"""
+        """Bottom-up level order: bottom level first, left->right within each level. O(n)"""
         if not self.root:
             return []
 
-        result = []
-        queue = [self.root]
+        levels = []
+        queue = deque([self.root])
 
         while queue:
-            node = queue.pop(0)
-            result.append(node.data)
-            if node.left:
-                queue.append(node.left)
-            if node.right:
-                queue.append(node.right)
+            level_size = len(queue)
+            level = []
+            for _ in range(level_size):
+                node = queue.popleft()
+                level.append(node.data)
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+            levels.append(level)
 
-        return result[::-1]
+        # Reverse the list of levels (bottom to top), then flatten
+        return [data for level in reversed(levels) for data in level]
 
     # ---- UTILITIES ----
 
@@ -171,10 +178,10 @@ class BinaryTree:
         """Check if tree is complete. O(n)"""
         if not root:
             return True
-        queue = [root]
+        queue = deque([root])
         reached_end = False
         while queue:
-            node = queue.pop(0)
+            node = queue.popleft()
             if node is None:
                 reached_end = True
             else:
@@ -332,7 +339,7 @@ def zigzag_traversal(root):
         level_size = len(queue)
 
         for _ in range(level_size):
-            node = queue.pop(0)
+            node = queue.popleft()
             if left_to_right:
                 level.append(node.data)
             else:
@@ -435,10 +442,10 @@ def vertical_order(root):
 
     column_table = {}
     min_col = max_col = 0
-    queue = [(root, 0)]
+    queue = deque([(root, 0)])
 
     while queue:
-        node, col = queue.pop(0)
+        node, col = queue.popleft()
 
         if col not in column_table:
             column_table[col] = []
@@ -467,10 +474,10 @@ def top_view(root):
         return []
 
     column_table = {}
-    queue = [(root, 0)]
+    queue = deque([(root, 0)])
 
     while queue:
-        node, col = queue.pop(0)
+        node, col = queue.popleft()
         if col not in column_table:
             column_table[col] = node.data
 
@@ -487,10 +494,10 @@ def bottom_view(root):
         return []
 
     column_table = {}
-    queue = [(root, 0)]
+    queue = deque([(root, 0)])
 
     while queue:
-        node, col = queue.pop(0)
+        node, col = queue.popleft()
         column_table[col] = node.data  # Overwrite with last seen
 
         if node.left:
@@ -520,7 +527,7 @@ def right_view(root):
     while queue:
         level_size = len(queue)
         for i in range(level_size):
-            node = queue.pop(0)
+            node = queue.popleft()
             if i == level_size - 1:
                 result.append(node.data)
             if node.left:
@@ -541,7 +548,7 @@ def left_view(root):
     while queue:
         level_size = len(queue)
         for i in range(level_size):
-            node = queue.pop(0)
+            node = queue.popleft()
             if i == 0:
                 result.append(node.data)
             if node.left:

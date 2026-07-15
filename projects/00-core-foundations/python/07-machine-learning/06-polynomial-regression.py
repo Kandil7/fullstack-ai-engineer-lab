@@ -10,7 +10,7 @@ Reference: https://www.w3schools.com/python/ml_polynomial_regression.asp
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import mean_squared_error, r2_score
 
 # ============================================================
@@ -128,35 +128,47 @@ print("Overfitting: Model memorizes noise instead of learning pattern")
 # ============================================================
 
 # Example 8: Proper degree selection
+# Select the degree using cross-validation on the TRAINING data only.
+# Never pick hyperparameters by looking at the test set - that leaks test
+# information into model selection and inflates the reported score.
+# The untouched test set is used ONCE at the end to report final performance.
 print("\nExample 8: Proper Degree Selection")
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
 best_degree = 1
-best_r2 = -np.inf
-results_test = []
+best_cv_r2 = -np.inf
+results_cv = []
 
 for degree in range(1, 8):
     poly = PolynomialFeatures(degree=degree, include_bias=False)
     X_train_poly = poly.fit_transform(X_train)
-    X_test_poly = poly.transform(X_test)
-    
-    model = LinearRegression()
-    model.fit(X_train_poly, y_train)
-    
-    y_pred_test = model.predict(X_test_poly)
-    r2_test = r2_score(y_test, y_pred_test)
-    
-    results_test.append({'degree': degree, 'r2_test': r2_test})
-    
-    if r2_test > best_r2:
-        best_r2 = r2_test
-        best_degree = degree
-    
-    print(f"Degree {degree}: Test R^2={r2_test:.4f}")
 
-print(f"\nBest degree: {best_degree} (Test R^2={best_r2:.4f})")
+    # 5-fold cross-validation R^2 on the training data
+    cv_r2 = cross_val_score(
+        LinearRegression(), X_train_poly, y_train, cv=5, scoring='r2'
+    ).mean()
+
+    results_cv.append({'degree': degree, 'cv_r2': cv_r2})
+
+    if cv_r2 > best_cv_r2:
+        best_cv_r2 = cv_r2
+        best_degree = degree
+
+    print(f"Degree {degree}: CV R^2={cv_r2:.4f}")
+
+# Evaluate the chosen degree ONCE on the untouched test set
+poly_sel = PolynomialFeatures(degree=best_degree, include_bias=False)
+X_train_sel = poly_sel.fit_transform(X_train)
+X_test_sel = poly_sel.transform(X_test)
+
+model_sel = LinearRegression()
+model_sel.fit(X_train_sel, y_train)
+best_test_r2 = r2_score(y_test, model_sel.predict(X_test_sel))
+
+print(f"\nBest degree: {best_degree} (CV R^2={best_cv_r2:.4f})")
+print(f"Final test R^2 for degree {best_degree}: {best_test_r2:.4f}")
 
 # ============================================================
 # Prediction with Polynomial Model

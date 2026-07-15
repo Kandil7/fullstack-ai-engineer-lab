@@ -107,20 +107,20 @@ arr = np.array([1, 2, 3, 4, 5])
 # Product with initial value
 print("\nProduct with initial=2:", np.prod(arr, initial=2))  # 240
 
-# Cumprod with initial
-print("cumprod with initial=1:", np.cumprod(arr, initial=1))
+# Cumprod with a leading one (prepend manually; cumprod has no initial)
+print("cumprod with leading 1:", np.concatenate([[1], np.cumprod(arr)]))
 # [  1   1   2   6  24 120]
 
-# Product along axis with initial
+# Cumulative product along an axis
 arr2d = np.array([[1, 2], [3, 4], [5, 6]])
 print("\n2D Array:\n", arr2d)
-print("cumprod(axis=1, initial=1):\n", np.cumprod(arr2d, axis=1, initial=1))
-# [[ 1  1  2]
-#  [ 1  3 12]
-#  [ 1  5 30]]
+print("cumprod(axis=1):\n", np.cumprod(arr2d, axis=1))
+# [[ 1  2]
+#  [ 3 12]
+#  [ 5 30]]
 # Output:
 # Product with initial=2: 240
-# cumprod with initial=1: [  1   1   2   6  24 120]
+# cumprod with leading 1: [  1   1   2   6  24 120]
 
 # ============================================================
 # Example 5: Practical Product Examples

@@ -57,7 +57,6 @@ submodules = [
     "ndimage",    # N-dimensional image processing
     "spatial",    # Spatial data structures
     "io",         # File I/O for various formats
-    "misc",       # Miscellaneous utilities
 ]
 
 for mod in submodules:

@@ -97,7 +97,8 @@
 
 DJANGO_SETTINGS_EXAMPLE = {
     # Security
-    "SECRET_KEY": "your-secret-key-change-in-production",
+    # Load from env in real projects: os.environ["DJANGO_SECRET_KEY"]
+    "SECRET_KEY": "django-insecure-REPLACE-ME-generate-with-get_random_secret_key()",
 
     # Debug mode (NEVER True in production)
     "DEBUG": True,

@@ -142,9 +142,9 @@ for p in percentiles:
     print(f"  {p}th: {val:.2f}")
 
 # Moment statistics
-m = stats.moment(exam_scores, moment=3)
+m = stats.moment(exam_scores, order=3)
 print(f"\nThird central moment: {m:.2f}")
-print(f"Fourth central moment: {stats.moment(exam_scores, moment=4):.2f}")
+print(f"Fourth central moment: {stats.moment(exam_scores, order=4):.2f}")
 
 # ============================================================
 # Example 4: Hypothesis Testing

@@ -210,7 +210,7 @@ def evaluate_postfix(expression):
                 stack.push(a - b)
             elif token == '*':
                 stack.push(a * b)
-            elif token == '-':
+            elif token == '/':
                 stack.push(a / b)
         else:
             stack.push(float(token))

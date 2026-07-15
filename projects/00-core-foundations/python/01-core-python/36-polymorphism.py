@@ -164,7 +164,8 @@ print("\n--- Built-in Polymorphism ---")
 # len() works with different types
 print(f"len('Hello'): {len('Hello')}")          # String
 print(f"len([1,2,3]): {len([1,2,3])}")         # List
-print(f"len({{1:2, 3:4}}): {len({{1:2, 3:4}})}") # Dict
+d = {1: 2, 3: 4}
+print(f"len(d): {len(d)}") # Dict
 print(f"len((1,2,3)): {len((1,2,3))}")         # Tuple
 
 # + operator is polymorphic

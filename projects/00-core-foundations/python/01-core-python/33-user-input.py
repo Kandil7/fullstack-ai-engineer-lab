@@ -217,23 +217,24 @@ print("  - 'Email (user@example.com): ' - with example")
 import ast
 
 def safe_eval(expression):
-    """Safely evaluate a mathematical expression."""
+    """Safely parse a literal value (numbers, lists, dicts, etc.)."""
     try:
-        # Only allows numbers, operators, and basic math
-        tree = ast.parse(expression, mode='eval')
-        return eval(compile(tree, '<string>', 'eval'))
-    except:
+        # ast.literal_eval only accepts Python literals.
+        # Function calls, names, and attribute access are rejected.
+        return ast.literal_eval(expression)
+    except (ValueError, SyntaxError):
+        # Anything that is not a plain literal is refused here.
         return None
 
-# Test safe eval
-expressions = ["2 + 3", "10 * 5", "100 / 4"]
+# Test safe eval with plain literals
+expressions = ["[1, 2, 3]", "{'a': 1}", "(10, 20)"]
 for expr in expressions:
     result = safe_eval(expr)
     print(f"  {expr} = {result}")
 
-# This would fail safely:
+# Malicious input is rejected (never executed):
 result = safe_eval("__import__('os').system('echo HACKED')")
-print(f"  Malicious input: {result}")  # None (blocked!)
+print(f"  Malicious input: {result}")  # None (blocked - not a literal!)
 
 # ============================================================
 # Summary
