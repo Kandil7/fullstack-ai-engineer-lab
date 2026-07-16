@@ -1,0 +1,36 @@
+# fast.ai Deep Learning track — pinned dependencies
+# ---------------------------------------------------------------------------
+# Install order matters. PyTorch is large (~2 GB with CUDA). On Windows/CPU
+# prefer the CPU wheel index to avoid pulling CUDA. See setup.ps1.
+#
+#   pip install -r requirements.txt
+#
+# GPU note: the fast.ai course itself recommends Kaggle/Paperspace free GPUs
+# over local training unless you are comfortable with CUDA drivers.
+# ---------------------------------------------------------------------------
+
+# --- Core deep learning (heavy — see setup.ps1 for CPU-only install) ---
+torch==2.4.1
+torchvision==0.19.1
+fastai==2.7.18
+
+# --- Notebook-driven development ---
+nbdev==2.3.13
+jupyterlab==4.2.5
+ipykernel==6.29.5
+
+# --- NLP / deployment demos used across lessons ---
+transformers==4.44.2
+gradio==4.44.0
+
+# --- Tabular / classic ML lessons (random forests, collab filtering) ---
+scikit-learn==1.5.2
+pandas==2.2.3
+numpy==2.1.1
+
+# --- Tooling (match repo conventions: black / isort / ruff / pytest) ---
+black==24.8.0
+isort==5.13.2
+ruff==0.6.8
+pytest==8.3.3
+python-dotenv==1.0.1
