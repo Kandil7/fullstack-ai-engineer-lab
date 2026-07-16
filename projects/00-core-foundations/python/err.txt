@@ -1,0 +1,1 @@
+C:\Users\amazon\AppData\Local\Microsoft\WindowsApps\python.exe: can't open file 'K:\\Projects\\fullstack-ai-engineer-lab\\projects\\00-core-foundations\\python\\29-regex.py': [Errno 2] No such file or directory

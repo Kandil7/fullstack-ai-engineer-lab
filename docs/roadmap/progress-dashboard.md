@@ -1,7 +1,8 @@
 # Progress Dashboard — Full-Stack AI Engineer Lab
 
 > Quick-read status summary. Update at weekly/monthly reviews.
-> Last updated: 2026-06-26 (Week 1 started)
+
+**Last updated:** 2026-06-26 (Week 1 started)
 
 ---
 

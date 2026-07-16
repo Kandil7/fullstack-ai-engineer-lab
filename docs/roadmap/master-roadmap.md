@@ -2,7 +2,8 @@
 
 > **Baseline plan.** This file is the single source of truth for the 12-month journey.
 > Do not modify day-to-phase — update milestones and progress-dashboard instead.
-> Last updated: 2026-06-26
+
+**Last updated:** 2026-06-26
 
 ---
 

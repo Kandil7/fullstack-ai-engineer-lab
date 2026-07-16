@@ -1,5 +1,7 @@
 # AI Learning Operating Manual
 
+**Last updated:** 2026-06-26
+
 How to use AI agents inside `fullstack-ai-engineer-lab` to accelerate learning **without** outsourcing understanding.
 
 > **You are the driver.** AI explains, plans, reviews, and debugs. You write the core logic.

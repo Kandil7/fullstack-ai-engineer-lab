@@ -1,5 +1,7 @@
 # Scope Definition
 
+**Last updated:** 2026-06-26
+
 ## Purpose
 
 This document defines what is **in scope**, **out of scope**, and **future scope** for the Full-Stack AI Engineer Lab. Clear scope boundaries prevent feature creep and keep the workspace focused on its primary mission: learning and experimentation.

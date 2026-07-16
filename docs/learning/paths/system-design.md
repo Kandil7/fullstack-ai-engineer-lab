@@ -1,5 +1,7 @@
 # Learning Path: System Design
 
+**Last updated:** 2026-06-26
+
 **Goal:** develop the ability to design scalable, reliable distributed systems — covering
 architecture patterns, infrastructure components, and real-world case studies.
 

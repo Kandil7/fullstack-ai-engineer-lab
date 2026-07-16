@@ -1,5 +1,7 @@
 # Deep Dive: RAG System
 
+**Last updated:** 2026-06-26
+
 **Project reference:** `projects/04-ai-engineering/rag-system`
 
 A comprehensive look at the Retrieval-Augmented Generation pipeline — from document

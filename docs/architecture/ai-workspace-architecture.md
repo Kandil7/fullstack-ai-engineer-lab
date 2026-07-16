@@ -10,25 +10,25 @@ Each AI run is assembled deterministically:
 1. system/workspace-governor.md      (global rules)
 2. roles/<role>.md                   (who you are)
 3. tasks/<task>.md                   (the specific job, optional)
-4. system/output-format-rules.md     (shape)
+4. system/output-format-rules.md     (output shape)
 5. critics/<critic>.md | repair/*    (optional follow-up pass)
 ```
 
-This keeps prompts **modular** — no monolithic mega-prompt. Format lives once in
+This keeps prompts **modular** — no monolithic mega-prompt. Format rules live once in
 `output-format-rules.md` (DRY); each prompt only declares its own constraints.
 
 ## Roles ↔ Workflows ↔ Templates
 
-| Role                     | Primary workflow            | Template produced            |
-| ------------------------ | --------------------------- | ---------------------------- |
-| Project Planner          | feature/01-plan             | project-plan                 |
-| System Architect         | feature/02-design           | architecture-review / adr    |
-| Pair Programmer          | feature/03-build            | (code, notes)                |
-| Code Reviewer            | feature/04-review           | code-review                  |
-| Debugging Specialist     | debugging/*                 | debugging-session            |
-| Source Learning Agent    | learning/*                  | source-*                     |
-| Principal System Designer| architecture/*, evaluation/*| architecture-review / eval   |
-| Learning Coach           | feature/06-reflect, learning| daily/weekly-review          |
+| Role | Primary workflow | Template produced |
+|------|------------------|-------------------|
+| Project Planner | feature/01-plan | project-plan |
+| System Architect | feature/02-design | architecture-review / adr |
+| Pair Programmer | feature/03-build | (code, notes) |
+| Code Reviewer | feature/04-review | code-review |
+| Debugging Specialist | debugging/* | debugging-session |
+| Source Learning Agent | learning/* | source-* |
+| Principal System Designer | architecture/*, evaluation/* | architecture-review / eval |
+| Learning Coach | feature/06-reflect, learning | daily/weekly-review |
 
 ## Critics & Repair
 
@@ -36,8 +36,38 @@ This keeps prompts **modular** — no monolithic mega-prompt. Format lives once 
   prompt-auditor) and emit findings with severity — they never rewrite.
 - **Repair** prompts handle failure modes: missing context, over-engineering, wrong output shape.
 
-## Governance
+## Registration & Governance
 
-Everything in `.ai/` is registered in `registries/prompt-registry.yaml` and
-`registries/workflow-registry.yaml` with id, version, owner, status, and constraints — the
-single source of truth for what exists and what each artifact is allowed to do.
+Everything in `.ai/` is registered in:
+- `registries/prompt-registry.yaml` — prompt id, version, owner, status, constraints
+- `registries/workflow-registry.yaml` — workflow id, steps, inputs, outputs
+- `registries/decision-log.yaml` — ADR index synchronized with docs/decisions/
+- `registries/template-registry.yaml` — template inventory
+- `registries/skills-registry.yaml` — reusable capability tracking
+
+This registration system is the single source of truth for what exists and what each
+artifact is allowed to do.
+
+## Prompt Composition Example
+
+```text
+Feature request enters the workspace:
+    ↓
+workspace-governor.md sets the global rules and constraints
+    ↓
+roles/project-planner.md defines who the AI is (planner persona)
+    ↓
+tasks/implementation-planner.md describes the specific job
+    ↓
+system/output-format-rules.md enforces the output shape (plan.md)
+    ↓
+(Optional) critics/architecture-validator.md reviews the plan
+```
+
+## Current State
+
+The `.ai/` directory structure is defined in the project structure but prompt files
+are being authored incrementally as each workflow is implemented. The registration
+registries are initialized with the core entries.
+
+*Last updated: 2026-06-26*

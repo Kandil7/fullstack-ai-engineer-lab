@@ -3,6 +3,8 @@
 Tailored for the `fullstack-ai-engineer-lab` stack:
 Go/FastAPI + Flutter/Next.js + PostgreSQL/Redis/Qdrant + LLMs/RAG + Agents.
 
+**Last updated:** 2026-06-26
+
 ---
 
 ## Philosophy

@@ -1,5 +1,7 @@
 # Deep Dive: Auth Service
 
+**Last updated:** 2026-06-26
+
 **Project reference:** `projects/01-backend-go/01-auth-service`
 
 A comprehensive look at the authentication and authorization service — the security

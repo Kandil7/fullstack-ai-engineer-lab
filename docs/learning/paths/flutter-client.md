@@ -1,5 +1,7 @@
 # Learning Path: Flutter Client
 
+**Last updated:** 2026-06-26
+
 **Goal:** build a production-quality Flutter mobile app that talks to the Go/FastAPI backend,
 with clean architecture, proper state management, and solid testing.
 

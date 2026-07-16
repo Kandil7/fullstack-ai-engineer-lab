@@ -1,5 +1,7 @@
 # Deep Dive: Baligh LLM Fine-Tuning
 
+**Last updated:** 2026-06-26
+
 **Context:** Fine-tuning and deploying a specialized LLM for Arabic domain-specific tasks,
 covering dataset preparation, training methodology, evaluation, and production deployment.
 

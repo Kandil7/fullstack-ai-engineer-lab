@@ -1,0 +1,50 @@
+# =============================================================================
+# Fullstack AI Engineer Lab — Python Module Requirements
+# =============================================================================
+# Install all at once: pip install -r requirements.txt
+# 
+# Organized by module/phase. Uncomment only what you need.
+# =============================================================================
+
+# ── Phase 1: Core Python ─────────────────────────────────────────────────────
+# No external dependencies required (pure Python standard library)
+
+# ── Phase 2: Advanced Python ─────────────────────────────────────────────────
+# No external dependencies required (pure Python standard library)
+
+# ── Phase 3: Data Science Libraries ──────────────────────────────────────────
+numpy>=1.24.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+scipy>=1.11.0
+
+# ── Phase 4: Databases ───────────────────────────────────────────────────────
+# MySQL uses built-in sqlite3 (no install needed)
+# MongoDB uses dict stand-ins (no install needed)
+# For real MongoDB use: pymongo>=4.5.0
+# For real MySQL use: mysql-connector-python>=8.2.0
+
+# ── Phase 5: Web Frameworks ──────────────────────────────────────────────────
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+python-multipart>=0.0.6
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+httpx>=0.25.0
+jinja2>=3.1.0
+aiofiles>=23.2.0
+sqlalchemy>=2.0.0
+pydantic[email]>=2.0.0
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Django (optional, for Phase 5 Django section)
+# django>=5.0.0
+# djangorestframework>=3.14.0
+# djangorestframework-simplejwt>=5.3.0
+
+# ── Phase 6: Data Structures & Algorithms ────────────────────────────────────
+# No external dependencies required (pure Python standard library)
+
+# ── Phase 7: Machine Learning ────────────────────────────────────────────────
+scikit-learn>=1.3.0

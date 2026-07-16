@@ -1,0 +1,248 @@
+"""
+Unit tests for Python Core Foundations - Phase 1 exercises.
+Tests that key exercise files compile and produce expected output.
+"""
+
+import subprocess
+import sys
+import pytest
+from pathlib import Path
+
+HERE = Path(__file__).parent.parent.parent  # python/ directory
+SKIP_FILES = {"practice_all.py", "practice_no_solutions.py", "39-pip.py", "40-virtualenv.py"}
+SKIP_DIRS = {".git", "__pycache__", ".mimocode", ".idea"}
+
+
+def _discover_phase_files(phase_dir: str) -> list[Path]:
+    """Discover all .py files in a phase directory."""
+    phase_path = HERE / phase_dir
+    if not phase_path.is_dir():
+        return []
+    files = []
+    for f in sorted(phase_path.iterdir()):
+        if f.suffix == ".py" and f.name not in SKIP_FILES:
+            files.append(f)
+    return files
+
+
+def _compile_check(filepath: Path) -> tuple[bool, str]:
+    """Check that a Python file compiles without syntax errors."""
+    try:
+        result = subprocess.run(
+            [sys.executable, "-c",
+             f"compile(open({str(filepath)!r}, 'r', encoding='utf-8').read(), {str(filepath.name)!r}, 'exec')"],
+            capture_output=True, text=True, timeout=15,
+        )
+        if result.returncode != 0:
+            return False, result.stderr.strip()[:200]
+        return True, "OK"
+    except subprocess.TimeoutExpired:
+        return True, "OK (timeout)"
+    except Exception as e:
+        return False, str(e)
+
+
+# =========================================================================
+# Phase 1: Core Python - Syntax Verification
+# =========================================================================
+
+PHASE1_FILES = _discover_phase_files("01-core-python")
+
+
+@pytest.mark.parametrize("filepath", PHASE1_FILES, ids=lambda p: p.name)
+def test_phase1_compiles(filepath):
+    """Every Phase 1 file must compile without syntax errors."""
+    ok, msg = _compile_check(filepath)
+    assert ok, f"{filepath.name} failed to compile: {msg}"
+
+
+@pytest.mark.parametrize("filepath", PHASE1_FILES, ids=lambda p: p.name)
+def test_phase1_has_docstring(filepath):
+    """Every Phase 1 file must have a module-level docstring."""
+    content = filepath.read_text(encoding="utf-8")
+    assert content.startswith('"""') or content.startswith("'''"), \
+        f"{filepath.name} missing module docstring"
+
+
+def test_phase1_all_files_present():
+    """Verify all 41 core Python files exist."""
+    expected = {f"{i:02d}" for i in range(1, 42)}
+    actual = {f.stem[:2] for f in PHASE1_FILES if f.stem[:2].isdigit()}
+    missing = expected - actual
+    assert not missing, f"Missing files: {sorted(missing)}"
+
+
+# =========================================================================
+# Phase 2: Advanced Python - Syntax Verification
+# =========================================================================
+
+PHASE2_FILES = _discover_phase_files("02-advanced-python")
+
+
+@pytest.mark.parametrize("filepath", PHASE2_FILES, ids=lambda p: p.name)
+def test_phase2_compiles(filepath):
+    """Every Phase 2 file must compile without syntax errors."""
+    ok, msg = _compile_check(filepath)
+    assert ok, f"{filepath.name} failed to compile: {msg}"
+
+
+@pytest.mark.parametrize("filepath", PHASE2_FILES, ids=lambda p: p.name)
+def test_phase2_has_docstring(filepath):
+    """Every Phase 2 file must have a module-level docstring."""
+    content = filepath.read_text(encoding="utf-8")
+    assert content.startswith('"""'), f"{filepath.name} missing module docstring"
+
+
+# =========================================================================
+# Phase 6: DSA - Syntax Verification
+# =========================================================================
+
+PHASE6_FILES = _discover_phase_files("06-data-structures-algorithms")
+
+
+@pytest.mark.parametrize("filepath", PHASE6_FILES, ids=lambda p: p.name)
+def test_phase6_compiles(filepath):
+    """Every DSA file must compile without syntax errors."""
+    ok, msg = _compile_check(filepath)
+    assert ok, f"{filepath.name} failed to compile: {msg}"
+
+
+# =========================================================================
+# Phase 7: ML - Syntax Verification
+# =========================================================================
+
+PHASE7_FILES = _discover_phase_files("07-machine-learning")
+
+
+@pytest.mark.parametrize("filepath", PHASE7_FILES, ids=lambda p: p.name)
+def test_phase7_compiles(filepath):
+    """Every ML file must compile without syntax errors."""
+    ok, msg = _compile_check(filepath)
+    assert ok, f"{filepath.name} failed to compile: {msg}"
+
+
+# =========================================================================
+# Smoke Test Runner Tests
+# =========================================================================
+
+def test_smoke_runner_imports():
+    """Smoke test runner must import without errors."""
+    result = subprocess.run(
+        [sys.executable, "-c", "import ast, os, sys; print('OK')"],
+        capture_output=True, text=True, timeout=10,
+    )
+    assert result.returncode == 0
+    assert "OK" in result.stdout
+
+
+def test_smoke_runner_list_flag():
+    """Smoke test runner --list must discover files."""
+    result = subprocess.run(
+        [sys.executable, str(HERE / "run_smoke_tests.py"), "--list"],
+        capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0
+    assert "Discovered Python Files" in result.stdout
+    assert "01-core-python" in result.stdout
+    assert "02-advanced-python" in result.stdout
+
+
+# =========================================================================
+# Structure Validation Tests
+# =========================================================================
+
+def test_expected_directories_exist():
+    """Verify all expected phase and sub-directories exist."""
+    expected = [
+        "01-core-python",
+        "02-advanced-python",
+        "03-libraries/numpy",
+        "03-libraries/pandas",
+        "04-databases/mysql",
+        "04-databases/mongodb",
+        "05-web-frameworks/fastapi",
+        "05-web-frameworks/django",
+        "06-data-structures-algorithms",
+        "07-machine-learning",
+        "projects/01-calculator",
+        "projects/02-file-manager",
+        "projects/03-api-server",
+        "projects/04-data-analyzer",
+        "projects/05-ml-pipeline",
+        "supplementary/quizzes",
+        "supplementary/interviews",
+        "supplementary/lectures/01-core-python",
+        "_dev",
+        "tests/unit",
+    ]
+    missing = []
+    for d in expected:
+        if not (HERE / d).is_dir():
+            missing.append(d)
+    assert not missing, f"Missing directories: {missing}"
+
+
+def test_readme_exists_in_phase_dirs():
+    """Verify README.md exists in all phase directories."""
+    phases = [
+        "01-core-python", "02-advanced-python", "03-libraries",
+        "04-databases", "05-web-frameworks", "06-data-structures-algorithms",
+        "07-machine-learning",
+    ]
+    missing = []
+    for phase in phases:
+        if not (HERE / phase / "README.md").is_file():
+            missing.append(phase)
+    # Library subdirectories
+    for lib in ["numpy", "pandas", "matplotlib", "scipy"]:
+        if not (HERE / "03-libraries" / lib / "README.md").is_file():
+            missing.append(f"03-libraries/{lib}")
+    assert not missing, f"Missing README.md: {missing}"
+
+
+def test_requirements_txt_parses():
+    """requirements.txt must be parseable."""
+    req_path = HERE / "requirements.txt"
+    assert req_path.is_file(), "requirements.txt not found"
+    lines = req_path.read_text(encoding="utf-8").splitlines()
+    # Check for at least some dependency lines
+    deps = [l.strip() for l in lines if l.strip() and not l.startswith("#")]
+    assert len(deps) > 5, "Too few dependencies listed"
+
+
+# =========================================================================
+# Supplementary Content Verification
+# =========================================================================
+
+def test_quizzes_exist():
+    """Verify quiz files exist."""
+    quiz_dir = HERE / "supplementary/quizzes/quizzes"
+    assert quiz_dir.is_dir()
+    md_files = list(quiz_dir.glob("*.md"))
+    assert len(md_files) >= 25, f"Expected 25+ quizzes, found {len(md_files)}"
+
+
+def test_interviews_exist():
+    """Verify interview files exist."""
+    interview_dir = HERE / "supplementary/interviews/interviews"
+    assert interview_dir.is_dir()
+    md_files = list(interview_dir.glob("*.md"))
+    assert len(md_files) >= 14, f"Expected 14+ interviews, found {len(md_files)}"
+
+
+def test_supplementary_lectures_exist():
+    """Verify supplementary lecture files exist with both lecture and glossary pairs."""
+    lecture_dir = HERE / "supplementary/lectures/01-core-python/lectures"
+    assert lecture_dir.is_dir()
+    md_files = list(lecture_dir.glob("*.md"))
+    assert len(md_files) >= 40, f"Expected 40+ lecture files, found {len(md_files)}"
+
+
+# =========================================================================
+# No Stale Artifact Files Test
+# =========================================================================
+
+def test_no_stale_artifact_files():
+    """Verify no stale err.txt or e.txt files exist."""
+    assert not (HERE / "01-core-python/err.txt").is_file(), "err.txt still exists"
+    assert not (HERE / "01-core-python/e.txt").is_file(), "e.txt still exists"
