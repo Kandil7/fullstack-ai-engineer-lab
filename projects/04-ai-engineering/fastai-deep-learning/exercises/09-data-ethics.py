@@ -139,6 +139,20 @@ class ModelCard:
         return "\n".join(lines)
 
 
+# ============================================================
+# Vibe Coding Self-Audit Checklist
+# ============================================================
+VIBE_CODING_AUDIT: list[str] = [
+    "Do you read every line of AI-generated code before accepting it?",
+    "Can you explain the architecture of your last AI-assisted project without looking at it?",
+    "Do you take side quests to learn unfamiliar concepts suggested by AI?",
+    "Do you write tests before or alongside AI-generated code?",
+    "Do you review the AI's approach before accepting the first suggestion?",
+    "Do you end sessions by reflecting on what you learned?",
+    "Can you identify which parts of your codebase you understand vs. accepted on faith?",
+]
+
+
 def main() -> None:
     rng = np.random.default_rng(0)
     n = 1000
@@ -199,6 +213,35 @@ def main() -> None:
 
     # EXERCISE: add an `ethical_considerations` field to ModelCard and render it.
     # Because the dataclass is frozen, you must build a NEW card, not mutate one.
+
+    print("\n" + "=" * 60)
+    print("4. [NEW] Vibe Coding Self-Audit (Supplement Exercise)")
+    print("=" * 60)
+    print()
+    print("Reflect on your own AI-assisted coding habits:")
+    print()
+    print("Rate yourself 1-5 (1=never, 5=always):")
+    print()
+    for q in VIBE_CODING_AUDIT:
+        print(f"  [ ] {q}")
+    print()
+    print("If you scored 3+ on any of the first 3 questions,")
+    print("you may be in dark flow. See Lecture 09 supplement")
+    print("for strategies to shift to deliberate engineering.")
+    print()
+
+    print("\n" + "=" * 60)
+    print("5. [NEW] Close Reading Workflow (Supplement Challenge)")
+    print("=" * 60)
+    print()
+    print("To practice close reading with AI:")
+    print()
+    print("  1. Find a technical article you want to understand deeply")
+    print("  2. Ask an AI to help you interrogate it (not summarize it)")
+    print("  3. Test at least one specific claim from the article")
+    print("  4. Create 3 flashcards from what you learned")
+    print("  5. Log this as a side quest (see exercise 10-solveit.py)")
+    print()
 
 
 if __name__ == "__main__":

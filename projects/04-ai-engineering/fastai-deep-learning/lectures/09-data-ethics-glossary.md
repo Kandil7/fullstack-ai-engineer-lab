@@ -23,6 +23,13 @@
 | Datasheet for datasets | Doc of a dataset's origin, composition, use | Motivation, collection, recommended use |
 | Data provenance | Known origin, license, and meaning of data | "Where did this come from and how?" |
 | Informed consent | Permission given with understanding of use | Opt-in with clear purpose |
+| Vibe coding (2026) | Generating large code blocks from vague prompts with minimal review | Feels productive, often isn't |
+| Dark flow | Superficial "flow" state from high-frequency, low-reward AI iterations | Slot-machine-like addiction |
+| Understanding debt | Gap between what code does and what you understand about it | Accrues when accepting AI output without reading |
+| Dialog Engineering | Discipline of structuring AI conversations as editable, deliberate artifacts | Treat conversation as code |
+| Side quest | Deliberate learning detour to understand an unfamiliar AI-suggested concept | Builds durable knowledge |
+| Close reading with AI | Using LLMs to interrogate texts deeply rather than outsource comprehension | AI as sparring partner, not oracle |
+| Architectural debt | Hidden fragility from merging AI-generated code without understanding integration | Each function works; system is fragile |
 
 ---
 
@@ -367,8 +374,173 @@ An opt-in checkbox with a clear, specific purpose statement — not a buried
 clause repurposing data for a use the person never anticipated.
 
 **Related Terms:** data provenance, privacy, datasheet for datasets
+
 - Availability of data is not permission to use it.
 - Practice data minimization: collect only what you need.
+
+---
+
+## Supplement: 2025–2026 Blog Terms
+
+The following terms are drawn from three major fast.ai blog posts published
+after the original ethics lesson: "Breaking the Spell of Vibe Coding"
+(Jan 2026), "How To Use AI for the Ancient Art of Close Reading" (Jan 2026),
+and "Build to Last" (Oct 2025). See the lecture supplement for full context.
+
+---
+
+### Vibe coding
+
+**Definition:** A style of AI-assisted development where the human gives vague,
+high-level prompts and accepts large blocks of generated code with minimal
+review. Rachel Thomas (fast.ai, Jan 2026) identifies this as inducing "dark
+flow" — a state that *feels* productive but may not be, per METR research.
+
+## Example
+
+```text
+VIBE:  "Build me a full-stack app" → accept → ship → cannot debug
+DIALOG ENGINEERING: "What's the best stack for step 1?" → review → test → repeat
+```
+
+**Related Terms:** dark flow, understanding debt, Dialog Engineering
+
+- Countered by deliberate reading of every line of AI output.
+- The antidote is small, verified increments with side quests.
+
+---
+
+### Dark flow
+
+**Definition:** A term adapted from Csikszentmihalyi's flow theory (Rachel
+Thomas, Jan 2026). Unlike true flow (positive, growth-producing), dark flow is
+a superficial addiction characterized by high-frequency, low-reward iterations
+— analogous to the "loss disguised as win" mechanism in slot machines.
+
+## Example
+
+```text
+DARK FLOW:  Generate code → accept without reading → feel productive → repeat
+TRUE FLOW: Understand problem → plan → execute in small steps → review → learn
+```
+
+**Related Terms:** vibe coding, understanding debt, automation bias
+
+- The feeling of productivity is disconnected from actual output.
+- Combatted by deliberate practice, side quests, and structured review.
+
+---
+
+### Understanding debt
+
+**Definition:** The gap between what code *does* and what the developer
+*understands* about it. Every AI-generated line accepted without reading,
+every library imported without knowing its purpose, and every fix whose root
+cause was never learned — all of it accrues understanding debt.
+
+## Example
+
+```text
+Codebase understanding: ████████░░  (80% working)
+Actual understanding:   ██░░░░░░░░  (20% understood)
+                        └─────────► debt = 60%
+```
+
+**Related Terms:** vibe coding, side quest, Dialog Engineering
+
+- Eventually makes debugging and extending impossible.
+- The "collapse point" is when you cannot fix what breaks.
+- Antidote: side quests for every unfamiliar concept.
+
+---
+
+### Dialog Engineering
+
+**Definition:** The discipline of structuring communication with an AI as an
+editable, transparent, and deliberately shaped artifact rather than a passive
+chat log. The conversation state is actively maintained by editing, hiding,
+and pinning messages.
+
+## Example
+
+```text
+PASSIVE CHAT:  8 messages, 3 wrong → AI confused by history
+DIALOG ENGINEERING:  8 messages, 3 wrong → hide wrong ones → clean context
+```
+
+**Related Terms:** vibe coding, fluid dialog, shared context
+
+- The Solveit platform implements this.
+- Corrects for the "context decay" problem in long AI sessions.
+
+---
+
+### Side quest
+
+**Definition:** A deliberate learning detour taken when the AI suggests an
+unfamiliar concept. Instead of accepting blindly, the developer pauses to
+understand, experiment with, and document the concept before returning to
+the main task.
+
+## Example
+
+```text
+Main: building a web scraper
+  → AI suggests BeautifulSoup
+  → SIDE QUEST: learn BeautifulSoup basics, write tiny test, create flashcard
+  → Return with deeper understanding
+```
+
+**Related Terms:** understanding debt, Dialog Engineering, close reading with AI
+
+- The primary mechanism for building durable knowledge.
+- Turns AI interactions into learning opportunities.
+
+---
+
+### Close reading with AI
+
+**Definition:** A methodology (Rachel Thomas, Jan 2026) for using LLMs to
+deepen understanding of texts rather than outsource comprehension. Involves
+iterative dialogue: asking "why?", testing interpretations, exploring
+counterexamples, and creating flashcards for spaced repetition.
+
+## Example
+
+```text
+TYPICAL:  "Summarize this article for me" → passive consumption
+CLOSE READING: "Explain why the author chose this term..." → active
+  "How does this connect to...?" → iterative dialogue
+  "Create a flashcard for this concept" → retention
+```
+
+**Related Terms:** side quest, understanding debt, Dialog Engineering
+
+- Active engagement over passive automation.
+- AI as sparring partner, not oracle.
+
+---
+
+### Architectural debt
+
+**Definition:** A form of technical debt specific to AI-assisted development
+(Jeremy Howard & Chris Lattner, Oct 2025). Each AI-generated function may
+work in isolation, but the system as a whole becomes fragile when
+developers do not understand the architectural integration.
+
+## Example
+
+```text
+Each function passes tests individually.
+The system fails at integration because nobody understands the interfaces.
+Architectural debt: the whole is weaker than the sum of its parts.
+```
+
+**Related Terms:** understanding debt, vibe coding, Dialog Engineering
+
+- Cannot be detected by unit tests alone.
+- Requires architectural review and deep understanding of integration points.
+- An argument for first-principles engineering in the AI era.
 
 ---
 

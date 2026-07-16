@@ -226,16 +226,109 @@ consequentialist (outcomes), rights (whose rights are at stake), and justice
 
 ---
 
+### Question 11
+**What does Rachel Thomas mean by "dark flow" in the context of AI-assisted coding?**
+
+- A) A state of deep concentration and peak productive flow
+- B) A superficial, addictive state of high-frequency, low-reward AI iterations that *feels* productive
+- C) Working late at night without sufficient lighting
+- D) A debugging technique for neural networks
+
+<details>
+<summary>View Answer</summary>
+
+**Correct Answer: B**
+
+**Explanation:** "Dark flow" (from "Breaking the Spell of Vibe Coding," Jan 2026) adapts Csikszentmihalyi's concept: unlike true flow (growth-producing), vibe coding induces a slot-machine-like addiction where each AI-generated block triggers a dopamine hit regardless of quality. METR research shows developers in this state often *feel* more productive while actually producing harder-to-maintain code.
+</details>
+
+---
+
+### Question 12
+**What is "vibe coding" as critiqued in the Data Ethics supplement?**
+
+- A) Writing code while listening to music
+- B) Generating large blocks from vague prompts with minimal review, accumulating understanding debt
+- C) A collaborative coding technique used by fast.ai
+- D) An approved methodology for production code
+
+<details>
+<summary>View Answer</summary>
+
+**Correct Answer: B**
+
+**Explanation:** Vibe coding means giving the AI high-level prompts, accepting output without reading it carefully, and moving on quickly. It induces dark flow, accrues understanding debt, and — per the Build to Last interview with Chris Lattner — creates architectural debt as well.
+</details>
+
+---
+
+### Question 13
+**According to Rachel Thomas's "Close Reading with AI" essay, what is the recommended way to use LLMs for reading?**
+
+- A) Ask the LLM to summarize the text so you do not have to read it
+- B) Use the LLM as a dialogue partner to interrogate, test interpretations, and explore counterexamples
+- C) Only read texts the LLM recommends
+- D) Use the LLM to generate new texts instead of reading old ones
+
+<details>
+<summary>View Answer</summary>
+
+**Correct Answer: B**
+
+**Explanation:** Close reading with AI means active engagement: asking "why?", testing hypotheses, exploring alternative readings, and creating flashcards for retention. The goal is to *deepen* understanding, not outsource it. Thomas's workflow is: prepare context → generate grounding summary → iterate in dialogue → create flashcards.
+</details>
+
+---
+
+### Question 14
+**What is "architectural debt," as discussed in the "Build to Last" interview?**
+
+- A) A loan taken to pay for cloud architecture
+- B) The hidden fragility caused by merging AI-generated code without understanding integration points
+- C) The cost of refactoring legacy systems
+- D) A type of database indexing strategy
+
+<details>
+<summary>View Answer</summary>
+
+**Correct Answer: B**
+
+**Explanation:** Jeremy Howard and Chris Lattner (Oct 2025) warn that each AI-generated function might work in isolation, but when developers do not understand how pieces fit together architecturally, the system becomes fragile. Unlike regular technical debt, architectural debt is invisible to unit tests.
+</details>
+
+---
+
+### Question 15
+**What is the recommended antidote to understanding debt?**
+
+- A) Using more powerful AI models
+- B) Generating more code faster to overwhelm the debt
+- C) Taking "side quests" — pausing to learn unfamiliar concepts before accepting AI output
+- D) Ignoring it, as it resolves itself over time
+
+<details>
+<summary>View Answer</summary>
+
+**Correct Answer: C**
+
+**Explanation:** Every time the AI suggests something unfamiliar, going on a "side quest" to understand it (asking the AI to explain, writing a small test, creating a flashcard) builds durable knowledge instead of accruing understanding debt. This is a core practice of Dialog Engineering.
+</details>
+
+---
+
 ## Answer Key
 
 | Q | Answer | Q | Answer |
 |---|--------|---|--------|
-| 1 | C | 6 | B |
-| 2 | B | 7 | B |
-| 3 | B | 8 | B |
-| 4 | C | 9 | B |
-| 5 | B | 10 | A |
+| 1 | C | 9 | B |
+| 2 | B | 10 | A |
+| 3 | B | 11 | B |
+| 4 | C | 12 | B |
+| 5 | B | 13 | B |
+| 6 | B | 14 | B |
+| 7 | B | 15 | C |
+| 8 | B |  |  |
 
 ---
 
-*Generated for fast.ai Deep Learning — Quiz 09 (Data Ethics bonus). Completes Part 1.*
+*Generated for fast.ai Deep Learning — Quiz 09 (Data Ethics bonus, updated with 2025–2026 supplement).*

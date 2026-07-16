@@ -14,8 +14,8 @@ scratch. These notes preserve that arc — start by *doing*, then understand.
 
 ## What this directory contains
 
-- **9 lectures** (8 core lessons + a data-ethics bonus)
-- **9 glossaries** with definitions, code, and cross-references
+- **13 lectures** (8 core + 5 contemporary modules)
+- **13 glossaries** with definitions, code, and cross-references
 - Companion **exercises** (`../exercises/`) and **quizzes** (`../quizzes/`)
 - An **nbdev demo package** (`../nbdev-demo/`) for notebook-driven development
 
@@ -84,8 +84,41 @@ scratch. These notes preserve that arc — start by *doing*, then understand.
 - Feedback loops, bias, and disaggregated evaluation
 - Recourse, accountability, and the human in the loop
 - A practical checklist before you ship a model
+- **Supplement:** Vibe Coding, Close Reading with LLMs, & Build to Last (2025–2026 essays)
 
 **Glossary:** [09-data-ethics-glossary.md](09-data-ethics-glossary.md)
+
+### 10. [How to Solve It With Code — Dialog Engineering](10-solveit-lecture.md)
+- Polya's problem-solving framework × AI-assisted coding
+- Dialog Engineering, fluid dialogs, and shared context
+- Understanding debt and the side-quest habit
+- Breaking the spell of vibe coding
+
+**Glossary:** [10-solveit-glossary.md](10-solveit-glossary.md)
+
+### 11. [GPT Tokenizer — Tokenization in LLMs](11-gpt-tokenizer-lecture.md)
+- Why tokenization matters: spelling, arithmetic, multilingual quirks
+- Byte Pair Encoding (BPE) from the ground up
+- Pre-tokenization, Unicode, and special tokens
+- Building a tokenizer from scratch
+
+**Glossary:** [11-gpt-tokenizer-glossary.md](11-gpt-tokenizer-glossary.md)
+
+### 12. [From Deep Learning Foundations to Stable Diffusion](12-stable-diffusion-lecture.md)
+- Building everything from scratch: the "miniai" framework
+- ResNets, U-Nets, VAEs, and the reparameterisation trick
+- CLIP, contrastive learning, and text conditioning
+- DDPM, DDIM, and the full Stable Diffusion pipeline
+
+**Glossary:** [12-stable-diffusion-glossary.md](12-stable-diffusion-glossary.md)
+
+### 13. [Contemporary fast.ai — The 2026 Ecosystem](13-contemporary-fastai-lecture.md)
+- Answer.AI, Solveit platform features, and the Dialog Engineering evolution
+- FastHTML, fasttransform, mojokernel, and the Answer.AI toolchain
+- The anti-agentic AI philosophy and Rachel Thomas's 2026 essays
+- The collaborative AI model: augmenting, not replacing
+
+**Glossary:** [13-contemporary-fastai-glossary.md](13-contemporary-fastai-glossary.md)
 
 ---
 
@@ -111,7 +144,14 @@ scratch. These notes preserve that arc — start by *doing*, then understand.
 │  7. Collaborative Filtering ───────────────┤                     │
 │                                            ▼                     │
 │  ALWAYS:                                                          │
-│  9. Data Ethics ───────────────────────────┘                     │
+│  9. Data Ethics ───────────────────────────┤                     │
+│                                            ▼                     │
+│  EXTEND (contemporary context):                                   │
+│  10. Dialog Engineering / Solveit ─────────┤                     │
+│  11. GPT Tokenizer ────────────────────────┤                     │
+│                                            ▼                     │
+│  ADVANCED (generative AI):                                        │
+│  12. Stable Diffusion ─────────────────────┘                     │
 │                                                                   │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -131,7 +171,7 @@ everything" — understanding comes from iteration.
 | 1 | 01–02 | Train + deploy a classifier end-to-end |
 | 2 | 03, 05, 08 | The engine: SGD, from-scratch net, convolutions |
 | 3 | 04, 06, 07 | NLP, tabular/forests, collaborative filtering |
-| 4 | 09 + projects | Ethics + apply one idea in a lab project |
+| 4 | 09–13 | Ethics + Dialog Engineering + GPT Tokenizer + Stable Diffusion + 2026 ecosystem + lab projects |
 
 ### 8-week pace (1 module per ~4–5 days)
 One module per sitting: read → run exercise → take quiz → apply → reflect.
@@ -168,6 +208,15 @@ repo's **source → artifact** rule.
 - [Are You Ready? — course prereqs](https://course.fast.ai)
 - [PyTorch docs](https://pytorch.org/docs/stable/index.html)
 - [Hugging Face Transformers](https://huggingface.co/docs/transformers)
+- [Solveit platform](https://solve.it.com)
+- [How to Solve It by George Polya (1945)](https://en.wikipedia.org/wiki/How_to_Solve_It)
+- [Andrej Karpathy's "Let's build the GPT Tokenizer"](https://www.youtube.com/watch?v=zduSFxRajkE)
+- [`tiktoken` — OpenAI's BPE tokenizer](https://github.com/openai/tiktoken)
+- [From Deep Learning Foundations to Stable Diffusion — course page](https://course.fast.ai/Lessons/part2.html)
+- [DDPM paper (Ho et al., 2020)](https://arxiv.org/abs/2006.11239)
+- [CLIP paper (Radford et al., 2021)](https://arxiv.org/abs/2103.00020)
+- [Answer.AI](https://www.answer.ai) + [FastHTML](https://fastht.ml)
+- [fasttransform — reversible pipelines](https://www.fast.ai/posts/2025-02-20-fasttransform.html)
 
 ---
 

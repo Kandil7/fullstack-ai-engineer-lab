@@ -74,17 +74,21 @@ if you want the published-site experience. See `nbdev-demo/README.md`.
 
 ## Modules
 
-| # | Module | fast.ai lesson | Core idea |
+| # | Module | Source | Core idea |
 |---|--------|----------------|-----------|
-| 01 | [Getting Started](lectures/01-getting-started-lecture.md) | 1 | Train an image classifier in minutes; transfer learning |
-| 02 | [Deployment & the fastai Stack](lectures/02-deployment-lecture.md) | 2 | Data cleaning, `DataBlock`, ship with Gradio |
-| 03 | [Neural Net Foundations (SGD)](lectures/03-neural-net-foundations-lecture.md) | 3 | Gradient descent, the training loop, from-scratch |
-| 04 | [Natural Language (NLP)](lectures/04-nlp-lecture.md) | 4 | Fine-tuning transformers with 🤗 Transformers |
-| 05 | [From-Scratch Model](lectures/05-from-scratch-model-lecture.md) | 5 | Build a neural net with nothing but tensors |
-| 06 | [Random Forests & Tabular](lectures/06-random-forests-lecture.md) | 6 | Trees, bagging, feature importance, tabular DL |
-| 07 | [Collaborative Filtering](lectures/07-collaborative-filtering-lecture.md) | 7 | Embeddings, latent factors, recommenders |
-| 08 | [Convolutions (CNNs)](lectures/08-convolutions-lecture.md) | 8 | How CNNs see; convolution from scratch |
-| — | [Data Ethics](lectures/09-data-ethics-lecture.md) | Bonus | Bias, feedback loops, responsibility |
+| 01 | [Getting Started](lectures/01-getting-started-lecture.md) | Lesson 1 | Train an image classifier in minutes; transfer learning |
+| 02 | [Deployment & the fastai Stack](lectures/02-deployment-lecture.md) | Lesson 2 | Data cleaning, `DataBlock`, ship with Gradio |
+| 03 | [Neural Net Foundations (SGD)](lectures/03-neural-net-foundations-lecture.md) | Lesson 3 | Gradient descent, the training loop, from-scratch |
+| 04 | [Natural Language (NLP)](lectures/04-nlp-lecture.md) | Lesson 4 | Fine-tuning transformers with 🤗 Transformers |
+| 05 | [From-Scratch Model](lectures/05-from-scratch-model-lecture.md) | Lesson 5 | Build a neural net with nothing but tensors |
+| 06 | [Random Forests & Tabular](lectures/06-random-forests-lecture.md) | Lesson 6 | Trees, bagging, feature importance, tabular DL |
+| 07 | [Collaborative Filtering](lectures/07-collaborative-filtering-lecture.md) | Lesson 7 | Embeddings, latent factors, recommenders |
+| 08 | [Convolutions (CNNs)](lectures/08-convolutions-lecture.md) | Lesson 8 | How CNNs see; convolution from scratch |
+| 09 | [Data Ethics](lectures/09-data-ethics-lecture.md) | Bonus + 2025–26 blogs | Bias, feedback loops, responsibility; vibe coding, dark flow, craftsmanship |
+| 10 | [Dialog Engineering / Solveit](lectures/10-solveit-lecture.md) | fast.ai ≥ 2024 | Polya's framework, fluid dialogs, understanding debt |
+| 11 | [GPT Tokenizer](lectures/11-gpt-tokenizer-lecture.md) | Karpathy / fast.ai Oct 2025 | BPE, tokenization, LLM quirks from scratch |
+| 12 | [Stable Diffusion](lectures/12-stable-diffusion-lecture.md) | fast.ai Part 2 (2022–23) | miniai, ResNets, U-Nets, VAEs, CLIP, DDPM, full pipeline |
+| 13 | [Contemporary fast.ai](lectures/13-contemporary-fastai-lecture.md) | 2026 Ecosystem | Answer.AI, Solveit, FastHTML, fasttransform, anti-agentic AI |
 
 Start with the [lecture series README](lectures/README.md) for the full
 learning path and study schedule.

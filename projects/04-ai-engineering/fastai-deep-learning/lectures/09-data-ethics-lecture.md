@@ -496,11 +496,167 @@ the loop** (guarding against automation bias), and disciplined handling of
 cards, and a pre-deployment checklist** examined through consequentialist,
 rights, and justice lenses.
 
-**Next lecture:** This completes **Part 1** of the fast.ai mirror. From here,
-fast.ai continues into **Part 2 — "From Deep Learning Foundations to Stable
-Diffusion,"** which builds generative diffusion models from the ground up. In
-this lab, carry the ethics habits forward into the applied tracks: the
-`agents/` track (where autonomous action multiplies the stakes of a wrong
-decision) and the `ai-automation/` RAG track (where data provenance, consent,
-and disaggregated evaluation of retrieval quality apply directly). Ship
-responsibly.
+---
+
+## Supplement: Contemporary Voices — fast.ai's Latest on AI, Ethics, and Craft
+
+Since the original fast.ai ethics lesson was released, the site's blog has
+published several essays that deepen, challenge, and apply the ethics framework
+from new angles. This supplement covers three of the most significant (2025–2026).
+
+### 1. "Breaking the Spell of Vibe Coding" (Rachel Thomas, January 2026)
+
+Rachel Thomas's most recent essay is a direct extension of the ethics lesson's
+human-in-the-loop and automation-bias themes, applied to the practice of
+developing *with* AI rather than deploying AI systems that affect others.
+
+**Key arguments:**
+
+- **"Dark flow" vs. true flow.** Csikszentmihalyi's concept of *flow* (optimal
+experience, growth, deep concentration) has a sinister cousin: "junk flow" or
+"dark flow" — a superficial state driven by high-frequency, low-reward
+iterations. Thomas argues that **vibe coding** (generating large blocks of code
+from vague prompts and accepting output uncritically) induces this dark flow.
+It *feels* intensely productive, but objective measures (e.g., METR research)
+show that heavy AI assistance can make developers slower while producing
+harder-to-maintain code.
+
+- **The slot machine parallel.** Thomas draws a direct parallel to "loss
+disguised as a win" mechanics in gambling. Each AI-generated code block that
+*looks* right triggers a dopamine hit, even when the code is wrong or
+architecturally unsound. The frequency of these micro-rewards creates
+addiction without competence.
+
+- **Skill erosion.** By outsourcing core thinking to AI, developers stop
+developing the abstractions and problem-solving skills needed to build reliable
+software. The focus on *quantity* (lines generated, PRs merged) over
+*architectural quality* is, in Thomas's words, "a career killer in slow
+motion."
+
+- **Skepticism of hype.** Thomas warns against the hyperbolic predictions of
+tech CEOs regarding imminent engineer obsolescence — noting such predictions
+have a long history of being wrong. The real risk is not that AI replaces
+engineers but that engineers replace their own judgment with AI output.
+
+**Connection to the ethics framework:** The *consequentialist lens* asks:
+what are the long-term outcomes of a generation trained to code via vibe
+coding? The *rights lens* asks: does a developer have a right to understand
+the code they ship? The *justice lens* asks: who benefits and who loses
+when coding skill becomes dependent on access to expensive AI tools?
+
+```python
+# From the lecture's ethics checklist, updated for AI-assisted development:
+ETHICS_CHECKLIST_AI: list[str] = [
+    "Can I explain every line of AI-generated code I am about to ship?",
+    "Am I in dark flow? (check: can I stop and explain my last 10 lines?)",
+    "Have I verified the AI's output with a test, not just a glance?",
+    "What skill am I not developing by delegating this to AI?",
+    "Who is harmed if the AI's code contains a subtle bug?",
+]
+```
+
+---
+
+### 2. "How To Use AI for the Ancient Art of Close Reading" (Rachel Thomas, January 2026)
+
+This essay flips the script: instead of asking "how do we protect people from
+AI?", it asks "how can AI *deepen* human understanding?" Thomas demonstrates a
+methodology for using LLMs as a **close reading partner** — a way to actively
+interrogate, explore, and understand texts rather than outsource comprehension.
+
+**Key insights:**
+
+- **Active engagement over automation.** The typical use of AI for reading is
+"summarize this for me" — outsourcing comprehension. Thomas proposes the
+opposite: use AI to ask probing questions, explore context, test hypotheses,
+and seek counterexamples.
+
+- **The Solveit workflow (see Lecture 10):**
+  1. **Prepare context** — convert documents to clean markdown so the AI can
+     reference them precisely.
+  2. **Generate grounding summaries** — not to replace reading, but to give the
+     AI a shared reference point.
+  3. **Dialogue iteratively** — ask "why?", test interpretations, explore
+     alternative readings.
+  4. **Create flashcards with fastanki** — convert insights into spaced
+     repetition cards for long-term retention.
+
+- **Antidote to understanding debt.** Where vibe coding creates understanding
+debt (Lecture 10), close reading with AI creates understanding *equity* — the
+dialogue deepens your grasp of the material rather than replacing it.
+
+**Connection to the ethics framework:** This essay challenges a simplistic
+"AI is always harmful" narrative. The *same* technology that enables
+automation bias (when used passively) can enable deeper understanding (when
+used actively). The ethical variable is not the technology — it is **how we
+choose to use it.**
+
+---
+
+### 3. "Build to Last" (Jeremy Howard with Chris Lattner, October 2025)
+
+An interview between Jeremy Howard (fast.ai co-founder) and Chris Lattner
+(creator of LLVM, Swift, and Mojo) about the tension between craftsmanship
+and AI-speed development.
+
+**Key arguments:**
+
+- **First-principles engineering.** Lattner argues that great software (like
+LLVM) lasts decades because it is built from deep architectural understanding.
+The fundamentals — modularity, clean interfaces, documented trade-offs — do
+not change with the arrival of AI code generation.
+
+- **"Dogfooding" is non-negotiable.** You cannot build truly great software
+unless you are your own first customer. Building in a vacuum — or relying on
+an AI to write code you do not personally need — produces bloated, unusable
+systems.
+
+- **Hidden technical debt.** Both authors warn that merging AI-generated PRs
+without understanding the architecture creates a new kind of technical debt:
+*architectural* debt. Each AI-generated function might work in isolation, but
+the system as a whole becomes fragile and impossible to reason about.
+
+- **Mastery over throughput.** True career value comes from solving problems
+others find difficult, not from maximizing lines of code generated. Lattner
+and Howard characterize the obsession with "number of lines" as a vanity
+metric that ignores the actual goals of software engineering.
+
+**Connection to the ethics framework:** This interview surfaces a
+responsibility that the original ethics lesson touched on only indirectly:
+the engineer's responsibility to *understand the architecture they are
+building.* The consequentialist lens (long-term system health), the
+professional responsibility lens (craftsmanship as an ethical duty), and
+the accountability lens (who fixes the undebuggable system?) all apply.
+
+---
+
+### Integrating the New Voices: An Updated Ethics Practice
+
+The three essays together suggest an evolution of the original ethics
+checklist that accounts for AI-assisted development:
+
+| Original Ethics Question | Updated for the AI Era |
+|--------------------------|------------------------|
+| Who benefits? Who is harmed? | Also: who is harmed by *how* I develop (vibe-coding vs. deliberate)? |
+| Have I evaluated disaggregated metrics? | Also: have I evaluated my *own understanding* disaggregated 
+from the AI's output? |
+| Is the human reviewer empowered? | Also: am I, the developer, empowered to understand what I ship? |
+| What proxy variables am I using? | Also: is "lines of code per day" a proxy I am optimizing over 
+quality? (Goodhart's Law again) |
+| Have I written a model card? | Also: have I documented which parts of this system I understand 
+vs. accepted on faith? |
+
+---
+
+**Next lecture:** Lecture 10 — How to Solve It With Code: Dialog Engineering &
+the Solveit Platform, where the human-centered design principles from this
+ethics lesson meet a practical tool for deliberate, transparent AI
+collaboration.
+
+From here, fast.ai continues into **Part 2 — "From Deep Learning Foundations
+to Stable Diffusion,"** which builds generative diffusion models from the
+ground up. In this lab, carry the ethics habits forward into the applied
+tracks: the `agents/` track (where autonomous action multiplies the stakes of
+a wrong decision), the `ai-automation/` RAG track (where data provenance and
+disaggregated evaluation apply directly), and the Solveit-inspired workflows
+you will learn in Lecture 10. Ship responsibly.
