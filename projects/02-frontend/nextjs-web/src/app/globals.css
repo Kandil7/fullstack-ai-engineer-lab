@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* Light theme tokens (HSL channels for Tailwind alpha support). */
+  --surface: 210 20% 98%;
+  --surface-raised: 0 0% 100%;
+  --ink: 222 47% 11%;
+  --ink-muted: 215 16% 47%;
+  --accent: 215 90% 55%;
+  --border: 215 20% 90%;
+}
+
+.dark {
+  --surface: 222 30% 8%;
+  --surface-raised: 222 25% 12%;
+  --ink: 210 20% 96%;
+  --ink-muted: 215 16% 65%;
+  --accent: 215 90% 62%;
+  --border: 222 20% 22%;
+}
+
+body {
+  background-color: hsl(var(--surface));
+  color: hsl(var(--ink));
+  font-family: var(--font-sans);
+}
