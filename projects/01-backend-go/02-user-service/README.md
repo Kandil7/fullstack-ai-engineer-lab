@@ -168,10 +168,10 @@ make load-test
 |-----------|--------|
 | Project structure | ✅ Complete |
 | CRUD operations | ✅ Complete |
-| Pagination | 🔄 In Progress |
-| Profile management | ⬜ Not Started |
-| Service-to-service auth | ⬜ Not Started |
-| Tests (80%+ coverage) | ⬜ Not Started |
+| Pagination (cursor + offset) | ✅ Complete |
+| Profile management | ✅ Complete |
+| Service-to-service auth | ✅ Scaffolded (bearer gate; JWT verify TODO) |
+| Tests (unit, DB-free) | ✅ Complete |
 
 ---
 

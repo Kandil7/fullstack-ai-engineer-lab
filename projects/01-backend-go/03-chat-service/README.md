@@ -282,11 +282,11 @@ make ws-test
 |-----------|--------|
 | Project structure | ✅ Complete |
 | WebSocket hub | ✅ Complete |
-| Room management | 🔄 In Progress |
-| Message persistence | ⬜ Not Started |
-| Presence tracking | ⬜ Not Started |
-| Read receipts | ⬜ Not Started |
-| Tests (80%+ coverage) | ⬜ Not Started |
+| Room management | ✅ Complete |
+| Message persistence | ✅ Complete |
+| Presence tracking | ✅ Join/leave + typing broadcasts |
+| Read receipts | 🔄 Protocol wired (persistence TODO) |
+| Tests (hub, DTO, service) | ✅ Complete |
 
 ---
 
