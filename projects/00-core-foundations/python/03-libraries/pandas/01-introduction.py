@@ -1,162 +1,190 @@
 """
-Pandas Introduction
-W3Schools: https://www.w3schools.com/python/pandas_intro.asp
+Pandas Introduction: Series & DataFrame Creation
+=================================================
 
-Pandas is a Python library used for working with data sets.
-It has functions for analyzing, cleaning, exploring, and manipulating data.
+This module covers the fundamentals of creating pandas Series and DataFrames
+from various data sources.
 """
+
 import pandas as pd
 import numpy as np
 
-# ---------------------------------------------------------------------------
-# Example 1: What is Pandas?
-# Pandas is short for "Panel Data" and is a powerful open-source Python library
-# used for data manipulation and analysis.
-# ---------------------------------------------------------------------------
+# =============================================================================
+# 1. CREATING SERIES
+# =============================================================================
 
 print("=" * 60)
-print("Example 1: What is Pandas?")
+print("1. CREATING SERIES")
 print("=" * 60)
 
-# Series – a one-dimensional labeled array
-mylist = [1, 2, 3, 4, 5]
-myseries = pd.Series(mylist)
-print("Series from list:")
-print(myseries)
+# From a list
+s1 = pd.Series([1, 3, 5, np.nan, 6, 8])
+print("From list:")
+print(s1)
+print(f"Index: {s1.index.tolist()}")
+print(f"Values: {s1.values}")
+print(f"Type: {type(s1)}")
 print()
 
-# DataFrame – a two-dimensional labeled data structure
-mydict = {
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [25, 30, 35],
-    "City": ["New York", "London", "Paris"],
-}
-mydf = pd.DataFrame(mydict)
-print("DataFrame from dict:")
-print(mydf)
+# From a dictionary (keys become index)
+s2 = pd.Series({'a': 1, 'b': 2, 'c': 3})
+print("From dict:")
+print(s2)
 print()
 
-# ---------------------------------------------------------------------------
-# Example 2: Pandas Series
-# A Pandas Series is like a column in a table. It is a one-dimensional array
-# holding data of any type.
-# ---------------------------------------------------------------------------
+# From scalar (broadcast to index)
+s3 = pd.Series(5, index=[0, 1, 2, 3])
+print("From scalar with index:")
+print(s3)
+print()
+
+# With custom index
+s4 = pd.Series([10, 20, 30], index=['x', 'y', 'z'])
+print("With custom index:")
+print(s4)
+print(f"Access by label: s4['y'] = {s4['y']}")
+print(f"Access by position: s4[1] = {s4[1]}")
+print()
+
+# =============================================================================
+# 2. CREATING DATAFRAMES
+# =============================================================================
 
 print("=" * 60)
-print("Example 2: Pandas Series")
+print("2. CREATING DATAFRAMES")
 print("=" * 60)
 
-# Simple Series
-s = pd.Series([10, 20, 30, 40, 50])
-print("Simple Series:")
-print(s)
-print()
-
-# Series with custom index
-s_named = pd.Series(
-    [100, 200, 300],
-    index=["a", "b", "c"],
-    name="Values"
-)
-print("Series with custom index:")
-print(s_named)
-print()
-
-# Access elements
-print("Access by label: s_named['b'] =", s_named["b"])
-print("Access by position: s_named.iloc[0] =", s_named.iloc[0])
-print()
-
-# ---------------------------------------------------------------------------
-# Example 3: Pandas DataFrame
-# A Pandas DataFrame is like a spreadsheet or SQL table – a 2D labeled data
-# structure with columns of potentially different types.
-# ---------------------------------------------------------------------------
-
-print("=" * 60)
-print("Example 3: Pandas DataFrame")
-print("=" * 60)
-
-data = {
-    "Product": ["Laptop", "Phone", "Tablet", "Monitor"],
-    "Price": [999, 699, 449, 299],
-    "Quantity": [10, 25, 40, 15],
-    "In_Stock": [True, False, True, True],
-}
-df = pd.DataFrame(data)
-
-print("Full DataFrame:")
-print(df)
-print()
-
-print("Column 'Product':")
-print(df["Product"])
-print()
-
-print("DataFrame shape:", df.shape)
-print("DataFrame dtypes:")
-print(df.dtypes)
-print()
-
-# ---------------------------------------------------------------------------
-# Example 4: Pandas vs Other Tools
-# Why Pandas?
-#   - Handles missing data (NaN)
-#   - Automatic data alignment by labels
-#   - Powerful groupby operations
-#   - Built-in visualization
-#   - Easy to read/write many file formats (CSV, JSON, SQL, Excel)
-# ---------------------------------------------------------------------------
-
-print("=" * 60)
-print("Example 4: Pandas Key Capabilities")
-print("=" * 60)
-
-# Missing data handling
-df_with_nan = pd.DataFrame({
-    "A": [1, 2, np.nan, 4],
-    "B": [np.nan, 2, 3, 4],
+# From dict of lists/arrays (columns)
+df1 = pd.DataFrame({
+    'name': ['Alice', 'Bob', 'Charlie', 'Diana'],
+    'age': [25, 30, 35, 28],
+    'city': ['NYC', 'LA', 'Chicago', 'Houston'],
+    'salary': [70000, 80000, 90000, 75000]
 })
-print("DataFrame with NaN:")
-print(df_with_nan)
+print("From dict of lists:")
+print(df1)
+print(f"Shape: {df1.shape}")
+print(f"Columns: {df1.columns.tolist()}")
+print(f"Dtypes:\n{df1.dtypes}")
 print()
 
-print("Drop rows with NaN:")
-print(df_with_nan.dropna())
+# From list of dicts (rows)
+df2 = pd.DataFrame([
+    {'name': 'Alice', 'age': 25, 'city': 'NYC'},
+    {'name': 'Bob', 'age': 30, 'city': 'LA'},
+    {'name': 'Charlie', 'age': 35, 'city': 'Chicago'},
+])
+print("From list of dicts:")
+print(df2)
 print()
 
-print("Fill NaN with 0:")
-print(df_with_nan.fillna(0))
+# From 2D numpy array
+arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+df3 = pd.DataFrame(arr, columns=['A', 'B', 'C'], index=['x', 'y', 'z'])
+print("From numpy array:")
+print(df3)
 print()
 
-# Data alignment
-s1 = pd.Series([1, 2, 3], index=["a", "b", "c"])
-s2 = pd.Series([10, 20, 30], index=["b", "c", "d"])
-print("Automatic alignment (s1 + s2):")
-print(s1 + s2)  # aligned by index; missing values become NaN
+# From Series (each becomes a column)
+s_a = pd.Series([1, 2, 3], name='A')
+s_b = pd.Series([4, 5, 6], name='B')
+df4 = pd.DataFrame({'A': s_a, 'B': s_b})
+print("From Series:")
+print(df4)
 print()
 
-# ---------------------------------------------------------------------------
-# Example 5: Getting Started – Install and Import
-# To use Pandas you need to install it:
-#   pip install pandas
-# Then import it (commonly aliased as pd):
-#   import pandas as pd
-# ---------------------------------------------------------------------------
+# =============================================================================
+# 3. READING FROM FILES (COMMON FORMATS)
+# =============================================================================
 
 print("=" * 60)
-print("Example 5: Quick Start – Version Check")
+print("3. READING FROM FILES (examples)")
 print("=" * 60)
 
-print(f"Pandas version: {pd.__version__}")
-print(f"NumPy version: {np.__version__}")
+# CSV
+# df_csv = pd.read_csv('data.csv')
+
+# JSON
+# df_json = pd.read_json('data.json')
+
+# Excel
+# df_excel = pd.read_excel('data.xlsx', sheet_name='Sheet1')
+
+# Parquet (efficient columnar format)
+# df_parquet = pd.read_parquet('data.parquet')
+
+# SQL
+# df_sql = pd.read_sql('SELECT * FROM users', connection)
+
+print("""
+Common read functions:
+  pd.read_csv('file.csv')
+  pd.read_json('file.json')
+  pd.read_excel('file.xlsx')
+  pd.read_parquet('file.parquet')
+  pd.read_sql(query, connection)
+  pd.read_html(url)          # HTML tables
+  pd.read_clipboard()        # From clipboard
+""")
+
+# =============================================================================
+# 4. BASIC INSPECTION
+# =============================================================================
+
+print("=" * 60)
+print("4. BASIC INSPECTION")
+print("=" * 60)
+
+print("df1.head():")
+print(df1.head())
 print()
 
-# A quick "hello world" with Pandas
-hello = pd.DataFrame({
-    "greeting": ["Hello", "Bonjour", "Hola", "Ciao"],
-    "language": ["English", "French", "Spanish", "Italian"],
-})
-print(hello)
+print("df1.tail(2):")
+print(df1.tail(2))
 print()
-print("Done! You are ready to learn Pandas.")
+
+print("df1.info():")
+df1.info()
+print()
+
+print("df1.describe():")
+print(df1.describe())
+print()
+
+print("df1.describe(include='all'):")
+print(df1.describe(include='all'))
+print()
+
+# =============================================================================
+# 5. SERIES VS DATAFRAME OPERATIONS
+# =============================================================================
+
+print("=" * 60)
+print("5. SERIES VS DATAFRAME")
+print("=" * 60)
+
+# Series is 1D, DataFrame is 2D
+print(f"Series ndim: {s1.ndim}")
+print(f"DataFrame ndim: {df1.ndim}")
+print()
+
+# Series has name, DataFrame has columns
+print(f"Series name: {s1.name}")
+s1.name = 'my_series'
+print(f"After naming: {s1.name}")
+print()
+
+# DataFrame columns can be accessed as Series
+print("df1['age'] is a Series:")
+print(type(df1['age']))
+print(df1['age'])
+print()
+
+# Multiple columns -> DataFrame
+print("df1[['name', 'age']] is a DataFrame:")
+print(type(df1[['name', 'age']]))
+print(df1[['name', 'age']])
+
+print("\n" + "=" * 60)
+print("END OF INTRODUCTION")
+print("=" * 60)
