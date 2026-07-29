@@ -55,14 +55,14 @@ failure, and the fix. A real bug from your own tree teaches better than a synthe
 
 | Gap | Detail |
 |---|---|
-No self-verification | **0 of 21** files contain `assert` — which is why 4 broke silently |
-Complexity stated, never measured | Lectures say O(n log n); no file demonstrates the curve empirically |
-No interview patterns | Individual structures taught; the **patterns** that solve problems (two pointers, sliding window, BFS/DFS templates) are absent |
-No dynamic programming | Zero coverage — a standard interview and optimization topic |
-No greedy / backtracking | Absent |
-Missing structures | Tries, heaps as a topic, union-find, segment trees, LRU cache |
-No graph algorithms beyond traversal | No Dijkstra, topological sort, MST, cycle detection |
-No AI-engineering bridge | The retrieval/embedding connection is never drawn |
+| No self-verification | **0 of 21** files contain `assert` — which is why 4 broke silently |
+| Complexity stated, never measured | Lectures say O(n log n); no file demonstrates the curve empirically |
+| No interview patterns | Individual structures taught; the **patterns** that solve problems (two pointers, sliding window, BFS/DFS templates) are absent |
+| No dynamic programming | Zero coverage — a standard interview and optimization topic |
+| No greedy / backtracking | Absent |
+| Missing structures | Tries, heaps as a topic, union-find, segment trees, LRU cache |
+| No graph algorithms beyond traversal | No Dijkstra, topological sort, MST, cycle detection |
+| No AI-engineering bridge | The retrieval/embedding connection is never drawn |
 
 ---
 
@@ -130,15 +130,15 @@ right way to teach cost.
 
 | Structure/Algorithm | AI-engineering use |
 |---|---|
-Hash tables | Token→ID vocab; dedup document IDs; embedding cache keys |
-Heaps | **Top-k retrieval** — `heapq.nlargest(k)` is O(n log k) vs `sorted()[:k]` O(n log n) |
-Binary search | `bisect` on a sorted score list; finding a threshold; quantile lookup |
-BSTs / balanced trees | Ordered index structures; range queries over metadata |
-Graphs + BFS/DFS | Knowledge graphs; agent tool dependency resolution; document link traversal |
-Sorting | Reranking candidates; stable sort for tie-breaking by score |
-Linked lists | LRU cache internals (with a hash map) — the standard cache design |
-Tries | Prefix search; autocomplete; tokenizer vocabularies |
-Union-find | Clustering near-duplicate documents |
+| Hash tables | Token→ID vocab; dedup document IDs; embedding cache keys |
+| Heaps | **Top-k retrieval** — `heapq.nlargest(k)` is O(n log k) vs `sorted()[:k]` O(n log n) |
+| Binary search | `bisect` on a sorted score list; finding a threshold; quantile lookup |
+| BSTs / balanced trees | Ordered index structures; range queries over metadata |
+| Graphs + BFS/DFS | Knowledge graphs; agent tool dependency resolution; document link traversal |
+| Sorting | Reranking candidates; stable sort for tie-breaking by score |
+| Linked lists | LRU cache internals (with a hash map) — the standard cache design |
+| Tries | Prefix search; autocomplete; tokenizer vocabularies |
+| Union-find | Clustering near-duplicate documents |
 
 ---
 
@@ -148,30 +148,30 @@ Union-find | Clustering near-duplicate documents |
 
 | # | Topic | Concepts |
 |---|---|---|
-21 | `21-heaps-and-priority-queues.py` | Binary heap invariant; sift up/down; `heapify` is O(n) not O(n log n); `heapq` API; **top-k as the canonical use**; k-way merge; median maintenance with two heaps |
-22 | `22-tries.py` | Prefix tree; insert/search/`starts_with`; space vs time; compressed tries; autocomplete; **tokenizer vocabularies** |
-23 | `23-union-find.py` | Disjoint set; union by rank; path compression; near-O(1) amortized; connected components; **near-duplicate clustering** |
-24 | `24-lru-cache.py` | Hash map + doubly linked list; O(1) get/put; `OrderedDict` shortcut; `functools.lru_cache` internals; LFU contrast; **embedding cache design** |
-25 | `25-bloom-filters.py` | Probabilistic membership; false positives (never false negatives); sizing and hash count; **dedup at scale before hitting the DB**; Count-Min Sketch |
-26 | `26-segment-and-fenwick-trees.py` | Range queries; point updates; O(log n) both; prefix sums; when a simple prefix array suffices |
+| 21 | `21-heaps-and-priority-queues.py` | Binary heap invariant; sift up/down; `heapify` is O(n) not O(n log n); `heapq` API; **top-k as the canonical use**; k-way merge; median maintenance with two heaps |
+| 22 | `22-tries.py` | Prefix tree; insert/search/`starts_with`; space vs time; compressed tries; autocomplete; **tokenizer vocabularies** |
+| 23 | `23-union-find.py` | Disjoint set; union by rank; path compression; near-O(1) amortized; connected components; **near-duplicate clustering** |
+| 24 | `24-lru-cache.py` | Hash map + doubly linked list; O(1) get/put; `OrderedDict` shortcut; `functools.lru_cache` internals; LFU contrast; **embedding cache design** |
+| 25 | `25-bloom-filters.py` | Probabilistic membership; false positives (never false negatives); sizing and hash count; **dedup at scale before hitting the DB**; Count-Min Sketch |
+| 26 | `26-segment-and-fenwick-trees.py` | Range queries; point updates; O(log n) both; prefix sums; when a simple prefix array suffices |
 
 ### 4.2 Graph algorithms (27–30)
 
 | # | Topic | Concepts |
 |---|---|---|
-27 | `27-graph-representations.py` | Adjacency list vs matrix — space/time tradeoff; weighted, directed; edge lists; when each fits |
-28 | `28-shortest-paths.py` | Dijkstra with a heap; Bellman-Ford (negative weights); A* with heuristics; BFS as unweighted shortest path |
-29 | `29-topological-sort.py` | Kahn's algorithm; DFS-based; cycle detection; **task/tool dependency resolution**; DAG scheduling |
-30 | `30-mst-and-connectivity.py` | Kruskal (with union-find), Prim; bridges and articulation points; strongly connected components |
+| 27 | `27-graph-representations.py` | Adjacency list vs matrix — space/time tradeoff; weighted, directed; edge lists; when each fits |
+| 28 | `28-shortest-paths.py` | Dijkstra with a heap; Bellman-Ford (negative weights); A* with heuristics; BFS as unweighted shortest path |
+| 29 | `29-topological-sort.py` | Kahn's algorithm; DFS-based; cycle detection; **task/tool dependency resolution**; DAG scheduling |
+| 30 | `30-mst-and-connectivity.py` | Kruskal (with union-find), Prim; bridges and articulation points; strongly connected components |
 
 ### 4.3 Algorithmic paradigms (31–34)
 
 | # | Topic | Concepts |
 |---|---|---|
-31 | `31-dynamic-programming.py` ⭐ | Memoization vs tabulation; optimal substructure; overlapping subproblems; 1-D and 2-D; space optimization; classics (LCS, knapsack, edit distance); **edit distance for fuzzy matching** |
-32 | `32-greedy-algorithms.py` | Greedy-choice property; when greedy is provably optimal and when it fails; interval scheduling; Huffman coding; proof sketches |
-33 | `33-backtracking.py` | Systematic search; pruning; N-queens, subsets, permutations, sudoku; complexity of search trees; constraint propagation |
-34 | `34-divide-and-conquer.py` | Recurrences and the Master Theorem; merge/quick revisited; binary-search variants; closest pair; matrix multiplication |
+| 31 | `31-dynamic-programming.py` ⭐ | Memoization vs tabulation; optimal substructure; overlapping subproblems; 1-D and 2-D; space optimization; classics (LCS, knapsack, edit distance); **edit distance for fuzzy matching** |
+| 32 | `32-greedy-algorithms.py` | Greedy-choice property; when greedy is provably optimal and when it fails; interval scheduling; Huffman coding; proof sketches |
+| 33 | `33-backtracking.py` | Systematic search; pruning; N-queens, subsets, permutations, sudoku; complexity of search trees; constraint propagation |
+| 34 | `34-divide-and-conquer.py` | Recurrences and the Master Theorem; merge/quick revisited; binary-search variants; closest pair; matrix multiplication |
 
 ### 4.4 Interview patterns (35–40) ⭐
 
@@ -180,12 +180,12 @@ actually solve problems are not. This track is what makes someone interview-read
 
 | # | Topic | Concepts |
 |---|---|---|
-35 | `35-two-pointers.py` | Opposite ends; same direction; fast/slow (cycle detection); partitioning; sorted-array pairs; in-place dedup |
-36 | `36-sliding-window.py` | Fixed and variable windows; window invariants; longest/shortest substring problems; **streaming context windows** |
-37 | `37-prefix-sums-and-hashing.py` | Prefix sums; difference arrays; subarray-sum with a hash map; 2-D prefix sums; rolling hash |
-38 | `38-tree-and-graph-patterns.py` | DFS/BFS templates; recursion vs explicit stack; level-order; path problems; lowest common ancestor; serialize/deserialize |
-39 | `39-complexity-analysis-deep.py` | Amortized analysis (why `list.append` is O(1)); space complexity including recursion stack; best/average/worst; **how to estimate before coding** |
-40 | `40-problem-solving-framework.py` | UMPIRE method; clarifying constraints; brute force → optimize; pattern recognition; **communicating while coding**; testing your own solution |
+| 35 | `35-two-pointers.py` | Opposite ends; same direction; fast/slow (cycle detection); partitioning; sorted-array pairs; in-place dedup |
+| 36 | `36-sliding-window.py` | Fixed and variable windows; window invariants; longest/shortest substring problems; **streaming context windows** |
+| 37 | `37-prefix-sums-and-hashing.py` | Prefix sums; difference arrays; subarray-sum with a hash map; 2-D prefix sums; rolling hash |
+| 38 | `38-tree-and-graph-patterns.py` | DFS/BFS templates; recursion vs explicit stack; level-order; path problems; lowest common ancestor; serialize/deserialize |
+| 39 | `39-complexity-analysis-deep.py` | Amortized analysis (why `list.append` is O(1)); space complexity including recursion stack; best/average/worst; **how to estimate before coding** |
+| 40 | `40-problem-solving-framework.py` | UMPIRE method; clarifying constraints; brute force → optimize; pattern recognition; **communicating while coding**; testing your own solution |
 
 ---
 
@@ -193,15 +193,15 @@ actually solve problems are not. This track is what makes someone interview-read
 
 | Item | Count |
 |---|---|
-Fixes (R1.1, R1.3, R1.4, R3) | 4 |
-`_verify()` retrofits | 20 |
-Empirical complexity demos | 20 |
-AI-relevance retrofits | 20 |
-New topics `21`–`40` | 20 |
-New lecture+glossary pairs | 40 |
-Challenges | 40 dirs × 3 tiers |
-Quizzes | 20 (7 exist) |
-Interview guides | 8 (7 exist) |
+| Fixes (R1.1, R1.3, R1.4, R3) | 4 |
+| `_verify()` retrofits | 20 |
+| Empirical complexity demos | 20 |
+| AI-relevance retrofits | 20 |
+| New topics `21`–`40` | 20 |
+| New lecture+glossary pairs | 40 |
+| Challenges | 40 dirs × 3 tiers |
+| Quizzes | 20 (7 exist) |
+| Interview guides | 8 (7 exist) |
 
 ---
 

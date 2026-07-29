@@ -46,6 +46,7 @@
 **Measured:** `timeout 15` → exit code **124** (timeout). No traceback; never terminates.
 **Cause:** `BoundedBuffer` (line ~463) is a condition-variable producer/consumer.
 The demo at line ~505 calls it **sequentially on one thread**:
+
 ```python
 for i in range(5):
     buffer.produce(i)      # capacity is 3 → 4th call blocks on not_full.wait()
@@ -114,17 +115,17 @@ Written against older pandas/numpy; current versions reject them.
 
 | File | Error | Fix |
 |---|---|---|
-`pandas/03-indexing-selection.py` | `ValueError: cannot set a row with mismatched columns` | `.loc[len(df)] = [...]` needs full-width row; use `pd.concat` or match column count |
-`pandas/06-data-types.py` | `ValueError: Length of values (4) does not match length of index (20)` | Column assignment length mismatch; build with correct length or `Series` + index |
-`pandas/07-string-methods.py` | `TypeError: StringMethods.replace() missing 1 required positional argument: 'repl'` | `.str.replace(pat, repl)` — `repl` no longer optional; add it and `regex=` explicitly |
-`pandas/10-pivot-tables.py` | `ValueError: Index contains duplicate entries, cannot reshape` | `.pivot()` needs unique index/column pairs → use `.pivot_table(aggfunc=...)` |
-`pandas/11-merging-joining.py` | `ValueError: Suffixes not supported when joining multiple DataFrames` | Drop `suffixes=` from multi-frame `.join()`, or chain pairwise merges |
-`pandas/17-data-cleaning.py` | `ValueError: Bin edges must be unique` | `pd.qcut` on skewed data yields duplicate edges → `duplicates="drop"` |
-`pandas/19-multiindex.py` | `TypeError: list keys are not supported in xs, pass a tuple instead` | `.xs(("a","b"))` not `.xs(["a","b"])` |
-`pandas/21-styling.py` | `TypeError: Styler.highlight_null() got an unexpected keyword argument 'null_color'` | Renamed to `color=` |
-`numpy/10-array-iterating.py` | `AttributeError: 'numpy.ndarray' object has no attribute 'index'` | `.index()` is a list method → `np.where(arr == v)[0][0]` |
-`numpy/12-array-split.py` | `ValueError: array split does not result in an equal division` | `np.split` requires exact division → `np.array_split` |
-`numpy/28-ufunc-set-operations.py` | `ValueError: truth value of an array ... is ambiguous` | `if arr:` on an array → `.any()` / `.all()` |
+| `pandas/03-indexing-selection.py` | `ValueError: cannot set a row with mismatched columns` | `.loc[len(df)] = [...]` needs full-width row; use `pd.concat` or match column count |
+| `pandas/06-data-types.py` | `ValueError: Length of values (4) does not match length of index (20)` | Column assignment length mismatch; build with correct length or `Series` + index |
+| `pandas/07-string-methods.py` | `TypeError: StringMethods.replace() missing 1 required positional argument: 'repl'` | `.str.replace(pat, repl)` — `repl` no longer optional; add it and `regex=` explicitly |
+| `pandas/10-pivot-tables.py` | `ValueError: Index contains duplicate entries, cannot reshape` | `.pivot()` needs unique index/column pairs → use `.pivot_table(aggfunc=...)` |
+| `pandas/11-merging-joining.py` | `ValueError: Suffixes not supported when joining multiple DataFrames` | Drop `suffixes=` from multi-frame `.join()`, or chain pairwise merges |
+| `pandas/17-data-cleaning.py` | `ValueError: Bin edges must be unique` | `pd.qcut` on skewed data yields duplicate edges → `duplicates="drop"` |
+| `pandas/19-multiindex.py` | `TypeError: list keys are not supported in xs, pass a tuple instead` | `.xs(("a","b"))` not `.xs(["a","b"])` |
+| `pandas/21-styling.py` | `TypeError: Styler.highlight_null() got an unexpected keyword argument 'null_color'` | Renamed to `color=` |
+| `numpy/10-array-iterating.py` | `AttributeError: 'numpy.ndarray' object has no attribute 'index'` | `.index()` is a list method → `np.where(arr == v)[0][0]` |
+| `numpy/12-array-split.py` | `ValueError: array split does not result in an equal division` | `np.split` requires exact division → `np.array_split` |
+| `numpy/28-ufunc-set-operations.py` | `ValueError: truth value of an array ... is ambiguous` | `if arr:` on an array → `.any()` / `.all()` |
 
 **Prevention:** pin minimum versions in `requirements.txt` and add a version-drift
 CI job. These 11 failures are all "worked in 2023, broken in 2026" — a pinned
@@ -138,10 +139,10 @@ matrix would have caught each one.
 
 | File | Character |
 |---|---|
-`numpy/27-ufunc-trigonometric.py` | `'\u03c0'` (π) |
-`pandas/13-apply-map.py` | `'\U0001f34e'` (🍎) |
-`06-dsa/07-trees.py` | box-drawing chars |
-`+1 more` | emoji in output |
+| `numpy/27-ufunc-trigonometric.py` | `'\u03c0'` (π) |
+| `pandas/13-apply-map.py` | `'\U0001f34e'` (🍎) |
+| `06-dsa/07-trees.py` | box-drawing chars |
+| `+1 more` | emoji in output |
 
 **Cause:** Windows console defaults to cp1252; these appear in `print()`.
 **Fix:** ASCII in program output — `pi`, `[OK]`, `->`, `+--`. Unicode stays fine in
@@ -156,16 +157,17 @@ papers over the issue and still breaks for a learner running the file directly.
 
 | File | Missing |
 |---|---|
-`pandas/15-io-csv-json.py` | `openpyxl` |
-`pandas/16-io-excel-sql.py` | `openpyxl` |
-`pandas/18-visualization.py` | `seaborn` |
-`pandas/22-case-study-eda.py` | `seaborn` |
+| `pandas/15-io-csv-json.py` | `openpyxl` |
+| `pandas/16-io-excel-sql.py` | `openpyxl` |
+| `pandas/18-visualization.py` | `seaborn` |
+| `pandas/22-case-study-eda.py` | `seaborn` |
 
 **Fix (both halves):**
 1. Add `openpyxl>=3.1` and `seaborn>=0.13` to `requirements.txt` — currently in
    neither `requirements.txt` nor `pyproject.toml`, though `EXPANSION_PLAN.md`
    lists `seaborn`.
 2. Guard the import so the file degrades instead of crashing:
+
    ```python
    try:
        import seaborn as sns
@@ -173,7 +175,7 @@ papers over the issue and still breaks for a learner running the file directly.
    except ImportError:
        HAS_SEABORN = False
        print("[skip] seaborn not installed — pip install seaborn")
-   ```
+```
 Teaching files should never hard-crash on an optional extra.
 
 ---
@@ -198,8 +200,8 @@ DELETE FROM t WHERE rowid IN (SELECT rowid FROM t WHERE cond LIMIT 1);
 
 | File | Error | Cause |
 |---|---|---|
-`mongodb/06-query.py` | `AttributeError: 'str' object has no attribute 'keys'` | Query helper assumes a dict operand but gets a bare string |
-`mongodb/11-aggregation.py` | `AttributeError: 'int' object has no attribute 'get'` | Pipeline stage iterates documents but receives already-reduced scalars |
+| `mongodb/06-query.py` | `AttributeError: 'str' object has no attribute 'keys'` | Query helper assumes a dict operand but gets a bare string |
+| `mongodb/11-aggregation.py` | `AttributeError: 'int' object has no attribute 'get'` | Pipeline stage iterates documents but receives already-reduced scalars |
 
 Both live in the dict-based MongoDB simulator. Fix the simulator's type handling
 and add `assert`s covering the mixed-type paths that broke.
@@ -237,18 +239,18 @@ merged. Prefixes `02`–`13` are each duplicated:
 
 | W3Schools series (has lectures) | EXPANSION_PLAN series (**no lectures**) |
 |---|---|
-`02-getting-started.py` | `02-inspecting-data.py` |
-`03-series.py` | `03-indexing-selection.py` |
-`04-dataframes.py` | `04-filtering.py` |
-`05-load-data.py` | `05-missing-data.py` |
-`06-reading-json.py` | `06-data-types.py` |
-`07-data-viewing.py` | `07-string-methods.py` |
-`08-data-selecting.py` | `08-datetime.py` |
-`09-data-loc.py` | `09-groupby-aggregation.py` |
-`10-data-drop.py` | `10-pivot-tables.py` |
-`11-rename-columns.py` | `11-merging-joining.py` |
-`12-iterating.py` | `12-window-functions.py` |
-`13-clearing-data.py` | `13-apply-map.py` |
+| `02-getting-started.py` | `02-inspecting-data.py` |
+| `03-series.py` | `03-indexing-selection.py` |
+| `04-dataframes.py` | `04-filtering.py` |
+| `05-load-data.py` | `05-missing-data.py` |
+| `06-reading-json.py` | `06-data-types.py` |
+| `07-data-viewing.py` | `07-string-methods.py` |
+| `08-data-selecting.py` | `08-datetime.py` |
+| `09-data-loc.py` | `09-groupby-aggregation.py` |
+| `10-data-drop.py` | `10-pivot-tables.py` |
+| `11-rename-columns.py` | `11-merging-joining.py` |
+| `12-iterating.py` | `12-window-functions.py` |
+| `13-clearing-data.py` | `13-apply-map.py` |
 
 **21 files have no lecture and no glossary** (`14-categorical-data` through
 `22-case-study-eda`, plus the twelve above).
@@ -268,19 +270,19 @@ and `12-window-functions` are the highest-value pandas content in the module.
 
 | File | Claim | Reality |
 |---|---|---|
-`python/README.md` | "405+ files" | **1128** |
-`python/README.md` | `01-core-python` = 43 files | 41 numbered + 2 practice |
-`python/README.md` | `pandas/ (24 files)` | **45** |
-`python/README.md` | `supplementary/lectures/01-core-python/` = 82 files | Lectures live at `<section>/lectures/` |
-`python/README.md` | quizzes "29" / interviews "16" | 29 ✅ / **15** |
-`EXPANSION_PLAN.md` | pandas `0 files ❌ MISSING` | 45 exist |
-`EXPANSION_PLAN.md` | matplotlib `0 files ❌ MISSING` | 20 exist |
-`EXPANSION_PLAN.md` | "Plan created: July 2024" | inconsistent with July 2026 content |
-`01-core-python/README.md` | "43 exercise files" | 41 + 2 |
-`01-core-python/lectures/README.md` | "consistent format" | drifts after file 14 |
-`learning_path.md` | lectures at `supplementary/lectures/01-core-python/` | wrong path |
-`pyproject.toml` vs `requirements.txt` | django core vs commented out | contradiction (R7) |
-`pyproject.toml` | `[tool.pytestini_options]` typo | dead section; `asyncio_mode` never applied |
+| `python/README.md` | "405+ files" | **1128** |
+| `python/README.md` | `01-core-python` = 43 files | 41 numbered + 2 practice |
+| `python/README.md` | `pandas/ (24 files)` | **45** |
+| `python/README.md` | `supplementary/lectures/01-core-python/` = 82 files | Lectures live at `<section>/lectures/` |
+| `python/README.md` | quizzes "29" / interviews "16" | 29 ✅ / **15** |
+| `EXPANSION_PLAN.md` | pandas `0 files ❌ MISSING` | 45 exist |
+| `EXPANSION_PLAN.md` | matplotlib `0 files ❌ MISSING` | 20 exist |
+| `EXPANSION_PLAN.md` | "Plan created: July 2024" | inconsistent with July 2026 content |
+| `01-core-python/README.md` | "43 exercise files" | 41 + 2 |
+| `01-core-python/lectures/README.md` | "consistent format" | drifts after file 14 |
+| `learning_path.md` | lectures at `supplementary/lectures/01-core-python/` | wrong path |
+| `pyproject.toml` vs `requirements.txt` | django core vs commented out | contradiction (R7) |
+| `pyproject.toml` | `[tool.pytestini_options]` typo | dead section; `asyncio_mode` never applied |
 
 Also: `pyproject.toml` has both `[tool.pytest.ini_options]` and a separate
 `pytest.ini` — two competing configs with different `testpaths`. Consolidate.

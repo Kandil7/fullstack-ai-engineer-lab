@@ -43,12 +43,12 @@ Fix the three per [10-remediation-backlog.md](10-remediation-backlog.md) before 
 
 | Gap | Measured | Consequence |
 |---|---|---|
-No cost model | **0 of 20** lectures mention complexity | `13-slots` teaches memory optimization without measuring memory; `10-itertools` never states laziness cost |
-No self-verification | **0 of 21** `.py` files contain `assert` | Hid R1.5–R1.7 |
-No AI framing | 0 lectures reference AI/ML | `04-async-await` is *the* concurrency primitive for LLM calls, taught abstractly |
-Concurrency shallow | 3 files (`16`,`17`,`04`), no comparison | The "threads vs processes vs async" decision is the most common senior interview question and is never posed |
-Missing modern typing | `Protocol` in 8 lectures but `TypeVar`/`ParamSpec`/`TypeAlias`/generics-syntax thin; `mypy` in 1 | Cannot write typed library code |
-No packaging | Nothing on building/distributing a package | Cannot ship internal libraries |
+| No cost model | **0 of 20** lectures mention complexity | `13-slots` teaches memory optimization without measuring memory; `10-itertools` never states laziness cost |
+| No self-verification | **0 of 21** `.py` files contain `assert` | Hid R1.5–R1.7 |
+| No AI framing | 0 lectures reference AI/ML | `04-async-await` is *the* concurrency primitive for LLM calls, taught abstractly |
+| Concurrency shallow | 3 files (`16`,`17`,`04`), no comparison | The "threads vs processes vs async" decision is the most common senior interview question and is never posed |
+| Missing modern typing | `Protocol` in 8 lectures but `TypeVar`/`ParamSpec`/`TypeAlias`/generics-syntax thin; `mypy` in 1 | Cannot write typed library code |
+| No packaging | Nothing on building/distributing a package | Cannot ship internal libraries |
 
 ---
 
@@ -57,53 +57,53 @@ No packaging | Nothing on building/distributing a package | Cannot ship internal
 ### 3.1 `_verify()` in all 20
 | File | Assert targets |
 |---|---|
-`01-decorators` | `functools.wraps` preserves `__name__`/`__doc__`/`__wrapped__`; stacking order bottom-to-top; factory arity; class decorator state |
-`02-generators` | laziness (no work before first `next`); exhaustion; `send`/`throw`/`close`; `yield from` delegation |
-`03-context-managers` | `__exit__` runs on exception; returning `True` suppresses; `ExitStack` LIFO order |
-`04-async-await` | `gather` concurrency beats sequential; `TimeoutError` on `wait_for`; `Semaphore` caps in-flight; cancellation |
-`05-type-hints` | `get_type_hints` output; `Protocol` structural match; `TypeVar` bound enforcement (via mypy in CI) |
-`06-dataclasses` | `frozen` raises; `eq`/`order` generated; `slots=True` blocks new attrs |
-`07-enum` | identity-based comparison; `auto()`; `Flag` bitwise ops; aliases via `@unique` |
-`08-abc` | instantiating abstract raises `TypeError`; registration; `__subclasshook__` |
-`09-functools` | `lru_cache` `cache_info` hits/misses; `partial` binding; `total_ordering` fills operators; `singledispatch` routing |
-`10-itertools` | `islice` on infinite; `groupby` **requires pre-sorted input** (the classic trap); `tee` independence |
-`11-collections` | `Counter` arithmetic; `defaultdict` factory; `deque` rotation; `ChainMap` precedence |
-`12-property` | setter validation raises; `cached_property` computes once |
-`13-slots` | **measure** `sys.getsizeof` reduction; `__dict__` absent; inheritance caveat |
-`14-metaclasses` | registry populated at class creation; `__new__` vs `__init__` order |
-`15-descriptors` | `__set_name__`; data vs non-data precedence; per-instance storage (**fix R1.7 here**) |
-`16-threading` | `Lock` prevents the race (assert the unsynchronized version *does* corrupt); `Event`/`Condition`; pool results |
-`17-multiprocessing` | pool map correctness; workers at module scope (**fix R1.5**); shared `Value` needs a lock |
-`18-unit-testing` | mock call counts; `side_effect`; `patch` scope; fixture teardown |
-`19-logging` | capture per level; propagation; handler cleanup (**fix R1.6**) |
-`20-patterns` | singleton identity; factory dispatch; observer notification; strategy swap |
+| `01-decorators` | `functools.wraps` preserves `__name__`/`__doc__`/`__wrapped__`; stacking order bottom-to-top; factory arity; class decorator state |
+| `02-generators` | laziness (no work before first `next`); exhaustion; `send`/`throw`/`close`; `yield from` delegation |
+| `03-context-managers` | `__exit__` runs on exception; returning `True` suppresses; `ExitStack` LIFO order |
+| `04-async-await` | `gather` concurrency beats sequential; `TimeoutError` on `wait_for`; `Semaphore` caps in-flight; cancellation |
+| `05-type-hints` | `get_type_hints` output; `Protocol` structural match; `TypeVar` bound enforcement (via mypy in CI) |
+| `06-dataclasses` | `frozen` raises; `eq`/`order` generated; `slots=True` blocks new attrs |
+| `07-enum` | identity-based comparison; `auto()`; `Flag` bitwise ops; aliases via `@unique` |
+| `08-abc` | instantiating abstract raises `TypeError`; registration; `__subclasshook__` |
+| `09-functools` | `lru_cache` `cache_info` hits/misses; `partial` binding; `total_ordering` fills operators; `singledispatch` routing |
+| `10-itertools` | `islice` on infinite; `groupby` **requires pre-sorted input** (the classic trap); `tee` independence |
+| `11-collections` | `Counter` arithmetic; `defaultdict` factory; `deque` rotation; `ChainMap` precedence |
+| `12-property` | setter validation raises; `cached_property` computes once |
+| `13-slots` | **measure** `sys.getsizeof` reduction; `__dict__` absent; inheritance caveat |
+| `14-metaclasses` | registry populated at class creation; `__new__` vs `__init__` order |
+| `15-descriptors` | `__set_name__`; data vs non-data precedence; per-instance storage (**fix R1.7 here**) |
+| `16-threading` | `Lock` prevents the race (assert the unsynchronized version *does* corrupt); `Event`/`Condition`; pool results |
+| `17-multiprocessing` | pool map correctness; workers at module scope (**fix R1.5**); shared `Value` needs a lock |
+| `18-unit-testing` | mock call counts; `side_effect`; `patch` scope; fixture teardown |
+| `19-logging` | capture per level; propagation; handler cleanup (**fix R1.6**) |
+| `20-patterns` | singleton identity; factory dispatch; observer notification; strategy swap |
 
 ### 3.2 Add the missing cost models
 `0 of 20` today. Highest-value additions:
 
 | Lecture | Must state |
 |---|---|
-`13-slots` | Actual bytes saved per instance, measured. At 10⁶ objects this is hundreds of MB |
-`09-functools` | `lru_cache` is O(1) lookup + unbounded memory when `maxsize=None`; keys must be hashable |
-`10-itertools` | Lazy = O(1) memory; `tee` buffers and can be O(n); `product` is combinatorial |
-`11-collections` | Full table: `deque` O(1) ends vs `list` O(n) front; `Counter.most_common` O(n log n) |
-`02-generators` | O(1) memory vs O(n) for the list equivalent — with a measurement |
-`16`/`17`/`04` | Thread ≈8MB stack; process ≈full interpreter; coroutine ≈KB. Drives the choice |
-`14-metaclasses` | Class-creation cost paid at import, not per instance |
+| `13-slots` | Actual bytes saved per instance, measured. At 10⁶ objects this is hundreds of MB |
+| `09-functools` | `lru_cache` is O(1) lookup + unbounded memory when `maxsize=None`; keys must be hashable |
+| `10-itertools` | Lazy = O(1) memory; `tee` buffers and can be O(n); `product` is combinatorial |
+| `11-collections` | Full table: `deque` O(1) ends vs `list` O(n) front; `Counter.most_common` O(n log n) |
+| `02-generators` | O(1) memory vs O(n) for the list equivalent — with a measurement |
+| `16`/`17`/`04` | Thread ≈8MB stack; process ≈full interpreter; coroutine ≈KB. Drives the choice |
+| `14-metaclasses` | Class-creation cost paid at import, not per instance |
 
 ### 3.3 Add AI-engineering relevance
 | Lecture | Hook |
 |---|---|
-`01-decorators` | `@retry` on 429s; `@cache` on embedding calls; `@timed` for latency SLOs |
-`02-generators` | streaming a corpus too large for RAM; token-by-token LLM streaming |
-`03-context-managers` | `torch.no_grad()`; DB sessions; temp dirs for model artifacts |
-`04-async-await` | 200 concurrent LLM calls; `Semaphore` for rate limits; the single biggest throughput lever |
-`05-type-hints` | typed tool schemas for function calling; Pydantic's foundation |
-`06-dataclasses` | `RetrievedChunk`; training config objects |
-`09-functools` | `lru_cache` on embeddings is the cheapest cost reduction available |
-`13-slots` | 1M embedding records in RAM |
-`16`/`17` | why inference servers use processes, not threads (the GIL) |
-`20-patterns` | Strategy for swapping LLM providers; Factory for retriever backends |
+| `01-decorators` | `@retry` on 429s; `@cache` on embedding calls; `@timed` for latency SLOs |
+| `02-generators` | streaming a corpus too large for RAM; token-by-token LLM streaming |
+| `03-context-managers` | `torch.no_grad()`; DB sessions; temp dirs for model artifacts |
+| `04-async-await` | 200 concurrent LLM calls; `Semaphore` for rate limits; the single biggest throughput lever |
+| `05-type-hints` | typed tool schemas for function calling; Pydantic's foundation |
+| `06-dataclasses` | `RetrievedChunk`; training config objects |
+| `09-functools` | `lru_cache` on embeddings is the cheapest cost reduction available |
+| `13-slots` | 1M embedding records in RAM |
+| `16`/`17` | why inference servers use processes, not threads (the GIL) |
+| `20-patterns` | Strategy for swapping LLM providers; Factory for retriever backends |
 
 ---
 
@@ -279,14 +279,14 @@ correctness failure with no traceback, the hardest and most common AI bug class.
 
 | Item | Count |
 |---|---|
-Bug fixes (R1.5, R1.6, R1.7) | 3 |
-New exercises `21`–`34` | 14 |
-New lectures + glossaries | 28 |
-`_verify()` retrofits | 20 |
-Cost-model retrofits | 20 |
-AI-relevance retrofits | 20 |
-Challenges | 34 dirs × 3 tiers |
-Quizzes | 34 |
+| Bug fixes (R1.5, R1.6, R1.7) | 3 |
+| New exercises `21`–`34` | 14 |
+| New lectures + glossaries | 28 |
+| `_verify()` retrofits | 20 |
+| Cost-model retrofits | 20 |
+| AI-relevance retrofits | 20 |
+| Challenges | 34 dirs × 3 tiers |
+| Quizzes | 34 |
 
 ---
 

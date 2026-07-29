@@ -71,7 +71,7 @@ Every figure below came from running commands against the tree on 2026-07-29.
 two independently-authored series were dropped into one folder. Every prefix
 `02`–`13` is duplicated:
 
-```
+```text
 02-getting-started.py   +  02-inspecting-data.py
 03-series.py            +  03-indexing-selection.py
 04-dataframes.py        +  04-filtering.py
@@ -136,16 +136,16 @@ Absent from all 41 `01-core-python` exercises (measured, `0` occurrences):
 
 | Missing | Needed for |
 |---|---|
-`logging`, `pytest`, `assert` | Nothing ships without these |
-`argparse`, `sys.argv`, `os.environ` | Every CLI, every 12-factor service |
-`dataclasses`, `functools`, `contextlib` | Modern Python baseline |
-`heapq`, `bisect`, `deque` | Top-k retrieval, ranked results, sliding windows |
-`pickle`, `sqlite3`, `shutil`, `subprocess` | Persistence, model artifacts, orchestration |
-`__slots__`, `__hash__`, `__lt__`, `total_ordering` | Memory limits, sortable domain objects |
-`zoneinfo` / `timezone` | Real correctness bugs |
-walrus `:=`, `f"{x=}"`, `TypeAlias`, `TypedDict` | Idiomatic ≥3.10 (module targets 3.10+) |
-`ExceptionGroup`, `raise ... from` | Structured error handling |
-`gc`, refcounting, interning, GIL | Reasoning about memory and concurrency |
+| `logging`, `pytest`, `assert` | Nothing ships without these |
+| `argparse`, `sys.argv`, `os.environ` | Every CLI, every 12-factor service |
+| `dataclasses`, `functools`, `contextlib` | Modern Python baseline |
+| `heapq`, `bisect`, `deque` | Top-k retrieval, ranked results, sliding windows |
+| `pickle`, `sqlite3`, `shutil`, `subprocess` | Persistence, model artifacts, orchestration |
+| `__slots__`, `__hash__`, `__lt__`, `total_ordering` | Memory limits, sortable domain objects |
+| `zoneinfo` / `timezone` | Real correctness bugs |
+| walrus `:=`, `f"{x=}"`, `TypeAlias`, `TypedDict` | Idiomatic ≥3.10 (module targets 3.10+) |
+| `ExceptionGroup`, `raise ... from` | Structured error handling |
+| `gc`, refcounting, interning, GIL | Reasoning about memory and concurrency |
 
 `pathlib` appears in only **1** exercise while `38-file-handling.py` teaches
 string paths — the deprecated habit is taught first.
@@ -156,13 +156,13 @@ Repo-wide `.py` occurrences:
 
 | Topic | Files |
 |---|---|
-`torch` | **0** |
-`openai` / `anthropic` | **0** / **0** |
-`mlflow`, `drift`, `feature store`, `onnx`, `quantiz` | **0** each |
-`opentelemetry`, `prometheus`, `structlog` | **0** each |
-`Dockerfile`, `celery`, `alembic`, `qdrant` | **0** each |
-`redis` | 1 |
-`embedding` | 1 |
+| `torch` | **0** |
+| `openai` / `anthropic` | **0** / **0** |
+| `mlflow`, `drift`, `feature store`, `onnx`, `quantiz` | **0** each |
+| `opentelemetry`, `prometheus`, `structlog` | **0** each |
+| `Dockerfile`, `celery`, `alembic`, `qdrant` | **0** each |
+| `redis` | 1 |
+| `embedding` | 1 |
 
 Meanwhile `torch` **is installed** in the environment and unused. The words
 "AI Engineer" appear in **0 of 41** core lectures. There are two entire phases
@@ -174,14 +174,14 @@ Meanwhile `torch` **is installed** in the environment and unused. The words
 
 | Section heading | Present in |
 |---|---|
-`Learning Objectives` | **41/41** ✅ |
-`Best Practices` | **41/41** ✅ |
-`Practice Exercises` | **41/41** ✅ |
-`Summary` | **41/41** ✅ |
-`Common Mistakes` | 39/41 |
-`Topic Overview` | **28/41** — files 29–41 use `## Topic NN:` instead |
-`Quick Reference` | **14/41** |
-`Next Steps` | **13/41** |
+| `Learning Objectives` | **41/41** ✅ |
+| `Best Practices` | **41/41** ✅ |
+| `Practice Exercises` | **41/41** ✅ |
+| `Summary` | **41/41** ✅ |
+| `Common Mistakes` | 39/41 |
+| `Topic Overview` | **28/41** — files 29–41 use `## Topic NN:` instead |
+| `Quick Reference` | **14/41** |
+| `Next Steps` | **13/41** |
 
 Glossaries use **three** different schemes: files 01–14 `## Detailed Definitions`,
 15–33 `## Definitions`, 34–41 `## Glossary Terms` with A/B/C letter grouping.
@@ -308,7 +308,7 @@ can be generated from one table row plus
 [01-content-standards.md](01-content-standards.md).
 
 **Definition of done for any new topic** — five artifacts, all present:
-```
+```python
 NN-topic.py                      exercise, runs clean, ends with _verify()
 lectures/NN-topic-lecture.md     canonical 12-section template
 lectures/NN-topic-glossary.md    canonical 4-section template
@@ -324,14 +324,14 @@ Found during the audit; fold into Tier 0.
 
 | File | Claim | Reality |
 |---|---|---|
-`python/README.md` | "405+ files"; `01-core-python` = 43 | 1128 files; 41 numbered + 2 practice |
-`python/README.md` | `pandas/ (24 files)` | 45 files (double series) |
-`EXPANSION_PLAN.md` | pandas `0 files ❌ MISSING` | 45 files exist |
-`EXPANSION_PLAN.md` | matplotlib `0 files ❌ MISSING` | 20 files exist |
-`EXPANSION_PLAN.md` | "Plan created: July 2024" | inconsistent with July 2026 content |
-`01-core-python/README.md` | "43 exercise files" | 41 numbered + 2 practice |
-`01-core-python/lectures/README.md` | "consistent format" | drifts after file 14 (Gap E) |
-`learning_path.md` | lectures at `supplementary/lectures/01-core-python/` | actually `01-core-python/lectures/` |
+| `python/README.md` | "405+ files"; `01-core-python` = 43 | 1128 files; 41 numbered + 2 practice |
+| `python/README.md` | `pandas/ (24 files)` | 45 files (double series) |
+| `EXPANSION_PLAN.md` | pandas `0 files ❌ MISSING` | 45 files exist |
+| `EXPANSION_PLAN.md` | matplotlib `0 files ❌ MISSING` | 20 files exist |
+| `EXPANSION_PLAN.md` | "Plan created: July 2024" | inconsistent with July 2026 content |
+| `01-core-python/README.md` | "43 exercise files" | 41 numbered + 2 practice |
+| `01-core-python/lectures/README.md` | "consistent format" | drifts after file 14 (Gap E) |
+| `learning_path.md` | lectures at `supplementary/lectures/01-core-python/` | actually `01-core-python/lectures/` |
 
 ---
 

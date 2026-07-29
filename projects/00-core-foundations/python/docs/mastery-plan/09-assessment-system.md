@@ -16,10 +16,10 @@ Each layer tests something the others cannot.
 
 | Layer | Tests | Feedback | Time |
 |---|---|---|---|
-**Quiz** | Recall and conceptual precision | Immediate, answer key | 20 min |
-**Code challenge** | Can you build it under constraints | Automated, hidden tests | 15–75 min |
-**Interview drill** | Can you *explain* it | Self-assessed against a model answer | 30 min |
-**Capstone** | Can you integrate it into a system | Rubric + working software | 1–2 weeks |
+| **Quiz** | Recall and conceptual precision | Immediate, answer key | 20 min |
+| **Code challenge** | Can you build it under constraints | Automated, hidden tests | 15–75 min |
+| **Interview drill** | Can you *explain* it | Self-assessed against a model answer | 30 min |
+| **Capstone** | Can you integrate it into a system | Rubric + working software | 1–2 weeks |
 
 The missing middle layer — code challenges — is the largest gap. There is nothing
 between "read the lecture" and "build a project," which is where most learners stall.
@@ -32,19 +32,19 @@ between "read the lecture" and "build a project," which is where most learners s
 
 | Area | Quizzes | Topics | Coverage |
 |---|---|---|---|
-Core Python | 8 | 41 | **20%** |
-Advanced Python | 0 | 20 | **0%** |
-NumPy | 2 | 28 | 7% |
-pandas | 2 | 38 | 5% |
-Matplotlib | 1 | 20 | 5% |
-SciPy | 1 | 12 | 8% |
-Databases | 0 | 64 | **0%** |
-FastAPI | 2 | 52 | 4% |
-Django | 1 | 20 | 5% |
-DSA | 7 | 40 | 18% |
-ML | 5 | 40 | 13% |
-MLOps | 0 | 16 | **0%** |
-GenAI | 0 | 25 | **0%** |
+| Core Python | 8 | 41 | **20%** |
+| Advanced Python | 0 | 20 | **0%** |
+| NumPy | 2 | 28 | 7% |
+| pandas | 2 | 38 | 5% |
+| Matplotlib | 1 | 20 | 5% |
+| SciPy | 1 | 12 | 8% |
+| Databases | 0 | 64 | **0%** |
+| FastAPI | 2 | 52 | 4% |
+| Django | 1 | 20 | 5% |
+| DSA | 7 | 40 | 18% |
+| ML | 5 | 40 | 13% |
+| MLOps | 0 | 16 | **0%** |
+| GenAI | 0 | 25 | **0%** |
 
 **Advanced Python has 20 topics and zero quizzes** — the section with the best
 lectures has no assessment at all.
@@ -66,16 +66,16 @@ add coverage. Requirements per quiz:
 
 | Area | Target |
 |---|---|
-Core Python (per-topic) | 44 |
-Advanced Python | 17 |
-NumPy / pandas / Matplotlib / SciPy / Polars | 20 |
-Databases (SQL, Postgres, SQLAlchemy, Redis, Mongo, vector) | 12 |
-Backend (FastAPI, system design) | 12 |
-DSA | 13 |
-ML | 12 |
-MLOps | 6 |
-GenAI | 8 |
-**Total** | **~144** |
+| Core Python (per-topic) | 44 |
+| Advanced Python | 17 |
+| NumPy / pandas / Matplotlib / SciPy / Polars | 20 |
+| Databases (SQL, Postgres, SQLAlchemy, Redis, Mongo, vector) | 12 |
+| Backend (FastAPI, system design) | 12 |
+| DSA | 13 |
+| ML | 12 |
+| MLOps | 6 |
+| GenAI | 8 |
+| **Total** | **~144** |
 
 Also add **cumulative checkpoint quizzes** (40 questions, mixed topics) at the end
 of each phase — spaced retrieval across a whole phase, which per-topic quizzes miss.
@@ -91,16 +91,16 @@ tiers each, graded by hidden tests.
 
 | Tier | Purpose | Constraint design |
 |---|---|---|
-🥉 **Bronze** | Confirm you understood the lecture | Small n; any correct approach passes |
-🥈 **Silver** | Force the right data structure | n ≤ 10⁶ — **O(n²) times out** |
-🥇 **Gold** | Force real engineering | Streaming 10⁷, memory ≤ 50MB — single pass required |
+| 🥉 **Bronze** | Confirm you understood the lecture | Small n; any correct approach passes |
+| 🥈 **Silver** | Force the right data structure | n ≤ 10⁶ — **O(n²) times out** |
+| 🥇 **Gold** | Force real engineering | Streaming 10⁷, memory ≤ 50MB — single pass required |
 
 The constraint is the teacher. A learner who passes Bronze with nested loops
 *cannot* pass Silver that way, and discovers why the complexity table mattered.
 
 ### 3.2 Directory contract
 
-```
+```python
 challenges/49-collections-toolkit/
 ├── README.md            # three briefs with I/O tables and constraints
 ├── starter.py           # signatures only; bodies raise NotImplementedError
@@ -148,18 +148,18 @@ def test_gold_memory_bounded():
 
 | Topic | Gold challenge |
 |---|---|
-`49-collections-toolkit` | Top-k from a 10⁷ stream in bounded memory (**heap, not sort**) |
-`52-memory-performance` | Process a 5GB file with a 50MB ceiling |
-`21-heaps` | Streaming median with two heaps |
-`24-lru-cache` | O(1) LRU from scratch — no `OrderedDict` |
-`25-bloom-filters` | Dedup 10⁸ IDs within a memory budget |
-`31-dynamic-programming` | Edit distance with O(min(m,n)) space |
-`sql/10-indexes` | Rewrite a query to use an index; assert the `EXPLAIN` plan changes |
-`sqlalchemy/06-eager-loading` | Eliminate N+1; assert query count drops from 101 to 2 |
-`fastapi/30-idempotency` | Idempotent endpoint surviving duplicate concurrent requests |
-`genai/07-chunking` | Chunker that never splits mid-sentence and preserves overlap |
-`genai/10-retrieval-quality` | Raise recall@5 above a threshold on a fixed corpus |
-`ml/25-data-leakage` | Find and fix the leak in a provided pipeline; score must *drop* |
+| `49-collections-toolkit` | Top-k from a 10⁷ stream in bounded memory (**heap, not sort**) |
+| `52-memory-performance` | Process a 5GB file with a 50MB ceiling |
+| `21-heaps` | Streaming median with two heaps |
+| `24-lru-cache` | O(1) LRU from scratch — no `OrderedDict` |
+| `25-bloom-filters` | Dedup 10⁸ IDs within a memory budget |
+| `31-dynamic-programming` | Edit distance with O(min(m,n)) space |
+| `sql/10-indexes` | Rewrite a query to use an index; assert the `EXPLAIN` plan changes |
+| `sqlalchemy/06-eager-loading` | Eliminate N+1; assert query count drops from 101 to 2 |
+| `fastapi/30-idempotency` | Idempotent endpoint surviving duplicate concurrent requests |
+| `genai/07-chunking` | Chunker that never splits mid-sentence and preserves overlap |
+| `genai/10-retrieval-quality` | Raise recall@5 above a threshold on a fixed corpus |
+| `ml/25-data-leakage` | Find and fix the leak in a provided pipeline; score must *drop* |
 
 That last one is the most valuable pattern in the entire assessment system: a
 challenge where **success means the metric gets worse**, because the original
@@ -178,14 +178,14 @@ libraries (1), FastAPI (1), ML (1). Format is good — Q, model answer, code. Ke
 
 | Area | New guides |
 |---|---|
-Advanced Python | decorators/generators, concurrency (**threads vs processes vs async**), typing, memory/GC, metaprogramming |
-Databases | SQL query writing, schema design, indexing/optimization, transactions/isolation, Redis/caching, vector search |
-Backend | API design, auth/security, observability, scaling/reliability, FastAPI internals |
-System design | LLM API design, RAG system design, inference platform, multi-tenancy |
-ML | feature engineering, validation/leakage, metrics selection, deep learning, explainability |
-MLOps | deployment, monitoring/drift, experiment tracking, cost |
-GenAI | prompt engineering, RAG architecture, agents, fine-tuning vs prompting, LLM eval, safety/injection |
-Behavioral | project walkthrough, debugging war stories, tradeoff articulation |
+| Advanced Python | decorators/generators, concurrency (**threads vs processes vs async**), typing, memory/GC, metaprogramming |
+| Databases | SQL query writing, schema design, indexing/optimization, transactions/isolation, Redis/caching, vector search |
+| Backend | API design, auth/security, observability, scaling/reliability, FastAPI internals |
+| System design | LLM API design, RAG system design, inference platform, multi-tenancy |
+| ML | feature engineering, validation/leakage, metrics selection, deep learning, explainability |
+| MLOps | deployment, monitoring/drift, experiment tracking, cost |
+| GenAI | prompt engineering, RAG architecture, agents, fine-tuning vs prompting, LLM eval, safety/injection |
+| Behavioral | project walkthrough, debugging war stories, tradeoff articulation |
 
 ### 4.3 Add what the current guides lack
 
@@ -205,27 +205,27 @@ All five existing projects contain only a `README.md`. Nothing is implemented.
 
 | # | Project | Phases | Deliverable |
 |---|---|---|---|
-01 | Calculator | 1 | CLI + parser, full test suite, error handling |
-02 | File Manager | 1, 2 | `pathlib`-based, atomic ops, progress, logging |
-03 | API Server | 5 | FastAPI CRUD, auth, DB, tests, Docker |
-04 | Data Analyzer | 3 | pandas EDA, charts, report generation |
-05 | ML Pipeline | 7 | Leak-free pipeline, tracked experiments, model artifact |
+| 01 | Calculator | 1 | CLI + parser, full test suite, error handling |
+| 02 | File Manager | 1, 2 | `pathlib`-based, atomic ops, progress, logging |
+| 03 | API Server | 5 | FastAPI CRUD, auth, DB, tests, Docker |
+| 04 | Data Analyzer | 3 | pandas EDA, charts, report generation |
+| 05 | ML Pipeline | 7 | Leak-free pipeline, tracked experiments, model artifact |
 
 ### 5.2 Seven new, AI-engineer targeted
 
 | # | Project | Phases | Core challenge |
 |---|---|---|---|
-06 | **RAG Knowledge Base** ⭐ | 1–5, 9 | Hybrid retrieval, citations, **measured recall@k**, eval suite, cost tracking |
-07 | ML Training Platform | 3, 7, 8 | Validation → train → register → serve → monitor, with drift detection |
-08 | LLM Gateway Service ⭐ | 2, 5, 9 | Multi-provider routing, semantic caching, rate limits, token accounting, tracing |
-09 | Document Intelligence | 3, 5, 9 | PDF/table extraction, structured output with validation, high volume |
-10 | Agent Platform | 2, 5, 9 | Tool registry, budget caps, state persistence, human-in-loop |
-11 | Vector Search Service | 4, 9 | Ingestion pipeline, incremental indexing, filtered search, reindex without downtime |
-12 | Observability Dashboard | 3, 4, 5, 8 | Metrics collection, drift charts, alerting, retraining triggers |
+| 06 | **RAG Knowledge Base** ⭐ | 1–5, 9 | Hybrid retrieval, citations, **measured recall@k**, eval suite, cost tracking |
+| 07 | ML Training Platform | 3, 7, 8 | Validation → train → register → serve → monitor, with drift detection |
+| 08 | LLM Gateway Service ⭐ | 2, 5, 9 | Multi-provider routing, semantic caching, rate limits, token accounting, tracing |
+| 09 | Document Intelligence | 3, 5, 9 | PDF/table extraction, structured output with validation, high volume |
+| 10 | Agent Platform | 2, 5, 9 | Tool registry, budget caps, state persistence, human-in-loop |
+| 11 | Vector Search Service | 4, 9 | Ingestion pipeline, incremental indexing, filtered search, reindex without downtime |
+| 12 | Observability Dashboard | 3, 4, 5, 8 | Metrics collection, drift charts, alerting, retraining triggers |
 
 ### 5.3 Every capstone must ship
 
-```
+```text
 projects/NN-name/
 ├── README.md              # architecture, decisions, setup, screenshots
 ├── src/                   # implementation
@@ -244,14 +244,14 @@ projects/NN-name/
 
 | Dimension | Pts | Senior-level bar |
 |---|---|---|
-Functionality | 20 | Works, handles errors, no happy-path-only |
-Code quality | 15 | Readable, typed, lint/type clean, no dead code |
-Testing | 15 | Meaningful coverage of logic and edges, not just smoke |
-Architecture | 15 | Clear boundaries, DI, swappable components |
-Observability | 10 | Structured logs, metrics, traceable requests |
-Documentation | 10 | Another engineer can run and extend it |
-Performance | 10 | Measured; bottleneck identified; cost stated |
-Reliability | 5 | Timeouts, retries, graceful degradation |
+| Functionality | 20 | Works, handles errors, no happy-path-only |
+| Code quality | 15 | Readable, typed, lint/type clean, no dead code |
+| Testing | 15 | Meaningful coverage of logic and edges, not just smoke |
+| Architecture | 15 | Clear boundaries, DI, swappable components |
+| Observability | 10 | Structured logs, metrics, traceable requests |
+| Documentation | 10 | Another engineer can run and extend it |
+| Performance | 10 | Measured; bottleneck identified; cost stated |
+| Reliability | 5 | Timeouts, retries, graceful degradation |
 
 **Bar: ≥80 to consider a capstone portfolio-ready.** Below 80, the gap is the
 next learning objective.
@@ -264,10 +264,10 @@ Add `supplementary/progress/`:
 
 | File | Purpose |
 |---|---|
-`SKILLS-MATRIX.md` | Every topic × 4 levels (Aware / Can use / Can teach / Can design) — self-assessed, dated |
-`CHECKPOINTS.md` | Per-phase gate: quiz score, challenges passed, capstone rubric |
-`SPACED-REVIEW.md` | Review schedule — topics resurface at 1d / 7d / 30d / 90d |
-`INTERVIEW-READINESS.md` | Checklist against a senior AI-engineer job description |
+| `SKILLS-MATRIX.md` | Every topic × 4 levels (Aware / Can use / Can teach / Can design) — self-assessed, dated |
+| `CHECKPOINTS.md` | Per-phase gate: quiz score, challenges passed, capstone rubric |
+| `SPACED-REVIEW.md` | Review schedule — topics resurface at 1d / 7d / 30d / 90d |
+| `INTERVIEW-READINESS.md` | Checklist against a senior AI-engineer job description |
 
 ### 6.1 Phase gates
 
@@ -275,11 +275,11 @@ Do not advance until:
 
 | Gate | Requirement |
 |---|---|
-Quiz | ≥80% on every topic quiz **and** the phase checkpoint quiz |
-Challenges | 100% Bronze, ≥80% Silver, ≥50% Gold |
-Verification | All `_verify()` in the phase pass on a clean clone |
-Articulation | Can explain any phase topic aloud for 5 minutes without notes |
-Capstone | ≥80 on the rubric where the phase has one |
+| Quiz | ≥80% on every topic quiz **and** the phase checkpoint quiz |
+| Challenges | 100% Bronze, ≥80% Silver, ≥50% Gold |
+| Verification | All `_verify()` in the phase pass on a clean clone |
+| Articulation | Can explain any phase topic aloud for 5 minutes without notes |
+| Capstone | ≥80 on the rubric where the phase has one |
 
 The articulation gate matters most and is easiest to skip. Recall ≠ understanding;
 if you cannot explain the threads-vs-async decision aloud, you do not own it.
@@ -290,12 +290,12 @@ if you cannot explain the threads-vs-async decision aloud, you do not own it.
 
 | Item | Count |
 |---|---|
-New quizzes | ~115 |
-Phase checkpoint quizzes | 9 |
-Challenge directories (×4 files) | ~200 |
-New interview guides | ~30 |
-Capstones built | 12 (5 existing + 7 new) |
-Progress-tracking docs | 4 |
+| New quizzes | ~115 |
+| Phase checkpoint quizzes | 9 |
+| Challenge directories (×4 files) | ~200 |
+| New interview guides | ~30 |
+| Capstones built | 12 (5 existing + 7 new) |
+| Progress-tracking docs | 4 |
 
 ---
 

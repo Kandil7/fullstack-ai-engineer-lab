@@ -17,7 +17,7 @@ impossible to generate against. One template, enforced.
 
 ## 1. Naming and Layout
 
-```
+```text
 <section>/
 ├── NN-topic-slug.py                 # exercise, kebab-case, zero-padded
 ├── lectures/
@@ -186,7 +186,7 @@ By the end of this lecture, you will be able to:
 ## Prerequisites
 | Need | Where |
 |---|---|
-| <concept> | [NN-other-lecture.md](NN-other-lecture.md) |
+| <concept> | `NN-other-lecture.md` (relative link to the prerequisite) |
 
 ## 1..N. <Key Concepts>
 <Numbered `##` sections. Each: prose, then a runnable block, then expected
@@ -194,10 +194,10 @@ output as a comment. Never a code block without its output.>
 
 ## Common Mistakes to Avoid
 ### Mistake 1: <name>
-```python
+```
 # WRONG — <why>
 # CORRECT — <why>
-```
+```python
 <3-6 mistakes, each with the failure mode named.>
 
 ## Best Practices
@@ -271,9 +271,10 @@ One scheme, replacing the three now in use.
 ### <Term>            <!-- alphabetical, ### level, no A/B/C letter grouping -->
 **Definition**: <1-3 sentences.>
 **Example**:
-```python
-<runnable snippet with output>
 ```
+<runnable snippet with output>
+
+```text
 **Complexity**: <when applicable>
 **Related**: <Term>, <Term>
 
@@ -325,9 +326,10 @@ The missing rung between reading a lecture and building a project.
 **Follow-up:** what breaks first at 10^9?
 
 ## Running
-```bash
-pytest challenges/NN-topic/test_challenge.py -v
 ```
+pytest challenges/NN-topic/test_challenge.py -v
+
+```text
 ```
 
 **`starter.py`** — signatures + docstrings, bodies `raise NotImplementedError`.

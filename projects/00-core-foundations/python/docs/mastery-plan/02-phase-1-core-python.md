@@ -28,14 +28,14 @@ Do not rewrite these. The audit found genuine quality:
 
 | Gap | Measured |
 |---|---|
-No self-verification | **0 of 44** `.py` files contain `assert` |
-No cost model | **2 of 41** lectures mention complexity |
-Practice not gradeable | **146** `input()` calls across 99 problems |
-Missing stdlib | 21 concepts at 0 occurrences (§4) |
-Template drift | `Topic Overview` 28/41, `Quick Reference` 14/41, `Next Steps` 13/41 |
-Glossary schemes | 3 competing (01–14, 15–33, 34–41) |
-No forward links | **0 of 41** lectures link to Phase 2 |
-Deprecated-first | `pathlib` in 1 file; `38-file-handling.py` teaches string paths |
+| No self-verification | **0 of 44** `.py` files contain `assert` |
+| No cost model | **2 of 41** lectures mention complexity |
+| Practice not gradeable | **146** `input()` calls across 99 problems |
+| Missing stdlib | 21 concepts at 0 occurrences (§4) |
+| Template drift | `Topic Overview` 28/41, `Quick Reference` 14/41, `Next Steps` 13/41 |
+| Glossary schemes | 3 competing (01–14, 15–33, 34–41) |
+| No forward links | **0 of 41** lectures link to Phase 2 |
+| Deprecated-first | `pathlib` in 1 file; `38-file-handling.py` teaches string paths |
 
 ---
 
@@ -47,40 +47,40 @@ Keep every existing `print()` — only add. Per-file assert targets:
 
 | File | Assert targets |
 |---|---|
-`06-variables` | scoping, unpacking, swap, `is` vs `==` on small ints |
-`07-data-types` | `type()` for all builtins, mutability matrix |
-`08-numbers` | int/float/complex ops, `0.1+0.2 != 0.3`, `math.isclose` |
-`09-casting` | round-trips, `int("3.7")` raises, `int(3.7)` truncates |
-`10-strings` | slicing, methods, immutability raises `TypeError` |
-`11-booleans` | truthiness of `0 "" [] {} None`, `bool` is `int` subclass |
-`12-operators` | precedence, `//` vs `/`, `%` on negatives, chained comparison |
-`13-lists` | mutation, slice assignment, copy-vs-reference, `deepcopy` |
-`14-tuples` | immutability raises, single-element `(x,)`, unpacking |
-`15-sets` | dedup, set algebra, `frozenset` hashable, unordered |
-`16-dictionaries` | insertion order (3.7+), `get` default, `setdefault`, merge `\|` |
-`17-if-else` | branch selection, ternary, truthiness pitfalls |
-`18-match` | literal/sequence/mapping/class patterns, guards, wildcard |
-`19-while` / `20-for` | `else` clause fires only without `break`; loop-var leak |
-`21-functions` | `*args`/`**kwargs`, mutable-default trap, closure capture, LEGB |
-`22-range` | half-open interval, negative step, `range` is lazy |
-`23-arrays` | `array` typecodes vs `list`, `bytes` immutability |
-`24-iterators` | protocol, `StopIteration`, exhaustion, generator laziness |
-`25-modules` | import machinery, `__name__`, `sys.path`, circular-import failure |
-`26-dates` | arithmetic, `strftime`/`strptime` round-trip, **naive vs aware** |
-`27-math` | `isclose`, `inf`/`nan` semantics (`nan != nan`), domain errors |
-`28-json` | round-trip, `default=`, non-str keys coerced, `NaN` non-standard |
-`29-regex` | groups, greedy vs lazy, `findall` vs `finditer`, catastrophic backtracking |
-`30-try-except` | ordering, `else`/`finally`, `finally` overriding return, custom types |
-`31-string-formatting` | f-string vs `.format()` vs `%`, `f"{x=}"`, spec mini-language |
-`32-none` | `is None` not `== None`, sentinel pattern, implicit return |
-`33-user-input` | refactor to `parse_input(str)` so it becomes testable |
-`34-classes` | attribute lookup, class-vs-instance state, `__str__`/`__repr__` |
-`35-inheritance` | MRO order, `super()` chain, `__mro__`, diamond |
-`36-polymorphism` | duck typing, operator overloading, `isinstance` vs duck |
-`37-encapsulation` | name mangling `_Class__attr`, `@property` validation |
-`38-file-handling` | read/write round-trip, `with` closes on exception, encoding |
-`39-pip` / `40-virtualenv` | parse `requirements.txt`, compare versions (offline) |
-`41-inner-classes` | nesting, closure over outer, when to prefer composition |
+| `06-variables` | scoping, unpacking, swap, `is` vs `==` on small ints |
+| `07-data-types` | `type()` for all builtins, mutability matrix |
+| `08-numbers` | int/float/complex ops, `0.1+0.2 != 0.3`, `math.isclose` |
+| `09-casting` | round-trips, `int("3.7")` raises, `int(3.7)` truncates |
+| `10-strings` | slicing, methods, immutability raises `TypeError` |
+| `11-booleans` | truthiness of `0 "" [] {} None`, `bool` is `int` subclass |
+| `12-operators` | precedence, `//` vs `/`, `%` on negatives, chained comparison |
+| `13-lists` | mutation, slice assignment, copy-vs-reference, `deepcopy` |
+| `14-tuples` | immutability raises, single-element `(x,)`, unpacking |
+| `15-sets` | dedup, set algebra, `frozenset` hashable, unordered |
+| `16-dictionaries` | insertion order (3.7+), `get` default, `setdefault`, merge `\|` |
+| `17-if-else` | branch selection, ternary, truthiness pitfalls |
+| `18-match` | literal/sequence/mapping/class patterns, guards, wildcard |
+| `19-while` / `20-for` | `else` clause fires only without `break`; loop-var leak |
+| `21-functions` | `*args`/`**kwargs`, mutable-default trap, closure capture, LEGB |
+| `22-range` | half-open interval, negative step, `range` is lazy |
+| `23-arrays` | `array` typecodes vs `list`, `bytes` immutability |
+| `24-iterators` | protocol, `StopIteration`, exhaustion, generator laziness |
+| `25-modules` | import machinery, `__name__`, `sys.path`, circular-import failure |
+| `26-dates` | arithmetic, `strftime`/`strptime` round-trip, **naive vs aware** |
+| `27-math` | `isclose`, `inf`/`nan` semantics (`nan != nan`), domain errors |
+| `28-json` | round-trip, `default=`, non-str keys coerced, `NaN` non-standard |
+| `29-regex` | groups, greedy vs lazy, `findall` vs `finditer`, catastrophic backtracking |
+| `30-try-except` | ordering, `else`/`finally`, `finally` overriding return, custom types |
+| `31-string-formatting` | f-string vs `.format()` vs `%`, `f"{x=}"`, spec mini-language |
+| `32-none` | `is None` not `== None`, sentinel pattern, implicit return |
+| `33-user-input` | refactor to `parse_input(str)` so it becomes testable |
+| `34-classes` | attribute lookup, class-vs-instance state, `__str__`/`__repr__` |
+| `35-inheritance` | MRO order, `super()` chain, `__mro__`, diamond |
+| `36-polymorphism` | duck typing, operator overloading, `isinstance` vs duck |
+| `37-encapsulation` | name mangling `_Class__attr`, `@property` validation |
+| `38-file-handling` | read/write round-trip, `with` closes on exception, encoding |
+| `39-pip` / `40-virtualenv` | parse `requirements.txt`, compare versions (offline) |
+| `41-inner-classes` | nesting, closure over outer, when to prefer composition |
 
 **Note on 39/40:** these are shell-oriented. Rewrite the testable core as pure
 functions (`parse_requirement("pkg>=1.2")`) and keep shell commands as comments.
@@ -89,7 +89,7 @@ functions (`parse_requirement("pkg>=1.2")`) and keep shell commands as comments.
 `practice_all.py` has **146** `input()` calls, so none of the 99 problems can be
 auto-graded. Add (do not replace):
 
-```
+```text
 practice_testable.py       # 99 pure functions: solve_01(name: str) -> str
 practice_stubs.py          # same signatures, NotImplementedError
 tests/test_practice.py     # parametrized cases per problem
@@ -102,13 +102,13 @@ For all 41: add `## Complexity and Cost` (where structures appear) and
 
 | Lecture | Complexity to state | AI-relevance hook |
 |---|---|---|
-`13-lists` | `insert(0)` O(n), `append` O(1) amortized, `x in list` O(n) | batching inference inputs; why `deque` for a sliding context window |
-`15-sets` | membership O(1) vs list O(n) | dedup document IDs in a retrieval set |
-`16-dictionaries` | O(1) average, O(n) worst; ordered since 3.7 | token→id vocab maps; feature dicts |
-`24-iterators` | O(1) memory streaming | streaming a 10GB JSONL corpus that will not fit in RAM |
-`29-regex` | backtracking can be exponential | cleaning scraped training text; ReDoS as a real DoS vector |
-`30-try-except` | try is ~free, except is costly | retry/backoff around flaky LLM API calls |
-`38-file-handling` | buffered vs unbuffered | reading shards, checkpointing |
+| `13-lists` | `insert(0)` O(n), `append` O(1) amortized, `x in list` O(n) | batching inference inputs; why `deque` for a sliding context window |
+| `15-sets` | membership O(1) vs list O(n) | dedup document IDs in a retrieval set |
+| `16-dictionaries` | O(1) average, O(n) worst; ordered since 3.7 | token→id vocab maps; feature dicts |
+| `24-iterators` | O(1) memory streaming | streaming a 10GB JSONL corpus that will not fit in RAM |
+| `29-regex` | backtracking can be exponential | cleaning scraped training text; ReDoS as a real DoS vector |
+| `30-try-except` | try is ~free, except is costly | retry/backoff around flaky LLM API calls |
+| `38-file-handling` | buffered vs unbuffered | reading shards, checkpointing |
 
 ### 3.4 Normalize headings
 27 lectures (29–41 and others) and 27 glossaries need heading alignment to the
@@ -121,12 +121,12 @@ glossaries: `33-user-input` (159 lines), `39-pip` (178), `32-none` (187),
 
 | From | To |
 |---|---|
-`21-functions` | `02-advanced-python/01-decorators`, `/09-functools` |
-`24-iterators` | `02-advanced-python/02-generators`, `/10-itertools` |
-`30-try-except` | new `47-exceptions-advanced` |
-`34–37` (OOP) | `/06-dataclasses`, `/08-abc`, `/12-property`, `/15-descriptors` |
-`38-file-handling` | new `42-pathlib`, `/03-context-managers` |
-`13/15/16` | new `49-collections-toolkit`, `/11-collections` |
+| `21-functions` | `02-advanced-python/01-decorators`, `/09-functools` |
+| `24-iterators` | `02-advanced-python/02-generators`, `/10-itertools` |
+| `30-try-except` | new `47-exceptions-advanced` |
+| `34–37` (OOP) | `/06-dataclasses`, `/08-abc`, `/12-property`, `/15-descriptors` |
+| `38-file-handling` | new `42-pathlib`, `/03-context-managers` |
+| `13/15/16` | new `49-collections-toolkit`, `/11-collections` |
 
 ---
 
@@ -275,16 +275,16 @@ servers use processes or async, not threads.
 
 | Item | Count |
 |---|---|
-New exercises `42`–`52` | 11 |
-New lectures | 11 |
-New glossaries | 11 |
-`_verify()` retrofits | 41 |
-Lecture retrofits (complexity + AI relevance) | 41 |
-Heading normalizations | ~27 lectures + ~27 glossaries |
-Glossary expansions | 5 |
-`practice_testable.py` + stubs + tests | 3 |
-Code challenges (`challenges/NN/`) | 52 dirs × 3 tiers |
-Quizzes (→ 1 per topic) | 44 new |
+| New exercises `42`–`52` | 11 |
+| New lectures | 11 |
+| New glossaries | 11 |
+| `_verify()` retrofits | 41 |
+| Lecture retrofits (complexity + AI relevance) | 41 |
+| Heading normalizations | ~27 lectures + ~27 glossaries |
+| Glossary expansions | 5 |
+| `practice_testable.py` + stubs + tests | 3 |
+| Code challenges (`challenges/NN/`) | 52 dirs × 3 tiers |
+| Quizzes (→ 1 per topic) | 44 new |
 
 ---
 
