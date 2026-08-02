@@ -3,7 +3,10 @@ Matplotlib Animations: FuncAnimation, saving, interactive
 ===========================================================
 """
 
+import pathlib
 import matplotlib.pyplot as plt
+OUTPUT_DIR = pathlib.Path(__file__).parent.parent.parent / "outputs" / "matplotlib"
+import pathlib
 import matplotlib.animation as animation
 import numpy as np
 

@@ -3,7 +3,10 @@ Matplotlib 3D Plots: surface, scatter, wireframe, contour
 ===========================================================
 """
 
+import pathlib
 import matplotlib.pyplot as plt
+OUTPUT_DIR = pathlib.Path(__file__).parent.parent.parent / "outputs" / "matplotlib"
+import pathlib
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -72,7 +75,7 @@ ax4.set_title('3D Scatter with XY Projection')
 
 plt.suptitle('3D Scatter Variations', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/3d_scatter.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "3d_scatter.png", dpi=150)
 plt.close()
 
 print("3D scatter plots saved")
@@ -130,7 +133,7 @@ ax4.set_title('Surface with Projected Contours')
 
 plt.suptitle('3D Surface Plots', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/3d_surface.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "3d_surface.png", dpi=150)
 plt.close()
 
 print("3D surface plots saved")
@@ -197,7 +200,7 @@ ax4.set_title('Colored Sphere')
 
 plt.suptitle('Parametric 3D Surfaces', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/3d_parametric.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "3d_parametric.png", dpi=150)
 plt.close()
 
 print("Parametric surfaces saved")
@@ -253,7 +256,7 @@ ax4.set_title('3D Bar Chart (Histogram)')
 
 plt.suptitle('3D Contour and Volume', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/3d_contour.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "3d_contour.png", dpi=150)
 plt.close()
 
 print("3D contour plots saved")
@@ -306,7 +309,7 @@ ax4.zaxis.pane.set_facecolor((0.9, 0.9, 0.9, 0.5))
 
 plt.suptitle('3D Customization', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/3d_custom.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "3d_custom.png", dpi=150)
 plt.close()
 
 print("3D customization saved")

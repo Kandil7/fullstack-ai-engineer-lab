@@ -40,7 +40,7 @@ print(f"  3x + y - z = 1")
 print(f"  x + 4y + 2z = 2")
 print(f"  -x + 2y + 5z = 3")
 print(f"\nSolution: x={x[0]:.4f}, y={x[1]:.4f}, z={x[2]:.4f}")
-print(f"Verification A·x = {A @ x} (should equal b = {b})")
+print(f"Verification AÂ·x = {A @ x} (should equal b = {b})")
 
 # Check if system is well-conditioned
 cond = np.linalg.cond(A)
@@ -108,7 +108,7 @@ for i, (val, vec) in enumerate(zip(eigenvalues, eigenvectors.T)):
     print(f"  lambda_{i+1} = {val:.6f}")
     print(f"    eigenvector = {vec}")
 
-# Verify: A @ v = λ * v
+# Verify: A @ v = Î» * v
 print(f"\nVerification:")
 for i in range(len(eigenvalues)):
     lhs = A_sym @ eigenvectors[:, i]
@@ -134,8 +134,8 @@ ax.set_title("Eigenvalues in Complex Plane")
 ax.grid(True, alpha=0.3)
 ax.set_aspect("equal")
 plt.tight_layout()
-plt.savefig("scipy_08_eigenvalues.png", dpi=100)
-print("Plot saved: scipy_08_eigenvalues.png")
+plt.savefig("../../outputs/scipy/scipy_08_eigenvalues.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_08_eigenvalues.png")
 
 # ============================================================
 # Example 4: Singular Value Decomposition (SVD)
@@ -168,8 +168,8 @@ for ax, k in zip(axes, ranks):
     ax.set_yticks([])
 plt.suptitle("Low-Rank Approximation via SVD", fontsize=14)
 plt.tight_layout()
-plt.savefig("scipy_08_svd.png", dpi=100)
-print("Plot saved: scipy_08_svd.png")
+plt.savefig("../../outputs/scipy/scipy_08_svd.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_08_svd.png")
 
 # Scree plot (singular value spectrum)
 fig, ax = plt.subplots(figsize=(8, 4))
@@ -181,8 +181,8 @@ ax.set_ylabel("Singular Value (log)")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_08_scree.png", dpi=100)
-print("Plot saved: scipy_08_scree.png")
+plt.savefig("../../outputs/scipy/scipy_08_scree.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_08_scree.png")
 
 # ============================================================
 # Example 5: Matrix Decompositions
@@ -199,7 +199,7 @@ A_pd = np.array([
 ])
 
 L_chol = linalg.cholesky(A_pd, lower=True)
-print("Cholesky Decomposition (A = L·L^T):")
+print("Cholesky Decomposition (A = LÂ·L^T):")
 print(f"  L =\n{L_chol}")
 print(f"  Reconstruction error: {np.max(np.abs(L_chol @ L_chol.T - A_pd)):.2e}")
 
@@ -226,7 +226,7 @@ fig, ax = plt.subplots(figsize=(6, 6))
 circle = np.array([[np.cos(t), np.sin(t)] for t in np.linspace(0, 2*np.pi, 100)])
 transformed = circle @ exp_A.T
 ax.plot(circle[:, 0], circle[:, 1], "b-", linewidth=2, label="Original circle")
-ax.plot(transformed[:, 0], transformed[:, 1], "r--", linewidth=2, label="exp(A)·circle")
+ax.plot(transformed[:, 0], transformed[:, 1], "r--", linewidth=2, label="exp(A)Â·circle")
 ax.set_xlim(-2, 2)
 ax.set_ylim(-2, 2)
 ax.set_aspect("equal")
@@ -234,8 +234,8 @@ ax.set_title("Effect of Matrix Exponential")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_08_expm.png", dpi=100)
-print("Plot saved: scipy_08_expm.png")
+plt.savefig("../../outputs/scipy/scipy_08_expm.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_08_expm.png")
 
 # --- Matrix square root ---
 M = np.array([[4, 2], [2, 5]])
@@ -246,3 +246,4 @@ print(f"  sqrt(M) @ sqrt(M) =\n{(sqrt_M @ sqrt_M).real}")
 
 print("\n[OK] SciPy linear algebra covered!")
 print("   Next: 09-fft.py for Fourier transforms.")
+

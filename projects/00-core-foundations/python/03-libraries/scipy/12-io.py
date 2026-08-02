@@ -165,8 +165,8 @@ axes[1].set_ylabel("Magnitude")
 axes[1].set_xlim(0, 1000)
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_12_wav.png", dpi=100)
-print("Plot saved: scipy_12_wav.png")
+plt.savefig("../../outputs/scipy/scipy_12_wav.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_12_wav.png")
 
 # ============================================================
 # Example 4: NumPy Binary Format (.npy, .npz)
@@ -267,3 +267,4 @@ for fmt, desc in formats.items():
 
 print("\n[OK] SciPy I/O module covered!")
 print("   All 12 SciPy tutorial modules complete! *")
+

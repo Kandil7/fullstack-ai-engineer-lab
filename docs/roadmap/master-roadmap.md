@@ -1,9 +1,31 @@
-# Master Roadmap — Full-Stack AI Engineer Lab
+# Master Roadmap — Long Track (not active)
 
-> **Baseline plan.** This file is the single source of truth for the 12-month journey.
-> Do not modify day-to-phase — update milestones and progress-dashboard instead.
+> ## ⚠️ This is no longer the active plan
+>
+> On **2026-08-02**, [ADR-0004](../decisions/0004-adopt-10-week-ai-engineer-track.md) adopted
+> the **[Active Track — 10-Week AI Engineer](active-track-10-week.md)** as the plan of record.
+> This document is retained as the **long track**: post-employment depth in Go, Flutter/Next.js,
+> and the ThanaweyaGPT capstone.
+>
+> **Why it was demoted.** It schedules "Python basics for AI" at weeks 37–38 and "chatbot with
+> LLM API" at weeks 39–40, while the repo already holds 354 Python files including all 20
+> advanced topics and 25 FastAPI topics. Following it as written means spending months on
+> completed material and reaching the actual goal in mid-2027.
+>
+> **What supersedes what:**
+>
+> | This document | Superseded by |
+> | --- | --- |
+> | Phase 3 — AI Fundamentals | active track week 1 |
+> | Phase 4 — RAG Systems | active track weeks 2–3 |
+> | Phase 5 — AI Agents | active track weeks 5–6 |
+> | Phase 6 — System Design + DevOps | active track weeks 0, 4, 7 |
+> | Phase 7 — Capstone (ThanaweyaGPT) | DevMate; then [phase 2](phase-2-athar-baligh.md) |
+>
+> Phases 0–2 (Go, frontend) are **deferred, not superseded** — they remain valid future work.
+> Milestone IDs here use the `M` prefix; the active track uses `A`.
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-08-02 (demoted) · **Originally written:** 2026-06-26
 
 ---
 
@@ -75,7 +97,7 @@
 - Go standard library docs
 - PostgreSQL official documentation
 - Redis documentation
-- "Go: Design Patterns" —书籍 or equivalent online resource
+- "Go Design Patterns" or an equivalent online resource
 
 ### Definition of Done
 - [ ] Auth service: register, login, refresh-token endpoints working
@@ -293,6 +315,10 @@
 ---
 
 ## Rules
+
+> These rules applied while this was the active plan. They are retained for when the long track
+> resumes. The governing rules today are in
+> [`active-track-10-week.md`](active-track-10-week.md) § 8.
 
 1. **This roadmap is the baseline** — phases don't change, only timing adjustments in milestones.
 2. **Evidence required** — every milestone needs a file path proving completion.

@@ -3,7 +3,7 @@ W3Schools Python Tutorial - ML NN: Correlation
 ===============================================
 Topics: Correlation Matrix, Feature Correlation with Target
 
-Run: python 13-corrilation.py
+Run: python 13-correlation.py
 Reference: https://www.w3schools.com/python/ml_correlation.asp
 """
 

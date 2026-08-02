@@ -1,14 +1,14 @@
 # 🗺️ Python Learning Path
 
-> **Fullstack AI Engineer Lab** — Complete learning map through all 7 phases.
+> **Fullstack AI Engineer Lab** — Complete learning map through all 9 phases.
 
 ---
 
 ## 📊 Overview
 
 ```
-Foundations ──> Libraries ──> Backend ──> Databases ──> DSA ──> ML ──> Projects
-   Phase 1       Phase 3      Phase 5     Phase 4      Phase 6   Phase 7    🏆
+Foundations ──> Libraries ──> Backend ──> Databases ──> DSA ──> ML ──> MLOps ──> GenAI ──> Projects
+   Phase 1       Phase 3      Phase 5     Phase 4      Phase 6   Phase 7   Phase 8   Phase 9    🏆
    Phase 2
 ```
 
@@ -17,7 +17,7 @@ Foundations ──> Libraries ──> Backend ──> Databases ──> DSA ─�
 ## 🚀 Phase 1: Core Python Fundamentals
 **Directory:** `01-core-python/`  
 **Files:** `01-introduction.py` → `41-inner-classes.py`  
-**Lectures:** `supplementary/lectures/01-core-python/`
+**Lectures:** `01-core-python/lectures/`
 
 | Week | Topics | Files | Milestone |
 |------|--------|-------|-----------|
@@ -137,8 +137,49 @@ NumPy ──> Pandas ──> Matplotlib ──> SciPy
 
 ---
 
+## 🚀 Phase 8: MLOps (Production Machine Learning)
+**Directory:** `08-mlops/`  
+**Files:** 16 exercise files (self-verifying) + full-detail lectures + glossaries  
+**Prerequisites:** Phase 7 (ML)
+
+| # | Topic | Production concern |
+|---|-------|--------------------|
+| 1 | Reproducibility | seeds, env capture, content hashing, run records |
+| 2 | Experiment Tracking | params/metrics/artifacts, leaderboards |
+| 3 | Data Versioning | content addressing, provenance, diffs |
+| 4 | Model Registry | versions, lifecycle stages, promotion, rollback |
+| 5 | Model Packaging | joblib/ONNX/pyfunc, signatures |
+| 6 | Docker for ML | images, multi-stage, GPU, 12-factor |
+| 7 | Model Serving | FastAPI endpoints, validation, latency |
+| 8 | Inference Optimization | quantization, ONNX, batching |
+| 9 | Pipeline Orchestration | DAGs, retries, caching (Prefect/Airflow) |
+| 10 | Data Validation | pandera schemas, skew detection |
+| 11 | Monitoring & Drift | PSI, prediction drift, delayed labels |
+| 12 | CI/CD for ML | eval gates, staged promotion |
+| 13 | Feature Stores | entities, point-in-time joins |
+| 14 | A/B Testing Models | sample size, chi-squared, t-test |
+| 15 | Cost Optimization | unit costs, spot, dedup, budgets |
+| 16 | Case Study: E2E | the full lifecycle as one system |
+
+---
+
+## 🧠 Phase 9: GenAI (LLMs, RAG, Agents, Production)
+**Directory:** `09-genai/`  
+**Files:** 25 exercise files (self-verifying, no network needed) + full-detail lectures + glossaries  
+**Prerequisites:** Phase 8 (MLOps)
+
+| # | Topic | Area |
+|---|-------|------|
+| 1–5 | LLM fundamentals, API clients, structured output, prompt engineering, prompt eval | Foundations |
+| 6–12 | Embeddings, chunking, document processing, RAG baseline, retrieval quality, advanced retrieval, reranking | RAG |
+| 13–16 | Tool calling, agent patterns, multi-agent, memory & context | Agents |
+| 17–22 | Observability, caching/cost, guardrails, evaluation frameworks, fine-tuning, local models | Production |
+| 23–25 | Case studies: RAG service, agent, extraction pipeline | Capstones |
+
+---
+
 ## 🏆 Capstone Projects
-**Directory:** `projects/`
+**Directory:** `capstones/`
 
 After completing all phases, reinforce your skills with these projects:
 
@@ -156,9 +197,8 @@ After completing all phases, reinforce your skills with these projects:
 
 | Resource | Location | Purpose |
 |----------|----------|---------|
-| **Lectures** | `supplementary/lectures/` | In-depth explanations per module |
-| **Quizzes** | `supplementary/quizzes/` (29 files) | Self-assessment for all topics |
-| **Interviews** | `supplementary/interviews/` (16 files) | Interview prep with Q&A + coding challenges |
+| **Quizzes** | `supplementary/quizzes/` (31 files) | Self-assessment for all topics (incl. MLOps + GenAI) |
+| **Interviews** | `supplementary/interviews/` (18 files) | Interview prep with Q&A + coding challenges (incl. MLOps + GenAI) |
 
 ---
 

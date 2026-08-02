@@ -1,10 +1,13 @@
 """
 Matplotlib Line Plots: Styles, markers, multiple lines
-========================================================
+=======================================================
 """
 
+
 import matplotlib.pyplot as plt
+import pathlib
 import numpy as np
+OUTPUT_DIR = pathlib.Path(__file__).parent.parent.parent / "outputs" / "matplotlib"
 
 # =============================================================================
 # 1. LINE STYLES
@@ -23,7 +26,6 @@ styles = [
     ('Dash-dot', '-.'),
     ('Dotted', ':'),
     ('None', ''),
-    ('Steps', 'steps')
 ]
 
 for (name, style), ax in zip(styles, axes.flat):
@@ -33,7 +35,7 @@ for (name, style), ax in zip(styles, axes.flat):
 
 plt.suptitle('Line Styles', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/line_styles.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "line_styles.png", dpi=150)
 plt.close()
 
 print("Line styles plot saved")
@@ -58,7 +60,7 @@ for marker, ax in zip(markers, axes.flat):
 
 plt.suptitle('Marker Styles', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/markers.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "markers.png", dpi=150)
 plt.close()
 
 print("Markers plot saved")
@@ -102,7 +104,7 @@ axes[1, 2].set_title("Colormap: viridis")
 
 plt.suptitle('Color Specification Methods', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/colors.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "colors.png", dpi=150)
 plt.close()
 
 print("Colors plot saved")
@@ -160,7 +162,7 @@ axes[1, 1].grid(True, alpha=0.3)
 
 plt.suptitle('Line Width, Alpha, and Dash Patterns', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/line_width_alpha.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "line_width_alpha.png", dpi=150)
 plt.close()
 
 print("Line width/alpha plot saved")
@@ -207,7 +209,7 @@ custom_lines = [
 ax.legend(handles=custom_lines, loc='lower right')
 
 plt.tight_layout()
-plt.savefig('output/multiple_lines.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "multiple_lines.png", dpi=150)
 plt.close()
 
 print("Multiple lines plot saved")
@@ -262,7 +264,7 @@ axes[1, 1].grid(True, alpha=0.3)
 
 plt.suptitle('Fill Between Examples', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/fill_between.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "fill_between.png", dpi=150)
 plt.close()
 
 print("Fill between plots saved")
@@ -323,7 +325,7 @@ axes[1, 1].grid(True, alpha=0.3)
 
 plt.suptitle('Error Bar Examples', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/error_bars.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "error_bars.png", dpi=150)
 plt.close()
 
 print("Error bars plot saved")

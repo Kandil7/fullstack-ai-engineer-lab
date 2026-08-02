@@ -364,21 +364,26 @@ def bst_to_dll(root):
     # Convert left subtree
     left_head = bst_to_dll(root.left)
 
-    # Find rightmost of left subtree
+    # Create new DLL node for current BST node
+    dll_node = DLLNode(root.key)
+
+    # Connect left subtree
     if left_head:
         curr = left_head
         while curr.right:
             curr = curr.right
-        curr.right = root
-        root.left = curr
+        curr.right = dll_node
+        dll_node.left = curr
 
     # Convert right subtree
     right_head = bst_to_dll(root.right)
     if right_head:
-        right_head.left = root
-        root.right = right_head
+        right_head.left = dll_node
+        dll_node.right = right_head
 
-    return left_head if left_head else root
+    # Return head of the list
+    head = left_head if left_head else dll_node
+    return head
 
 print("\n=== BST to Doubly Linked List ===")
 dll_root = bst_to_dll(bst.root)

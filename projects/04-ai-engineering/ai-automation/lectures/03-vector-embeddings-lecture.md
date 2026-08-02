@@ -617,7 +617,7 @@ class EmbeddingVisualizer:
         plt.title(title)
         plt.colorbar(scatter)
         plt.tight_layout()
-        plt.savefig("embeddings_2d.png", dpi=150)
+        plt.savefig("output/embeddings_2d.png", dpi=150)
         plt.show()
     
     def find_clusters(

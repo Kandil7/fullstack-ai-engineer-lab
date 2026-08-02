@@ -14,16 +14,16 @@ import numpy as np
 
 arr = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
-# Split into 3 equal parts
-parts = np.split(arr, 3)
+# Split into 3 parts (array_split handles unequal divisions)
+parts = np.array_split(arr, 3)
 print("Split into 3:")
 for i, part in enumerate(parts):
     print(f"  Part {i}: {part}")
 # Output:
 # Split into 3:
 #   Part 0: [1 2 3 4]
-#   Part 1: [5 6 7 8]
-#   Part 2: [ 9 10]
+#   Part 1: [5 6 7]
+#   Part 2: [ 8  9 10]
 
 # Split into 5 parts
 parts = np.split(arr, 5)

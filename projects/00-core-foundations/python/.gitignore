@@ -171,13 +171,18 @@ Desktop.ini
 *.db
 local_settings.py
 
-# Project specific
-matplotlib/output/
+# Project specific - Exercise outputs
+outputs/
+scipy_*.png
 *.png
 *.jpg
 *.jpeg
 *.gif
 *.pdf
+
+# Capstones
+capstones/**/.venv/
+capstones/**/__pycache__/
 
 # Test outputs
 test_output/

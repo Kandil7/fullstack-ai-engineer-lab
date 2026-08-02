@@ -27,7 +27,8 @@ from sqlalchemy.orm import (
 
 app = FastAPI(title="ORM Exercises")
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./exercises_19.db"
+import pathlib
+SQLALCHEMY_DATABASE_URL = f"sqlite:///{pathlib.Path(__file__).parent.parent.parent.parent / 'outputs' / 'dbs' / 'exercises_19.db'}"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

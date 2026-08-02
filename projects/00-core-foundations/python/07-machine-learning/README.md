@@ -15,7 +15,7 @@ W3Schools Python ML Tutorial exercises with working examples.
 | 9 | 10-train-test.py | train_test_split, why split data, test size, random state |
 | 10 | 11-decision-tree.py | DecisionTreeClassifier, tree visualization, gini/entropy |
 | 11 | 12-confusion-matrix.py | Confusion matrix, accuracy, precision, recall, F1 score |
-| 12 | 13-corrilation.py | Correlation matrix, feature correlation with target |
+| 12 | 13-correlation.py | Correlation matrix, feature correlation with target |
 | 13 | 14-linear-regression-example.py | Complete linear regression project end-to-end |
 | 14 | 15-logistic-regression.py | LogisticRegression, sigmoid, binary classification |
 | 15 | 16-k-means.py | KMeans clustering, elbow method, inertia |

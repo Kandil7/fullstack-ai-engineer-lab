@@ -17,7 +17,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
 # ----- Database setup -----
-SQLALCHEMY_DATABASE_URL = "sqlite:///./fastapi_demo.db"
+import pathlib
+DB_PATH = pathlib.Path(__file__).parent.parent.parent / "outputs" / "dbs" / "fastapi_demo.db"
+SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

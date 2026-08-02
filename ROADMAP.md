@@ -1,9 +1,20 @@
-# Roadmap
+# Roadmap — Long Track (not active)
+
+> ## ⚠️ Not the active plan
+>
+> The plan of record is
+> **[`docs/roadmap/active-track-10-week.md`](docs/roadmap/active-track-10-week.md)**, adopted
+> 2026-08-02 by [ADR-0004](docs/decisions/0004-adopt-10-week-ai-engineer-track.md).
+>
+> This file and [`docs/product/12-month-plan.md`](docs/product/12-month-plan.md) describe the
+> **long track** — Go, Flutter/Next.js, and the ThanaweyaGPT capstone — deferred until after
+> the job search. Its AI phases (3–5) are superseded by the active track's weeks 1–6.
+>
+> Retained because the phase structure, the source→artifact rule, and the resource mapping
+> stay valid for when the long track resumes.
 
 This roadmap maps **learning phases** to **concrete projects** and to the **build phases**
 defined in the architecture spec. Each "phase" is a sprint of 2–4 weeks, not a single day.
-
-See [`docs/product/12-month-plan.md`](docs/product/12-month-plan.md) for the full 12-month timeline with specific resources.
 
 ---
 

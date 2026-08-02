@@ -127,11 +127,17 @@ cursor.executemany("INSERT INTO orders VALUES (?, ?, ?, ?, ?)", [
 ])
 conn.commit()
 
-cursor.execute("DELETE FROM orders WHERE status = 'pending' LIMIT 2")
+# MySQL supports: DELETE FROM orders WHERE status = 'pending' LIMIT 2
+# sqlite3 rejects DELETE ... LIMIT, so use a portable subquery form:
+cursor.execute(
+    "DELETE FROM orders WHERE id IN "
+    "(SELECT id FROM orders WHERE status = 'pending' LIMIT 2)"
+)
 conn.commit()
 print(f"Deleted rows: {cursor.rowcount}")
 show_orders("After deleting 2 pending orders")
-print("NOTE: MySQL supports DELETE ... LIMIT; sqlite3 may not in all versions")
+print("NOTE: MySQL allows DELETE ... LIMIT directly;")
+print("      the portable subquery form works on both MySQL and sqlite3.")
 print()
 
 # ============================================================

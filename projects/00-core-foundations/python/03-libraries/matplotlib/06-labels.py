@@ -1,14 +1,15 @@
-﻿"""
+"""
 Matplotlib Labels - W3Schools Exercises
 =========================================
 Title, xlabel, ylabel, and text customization.
 """
-import matplotlib
 matplotlib.use('Agg')
+
+import matplotlib
+import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -24,7 +25,7 @@ def exercise_01():
     plt.title("Student Exam Scores")
     plt.xlabel("Exam Number")
     plt.ylabel("Score")
-    plt.savefig(os.path.join(OUTPUT_DIR, "06_exercise_01.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "06_exercise_01.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 01 saved")
 
@@ -42,7 +43,7 @@ def exercise_02():
     plt.xlabel("Time (s)", fontsize=14, fontstyle="italic")
     plt.ylabel("Amplitude", fontsize=14, fontfamily="serif")
     plt.tick_params(axis="both", labelsize=11)
-    plt.savefig(os.path.join(OUTPUT_DIR, "06_exercise_02.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "06_exercise_02.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 02 saved")
 
@@ -62,7 +63,7 @@ def exercise_03():
     plt.title("Fruit Inventory")
     plt.xlabel("Fruit Type")
     plt.ylabel("Count")
-    plt.savefig(os.path.join(OUTPUT_DIR, "06_exercise_03.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "06_exercise_03.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 03 saved")
 
@@ -79,7 +80,7 @@ def exercise_04():
     plt.title(r"Exercise 4: LaTeX Labels ($\sigma = 1$)", fontsize=14)
     plt.xlabel(r"$x$", fontsize=12)
     plt.ylabel(r"$f(x)$", fontsize=12)
-    plt.savefig(os.path.join(OUTPUT_DIR, "06_exercise_04.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "06_exercise_04.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 04 saved")
 
@@ -103,7 +104,7 @@ def exercise_05():
     fig.text(0.5, 0.01, "Source: Internal Report Q1-Q2 2024", ha="center",
              fontsize=9, fontstyle="italic", color="gray")
     plt.tight_layout(rect=[0, 0.03, 1, 1])
-    plt.savefig(os.path.join(OUTPUT_DIR, "06_exercise_05.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "06_exercise_05.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 05 saved")
 

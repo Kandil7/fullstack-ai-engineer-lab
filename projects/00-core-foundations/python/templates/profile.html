@@ -1,0 +1,15 @@
+
+<!DOCTYPE html>
+<html>
+<head><title>User Profile</title></head>
+<body>
+    <h1>{{ user.name }}</h1>
+    <p>Email: {{ user.email }}</p>
+    <p>Age: {{ user.age }}</p>
+    {% if user.bio %}
+        <p>Bio: {{ user.bio }}</p>
+    {% endif %}
+    <p>Member since: {{ user.created_at }}</p>
+    <a href="/dashboard">Back to Dashboard</a>
+</body>
+</html>

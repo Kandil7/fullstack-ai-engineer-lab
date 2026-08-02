@@ -3,12 +3,13 @@ Matplotlib Box Plots - W3Schools Exercises
 ============================================
 Box plot creation for statistical data visualization.
 """
-import matplotlib
 matplotlib.use('Agg')
+
+import matplotlib
+import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -23,7 +24,7 @@ def exercise_01():
     plt.boxplot(data, tick_labels=["A", "B", "C", "D"])
     plt.title("Exercise 1: Basic Box Plot")
     plt.ylabel("Value")
-    plt.savefig(os.path.join(OUTPUT_DIR, "13_exercise_01.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "13_exercise_01.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 01 saved")
 
@@ -40,7 +41,7 @@ def exercise_02():
                 boxprops=dict(facecolor="lightblue"))
     plt.title("Exercise 2: Horizontal Box Plot")
     plt.xlabel("Response")
-    plt.savefig(os.path.join(OUTPUT_DIR, "13_exercise_02.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "13_exercise_02.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 02 saved")
 
@@ -68,7 +69,7 @@ def exercise_03():
 
     plt.title("Exercise 3: Custom Colored Box Plot")
     plt.ylabel("Value")
-    plt.savefig(os.path.join(OUTPUT_DIR, "13_exercise_03.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "13_exercise_03.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 03 saved")
 
@@ -98,7 +99,7 @@ def exercise_04():
 
     fig.suptitle("Exercise 4: Box vs Violin", fontsize=14)
     plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "13_exercise_04.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "13_exercise_04.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 04 saved")
 
@@ -119,7 +120,7 @@ def exercise_05():
     plt.title("Exercise 5: Box Plot with Outliers")
     plt.ylabel("Value")
     plt.text(1.15, 95, "← Outliers", color="red", fontsize=10)
-    plt.savefig(os.path.join(OUTPUT_DIR, "13_exercise_05.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "13_exercise_05.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 05 saved")
 

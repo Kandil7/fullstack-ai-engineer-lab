@@ -331,7 +331,7 @@ def zigzag_traversal(root):
         return []
 
     result = []
-    queue = [root]
+    queue = deque([root])
     left_to_right = True
 
     while queue:
@@ -522,7 +522,7 @@ def right_view(root):
         return []
 
     result = []
-    queue = [root]
+    queue = deque([root])
 
     while queue:
         level_size = len(queue)
@@ -543,7 +543,7 @@ def left_view(root):
         return []
 
     result = []
-    queue = [root]
+    queue = deque([root])
 
     while queue:
         level_size = len(queue)

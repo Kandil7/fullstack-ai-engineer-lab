@@ -3,7 +3,10 @@ Matplotlib Histograms and Density Plots
 ========================================
 """
 
+import pathlib
 import matplotlib.pyplot as plt
+OUTPUT_DIR = pathlib.Path(__file__).parent.parent.parent / "outputs" / "matplotlib"
+import pathlib
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -79,7 +82,7 @@ axes[1, 2].grid(True, alpha=0.3)
 
 plt.suptitle('Histogram Variations', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/hist_basic.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "hist_basic.png", dpi=150)
 plt.close()
 
 print("Basic histograms saved")
@@ -127,7 +130,7 @@ for ax in axes.flat:
 
 plt.suptitle('Binning Strategies', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/hist_bins.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "hist_bins.png", dpi=150)
 plt.close()
 
 print("Binning strategies saved")
@@ -191,7 +194,7 @@ ax_histy.axis('off')
 plt.colorbar(hb, ax=ax_main, label='Count')
 ax_main.set_title('Joint Hexbin with Marginals')
 plt.tight_layout()
-plt.savefig('output/hist_2d.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "hist_2d.png", dpi=150)
 plt.close()
 
 print("2D histograms saved")
@@ -266,7 +269,7 @@ axes[1, 1].grid(True, alpha=0.3)
 
 plt.suptitle('Kernel Density Estimation', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/hist_kde.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "hist_kde.png", dpi=150)
 plt.close()
 
 print("KDE plots saved")
@@ -337,7 +340,7 @@ axes[1, 1].grid(True, alpha=0.3)
 
 plt.suptitle('Distribution Comparison Techniques', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/hist_comparison.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "hist_comparison.png", dpi=150)
 plt.close()
 
 print("Comparison plots saved")

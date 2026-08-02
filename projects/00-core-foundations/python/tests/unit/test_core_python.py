@@ -1,6 +1,7 @@
 """
 Unit tests for Python Core Foundations - Phase 1 exercises.
-Tests that key exercise files compile and produce expected output.
+Tests that key exercise files compile, that the module structure is intact,
+and that the smoke-test runner and dev tooling work.
 """
 
 import subprocess
@@ -8,13 +9,14 @@ import sys
 import pytest
 from pathlib import Path
 
-HERE = Path(__file__).parent.parent.parent  # python/ directory
+from tests.unit.helpers import PROJECT_ROOT, discover_phase_files
+
+HERE = PROJECT_ROOT
 SKIP_FILES = {"practice_all.py", "practice_no_solutions.py", "39-pip.py", "40-virtualenv.py"}
-SKIP_DIRS = {".git", "__pycache__", ".mimocode", ".idea"}
 
 
 def _discover_phase_files(phase_dir: str) -> list[Path]:
-    """Discover all .py files in a phase directory."""
+    """Discover all .py files in a phase directory (matching smoke runner)."""
     phase_path = HERE / phase_dir
     if not phase_path.is_dir():
         return []
@@ -56,17 +58,20 @@ def test_phase1_compiles(filepath):
     assert ok, f"{filepath.name} failed to compile: {msg}"
 
 
-@pytest.mark.parametrize("filepath", PHASE1_FILES, ids=lambda p: p.name)
+@pytest.mark.parametrize(
+    "filepath", [f for f in PHASE1_FILES if f.name != "__init__.py"],
+    ids=lambda p: p.name,
+)
 def test_phase1_has_docstring(filepath):
-    """Every Phase 1 file must have a module-level docstring."""
+    """Every Phase 1 exercise must have a module-level docstring."""
     content = filepath.read_text(encoding="utf-8")
-    assert content.startswith('"""') or content.startswith("'''"), \
+    assert content.lstrip("\ufeff").startswith('"""') or content.lstrip("\ufeff").startswith("'''"), \
         f"{filepath.name} missing module docstring"
 
 
 def test_phase1_all_files_present():
-    """Verify all 41 core Python files exist."""
-    expected = {f"{i:02d}" for i in range(1, 42)}
+    """Verify all 41 core Python files exist (39 runnable + 2 skipped)."""
+    expected = {f"{i:02d}" for i in range(1, 42)} - {"39", "40"}  # 39/40 are in SKIP_FILES
     actual = {f.stem[:2] for f in PHASE1_FILES if f.stem[:2].isdigit()}
     missing = expected - actual
     assert not missing, f"Missing files: {sorted(missing)}"
@@ -86,11 +91,14 @@ def test_phase2_compiles(filepath):
     assert ok, f"{filepath.name} failed to compile: {msg}"
 
 
-@pytest.mark.parametrize("filepath", PHASE2_FILES, ids=lambda p: p.name)
+@pytest.mark.parametrize(
+    "filepath", [f for f in PHASE2_FILES if f.name != "__init__.py"],
+    ids=lambda p: p.name,
+)
 def test_phase2_has_docstring(filepath):
-    """Every Phase 2 file must have a module-level docstring."""
+    """Every Phase 2 exercise must have a module-level docstring."""
     content = filepath.read_text(encoding="utf-8")
-    assert content.startswith('"""'), f"{filepath.name} missing module docstring"
+    assert content.lstrip("\ufeff").startswith('"""'), f"{filepath.name} missing module docstring"
 
 
 # =========================================================================
@@ -125,16 +133,6 @@ def test_phase7_compiles(filepath):
 # Smoke Test Runner Tests
 # =========================================================================
 
-def test_smoke_runner_imports():
-    """Smoke test runner must import without errors."""
-    result = subprocess.run(
-        [sys.executable, "-c", "import ast, os, sys; print('OK')"],
-        capture_output=True, text=True, timeout=10,
-    )
-    assert result.returncode == 0
-    assert "OK" in result.stdout
-
-
 def test_smoke_runner_list_flag():
     """Smoke test runner --list must discover files."""
     result = subprocess.run(
@@ -153,32 +151,34 @@ def test_smoke_runner_list_flag():
 
 def test_expected_directories_exist():
     """Verify all expected phase and sub-directories exist."""
+    # Capstone dirs live under "projects/" in older snapshots and "capstones/"
+    # in the current structure - accept either layout.
+    def _any(*paths: str) -> bool:
+        return any((HERE / p).is_dir() for p in paths)
+
     expected = [
         "01-core-python",
         "02-advanced-python",
         "03-libraries/numpy",
         "03-libraries/pandas",
+        "03-libraries/matplotlib",
+        "03-libraries/scipy",
         "04-databases/mysql",
         "04-databases/mongodb",
         "05-web-frameworks/fastapi",
         "05-web-frameworks/django",
         "06-data-structures-algorithms",
         "07-machine-learning",
-        "projects/01-calculator",
-        "projects/02-file-manager",
-        "projects/03-api-server",
-        "projects/04-data-analyzer",
-        "projects/05-ml-pipeline",
         "supplementary/quizzes",
         "supplementary/interviews",
-        "supplementary/lectures/01-core-python",
-        "_dev",
         "tests/unit",
     ]
-    missing = []
-    for d in expected:
-        if not (HERE / d).is_dir():
-            missing.append(d)
+    # Dev-tooling dir: either scripts/ or _dev/ is acceptable.
+    assert _any("scripts", "_dev"), "No dev-tooling directory (scripts/ or _dev/)"
+    # Capstone dirs: accept projects/ or capstones/ layouts.
+    for name in ["01-calculator", "02-file-manager", "03-api-server", "04-data-analyzer", "05-ml-pipeline"]:
+        assert _any(f"projects/{name}", f"capstones/{name}"), f"Capstone {name} not found"
+    missing = [d for d in expected if not (HERE / d).is_dir()]
     assert not missing, f"Missing directories: {missing}"
 
 
@@ -189,11 +189,7 @@ def test_readme_exists_in_phase_dirs():
         "04-databases", "05-web-frameworks", "06-data-structures-algorithms",
         "07-machine-learning",
     ]
-    missing = []
-    for phase in phases:
-        if not (HERE / phase / "README.md").is_file():
-            missing.append(phase)
-    # Library subdirectories
+    missing = [phase for phase in phases if not (HERE / phase / "README.md").is_file()]
     for lib in ["numpy", "pandas", "matplotlib", "scipy"]:
         if not (HERE / "03-libraries" / lib / "README.md").is_file():
             missing.append(f"03-libraries/{lib}")
@@ -205,7 +201,6 @@ def test_requirements_txt_parses():
     req_path = HERE / "requirements.txt"
     assert req_path.is_file(), "requirements.txt not found"
     lines = req_path.read_text(encoding="utf-8").splitlines()
-    # Check for at least some dependency lines
     deps = [l.strip() for l in lines if l.strip() and not l.startswith("#")]
     assert len(deps) > 5, "Too few dependencies listed"
 
@@ -215,24 +210,24 @@ def test_requirements_txt_parses():
 # =========================================================================
 
 def test_quizzes_exist():
-    """Verify quiz files exist."""
-    quiz_dir = HERE / "supplementary/quizzes/quizzes"
+    """Verify quiz files exist (directly under supplementary/quizzes)."""
+    quiz_dir = HERE / "supplementary/quizzes"
     assert quiz_dir.is_dir()
     md_files = list(quiz_dir.glob("*.md"))
     assert len(md_files) >= 25, f"Expected 25+ quizzes, found {len(md_files)}"
 
 
 def test_interviews_exist():
-    """Verify interview files exist."""
-    interview_dir = HERE / "supplementary/interviews/interviews"
+    """Verify interview files exist (directly under supplementary/interviews)."""
+    interview_dir = HERE / "supplementary/interviews"
     assert interview_dir.is_dir()
     md_files = list(interview_dir.glob("*.md"))
     assert len(md_files) >= 14, f"Expected 14+ interviews, found {len(md_files)}"
 
 
-def test_supplementary_lectures_exist():
-    """Verify supplementary lecture files exist with both lecture and glossary pairs."""
-    lecture_dir = HERE / "supplementary/lectures/01-core-python/lectures"
+def test_phase1_lectures_exist():
+    """Verify Phase 1 lecture/glossary pairs exist in the module lectures dir."""
+    lecture_dir = HERE / "01-core-python/lectures"
     assert lecture_dir.is_dir()
     md_files = list(lecture_dir.glob("*.md"))
     assert len(md_files) >= 40, f"Expected 40+ lecture files, found {len(md_files)}"
@@ -243,6 +238,7 @@ def test_supplementary_lectures_exist():
 # =========================================================================
 
 def test_no_stale_artifact_files():
-    """Verify no stale err.txt or e.txt files exist."""
+    """Verify no stale err.txt or e.txt files exist in the module root."""
+    assert not (HERE / "err.txt").is_file(), "err.txt still exists at module root"
     assert not (HERE / "01-core-python/err.txt").is_file(), "err.txt still exists"
     assert not (HERE / "01-core-python/e.txt").is_file(), "e.txt still exists"

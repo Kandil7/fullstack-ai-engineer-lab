@@ -501,12 +501,19 @@ def consumer():
         buffer.consume()
 
 # Note: In real usage, these would run in separate threads
-# For demo, we simulate sequentially
-print("(Simulated producer-consumer)")
-for i in range(5):
-    buffer.produce(i)
-for _ in range(5):
-    buffer.consume()
+# For demo, we run producer and consumer in REAL threads to demonstrate
+# the blocking behavior correctly - capacity 3 means producer blocks after 3 items
+print("(Real producer-consumer with threading)")
+producer_thread = threading.Thread(target=producer)
+consumer_thread = threading.Thread(target=consumer)
+
+producer_thread.start()
+consumer_thread.start()
+
+producer_thread.join()
+consumer_thread.join()
+
+print("(Producer-consumer completed successfully)")
 
 
 # =============================================================================

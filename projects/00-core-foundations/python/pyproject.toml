@@ -90,48 +90,6 @@ include = ["*"]
 [tool.setuptools.package-dir]
 "" = "."
 
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "-ra -q --strict-markers --strict-config"
-testpaths = ["."]
-python_files = ["*_test.py", "test_*.py", "*_tests.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-markers = [
-    "slow: marks tests as slow",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-    "django: marks tests requiring Django",
-    "fastapi: marks tests requiring FastAPI",
-    "ml: marks tests requiring ML dependencies",
-]
-
-[tool.coverage.run]
-source = ["."]
-omit = [
-    "*/test*",
-    "*_test.py",
-    "test_*.py",
-    "*_tests.py",
-    "*/venv/*",
-    "*/.venv/*",
-    "*/site-packages/*",
-    "practice_all.py",
-    "practice_no_solutions.py",
-]
-branch = true
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-]
-show_missing = true
-precision = 2
-
 [tool.black]
 line-length = 100
 target-version = ["py310", "py311", "py312"]
@@ -217,6 +175,3 @@ skip = ["practice_all.py", "practice_no_solutions.py"]
 [tool.pydantic]
 # For pydantic v2 config
 extra = "ignore"
-
-[tool.pytestini_options]
-asyncio_mode = "auto"

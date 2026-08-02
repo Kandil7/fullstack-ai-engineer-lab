@@ -1,9 +1,21 @@
-# 12-Month Learning Plan: Zero → Strong Full-Stack AI Engineer
+# 12-Month Learning Plan — Long Track (not active)
+
+> ## ⚠️ Not the active plan
+>
+> Superseded 2026-08-02 by
+> [`docs/roadmap/active-track-10-week.md`](../roadmap/active-track-10-week.md)
+> ([ADR-0004](../decisions/0004-adopt-10-week-ai-engineer-track.md)).
+>
+> This plan schedules "Python basics for AI" at weeks 37–38 and "chatbot with LLM API" at
+> weeks 39–40. The repo already contains 354 Python files including all 20 advanced topics and
+> 25 FastAPI topics, so months 1–9 would largely re-cover completed material.
+>
+> Retained for the Go, frontend, and DevOps sequencing, which resumes post-employment.
 
 Tailored for the `fullstack-ai-engineer-lab` stack:
 Go/FastAPI + Flutter/Next.js + PostgreSQL/Redis/Qdrant + LLMs/RAG + Agents.
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-08-02 (demoted) · **Originally written:** 2026-06-26
 
 ---
 

@@ -24,14 +24,14 @@ print("=" * 60)
 print("Example 1: Definite Integration with quad()")
 print("=" * 60)
 
-# Integrate sin(x) from 0 to pi — exact answer is 2
+# Integrate sin(x) from 0 to pi â€” exact answer is 2
 result, error = integrate.quad(np.sin, 0, np.pi)
 print(f"Integral from 0 to pi of sin(x) dx")
 print(f"  Numerical: {result:.10f}")
 print(f"  Exact:     2.0")
 print(f"  Error est: {error:.2e}")
 
-# Integrate x^2 from 0 to 1 — exact answer is 1/3
+# Integrate x^2 from 0 to 1 â€” exact answer is 1/3
 result2, err2 = integrate.quad(lambda x: x**2, 0, 1)
 print(f"\nIntegral from 0 to 1 of x^2 dx")
 print(f"  Numerical: {result2:.10f}")
@@ -60,13 +60,13 @@ y = complicated(x)
 fig, ax = plt.subplots(figsize=(8, 4))
 ax.plot(x, y, "b-", linewidth=2)
 ax.fill_between(x, y, alpha=0.2)
-ax.set_title(f"Integrand: e^(-x)·sin(10x)·ln(1+x²), ∫≈{result4:.4f}")
+ax.set_title(f"Integrand: e^(-x)Â·sin(10x)Â·ln(1+xÂ²), âˆ«â‰ˆ{result4:.4f}")
 ax.set_xlabel("x")
 ax.set_ylabel("f(x)")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_05_quad.png", dpi=100)
-print("Plot saved: scipy_05_quad.png")
+plt.savefig("../../outputs/scipy/scipy_05_quad.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_05_quad.png")
 
 # ============================================================
 # Example 2: Double Integration with dblquad
@@ -87,14 +87,14 @@ result_2d, error_2d = integrate.dblquad(
     0, 1        # y limits (functions of x, here constants)
 )
 
-# Exact: ∫∫ (x² + y²) dx dy = 2/3
+# Exact: âˆ«âˆ« (xÂ² + yÂ²) dx dy = 2/3
 exact_2d = 2/3
 print(f"Double integral of (x^2 + y^2) dx dy over [0,1]x[0,1]")
 print(f"  Numerical: {result_2d:.10f}")
 print(f"  Exact:     {exact_2d:.10f}")
 print(f"  Error est: {error_2d:.2e}")
 
-# Circular region: x² + y² <= 1
+# Circular region: xÂ² + yÂ² <= 1
 def circular_integrand(y, x):
     return np.sqrt(x**2 + y**2)
 
@@ -173,8 +173,8 @@ axes[1].set_ylabel("Predator population")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_05_ode.png", dpi=100)
-print("Plot saved: scipy_05_ode.png")
+plt.savefig("../../outputs/scipy/scipy_05_ode.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_05_ode.png")
 
 # ============================================================
 # Example 4: Spring-Mass-Damper System
@@ -226,8 +226,8 @@ axes[1].set_ylabel("Energy")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_05_spring.png", dpi=100)
-print("Plot saved: scipy_05_spring.png")
+plt.savefig("../../outputs/scipy/scipy_05_spring.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_05_spring.png")
 
 # ============================================================
 # Example 5: Cumulative Integration (Area Under Curve)
@@ -250,7 +250,7 @@ print(f"  Expected:   0.0 (full period, symmetric)")
 fig, axes = plt.subplots(2, 1, figsize=(10, 6))
 axes[0].plot(t, signal, "b-", linewidth=2)
 axes[0].fill_between(t, signal, alpha=0.2)
-axes[0].set_title("Signal: sin(x) + 0.5·sin(3x)")
+axes[0].set_title("Signal: sin(x) + 0.5Â·sin(3x)")
 axes[0].set_ylabel("f(t)")
 axes[0].grid(True, alpha=0.3)
 
@@ -258,11 +258,12 @@ axes[1].plot(t, cumulative, "r-", linewidth=2)
 axes[1].axhline(y=total_area, color="k", linestyle="--", alpha=0.5)
 axes[1].set_title(f"Cumulative Integral (total = {total_area:.4f})")
 axes[1].set_xlabel("t")
-axes[1].set_ylabel("∫ f(t) dt")
+axes[1].set_ylabel("âˆ« f(t) dt")
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_05_cumulative.png", dpi=100)
-print("Plot saved: scipy_05_cumulative.png")
+plt.savefig("../../outputs/scipy/scipy_05_cumulative.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_05_cumulative.png")
 
 print("\n[OK] SciPy integration module covered!")
 print("   Next: 06-interpolation.py for interpolation techniques.")
+

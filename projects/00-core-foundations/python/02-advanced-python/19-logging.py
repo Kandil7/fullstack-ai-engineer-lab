@@ -220,7 +220,13 @@ def demo_application_logger():
 
     app_log.info("Application finished")
 
-    # Clean up
+    # Clean up - close handlers BEFORE removing the file.
+    # On Windows an open FileHandler holds the file open (WinError 32).
+    # Iterate over a copy: removeHandler mutates the list while iterating.
+    for h in list(app_log.logger.handlers):
+        h.close()
+        app_log.logger.removeHandler(h)
+
     import os
     if os.path.exists(temp_file):
         os.remove(temp_file)

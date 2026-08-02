@@ -3,7 +3,10 @@ Matplotlib Bar Charts: bar, barh, stacked, grouped
 ====================================================
 """
 
+import pathlib
 import matplotlib.pyplot as plt
+OUTPUT_DIR = pathlib.Path(__file__).parent.parent.parent / "outputs" / "matplotlib"
+import pathlib
 import numpy as np
 import pandas as pd
 
@@ -49,7 +52,7 @@ axes[1, 1].set_ylim(0, max(values) * 1.2)
 
 plt.suptitle('Basic Bar Charts', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/bar_basic.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "bar_basic.png", dpi=150)
 plt.close()
 
 print("Basic bar charts saved")
@@ -125,7 +128,7 @@ axes[1, 1].grid(True, alpha=0.3, axis='x')
 
 plt.suptitle('Grouped Bar Charts', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/bar_grouped.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "bar_grouped.png", dpi=150)
 plt.close()
 
 print("Grouped bar charts saved")
@@ -199,7 +202,7 @@ axes[1, 1].grid(True, alpha=0.3, axis='y')
 
 plt.suptitle('Stacked Bar Charts', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/bar_stacked.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "bar_stacked.png", dpi=150)
 plt.close()
 
 print("Stacked bar charts saved")
@@ -293,7 +296,7 @@ axes[1, 1].grid(True, alpha=0.3, axis='y')
 
 plt.suptitle('Advanced Bar Customizations', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/bar_advanced.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "bar_advanced.png", dpi=150)
 plt.close()
 
 print("Advanced bar charts saved")
@@ -372,7 +375,7 @@ axes[1, 1].grid(True, alpha=0.3, axis='y')
 
 plt.suptitle('Sales Dashboard - Bar Chart Examples', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/bar_dashboard.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "bar_dashboard.png", dpi=150)
 plt.close()
 
 print("Sales dashboard saved")

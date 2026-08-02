@@ -1,0 +1,158 @@
+name: CI
+
+# Scope note (2026-08-02):
+# This pipeline gates the DevMate service only. The legacy curriculum under
+# projects/00-core-foundations/python/ currently has 2 collection errors and 68 test
+# failures caused by directory-name shadowing (e.g. 03-libraries/pandas/ shadowing the
+# real `pandas` package). Gating on it today would mean a permanently red pipeline,
+# which teaches the team to ignore CI. Repair is tracked as a separate task; the
+# legacy-lint job below runs advisory-only until then.
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  devmate:
+    name: DevMate — lint, types, tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: projects/04-ai-engineering/devmate
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Cache virtualenv
+        uses: actions/cache@v4
+        with:
+          path: projects/04-ai-engineering/devmate/.venv
+          key: venv-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('projects/04-ai-engineering/devmate/poetry.lock') }}
+
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry install --no-interaction
+
+      - name: Lint (ruff)
+        run: poetry run ruff check .
+
+      - name: Format check (ruff format)
+        run: poetry run ruff format --check .
+
+      - name: Type check (mypy)
+        run: poetry run mypy src/
+
+      - name: Tests
+        run: poetry run pytest -q --cov=devmate --cov-report=term-missing
+        env:
+          # Unit tests must not call a real API. Integration tests are marked
+          # and excluded here; they run in the integration job below.
+          ANTHROPIC_API_KEY: test-key-not-used
+
+  integration:
+    name: DevMate — integration (Qdrant + Redis)
+    runs-on: ubuntu-latest
+    # Enabled from week 2, once the vector store exists.
+    if: false
+    defaults:
+      run:
+        working-directory: projects/04-ai-engineering/devmate
+
+    services:
+      qdrant:
+        image: qdrant/qdrant:latest
+        ports: ["6333:6333"]
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: pipx install poetry
+      - run: poetry install --no-interaction
+      - run: poetry run pytest -q -m integration
+        env:
+          QDRANT_URL: http://localhost:6333
+          REDIS_URL: redis://localhost:6379
+
+  docs:
+    name: Docs — link and structure validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for broken relative links in docs/
+        run: |
+          fail=0
+          while IFS= read -r file; do
+            dir=$(dirname "$file")
+            grep -oE '\]\([^)#][^)]*\.md[^)]*\)' "$file" 2>/dev/null \
+              | sed -E 's/^\]\(//; s/\)$//; s/#.*$//' \
+              | while read -r link; do
+                  case "$link" in http*) continue ;; esac
+                  target="$dir/$link"
+                  if [ ! -f "$target" ]; then
+                    echo "::error file=$file::broken link -> $link"
+                    exit 1
+                  fi
+                done || fail=1
+          done < <(find docs -name '*.md' -not -path 'docs/plan/archive/*')
+          exit $fail
+
+      - name: Tracking freshness
+        # current-focus.md must be updated weekly. It went five weeks stale
+        # under the previous plan; this makes staleness visible.
+        run: |
+          file=docs/tracking/current-focus.md
+          stamp=$(grep -oE '\*\*Last updated:\*\* [0-9]{4}-[0-9]{2}-[0-9]{2}' "$file" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+          if [ -z "$stamp" ]; then
+            echo "::error::no 'Last updated:' stamp found in $file"
+            exit 1
+          fi
+          age=$(( ( $(date +%s) - $(date -d "$stamp" +%s) ) / 86400 ))
+          echo "current-focus.md is $age day(s) old (stamped $stamp)"
+          if [ "$age" -gt 8 ]; then
+            echo "::error::$file is $age days old — update it (weekly review)"
+            exit 1
+          fi
+
+  legacy-lint:
+    name: Legacy curriculum (advisory)
+    runs-on: ubuntu-latest
+    continue-on-error: true   # advisory until the suite is repaired
+    defaults:
+      run:
+        working-directory: projects/00-core-foundations/python
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: pip install ruff
+      - name: Lint (advisory)
+        run: ruff check . --output-format=github || true
+      - name: Report test collection status
+        run: |
+          pip install pytest
+          pytest --collect-only -q 2>&1 | tail -20 || true
+          echo "Known: 2 collection errors, 68 failures from directory-name shadowing."
+          echo "Tracked for repair; see docs/tracking/current-focus.md."

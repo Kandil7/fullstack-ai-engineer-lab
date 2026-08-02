@@ -13,19 +13,64 @@ from multiprocessing import Pool, Queue, Process, Value, Array
 
 
 # =============================================================================
+# Module-level worker callables
+# =============================================================================
+# Windows uses the "spawn" start method: the child re-imports this module and
+# pickles each target by qualified name. Nested (local) functions cannot be
+# pickled, so every Process/Queue target MUST live at module level.
+# This is the fork-vs-spawn lesson from the lecture - keep it visible.
+
+
+def _worker(name: str):
+    print(f"  [{name}] PID: {os.getpid()}")
+    time.sleep(0.1)
+    print(f"  [{name}] Done")
+
+
+def _increment(shared_val, n):
+    for _ in range(n):
+        with shared_val.get_lock():
+            shared_val.value += 1
+
+
+def _fill_array(shared_arr, index, value):
+    shared_arr[index] = value
+
+
+def _producer(q: Queue, count: int):
+    for i in range(count):
+        q.put(f"item-{i}")
+    q.put(None)  # Sentinel
+
+
+def _consumer(q: Queue, results: list):
+    while True:
+        item = q.get()
+        if item is None:
+            break
+        results.append(item.upper())
+
+
+def _safe_print(msg: str, lock_obj):
+    with lock_obj:
+        print(f"  {msg}")
+
+
+def _background_task():
+    while True:
+        time.sleep(0.1)
+        print("  Background running...")
+
+
+# =============================================================================
 # 1. Basic Process
 # =============================================================================
 
 def demo_basic_process():
     """Demonstrate basic process creation."""
-    def worker(name: str):
-        print(f"  [{name}] PID: {os.getpid()}")
-        time.sleep(0.1)
-        print(f"  [{name}] Done")
-
     processes = []
     for i in range(3):
-        p = Process(target=worker, args=(f"Process-{i}",))
+        p = Process(target=_worker, args=(f"Process-{i}",))
         processes.append(p)
         p.start()
 
@@ -95,14 +140,9 @@ def demo_shared_state():
     # Shared value
     counter = Value('i', 0)  # 'i' = int
 
-    def increment(shared_val, n):
-        for _ in range(n):
-            with shared_val.get_lock():
-                shared_val.value += 1
-
     processes = []
     for _ in range(4):
-        p = Process(target=increment, args=(counter, 1000))
+        p = Process(target=_increment, args=(counter, 1000))
         processes.append(p)
         p.start()
 
@@ -114,12 +154,9 @@ def demo_shared_state():
     # Shared array
     arr = Array('i', [0, 0, 0, 0, 0])
 
-    def fill_array(shared_arr, index, value):
-        shared_arr[index] = value
-
     processes = []
     for i in range(5):
-        p = Process(target=fill_array, args=(arr, i, i * 10))
+        p = Process(target=_fill_array, args=(arr, i, i * 10))
         processes.append(p)
         p.start()
 
@@ -135,24 +172,12 @@ def demo_shared_state():
 
 def demo_queue():
     """Demonstrate Queue for inter-process communication."""
-    def producer(q: Queue, count: int):
-        for i in range(count):
-            q.put(f"item-{i}")
-        q.put(None)  # Sentinel
-
-    def consumer(q: Queue, results: list):
-        while True:
-            item = q.get()
-            if item is None:
-                break
-            results.append(item.upper())
-
     q = Queue()
     manager = multiprocessing.Manager()
     results = manager.list()
 
-    prod = Process(target=producer, args=(q, 5))
-    cons = Process(target=consumer, args=(q, results))
+    prod = Process(target=_producer, args=(q, 5))
+    cons = Process(target=_consumer, args=(q, results))
 
     prod.start()
     cons.start()
@@ -197,13 +222,9 @@ def demo_process_lock():
     """Demonstrate Lock for process safety."""
     lock = multiprocessing.Lock()
 
-    def safe_print(msg: str, lock_obj):
-        with lock_obj:
-            print(f"  {msg}")
-
     processes = []
     for i in range(5):
-        p = Process(target=safe_print, args=(f"Message from process {i}", lock))
+        p = Process(target=_safe_print, args=(f"Message from process {i}", lock))
         processes.append(p)
         p.start()
 
@@ -217,13 +238,8 @@ def demo_process_lock():
 
 def demo_daemon():
     """Demonstrate daemon processes."""
-    def background_task():
-        while True:
-            time.sleep(0.1)
-            print("  Background running...")
-
     # Daemon process stops when main process exits
-    daemon = Process(target=background_task, daemon=True)
+    daemon = Process(target=_background_task, daemon=True)
     daemon.start()
     time.sleep(0.3)
     print("  Main process exiting (daemon will stop)")

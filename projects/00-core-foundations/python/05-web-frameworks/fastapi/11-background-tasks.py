@@ -9,7 +9,7 @@ Run: uvicorn 11-background-tasks:app --reload
 
 import time
 from datetime import datetime
-from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi import FastAPI, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, EmailStr
 
 app = FastAPI(title="Background Tasks in FastAPI")

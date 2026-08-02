@@ -69,8 +69,8 @@ ax.legend()
 ax.grid(True, alpha=0.3)
 ax.set_aspect("equal")
 plt.tight_layout()
-plt.savefig("scipy_10_kdtree.png", dpi=100)
-print("Plot saved: scipy_10_kdtree.png")
+plt.savefig("../../outputs/scipy/scipy_10_kdtree.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_10_kdtree.png")
 
 # ============================================================
 # Example 2: Delaunay Triangulation
@@ -110,8 +110,8 @@ ax.set_title(f"Delaunay Triangulation ({len(tri.simplices)} triangles)")
 ax.set_aspect("equal")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_10_delaunay.png", dpi=100)
-print("Plot saved: scipy_10_delaunay.png")
+plt.savefig("../../outputs/scipy/scipy_10_delaunay.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_10_delaunay.png")
 
 # Point-in-triangle test
 test_point = np.array([0.0, 0.0])
@@ -154,8 +154,8 @@ ax.legend()
 ax.grid(True, alpha=0.3)
 ax.set_aspect("equal")
 plt.tight_layout()
-plt.savefig("scipy_10_convexhull.png", dpi=100)
-print("Plot saved: scipy_10_convexhull.png")
+plt.savefig("../../outputs/scipy/scipy_10_convexhull.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_10_convexhull.png")
 
 # ============================================================
 # Example 4: Voronoi Diagram
@@ -188,8 +188,8 @@ ax.set_xlim(-0.1, 1.1)
 ax.set_ylim(-0.1, 1.1)
 ax.set_aspect("equal")
 plt.tight_layout()
-plt.savefig("scipy_10_voronoi.png", dpi=100)
-print("Plot saved: scipy_10_voronoi.png")
+plt.savefig("../../outputs/scipy/scipy_10_voronoi.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_10_voronoi.png")
 
 # ============================================================
 # Example 5: Spatial Distance and Proximity
@@ -240,3 +240,4 @@ for k in k_values:
 
 print("\n[OK] SciPy spatial module covered!")
 print("   Next: 11-image-processing.py for image operations.")
+

@@ -1,5 +1,7 @@
 # Django Tutorial - Reference Guides
 
+> **Note:** Unlike FastAPI (which has an `exercises/` subdirectory with hands-on practice files), Django exercises in this module are **reference-only**. Django is not installed by default in this environment, and these files serve as comprehensive code references for learning Django concepts.
+
 A comprehensive collection of 20 reference guides covering the W3Schools Django tutorial. Each file provides complete code examples for building Django web applications.
 
 ## Files

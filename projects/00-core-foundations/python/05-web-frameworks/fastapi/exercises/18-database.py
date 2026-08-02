@@ -22,7 +22,8 @@ import re
 
 app = FastAPI(title="Database Integration Exercises")
 
-DATABASE_URL = "exercises_18.db"
+import pathlib
+DATABASE_URL = str(pathlib.Path(__file__).parent.parent.parent.parent / "outputs" / "dbs" / "exercises_18.db")
 
 
 # ============================================================

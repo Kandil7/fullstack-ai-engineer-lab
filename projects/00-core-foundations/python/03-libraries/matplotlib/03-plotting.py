@@ -1,14 +1,15 @@
-﻿"""
+"""
 Matplotlib Plotting Markers & Line Styles - W3Schools Exercises
 ================================================================
 Comprehensive exercises on line and marker customization.
 """
-import matplotlib
 matplotlib.use('Agg')
+
+import matplotlib
+import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -26,7 +27,7 @@ def exercise_01():
     plt.title("Exercise 1: Marker Styles")
     plt.xlabel("x")
     plt.legend(title="Marker", ncol=2)
-    plt.savefig(os.path.join(OUTPUT_DIR, "03_exercise_01.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "03_exercise_01.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 01 saved")
 
@@ -46,7 +47,7 @@ def exercise_02():
     plt.title("Exercise 2: Line Styles")
     plt.xlabel("x")
     plt.ylabel("y")
-    plt.savefig(os.path.join(OUTPUT_DIR, "03_exercise_02.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "03_exercise_02.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 02 saved")
 
@@ -63,7 +64,7 @@ def exercise_03():
         plt.plot(x, np.sin(x) * w, linewidth=w, color=c, label=f"w={w}")
     plt.legend()
     plt.title("Exercise 3: Line Width & Color")
-    plt.savefig(os.path.join(OUTPUT_DIR, "03_exercise_03.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "03_exercise_03.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 03 saved")
 
@@ -87,7 +88,7 @@ def exercise_04():
     plt.xlabel("Time Point")
     plt.ylabel("Cumulative Value")
     plt.grid(True, alpha=0.3)
-    plt.savefig(os.path.join(OUTPUT_DIR, "03_exercise_04.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "03_exercise_04.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 04 saved")
 
@@ -107,7 +108,7 @@ def exercise_05():
     plt.ylabel("Y")
     plt.axhline(y=0, color="gray", linestyle="--", alpha=0.5)
     plt.axvline(x=0, color="gray", linestyle="--", alpha=0.5)
-    plt.savefig(os.path.join(OUTPUT_DIR, "03_exercise_05.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "03_exercise_05.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 05 saved")
 

@@ -73,8 +73,8 @@ axes[1].set_ylabel("Magnitude")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_09_basic_fft.png", dpi=100)
-print("Plot saved: scipy_09_basic_fft.png")
+plt.savefig("../../outputs/scipy/scipy_09_basic_fft.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_09_basic_fft.png")
 
 # ============================================================
 # Example 2: Power Spectral Density
@@ -122,8 +122,8 @@ ax.axvline(x=50, color="r", linestyle="--", alpha=0.7, label="50 Hz tone")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_09_psd.png", dpi=100)
-print("Plot saved: scipy_09_psd.png")
+plt.savefig("../../outputs/scipy/scipy_09_psd.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_09_psd.png")
 
 print(f"Signal length: {len(t)} samples")
 print(f"Sampling rate: {fs} Hz")
@@ -164,8 +164,8 @@ axes[1].set_title("2D FFT Magnitude (log scale)")
 axes[1].set_xlabel("u (frequency)")
 axes[1].set_ylabel("v (frequency)")
 plt.tight_layout()
-plt.savefig("scipy_09_2d_fft.png", dpi=100)
-print("Plot saved: scipy_09_2d_fft.png")
+plt.savefig("../../outputs/scipy/scipy_09_2d_fft.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_09_2d_fft.png")
 
 # Low-pass filtering in frequency domain
 rows, cols = image.shape
@@ -193,8 +193,8 @@ for ax in axes:
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("scipy_09_lowpass.png", dpi=100)
-print("Plot saved: scipy_09_lowpass.png")
+plt.savefig("../../outputs/scipy/scipy_09_lowpass.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_09_lowpass.png")
 
 # ============================================================
 # Example 4: Windowing Functions
@@ -225,8 +225,8 @@ for ax, name in zip(axes, window_names):
     ax.grid(True, alpha=0.3)
     ax.set_ylim(-0.1, 1.1)
 plt.tight_layout()
-plt.savefig("scipy_09_windows.png", dpi=100)
-print("Plot saved: scipy_09_windows.png")
+plt.savefig("../../outputs/scipy/scipy_09_windows.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_09_windows.png")
 
 # Effect of windowing on spectral leakage
 np.random.seed(42)
@@ -254,8 +254,8 @@ axes[1].set_xlabel("Frequency (Hz)")
 axes[1].set_xlim(0, 100)
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_09_window_effect.png", dpi=100)
-print("Plot saved: scipy_09_window_effect.png")
+plt.savefig("../../outputs/scipy/scipy_09_window_effect.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_09_window_effect.png")
 
 # ============================================================
 # Example 5: FFT-based Convolution
@@ -309,8 +309,9 @@ axes[2].set_title(f"Convolution result (length={len(result_fft)})")
 axes[2].set_xlabel("Sample")
 axes[2].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_09_convolution.png", dpi=100)
-print("Plot saved: scipy_09_convolution.png")
+plt.savefig("../../outputs/scipy/scipy_09_convolution.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_09_convolution.png")
 
 print("\n[OK] SciPy FFT module covered!")
 print("   Next: 10-spatial-data.py for spatial computations.")
+

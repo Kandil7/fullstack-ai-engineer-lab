@@ -1,14 +1,15 @@
-﻿"""
+"""
 Matplotlib Bar Charts - W3Schools Exercises
 =============================================
 Bar chart creation and customization.
 """
-import matplotlib
 matplotlib.use('Agg')
+
+import matplotlib
+import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -24,7 +25,7 @@ def exercise_01():
     plt.title("Exercise 1: Basic Bar Chart")
     plt.xlabel("Category")
     plt.ylabel("Value")
-    plt.savefig(os.path.join(OUTPUT_DIR, "10_exercise_01.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "10_exercise_01.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 01 saved")
 
@@ -41,7 +42,7 @@ def exercise_02():
     plt.xlabel("Popularity (%)")
     for i, v in enumerate(popularity):
         plt.text(v + 0.3, i, f"{v}%", va="center")
-    plt.savefig(os.path.join(OUTPUT_DIR, "10_exercise_02.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "10_exercise_02.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 02 saved")
 
@@ -62,7 +63,7 @@ def exercise_03():
     plt.title("Exercise 3: Grouped Bar Chart")
     plt.ylabel("Sales")
     plt.legend()
-    plt.savefig(os.path.join(OUTPUT_DIR, "10_exercise_03.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "10_exercise_03.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 03 saved")
 
@@ -80,7 +81,7 @@ def exercise_04():
     plt.title("Exercise 4: Stacked Bar Chart")
     plt.ylabel("Revenue ($)")
     plt.legend()
-    plt.savefig(os.path.join(OUTPUT_DIR, "10_exercise_04.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "10_exercise_04.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 04 saved")
 
@@ -104,7 +105,7 @@ def exercise_05():
     plt.title("Exercise 5: Bar Chart with Error Bars")
     plt.ylabel("Accuracy (%)")
     plt.ylim(0, 100)
-    plt.savefig(os.path.join(OUTPUT_DIR, "10_exercise_05.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "10_exercise_05.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 05 saved")
 

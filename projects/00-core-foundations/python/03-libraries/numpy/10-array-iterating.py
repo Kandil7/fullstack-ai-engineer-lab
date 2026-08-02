@@ -90,8 +90,9 @@ arr = np.array([[1, 2, 3], [4, 5, 6]])
 
 # C-style (row-major) iteration
 print("C-style iteration:")
-for x in np.nditer(arr, flags=["c_index"]):
-    print(f"  {x} at index {x.index}")
+it = np.nditer(arr, flags=["c_index"])
+for x in it:
+    print(f"  {x} at index {it.index}")
 # Output:
 #   1 at index 0
 #   2 at index 1
@@ -102,8 +103,9 @@ for x in np.nditer(arr, flags=["c_index"]):
 
 # F-style (column-major) iteration
 print("\nF-style iteration:")
-for x in np.nditer(arr, flags=["f_index"]):
-    print(f"  {x} at index {x.index}")
+it = np.nditer(arr, flags=["f_index"])
+for x in it:
+    print(f"  {x} at index {it.index}")
 # Output:
 #   1 at index 0
 #   4 at index 1
@@ -114,8 +116,9 @@ for x in np.nditer(arr, flags=["f_index"]):
 
 # With multi_index
 print("\nMulti-index iteration:")
-for x in np.nditer(arr, flags=["multi_index"]):
-    print(f"  {x} at {x.multi_index}")
+it = np.nditer(arr, flags=["multi_index"])
+for x in it:
+    print(f"  {x} at {it.multi_index}")
 # Output:
 #   1 at (0, 0)
 #   2 at (0, 1)
@@ -132,19 +135,19 @@ for x in np.nditer(arr, flags=["multi_index"]):
 arr_int = np.array([[1, 2, 3], [4, 5, 6]], dtype=int)
 arr_float = np.array([[1.1, 2.2, 3.3], [4.4, 5.5, 6.6]], dtype=float)
 
-# Default: type promotion
+# Default: type promotion (buffered required for mixed dtypes in NumPy 2.x)
 print("Default iteration (mixed types):")
-for x, y in np.nditer([arr_int, arr_float]):
+for x, y in np.nditer([arr_int, arr_float], flags=["buffered"]):
     print(f"  {x} ({x.dtype}) + {y} ({y.dtype})")
 
 # With casting="same_kind"
 print("\nSame_kind casting:")
-for x, y in np.nditer([arr_int, arr_float], casting="same_kind"):
+for x, y in np.nditer([arr_int, arr_float], flags=["buffered"], casting="same_kind"):
     print(f"  {x} + {y}")
 
 # With op_dtypes
 print("\nWith op_dtypes (float output):")
-for x in np.nditer(arr_int, op_dtypes=["float64"]):
+for x in np.nditer(arr_int, op_dtypes=["float64"], flags=["buffered"]):
     print(f"  {x} ({x.dtype})", end=" ")
 print()
 # Output:

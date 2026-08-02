@@ -15,10 +15,10 @@ This module covers:
 import numpy as np
 
 # ============================================================
-# Example 1: SciPy vs NumPy — What SciPy Adds
+# Example 1: SciPy vs NumPy â€” What SciPy Adds
 # ============================================================
 print("=" * 60)
-print("Example 1: SciPy vs NumPy — Key Differences")
+print("Example 1: SciPy vs NumPy â€” Key Differences")
 print("=" * 60)
 
 from scipy import constants
@@ -62,9 +62,9 @@ submodules = [
 for mod in submodules:
     try:
         __import__(f"scipy.{mod}")
-        print(f"  scipy.{mod:<14s} — loaded successfully")
+        print(f"  scipy.{mod:<14s} â€” loaded successfully")
     except Exception as e:
-        print(f"  scipy.{mod:<14s} — error: {e}")
+        print(f"  scipy.{mod:<14s} â€” error: {e}")
 
 # ============================================================
 # Example 3: Special Functions (scipy.special)
@@ -126,7 +126,7 @@ print(f"Visible light (~2.5 eV) = {2.5 * eV:.4e} Joules")
 # Example 5: SciPy Integration with NumPy Arrays
 # ============================================================
 print("\n" + "=" * 60)
-print("Example 5: SciPy + NumPy — Seamless Integration")
+print("Example 5: SciPy + NumPy â€” Seamless Integration")
 print("=" * 60)
 
 from scipy import ndimage
@@ -151,3 +151,4 @@ print(f"Edge magnitude range: [{edge_magnitude.min():.4f}, {edge_magnitude.max()
 
 print("\n[OK] SciPy provides powerful scientific tools that extend NumPy!")
 print("     Next: 02-getting-started.py to install and start using SciPy.")
+

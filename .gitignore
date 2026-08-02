@@ -60,3 +60,13 @@ desktop.ini
 *.log
 coverage/
 *.cover
+
+# ---- Generated artifacts (regenerable — do not commit) ----
+# Plot output from matplotlib/scipy exercises. ~10MB, reproduced by re-running the scripts.
+# Untracked 2026-08-02; the exercise READMEs list expected filenames, none are embedded.
+**/output/*.png
+projects/00-core-foundations/python/*.png
+*.sqlite
+*.sqlite3
+projects/00-core-foundations/python/*.db
+err.txt

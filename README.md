@@ -48,10 +48,16 @@ See [`docs/product/ai-learning-operating-manual.md`](docs/product/ai-learning-op
   workflows/       # feature, debugging, learning, architecture, evaluation
 templates/         # Standardized artifact templates (ADR, review, plan, ...)
 registries/        # YAML inventories: prompts, workflows, templates, decisions, skills
-docs/              # architecture, decisions (ADRs), learning, product, cheat-sheets
+docs/
+  roadmap/         # active-track-10-week (PLAN OF RECORD), milestones, dashboard
+  decisions/       # ADRs
+  reference/       # LLM production architecture, clean code, ML map, interviews
+  learning/        # paths, deep-dives, daily-logs, source-summaries
+  tracking/        # current-focus — what to do right now
+  plan/archive/    # superseded plans, kept for provenance
 learning-sources/  # Source-driven learning (books, repos, notebooks, official-docs)
 evaluations/       # Golden cases, regressions, RAG datasets, eval reports
-projects/          # Phase folders 00→07 (auth-service is the live demo)
+projects/          # Phase folders 00→07 (devmate is the active project)
 infra/             # docker-compose + PowerShell scripts
 tests/             # repo-structure, templates, workflows, prompts validation
 ```
@@ -72,18 +78,54 @@ full tree and rationale.
 
 ---
 
-## Daily Loop (6 hours)
+## Daily Loop (5+ hours)
 
-| Block | Time | Activity                                  |
-| ----- | ---- | ----------------------------------------- |
-| Learn | 1h   | One topic, docs-first, AI as teacher      |
-| Build | 3h   | One feature in one continuous project     |
-| Review| 1h   | AI code review + debugging session        |
-| Recall| 1h   | Active recall + notes + plan tomorrow     |
+| Block  | Time | Activity                                      |
+| ------ | ---- | --------------------------------------------- |
+| Build  | 3h   | The week's deliverable — code first            |
+| Learn  | 1h   | One topic, docs-first, **after** building it   |
+| Review | 1h   | AI code review + debugging log                 |
+| Recall | 30m  | Explain without notes + daily log + plan       |
+
+Full cadence: [`docs/WEEKLY_PROTOCOL.md`](docs/WEEKLY_PROTOCOL.md)
 
 ---
 
-## Progress Tracker
+## Active Plan
+
+**[Active Track — 10-Week AI Engineer](docs/roadmap/active-track-10-week.md)** — adopted
+2026-08-02 by [ADR-0004](docs/decisions/0004-adopt-10-week-ai-engineer-track.md).
+Target: a remote AI/LLM engineering role. Vehicle: **DevMate**.
+
+> **Governing rule:** no new lecture, glossary, or quiz file until DevMate is deployed at a
+> public URL. The repo holds 6,947 lines of AI teaching material and zero running AI services;
+> that ratio has to invert.
+
+| Week | Milestone | Deliverable |
+| ---- | --------- | ----------- |
+| 0 | A1 | CI green + `devmate stats` CLI |
+| 1 | A2 | LLM layer — streaming, traced, costed |
+| 2–3 | A3 | RAG with a measured eval harness |
+| 4 | A4 | **Deployed at a public URL** + SQL sprint |
+| 5–6 | A5 | Agent with 4 tools + MCP server |
+| 7 | A6 | Cache, guardrails, hardening |
+| 8 | A7 | Portfolio — blog, README, CV |
+| 9–10 | A8, A9 | 40 applications, first interview |
+| 11+ | A10 | Deferred ML sprint (buffer weeks) |
+
+**Right now:** [`docs/tracking/current-focus.md`](docs/tracking/current-focus.md) ·
+**Status:** [`docs/roadmap/progress-dashboard.md`](docs/roadmap/progress-dashboard.md)
+
+### Other tracks
+
+| Track | Status |
+| ----- | ------ |
+| [Phase 2 — Athar & Baligh](docs/roadmap/phase-2-athar-baligh.md) | After A7 |
+| [Long track — 12-month roadmap](docs/roadmap/master-roadmap.md) (Go, Flutter/Next.js, ThanaweyaGPT) | Deferred |
+
+---
+
+## Progress
 
 ### Workspace Build (Complete ✅)
 - [x] Phase 0 — Foundations (repo skeleton, templates, prompts, registries)
@@ -92,36 +134,27 @@ full tree and rationale.
 - [x] Phase 3 — Scale (scaffolding scripts, repo validation, deep dives)
 - [x] Phase 4 — Advanced (RAG eval harness, capstone structure, operating manual)
 
-### Learning Journey (In Progress)
-- [ ] **Phase 0 — Foundations** ← YOU ARE HERE (Months 1–3)
-  - [x] Week 1 scaffold: Exercise 01 + 02 created
-  - [ ] Go Tour completion
-  - [ ] HTML/CSS/JS portfolio
-  - [ ] Git workflow mastery
-- [ ] Phase 1 — Backend (Go + PostgreSQL)
-- [ ] Phase 2 — Frontend (Flutter/Next.js)
-- [ ] Phase 3 — AI Fundamentals
-- [ ] Phase 4 — RAG Systems
-- [ ] Phase 5 — AI Agents
-- [ ] Phase 6 — System Design + DevOps
-- [ ] Phase 7 — Capstone (ThanaweyaGPT)
-
-See [`ROADMAP.md`](ROADMAP.md) for the full phase breakdown.
-See [`docs/product/12-month-plan.md`](docs/product/12-month-plan.md) for the 12-month timeline.
+### Learning Journey
+- [x] Python foundations — 354 files: core (41 topics), advanced (20), libraries, FastAPI (25)
+- [x] AI curriculum — 6,947 lines across LLM APIs, RAG, agents, evaluation, safety
+- [ ] **A1 — CI green + first DevMate command** ← YOU ARE HERE
+- [ ] A2–A10 — see the table above
+- [ ] Deferred: Go, frontend, classical ML
 
 ---
 
 ## Getting Started
 
 ```powershell
-# 1. Bring up local infra (optional — Postgres / Redis / Qdrant)
+# 1. Bring up local infra (Postgres / Redis / Qdrant)
 docker compose -f infra/docker/docker-compose.yml up -d
 
-# 2. Run the live demo service
-cd projects/01-backend-go/01-auth-service
-go test ./...
-go run .
+# 2. Work on the active project
+cd projects/04-ai-engineering/devmate
 
 # 3. Create a new ADR
 ./infra/scripts/new-adr.ps1 "Adopt keyset pagination"
+
+# 4. Start today's log
+./infra/scripts/new-daily-log.ps1
 ```

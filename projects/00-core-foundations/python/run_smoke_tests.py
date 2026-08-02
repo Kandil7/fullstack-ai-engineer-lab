@@ -9,6 +9,7 @@ Usage:
     python run_smoke_tests.py --phase 1    # Run Phase 1 only
     python run_smoke_tests.py --file 01-introduction.py  # Run single file
     python run_smoke_tests.py --list       # List all discovered files
+    python run_smoke_tests.py --all --verify  # Run all with _verify()
 
 Exit code: number of failures (0 = all passed)
 """
@@ -18,19 +19,35 @@ import os
 import subprocess
 import sys
 import time
+import random
+import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
+# Files that cannot run standalone (require stdin, special setup, etc.)
 SKIP_FILES = {
     "practice_all.py",
     "practice_no_solutions.py",
     "39-pip.py",
     "40-virtualenv.py",
+    "33-user-input.py",  # requires stdin
 }
 
+# Directories to skip entirely
 SKIP_DIRECTORIES = {
     ".git", "__pycache__", ".mimocode", ".idea",
+    "django",  # Django not installed - reference only (R7)
+    "outputs",  # Exercise outputs - regenerated on run
 }
+
+# Per-file timeout in seconds (prevents hangs like R1.1)
+FILE_TIMEOUT = 30
+
+# CI reproducibility settings
+os.environ.setdefault("MPLBACKEND", "Agg")
+os.environ.setdefault("PYTHONHASHSEED", "0")
+random.seed(42)
+np.random.seed(42)
 
 
 def discover_files(root_dir: str) -> list[str]:
@@ -52,9 +69,9 @@ def print_header(text: str, width: int = 60) -> None:
     print("=" * width)
 
 
-def smoke_test_file(rel_path: str) -> tuple[bool, str]:
+def smoke_test_file(rel_path: str, verify: bool = False) -> tuple[bool, str]:
     full = os.path.join(HERE, rel_path)
-    
+
     # Step 1: Check syntax (explicit UTF-8 encoding)
     compile_result = subprocess.run(
         [sys.executable, "-c",
@@ -66,12 +83,18 @@ def smoke_test_file(rel_path: str) -> tuple[bool, str]:
         return False, f"SYNTAX ERROR: {msg[:200]}"
 
     # Step 2: Try running (with timeout, with UTF-8 environment)
+    # Use --verify flag if requested and file supports it
+    cmd = [sys.executable, full]
+    if verify:
+        cmd.append("--verify")
+
     try:
         env = os.environ.copy()
         env["PYTHONIOENCODING"] = "utf-8"
+        env["MPLBACKEND"] = "Agg"
         run_result = subprocess.run(
-            [sys.executable, full],
-            capture_output=True, text=True, timeout=30,
+            cmd,
+            capture_output=True, text=True, timeout=FILE_TIMEOUT,
             env=env,
         )
         if run_result.returncode != 0:
@@ -79,14 +102,14 @@ def smoke_test_file(rel_path: str) -> tuple[bool, str]:
             if "Traceback" in msg or "Error" in msg:
                 return False, f"RUNTIME ERROR: {msg[:200]}"
     except subprocess.TimeoutExpired:
-        return True, "OK (timeout - likely a server)"
+        return False, f"TIMEOUT after {FILE_TIMEOUT}s (likely hang - see R1.1)"
     except subprocess.CalledProcessError as e:
         return False, f"SUBPROCESS ERROR: {e}"
 
     return True, "OK"
 
 
-def run_phase(phase_dir: str, label: str) -> tuple[int, int, float]:
+def run_phase(phase_dir: str, label: str, verify: bool = False) -> tuple[int, int, float]:
     phase_path = os.path.join(HERE, phase_dir) if phase_dir != "." else HERE
     if not os.path.isdir(phase_path):
         return 0, 0, 0.0
@@ -102,7 +125,7 @@ def run_phase(phase_dir: str, label: str) -> tuple[int, int, float]:
     start = time.perf_counter()
 
     for f in files:
-        ok, detail = smoke_test_file(f)
+        ok, detail = smoke_test_file(f, verify=verify)
         status = "PASS" if ok else "FAIL"
         display = f.replace("\\", "/") if len(f) > 50 else f
         print(f"  [{status}] {display:<50}  {detail[:60]}")
@@ -119,13 +142,39 @@ def main():
     parser = argparse.ArgumentParser(
         description="Smoke test runner for Python learning module"
     )
-    parser.add_argument("--phase", type=int, choices=range(1, 8),
-                        help="Run only a specific phase (1-7)")
+    parser.add_argument("--phase", type=int, choices=range(1, 10),
+                        help="Run only a specific phase (1-9)")
     parser.add_argument("--file", type=str,
                         help="Run a single file (relative path)")
     parser.add_argument("--list", action="store_true",
                         help="List all discovered files without running")
+    parser.add_argument("--all", action="store_true",
+                        help="Run all phases (default)")
+    parser.add_argument("--verify", action="store_true",
+                        help="Pass --verify to each exercise file to run _verify()")
+    parser.add_argument("--clean-outputs", action="store_true",
+                        help="Clean outputs/ directory before running tests")
+    parser.add_argument("--timeout", type=int, default=30,
+                        help="Per-file timeout in seconds (default: 30)")
     args = parser.parse_args()
+
+    global FILE_TIMEOUT
+    FILE_TIMEOUT = args.timeout
+
+    if args.clean_outputs:
+        import shutil
+        outputs_dir = os.path.join(HERE, "outputs")
+        if os.path.isdir(outputs_dir):
+            shutil.rmtree(outputs_dir)
+            os.makedirs(os.path.join(outputs_dir, "scipy"))
+            os.makedirs(os.path.join(outputs_dir, "matplotlib"))
+            os.makedirs(os.path.join(outputs_dir, "dbs"))
+            print(f"Cleaned and recreated outputs/ directory")
+        else:
+            os.makedirs(os.path.join(outputs_dir, "scipy"))
+            os.makedirs(os.path.join(outputs_dir, "matplotlib"))
+            os.makedirs(os.path.join(outputs_dir, "dbs"))
+            print(f"Created outputs/ directory")
 
     phases = [
         ("01-core-python", "01 - Core Python"),
@@ -135,6 +184,8 @@ def main():
         ("05-web-frameworks", "05 - Web Frameworks (FastAPI, Django)"),
         ("06-data-structures-algorithms", "06 - DSA"),
         ("07-machine-learning", "07 - Machine Learning"),
+        ("08-mlops", "08 - MLOps (Reproducibility to E2E)"),
+        ("09-genai", "09 - GenAI (LLMs, RAG, Agents, Production)"),
     ]
 
     if args.list:
@@ -152,7 +203,7 @@ def main():
 
     if args.file:
         print_header(f"Testing: {args.file}")
-        ok, detail = smoke_test_file(args.file)
+        ok, detail = smoke_test_file(args.file, verify=args.verify)
         status = "PASSED" if ok else "FAILED"
         print(f"  {status}: {detail}")
         return 0 if ok else 1
@@ -161,6 +212,10 @@ def main():
     print("  PYTHON MODULE - Smoke Test Suite")
     print("=" * 60)
     print(f"  Started: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"  Verify mode: {'ON' if args.verify else 'OFF'}")
+    print(f"  Per-file timeout: {FILE_TIMEOUT}s")
+    print(f"  Skip list: {sorted(SKIP_FILES)}")
+    print(f"  Skip dirs: {sorted(SKIP_DIRECTORIES)}")
 
     total_passed = 0
     total_failed = 0
@@ -171,21 +226,21 @@ def main():
             phase_num = int(phase_dir[:2])
             if phase_num != args.phase:
                 continue
-        p, f, elapsed = run_phase(phase_dir, label)
+        p, f, elapsed = run_phase(phase_dir, label, verify=args.verify)
         total_passed += p
         total_failed += f
 
     if not args.phase:
-        projects_dir = os.path.join(HERE, "projects")
-        if os.path.isdir(projects_dir):
-            print_header("Projects")
-            for proj in sorted(os.listdir(projects_dir)):
-                proj_path = os.path.join(projects_dir, proj)
+        capstones_dir = os.path.join(HERE, "capstones")
+        if os.path.isdir(capstones_dir):
+            print_header("Capstones")
+            for proj in sorted(os.listdir(capstones_dir)):
+                proj_path = os.path.join(capstones_dir, proj)
                 if os.path.isdir(proj_path):
                     py_files = [f for f in os.listdir(proj_path) if f.endswith(".py")]
                     for pf in py_files:
-                        rel = f"projects/{proj}/{pf}"
-                        ok, detail = smoke_test_file(rel)
+                        rel = f"capstones/{proj}/{pf}"
+                        ok, detail = smoke_test_file(rel, verify=args.verify)
                         status = "PASS" if ok else "FAIL"
                         print(f"  [{status}] {rel:<50}  {detail[:50]}")
                         if ok:

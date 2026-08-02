@@ -3,12 +3,13 @@ Matplotlib Subplots - W3Schools Exercises
 ===========================================
 Creating multi-panel figure layouts.
 """
-import matplotlib
 matplotlib.use('Agg')
+
+import matplotlib
+import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -35,7 +36,7 @@ def exercise_01():
 
     plt.suptitle("Exercise 1: 2x2 Subplots", fontsize=14)
     plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "08_exercise_01.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "08_exercise_01.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 01 saved")
 
@@ -59,7 +60,7 @@ def exercise_02():
     for i, ax in enumerate(axes):
         ax.set_ylabel(f"Signal {i+1}")
     plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "08_exercise_02.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "08_exercise_02.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 02 saved")
 
@@ -85,7 +86,7 @@ def exercise_03():
     ax3.set_title("Bottom Right")
 
     fig.suptitle("Exercise 3: Uneven Layout", fontsize=14)
-    plt.savefig(os.path.join(OUTPUT_DIR, "08_exercise_03.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "08_exercise_03.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 03 saved")
 
@@ -110,7 +111,7 @@ def exercise_04():
     ax_inset.set_xlabel("x", fontsize=8)
     ax_inset.tick_params(labelsize=7)
 
-    plt.savefig(os.path.join(OUTPUT_DIR, "08_exercise_04.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "08_exercise_04.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 04 saved")
 
@@ -139,7 +140,7 @@ def exercise_05():
 
     plt.suptitle("Exercise 5: Distribution Gallery", fontsize=14)
     plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "08_exercise_05.png"), dpi=100, bbox_inches="tight")
+    plt.savefig(OUTPUT_DIR / "08_exercise_05.png", dpi=100, bbox_inches="tight")
     plt.close()
     print("[OK] Exercise 05 saved")
 

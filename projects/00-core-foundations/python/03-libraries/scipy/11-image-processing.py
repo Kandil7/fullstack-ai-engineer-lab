@@ -50,8 +50,8 @@ for ax in axes:
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("scipy_11_smoothing.png", dpi=100)
-print("Plot saved: scipy_11_smoothing.png")
+plt.savefig("../../outputs/scipy/scipy_11_smoothing.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_11_smoothing.png")
 
 # Edge detection with Sobel filter
 sx = ndimage.sobel(image, axis=0, mode="constant")
@@ -69,8 +69,8 @@ for ax in axes:
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("scipy_11_edges.png", dpi=100)
-print("Plot saved: scipy_11_edges.png")
+plt.savefig("../../outputs/scipy/scipy_11_edges.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_11_edges.png")
 
 # ============================================================
 # Example 2: Morphological Operations
@@ -112,8 +112,8 @@ for ax in axes.flatten():
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("scipy_11_morphology.png", dpi=100)
-print("Plot saved: scipy_11_morphology.png")
+plt.savefig("../../outputs/scipy/scipy_11_morphology.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_11_morphology.png")
 
 # Count objects after cleaning
 labeled_opened, n_opened = ndimage.label(opened)
@@ -166,7 +166,7 @@ for i in range(1, num_features + 1):
     print(f"\n  Object {i}:")
     print(f"    Centroid: ({cx:.1f}, {cy:.1f})")
     print(f"    Area:     {area:.0f} pixels")
-    print(f"    BBox:     {bbox_w}×{bbox_h} pixels")
+    print(f"    BBox:     {bbox_w}Ã—{bbox_h} pixels")
 
 # Visualize
 fig, axes = plt.subplots(1, 3, figsize=(14, 4))
@@ -184,8 +184,8 @@ for ax in axes:
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("scipy_11_labeling.png", dpi=100)
-print("Plot saved: scipy_11_labeling.png")
+plt.savefig("../../outputs/scipy/scipy_11_labeling.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_11_labeling.png")
 
 # ============================================================
 # Example 4: Image Transformations
@@ -218,24 +218,24 @@ fig, axes = plt.subplots(2, 3, figsize=(12, 8))
 axes[0, 0].imshow(test_img, cmap="gray")
 axes[0, 0].set_title("Original")
 axes[0, 1].imshow(rotated_30, cmap="gray")
-axes[0, 1].set_title("Rotated 30°")
+axes[0, 1].set_title("Rotated 30Â°")
 axes[0, 2].imshow(rotated_45, cmap="gray")
-axes[0, 2].set_title("Rotated 45°")
+axes[0, 2].set_title("Rotated 45Â°")
 axes[1, 0].imshow(shifted, cmap="gray")
 axes[1, 0].set_title("Shifted [10, -15]")
 axes[1, 1].imshow(zoomed, cmap="gray")
-axes[1, 1].set_title(f"Zoomed 1.5× ({zoomed.shape})")
+axes[1, 1].set_title(f"Zoomed 1.5Ã— ({zoomed.shape})")
 axes[1, 2].imshow(flipped_h, cmap="gray")
 axes[1, 2].set_title("Flipped vertically")
 for ax in axes.flatten():
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("scipy_11_transforms.png", dpi=100)
-print("Plot saved: scipy_11_transforms.png")
+plt.savefig("../../outputs/scipy/scipy_11_transforms.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_11_transforms.png")
 
 print(f"\nOriginal shape: {test_img.shape}")
-print(f"Rotated 45° shape: {rotated_45.shape}")
+print(f"Rotated 45Â° shape: {rotated_45.shape}")
 print(f"Zoomed shape: {zoomed.shape}")
 
 # ============================================================
@@ -281,8 +281,8 @@ for ax in axes.flatten():
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("scipy_11_contrast.png", dpi=100)
-print("Plot saved: scipy_11_contrast.png")
+plt.savefig("../../outputs/scipy/scipy_11_contrast.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_11_contrast.png")
 
 # Print statistics
 print(f"\nImage statistics:")
@@ -292,3 +292,4 @@ print(f"  Adaptive:      mean={adaptive_enhanced.mean():.4f}, std={adaptive_enha
 
 print("\n[OK] SciPy image processing covered!")
 print("   Next: 12-io.py for file I/O operations.")
+

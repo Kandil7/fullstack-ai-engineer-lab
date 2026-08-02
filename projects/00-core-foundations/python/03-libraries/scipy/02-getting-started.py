@@ -172,3 +172,4 @@ print(f"\n95% CI for mean: [{ci[0]:.2f}, {ci[1]:.2f}]")
 
 print("\n[OK] You're ready to use SciPy!")
 print("   Next: 03-basic-functions.py to explore core functions.")
+

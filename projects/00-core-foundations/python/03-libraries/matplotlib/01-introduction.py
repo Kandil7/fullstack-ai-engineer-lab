@@ -1,12 +1,15 @@
-﻿"""
+"""
 Matplotlib Introduction: Basic Plotting
 ========================================
 
 This module covers the fundamentals of matplotlib plotting.
 """
 
+
 import matplotlib.pyplot as plt
 import numpy as np
+import pathlib
+OUTPUT_DIR = pathlib.Path(__file__).parent.parent.parent / "outputs" / "matplotlib"
 
 # =============================================================================
 # 1. BASIC PLOT
@@ -27,7 +30,7 @@ plt.xlabel('x')
 plt.ylabel('sin(x)')
 plt.grid(True)
 plt.tight_layout()
-plt.savefig('output/01_basic_plot.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "01_basic_plot.png", dpi=150)
 plt.close()
 
 print("Basic plot saved to output/01_basic_plot.png")
@@ -51,7 +54,7 @@ plt.ylabel('y')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig('output/02_multiple_lines.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "02_multiple_lines.png", dpi=150)
 plt.close()
 
 print("Multiple lines plot saved")
@@ -80,7 +83,7 @@ plt.xlabel('X')
 plt.ylabel('Y')
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig('output/03_scatter.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "03_scatter.png", dpi=150)
 plt.close()
 
 print("Scatter plot saved")
@@ -106,7 +109,7 @@ plt.xlabel('Category')
 plt.ylabel('Value')
 plt.grid(True, axis='y', alpha=0.3)
 plt.tight_layout()
-plt.savefig('output/04_bar.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "04_bar.png", dpi=150)
 plt.close()
 
 print("Bar chart saved")
@@ -135,7 +138,7 @@ plt.ylabel('Density')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig('output/05_histogram.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "05_histogram.png", dpi=150)
 plt.close()
 
 print("Histogram saved")
@@ -173,7 +176,7 @@ axes[1, 1].grid(True, alpha=0.3)
 
 plt.suptitle('2x2 Subplot Grid', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/06_subplots.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "06_subplots.png", dpi=150)
 plt.close()
 
 print("Subplots saved")
@@ -223,7 +226,7 @@ plt.annotate('Peak', xy=(np.pi/2, 1), xytext=(2, 1.3),
              fontsize=12, color='red')
 
 plt.tight_layout()
-plt.savefig('output/07_customization.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "07_customization.png", dpi=150)
 plt.close()
 
 print("Customized plot saved")
@@ -242,10 +245,10 @@ plt.plot(x, np.sin(x))
 plt.title('Save Demo')
 
 # Save in different formats
-plt.savefig('output/plot.png', dpi=300, bbox_inches='tight')
-plt.savefig('output/plot.pdf', bbox_inches='tight')
-plt.savefig('output/plot.svg', bbox_inches='tight')
-plt.savefig('output/plot_transparent.png', dpi=150, transparent=True, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "plot.png", dpi=300, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "plot.pdf", bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "plot.svg", bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "plot_transparent.png", dpi=150, transparent=True, bbox_inches='tight')
 plt.close()
 
 print("Saved: PNG (300 DPI), PDF, SVG, Transparent PNG")
@@ -270,7 +273,7 @@ with plt.style.context('seaborn-v0_8-whitegrid'):
     plt.plot(x, np.sin(x))
     plt.title('With seaborn-v0_8-whitegrid style')
     plt.tight_layout()
-    plt.savefig('output/09_style.png', dpi=150)
+    plt.savefig(OUTPUT_DIR / "09_style.png", dpi=150)
     plt.close()
 
 print("\nStyle demo saved")
@@ -299,7 +302,7 @@ ax.legend()
 ax.grid(True, alpha=0.3)
 
 # Save
-fig.savefig('output/10_oop.png', dpi=150)
+fig.savefig(OUTPUT_DIR / '10_oop.png', dpi=150)
 plt.close(fig)
 
 print("OOP interface demo saved")

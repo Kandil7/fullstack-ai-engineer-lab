@@ -49,7 +49,7 @@ for m in methods:
 x_plot = np.linspace(-5, 10, 500)
 y_plot = objective(x_plot)
 fig, ax = plt.subplots(figsize=(10, 4))
-ax.plot(x_plot, y_plot, "b-", linewidth=2, label="f(x) = (x-3)² + 2sin(2πx)")
+ax.plot(x_plot, y_plot, "b-", linewidth=2, label="f(x) = (x-3)Â² + 2sin(2Ï€x)")
 ax.plot(result.x, result.fun, "r*", markersize=15, label=f"Minimum ({result.x:.2f}, {result.fun:.2f})")
 ax.set_title("Scalar Minimization")
 ax.set_xlabel("x")
@@ -57,8 +57,8 @@ ax.set_ylabel("f(x)")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_07_scalar_min.png", dpi=100)
-print("Plot saved: scipy_07_scalar_min.png")
+plt.savefig("../../outputs/scipy/scipy_07_scalar_min.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_07_scalar_min.png")
 
 # ============================================================
 # Example 2: Multivariate Minimization
@@ -106,8 +106,8 @@ ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.legend()
 plt.tight_layout()
-plt.savefig("scipy_07_rosenbrock.png", dpi=100)
-print("Plot saved: scipy_07_rosenbrock.png")
+plt.savefig("../../outputs/scipy/scipy_07_rosenbrock.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_07_rosenbrock.png")
 
 # ============================================================
 # Example 3: Curve Fitting with curve_fit
@@ -131,11 +131,11 @@ def exp_decay(x, A, B, C):
 popt, pcov = optimize.curve_fit(exp_decay, x_data, y_noisy, p0=[2, 1, 0])
 perr = np.sqrt(np.diag(pcov))  # Standard errors
 
-print(f"Curve fitting: y = A·exp(-B·x) + C")
+print(f"Curve fitting: y = AÂ·exp(-BÂ·x) + C")
 print(f"  Fitted parameters:")
-print(f"    A = {popt[0]:.4f} ± {perr[0]:.4f} (true: {A_true})")
-print(f"    B = {popt[1]:.4f} ± {perr[1]:.4f} (true: {B_true})")
-print(f"    C = {popt[2]:.4f} ± {perr[2]:.4f} (true: {C_true})")
+print(f"    A = {popt[0]:.4f} Â± {perr[0]:.4f} (true: {A_true})")
+print(f"    B = {popt[1]:.4f} Â± {perr[1]:.4f} (true: {B_true})")
+print(f"    C = {popt[2]:.4f} Â± {perr[2]:.4f} (true: {C_true})")
 
 # Goodness of fit
 y_fit = exp_decay(x_data, *popt)
@@ -157,8 +157,8 @@ ax.set_ylabel("y")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_07_curve_fit.png", dpi=100)
-print("Plot saved: scipy_07_curve_fit.png")
+plt.savefig("../../outputs/scipy/scipy_07_curve_fit.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_07_curve_fit.png")
 
 # ============================================================
 # Example 4: Root Finding
@@ -198,8 +198,8 @@ ax.set_xlabel("x")
 ax.set_ylabel("f(x)")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_07_roots.png", dpi=100)
-print("Plot saved: scipy_07_roots.png")
+plt.savefig("../../outputs/scipy/scipy_07_roots.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_07_roots.png")
 
 # Verify roots
 print(f"\nVerification:")
@@ -267,8 +267,9 @@ ax.set_title("Linear Programming: Max 3x + 5y")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_07_linprog.png", dpi=100)
-print("Plot saved: scipy_07_linprog.png")
+plt.savefig("../../outputs/scipy/scipy_07_linprog.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_07_linprog.png")
 
 print("\n[OK] SciPy optimization covered!")
 print("   Next: 08-linear-algebra.py for matrix operations.")
+

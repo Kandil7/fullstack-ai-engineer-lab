@@ -60,8 +60,8 @@ axes[1].set_title("Sample Histogram vs PDF")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_04_distributions.png", dpi=100)
-print("Plot saved: scipy_04_distributions.png")
+plt.savefig("../../outputs/scipy/scipy_04_distributions.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_04_distributions.png")
 
 # ============================================================
 # Example 2: Comparing Multiple Distributions
@@ -98,8 +98,8 @@ axes[1].set_ylabel("F(x)")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_04_multi_dist.png", dpi=100)
-print("Plot saved: scipy_04_multi_dist.png")
+plt.savefig("../../outputs/scipy/scipy_04_multi_dist.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_04_multi_dist.png")
 
 # Quick stats summary for each
 print(f"\n{'Distribution':<20s} {'Mean':>8s} {'Std':>8s} {'Skew':>8s} {'Kurt':>8s}")
@@ -220,7 +220,7 @@ slope, intercept, r_val, p_val, std_err = stats.linregress(x, y)
 print(f"\nLinear regression (y = mx + b):")
 print(f"  Slope (m):     {slope:.4f} (true: 2.5)")
 print(f"  Intercept (b): {intercept:.4f} (true: 3.0)")
-print(f"  R²:            {r_val**2:.4f}")
+print(f"  RÂ²:            {r_val**2:.4f}")
 print(f"  Std error:     {std_err:.4f}")
 
 # Plot regression
@@ -234,8 +234,9 @@ ax.set_ylabel("y")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_04_regression.png", dpi=100)
-print("Plot saved: scipy_04_regression.png")
+plt.savefig("../../outputs/scipy/scipy_04_regression.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_04_regression.png")
 
 print("\n[OK] SciPy statistics module covered!")
 print("   Next: 05-integration.py for numerical integration.")
+

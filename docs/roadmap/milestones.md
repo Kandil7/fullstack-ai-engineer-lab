@@ -3,164 +3,206 @@
 > Trackable milestones with evidence. Update status at weekly reviews.
 > Statuses: `Planned` · `In Progress` · `Blocked` · `Review` · `Done` · `Deferred`
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-08-02
 
 ---
 
-## Phase 0 — Foundations (Months 1–3)
+## Two tracks, two ID prefixes
 
-| ID | Milestone | Due | Evidence | Status |
-|----|-----------|-----|----------|--------|
-| M1 | Go basics + mini exercises | Month 1 | `projects/00-core-foundations/go/` | In Progress |
-| M2 | HTML/CSS/JS portfolio | Month 1 | `projects/00-core-foundations/` | Planned |
-| M3 | Git workflow mastery | Month 2 | `projects/00-core-foundations/git-linux/` | Planned |
-| M6 | First source-learning workflow complete | Month 3 | `docs/learning/source-summaries/` | Planned |
+| Prefix | Track | Status |
+| --- | --- | --- |
+| **A** | [Active Track — 10-Week AI Engineer](active-track-10-week.md) | **Active** |
+| **M** | [Long Track — 12-month master roadmap](master-roadmap.md) | Deferred under [ADR-0004](../decisions/0004-adopt-10-week-ai-engineer-track.md) |
 
-### M1 — Go Basics + Mini Exercises
-- **Description:** Complete Go Tour + 10 mini-exercises (structs, interfaces, HTTP handlers, error handling)
-- **Owner:** Mohamed
-- **Acceptance:** 10 exercises in `projects/00-core-foundations/go/`, each with `_test.go` passing
-- **Blocked by:** Nothing
-
-### M2 — HTML/CSS/JS Portfolio
-- **Description:** Build a 3-page portfolio site demonstrating HTML/CSS/JS fundamentals
-- **Owner:** Mohamed
-- **Acceptance:** Deployed site (GitHub Pages or Vercel), responsive, 3+ pages
-- **Blocked by:** Nothing
-
-### M3 — Git Workflow Mastery
-- **Description:** Demonstrate feature branch → commit → PR → merge → cleanup workflow
-- **Owner:** Mohamed
-- **Acceptance:** 5+ PRs with clean history, conventional commits, no merge conflicts
-- **Blocked by:** Nothing
-
-### M6 — First Source-Learning Workflow
-- **Description:** Complete one full source-learning cycle (read → extract → apply → document)
-- **Owner:** Mohamed
-- **Acceptance:** Source summary in `docs/learning/source-summaries/`, exercise applied in project
-- **Blocked by:** Nothing
+Long-track milestones are retained rather than deleted — several will be revisited after
+employment, and M1/M3/M6 are partially satisfied already.
 
 ---
 
-## Phase 0 → Phase 1 Bridge (Month 3)
+# Active Track (A1–A10)
 
-| ID | Milestone | Due | Evidence | Status |
-|----|-----------|-----|----------|--------|
-| M4 | Auth-service MVP | Month 3 | `projects/01-backend-go/01-auth-service/` | Planned |
-| M5 | PostgreSQL schema design | Month 3 | `projects/03-databases/postgres-design/` | Planned |
-
-### M4 — Auth-Service MVP
-- **Description:** Go auth service with register, login, JWT middleware, and basic error handling
-- **Owner:** Mohamed
-- **Acceptance:** `go test ./...` passes, API endpoints working, README with usage
-- **Blocked by:** M1 (Go basics)
-
-### M5 — PostgreSQL Schema Design
-- **Description:** Design and implement PostgreSQL schema for auth + users + sessions
-- **Owner:** Mohamed
-- **Acceptance:** Migration files, schema documented, seed data, queries tested
-- **Blocked by:** Nothing (can start in parallel)
+| ID | Milestone | Week | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| A1 | CI green + `devmate stats` CLI | 0 | `.github/workflows/ci.yml`, `devmate/src/` | In Progress |
+| A2 | LLM layer traced and costed | 1 | `devmate/src/devmate/obs/` | Planned |
+| A3 | RAG with measured eval + 2 ADRs | 2–3 | `evaluations/rag/reports/` | Planned |
+| A4 | **Deployed at a public URL** | 4 | live link in `devmate/README.md` | Planned |
+| A5 | Agent with 4 tools + MCP server | 5–6 | `devmate/src/devmate/agent/`, `devmate/mcp/` | Planned |
+| A6 | Production hardening | 7 | `devmate/docs/failure-modes.md` | Planned |
+| A7 | Portfolio complete | 8 | `docs/writing/`, `docs/career/` | Planned |
+| A8 | 40 applications submitted | 9–10 | `docs/tracking/applications.md` | Planned |
+| A9 | First technical interview | 9–10 | `docs/tracking/applications.md` | Planned |
+| A10 | Deferred ML sprint | 11+ | `python/07-machine-learning/` | Planned |
 
 ---
 
-## Phase 1 + Phase 2 (Months 4–6)
+### A1 — CI Green + `devmate stats` CLI
 
-| ID | Milestone | Due | Evidence | Status |
-|----|-----------|-----|----------|--------|
-| M7 | Frontend app (Flutter or Next.js) | Month 4 | `projects/02-frontend/` | Planned |
-| M8 | Full-stack integration | Month 5 | Complete app (frontend + backend) | Planned |
-| M9 | Docker deployment | Month 6 | `projects/06-devops/docker/` | Planned |
+- **Description:** Repo hygiene fixed, CI pipeline running, and the first DevMate command
+  shipped: walk a repository, parse Python with `ast`, report functions/classes/LOC/file types.
+- **Acceptance:** `make ci` passes locally and on GitHub · `devmate stats .` produces
+  hand-verified numbers for this repo · unit tests pass · 5 PRs merged with clean history ·
+  one deliberate interactive rebase · pyproject typo fixed and tracked binaries removed.
+- **Blocked by:** nothing.
 
-### M7 — Frontend App
-- **Description:** Build frontend application (Flutter mobile OR Next.js web) with API integration
-- **Owner:** Mohamed
-- **Acceptance:** App connects to Go backend, auth flow works, responsive UI
-- **Blocked by:** M4 (Auth-service MVP)
+### A2 — LLM Layer Traced and Costed
 
-### M8 — Full-Stack Integration
-- **Description:** End-to-end flow: frontend → backend → database → response
-- **Owner:** Mohamed
-- **Acceptance:** User can register, login, see dashboard with real data
-- **Blocked by:** M7, M4, M5
+- **Description:** Claude API integration with streaming, structured outputs, retries with
+  backoff, and typed errors — instrumented from the first call.
+- **Acceptance:** `devmate ask "<q>"` streams an answer · every call appears as a Langfuse
+  trace · token count and dollar cost recorded per request · 10 golden cases committed ·
+  three deliberate failures (mid-stream kill, oversized prompt, malformed structured output)
+  documented in `mistakes.md`.
+- **Blocked by:** A1.
+- **Note:** observability is a *precondition* here, not a later addition — the correction
+  recorded in ADR-0004.
 
-### M9 — Docker Deployment
-- **Description:** Docker Compose setup for full stack (Go + Frontend + PostgreSQL + Redis)
-- **Owner:** Mohamed
-- **Acceptance:** `docker compose up` runs entire stack, health checks pass
-- **Blocked by:** M8
+### A3 — RAG with Measured Evaluation
+
+- **Description:** Full retrieval pipeline, built eval-first: golden set → harness → three
+  chunkers → Qdrant → Chroma comparison → hybrid + rerank.
+- **Acceptance:** 25-question golden set over this repo · `make eval` prints recall@5,
+  recall@10, MRR, faithfulness · three chunking strategies compared in a table · `VectorStore`
+  Protocol with two working adapters · hybrid retrieval (dense + BM25) with reranking · **two
+  ADRs, each citing measured numbers** (chunking strategy; vector store comparison).
+- **Blocked by:** A2.
+- **Note:** the eval harness precedes the chunkers. Comparing without measuring produces
+  opinion.
+
+### A4 — Deployed at a Public URL
+
+- **Description:** FastAPI service, containerized, deployed, with Postgres persistence and a
+  Streamlit UI. Includes the 3-day SQL sprint.
+- **Acceptance:** public URL reachable · `/health` and `/ready` respond · `/ask` streams over
+  SSE · rate limiting and API-key auth active · Postgres stores conversations, messages, eval
+  runs, and per-query cost · migrations with justified indexes · multi-stage Dockerfile ·
+  service present in `infra/docker/docker-compose.yml` · cold-start behaviour handled or
+  documented.
+- **Blocked by:** A3.
+- **Note:** **the governing rule lifts here.** First portfolio-ready artifact.
+
+### A5 — Agent with 4 Tools + MCP Server
+
+- **Description:** Tool-using agent, built one tool at a time, plus an MCP server exposing
+  DevMate retrieval.
+- **Acceptance:** 4 working tools (`search_code`, `read_file`, `run_tests`, `propose_patch`) ·
+  ReAct loop with step cap and loop detection, **proven by a test** · LangGraph port with a
+  written comparison against the hand-rolled version · MCP server reachable from a real MCP
+  client · agent eval reporting task completion and tool-selection accuracy.
+- **Blocked by:** A4.
+- **Note:** MCP is the differentiator — it appears in current postings and the repo has none.
+
+### A6 — Production Hardening
+
+- **Description:** Cache, guardrails, fallback, and testing appropriate to a non-deterministic
+  system.
+- **Acceptance:** Redis semantic cache with a measured hit rate · input guardrails blocking
+  OWASP LLM top-10 injection attempts, with evidence · output guardrails (PII, schema) ·
+  model fallback chain · tests using a mocked LLM, prompt snapshots, and recorded cassettes ·
+  p50/p95 latency under load · `failure-modes.md` covering every dependency failure exercised.
+- **Blocked by:** A5.
+
+### A7 — Portfolio Complete
+
+- **Description:** Everything built becomes legible. No new features.
+- **Acceptance:** technical blog post about decisions and trade-offs (not a tutorial) ·
+  portfolio README with architecture diagram, eval numbers, cost per query, demo GIF · CV
+  targeted at remote AI roles · LinkedIn and GitHub profile updated · 3 recorded 2-minute
+  English explanations · drafted answers to all 27 interview questions.
+- **Blocked by:** A6.
+- **Acceptance test:** a stranger understands what the project does and why it is built that
+  way, from the README alone, in under two minutes.
+
+### A8 — 40 Applications Submitted
+
+- **Description:** 20 per week across weeks 9–10, tracked with a feedback loop.
+- **Acceptance:** `docs/tracking/applications.md` with 40 entries · each recording platform,
+  stack from the posting, status, **gap identified**, and the task created to close it.
+- **Blocked by:** A7.
+
+### A9 — First Technical Interview
+
+- **Description:** Reach and complete a technical round.
+- **Acceptance:** interview completed · every question that caused a stumble logged as a gap ·
+  each gap converted into a task.
+- **Blocked by:** A8.
+
+### A10 — Deferred ML Sprint
+
+- **Description:** Close the classical ML/DL gap deliberately deferred in ADR-0004.
+- **Acceptance:** sklearn pipeline end-to-end · data leakage induced, measured, and fixed ·
+  a PyTorch training loop written by hand · self-attention implemented from scratch ·
+  gradient-boosting vs. neural net comparison written up · able to explain backpropagation,
+  data leakage, and self-attention at a whiteboard without notes.
+- **Blocked by:** A7 (uses buffer weeks 11–12; runs in parallel with A8/A9).
+- **Reference:** [`../reference/ml-fundamentals-map.md`](../reference/ml-fundamentals-map.md)
 
 ---
 
-## Phase 3 — AI Fundamentals (Month 7)
+### Active-track dependency chain
 
-| ID | Milestone | Due | Evidence | Status |
-|----|-----------|-----|----------|--------|
-| M10 | AI foundations complete | Month 7 | `projects/04-ai-engineering/` | Planned |
-
-### M10 — AI Foundations Complete
-- **Description:** Python proficiency + ML basics + prompt engineering library
-- **Owner:** Mohamed
-- **Acceptance:** 20+ Python scripts, prompt library with 10+ prompts, ML classifier trained
-- **Blocked by:** Nothing (can start after Phase 0)
-
----
-
-## Phase 4 — RAG Systems (Month 10)
-
-| ID | Milestone | Due | Evidence | Status |
-|----|-----------|-----|----------|--------|
-| M11 | RAG system working | Month 10 | `projects/04-ai-engineering/rag-system/` | Planned |
-
-### M11 — RAG System Working
-- **Description:** End-to-end RAG pipeline with evaluation
-- **Owner:** Mohamed
-- **Acceptance:** Ingest → chunk → embed → store → retrieve → generate, evaluation report
-- **Blocked by:** M10
-
----
-
-## Phase 5 — AI Agents (Month 11)
-
-| ID | Milestone | Due | Evidence | Status |
-|----|-----------|-----|----------|--------|
-| M12 | Agent system working | Month 11 | `projects/04-ai-engineering/agents/` | Planned |
-
-### M12 — Agent System Working
-- **Description:** Agent with 3+ tools, multi-step reasoning, error handling
-- **Owner:** Mohamed
-- **Acceptance:** Agent completes tasks, tool accuracy > 80%, evaluation report
-- **Blocked by:** M10
-
----
-
-## Phase 7 — Capstone (Month 12)
-
-| ID | Milestone | Due | Evidence | Status |
-|----|-----------|-----|----------|--------|
-| M13 | Capstone MVP | Month 12 | `projects/07-capstone/thanaweyagpt/` | Planned |
-
-### M13 — ThanaweyaGPT MVP
-- **Description:** Full-stack AI application integrating all learned skills
-- **Owner:** Mohamed
-- **Acceptance:** Working app with backend + frontend + RAG + agent, deployed
-- **Blocked by:** M8, M11, M12, M9
-
----
-
-## Milestone Summary
-
-| Total | Done | In Progress | Blocked | Planned | Deferred |
-|-------|------|-------------|---------|---------|----------|
-| 13 | 0 | 0 | 0 | 13 | 0 |
-
-### Dependency Graph
-
+```text
+A1 → A2 → A3 → A4 → A5 → A6 → A7 → A8 → A9
+     (CI)  (LLM) (RAG) (deploy) (agent) (harden) (portfolio) (apply)
+                                                  └→ A10 (ML sprint, parallel)
 ```
-M1 (Go basics) ──────────→ M4 (Auth MVP) ──→ M7 (Frontend) ──→ M8 (Full-stack) ──→ M9 (Docker)
-M2 (Portfolio)                                                                │
-M3 (Git mastery)                                                              │
-M5 (PostgreSQL) ──────────────────────────────────────────────────────────────→│
-M6 (Source learning)                                                          │
-M10 (AI foundations) ──→ M11 (RAG) ──→ M13 (ThanaweyaGPT) ←──────────────────┘
-                   └──→ M12 (Agents) ──────────────────────────→ M13
-```
+
+Strictly linear through A7 — each week's deliverable is the next week's foundation. Two float
+weeks (11–12) absorb slippage.
+
+---
+
+# Long Track (M1–M13) — deferred
+
+> Retained for post-employment depth. Not scheduled. See
+> [`master-roadmap.md`](master-roadmap.md) and
+> [`phase-2-athar-baligh.md`](phase-2-athar-baligh.md).
+
+## Phase 0 — Foundations
+
+| ID | Milestone | Evidence | Status |
+| --- | --- | --- | --- |
+| M1 | Go basics + mini exercises | `projects/00-core-foundations/go/` | Deferred — 2 of 10 exercises scaffolded |
+| M2 | HTML/CSS/JS portfolio | `projects/00-core-foundations/` | Deferred |
+| M3 | Git workflow mastery | this repo | Partially met — folded into A1 |
+| M6 | First source-learning workflow | `docs/learning/source-summaries/` | Partially met — 1 summary exists |
+
+## Phase 0 → 1 Bridge
+
+| ID | Milestone | Evidence | Status |
+| --- | --- | --- | --- |
+| M4 | Auth-service MVP | `projects/01-backend-go/01-auth-service/` | Deferred — scaffolded, incomplete |
+| M5 | PostgreSQL schema design | `projects/03-databases/postgres-design/` | Superseded by A4's SQL sprint |
+
+## Phases 1–2 — Backend + Frontend
+
+| ID | Milestone | Evidence | Status |
+| --- | --- | --- | --- |
+| M7 | Frontend app (Flutter or Next.js) | `projects/02-frontend/` | Deferred |
+| M8 | Full-stack integration | complete app | Deferred |
+| M9 | Docker deployment | `projects/06-devops/docker/` | Partially met by A4 |
+
+## Phases 3–5 — AI
+
+| ID | Milestone | Evidence | Status |
+| --- | --- | --- | --- |
+| M10 | AI foundations complete | `projects/04-ai-engineering/` | Superseded by A2 |
+| M11 | RAG system working | `projects/04-ai-engineering/rag-system/` | Superseded by A3 |
+| M12 | Agent system working | `projects/04-ai-engineering/agents/` | Superseded by A5 |
+
+## Phase 7 — Capstone
+
+| ID | Milestone | Evidence | Status |
+| --- | --- | --- | --- |
+| M13 | ThanaweyaGPT MVP | `projects/07-capstone/thanaweyagpt/` | Deferred — DevMate is the active vehicle |
+
+---
+
+## Summary
+
+| Track | Total | Done | In Progress | Planned | Deferred / Superseded |
+| --- | --- | --- | --- | --- | --- |
+| Active (A) | 10 | 0 | 1 | 9 | 0 |
+| Long (M) | 13 | 0 | 0 | 0 | 13 |
+
+**The number that matters: deployed services = 0.** Target A4, week 4.

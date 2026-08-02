@@ -1,0 +1,21 @@
+
+<!DOCTYPE html>
+<html>
+<head><title>Dashboard</title></head>
+<body>
+    <h1>Dashboard</h1>
+    <p>Welcome back, {{ user.name }}!</p>
+    <h2>Your Items:</h2>
+    <table border="1">
+        <tr><th>Name</th><th>Price</th><th>In Stock</th></tr>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>${{ "%.2f"|format(item.price) }}</td>
+            <td>{{ "Yes" if item.in_stock else "No" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>Total items: {{ items|length }}</p>
+</body>
+</html>

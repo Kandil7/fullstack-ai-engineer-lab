@@ -66,9 +66,9 @@ print("Common values:", common)
 print("Indices in arr1:", idx1)  # [3 4 5]
 print("Indices in arr2:", idx2)  # [0 1 2]
 
-# Multiple arrays
+# Multiple arrays (intersect1d takes exactly two arrays; chain for more)
 arr3 = np.array([5, 6, 7, 10])
-common_all = np.intersect1d(arr1, arr2, arr3)
+common_all = np.intersect1d(np.intersect1d(arr1, arr2), arr3)
 print("\nCommon in all 3:", common_all)  # [5 6]
 
 # Practical: find common customers

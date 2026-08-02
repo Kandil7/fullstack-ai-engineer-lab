@@ -54,7 +54,9 @@ def aggregate(collection, pipeline):
         elif stage_type == "$project":
             result = agg_project(result, stage_args)
         elif stage_type == "$limit":
-            result = result[:stage_args.get("limit", 10)]
+            # Stage may be ("$limit", 3) or ("$limit", {"limit": 3})
+            limit = stage_args if isinstance(stage_args, int) else stage_args.get("limit", 10)
+            result = result[:limit]
         elif stage_type == "$unwind":
             result = agg_unwind(result, stage_args)
     

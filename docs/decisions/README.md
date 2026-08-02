@@ -10,6 +10,9 @@ the architectural memory of the workspace. New ADRs are created with `infra/scri
 | [0001](0001-repo-centric-workspace.md) | Repo-centric agentic workspace | Accepted | 2026-06-26 |
 | [0002](0002-prompt-modularization.md) | Prompt modularization & `.ai` namespace | Accepted | 2026-06-26 |
 | [0003](0003-hybrid-stack-go-fastapi.md) | Hybrid stack — Go core + FastAPI AI | Accepted | 2026-06-26 |
+| [0004](0004-adopt-10-week-ai-engineer-track.md) | Adopt the 10-week AI-Engineer track as the active plan | Accepted | 2026-08-02 |
+| [0005](0005-vector-db-qdrant-over-chromadb.md) | Vector DB — Qdrant primary, ChromaDB as a one-week comparison | Accepted | 2026-08-02 |
+| [0006](0006-adopt-master-ai-engineering-curriculum.md) | Lift the lecture moratorium — adopt the Master AI Engineering curriculum | Accepted | 2026-08-02 |
 
 ## Lifecycle
 
@@ -39,4 +42,4 @@ Or manually:
 3. Add to this index table
 4. Update `registries/decision-log.yaml`
 
-*Last updated: 2026-06-26*
+*Last updated: 2026-08-02*

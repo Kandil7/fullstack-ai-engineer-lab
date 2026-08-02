@@ -107,9 +107,18 @@ def query_and(collection, conditions):
         match = True
         for condition in conditions:
             field = list(condition.keys())[0]
-            op = list(condition[field].keys())[0]
-            value = condition[field][op]
-            
+            value = condition[field]
+
+            # Plain equality condition: {"city": "Boston"}
+            if not isinstance(value, dict):
+                if doc.get(field) != value:
+                    match = False
+                continue
+
+            # Operator condition: {"age": {"$gt": 25}}
+            op = list(value.keys())[0]
+            value = value[op]
+
             if op == "$gt" and not (doc.get(field, 0) > value):
                 match = False
             elif op == "$lt" and not (doc.get(field, 0) < value):

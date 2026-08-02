@@ -48,11 +48,11 @@ root = brentq(f, 2, 3)
 print(f"Root of x^3 - 2x - 5 = 0: x = {root:.6f}")
 print(f"Verification: f({root:.6f}) = {f(root):.2e}")
 
-ax.plot(root, f(root), "ro", markersize=10, label=f"Root ≈ {root:.4f}")
+ax.plot(root, f(root), "ro", markersize=10, label=f"Root â‰ˆ {root:.4f}")
 ax.legend()
 plt.tight_layout()
-plt.savefig("scipy_03_roots.png", dpi=100)
-print("Plot saved: scipy_03_roots.png")
+plt.savefig("../../outputs/scipy/scipy_03_roots.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_03_roots.png")
 
 # System of nonlinear equations with fsolve
 def system(vars):
@@ -117,8 +117,8 @@ ax.set_xlabel("x")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_03_derivative.png", dpi=100)
-print("Plot saved: scipy_03_derivative.png")
+plt.savefig("../../outputs/scipy/scipy_03_derivative.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_03_derivative.png")
 
 # ============================================================
 # Example 3: Spatial Distance Calculations
@@ -175,15 +175,15 @@ smoothed_3 = gaussian_filter1d(signal_noisy, sigma=5)
 fig, ax = plt.subplots(figsize=(10, 4))
 ax.plot(x, signal_noisy, "gray", alpha=0.5, label="Noisy signal")
 ax.plot(x, signal_clean, "b-", linewidth=2, label="Clean signal")
-ax.plot(x, smoothed_1, "r-", linewidth=1.5, label="Gaussian σ=2")
-ax.plot(x, smoothed_3, "g-", linewidth=1.5, label="Gaussian σ=5")
+ax.plot(x, smoothed_1, "r-", linewidth=1.5, label="Gaussian Ïƒ=2")
+ax.plot(x, smoothed_3, "g-", linewidth=1.5, label="Gaussian Ïƒ=5")
 ax.set_title("Gaussian Smoothing of Noisy Signal")
 ax.set_xlabel("x")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("scipy_03_smoothing.png", dpi=100)
-print("Plot saved: scipy_03_smoothing.png")
+plt.savefig("../../outputs/scipy/scipy_03_smoothing.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_03_smoothing.png")
 
 # 2D Gaussian filter example
 image = np.random.rand(100, 100)
@@ -195,11 +195,11 @@ im0 = axes[0].imshow(image, cmap="viridis")
 axes[0].set_title("Noisy 2D Data")
 plt.colorbar(im0, ax=axes[0], shrink=0.8)
 im1 = axes[1].imshow(image_smooth, cmap="viridis")
-axes[1].set_title("After Gaussian Filter (σ=5)")
+axes[1].set_title("After Gaussian Filter (Ïƒ=5)")
 plt.colorbar(im1, ax=axes[1], shrink=0.8)
 plt.tight_layout()
-plt.savefig("scipy_03_2d_filter.png", dpi=100)
-print("Plot saved: scipy_03_2d_filter.png")
+plt.savefig("../../outputs/scipy/scipy_03_2d_filter.png", dpi=100)
+print("Plot saved: ../../outputs/scipy/scipy_03_2d_filter.png")
 
 # ============================================================
 # Example 5: Quick Optimization (minimize a function)
@@ -226,3 +226,4 @@ for start in starts:
 
 print("\n[OK] Basic SciPy functions covered!")
 print("   Next: 04-statistics.py for statistical analysis.")
+

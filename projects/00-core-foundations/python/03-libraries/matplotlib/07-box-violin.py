@@ -3,7 +3,10 @@ Matplotlib Box and Violin Plots
 ================================
 """
 
+import pathlib
 import matplotlib.pyplot as plt
+OUTPUT_DIR = pathlib.Path(__file__).parent.parent.parent / "outputs" / "matplotlib"
+import pathlib
 import numpy as np
 import pandas as pd
 
@@ -64,7 +67,7 @@ axes[1, 1].grid(True, alpha=0.3, axis='y')
 
 plt.suptitle('Box Plot Variations', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/box_basic.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "box_basic.png", dpi=150)
 plt.close()
 
 print("Basic box plots saved")
@@ -122,7 +125,7 @@ axes[1, 1].grid(True, alpha=0.3, axis='y')
 
 plt.suptitle('Box Plot Customizations', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/box_custom.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "box_custom.png", dpi=150)
 plt.close()
 
 print("Customized box plots saved")
@@ -196,7 +199,7 @@ axes[1, 1].grid(True, alpha=0.3, axis='y')
 
 plt.suptitle('Violin Plot Variations', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/violin_basic.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "violin_basic.png", dpi=150)
 plt.close()
 
 print("Violin plots saved")
@@ -299,7 +302,7 @@ axes[1, 1].grid(True, alpha=0.3, axis='y')
 
 plt.suptitle('Statistical Annotations', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/box_violin_stats.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "box_violin_stats.png", dpi=150)
 plt.close()
 
 print("Statistical annotations saved")
@@ -416,7 +419,7 @@ axes[1, 1].grid(True, alpha=0.3, axis='y')
 
 plt.suptitle('Grouped Box/Violin Plots', fontsize=16)
 plt.tight_layout()
-plt.savefig('output/box_violin_grouped.png', dpi=150)
+plt.savefig(OUTPUT_DIR / "box_violin_grouped.png", dpi=150)
 plt.close()
 
 print("Grouped plots saved")

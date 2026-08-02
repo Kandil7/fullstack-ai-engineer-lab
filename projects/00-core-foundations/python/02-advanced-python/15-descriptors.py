@@ -264,7 +264,7 @@ if __name__ == "__main__":
 
     # 2. Type-checked descriptor
     print("\n--- Type-Checked Descriptors ---")
-    emp = Employee("Alice", 30, 75000)
+    emp = Employee("Alice", 30, 75000.0)  # float, as Typed(float) requires
     print(f"  Employee: {emp.name}, age {emp.age}")
     print(f"  Tax rate: {emp.tax_rate:.0%}")
     print(f"  Annual tax: ${emp.annual_tax:,.2f}")
