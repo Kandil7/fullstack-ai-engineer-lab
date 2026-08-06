@@ -145,8 +145,13 @@ print(joined[['name', 'dept_name', 'location']])
 print()
 
 # Join multiple
-projects_indexed = projects.set_index('emp_id')
-joined_multi = emp_indexed.join([dept_indexed, projects_indexed], how='left', rsuffix='_proj')
+# NOTE: .join([df1, df2]) does NOT support suffixes ("Suffixes not supported when
+# joining multiple DataFrames"), so chain pairwise joins and rename first to avoid
+# the 'budget' column collision
+projects_indexed = projects.set_index('emp_id').rename(columns={'budget': 'project_budget'})
+joined_multi = (emp_indexed
+    .join(dept_indexed, how='left', rsuffix='_dept')
+    .join(projects_indexed, how='left', rsuffix='_proj'))
 print("Join multiple DataFrames:")
 print(joined_multi[['name', 'dept_name', 'project_name', 'project_budget']])
 print()

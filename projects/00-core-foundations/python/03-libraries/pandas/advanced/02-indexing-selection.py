@@ -244,7 +244,9 @@ print("=" * 60)
 # df.iloc[0:3] excludes position 3
 
 # Setting with enlargement
-df.loc['z'] = ['Zoe', 28, 95000, 'Eng', 5, True, 5000]
+# NOTE: the list must match the FULL column count (8 cols), or pandas raises
+# "cannot set a row with mismatched columns"
+df.loc['z'] = [21, 'Zoe', 28, 95000, 'Eng', 5, True, 5000]
 print("After df.loc['z'] = [...]:")
 print(df.tail(3))
 

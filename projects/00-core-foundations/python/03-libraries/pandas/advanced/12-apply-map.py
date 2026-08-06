@@ -35,8 +35,8 @@ print("=" * 60)
 print("2. MAP - SERIES TRANSFORMATION")
 print("=" * 60)
 
-# Map with dict
-fruit_map = {'apple': '🍎', 'banana': '🍌', 'cherry': '🍒', 'date': '🌴', 'elderberry': '🫐'}
+# Map with dict (ASCII-safe labels: emoji are not printable on Windows cp1252)
+fruit_map = {'apple': 'APPLE', 'banana': 'BANANA', 'cherry': 'CHERRY', 'date': 'DATE', 'elderberry': 'BERRY'}
 df['C_emoji'] = df['C'].map(fruit_map)
 print("Map with dict:")
 print(df[['C', 'C_emoji']])
@@ -103,7 +103,9 @@ def multiply_add(x, mult, add):
     return x * mult + add
 
 print("Apply with args:")
-print(df['A'].apply(multiply_add, args=(2,), kwargs={'add': 10}))
+# NOTE: apply(func, args=..., **kwds) — there is no 'kwargs=' parameter;
+# keyword arguments are passed directly (apply(..., add=10))
+print(df['A'].apply(multiply_add, args=(2,), add=10))
 print()
 
 # =============================================================================

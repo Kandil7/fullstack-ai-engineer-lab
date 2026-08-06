@@ -11,6 +11,20 @@ import io
 import sqlite3
 from sqlalchemy import create_engine, text
 
+try:
+    import openpyxl  # noqa: F401
+    HAS_OPENPYXL = True
+except ImportError:
+    HAS_OPENPYXL = False
+    print("[skip] openpyxl not installed — pip install openpyxl")
+
+try:
+    import xlsxwriter  # noqa: F401
+    HAS_XLSXWRITER = True
+except ImportError:
+    HAS_XLSXWRITER = False
+    print("[skip] xlsxwriter not installed — pip install xlsxwriter")
+
 np.random.seed(42)
 
 # =============================================================================
@@ -29,47 +43,50 @@ df = pd.DataFrame({
     'Rep': np.random.choice(['Alice', 'Bob', 'Charlie'], 100)
 })
 
-# Write with multiple sheets and formatting
-buffer = io.BytesIO()
-with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-    # Main data
-    df.to_excel(writer, sheet_name='Sales Data', index=False)
-    
-    # Pivot table
-    pivot = pd.pivot_table(df, values='Sales', index='Product', columns='Region', 
-                           aggfunc='sum', fill_value=0)
-    pivot.to_excel(writer, sheet_name='Pivot by Region')
-    
-    # Summary stats
-    summary = df.groupby('Product')['Sales'].agg(['sum', 'mean', 'count']).round(2)
-    summary.to_excel(writer, sheet_name='Summary')
-    
-    # Access worksheet for formatting
-    ws = writer.sheets['Sales Data']
-    # Auto-filter
-    ws.auto_filter.ref = ws.dimensions
-    # Freeze panes
-    ws.freeze_panes = 'A2'
-    # Column widths
-    for col in ws.columns:
-        max_length = max(len(str(cell.value)) for cell in col)
-        ws.column_dimensions[col[0].column_letter].width = max_length + 2
+if not HAS_OPENPYXL:
+    print("[skip] openpyxl not installed — Excel section skipped (pip install openpyxl)")
+else:
+    # Write with multiple sheets and formatting
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+        # Main data
+        df.to_excel(writer, sheet_name='Sales Data', index=False)
 
-print(f"Excel with formatting written: {len(buffer.getvalue())} bytes")
-print()
+        # Pivot table
+        pivot = pd.pivot_table(df, values='Sales', index='Product', columns='Region',
+                               aggfunc='sum', fill_value=0)
+        pivot.to_excel(writer, sheet_name='Pivot by Region')
 
-# Read with specific options
-df_read = pd.read_excel(buffer, sheet_name='Sales Data', 
-                        parse_dates=['Date'],
-                        dtype={'Product': 'category', 'Region': 'category', 'Rep': 'category'})
-print(f"Read with dtypes: {df_read.dtypes}")
-print()
+        # Summary stats
+        summary = df.groupby('Product')['Sales'].agg(['sum', 'mean', 'count']).round(2)
+        summary.to_excel(writer, sheet_name='Summary')
 
-# Read multiple sheets
-all_sheets = pd.read_excel(buffer, sheet_name=['Sales Data', 'Pivot by Region', 'Summary'])
-for name, sheet_df in all_sheets.items():
-    print(f"  {name}: {sheet_df.shape}")
-print()
+        # Access worksheet for formatting
+        ws = writer.sheets['Sales Data']
+        # Auto-filter
+        ws.auto_filter.ref = ws.dimensions
+        # Freeze panes
+        ws.freeze_panes = 'A2'
+        # Column widths
+        for col in ws.columns:
+            max_length = max(len(str(cell.value)) for cell in col)
+            ws.column_dimensions[col[0].column_letter].width = max_length + 2
+
+    print(f"Excel with formatting written: {len(buffer.getvalue())} bytes")
+    print()
+
+    # Read with specific options
+    df_read = pd.read_excel(buffer, sheet_name='Sales Data',
+                            parse_dates=['Date'],
+                            dtype={'Product': 'category', 'Region': 'category', 'Rep': 'category'})
+    print(f"Read with dtypes: {df_read.dtypes}")
+    print()
+
+    # Read multiple sheets
+    all_sheets = pd.read_excel(buffer, sheet_name=['Sales Data', 'Pivot by Region', 'Summary'])
+    for name, sheet_df in all_sheets.items():
+        print(f"  {name}: {sheet_df.shape}")
+    print()
 
 # =============================================================================
 # 2. EXCEL FORMATTING WITH XLSXWRITER
@@ -79,58 +96,61 @@ print("=" * 60)
 print("2. EXCEL FORMATTING WITH XLSXWRITER")
 print("=" * 60)
 
-buffer2 = io.BytesIO()
-with pd.ExcelWriter(buffer2, engine='xlsxwriter') as writer:
-    df.to_excel(writer, sheet_name='Report', index=False, startrow=1)
-    
-    workbook = writer.book
-    worksheet = writer.sheets['Report']
-    
-    # Formats
-    header_format = workbook.add_format({
-        'bold': True,
-        'bg_color': '#4472C4',
-        'font_color': 'white',
-        'border': 1
-    })
-    
-    money_format = workbook.add_format({'num_format': '$#,##0', 'border': 1})
-    date_format = workbook.add_format({'num_format': 'yyyy-mm-dd', 'border': 1})
-    default_format = workbook.add_format({'border': 1})
-    
-    # Write header
-    for col_num, value in enumerate(df.columns.values):
-        worksheet.write(0, col_num, value, header_format)
-    
-    # Set column formats
-    worksheet.set_column('A:A', 15, default_format)  # Product
-    worksheet.set_column('B:B', 12, default_format)  # Region
-    worksheet.set_column('C:C', 12, money_format)    # Sales
-    worksheet.set_column('D:D', 12, date_format)     # Date
-    worksheet.set_column('E:E', 12, default_format)  # Rep
-    
-    # Conditional formatting
-    worksheet.conditional_format('C2:C101', {
-        'type': '3_color_scale',
-        'min_color': '#FF0000',
-        'mid_color': '#FFFF00',
-        'max_color': '#00FF00'
-    })
-    
-    # Add chart
-    chart = workbook.add_chart({'type': 'column'})
-    chart.add_series({
-        'name': 'Sales',
-        'categories': '=Report!$A$2:$A$101',
-        'values': '=Report!$C$2:$C$101',
-    })
-    chart.set_title({'name': 'Sales by Product'})
-    chart.set_x_axis({'name': 'Product'})
-    chart.set_y_axis({'name': 'Sales ($)'})
-    worksheet.insert_chart('G2', chart)
+if not HAS_XLSXWRITER:
+    print("[skip] xlsxwriter not installed — formatting section skipped (pip install xlsxwriter)")
+else:
+    buffer2 = io.BytesIO()
+    with pd.ExcelWriter(buffer2, engine='xlsxwriter') as writer:
+        df.to_excel(writer, sheet_name='Report', index=False, startrow=1)
 
-print(f"Formatted Excel written: {len(buffer2.getvalue())} bytes")
-print()
+        workbook = writer.book
+        worksheet = writer.sheets['Report']
+
+        # Formats
+        header_format = workbook.add_format({
+            'bold': True,
+            'bg_color': '#4472C4',
+            'font_color': 'white',
+            'border': 1
+        })
+
+        money_format = workbook.add_format({'num_format': '$#,##0', 'border': 1})
+        date_format = workbook.add_format({'num_format': 'yyyy-mm-dd', 'border': 1})
+        default_format = workbook.add_format({'border': 1})
+
+        # Write header
+        for col_num, value in enumerate(df.columns.values):
+            worksheet.write(0, col_num, value, header_format)
+
+        # Set column formats
+        worksheet.set_column('A:A', 15, default_format)  # Product
+        worksheet.set_column('B:B', 12, default_format)  # Region
+        worksheet.set_column('C:C', 12, money_format)    # Sales
+        worksheet.set_column('D:D', 12, date_format)     # Date
+        worksheet.set_column('E:E', 12, default_format)  # Rep
+
+        # Conditional formatting
+        worksheet.conditional_format('C2:C101', {
+            'type': '3_color_scale',
+            'min_color': '#FF0000',
+            'mid_color': '#FFFF00',
+            'max_color': '#00FF00'
+        })
+
+        # Add chart
+        chart = workbook.add_chart({'type': 'column'})
+        chart.add_series({
+            'name': 'Sales',
+            'categories': '=Report!$A$2:$A$101',
+            'values': '=Report!$C$2:$C$101',
+        })
+        chart.set_title({'name': 'Sales by Product'})
+        chart.set_x_axis({'name': 'Product'})
+        chart.set_y_axis({'name': 'Sales ($)'})
+        worksheet.insert_chart('G2', chart)
+
+    print(f"Formatted Excel written: {len(buffer2.getvalue())} bytes")
+    print()
 
 # =============================================================================
 # 3. ADVANCED SQL WITH SQLALCHEMY
@@ -246,7 +266,9 @@ print(f"  executemany: {time.time() - start:.4f}s")
 
 # Pattern 3: Read with dtype specification
 print("\nPattern 3: Type-safe reads")
-df_typed = pd.read_sql("SELECT * FROM sales", conn, dtype={
+# NOTE: 'sales' was written via the SQLAlchemy engine's in-memory DB, not the
+# sqlite3 'conn' — read it back through the engine
+df_typed = pd.read_sql("SELECT * FROM sales", engine, dtype={
     'Product': 'category',
     'Region': 'category',
     'Rep': 'category'
@@ -258,7 +280,7 @@ print()
 print("Pattern 4: Streaming large results")
 chunk_size = 5000
 total_rows = 0
-for chunk in pd.read_sql("SELECT * FROM sales", conn, chunksize=chunk_size):
+for chunk in pd.read_sql("SELECT * FROM sales", engine, chunksize=chunk_size):
     total_rows += len(chunk)
     # Process chunk
 print(f"  Streamed {total_rows} rows in chunks of {chunk_size}")

@@ -185,14 +185,16 @@ print("=" * 60)
 print("4. PIVOT (SIMPLE RESHAPING)")
 print("=" * 60)
 
-# Pivot requires unique index/column combinations
+# pivot() requires UNIQUE (index, column) pairs. Dedup on ['region', 'product', 'month']
+# still leaves repeated (region, product) pairs because 'month' varies, which raises
+# "Index contains duplicate entries, cannot reshape" -> use pivot_table with an aggfunc
 df_unique = df.drop_duplicates(subset=['region', 'product', 'month']).head(20)
-print("Unique subset for pivot:")
+print("Unique subset for pivot_table:")
 print(df_unique[['region', 'product', 'month', 'revenue']].head(10))
 print()
 
-pivot_simple = df_unique.pivot(index='region', columns='product', values='revenue')
-print("Simple pivot:")
+pivot_simple = pd.pivot_table(df_unique, index='region', columns='product', values='revenue', aggfunc='sum')
+print("Simple pivot (pivot_table, aggfunc='sum'):")
 print(pivot_simple.round(2))
 print()
 
@@ -368,9 +370,9 @@ print(cohort_pivot.round(2))
 print()
 
 # Example 5: Feature engineering from pivot
-# Create customer-product matrix
-customer_product = pd.crosstab(df['sales_rep'], df['product'], 
-                               values=df['revenue'], aggfunc='sum', fill_value=0)
+# crosstab has no fill_value kwarg; zero-fill afterwards with fillna(0)
+customer_product = pd.crosstab(df['sales_rep'], df['product'],
+                               values=df['revenue'], aggfunc='sum').fillna(0)
 print("Customer-Product matrix (for ML features):")
 print(customer_product.round(2))
 print()

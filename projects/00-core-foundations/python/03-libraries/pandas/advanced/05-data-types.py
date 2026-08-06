@@ -56,7 +56,9 @@ print(f"After astype dict: age={df['age'].dtype}, rating={df['rating'].dtype}")
 print()
 
 # Convert to nullable integer (supports NaN)
-df['age_nullable'] = pd.array([1, 2, None, 4], dtype='Int64')  # Capital I
+# NOTE: value list must match the DataFrame length (20 rows) — pandas raises
+# "Length of values (4) does not match length of index (20)" otherwise
+df['age_nullable'] = pd.array([1, 2, None, 4] + [None] * 16, dtype='Int64')  # Capital I
 print(f"Nullable Int64: {df['age_nullable'].dtype}")
 print(df['age_nullable'])
 print()
@@ -111,9 +113,10 @@ df['join_date_fmt'] = pd.to_datetime(df['join_date_str'], format='%Y-%m-%d')
 print(f"With format: {df['join_date_fmt'].dtype}")
 print()
 
-# Mixed formats - infer_datetime_format
+# Mixed formats - infer_datetime_format (pandas 2.x needs format='mixed' for
+# heterogeneous strings, then repeat the 4 parsed dates to match 20 rows)
 mixed_dates = pd.Series(['2020-01-01', '01/15/2020', '2020.02.01', 'Jan 3 2020'])
-df['mixed_dates'] = pd.to_datetime(mixed_dates)
+df['mixed_dates'] = np.tile(pd.to_datetime(mixed_dates, format='mixed'), 5)
 print("Mixed formats parsed:")
 print(df['mixed_dates'])
 print()

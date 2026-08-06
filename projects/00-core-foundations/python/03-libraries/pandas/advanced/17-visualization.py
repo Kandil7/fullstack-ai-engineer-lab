@@ -5,10 +5,19 @@ Pandas Visualization: Built-in plotting with Matplotlib
 Quick data visualization directly from pandas DataFrames.
 """
 
+import os
+os.environ.setdefault("MPLBACKEND", "Agg")  # never open a GUI window
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
+
+try:
+    import seaborn as sns
+    HAS_SEABORN = True
+except ImportError:
+    HAS_SEABORN = False
+    print("[skip] seaborn not installed — pip install seaborn")
 
 np.random.seed(42)
 
@@ -295,43 +304,46 @@ print("=" * 60)
 print("6. SEABORN INTEGRATION")
 print("=" * 60)
 
-# Seaborn works directly with pandas DataFrames
-fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+if not HAS_SEABORN:
+    print("[skip] seaborn not installed — seaborn section skipped (pip install seaborn)")
+else:
+    # Seaborn works directly with pandas DataFrames
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 
-# Pairplot (subset for speed)
-sns.pairplot(df[['sales', 'visitors', 'conversion_rate', 'channel']].sample(200), 
-             hue='channel', diag_kind='kde', corner=True)
-plt.savefig('output/pairplot.png', dpi=150)
-plt.close()
+    # Pairplot (subset for speed; sample(200, replace=True) because df has 100 rows)
+    sns.pairplot(df[['sales', 'visitors', 'conversion_rate', 'channel']].sample(200, replace=True),
+                 hue='channel', diag_kind='kde', corner=True)
+    plt.savefig('output/pairplot.png', dpi=150)
+    plt.close()
 
-# Violin plot
-fig, ax = plt.subplots(figsize=(10, 6))
-sns.violinplot(data=df, x='channel', y='sales', ax=ax, palette='Set2')
-ax.set_title('Sales Distribution by Channel (Violin)')
-plt.tight_layout()
-plt.savefig('output/violin.png', dpi=150)
-plt.close()
+    # Violin plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.violinplot(data=df, x='channel', y='sales', ax=ax, palette='Set2')
+    ax.set_title('Sales Distribution by Channel (Violin)')
+    plt.tight_layout()
+    plt.savefig('output/violin.png', dpi=150)
+    plt.close()
 
-# Swarm plot
-fig, ax = plt.subplots(figsize=(10, 6))
-sns.swarmplot(data=df, x='channel', y='sales', ax=ax, palette='Set2', size=4)
-ax.set_title('Sales by Channel (Swarm)')
-plt.tight_layout()
-plt.savefig('output/swarm.png', dpi=150)
-plt.close()
+    # Swarm plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.swarmplot(data=df, x='channel', y='sales', ax=ax, palette='Set2', size=4)
+    ax.set_title('Sales by Channel (Swarm)')
+    plt.tight_layout()
+    plt.savefig('output/swarm.png', dpi=150)
+    plt.close()
 
-# Heatmap
-corr = df[['sales', 'visitors', 'conversion_rate']].corr()
-fig, ax = plt.subplots(figsize=(6, 5))
-sns.heatmap(corr, annot=True, cmap='RdBu_r', center=0, ax=ax, 
-            square=True, cbar_kws={'shrink': 0.8})
-ax.set_title('Correlation Heatmap')
-plt.tight_layout()
-plt.savefig('output/heatmap.png', dpi=150)
-plt.close()
+    # Heatmap
+    corr = df[['sales', 'visitors', 'conversion_rate']].corr()
+    fig, ax = plt.subplots(figsize=(6, 5))
+    sns.heatmap(corr, annot=True, cmap='RdBu_r', center=0, ax=ax,
+                square=True, cbar_kws={'shrink': 0.8})
+    ax.set_title('Correlation Heatmap')
+    plt.tight_layout()
+    plt.savefig('output/heatmap.png', dpi=150)
+    plt.close()
 
-print("Seaborn integration examples created")
-print()
+    print("Seaborn integration examples created")
+    print()
 
 # =============================================================================
 # 7. SAVING & EXPORTING

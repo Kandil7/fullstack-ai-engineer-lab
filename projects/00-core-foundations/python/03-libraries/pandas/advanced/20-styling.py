@@ -7,6 +7,7 @@ Beautiful DataFrame presentation for reports and dashboards.
 
 import pandas as pd
 import numpy as np
+import io
 
 np.random.seed(42)
 
@@ -64,7 +65,7 @@ print()
 # Highlight null
 df_nan = df.copy()
 df_nan.loc[0, 'Q2_Sales'] = np.nan
-styled_null = df_nan.style.highlight_null(null_color='yellow')
+styled_null = df_nan.style.highlight_null(color='yellow')  # 'color=', not 'null_color='
 print("Highlight null values in yellow")
 print()
 
@@ -237,10 +238,10 @@ financial_style = financial.style.format({
     subset=['Variance'], color=['#f8d7da', '#d4edda'], align='zero'
 )
 
-# Add sparkline-like bars for trend
+# Add sparkline-like bars for trend (ASCII bars: block chars crash cp1252 consoles)
 for i, row in financial.iterrows():
     trend = row['Trend']
-    sparkline = ''.join(['█' * int((v - min(trend)) / (max(trend) - min(trend)) * 10) for v in trend])
+    sparkline = ''.join(['#' * int((v - min(trend)) / (max(trend) - min(trend)) * 10) for v in trend])
     financial.iloc[i, financial.columns.get_loc('Trend')] = sparkline
 
 print(financial_style.to_string())

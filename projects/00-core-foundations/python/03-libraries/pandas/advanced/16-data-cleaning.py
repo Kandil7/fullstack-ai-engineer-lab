@@ -290,8 +290,10 @@ df_feat['days_since_signup'] = (pd.Timestamp.now() - df_feat['signup_date_clean'
 df_feat['days_since_login'] = (pd.Timestamp.now() - df_feat['last_login_clean']).dt.days
 
 # Income features
+# income has only ~5 unique values -> qcut yields duplicate bin edges; use
+# duplicates='drop' (bins shrink, so no fixed label list can be supplied)
 df_feat['income_log'] = np.log1p(df_feat['income_clean'])
-df_feat['income_bracket'] = pd.qcut(df_feat['income_clean'], q=5, labels=['Very Low', 'Low', 'Medium', 'High', 'Very High'])
+df_feat['income_bracket'] = pd.qcut(df_feat['income_clean'], q=5, duplicates='drop')
 
 # Age features
 df_feat['age_group'] = pd.cut(df_feat['age_clean'], bins=[0, 25, 35, 50, 100], labels=['Gen Z', 'Millennial', 'Gen X', 'Boomer'])

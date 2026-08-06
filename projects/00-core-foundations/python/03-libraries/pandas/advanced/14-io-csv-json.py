@@ -10,6 +10,13 @@ import numpy as np
 import io
 import json
 
+try:
+    import openpyxl  # noqa: F401
+    HAS_OPENPYXL = True
+except ImportError:
+    HAS_OPENPYXL = False
+    print("[skip] openpyxl not installed — pip install openpyxl")
+
 np.random.seed(42)
 
 # =============================================================================
@@ -151,39 +158,42 @@ print("=" * 60)
 print("4. EXCEL")
 print("=" * 60)
 
-# Write to BytesIO buffer
-excel_buffer = io.BytesIO()
-with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
-    df.to_excel(writer, sheet_name='Employees', index=False)
-    # Multiple sheets
-    df.head(20).to_excel(writer, sheet_name='Sample', index=False)
-    # With formatting
-    summary = df.groupby('department').agg({'salary': 'mean', 'age': 'mean'}).round(2)
-    summary.to_excel(writer, sheet_name='Summary')
+if not HAS_OPENPYXL:
+    print("[skip] openpyxl not installed — Excel section skipped (pip install openpyxl)")
+else:
+    # Write to BytesIO buffer
+    excel_buffer = io.BytesIO()
+    with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Employees', index=False)
+        # Multiple sheets
+        df.head(20).to_excel(writer, sheet_name='Sample', index=False)
+        # With formatting
+        summary = df.groupby('department').agg({'salary': 'mean', 'age': 'mean'}).round(2)
+        summary.to_excel(writer, sheet_name='Summary')
 
-excel_data = excel_buffer.getvalue()
-print(f"Excel file size: {len(excel_data)} bytes")
-print()
+    excel_data = excel_buffer.getvalue()
+    print(f"Excel file size: {len(excel_data)} bytes")
+    print()
 
-# Read Excel
-df_excel = pd.read_excel(io.BytesIO(excel_data), sheet_name='Employees')
-print(f"Read Excel shape: {df_excel.shape}")
-print()
+    # Read Excel
+    df_excel = pd.read_excel(io.BytesIO(excel_data), sheet_name='Employees')
+    print(f"Read Excel shape: {df_excel.shape}")
+    print()
 
-# Read specific sheet
-df_sample = pd.read_excel(io.BytesIO(excel_data), sheet_name='Sample')
-print(f"Sample sheet shape: {df_sample.shape}")
-print()
+    # Read specific sheet
+    df_sample = pd.read_excel(io.BytesIO(excel_data), sheet_name='Sample')
+    print(f"Sample sheet shape: {df_sample.shape}")
+    print()
 
-# Read all sheets
-all_sheets = pd.read_excel(io.BytesIO(excel_data), sheet_name=None)
-print(f"All sheets: {list(all_sheets.keys())}")
-for name, sheet_df in all_sheets.items():
-    print(f"  {name}: {sheet_df.shape}")
-print()
+    # Read all sheets
+    all_sheets = pd.read_excel(io.BytesIO(excel_data), sheet_name=None)
+    print(f"All sheets: {list(all_sheets.keys())}")
+    for name, sheet_df in all_sheets.items():
+        print(f"  {name}: {sheet_df.shape}")
+    print()
 
-print("KEY EXCEL OPTIONS:")
-print("""
+    print("KEY EXCEL OPTIONS:")
+    print("""
 read_excel:
   - sheet_name: str, int, list, or None (all sheets)
   - header: row number for header
@@ -225,13 +235,15 @@ print(f"Dtypes preserved: {df_parquet.dtypes.tolist()}")
 print()
 
 # Partitioned Parquet
-partition_buffer = io.BytesIO()
-df.to_parquet(partition_buffer, partition_cols=['department'], index=False)
-print(f"Partitioned Parquet written")
+# NOTE: pyarrow cannot partition into a BytesIO file object ("Argument 'filesystem'
+# has incorrect type ... got NoneType"); write to a real directory under output/
+partition_dir = 'output/parquet_partitioned/'
+df.to_parquet(partition_dir, partition_cols=['department'], index=False)
+print(f"Partitioned Parquet written to {partition_dir}")
 print()
 
 # Read with filters
-df_filtered = pd.read_parquet(partition_buffer, filters=[('department', 'in', ['Eng', 'Sales'])])
+df_filtered = pd.read_parquet(partition_dir, filters=[('department', 'in', ['Eng', 'Sales'])])
 print(f"Filtered read (Eng, Sales): {df_filtered.shape}")
 print()
 

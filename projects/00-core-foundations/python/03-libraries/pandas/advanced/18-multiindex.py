@@ -111,9 +111,13 @@ print("df_multi.xs('North', level='region') (by region):")
 print(df_multi.xs('North', level='region').head())
 print()
 
-# Multiple xs
-print("df_multi.xs([('2023', 'Q1'), ('2024', 'Q2')], level=('year', 'quarter')):")
-print(df_multi.xs([('2023', 'Q1'), ('2024', 'Q2')], level=('year', 'quarter')))
+# Multiple xs: key must be a TUPLE (lists raise "list keys are not supported in
+# xs"); select each cross-section separately and concat the results
+print("pd.concat([xs(('2023', 'Q1')), xs(('2024', 'Q2'))]):")
+print(pd.concat([
+    df_multi.xs(('2023', 'Q1'), level=('year', 'quarter')),
+    df_multi.xs(('2024', 'Q2'), level=('year', 'quarter')),
+]))
 print()
 
 # =============================================================================
@@ -243,8 +247,9 @@ print(df_multi.loc[idx['2023':'2024', 'Q1':'Q2', ['North', 'South']], :].head(12
 print()
 
 # Column selection with IndexSlice
-print("idx[:, ['sales', 'profit']] (select columns):")
-print(df_multi.loc[idx[:, :], idx[:, ['sales', 'profit']]].head(8))
+# NOTE: a column tuple (slice, list) is unhashable — use a plain column list
+print("loc[idx[:, :], ['sales', 'profit']] (select columns):")
+print(df_multi.loc[idx[:, :], ['sales', 'profit']].head(8))
 print()
 
 # =============================================================================

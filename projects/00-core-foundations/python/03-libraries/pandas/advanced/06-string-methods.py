@@ -163,8 +163,13 @@ print("Mask emails:", df['email'].str.replace(r'(.+)@(.+)', mask_email, regex=Tr
 print()
 
 # Replace multiple
+# NOTE: str.replace(pat, repl) needs an explicit repl per call; a dict shortcut
+# no longer works, so chain one replace per mapping
 replacements = {'python': 'Python', 'ml': 'ML', 'ai': 'AI'}
-print("Multiple replacements:", df['tags'].str.replace(replacements, regex=False).head().tolist())
+tags_replaced = df['tags']
+for old, new in replacements.items():
+    tags_replaced = tags_replaced.str.replace(old, new, regex=False)
+print("Multiple replacements:", tags_replaced.head().tolist())
 print()
 
 # =============================================================================
@@ -236,15 +241,17 @@ print("=" * 60)
 print("8. VECTORIZED COMPARISONS")
 print("=" * 60)
 
+# Vectorized comparisons: .str has no eq/ne/lt/le/gt/ge accessors — use the
+# plain Series operators, which compare elementwise
 s1 = pd.Series(['apple', 'banana', 'cherry'])
 s2 = pd.Series(['apple', 'BANANA', 'date'])
 
-print("eq (==):", s1.str.eq(s2).tolist())
-print("ne (!=):", s1.str.ne(s2).tolist())
-print("lt (<):", s1.str.lt(s2).tolist())
-print("le (<=):", s1.str.le(s2).tolist())
-print("gt (>):", s1.str.gt(s2).tolist())
-print("ge (>=):", s1.str.ge(s2).tolist())
+print("eq (==):", (s1 == s2).tolist())
+print("ne (!=):", (s1 != s2).tolist())
+print("lt (<):", (s1 < s2).tolist())
+print("le (<=):", (s1 <= s2).tolist())
+print("gt (>):", (s1 > s2).tolist())
+print("ge (>=):", (s1 >= s2).tolist())
 print()
 
 # =============================================================================

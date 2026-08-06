@@ -8,7 +8,13 @@ End-to-end EDA on a realistic dataset using all pandas techniques learned.
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
+
+try:
+    import seaborn as sns  # noqa: F401  (optional; unused in this script)
+    HAS_SEABORN = True
+except ImportError:
+    HAS_SEABORN = False
+    print("[skip] seaborn not installed — pip install seaborn")
 
 np.random.seed(42)
 
@@ -65,8 +71,8 @@ orders = pd.DataFrame({
                                n_orders, p=[0.7, 0.15, 0.05, 0.05, 0.05])
 })
 
-# Merge to get prices
-orders = orders.merge(products[['product_id', 'base_price', 'category', 'brand']], on='product_id', how='left')
+# Merge to get prices (include 'cost' — it is used below for profit)
+orders = orders.merge(products[['product_id', 'base_price', 'cost', 'category', 'brand']], on='product_id', how='left')
 orders['revenue'] = orders['quantity'] * orders['base_price'] * (1 - orders['discount_pct'])
 orders['profit'] = orders['revenue'] - (orders['quantity'] * orders['cost']) - orders['shipping_cost']
 
