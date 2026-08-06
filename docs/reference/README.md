@@ -27,4 +27,4 @@ The material that survives is here, organized by subject. The raw export is kept
 - **Learning paths:** [`../learning/paths/`](../learning/paths/) — per-technology study routes.
 - **Cheat sheets:** [`../cheat-sheets/`](../cheat-sheets/) — command-level recall.
 
-*Last updated: 2026-08-02*
+*Last updated: 2026-08-06*
