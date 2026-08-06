@@ -320,4 +320,4 @@ QDRANT__STORAGE__STORAGE_PATH=/qdrant/storage
 
 ---
 
-*Last updated: 2026-06-26*
+*Last updated: 2026-08-06*
