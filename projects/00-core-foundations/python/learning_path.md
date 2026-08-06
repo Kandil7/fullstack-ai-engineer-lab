@@ -36,7 +36,7 @@ Foundations ──> Libraries ──> Backend ──> Databases ──> DSA ─�
 
 ## ⚡ Phase 2: Advanced Python
 **Directory:** `02-advanced-python/`  
-**Files:** `01-decorators.py` → `20-patterns.py`  
+**Files:** `01-decorators.py` → `34-debugging-techniques.py` (34 exercises)  
 **Prerequisites:** Phase 1 complete
 
 | Order | Topic | Key Concepts |
@@ -76,10 +76,10 @@ NumPy ──> Pandas ──> Matplotlib ──> SciPy
 
 | Library | Files | Covers |
 |---------|-------|--------|
-| **NumPy** | 28 files | Arrays, indexing, reshaping, ufuncs, random, set ops |
-| **Pandas** | 24 files | Series, DataFrames, I/O, cleaning, groupby, merge, plotting |
-| **Matplotlib** | 20 files | Line, scatter, bar, histogram, pie, 3D, contour |
-| **SciPy** | 12 files | Constants, optimization, integration, stats, I/O |
+| **NumPy** | 53 files | Arrays, indexing, reshaping, ufuncs, random, set ops, broadcasting, vectorization, linear algebra |
+| **Pandas** | 72 files | Series, DataFrames, I/O, cleaning, groupby, merge, plotting, method chaining, memory optimization, timeseries, pitfalls |
+| **Matplotlib** | 47 files | Line, scatter, bar, histogram, pie, 3D, contour, OO API, styling, ML visualization, saving |
+| **SciPy** | 30 files | Constants, optimization, integration, stats, I/O, image processing, spatial, FFT |
 
 ---
 
@@ -91,6 +91,11 @@ NumPy ──> Pandas ──> Matplotlib ──> SciPy
 |--------|-------|----------|
 | **MySQL** | 12 files | Uses `sqlite3` as stand-in (identical SQL syntax) |
 | **MongoDB** | 11 files | Uses Python dicts as stand-in documents |
+| **PostgreSQL** | exercises | Real PostgreSQL with Docker |
+| **Redis** | exercises | Caching, pub/sub, sessions |
+| **SQL Fundamentals** | exercises | Core SQL concepts |
+| **SQLAlchemy** | exercises | ORM patterns |
+| **Vector Stores** | 8 files | Embeddings, similarity search, hybrid search |
 
 ---
 
@@ -100,14 +105,14 @@ NumPy ──> Pandas ──> Matplotlib ──> SciPy
 
 | Framework | Files | Type |
 |-----------|-------|------|
-| **FastAPI** | 25 files | Runnable scripts (use `uvicorn`) |
-| **Django** | 20 files | Reference guides with code snippets |
+| **FastAPI** | 52 files | Runnable scripts (use `uvicorn`) — routing, validation, auth, websockets, database, testing |
+| **Django** | 20 files | Reference guides with code snippets (not installed by default) |
 
 ---
 
 ## ⚙️ Phase 6: Data Structures & Algorithms
 **Directory:** `06-data-structures-algorithms/`  
-**Files:** 20 exercise files + lectures  
+**Files:** 21 exercise files + lectures  
 **Prerequisites:** Phase 1 complete
 
 | Category | Topics |
@@ -119,21 +124,14 @@ NumPy ──> Pandas ──> Matplotlib ──> SciPy
 
 ## 🤖 Phase 7: Machine Learning
 **Directory:** `07-machine-learning/`  
-**Files:** 23 exercise files + lectures  
+**Files:** 41 exercise files + lectures  
 **Prerequisites:** Phases 1, 3 (NumPy, Pandas)
 
 | Order | Algorithm | Type |
 |-------|-----------|------|
-| 1 | Linear Regression | Supervised |
-| 2 | Polynomial Regression | Supervised |
-| 3 | Multiple Regression | Supervised |
-| 4 | Decision Trees | Supervised |
-| 5 | Logistic Regression | Supervised |
-| 6 | K-Means | Unsupervised |
-| 7 | PCA | Unsupervised |
-| 8 | Random Forest | Supervised |
-| 9 | SVM | Supervised |
-| 10 | KNN | Supervised |
+| 1–10 | Core ML (Linear, Polynomial, Multiple Regression, Decision Trees, Logistic, K-Means, PCA, Random Forest, SVM, KNN) | Supervised/Unsupervised |
+| 11–23 | Advanced (Gradient Boosting, Feature Engineering, Feature Selection, Hyperparameter Tuning, Ensembling, Explainability) | Advanced ML |
+| 24–40 | PyTorch (Pipelines, Data Leakage, Validation, Metrics, Calibration, Imbalanced Learning, Tensors, Training Loop, Neural Networks, Transfer Learning, Transformers) | Deep Learning |
 
 ---
 
@@ -197,7 +195,7 @@ After completing all phases, reinforce your skills with these projects:
 
 | Resource | Location | Purpose |
 |----------|----------|---------|
-| **Quizzes** | `supplementary/quizzes/` (31 files) | Self-assessment for all topics (incl. MLOps + GenAI) |
+| **Quizzes** | `supplementary/quizzes/` (80 files) | Self-assessment for all topics (incl. MLOps + GenAI) |
 | **Interviews** | `supplementary/interviews/` (18 files) | Interview prep with Q&A + coding challenges (incl. MLOps + GenAI) |
 
 ---
