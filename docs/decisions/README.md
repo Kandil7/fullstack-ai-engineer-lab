@@ -42,4 +42,4 @@ Or manually:
 3. Add to this index table
 4. Update `registries/decision-log.yaml`
 
-*Last updated: 2026-08-02*
+*Last updated: 2026-08-06*
