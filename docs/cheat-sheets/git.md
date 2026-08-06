@@ -202,4 +202,4 @@ git log -G "regex"                # Search with regex
 
 ---
 
-*Last updated: 2026-06-26*
+*Last updated: 2026-08-06*
