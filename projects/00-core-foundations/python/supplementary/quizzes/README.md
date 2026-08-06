@@ -27,6 +27,10 @@ This directory contains comprehensive multiple-choice quizzes covering essential
 ### Web Frameworks
 - [Django Quiz](./django-quiz.md) - Models, views, templates, ORM, admin, REST framework
 
+### Databases
+- [SQLAlchemy Basics](./sqlalchemy-basics-quiz.md) - Core vs ORM, declarative models, session lifecycle, relationships, 2.0 querying
+- [SQLAlchemy Advanced](./sqlalchemy-advanced-quiz.md) - N+1 and eager loading, async SQLAlchemy, advanced patterns, DB testing, repository pattern
+
 ## How to Use
 
 ### Study Approach
@@ -64,12 +68,16 @@ Each quiz contains:
 1. FastAPI Basics → FastAPI Advanced
 2. Django Quiz
 
+### Database Track
+1. SQLAlchemy Basics → SQLAlchemy Advanced
+
 ### Full Stack AI Engineer Path
 1. NumPy + Pandas (data handling)
 2. Matplotlib (visualization)
 3. SciPy (scientific computing)
 4. FastAPI (API development)
 5. Django (full-stack web apps)
+6. SQLAlchemy (database layer)
 
 ## Tips for Success
 
