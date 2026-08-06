@@ -1,6 +1,6 @@
 # Advanced Python Exercises
 
-A comprehensive collection of 20 advanced Python exercise scripts covering essential topics for building production-grade applications.
+A comprehensive collection of 27 advanced Python exercise scripts covering essential topics for building production-grade applications.
 
 ## 📚 Topics Covered
 
@@ -26,6 +26,21 @@ A comprehensive collection of 20 advanced Python exercise scripts covering essen
 | 18 | `18-unit-testing.py` | Unit Testing | unittest, mocking, fixtures, parameterized tests |
 | 19 | `19-logging.py` | Logging | Levels, handlers, formatters, application logging |
 | 20 | `20-patterns.py` | Design Patterns | Singleton, Factory, Observer, Strategy, Adapter |
+| 21 | `21-concurrency-comparison.py` | Concurrency Comparison | Threads vs processes vs async, measured |
+| 22 | `22-asyncio-advanced.py` | Asyncio Advanced | TaskGroup, cancellation, shield, timeouts, queues |
+| 23 | `23-typing-advanced.py` | Typing Advanced | Protocol, ParamSpec, TypeGuard, generics, bounds |
+| 24 | `24-memory-and-gc.py` | Memory & GC | Refcounts, cycles, weak refs, slots, tracemalloc |
+| 25 | `25-profiling-and-optimization.py` | Profiling & Optimization | timeit, cProfile, hash join, memoization, vectorization |
+| 26 | `26-design-patterns-advanced.py` | Design Patterns Advanced | Adapter, DI, Command, Registry, Strategy |
+| 27 | `27-packaging-and-distribution.py` | Packaging & Distribution | pyproject.toml, semver, PEP 440, extras, entry points |
+
+## 🧩 Companion Material (Topics 21-27)
+
+Each topic 21-27 ships the full five-artifact set per the content standards:
+
+- **Lecture + Glossary**: `lectures/NN-topic-lecture.md` + `lectures/NN-topic-glossary.md`
+- **3-tier challenge**: `challenges/NN-topic/` (README + starter + solution + pytest suite)
+- **Quiz**: `supplementary/quizzes/advanced-NN-topic-quiz.md` (20 Q, difficulty-tagged, explained key)
 
 ## 🚀 How to Run
 
@@ -75,6 +90,15 @@ for f in *.py; do echo "=== $f ==="; python "$f"; done
 18. **19-logging.py** - Application logging
 19. **20-patterns.py** - Design patterns in Python
 20. **04-async-await.py** - Async programming (most complex)
+
+### Production Depth (Topics 21-27)
+21. **21-concurrency-comparison.py** - Measured trade-offs: threads vs processes vs async
+22. **22-asyncio-advanced.py** - TaskGroup, cancellation, shield, timeouts, backpressure
+23. **23-typing-advanced.py** - Protocol, ParamSpec, TypeGuard, generic bounds
+24. **24-memory-and-gc.py** - Refcounts, cycles, weak refs, tracemalloc debugging
+25. **25-profiling-and-optimization.py** - timeit, cProfile, hash join, memoization, vectorization
+26. **26-design-patterns-advanced.py** - DI, Registry, Command, Strategy in practice
+27. **27-packaging-and-distribution.py** - pyproject.toml, PEP 440, shipping real projects
 
 ## 🎯 Each File Contains
 
