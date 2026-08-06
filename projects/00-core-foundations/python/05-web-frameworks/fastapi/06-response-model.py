@@ -7,6 +7,7 @@ They filter out internal fields, validate output, and generate better docs.
 Run: uvicorn 06-response-model:app --reload
 """
 
+import sys
 from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, EmailStr
@@ -208,6 +209,64 @@ Testing with curl:
     # WARNING: No response_model — no filtering!
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.post(
+        "/users/",
+        json={"name": "Alice", "email": "alice@test.com", "password": "secret123", "age": 30},
+    )
+    assert r.status_code == 201
+    assert "password" not in r.json()  # response_model filters it out
+
+    r = client.get("/users/1")
+    assert r.status_code == 200
+    assert r.json()["name"] == "Alice"
+
+    r = client.get("/users/")
+    assert r.status_code == 200
+    assert isinstance(r.json(), list)
+
+    r = client.get("/users/1/profile")
+    assert r.status_code == 200
+    assert r.json()["profile_url"] == "/users/1/profile"
+
+    r = client.get("/users/999")
+    assert r.status_code == 404
+
+    r = client.post("/items/", json={"name": "Widget", "price": 9.99})
+    assert r.status_code == 200
+    assert "description" not in r.json()  # exclude_unset
+
+    r = client.get("/items/list")
+    assert r.status_code == 200
+    items = r.json()
+    # exclude_none: None fields vanish, but present values stay
+    phone = next(i for i in items if i["price"] == 699.99)
+    assert "description" not in phone
+    laptop = next(i for i in items if i["price"] == 999.99)
+    assert laptop["description"] == "A laptop"
+
+    r = client.get("/error-demo")
+    assert r.status_code == 404
+
+    r = client.get("/custom-response")
+    assert r.status_code == 200
+    assert r.json()["password_leaked"] == "should-not-be-here"
+
+    print("[OK] 06-response-model: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

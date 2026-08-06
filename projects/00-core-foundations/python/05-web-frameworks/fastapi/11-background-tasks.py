@@ -7,10 +7,18 @@ Useful for: sending emails, logging, cleanup, notifications.
 Run: uvicorn 11-background-tasks:app --reload
 """
 
+import sys
 import time
 from datetime import datetime
 from fastapi import FastAPI, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, EmailStr
+
+# CI-safe stdout: teaching prints contain emojis which crash on a cp1252
+# console; make encoding explicit and never raise on encode.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 app = FastAPI(title="Background Tasks in FastAPI")
 
@@ -189,6 +197,38 @@ Testing with curl:
     Check the terminal output for background task logs!
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    # NOTE: TestClient waits for background tasks, so these take ~1s each.
+    r = client.post("/notify/?email=alice@test.com&message=Hello")
+    assert r.status_code == 200
+    assert r.json()["status"] == "queued"
+
+    r = client.post(
+        "/orders/",
+        json={"customer_email": "charlie@test.com", "product": "Laptop", "quantity": 1},
+    )
+    assert r.status_code == 200
+    assert r.json()["status"] == "created"
+
+    r = client.post("/users/42/send-welcome/")
+    assert r.status_code == 200
+    assert r.json()["status"] == "welcome_queued"
+
+    print("[OK] 11-background-tasks: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

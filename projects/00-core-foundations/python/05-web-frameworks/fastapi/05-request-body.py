@@ -7,6 +7,7 @@ FastAPI uses Pydantic models to declare and validate request bodies.
 Run: uvicorn 05-request-body:app --reload
 """
 
+import sys
 from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, EmailStr
@@ -201,6 +202,77 @@ Testing with curl:
     curl -X POST http://127.0.0.1:8000/batch-create -H "Content-Type: application/json" -d '[{"name": "User1", "email": "u1@test.com", "age": 20}, {"name": "User2", "email": "u2@test.com", "age": 25}]'
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.post(
+        "/users/",
+        json={"name": "Alice", "email": "alice@example.com", "age": 30},
+    )
+    assert r.status_code == 201
+    assert r.json()["id"] == 1
+    assert "created_at" in r.json()
+
+    r = client.post("/users/", json={"name": "X", "email": "bad", "age": 999})
+    assert r.status_code == 422  # Validation error (age out of range)
+
+    r = client.patch("/users/1", json={"bio": "Updated bio"})
+    assert r.status_code == 200
+    assert r.json()["bio"] == "Updated bio"
+
+    r = client.patch("/users/999", json={"bio": "nope"})
+    assert r.status_code == 404
+
+    r = client.put(
+        "/users/1",
+        json={"name": "Alice Smith", "email": "alice@new.com", "age": 31},
+    )
+    assert r.status_code == 200
+    assert r.json()["name"] == "Alice Smith"
+
+    r = client.post(
+        "/orders/",
+        json={
+            "customer_name": "Bob",
+            "items": [{"product_name": "Keyboard", "quantity": 2, "unit_price": 79.99}],
+            "shipping_address": {
+                "street": "123 Main St", "city": "Springfield",
+                "state": "IL", "zip_code": "62701",
+            },
+        },
+    )
+    assert r.status_code == 200
+    assert r.json()["total"] == 159.98
+
+    r = client.post(
+        "/batch-create",
+        json=[
+            {"name": "User1", "email": "u1@test.com", "age": 20},
+            {"name": "User2", "email": "u2@test.com", "age": 25},
+        ],
+    )
+    assert r.status_code == 200
+    assert r.json()["created_count"] == 2
+
+    r = client.post(
+        "/products/",
+        json={"name": "Wireless Mouse", "price": 29.99},
+    )
+    assert r.status_code == 201
+
+    print("[OK] 05-request-body: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

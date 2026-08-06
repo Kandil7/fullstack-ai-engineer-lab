@@ -18,6 +18,7 @@ Install: pip install fastapi uvicorn
 Run: uvicorn 01-introduction:app --reload
 """
 
+import sys
 from fastapi import FastAPI
 
 # Create an instance of FastAPI
@@ -104,6 +105,50 @@ Testing with curl:
     OpenAPI JSON: http://127.0.0.1:8000/openapi.json
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.get("/")
+    assert r.status_code == 200
+    assert "Welcome to FastAPI!" in r.json()["message"]
+
+    r = client.get("/hello/Alice")
+    assert r.status_code == 200
+    assert r.json()["message"] == "Hello, Alice! Welcome to FastAPI."
+
+    r = client.get("/server-info")
+    assert r.status_code == 200
+    assert r.json()["framework"] == "FastAPI"
+    assert "features" in r.json()
+
+    r = client.post("/submit")
+    assert r.status_code == 200
+    assert r.json()["method"] == "POST"
+
+    r = client.put("/update")
+    assert r.status_code == 200
+    assert r.json()["method"] == "PUT"
+
+    r = client.delete("/remove")
+    assert r.status_code == 200
+    assert r.json()["method"] == "DELETE"
+
+    r = client.get("/does-not-exist")
+    assert r.status_code == 404
+
+    print("[OK] 01-introduction: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

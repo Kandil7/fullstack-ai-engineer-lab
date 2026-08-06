@@ -9,11 +9,19 @@ Note: @app.on_event is deprecated. Use the lifespan context manager pattern.
 Run: uvicorn 25-events:app --reload
 """
 
+import sys
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 from fastapi import FastAPI
 from pydantic import BaseModel
+
+# CI-safe stdout: teaching prints contain emojis which crash on a cp1252
+# console; make encoding explicit and never raise on encode.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 
 # ----- Lifespan context manager (modern pattern) -----
@@ -192,6 +200,43 @@ Testing with curl:
        ✅ Shutdown complete (12ms)
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server).
+
+    TestClient as a context manager triggers the lifespan's startup block
+    (on enter) and shutdown block (on exit) automatically.
+    """
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    with TestClient(app) as client:  # runs startup ... requests ... shutdown
+        r = client.get("/")
+        assert r.status_code == 200
+        assert r.json()["status"] == "running"
+        assert r.json()["version"] == "1.0.0"
+        assert r.json()["request_count"] >= 1
+
+        r = client.get("/config")
+        assert r.status_code == 200
+        assert r.json()["config"]["debug"] is True
+
+        r = client.get("/health")
+        assert r.status_code == 200
+        assert r.json()["healthy"] is True
+
+        r = client.get("/db/status")
+        assert r.status_code == 200
+        assert "active_connections" in r.json()
+
+    print("[OK] 25-events: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

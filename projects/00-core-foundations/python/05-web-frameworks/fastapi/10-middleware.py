@@ -7,10 +7,18 @@ It can modify the request/response, add headers, log activity, measure timing, e
 Run: uvicorn 10-middleware:app --reload
 """
 
+import sys
 import time
 import uuid
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
+
+# CI-safe stdout: teaching prints contain non-ASCII (e.g. "->") which crashes
+# on a cp1252 console; make encoding explicit and never raise on encode.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 app = FastAPI(title="Middleware in FastAPI")
 
@@ -159,6 +167,39 @@ Testing with curl:
     # Even error responses get middleware headers
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.get("/")
+    assert r.status_code == 200
+    assert r.headers.get("X-Request-ID")  # custom middleware header
+    assert r.headers.get("X-Content-Type-Options") == "nosniff"  # security headers
+
+    r = client.get("/fast")
+    assert r.status_code == 200
+    assert r.json()["message"] == "This was fast"
+
+    r = client.get("/error")
+    assert r.status_code == 400
+    assert r.headers.get("X-RateLimit-Limit") == "100"
+
+    r = client.get("/slow")  # takes ~0.5s (teaching demo of timing middleware)
+    assert r.status_code == 200
+    assert r.headers.get("X-Process-Time-Ms")
+
+    print("[OK] 10-middleware: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

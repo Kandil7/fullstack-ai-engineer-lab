@@ -9,6 +9,7 @@ Requires: pip install sqlalchemy
 Run: uvicorn 18-database:app --reload
 """
 
+import sys
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
@@ -197,6 +198,88 @@ Testing with curl:
     Database file: fastapi_demo.db (SQLite)
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server).
+
+    Uses a throwaway temp SQLite file (NOT the teaching DB) so verification
+    never touches outputs/dbs/fastapi_demo.db and never leaves file locks.
+    """
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    import os
+    import shutil
+    import tempfile
+
+    tmp_dir = tempfile.mkdtemp(prefix="fastapi_18_verify_")
+    db_file = os.path.join(tmp_dir, "verify.db")
+    try:
+        verify_engine = create_engine(
+            f"sqlite:///{db_file}", connect_args={"check_same_thread": False}
+        )
+        Base.metadata.create_all(bind=verify_engine)
+        verify_session = sessionmaker(autocommit=False, autoflush=False, bind=verify_engine)
+
+        def override_get_db():
+            db = verify_session()
+            try:
+                yield db
+            finally:
+                db.close()
+
+        app.dependency_overrides[get_db] = override_get_db
+        client = TestClient(app)
+
+        r = client.post(
+            "/items/",
+            json={"name": "Laptop", "price": 999.99, "description": "A powerful laptop"},
+        )
+        assert r.status_code == 201
+        assert r.json()["name"] == "Laptop"
+
+        r = client.post("/items/", json={"name": "Phone", "price": 699.99})
+        assert r.status_code == 201
+
+        r = client.get("/items/")
+        assert r.status_code == 200
+        assert len(r.json()) == 2
+
+        r = client.get("/items/1")
+        assert r.status_code == 200
+        assert r.json()["price"] == 999.99
+
+        r = client.get("/items/999")
+        assert r.status_code == 404
+
+        r = client.put("/items/1", json={"price": 899.99})
+        assert r.status_code == 200
+        assert r.json()["price"] == 899.99
+
+        r = client.delete("/items/2")
+        assert r.status_code == 200
+        assert r.json()["deleted"] is True
+
+        r = client.get("/search/?name=laptop&min_price=500")
+        assert r.status_code == 200
+        assert r.json()["count"] == 1
+
+        r = client.get("/stats/")
+        assert r.status_code == 200
+        assert r.json()["total_items"] == 1
+
+        verify_engine.dispose()  # close all connections BEFORE removing the file
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    print("[OK] 18-database: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

@@ -7,6 +7,7 @@ They are used to capture values from the URL and pass them to the function.
 Run: uvicorn 03-path-parameters:app --reload
 """
 
+import sys
 from datetime import datetime
 from fastapi import FastAPI, Path
 from pydantic import BaseModel, Field
@@ -157,6 +158,70 @@ Testing with curl:
     curl http://127.0.0.1:8000/categories/invalid
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.get("/users/42")
+    assert r.status_code == 200
+    assert r.json()["user_id"] == 42
+
+    r = client.get("/users/5/posts/10")
+    assert r.status_code == 200
+    assert r.json()["post_id"] == 10
+
+    r = client.get("/models/resnet")
+    assert r.status_code == 200
+    assert "Residual Learning" in r.json()["message"]
+
+    r = client.get("/models/unknown-model")
+    assert r.status_code == 422  # Enum validation
+
+    r = client.get("/products/42")
+    assert r.status_code == 200
+    assert r.json()["available"] is True
+
+    r = client.get("/products/0")
+    assert r.status_code == 422  # Path(ge=1) validation
+
+    r = client.get("/files/home/user/document.txt")
+    assert r.status_code == 200
+    assert r.json()["file_path"] == "home/user/document.txt"
+
+    r = client.get("/status/200")
+    assert r.status_code == 200
+    assert r.json()["message"] == "OK"
+
+    r = client.get("/status/999")
+    assert r.status_code == 200
+    assert "error" in r.json()
+
+    r = client.get("/orders/550e8400-e29b-41d4-a716-446655440000")
+    assert r.status_code == 200
+    assert r.json()["status"] == "shipped"
+
+    r = client.get("/orders/not-a-uuid")
+    assert r.status_code == 422  # UUID validation
+
+    r = client.get("/categories/electronics")
+    assert r.status_code == 200
+    assert r.json()["category"] == "electronics"
+
+    r = client.get("/categories/invalid")
+    assert r.status_code == 404  # Custom HTTPException
+
+    print("[OK] 03-path-parameters: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

@@ -8,6 +8,7 @@ authentication, shared logic, and configuration.
 Run: uvicorn 09-dependency-injection:app --reload
 """
 
+import sys
 from datetime import datetime
 from fastapi import FastAPI, Depends, HTTPException, Header
 from pydantic import BaseModel
@@ -179,6 +180,63 @@ Testing with curl:
     curl -H "Authorization: Bearer valid-token-123" -H "X-Api-Key: my-secret-key" http://127.0.0.1:8000/admin/stats/
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+    auth_headers = {"Authorization": "Bearer valid-token-123"}
+
+    r = client.get("/items/")
+    assert r.status_code == 200
+    assert r.json()["filters"] == {"skip": 0, "limit": 10, "sort": "name"}
+
+    r = client.get("/products/?skip=5&limit=5")
+    assert r.status_code == 200
+    assert r.json()["pagination"] == {"skip": 5, "limit": 5}
+
+    r = client.get("/protected/")
+    assert r.status_code == 422  # Missing required Header -> validation error
+
+    r = client.get("/protected/", headers=auth_headers)
+    assert r.status_code == 200
+    assert r.json()["message"] == "Access granted"
+
+    r = client.get("/protected/", headers={"Authorization": "Bearer wrong"})
+    assert r.status_code == 401
+
+    r = client.get("/my-profile/")
+    assert r.status_code == 200
+    assert r.json()["user"] == "alice"
+
+    r = client.get("/search?q=fastapi&page=2&per_page=10")
+    assert r.status_code == 200
+    assert r.json()["page"] == 2
+
+    r = client.get("/cached-data/")
+    assert r.status_code == 200
+    assert r.json()["cached"] is True
+
+    r = client.get("/admin/stats/")
+    assert r.status_code == 422  # Missing required headers
+
+    r = client.get(
+        "/admin/stats/",
+        headers={**auth_headers, "X-Api-Key": "my-secret-key"},
+    )
+    assert r.status_code == 200
+    assert r.json()["authorized"] is True
+
+    print("[OK] 09-dependency-injection: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

@@ -9,6 +9,7 @@ Requires: pip install httpx pytest
 Run: pytest 20-testing.py -v
 """
 
+import sys
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
@@ -217,13 +218,29 @@ Testing with pytest:
     python 20-testing.py
 """
 
-if __name__ == "__main__":
-    # Run a quick smoke test
-    print("Running smoke tests...")
+def _verify():
+    """Run the smoke tests in-process with the module-level TestClient."""
+    try:
+        from fastapi.testclient import TestClient  # noqa: F401 (already imported above)
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
     test_root()
     test_create_item()
     test_get_item()
     test_list_items()
     test_delete_item()
     test_get_nonexistent_item()
-    print("✅ All smoke tests passed!")
+    test_create_item_validation()
+    test_create_item_wrong_type()
+    test_with_overridden_dependency()
+    print("[OK] 20-testing: all checks passed")
+
+
+if __name__ == "__main__":
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

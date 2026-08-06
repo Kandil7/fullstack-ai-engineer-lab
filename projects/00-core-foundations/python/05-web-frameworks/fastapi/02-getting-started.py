@@ -7,6 +7,7 @@ and basic request handling patterns.
 Run: uvicorn 02-getting-started:app --reload
 """
 
+import sys
 from datetime import datetime
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -143,6 +144,71 @@ Testing with curl:
     curl http://127.0.0.1:8000/health
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.get("/")
+    assert r.status_code == 200
+    assert r.json()["message"] == "FastAPI Getting Started"
+
+    r = client.get("/items/1")
+    assert r.status_code == 200
+    assert r.json()["name"] == "Laptop"
+
+    # Out-of-range id: this file returns a 200 with an error dict (teaching quirk)
+    r = client.get("/items/999")
+    assert r.status_code == 200
+    assert "error" in r.json()
+
+    r = client.get("/items/?skip=0&limit=2")
+    assert r.status_code == 200
+    assert len(r.json()) == 2
+
+    r = client.post(
+        "/items/",
+        json={"name": "Monitor", "price": 399.99, "tax": 0.1},
+    )
+    assert r.status_code == 200
+    assert r.json()["name"] == "Monitor"
+    assert "price_with_tax" in r.json()
+
+    r = client.post("/items/", json={"name": "Incomplete"})
+    assert r.status_code == 422  # Validation error
+
+    r = client.post(
+        "/items/multi-status/",
+        json={"name": "Mouse", "price": 19.99},
+    )
+    assert r.status_code == 201
+
+    r = client.put(
+        "/items/1",
+        json={"name": "Gaming Laptop", "price": 1299.99},
+    )
+    assert r.status_code == 200
+    assert r.json()["name"] == "Gaming Laptop"
+
+    r = client.delete("/items/2")
+    assert r.status_code == 200
+    assert r.json()["deleted"]["name"] == "Phone"
+
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json()["status"] == "healthy"
+
+    print("[OK] 02-getting-started: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

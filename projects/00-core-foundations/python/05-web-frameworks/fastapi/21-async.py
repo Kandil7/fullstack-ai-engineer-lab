@@ -7,6 +7,7 @@ FastAPI supports both sync and async functions.
 Run: uvicorn 21-async:app --reload
 """
 
+import sys
 import asyncio
 import time
 from datetime import datetime
@@ -202,6 +203,39 @@ Testing with curl:
     for i in $(seq 1 10); do curl http://127.0.0.1:8000/rate-limited/ & done; wait
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server).
+
+    Only endpoints with simulated (deterministic) delays are exercised.
+    /fetch* need real network so they are intentionally NOT called here;
+    /sequential, /stream/ and /rate-limited/ are skipped to stay fast.
+    """
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.get("/sync")  # ~1s (thread pool)
+    assert r.status_code == 200
+    assert r.json()["type"] == "sync"
+
+    r = client.get("/async")  # ~1s (event loop)
+    assert r.status_code == 200
+    assert r.json()["type"] == "async"
+
+    r = client.get("/concurrent")  # ~1s (3 queries gathered in parallel)
+    assert r.status_code == 200
+    assert len(r.json()["results"]) == 3
+
+    print("[OK] 21-async: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

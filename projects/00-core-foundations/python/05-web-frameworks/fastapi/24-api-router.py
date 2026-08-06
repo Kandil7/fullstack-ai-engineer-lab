@@ -7,6 +7,7 @@ Each router handles a group of related endpoints.
 Run: uvicorn 24-api-router:app --reload
 """
 
+import sys
 from datetime import datetime
 from fastapi import FastAPI, APIRouter, HTTPException
 from pydantic import BaseModel
@@ -238,6 +239,83 @@ Testing with curl:
     Open /docs to see grouped tags in Swagger UI!
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.get("/")
+    assert r.status_code == 200
+    assert r.json()["message"] == "APIRouter Demo"
+
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json()["status"] == "healthy"
+
+    r = client.get("/info")
+    assert r.status_code == 200
+    assert len(r.json()["routers"]) == 4
+
+    r = client.post("/users/", json={"name": "Alice", "email": "alice@test.com"})
+    assert r.status_code == 201
+
+    r = client.get("/users/")
+    assert r.status_code == 200
+    assert len(r.json()) == 1
+
+    r = client.get("/users/1")
+    assert r.status_code == 200
+    assert r.json()["name"] == "Alice"
+
+    r = client.get("/users/999")
+    assert r.status_code == 404
+
+    r = client.post(
+        "/products/",
+        json={"name": "Laptop", "price": 999.99, "category": "electronics"},
+    )
+    assert r.status_code == 201
+
+    r = client.get("/products/?category=electronics")
+    assert r.status_code == 200
+    assert r.json()["count"] == 1
+
+    r = client.post(
+        "/orders/",
+        json={"user_id": 1, "product_id": 1, "quantity": 2},
+    )
+    assert r.status_code == 201
+    assert r.json()["total"] == 1999.98
+
+    r = client.post(
+        "/orders/",
+        json={"user_id": 99, "product_id": 1, "quantity": 1},
+    )
+    assert r.status_code == 404  # User not found
+
+    r = client.get("/orders/")
+    assert r.status_code == 200
+    assert r.json()["count"] == 1
+
+    r = client.get("/admin/stats")
+    assert r.status_code == 200
+    assert r.json()["users"] == 1
+
+    r = client.get("/admin/users")
+    assert r.status_code == 200
+    assert len(r.json()["users"]) == 1
+
+    print("[OK] 24-api-router: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

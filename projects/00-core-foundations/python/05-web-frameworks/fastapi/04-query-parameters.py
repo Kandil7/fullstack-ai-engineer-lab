@@ -8,6 +8,7 @@ FastAPI handles them automatically using function parameters.
 Run: uvicorn 04-query-parameters:app --reload
 """
 
+import sys
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
 
@@ -194,6 +195,54 @@ Testing with curl:
     curl "http://127.0.0.1:8000/users/search?q=e&department=Engineering&page=1"
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.get("/search?q=alice")
+    assert r.status_code == 200
+    assert r.json()["total"] == 1
+
+    r = client.get("/users/?sort_by=age&order=desc")
+    assert r.status_code == 200
+    assert "results" in r.json()
+
+    # /filter has a REQUIRED query parameter
+    r = client.get("/filter?department=Engineering")
+    assert r.status_code == 200
+    assert r.json()["count"] == 3
+
+    r = client.get("/filter")
+    assert r.status_code == 422  # Missing required query param
+
+    r = client.get("/active-users?active=false")
+    assert r.status_code == 200
+    assert r.json()["count"] == 1  # only Charlie is inactive
+
+    r = client.get("/multi-filter?departments=Engineering&departments=Sales&min_age=25")
+    assert r.status_code == 200
+    assert r.json()["count"] >= 2
+
+    r = client.get("/products/?name=laptop&min_price=500")
+    assert r.status_code == 200
+    assert r.json()["filters"]["name"] == "laptop"
+
+    r = client.get("/users/search?q=e&department=Engineering&page=1")
+    assert r.status_code == 200
+    assert "pagination" in r.json()
+
+    print("[OK] 04-query-parameters: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

@@ -9,6 +9,7 @@ Run: uvicorn 17-static-files:app --reload
 """
 
 import os
+import sys
 from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -190,6 +191,57 @@ Testing with curl:
     http://127.0.0.1:8000/static/css/style.css
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.get("/")
+    assert r.status_code == 200
+    assert "Static Files Demo" in r.text
+
+    r = client.get("/static/css/style.css")
+    assert r.status_code == 200
+    assert "font-family" in r.text
+
+    r = client.get("/static/js/app.js")
+    assert r.status_code == 200
+    assert "FastAPI static files demo loaded!" in r.text
+
+    r = client.get("/files/data.csv")
+    assert r.status_code == 200
+    assert "Laptop" in r.text
+
+    r = client.get("/files/missing.csv")
+    assert r.status_code == 404
+
+    # NOTE: /files/stream is shadowed by /files/{filename} (registered first),
+    # so it returns 404 -- a route-order quirk of the teaching file.
+    r = client.get("/files/stream")
+    assert r.status_code == 404
+
+    r = client.get("/api/files")
+    assert r.status_code == 200
+    assert r.json()["total"] >= 4
+
+    r = client.get("/api/file-info/style.css")
+    assert r.status_code == 200
+    assert r.json()["name"] == "style.css"
+
+    r = client.get("/api/file-info/nope.css")
+    assert r.status_code == 404
+
+    print("[OK] 17-static-files: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

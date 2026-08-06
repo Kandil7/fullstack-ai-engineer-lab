@@ -9,6 +9,7 @@ Requires: pip install python-multipart
 Run: uvicorn 07-form-data:app --reload
 """
 
+import sys
 from fastapi import FastAPI, Form, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
@@ -205,6 +206,74 @@ Testing with curl:
     http://127.0.0.1:8000/multi-form
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.post("/login/", data={"username": "admin", "password": "secret"})
+    assert r.status_code == 200
+    assert r.json()["message"] == "Login successful"
+
+    r = client.post("/login/", data={"username": "admin", "password": "wrong"})
+    assert r.status_code == 401
+
+    r = client.post(
+        "/contact/",
+        data={"name": "Alice", "email": "alice@test.com", "message": "Hello FastAPI"},
+    )
+    assert r.status_code == 200
+    assert r.json()["status"] == "received"
+
+    r = client.post(
+        "/register/",
+        data={
+            "username": "alice", "email": "alice@test.com",
+            "password": "password123", "confirm_password": "password123",
+            "role": "user",
+        },
+    )
+    assert r.status_code == 200
+    assert r.json()["message"] == "Registration successful!"
+
+    r = client.post(
+        "/register/",
+        data={
+            "username": "bob", "email": "bob@test.com",
+            "password": "password123", "confirm_password": "different",
+        },
+    )
+    assert r.status_code == 400  # Password mismatch
+
+    r = client.post("/feedback/", data={"rating": 5, "comment": "Great API"})
+    assert r.status_code == 200
+    assert r.json()["rating"] == 5
+
+    r = client.post("/feedback/", data={"rating": 9})
+    assert r.status_code == 422  # rating must be 1-5
+
+    r = client.post(
+        "/profile-update/",
+        data={"full_name": "Alice Smith", "bio": "Developer"},
+    )
+    assert r.status_code == 200
+    assert r.json()["updated"] is True
+
+    r = client.get("/form")
+    assert r.status_code == 200
+    assert "Contact Form" in r.text
+
+    print("[OK] 07-form-data: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

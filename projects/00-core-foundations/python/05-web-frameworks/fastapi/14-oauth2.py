@@ -9,13 +9,23 @@ Requires: pip install python-jose[cryptography] passlib[bcrypt]
 Run: uvicorn 14-oauth2:app --reload
 """
 
+import sys
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Depends, HTTPException, status, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from passlib.context import CryptContext
-from jose import JWTError, jwt
 import secrets
+
+# Guarded import: lets the file load (and smoke-test [skip]) when python-jose
+# is not installed, while keeping the teaching code unchanged.
+try:
+    from jose import JWTError, jwt
+    JOSE_AVAILABLE = True
+except ImportError:
+    JWTError = Exception
+    jwt = None
+    JOSE_AVAILABLE = False
 
 app = FastAPI(title="OAuth2 in FastAPI")
 
@@ -280,6 +290,98 @@ Testing with curl:
     curl -X POST "http://127.0.0.1:8000/oauth/token-code?code=<CODE>&client_id=my-app&client_secret=app-secret-123&redirect_uri=http://localhost:8000/callback"
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+    if not JOSE_AVAILABLE:
+        print("[skip] python-jose not installed (pip install python-jose[cryptography])")
+        return
+    try:
+        pwd_context.hash("verify-password")
+    except Exception:
+        print("[skip] password hashing unavailable (passlib/bcrypt issue: pip install passlib[bcrypt])")
+        return
+
+    client = TestClient(app)
+
+    r = client.post(
+        "/register/",
+        data={"username": "alice", "email": "alice@test.com", "password": "secret123"},
+    )
+    assert r.status_code == 201
+
+    r = client.post(
+        "/register/",
+        data={"username": "admin", "email": "admin@test.com", "password": "admin123"},
+    )
+    assert r.status_code == 201
+
+    # Password Grant flow
+    r = client.post("/oauth/token", data={"username": "alice", "password": "secret123"})
+    assert r.status_code == 200
+    alice_token = r.json()["access_token"]
+
+    r = client.post("/oauth/token", data={"username": "alice", "password": "wrong"})
+    assert r.status_code == 401
+
+    r = client.get("/users/me/")
+    assert r.status_code == 401  # No token
+
+    r = client.get("/users/me/", headers={"Authorization": f"Bearer {alice_token}"})
+    assert r.status_code == 200
+    assert r.json()["username"] == "alice"
+
+    r = client.get(
+        "/users/me/items/",
+        headers={"Authorization": f"Bearer {alice_token}"},
+    )
+    assert r.status_code == 200
+    assert len(r.json()["items"]) == 1
+
+    # Authorization Code flow
+    r = client.get(
+        "/oauth/authorize",
+        params={"client_id": "my-app", "redirect_uri": "http://localhost:8000/callback"},
+    )
+    assert r.status_code == 200
+    code = r.json()["authorization_code"]
+
+    r = client.post(
+        "/oauth/token-code",
+        params={
+            "code": code,
+            "client_id": "my-app",
+            "client_secret": "app-secret-123",
+            "redirect_uri": "http://localhost:8000/callback",
+        },
+    )
+    assert r.status_code == 200
+    assert "access_token" in r.json()
+
+    r = client.get("/oauth/authorize", params={"client_id": "unknown"})
+    assert r.status_code == 400
+
+    # Scope enforcement: alice is not admin
+    r = client.get("/admin/stats/", headers={"Authorization": f"Bearer {alice_token}"})
+    assert r.status_code == 403
+
+    admin_token = client.post(
+        "/oauth/token", data={"username": "admin", "password": "admin123"}
+    ).json()["access_token"]
+    r = client.get("/admin/stats/", headers={"Authorization": f"Bearer {admin_token}"})
+    assert r.status_code == 200
+    assert "stats" in r.json()
+
+    print("[OK] 14-oauth2: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

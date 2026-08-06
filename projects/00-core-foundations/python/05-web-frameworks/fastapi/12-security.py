@@ -9,12 +9,22 @@ Requires: pip install passlib[bcrypt] python-jose[cryptography]
 Run: uvicorn 12-security:app --reload
 """
 
+import sys
 from datetime import datetime, timedelta
 from fastapi import FastAPI, Depends, HTTPException, Header, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from passlib.context import CryptContext
-from jose import JWTError, jwt
+
+# Guarded import: lets the file load (and smoke-test [skip]) when python-jose
+# is not installed, while keeping the teaching code unchanged.
+try:
+    from jose import JWTError, jwt
+    JOSE_AVAILABLE = True
+except ImportError:
+    JWTError = Exception
+    jwt = None
+    JOSE_AVAILABLE = False
 
 app = FastAPI(title="Security in FastAPI")
 
@@ -214,6 +224,68 @@ Testing with curl:
     curl -H "X-Api-Key: admin-key-123" http://127.0.0.1:8000/api-key-protected/
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+    if not JOSE_AVAILABLE:
+        print("[skip] python-jose not installed (pip install python-jose[cryptography])")
+        return
+    try:
+        hash_password("verify-password")
+    except Exception:
+        print("[skip] password hashing unavailable (passlib/bcrypt issue: pip install passlib[bcrypt])")
+        return
+
+    client = TestClient(app)
+
+    r = client.post(
+        "/register/",
+        json={"username": "alice", "email": "alice@test.com", "password": "secret123"},
+    )
+    assert r.status_code == 201
+
+    r = client.post("/login/", data={"username": "alice", "password": "secret123"})
+    assert r.status_code == 200
+    token = r.json()["access_token"]
+
+    r = client.get("/me/")
+    assert r.status_code == 401  # No token
+
+    r = client.get("/me/", headers={"Authorization": f"Bearer {token}"})
+    assert r.status_code == 200
+    assert r.json()["username"] == "alice"
+
+    r = client.get("/api-key-protected/")
+    assert r.status_code == 403  # No API key
+
+    r = client.get("/api-key-protected/", headers={"X-Api-Key": "admin-key-123"})
+    assert r.status_code == 200
+    assert r.json()["role"] == "admin"
+
+    r = client.post(
+        "/change-password/",
+        json={"old_password": "wrong", "new_password": "newpass123"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert r.status_code == 400  # Incorrect old password
+
+    r = client.post(
+        "/change-password/",
+        json={"old_password": "secret123", "new_password": "newpass123"},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert r.status_code == 200
+
+    print("[OK] 12-security: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

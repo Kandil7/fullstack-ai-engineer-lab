@@ -7,6 +7,7 @@ Proper error handling is critical for API usability.
 Run: uvicorn 23-exception-handling:app --reload
 """
 
+import sys
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -230,6 +231,62 @@ Testing with curl:
     curl http://127.0.0.1:8000/nonexistent  # Custom 404 handler
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.post("/users/", json={"name": "Alice", "email": "a@test.com", "age": 30})
+    assert r.status_code == 201
+
+    r = client.post("/users/", json={"name": "Alice2", "email": "a@test.com", "age": 30})
+    assert r.status_code == 422  # Duplicate email -> custom business validation
+    assert r.json()["error"]["code"] == "VALIDATION_ERROR"
+
+    r = client.post("/users/", json={"name": "Bob", "email": "b@test.com", "age": 999})
+    assert r.status_code == 422  # Pydantic validation handler
+
+    r = client.get("/users/999")
+    assert r.status_code == 404
+    assert r.json()["error"]["code"] == "NOT_FOUND"
+
+    r = client.get("/rate-limited/")
+    assert r.status_code == 429
+    assert r.headers.get("Retry-After") == "60"
+
+    r = client.get("/error/not-found")
+    assert r.status_code == 404
+
+    r = client.get("/error/validation")
+    assert r.status_code == 422
+    assert r.json()["error"]["code"] == "VALIDATION_ERROR"
+
+    r = client.get("/error/rate-limit")
+    assert r.status_code == 429
+    assert r.json()["error"]["code"] == "RATE_LIMITED"
+
+    r = client.get("/error/division")
+    assert r.status_code == 500
+
+    r = client.get("/nonexistent")
+    assert r.status_code == 404
+    assert r.json()["error"]["code"] == "ROUTE_NOT_FOUND"
+
+    r = client.get("/error/unknown-type")
+    assert r.status_code == 200
+    assert "available_errors" in r.json()
+
+    print("[OK] 23-exception-handling: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

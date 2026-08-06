@@ -9,6 +9,7 @@ Requires: pip install sqlalchemy
 Run: uvicorn 19-orm:app --reload
 """
 
+import sys
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, Depends, Query
 from pydantic import BaseModel
@@ -287,6 +288,106 @@ Testing with curl:
     curl http://127.0.0.1:8000/stats/by-author
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server).
+
+    Uses a throwaway temp SQLite file (NOT the teaching DB) so verification
+    never touches outputs/dbs/orm_demo.db and never leaves file locks.
+    """
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    import os
+    import shutil
+    import tempfile
+
+    tmp_dir = tempfile.mkdtemp(prefix="fastapi_19_verify_")
+    db_file = os.path.join(tmp_dir, "verify.db")
+    try:
+        verify_engine = create_engine(
+            f"sqlite:///{db_file}", connect_args={"check_same_thread": False}
+        )
+        Base.metadata.create_all(bind=verify_engine)
+        verify_session = sessionmaker(autocommit=False, autoflush=False, bind=verify_engine)
+
+        def override_get_db():
+            db = verify_session()
+            try:
+                yield db
+            finally:
+                db.close()
+
+        app.dependency_overrides[get_db] = override_get_db
+        client = TestClient(app)
+
+        r = client.post(
+            "/authors/",
+            json={"name": "J.K. Rowling", "email": "jk@test.com"},
+        )
+        assert r.status_code == 201
+
+        r = client.post(
+            "/books/",
+            json={"title": "Harry Potter", "genre": "Fantasy", "price": 29.99, "published_year": 1997, "author_id": 1},
+        )
+        assert r.status_code == 201
+        assert r.json()["author_name"] == "J.K. Rowling"
+
+        r = client.post(
+            "/books/",
+            json={"title": "Dune", "genre": "Sci-Fi", "price": 19.99, "published_year": 1965, "author_id": 1},
+        )
+        assert r.status_code == 201
+
+        r = client.post(
+            "/books/",
+            json={"title": "Orphan", "genre": "Fantasy", "price": 9.99, "published_year": 2020, "author_id": 99},
+        )
+        assert r.status_code == 404  # Author not found
+
+        r = client.get("/authors/1")
+        assert r.status_code == 200
+        assert len(r.json()["books"]) == 2
+
+        r = client.get("/authors/999")
+        assert r.status_code == 404
+
+        r = client.get("/books/?genre=Fantasy")
+        assert r.status_code == 200
+        assert len(r.json()) == 1
+
+        r = client.get("/books/1")
+        assert r.status_code == 200
+        assert r.json()["author"]["name"] == "J.K. Rowling"
+
+        r = client.get("/stats/by-genre")
+        assert r.status_code == 200
+        genres = {g["genre"] for g in r.json()}
+        assert genres == {"Fantasy", "Sci-Fi"}
+
+        r = client.get("/stats/by-author")
+        assert r.status_code == 200
+        assert r.json()[0]["books"] == 2
+
+        r = client.delete("/books/2")
+        assert r.status_code == 200
+
+        r = client.delete("/books/999")
+        assert r.status_code == 404
+
+        verify_engine.dispose()  # close all connections BEFORE removing the file
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    print("[OK] 19-orm: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

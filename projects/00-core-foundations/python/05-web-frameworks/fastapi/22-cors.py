@@ -7,6 +7,7 @@ Essential for frontend apps on different domains/ports.
 Run: uvicorn 22-cors:app --reload
 """
 
+import sys
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -155,6 +156,52 @@ Testing with curl:
     fetch('http://localhost:8000/api/data').then(r => r.json()).then(console.log)
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    # CORS headers only appear on requests that carry an Origin header
+    r = client.get("/", headers={"Origin": "http://example.com"})
+    assert r.status_code == 200
+    assert r.headers.get("Access-Control-Allow-Origin") is not None
+
+    # Simulate a cross-origin request
+    r = client.get("/api/data", headers={"Origin": "http://example.com"})
+    assert r.status_code == 200
+    assert r.headers.get("Access-Control-Allow-Origin") is not None
+    assert len(r.json()["data"]) == 2
+
+    r = client.post("/api/submit", json={"name": "test"})
+    assert r.status_code == 200
+    assert r.json()["status"] == "ok"
+
+    # Preflight request (CORS middleware handles OPTIONS automatically)
+    r = client.options(
+        "/api/submit",
+        headers={
+            "Origin": "http://example.com",
+            "Access-Control-Request-Method": "POST",
+        },
+    )
+    assert r.status_code == 200
+    assert r.headers.get("Access-Control-Allow-Methods") is not None
+
+    r = client.get("/test-cors")
+    assert r.status_code == 200
+    assert "CORS Test Page" in r.text
+
+    print("[OK] 22-cors: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

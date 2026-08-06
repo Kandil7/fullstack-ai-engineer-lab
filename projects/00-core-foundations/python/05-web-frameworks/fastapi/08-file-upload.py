@@ -9,6 +9,7 @@ Run: uvicorn 08-file-upload:app --reload
 """
 
 import os
+import sys
 import shutil
 import hashlib
 from datetime import datetime
@@ -229,6 +230,83 @@ Testing with curl:
     curl http://127.0.0.1:8000/uploads/
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+    created_paths = []  # track files written so we can clean them up
+
+    try:
+        r = client.post(
+            "/upload/",
+            files={"file": ("verify_hello.txt", b"hello fastapi", "text/plain")},
+        )
+        assert r.status_code == 200
+        assert "md5" in r.json()
+        created_paths.append(r.json()["saved_to"])
+
+        r = client.post(
+            "/upload/image/",
+            files={"file": ("verify_photo.jpg", b"\xff\xd8\xff\xe0fakejpeg", "image/jpeg")},
+        )
+        assert r.status_code == 200
+        created_paths.append(os.path.join(UPLOAD_DIR, r.json()["saved_as"]))
+
+        r = client.post(
+            "/upload/image/",
+            files={"file": ("verify_evil.txt", b"not an image", "text/plain")},
+        )
+        assert r.status_code == 400  # MIME type rejected
+
+        r = client.post(
+            "/upload/multiple/",
+            files=[
+                ("files", ("verify_a.txt", b"aaa", "text/plain")),
+                ("files", ("verify_b.txt", b"bbb", "text/plain")),
+            ],
+        )
+        assert r.status_code == 200
+        assert r.json()["total_files"] == 2
+        # response does not include saved paths, so track them for cleanup
+        created_paths.append(os.path.join(UPLOAD_DIR, "verify_a.txt"))
+        created_paths.append(os.path.join(UPLOAD_DIR, "verify_b.txt"))
+
+        r = client.post(
+            "/upload/document/",
+            files={"file": ("verify_report.txt", b"report data", "text/plain")},
+            params={"category": "verify_cat", "description": "Q4 report"},
+        )
+        assert r.status_code == 200
+        assert r.json()["category"] == "verify_cat"
+        assert r.json()["description"] == "Q4 report"
+        created_paths.append(r.json()["path"])
+
+        r = client.get("/uploads/")
+        assert r.status_code == 200
+        assert "total" in r.json()
+    finally:
+        # Clean up only the files this verification created (Windows: close first)
+        for p in created_paths:
+            try:
+                os.remove(p)
+            except OSError:
+                pass
+        try:
+            os.rmdir(os.path.join(UPLOAD_DIR, "verify_cat"))
+        except OSError:
+            pass
+
+    print("[OK] 08-file-upload: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()

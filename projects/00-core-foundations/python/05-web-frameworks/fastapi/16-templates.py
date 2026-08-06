@@ -9,6 +9,7 @@ Requires: pip install jinja2
 Run: uvicorn 16-templates:app --reload
 """
 
+import sys
 from datetime import datetime
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -207,6 +208,42 @@ Testing with curl:
     Open in browser for best experience!
 """
 
+def _verify():
+    """Smoke-test the app in-process with TestClient (no real server)."""
+    try:
+        from fastapi.testclient import TestClient
+    except ImportError:
+        print("[skip] fastapi not installed")
+        return
+
+    client = TestClient(app)
+
+    r = client.get("/")
+    assert r.status_code == 200
+    assert "FastAPI Templates Demo" in r.text
+
+    r = client.get("/dashboard")
+    assert r.status_code == 200
+    assert "Widget A" in r.text
+
+    r = client.get("/users/1")
+    assert r.status_code == 200
+    assert "alice@test.com" in r.text
+
+    r = client.get("/users/999")
+    assert r.status_code == 404
+    assert "not found" in r.text
+
+    r = client.get("/products-page")
+    assert r.status_code == 200
+    assert "Products" in r.text
+
+    print("[OK] 16-templates: all checks passed")
+
+
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    if "--serve" in sys.argv:
+        import uvicorn
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    else:
+        _verify()
