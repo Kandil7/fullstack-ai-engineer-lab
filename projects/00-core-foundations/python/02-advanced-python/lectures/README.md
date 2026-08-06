@@ -1,15 +1,17 @@
-# Advanced Python Lectures (Topics 11-20)
+# Advanced Python Lectures (Topics 11-27)
 
-A comprehensive collection of lecture notes and glossaries covering advanced Python topics 11-20, designed to provide deep understanding of Python's powerful features and patterns.
+A comprehensive collection of lecture notes and glossaries covering advanced Python topics 11-27, designed to provide deep understanding of Python's powerful features and patterns.
 
 ---
 
 ## 📚 What This Directory Contains
 
-This directory contains detailed lecture notes and glossary files for advanced Python topics 11-20. Each topic includes:
+This directory contains detailed lecture notes and glossary files for advanced Python topics 11-27. Each topic includes:
 
 - **Lecture File** (`XX-topic-lecture.md`): Comprehensive explanations, code examples, best practices, and exercises
 - **Glossary File** (`XX-topic-glossary.md`): Alphabetical definitions with examples and quick reference tables
+
+Topics 21-27 also include a **3-tier challenge** (`challenges/NN-topic/`) and a **20-question quiz** (`supplementary/quizzes/advanced-NN-topic-quiz.md`) per the content standards.
 
 ---
 
@@ -27,6 +29,13 @@ This directory contains detailed lecture notes and glossary files for advanced P
 | 18 | [Lecture](lectures/18-unit-testing-lecture.md) | [Glossary](lectures/18-unit-testing-glossary.md) | **Unit Testing** | unittest, mocking, fixtures, parameterized tests, TDD |
 | 19 | [Lecture](lectures/19-logging-lecture.md) | [Glossary](lectures/19-logging-glossary.md) | **Logging** | Levels, handlers, formatters, hierarchy, application logging |
 | 20 | [Lecture](lectures/20-patterns-lecture.md) | [Glossary](lectures/20-patterns-glossary.md) | **Design Patterns** | Singleton, Factory, Observer, Strategy, Adapter, Decorator |
+| 21 | [Lecture](lectures/21-concurrency-comparison-lecture.md) | [Glossary](lectures/21-concurrency-comparison-glossary.md) | **Concurrency Comparison** | Threads vs processes vs async, GIL, measured trade-offs |
+| 22 | [Lecture](lectures/22-asyncio-advanced-lecture.md) | [Glossary](lectures/22-asyncio-advanced-glossary.md) | **Asyncio Advanced** | TaskGroup, cancellation, shield, timeouts, backpressure |
+| 23 | [Lecture](lectures/23-typing-advanced-lecture.md) | [Glossary](lectures/23-typing-advanced-glossary.md) | **Typing Advanced** | Protocol, ParamSpec, TypeGuard, generic bounds, runtime checkable |
+| 24 | [Lecture](lectures/24-memory-and-gc-lecture.md) | [Glossary](lectures/24-memory-and-gc-glossary.md) | **Memory & GC** | Refcounts, cycles, generational GC, weak refs, tracemalloc |
+| 25 | [Lecture](lectures/25-profiling-and-optimization-lecture.md) | [Glossary](lectures/25-profiling-and-optimization-glossary.md) | **Profiling & Optimization** | timeit, cProfile, hash join, memoization, vectorization |
+| 26 | [Lecture](lectures/26-design-patterns-advanced-lecture.md) | [Glossary](lectures/26-design-patterns-advanced-glossary.md) | **Design Patterns Advanced** | Adapter, dependency injection, Command, Registry, Strategy |
+| 27 | [Lecture](lectures/27-packaging-and-distribution-lecture.md) | [Glossary](lectures/27-packaging-and-distribution-glossary.md) | **Packaging & Distribution** | pyproject.toml, semver, PEP 440, extras, entry points |
 
 ---
 
@@ -47,6 +56,17 @@ This directory contains detailed lecture notes and glossary files for advanced P
 8. **18 - Unit Testing** → Testing best practices and mocking
 9. **19 - Logging** → Production-ready application logging
 10. **20 - Design Patterns** → Reusable solutions to common problems
+
+### Phase 4: Systems & Engineering Depth (Topics 21-27)
+11. **21 - Concurrency Comparison** → When to use threads, processes, or async (measured)
+12. **22 - Asyncio Advanced** → TaskGroups, cancellation, timeouts, backpressure
+13. **23 - Typing Advanced** → Protocols, ParamSpec, TypeGuard for maintainable APIs
+14. **24 - Memory & GC** → Refcounts, cycles, weak refs, tracemalloc debugging
+15. **25 - Profiling & Optimization** → Measure first: timeit, cProfile, algorithmic wins
+16. **26 - Design Patterns Advanced** → DI, Registry, Command, Strategy in practice
+17. **27 - Packaging & Distribution** → pyproject.toml, PEP 440, shipping real projects
+
+Topics 21-27 follow the same learning loop as 11-20 but add **challenges** (`challenges/NN-topic/`) and **quizzes** (`supplementary/quizzes/`): read the lecture → look up terms in the glossary → do the 3-tier challenge (🥉 → 🥈 → 🥇) → confirm with the quiz → run the exercise `NN-topic.py` with `--verify`.
 
 ---
 
