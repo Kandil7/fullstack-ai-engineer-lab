@@ -121,9 +121,9 @@ class Tree:
             print(" " * (level * 4) + prefix + str(node.data))
             for i, child in enumerate(node.children):
                 if i == len(node.children) - 1:
-                    self.display(child, level + 1, "└── ")
+                    self.display(child, level + 1, "+-- ")
                 else:
-                    self.display(child, level + 1, "├── ")
+                    self.display(child, level + 1, "+-- ")
 
 
 print("=== General Tree ===")
