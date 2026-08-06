@@ -12,6 +12,10 @@ Topics:
 """
 
 import numpy as np
+# Ensure output directory exists (Tier 0 fix: Windows + CI)
+import os
+os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -65,8 +69,8 @@ ax.set_xlabel("x")
 ax.set_ylabel("f(x)")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_05_quad.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_05_quad.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_quad.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_quad.png")
 
 # ============================================================
 # Example 2: Double Integration with dblquad
@@ -173,8 +177,8 @@ axes[1].set_ylabel("Predator population")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_05_ode.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_05_ode.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_ode.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_ode.png")
 
 # ============================================================
 # Example 4: Spring-Mass-Damper System
@@ -226,8 +230,8 @@ axes[1].set_ylabel("Energy")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_05_spring.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_05_spring.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_spring.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_spring.png")
 
 # ============================================================
 # Example 5: Cumulative Integration (Area Under Curve)
@@ -261,8 +265,8 @@ axes[1].set_xlabel("t")
 axes[1].set_ylabel("âˆ« f(t) dt")
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_05_cumulative.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_05_cumulative.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_cumulative.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_cumulative.png")
 
 print("\n[OK] SciPy integration module covered!")
 print("   Next: 06-interpolation.py for interpolation techniques.")

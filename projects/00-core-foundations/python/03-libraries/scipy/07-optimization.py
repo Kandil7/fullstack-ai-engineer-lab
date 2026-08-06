@@ -12,6 +12,10 @@ Topics:
 """
 
 import numpy as np
+# Ensure output directory exists (Tier 0 fix: Windows + CI)
+import os
+os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -57,8 +61,8 @@ ax.set_ylabel("f(x)")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_07_scalar_min.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_07_scalar_min.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_07_scalar_min.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_07_scalar_min.png")
 
 # ============================================================
 # Example 2: Multivariate Minimization
@@ -106,8 +110,8 @@ ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.legend()
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_07_rosenbrock.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_07_rosenbrock.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_07_rosenbrock.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_07_rosenbrock.png")
 
 # ============================================================
 # Example 3: Curve Fitting with curve_fit
@@ -157,8 +161,8 @@ ax.set_ylabel("y")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_07_curve_fit.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_07_curve_fit.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_07_curve_fit.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_07_curve_fit.png")
 
 # ============================================================
 # Example 4: Root Finding
@@ -198,8 +202,8 @@ ax.set_xlabel("x")
 ax.set_ylabel("f(x)")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_07_roots.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_07_roots.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_07_roots.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_07_roots.png")
 
 # Verify roots
 print(f"\nVerification:")
@@ -267,8 +271,8 @@ ax.set_title("Linear Programming: Max 3x + 5y")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_07_linprog.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_07_linprog.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_07_linprog.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_07_linprog.png")
 
 print("\n[OK] SciPy optimization covered!")
 print("   Next: 08-linear-algebra.py for matrix operations.")

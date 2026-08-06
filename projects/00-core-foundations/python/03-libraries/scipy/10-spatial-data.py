@@ -14,6 +14,10 @@ Topics:
 """
 
 import numpy as np
+# Ensure output directory exists (Tier 0 fix: Windows + CI)
+import os
+os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -69,8 +73,8 @@ ax.legend()
 ax.grid(True, alpha=0.3)
 ax.set_aspect("equal")
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_10_kdtree.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_10_kdtree.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_kdtree.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_kdtree.png")
 
 # ============================================================
 # Example 2: Delaunay Triangulation
@@ -110,8 +114,8 @@ ax.set_title(f"Delaunay Triangulation ({len(tri.simplices)} triangles)")
 ax.set_aspect("equal")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_10_delaunay.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_10_delaunay.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_delaunay.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_delaunay.png")
 
 # Point-in-triangle test
 test_point = np.array([0.0, 0.0])
@@ -154,8 +158,8 @@ ax.legend()
 ax.grid(True, alpha=0.3)
 ax.set_aspect("equal")
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_10_convexhull.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_10_convexhull.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_convexhull.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_convexhull.png")
 
 # ============================================================
 # Example 4: Voronoi Diagram
@@ -188,8 +192,8 @@ ax.set_xlim(-0.1, 1.1)
 ax.set_ylim(-0.1, 1.1)
 ax.set_aspect("equal")
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_10_voronoi.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_10_voronoi.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_voronoi.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_voronoi.png")
 
 # ============================================================
 # Example 5: Spatial Distance and Proximity

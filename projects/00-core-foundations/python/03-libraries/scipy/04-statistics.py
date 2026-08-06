@@ -12,6 +12,10 @@ Topics:
 """
 
 import numpy as np
+# Ensure output directory exists (Tier 0 fix: Windows + CI)
+import os
+os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -60,8 +64,8 @@ axes[1].set_title("Sample Histogram vs PDF")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_04_distributions.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_04_distributions.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_distributions.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_distributions.png")
 
 # ============================================================
 # Example 2: Comparing Multiple Distributions
@@ -98,8 +102,8 @@ axes[1].set_ylabel("F(x)")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_04_multi_dist.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_04_multi_dist.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_multi_dist.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_multi_dist.png")
 
 # Quick stats summary for each
 print(f"\n{'Distribution':<20s} {'Mean':>8s} {'Std':>8s} {'Skew':>8s} {'Kurt':>8s}")
@@ -234,8 +238,8 @@ ax.set_ylabel("y")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_04_regression.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_04_regression.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_regression.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_regression.png")
 
 print("\n[OK] SciPy statistics module covered!")
 print("   Next: 05-integration.py for numerical integration.")

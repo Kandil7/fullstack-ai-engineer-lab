@@ -12,6 +12,10 @@ Topics:
 """
 
 import numpy as np
+# Ensure output directory exists (Tier 0 fix: Windows + CI)
+import os
+os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -53,8 +57,8 @@ ax.set_ylabel("y")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_06_1d_interp.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_06_1d_interp.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_1d_interp.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_1d_interp.png")
 
 # Print interpolation values at specific points
 test_points = [1.5, 3.7, 6.2, 8.9]
@@ -109,8 +113,8 @@ axes[1].set_xlabel("x")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_06_spline.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_06_spline.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_spline.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_spline.png")
 
 # Evaluate spline coefficients
 print(f"Spline has {len(spline_natural.c)} coefficient sets")
@@ -151,8 +155,8 @@ im1 = axes[1].pcolormesh(X_fine, Y_fine, Z_fine, cmap="viridis", shading="auto")
 axes[1].set_title("Interpolated (100Ã—100)")
 plt.colorbar(im1, ax=axes[1], shrink=0.8)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_06_2d_interp.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_06_2d_interp.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_2d_interp.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_2d_interp.png")
 
 # Interpolate specific points
 query_points = np.array([[1.5, 2.0], [3.0, 4.0], [0.5, 1.0]])
@@ -206,8 +210,8 @@ im2 = axes[2].pcolormesh(X_rbf, Y_rbf, np.abs(Z_rbf - Z_true), cmap="hot", shadi
 axes[2].set_title("Absolute Error")
 plt.colorbar(im2, ax=axes[2], shrink=0.8)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_06_rbf.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_06_rbf.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_rbf.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_rbf.png")
 
 print(f"Max interpolation error: {np.abs(Z_rbf - Z_true).max():.6f}")
 
@@ -238,8 +242,8 @@ ax.set_ylabel("Value")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("../../outputs/scipy/scipy_06_resample.png", dpi=100)
-print("Plot saved: ../../outputs/scipy/scipy_06_resample.png")
+plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_resample.png", dpi=100)
+print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_resample.png")
 
 print(f"\nOriginal samples: {n_samples}")
 print(f"Resampled points: {len(t_regular)}")
