@@ -70,4 +70,4 @@ The `.ai/` directory structure is defined in the project structure but prompt fi
 are being authored incrementally as each workflow is implemented. The registration
 registries are initialized with the core entries.
 
-*Last updated: 2026-06-26*
+*Last updated: 2026-08-06*
