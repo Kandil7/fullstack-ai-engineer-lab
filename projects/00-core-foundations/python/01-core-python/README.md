@@ -1,6 +1,6 @@
 # 📘 Phase 1: Core Python Fundamentals
 
-41 numbered exercise files (01–41) plus 2 practice files, covering Python from absolute basics through object-oriented programming and file handling.
+88 Python files including 41 numbered exercise files (01–41), 2 practice files, and 45 lecture/glossary/challenge files covering Python from absolute basics through object-oriented programming and file handling.
 
 ## Contents
 
