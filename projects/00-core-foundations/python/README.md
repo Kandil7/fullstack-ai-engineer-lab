@@ -1,6 +1,6 @@
 # 🐍 Python Learning Module — Fullstack AI Engineer Lab
 
-> **2,564 files across 9 learning phases** — from `print("Hello")` to production ML pipelines and GenAI systems.
+> **3,069 files across 9 learning phases** — from `print("Hello")` to production ML pipelines and GenAI systems.
 > Each topic ships with a lecture + glossary pair, and most phases include quizzes, challenges, and interview prep.
 
 ---
@@ -58,25 +58,30 @@ python/
 │   └── lectures/
 │
 ├── 03-libraries/                    # 📊 Phase 3: Data Science Libraries
-│   ├── numpy/        (28 files + lectures)
-│   ├── pandas/       (basics + case studies + lectures)
-│   ├── matplotlib/   (basics + advanced + lectures)
-│   └── scipy/        (12 files + lectures)
+│   ├── numpy/        (53 files + lectures)
+│   ├── pandas/       (72 files + lectures)
+│   ├── matplotlib/   (47 files + lectures)
+│   └── scipy/        (30 files + lectures)
 │
 ├── 04-databases/                    # 🗄️ Phase 4: Database Integration
 │   ├── mysql/        (12 files, sqlite3 stand-in)
-│   └── mongodb/      (11 files, dict stand-in)
+│   ├── mongodb/      (11 files, dict stand-in)
+│   ├── postgres/     (PostgreSQL exercises)
+│   ├── redis/        (Redis exercises)
+│   ├── sql-fundamentals/ (SQL fundamentals)
+│   ├── sqlalchemy/   (SQLAlchemy ORM)
+│   └── vector-stores/ (Vector store exercises)
 │
 ├── 05-web-frameworks/               # 🌐 Phase 5: Backend Development
-│   ├── fastapi/      (25 files + exercises + lectures)
-│   └── django/       (reference snippets — Django not required)
+│   ├── fastapi/      (52 files + exercises + lectures)
+│   └── django/       (20 files, reference-only — Django not required)
 │
 ├── 06-data-structures-algorithms/   # ⚙️ Phase 6: DSA
 │   ├── 01-introduction.py → 20-merge-sort.py
 │   └── lectures/
 │
 ├── 07-machine-learning/             # 🤖 Phase 7: Machine Learning
-│   ├── 01-getting-started.py → 23-k-nearest-neighbors.py
+│   ├── 01-getting-started.py → 40-transformers-from-scratch.py
 │   └── lectures/
 │
 ├── 08-mlops/                        # 🚀 Phase 8: MLOps (Production ML)
