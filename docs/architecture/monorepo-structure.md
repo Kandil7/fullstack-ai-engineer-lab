@@ -41,7 +41,7 @@ fullstack-ai-engineer-lab/
     07-capstone/          thanaweyagpt/ backend/ frontend/ ai/ infra/ docs/
 
   infra/
-    docker/   docker-compose.yml + postgres/ redis/
+    docker/   docker-compose.yml + postgres/ redis/ mongodb/ qdrant/ langfuse/
     scripts/  setup.ps1 dev-run.ps1 seed-db.ps1 new-adr.ps1 new-review.ps1 new-source-note.ps1
 
   tests/
@@ -77,4 +77,4 @@ convention established by projects like .github/ and .vscode/.
 | `evaluations/` | Quality metrics — prompt evals, RAG evals, project release gates |
 | `learning-sources/` | External reference materials indexed and summarized |
 
-*Last updated: 2026-06-26*
+*Last updated: 2026-08-06*
