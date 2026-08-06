@@ -1,6 +1,6 @@
 # Learning Strategy
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-08-06
 
 How to use the 5-axis resource system with the Full-Stack AI Engineer Lab workspace.
 
