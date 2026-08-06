@@ -4,6 +4,7 @@ W3Schools Python Tutorial - MongoDB 05: Find Documents
 Topics: find() for all, find() with query, find_one(), querying nested fields, projection
 
 Run: python 05-find.py
+Verify: python 05-find.py --verify
 Reference: https://www.w3schools.com/python/python_mongodb_find.asp
 """
 
@@ -105,20 +106,30 @@ orders = [
 ]
 
 def find_nested(collection, query):
-    """Find documents with nested field queries"""
+    """Find documents with nested field queries.
+
+    Walks dot paths ("items.name") through dicts AND arrays: at a list, ANY
+    element may continue the path — matching MongoDB's array-field semantics
+    ({"items.name": "Laptop"} matches if any item is a Laptop).
+    """
     results = []
     for doc in collection:
         match = True
         for path, value in query.items():
-            keys = path.split(".")
-            current = doc
-            for key in keys:
-                if isinstance(current, dict) and key in current:
-                    current = current[key]
-                else:
-                    match = False
+            candidates = [doc]
+            for key in path.split("."):
+                nxt = []
+                for cur in candidates:
+                    if isinstance(cur, dict) and key in cur:
+                        item = cur[key]
+                        if isinstance(item, list):
+                            nxt.extend(item)
+                        else:
+                            nxt.append(item)
+                candidates = nxt
+                if not candidates:
                     break
-            if match and current != value:
+            if not any(c == value for c in candidates):
                 match = False
         if match:
             results.append(doc)
@@ -262,3 +273,43 @@ print("""
 9. count_documents() counts matching documents
 10. find() with empty query returns all documents
 """)
+
+# ============================================================
+# Self-Verification  (MANDATORY)
+# ============================================================
+def _verify() -> None:
+    """Assert every claim this file makes. Silent on success."""
+    # find(): exact-match query
+    assert len(find_all(users)) == 5
+    assert [d["name"] for d in find(users, {"city": "New York"})] == ["Alice", "Charlie"]
+    assert find(users, {"age": 25})[0]["name"] == "Alice"
+
+    # find_one(): first match, or None
+    assert find_one(users, {"name": "Bob"})["_id"] == 2
+    assert find_one(users, {"name": "Zack"}) is None
+
+    # nested field query via dot notation
+    assert len(find_nested(orders, {"items.name": "Laptop"})) == 1
+    assert find_nested(orders, {"items.name": "Laptop"})[0]["customer"] == "Alice"
+
+    # projection: inclusion keeps only listed fields + _id by default
+    proj = find_projection(users, {}, {"name": 1, "email": 1})
+    assert set(proj[0].keys()) == {"_id", "name", "email"}
+    # projection: exclusion drops listed fields
+    excl = find_projection(users, {}, {"password": 0, "_id": 0})
+    assert "_id" not in excl[0] and "name" in excl[0]
+
+    # comparison helpers
+    assert len(find_gt(users, "age", 25)) == 4
+    assert len(find_lt(users, "age", 30)) == 2
+
+    # counts
+    assert count_documents(users) == 5
+    assert count_documents(users, {"active": True}) == 4
+    assert count_documents(users, {"city": "Boston"}) == 2
+
+    print("[OK] 05-find: all checks passed")
+
+
+if __name__ == "__main__":
+    _verify()  # plain execution and --verify are both tests

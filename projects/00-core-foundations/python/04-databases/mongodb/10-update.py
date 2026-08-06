@@ -4,6 +4,7 @@ W3Schools Python Tutorial - MongoDB 10: Update Documents
 Topics: update_one(), update_many(), $set, $unset, $inc, $push, upsert
 
 Run: python 10-update.py
+Verify: python 10-update.py --verify
 Reference: https://www.w3schools.com/python/python_mongodb_update.asp
 """
 
@@ -283,3 +284,59 @@ print("""
 9. Multiple update operators can be combined
 10. Updates are atomic within a single document
 """)
+
+# ============================================================
+# Self-Verification  (MANDATORY)
+# ============================================================
+def _verify() -> None:
+    """Assert every claim this file makes. Silent on success."""
+    # $set single and multi-field
+    u1 = reset_users()
+    assert update_one(u1, {"name": "Alice"}, {"$set": {"age": 26}})["modified_count"] == 1
+    assert u1[0]["age"] == 26
+    assert update_one(u1, {"name": "Bob"}, {"$set": {"age": 31, "email": "bob_new@mail.com"}})["modified_count"] == 1
+    assert u1[1]["email"] == "bob_new@mail.com"
+
+    # $unset removes a field
+    u2 = reset_users()
+    update_one(u2, {"name": "Charlie"}, {"$unset": {"email": ""}})
+    assert "email" not in u2[2]
+
+    # $inc increments and decrements
+    u3 = reset_users()
+    update_one(u3, {"name": "Alice"}, {"$inc": {"age": 1}})
+    assert u3[0]["age"] == 26
+    update_one(u3, {"name": "Bob"}, {"$inc": {"age": -2}})
+    assert u3[1]["age"] == 28
+
+    # $push appends to an array
+    u4 = reset_users()
+    update_one(u4, {"name": "Alice"}, {"$push": {"scores": 95}})
+    assert u4[0]["scores"] == [85, 90, 95]
+
+    # update_many touches every match
+    u5 = reset_users()
+    assert update_many(u5, {"status": "active"}, {"$set": {"verified": True}})["modified_count"] == 3
+    assert all(d.get("verified") for d in u5 if d["status"] == "active")
+
+    # upsert: insert when missing, update when present
+    u6 = reset_users()
+    r_ins = upsert_one(u6, {"name": "Eve"}, {"$set": {"age": 28, "status": "active"}})
+    assert r_ins["upserted"] is not None and len(u6) == 5
+    r_upd = upsert_one(u6, {"name": "Eve"}, {"$set": {"age": 29}})
+    assert r_upd["modified_count"] == 1 and next(d for d in u6 if d["name"] == "Eve")["age"] == 29
+
+    # nested field update via dot notation
+    assert update_nested(users_with_address, {"name": "Alice"}, "address.city", "Los Angeles")["modified_count"] == 1
+    assert users_with_address[0]["address"]["city"] == "Los Angeles"
+
+    # combined operators in one update
+    u7 = reset_users()
+    update_one(u7, {"name": "Alice"}, {"$inc": {"age": 1}, "$set": {"status": "active"}, "$push": {"scores": 100}})
+    assert u7[0]["age"] == 26 and u7[0]["scores"] == [85, 90, 100]
+
+    print("[OK] 10-update: all checks passed")
+
+
+if __name__ == "__main__":
+    _verify()  # plain execution and --verify are both tests

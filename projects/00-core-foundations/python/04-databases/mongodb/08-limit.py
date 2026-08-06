@@ -4,6 +4,7 @@ W3Schools Python Tutorial - MongoDB 08: Limit and Skip
 Topics: limit(), skip(), Pagination Pattern, count_documents
 
 Run: python 08-limit.py
+Verify: python 08-limit.py --verify
 Reference: https://www.w3schools.com/python/python_mongodb_limit.asp
 """
 
@@ -291,3 +292,47 @@ print("""
 8. Always calculate total_pages for UI pagination
 9. Consider cursor-based pagination for real-time data
 """)
+
+# ============================================================
+# Self-Verification  (MANDATORY)
+# ============================================================
+def _verify() -> None:
+    """Assert every claim this file makes. Silent on success."""
+    # limit / skip
+    assert len(limit_results(products, 5)) == 5
+    assert skip_results(products, 5)[0]["_id"] == 6
+
+    # paginate: skip + limit
+    page_2 = paginate(products, skip=5, limit=5)
+    assert [p["_id"] for p in page_2] == [6, 7, 8, 9, 10]
+    page_3 = paginate(products, skip=10, limit=5)
+    assert [p["_id"] for p in page_3] == [11, 12]
+
+    # pagination metadata
+    assert get_total_pages(products, 5) == 3
+    info = get_pagination_info(products, 2, 5)
+    assert info["items_on_page"] == 5 and info["has_next"] is True and info["has_prev"] is True
+    assert get_pagination_info(products, 1, 5)["has_prev"] is False
+
+    # counts
+    assert count_all(products) == 12
+    assert count_filtered(products, {"category": "Electronics"}) == 4
+    assert count_filtered(products, {"category": "Furniture"}) == 4
+
+    # id-based cursor pagination: batches continue after the last _id
+    batch1 = get_page_by_id(products, None, 4)
+    batch2 = get_page_by_id(products, batch1[-1]["_id"], 4)
+    assert batch1[-1]["_id"] == 4 and batch2[0]["_id"] == 5
+
+    # top-N by price
+    assert [p["name"] for p in top_n_products(products, 3)] == ["Laptop", "Monitor", "Desk"]
+
+    # search + pagination
+    sr = search_paginated(products, {"category": "Electronics"}, page=1, page_size=2)
+    assert sr["total"] == 4 and sr["total_pages"] == 2 and len(sr["results"]) == 2
+
+    print("[OK] 08-limit: all checks passed")
+
+
+if __name__ == "__main__":
+    _verify()  # plain execution and --verify are both tests

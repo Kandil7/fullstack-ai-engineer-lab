@@ -4,6 +4,7 @@ W3Schools Python Tutorial - MongoDB 02: Databases
 Topics: Databases Concept, Creating/Using Databases, Collection Concept
 
 Run: python 02-databases.py
+Verify: python 02-databases.py --verify
 Reference: https://www.w3schools.com/python/python_mongodb_get_started.asp
 """
 
@@ -215,3 +216,43 @@ print("""
 7. Collections are created automatically when documents are inserted
 8. Use db.dropDatabase() to remove a database
 """)
+
+# ============================================================
+# Self-Verification  (MANDATORY)
+# ============================================================
+def _verify() -> None:
+    """Assert every claim this file makes. Silent on success."""
+    # create/drop database
+    dbs = {}
+    create_database(dbs, "analytics")
+    assert "analytics" in dbs
+    drop_database(dbs, "analytics")
+    assert "analytics" not in dbs
+    drop_database(dbs, "missing")  # no-op, must not raise
+
+    # create/drop collections (rename lives in the collection lecture)
+    db = {}
+    create_collection(db, "users")
+    assert list_collections(db) == ["users"]
+    create_collection(db, "users")  # duplicate is a no-op
+    assert len(list_collections(db)) == 1
+    drop_collection(db, "users")
+    assert list_collections(db) == []
+
+    # use_database / use_collection lazily create
+    dbs2 = {}
+    inv = use_database(dbs2, "inventory")
+    items = use_collection(inv, "items")
+    items.append({"_id": 1, "name": "Widget", "quantity": 100})
+    assert dbs2["inventory"]["items"][0]["name"] == "Widget"
+
+    # multi-database model (the demo additionally created "inventory")
+    assert {"school", "store"} <= set(databases.keys())
+    assert len(databases["school"]["students"]) == 2
+    assert databases["inventory"]["items"][0]["name"] == "Widget"
+
+    print("[OK] 02-databases: all checks passed")
+
+
+if __name__ == "__main__":
+    _verify()  # plain execution and --verify are both tests

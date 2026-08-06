@@ -4,6 +4,7 @@ W3Schools Python Tutorial - MongoDB 06: Query Operators
 Topics: Comparison Operators ($eq, $ne, $gt, $lt), Logical Operators ($and, $or), $in, $regex
 
 Run: python 06-query.py
+Verify: python 06-query.py --verify
 Reference: https://www.w3schools.com/python/python_mongodb_query.asp
 """
 
@@ -121,7 +122,11 @@ def query_and(collection, conditions):
 
             if op == "$gt" and not (doc.get(field, 0) > value):
                 match = False
+            elif op == "$gte" and not (doc.get(field, 0) >= value):
+                match = False
             elif op == "$lt" and not (doc.get(field, 0) < value):
+                match = False
+            elif op == "$lte" and not (doc.get(field, 0) <= value):
                 match = False
             elif op == "$eq" and not (doc.get(field) == value):
                 match = False
@@ -312,3 +317,44 @@ print("""
 11. $regex - Regular expression pattern matching
 12. Queries can be combined for complex filters
 """)
+
+# ============================================================
+# Self-Verification  (MANDATORY)
+# ============================================================
+def _verify() -> None:
+    """Assert every claim this file makes. Silent on success."""
+    # comparison operators
+    assert [d["name"] for d in query_eq(users, "age", 25)] == ["Alice"]
+    assert [d["name"] for d in query_ne(users, "status", "active")] == ["Charlie", "Frank"]
+    assert [d["name"] for d in query_gt(users, "age", 30)] == ["Charlie", "Eve", "Frank"]
+    assert [d["name"] for d in query_gte(users, "age", 30)] == ["Bob", "Charlie", "Eve", "Frank"]
+    assert [d["name"] for d in query_lt(users, "age", 30)] == ["Alice", "Diana"]
+    assert [d["name"] for d in query_lte(users, "age", 25)] == ["Alice"]
+
+    # logical operators
+    assert [d["name"] for d in query_and(users, [{"age": {"$gt": 25}}, {"city": "Boston"}])] == ["Bob", "Eve"]
+    assert [d["name"] for d in query_or(users, [{"city": "New York"}, {"city": "Boston"}])] == ["Alice", "Bob", "Charlie", "Eve"]
+
+    # regression (R6): $gte/$lte inside $and must filter, not be ignored
+    assert [d["name"] for d in query_and(users, [{"age": {"$gte": 30}}])] == ["Bob", "Charlie", "Eve", "Frank"]
+    assert [d["name"] for d in query_and(users, [{"age": {"$lte": 28}}])] == ["Alice", "Diana"]
+
+    # $in / $nin
+    assert [d["name"] for d in query_in(users, "city", ["New York", "Chicago"])] == ["Alice", "Charlie", "Diana", "Frank"]
+    assert [d["name"] for d in query_nin(users, "city", ["New York"])] == ["Bob", "Diana", "Eve", "Frank"]
+
+    # $regex
+    assert len(query_regex(users, "email", r"@mail\.com")) == 6
+    assert [d["name"] for d in query_regex(users, "name", r"^[AB]")] == ["Alice", "Bob"]
+
+    # complex combined query
+    assert [d["name"] for d in complex_query(users, {
+        "$and": [{"age": {"$gte": 28}}, {"age": {"$lte": 35}}],
+        "status": "active"
+    })] == ["Bob", "Diana", "Eve"]
+
+    print("[OK] 06-query: all checks passed")
+
+
+if __name__ == "__main__":
+    _verify()  # plain execution and --verify are both tests

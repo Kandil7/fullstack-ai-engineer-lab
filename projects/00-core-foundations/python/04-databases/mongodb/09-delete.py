@@ -4,6 +4,7 @@ W3Schools Python Tutorial - MongoDB 09: Delete Documents
 Topics: delete_one(), delete_many(), Deleting with Filters
 
 Run: python 09-delete.py
+Verify: python 09-delete.py --verify
 Reference: https://www.w3schools.com/python/python_mongodb_delete.asp
 """
 
@@ -333,3 +334,63 @@ print("""
 8. Always validate queries before delete_many()
 9. Back up data before bulk delete operations
 """)
+
+# ============================================================
+# Self-Verification  (MANDATORY)
+# ============================================================
+def _verify() -> None:
+    """Assert every claim this file makes. Silent on success."""
+    # delete one by _id
+    u1 = reset_users()
+    r1 = delete_one_by_id(u1, 3)
+    assert r1["deleted_count"] == 1 and len(u1) == 5
+    assert delete_one_by_id(u1, 999)["deleted_count"] == 0
+
+    # delete one by query
+    u2 = reset_users()
+    r2 = delete_one_by_query(u2, {"name": "Bob"})
+    assert r2["deleted_count"] == 1 and "Bob" not in [d["name"] for d in u2]
+
+    # delete many by query
+    u3 = reset_users()
+    r3 = delete_many_by_query(u3, {"status": "inactive"})
+    assert r3["deleted_count"] == 2 and len(u3) == 4
+
+    # delete with comparison operator
+    u4 = reset_users()
+    r4 = delete_many_with_operator(u4, "age", "$lt", 30)
+    assert r4["deleted_count"] == 2  # Alice(25), Diana(28)
+    assert all(d["age"] >= 30 for d in u4)
+
+    # delete with $in
+    u5 = reset_users()
+    r5 = delete_many_in(u5, "city", ["New York", "Chicago"])
+    assert r5["deleted_count"] == 4  # Alice, Charlie, Diana, Frank
+
+    # delete all
+    u6 = reset_users()
+    assert delete_all(u6)["deleted_count"] == 6 and len(u6) == 0
+
+    # complex AND conditions: active AND age > 30 -> Frank only
+    # (Eve is inactive in this dataset)
+    u7 = reset_users()
+    r7 = delete_many_complex(u7, [{"status": "active"}, {"age": {"$gt": 30}}])
+    assert r7["deleted_count"] == 1  # Frank(45, active)
+    assert all(d["status"] == "inactive" or d["age"] <= 30 for d in u7)
+
+    # soft delete: document remains, marked deleted
+    u8 = reset_users()
+    soft_delete_one(u8, 2)
+    assert any(d["_id"] == 2 and d.get("deleted") for d in u8)
+
+    # confirmation guard
+    u9 = reset_users()
+    assert delete_with_confirm(u9, {"status": "inactive"}, confirm=False)["deleted_count"] == 0
+    assert len(u9) == 6
+    assert delete_with_confirm(u9, {"status": "inactive"}, confirm=True)["deleted_count"] == 2
+
+    print("[OK] 09-delete: all checks passed")
+
+
+if __name__ == "__main__":
+    _verify()  # plain execution and --verify are both tests

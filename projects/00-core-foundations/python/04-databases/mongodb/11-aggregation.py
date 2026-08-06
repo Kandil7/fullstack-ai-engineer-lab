@@ -4,6 +4,7 @@ W3Schools Python Tutorial - MongoDB 11: Aggregation
 Topics: Aggregation Pipeline Concept, $match, $group, $sort, $project
 
 Run: python 11-aggregation.py
+Verify: python 11-aggregation.py --verify
 Reference: https://www.w3schools.com/python/python_mongodb_aggregation.asp
 """
 
@@ -209,6 +210,12 @@ def agg_project(collection, project_spec):
                     f1 = include["$multiply"][0].replace("$", "")
                     f2 = include["$multiply"][1].replace("$", "")
                     projected[field] = doc.get(f1, 0) * doc.get(f2, 0)
+            elif isinstance(include, str) and include.startswith("$"):
+                # Field reference: rename/copy, e.g. {"customer": "$_id"}
+                # matches MongoDB $project semantics
+                src = include[1:]
+                if src in doc:
+                    projected[field] = doc[src]
         
         # Always include _id unless explicitly excluded
         if "_id" not in project_spec or project_spec.get("_id") != 0:
@@ -218,13 +225,14 @@ def agg_project(collection, project_spec):
     return results
 
 # Project name and total
+# MongoDB equivalent: {$project: {_id: 0, customer: "$_id", total: 1}}
 pipeline = [
     ("$match", {}),
     ("$group", {
         "_id": "$customer",
         "total": {"op": "sum", "field": "$price"}
     }),
-    ("$project", {"_id": 0, "customer": 1, "total": 1})
+    ("$project", {"_id": 0, "customer": "$_id", "total": 1})
 ]
 result = aggregate(orders, pipeline)
 print("\nProjected (name + total):")
@@ -342,3 +350,77 @@ print("""
 9. Use dot notation for nested fields: "$address.city"
 10. Complex analytics can be built by chaining stages
 """)
+
+# ============================================================
+# Self-Verification  (MANDATORY)
+# ============================================================
+def _verify() -> None:
+    """Assert every claim this file makes. Silent on success."""
+    # $match filters
+    elec = aggregate(orders, [("$match", {"category": "Electronics"})])
+    assert len(elec) == 4
+
+    # $group: sum + count accumulators
+    by_customer = aggregate(orders, [
+        ("$group", {
+            "_id": "$customer",
+            "total": {"op": "sum", "field": "$price"},
+            "order_count": {"op": "count"}
+        })
+    ])
+    by_customer = {r["_id"]: r for r in by_customer}
+    assert by_customer["Alice"]["order_count"] == 3
+    assert abs(by_customer["Alice"]["total"] - 1129.97) < 1e-6
+    assert abs(by_customer["Bob"]["total"] - 229.98) < 1e-6
+
+    # $sort descending by total
+    ranked = aggregate(orders, [
+        ("$group", {"_id": "$customer", "total": {"op": "sum", "field": "$price"}}),
+        ("$sort", {"total": -1})
+    ])
+    assert ranked[0]["_id"] == "Alice"
+
+    # $project with field reference (regression for R6: "$_id" rename)
+    proj = aggregate(orders, [
+        ("$group", {"_id": "$customer", "total": {"op": "sum", "field": "$price"}}),
+        ("$project", {"_id": 0, "customer": "$_id", "total": 1})
+    ])
+    assert all(set(r.keys()) == {"customer", "total"} for r in proj)
+    assert {r["customer"] for r in proj} == {"Alice", "Bob", "Charlie", "Diana"}
+
+    # $unwind deconstructs arrays
+    unwound = aggregate(products, [("$unwind", {"path": "$tags"})])
+    assert len(unwound) == 4
+    assert [r["tags"] for r in unwound] == ["electronics", "computers", "electronics", "accessories"]
+
+    # $limit stage
+    limited = aggregate(orders, [("$match", {}), ("$limit", 3)])
+    assert len(limited) == 3
+
+    # multi-stage pipeline: match -> group -> sort -> limit
+    top = aggregate(orders, [
+        ("$match", {"category": "Electronics"}),
+        ("$group", {
+            "_id": "$customer",
+            "total_spent": {"op": "sum", "field": "$price"},
+            "items_bought": {"op": "sum", "field": "$quantity"}
+        }),
+        ("$sort", {"total_spent": -1}),
+        ("$limit", 3)
+    ])
+    assert top[0]["_id"] == "Alice" and top[0]["items_bought"] == 2
+
+    # avg / min / max accumulators
+    avg = aggregate(orders, [
+        ("$group", {"_id": "$category", "min_price": {"op": "min", "field": "$price"},
+                    "max_price": {"op": "max", "field": "$price"}})
+    ])
+    by_cat = {r["_id"]: r for r in avg}
+    assert by_cat["Electronics"]["min_price"] == 29.99
+    assert by_cat["Electronics"]["max_price"] == 999.99
+
+    print("[OK] 11-aggregation: all checks passed")
+
+
+if __name__ == "__main__":
+    _verify()  # plain execution and --verify are both tests

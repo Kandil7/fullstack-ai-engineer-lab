@@ -4,6 +4,7 @@ W3Schools Python Tutorial - MongoDB 03: Collections
 Topics: Collections Concept, Creating/Dropping Collections
 
 Run: python 03-collection.py
+Verify: python 03-collection.py --verify
 Reference: https://www.w3schools.com/python/python_mongodb_get_started.asp
 """
 
@@ -213,3 +214,45 @@ print("""
 8. Collections can hold documents with different structures
 9. Collections are case-sensitive in some MongoDB deployments
 """)
+
+# ============================================================
+# Self-Verification  (MANDATORY)
+# ============================================================
+def _verify() -> None:
+    """Assert every claim this file makes. Silent on success."""
+    # create_collection registers a fresh empty collection
+    db = {}
+    coll = create_collection(db, "users")
+    assert coll == [] and "users" in db
+    # duplicate create is a no-op
+    create_collection(db, "users")
+    assert len(list_collections(db)) == 1
+
+    # exists / count
+    assert collection_exists(db, "users") is True
+    assert collection_exists(db, "orders") is False
+    assert collection_count(db, "orders") == 0
+
+    # insert + count
+    insert_document(coll, {"_id": 1, "name": "Alice"})
+    insert_document(coll, {"_id": 2, "name": "Bob"})
+    assert count_documents(coll) == 2
+
+    # rename
+    assert rename_collection(db, "users", "customers") is True
+    assert rename_collection(db, "missing", "x") is False
+    assert "customers" in db and "users" not in db
+
+    # drop
+    assert drop_collection(db, "customers") is True
+    assert drop_collection(db, "customers") is False
+
+    # flexible schema: docs in one collection may differ
+    assert {"type": "product", "price": 999.99}.items() <= mixed_collection[1].items()
+    assert "age" not in mixed_collection[2] or mixed_collection[2].get("email")
+
+    print("[OK] 03-collection: all checks passed")
+
+
+if __name__ == "__main__":
+    _verify()  # plain execution and --verify are both tests

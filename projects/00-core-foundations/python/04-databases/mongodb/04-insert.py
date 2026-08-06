@@ -4,6 +4,7 @@ W3Schools Python Tutorial - MongoDB 04: Insert Documents
 Topics: insert_one, insert_many, _id Field, Automatic IDs, Inserting Documents
 
 Run: python 04-insert.py
+Verify: python 04-insert.py --verify
 Reference: https://www.w3schools.com/python/python_mongodb_insert.asp
 """
 
@@ -276,3 +277,48 @@ print("""
 9. Use timestamps for audit trails
 10. insert_many() returns a list of inserted _id values
 """)
+
+# ============================================================
+# Self-Verification  (MANDATORY)
+# ============================================================
+def _verify() -> None:
+    """Assert every claim this file makes. Silent on success."""
+    global next_id
+    next_id = 1  # deterministic auto-_id sequence for this verification
+
+    # insert_one: auto _id assigned when omitted
+    c1 = []
+    i1 = insert_one(c1, {"name": "Alice"})
+    assert i1 == 1 and c1[0]["_id"] == 1
+    # explicit _id preserved
+    i2 = insert_one(c1, {"_id": 100, "name": "Bob"})
+    assert i2 == 100 and len(c1) == 2
+
+    # insert_many: returns the ids in order
+    c2 = []
+    ids = insert_many(c2, [{"name": "A"}, {"name": "B"}, {"name": "C"}])
+    assert ids == [2, 3, 4] and len(c2) == 3
+
+    # nested documents and arrays survive insertion
+    assert products[0]["specs"]["ram"] == "16GB"
+    assert products[1]["tags"] == ["electronics", "accessories"]
+    assert students[0]["courses"] == ["Math", "Science", "English"]
+
+    # validation rejects missing required fields
+    vc = []
+    assert insert_with_validation(vc, {"name": "G", "email": "g@x.com"}, ["name", "email"]) is not None
+    assert insert_with_validation(vc, {"name": "H"}, ["name", "email"]) is None
+    assert len(vc) == 1
+
+    # batch and single inserts produce the same data (timing is not asserted)
+    c3, c4 = [], []
+    bulk_insert_simple(c3, 100)
+    bulk_insert_batch(c4, 100)
+    assert len(c3) == len(c4) == 100
+    assert c3[0] == c4[0] == {"_id": 0, "value": "item_0"}
+
+    print("[OK] 04-insert: all checks passed")
+
+
+if __name__ == "__main__":
+    _verify()  # plain execution and --verify are both tests

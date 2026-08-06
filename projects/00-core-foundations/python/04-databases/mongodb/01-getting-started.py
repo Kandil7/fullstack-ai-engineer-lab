@@ -4,6 +4,7 @@ W3Schools Python Tutorial - MongoDB 01: Getting Started
 Topics: What is MongoDB, Document Model vs Relational, PyMongo Concept, CRUD Overview
 
 Run: python 01-getting-started.py
+Verify: python 01-getting-started.py --verify
 Reference: https://www.w3schools.com/python/python_mongodb_get_started.asp
 """
 
@@ -165,3 +166,41 @@ print("""
 7. MongoDB stores data as BSON (Binary JSON)
 8. Schema is flexible - documents can vary in structure
 """)
+
+# ============================================================
+# Self-Verification  (MANDATORY)
+# ============================================================
+def _verify() -> None:
+    """Assert every claim this file makes. Silent on success."""
+    # Document model: nested docs and arrays are first-class
+    assert nested_document["address"]["city"] == "Springfield"
+    assert nested_document["hobbies"] == ["reading", "coding", "hiking"]
+
+    # CRUD on a fresh collection
+    coll = [
+        {"_id": 1, "name": "Alice", "age": 25},
+        {"_id": 2, "name": "Bob", "age": 30},
+    ]
+    # CREATE appends
+    coll.append({"_id": 3, "name": "Carol", "age": 27})
+    assert len(coll) == 3
+    # READ finds by _id
+    assert next(u for u in coll if u["_id"] == 2)["name"] == "Bob"
+    # UPDATE mutates the matched document
+    for u in coll:
+        if u["_id"] == 1:
+            u["age"] = 26
+    assert coll[0]["age"] == 26
+    # DELETE removes the document
+    coll = [u for u in coll if u["_id"] != 3]
+    assert len(coll) == 2
+
+    # Database shape: collections hold lists of documents
+    assert set(database.keys()) == {"users", "products"}
+    assert len(database["users"]) == 2 and len(database["products"]) == 2
+
+    print("[OK] 01-getting-started: all checks passed")
+
+
+if __name__ == "__main__":
+    _verify()  # plain execution and --verify are both tests

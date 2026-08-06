@@ -4,6 +4,7 @@ W3Schools Python Tutorial - MongoDB 07: Sort Documents
 Topics: sort() Ascending/Descending, Sorting by Multiple Fields
 
 Run: python 07-sort.py
+Verify: python 07-sort.py --verify
 Reference: https://www.w3schools.com/python/python_mongodb_sort.asp
 """
 
@@ -233,3 +234,40 @@ print("""
 7. Combine sort with limit() for top-N queries
 8. Common patterns: sort by date, price, name, or custom field
 """)
+
+# ============================================================
+# Self-Verification  (MANDATORY)
+# ============================================================
+def _verify() -> None:
+    """Assert every claim this file makes. Silent on success."""
+    # ascending / descending
+    asc = sort_ascending(users, "age")
+    assert [d["age"] for d in asc] == sorted(d["age"] for d in users)
+    desc = sort_descending(users, "salary")
+    assert desc[0]["name"] == "Frank" and desc[-1]["name"] == "Diana"
+
+    # direction parameter (1 = ASC, -1 = DESC)
+    assert sort_by(users, "name", 1)[0]["name"] == "Alice"
+    assert sort_by(users, "name", -1)[0]["name"] == "Frank"
+
+    # multi-field: city ASC then age ASC
+    multi = sort_multiple(users, [("city", 1), ("age", 1)])
+    assert [d["name"] for d in multi[:3]] == ["Bob", "Eve", "Diana"]  # Boston(30,32), Chicago(28)
+
+    # filter then sort
+    ny = find_and_sort(users, {"city": "New York"}, "age")
+    assert [d["name"] for d in ny] == ["Alice", "Charlie"]
+
+    # missing fields sort last
+    safe = sort_safe(users_with_missing, "age", 1)
+    assert safe[-1]["name"] == "Bob" or safe[-1]["name"] == "Diana"  # no-age docs at end
+
+    # top-N and sort+limit
+    assert [d["name"] for d in top_n(users, "salary", 3)] == ["Frank", "Charlie", "Eve"]
+    assert len(sort_and_limit(users, "age", 2, -1)) == 2
+
+    print("[OK] 07-sort: all checks passed")
+
+
+if __name__ == "__main__":
+    _verify()  # plain execution and --verify are both tests
