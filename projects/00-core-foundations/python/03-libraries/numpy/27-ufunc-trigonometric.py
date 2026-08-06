@@ -137,8 +137,8 @@ frequency = 3  # Hz
 amplitude = 5
 phase = np.pi / 4
 wave = amplitude * np.sin(2 * np.pi * frequency * t + phase)
-print(f"\nWave: A*sin(2πft + φ)")
-print(f"  A={amplitude}, f={frequency}, φ={np.degrees(phase):.0f}°")
+print(f"\nWave: A*sin(2*pi*ft + phi)")
+print(f"  A={amplitude}, f={frequency}, phi={np.degrees(phase):.0f}°")
 print(f"  Max: {wave.max():.2f}, Min: {wave.min():.2f}")
 
 # Distance between points (using trigonometry)
