@@ -19,6 +19,7 @@ versioned **engineering artifacts**.
 | Mobile           | Flutter                                       |
 | Web dashboard    | Next.js + TypeScript                          |
 | Relational DB    | PostgreSQL                                    |
+| Document DB      | MongoDB                                       |
 | Cache / sessions | Redis                                         |
 | Vector DB        | Qdrant                                        |
 | Infra            | Docker / Docker Compose                       |
@@ -53,8 +54,10 @@ docs/
   decisions/       # ADRs
   reference/       # LLM production architecture, clean code, ML map, interviews
   learning/        # paths, deep-dives, daily-logs, source-summaries
-  tracking/        # current-focus — what to do right now
+  tracking/        # current-focus — what to work on right now
   plan/archive/    # superseded plans, kept for provenance
+  product/         # workspace-goals, scope, feature-priorities, learning-strategy
+  cheat-sheets/    # git, docker, postgres, qdrant, prompt-design
 learning-sources/  # Source-driven learning (books, repos, notebooks, official-docs)
 evaluations/       # Golden cases, regressions, RAG datasets, eval reports
 projects/          # Phase folders 00→07 (devmate is the active project)
@@ -135,8 +138,9 @@ Target: a remote AI/LLM engineering role. Vehicle: **DevMate**.
 - [x] Phase 4 — Advanced (RAG eval harness, capstone structure, operating manual)
 
 ### Learning Journey
-- [x] Python foundations — 354 files: core (41 topics), advanced (20), libraries, FastAPI (25)
-- [x] AI curriculum — 6,947 lines across LLM APIs, RAG, agents, evaluation, safety
+- [x] Python foundations — 1,128 files across 9 phases: core (41 topics), advanced (27), libraries (NumPy, Pandas, Matplotlib, SciPy), databases, web frameworks, DSA, ML, MLOps, GenAI
+- [x] AI curriculum — 6,947+ lines across LLM APIs, RAG, agents, evaluation, safety, security (10 lectures + quizzes)
+- [x] fast.ai Deep Learning track — 13 modules with lectures, exercises, and quizzes
 - [ ] **A1 — CI green + first DevMate command** ← YOU ARE HERE
 - [ ] A2–A10 — see the table above
 - [ ] Deferred: Go, frontend, classical ML
@@ -146,7 +150,7 @@ Target: a remote AI/LLM engineering role. Vehicle: **DevMate**.
 ## Getting Started
 
 ```powershell
-# 1. Bring up local infra (Postgres / Redis / Qdrant)
+# 1. Bring up local infra (Postgres / Redis / Qdrant / MongoDB / Langfuse)
 docker compose -f infra/docker/docker-compose.yml up -d
 
 # 2. Work on the active project
