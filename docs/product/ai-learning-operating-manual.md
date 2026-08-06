@@ -1,6 +1,6 @@
 # AI Learning Operating Manual
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-08-06
 
 How to use AI agents inside `fullstack-ai-engineer-lab` to accelerate learning **without** outsourcing understanding.
 
