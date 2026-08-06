@@ -76,4 +76,4 @@ No hidden opaque memory. Everything is explicit and file-based.
 | Orphaned reviews | Feature workflow includes fix step (05-fix); reviews always produce follow-up |
 | Unlinked learning | Source summary template includes "Link to Project Task" section |
 
-*Last updated: 2026-06-26*
+*Last updated: 2026-08-06*
