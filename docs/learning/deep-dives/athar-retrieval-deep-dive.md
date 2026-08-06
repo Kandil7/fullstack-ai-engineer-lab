@@ -1,6 +1,6 @@
 # Deep Dive: Athar RAG Retrieval Optimization
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-08-06
 
 **Context:** Optimizing retrieval quality for domain-specific RAG systems, with emphasis on
 Arabic and multilingual content retrieval challenges.
