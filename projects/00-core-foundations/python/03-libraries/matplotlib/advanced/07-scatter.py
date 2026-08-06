@@ -3,6 +3,7 @@ Matplotlib Scatter Plot - W3Schools Exercises
 ===============================================
 Scatter plot customization and techniques.
 """
+import matplotlib
 matplotlib.use('Agg')
 
 import matplotlib
@@ -10,7 +11,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
+OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
