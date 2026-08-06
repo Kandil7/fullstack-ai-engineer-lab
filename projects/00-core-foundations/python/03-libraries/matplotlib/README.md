@@ -49,8 +49,12 @@ pip install matplotlib numpy scipy
 | 18 | `18-3d-scatter.py` | 3D scatter plots | 5 |
 | 19 | `19-3d-line.py` | 3D line / parametric curves | 5 |
 | 20 | `20-3d-surface.py` | Advanced 3D surfaces | 5 |
+| 21 | `21-object-oriented-api.py` | OO API: fig/ax, GridSpec, mosaic, shared axes | 5 |
+| 22 | `22-styling-and-themes.py` | rcParams, stylesheets, colormaps, annotation | 5 |
+| 23 | `23-ml-visualization.py` | Learning curves, confusion, ROC/PR, residuals | 6 |
+| 24 | `24-saving-and-export.py` | DPI, vector vs raster, tight bbox, Agg | 5 |
 
-**Total: 100 exercises across 20 scripts**
+**Total: 106 exercises across 24 scripts**
 
 ## Design Decisions
 
@@ -85,3 +89,22 @@ pip install matplotlib numpy scipy
 - 3D scatter (clusters, color-mapped, variable size)
 - 3D lines (helix, Lissajous, parametric torus)
 - Advanced 3D surfaces (projections, monkey saddle, view angles)
+
+### Production Plotting (21–24)
+- Object-Oriented API: explicit fig/ax, GridSpec, `subplot_mosaic`, shared axes
+- Styling & themes: rcParams, scoped stylesheets, perceptually-uniform colormaps
+- ML visualization: learning curves, confusion matrices, ROC/PR, residuals,
+  feature importance, embedding scatter (sklearn metrics + numpy fallback)
+- Saving & export: DPI contract, vector vs raster, `bbox_inches="tight"`,
+  transparency, PNG-header verification for CI
+
+## Advanced Series
+
+Exercises 21–24 are the production-focused series (each self-verifying with
+`--verify`). Companion material lives in `lectures/` (lecture + glossary per
+topic) and `challenges/` (3-tier Bronze/Silver/Gold with pytest tests):
+
+```bash
+python 21-object-oriented-api.py --verify
+python -m pytest 03-libraries/matplotlib/challenges/21-object-oriented-api -v
+```
