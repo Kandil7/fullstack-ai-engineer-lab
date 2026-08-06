@@ -26,4 +26,4 @@ applied. Archiving them makes the active plan unambiguous while preserving the r
 transcription noise — `iiwm` at line 822, `kدة` at line 860, and an "AI Exporter" footer. The
 extracted reference documents are cleaned; the export is not.
 
-*Last updated: 2026-08-02*
+*Last updated: 2026-08-06*
