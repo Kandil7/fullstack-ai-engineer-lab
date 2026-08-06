@@ -108,6 +108,11 @@ with tempfile.TemporaryDirectory() as tmp:
     with open(log_file) as f:
         print(f"Log content:\n{f.read()}")
 
+    # CRITICAL (Windows): close the handler before TemporaryDirectory
+    # cleanup, or the file stays locked and cleanup raises PermissionError.
+    app_logger.removeHandler(file_handler)
+    file_handler.close()
+
 # ============================================================
 # 4. Exception Logging: exc_info vs logger.exception
 # ============================================================
@@ -139,22 +144,33 @@ def expensive_computation():
     time.sleep(0.01)
     return "result"
 
-# BAD: f-string always evaluated
+# BAD: f-string always evaluated (eager, even if level is too low)
 logger.info(f"Result: {expensive_computation()}")  # Always computes!
 
-# GOOD: lazy % formatting — only evaluates if level permits
-logger.info("Result: %s", expensive_computation)  # Only computes if INFO enabled!
+# Truth about logging: arguments ARE evaluated eagerly by Python at the
+# call site. The laziness of %s is limited to string FORMATTING, which is
+# skipped when the level filters the record out. To defer a genuinely
+# expensive computation, wrap it in a callable whose __str__ does the work:
 
-# With logging disabled for this logger:
+class LazyStr:
+    """Defers work until the log formatter actually renders the record."""
+    def __init__(self, fn):
+        self.fn = fn
+    def __str__(self) -> str:
+        return self.fn()
+
+# With logging disabled for this logger, LazyStr.__str__ never runs:
 logger.setLevel(logging.WARNING)
+lazy = LazyStr(expensive_computation)
 start = time.time()
-logger.info("Result: %s", expensive_computation)  # Returns immediately!
+logger.info("Result: %s", lazy)  # Returns immediately, nothing computed
 elapsed = time.time() - start
 print(f"\nLazy formatting time (disabled): {elapsed:.4f}s")  # ~0.00s
 
+# With logging enabled, __str__ runs and the work happens:
 logger.setLevel(logging.DEBUG)
 start = time.time()
-logger.info("Result: %s", expensive_computation)  # Actually computes
+logger.info("Result: %s", lazy)  # __str__ runs -> expensive_computation()
 elapsed = time.time() - start
 print(f"Lazy formatting time (enabled):  {elapsed:.4f}s")  # ~0.01s
 
@@ -354,20 +370,20 @@ def _verify() -> None:
         "root": {"level": "INFO", "handlers": ["h"]},
     })
     
-    # Lazy formatting: %s doesn't evaluate if level too high
+    # Lazy formatting: deferred work only happens when level permits
     logger = lg.getLogger("lazy_test")
     logger.setLevel(lg.WARNING)
     called = []
     def expensive():
         called.append(True)
         return "x"
-    logger.info("Result: %s", expensive)
-    assert len(called) == 0  # Not called!
-    
+    lazy = LazyStr(expensive)
+    logger.info("Result: %s", lazy)
+    assert len(called) == 0, "disabled level must not run __str__"
+
     logger.setLevel(lg.INFO)
-    called.clear()
-    logger.info("Result: %s", expensive)
-    assert len(called) == 1  # Called!
+    logger.info("Result: %s", lazy)
+    assert len(called) == 1, "enabled level must render the record"
     
     print("[OK] 44-logging: all checks passed")
 

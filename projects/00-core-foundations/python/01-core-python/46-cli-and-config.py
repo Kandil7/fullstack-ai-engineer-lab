@@ -20,6 +20,7 @@ import sys
 import os
 import argparse
 import json
+import tempfile
 from pathlib import Path
 from typing import Optional
 
@@ -64,8 +65,8 @@ parser.add_argument("--no-wandb", action="store_true", help="Disable W&B logging
 # Choices
 parser.add_argument("--optimizer", choices=["adam", "adamw", "sgd"], default="adamw")
 
-# Parse
-args = parser.parse_args([])  # Empty list for demo
+# Parse (with a demo model so the demo runs standalone)
+args = parser.parse_args(["bert-base"])  # positional required in this parser
 print(f"\n=== Parsed Args ===")
 print(f"  model: {args.model}")
 print(f"  epochs: {args.epochs}")
