@@ -73,8 +73,10 @@ dup_idx = np.random.choice(n, 50, replace=False)
 df = pd.concat([df, df.iloc[dup_idx]], ignore_index=True)
 
 # 6. Correlated noise features
+# NOTE: duplicate rows were appended above, so df is now n + 50 rows — build the
+# noise arrays with len(df), or pandas raises a broadcast shape mismatch
 for i in range(5):
-    df[f'noise_feature_{i}'] = df['income'] * np.random.randn(n) * 0.1 + np.random.randn(n)
+    df[f'noise_feature_{i}'] = df['income'] * np.random.randn(len(df)) * 0.1 + np.random.randn(len(df))
 
 print(f"Final shape: {df.shape}")
 print(f"Missing values:\n{df.isna().sum()}")
@@ -158,8 +160,9 @@ def create_features(df):
     df['age_group'] = pd.cut(df['age'], bins=[0, 25, 35, 50, 65, 100], 
                               labels=['GenZ', 'Millennial', 'GenX', 'Boomer', 'Senior'])
     df['income_bracket'] = pd.qcut(df['income'], q=5, labels=['VeryLow', 'Low', 'Medium', 'High', 'VeryHigh'])
-    df['balance_tier'] = pd.qcut(df['account_balance'].clip(lower=0), q=4, 
-                                  labels=['Low', 'Medium', 'High', 'Premium'])
+    # Many balances clip to exactly 0 -> duplicate bin edges; duplicates='drop'
+    # shrinks the bin count, so no fixed label list can be supplied
+    df['balance_tier'] = pd.qcut(df['account_balance'].clip(lower=0), q=4, duplicates='drop')
     
     # Ratio features
     df['active_ratio'] = df['is_active'] / (df['tenure_months'] / 12 + 1)
@@ -189,7 +192,12 @@ print("=" * 60)
 print("4. CATEGORICAL ENCODING")
 print("=" * 60)
 
-from category_encoders import TargetEncoder, CatBoostEncoder
+try:
+    from category_encoders import TargetEncoder, CatBoostEncoder  # noqa: F401
+    HAS_CATEGORY_ENCODERS = True
+except ImportError:
+    HAS_CATEGORY_ENCODERS = False
+    print("[skip] category_encoders not installed — pip install category_encoders")
 
 # Prepare for encoding
 cat_cols = ['region', 'channel', 'segment', 'age_group', 'income_bracket', 'balance_tier']
@@ -339,8 +347,10 @@ numeric_transformer = Pipeline(steps=[
     ('scaler', StandardScaler())
 ])
 
+# NOTE: X_train columns are already one-hot encoded (int64 0/1), so a string
+# fill_value like 'missing' cannot be cast — use 0 instead
 categorical_transformer = Pipeline(steps=[
-    ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+    ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
     ('encoder', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
 ])
 
@@ -395,8 +405,9 @@ os.makedirs(output_dir, exist_ok=True)
 
 X_train_final.to_parquet(f'{output_dir}X_train.parquet')
 X_test_final.to_parquet(f'{output_dir}X_test.parquet')
-y_train.to_parquet(f'{output_dir}y_train.parquet')
-y_test.to_parquet(f'{output_dir}y_test.parquet')
+# Series has no to_parquet — wrap the target in a DataFrame first
+y_train.to_frame(name='churned').to_parquet(f'{output_dir}y_train.parquet')
+y_test.to_frame(name='churned').to_parquet(f'{output_dir}y_test.parquet')
 
 # Save preprocessing objects
 import joblib

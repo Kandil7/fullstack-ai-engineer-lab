@@ -8,6 +8,7 @@ Preparing time series data for forecasting models (ARIMA, Prophet, ML).
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
@@ -49,10 +50,13 @@ print()
 # Plot
 fig, axes = plt.subplots(4, 1, figsize=(12, 10))
 ts_df['sales'].plot(ax=axes[0], title='Daily Sales (Raw)')
-(trend + yearly_seasonal + weekly_seasonal).plot(ax=axes[1], title='Trend + Seasonality', color='orange')
+pd.Series(trend + yearly_seasonal + weekly_seasonal, index=dates).plot(
+    ax=axes[1], title='Trend + Seasonality', color='orange'
+)
 pd.Series(trend, index=dates).plot(ax=axes[2], title='Trend', color='green')
 pd.Series(yearly_seasonal + weekly_seasonal, index=dates).plot(ax=axes[3], title='Seasonality', color='red')
 plt.tight_layout()
+os.makedirs('output', exist_ok=True)
 plt.savefig('output/ts_components.png', dpi=150)
 plt.close()
 
