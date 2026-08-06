@@ -26,3 +26,7 @@ Comprehensive lecture and glossary files for Matplotlib, organized by topic.
 | 18 | 3D Scatter Plots | [📖](18-3d-scatter-lecture.md) | [📖](18-3d-scatter-glossary.md) |
 | 19 | 3D Line Plots | [📖](19-3d-line-lecture.md) | [📖](19-3d-line-glossary.md) |
 | 20 | Advanced 3D Surfaces | [📖](20-3d-surface-lecture.md) | [📖](20-3d-surface-glossary.md) |
+| 21 | Object-Oriented API | [📖](21-object-oriented-api-lecture.md) | [📖](21-object-oriented-api-glossary.md) |
+| 22 | Styling and Themes | [📖](22-styling-and-themes-lecture.md) | [📖](22-styling-and-themes-glossary.md) |
+| 23 | ML Visualization | [📖](23-ml-visualization-lecture.md) | [📖](23-ml-visualization-glossary.md) |
+| 24 | Saving and Export | [📖](24-saving-and-export-lecture.md) | [📖](24-saving-and-export-glossary.md) |
