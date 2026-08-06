@@ -1,6 +1,6 @@
 # Deep Dive: RAG System
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-08-06
 
 **Project reference:** `projects/04-ai-engineering/rag-system`
 
