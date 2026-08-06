@@ -25,6 +25,7 @@ dependencies = [
     "rich>=13.7.0",
     "loguru>=0.7.2",
     "tiktoken>=0.7.0",
+    "streamlit>=1.33.0",
 ]
 
 [project.optional-dependencies]
@@ -35,26 +36,28 @@ dev = [
     "pytest-mock>=3.14.0",
     "httpx>=0.27.0",
     "ruff>=0.5.0",
-    "black>=24.4.0",
     "mypy>=1.10.0",
-    "pre-commit>=3.7.0",
 ]
+# Evaluation harness (week 2-3). ragas is heavy and optional; the core harness
+# in devmate/eval/ runs without it (pure-python metrics). Install with:
+#   pip install -e ".[eval]"
 eval = [
     "ragas>=0.2.0",
-    "deepeval>=1.0.0",
     "langsmith>=0.1.0",
 ]
+# Agents + MCP (weeks 5-6). langgraph is optional — the hand-rolled ReAct loop
+# is the primary implementation and runs without it.
 agents = [
     "langgraph>=0.1.0",
-    "mcp>=0.1.0",
+    "mcp>=1.0.0",
 ]
-
-[tool.poetry.group.dev.dependencies]
-# Using pip/venv instead of poetry for simplicity
 
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.ruff]
 line-length = 100
@@ -81,6 +84,10 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
+markers = [
+    "integration: requires docker services (Qdrant/Redis/Postgres)",
+    "llm: requires a real LLM API key (never run in CI)",
+]
 
 [project.scripts]
 devmate = "devmate.cli.main:app"
