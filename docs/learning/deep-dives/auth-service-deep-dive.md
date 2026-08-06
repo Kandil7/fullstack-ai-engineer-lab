@@ -1,6 +1,6 @@
 # Deep Dive: Auth Service
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-08-06
 
 **Project reference:** `projects/01-backend-go/01-auth-service`
 
