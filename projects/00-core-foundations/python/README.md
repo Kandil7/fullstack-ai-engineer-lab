@@ -1,7 +1,7 @@
 # 🐍 Python Learning Module — Fullstack AI Engineer Lab
 
-> **350+ exercise files across 9 learning phases** — from `print("Hello")` to production ML pipelines and GenAI systems.
-> Each topic ships with a lecture + glossary pair, and most phases include quizzes and interview prep.
+> **2,564 files across 9 learning phases** — from `print("Hello")` to production ML pipelines and GenAI systems.
+> Each topic ships with a lecture + glossary pair, and most phases include quizzes, challenges, and interview prep.
 
 ---
 
