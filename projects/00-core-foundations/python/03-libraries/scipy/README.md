@@ -1,61 +1,65 @@
-# SciPy Tutorial — W3Schools Style
+# 🔬 SciPy — Scientific Computing
 
-A complete set of 12 exercise scripts covering every topic in the W3Schools SciPy tutorial. Each script contains **3–5 fully working examples** with real output, plots (saved as PNG), and explanations.
+16 self-contained topic directories covering scientific computing from basics through advanced topics.
 
-## 📁 Files
+## 📋 Directory Structure
 
-| # | File | Topic | Key Concepts |
-|---|------|-------|-------------|
-| 01 | `01-introduction.py` | Introduction | SciPy vs NumPy, special functions, constants |
-| 02 | `02-getting-started.py` | Getting Started | Installation, imports, sparse matrices, basic linalg |
-| 03 | `03-basic-functions.py` | Basic Functions | Root finding, differentiation, distance, filtering, optimization |
-| 04 | `04-statistics.py` | Statistics | Distributions, descriptive stats, hypothesis testing, regression |
-| 05 | `05-integration.py` | Integration | quad, dblquad, ODEs (solve_ivp), spring-mass-damper |
-| 06 | `06-interpolation.py` | Interpolation | interp1d, CubicSpline, 2D interpolation, RBF, resampling |
-| 07 | `07-optimization.py` | Optimization | minimize, curve_fit, root finding, linear programming |
-| 08 | `08-linear-algebra.py` | Linear Algebra | LU, QR, Cholesky, SVD, eigenvalues, matrix functions |
-| 09 | `09-fft.py` | FFT | 1D/2D FFT, PSD, windowing, convolution |
-| 10 | `10-spatial-data.py` | Spatial Data | KD-Tree, Delaunay, Convex Hull, Voronoi, distance metrics |
-| 11 | `11-image-processing.py` | Image Processing | Filtering, morphology, labeling, transforms, contrast |
-| 12 | `12-io.py` | I/O | MATLAB .mat, Matrix Market, WAV, .npy/.npz, CSV |
+Each topic directory contains:
+- `NN-topic-name.py` — Exercise (runnable code)
+- `NN-topic-name-lecture.md` — Lecture (detailed explanation)
+- `NN-topic-name-glossary.md` — Glossary (key terms)
+
+```
+scipy/
+├── 01-introduction/
+│   ├── 01-introduction.py
+│   ├── 01-introduction-lecture.md
+│   └── 01-introduction-glossary.md
+├── 02-getting-started/
+└── ... (16 topics)
+```
+
+## 📚 Topics
+
+| # | Topic | Description |
+|---|-------|-------------|
+| 01 | Introduction | What is SciPy, relationship with NumPy |
+| 02 | Getting Started | Installation, first operations |
+| 03 | Basic Functions | Math, special functions, constants |
+| 04 | Statistics | Descriptive statistics, distributions |
+| 05 | Integration | Numerical integration (quad, trapz) |
+| 06 | Interpolation | 1D and N-D interpolation |
+| 07 | Optimization | Minimization, curve fitting |
+| 08 | Linear Algebra | Matrix operations, decompositions |
+| 09 | FFT | Fast Fourier Transform |
+| 10 | Spatial Data | KDTree, distance calculations |
+| 11 | Image Processing | Filters, transforms, measurements |
+| 12 | I/O | Reading/writing files (MMIO, WAV, ARFF) |
+| 13 | Statistical Tests | Hypothesis testing, significance |
+| 14 | Optimization Advanced | Global optimization, root finding |
+| 15 | Sparse Matrices | Sparse data structures, operations |
+| 16 | Distance and Similarity | Distance metrics, similarity measures |
 
 ## 🚀 Quick Start
 
 ```bash
-# Install dependencies
-pip install numpy scipy matplotlib
+# Run any topic
+python 01-introduction/01-introduction.py
 
-# Run any script
-python 01-introduction.py
-python 04-statistics.py
-python 07-optimization.py
+# Run all topics
+for d in [0-9]*/; do
+    py=$(ls "$d"/*.py 2>/dev/null | head -1)
+    [ -n "$py" ] && echo "=== $d ===" && python "$py"
+done
 ```
 
-## 📊 Generated Plots
+## 📖 Recommended Learning Order
 
-Each script saves plots as PNG files in the working directory:
-- `scipy_03_roots.png`, `scipy_03_derivative.png`, `scipy_03_smoothing.png`
-- `scipy_04_distributions.png`, `scipy_04_regression.png`
-- `scipy_05_ode.png`, `scipy_05_spring.png`
-- `scipy_06_1d_interp.png`, `scipy_06_spline.png`, `scipy_06_2d_interp.png`
-- `scipy_07_rosenbrock.png`, `scipy_07_curve_fit.png`
-- `scipy_08_svd.png`, `scipy_08_eigenvalues.png`
-- `scipy_09_basic_fft.png`, `scipy_09_psd.png`
-- `scipy_10_kdtree.png`, `scipy_10_delaunay.png`
-- `scipy_11_smoothing.png`, `scipy_11_morphology.png`
-- `scipy_12_wav.png`
+1. **Fundamentals** (01-03): Introduction, setup, basic functions
+2. **Core Modules** (04-09): Statistics, integration, interpolation, optimization, linear algebra, FFT
+3. **Specialized** (10-12): Spatial data, image processing, I/O
+4. **Advanced** (13-16): Statistical tests, optimization, sparse matrices, distance metrics
 
-## 🎯 Learning Path
+---
 
-1. **Start here**: `01-introduction.py` → `02-getting-started.py`
-2. **Core math**: `03-basic-functions.py` → `05-integration.py` → `08-linear-algebra.py`
-3. **Data analysis**: `04-statistics.py` → `06-interpolation.py` → `07-optimization.py`
-4. **Applied**: `09-fft.py` → `10-spatial-data.py` → `11-image-processing.py`
-5. **Practical**: `12-io.py`
-
-## 📋 Requirements
-
-- Python 3.8+
-- NumPy
-- SciPy
-- Matplotlib
+*Last updated: August 2026*

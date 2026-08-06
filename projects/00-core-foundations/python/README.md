@@ -1,7 +1,7 @@
 # 🐍 Python Learning Module — Fullstack AI Engineer Lab
 
 > **3,069 files across 9 learning phases** — from `print("Hello")` to production ML pipelines and GenAI systems.
-> Each topic ships with a lecture + glossary pair, and most phases include quizzes, challenges, and interview prep.
+> Each topic ships with a self-contained directory containing exercise, lecture, and glossary.
 
 ---
 
@@ -9,19 +9,17 @@
 
 | Phase | Directory | Focus |
 |-------|-----------|-------|
-| **1** | `01-core-python/` | Python fundamentals: syntax → OOP → file I/O |
+| **1** | `01-core-python/` | Python fundamentals: basics → control-flow → functions → OOP → advanced |
 | **2** | `02-advanced-python/` | Decorators → async → metaclasses → design patterns |
-| **3** | `03-libraries/` | NumPy, Pandas, Matplotlib, SciPy |
-| **4** | `04-databases/` | MySQL (sqlite3 stand-in), MongoDB (dict stand-in) |
+| **3** | `03-libraries/` | NumPy, Pandas, Matplotlib, SciPy, Polars |
+| **4** | `04-databases/` | SQL, PostgreSQL, MongoDB, Redis, SQLAlchemy, Vector Stores |
 | **5** | `05-web-frameworks/` | FastAPI (runnable), Django (reference-only) |
 | **6** | `06-data-structures-algorithms/` | Arrays → trees → sorts → searches |
-| **7** | `07-machine-learning/` | Regression → classification → clustering → PCA |
+| **7** | `07-machine-learning/` | Fundamentals → Advanced → Deep Learning |
 | **8** | `08-mlops/` | Reproducibility → registry → serving → monitoring → A/B |
 | **9** | `09-genai/` | LLMs → RAG → agents → eval → fine-tuning → production |
 | 📚 | `supplementary/` | Quizzes + interview prep |
 | 🏆 | `projects/` | Capstone mini-projects combining all phases |
-
-> **Lectures & glossaries live inside each phase** (`01-core-python/lectures/`, `02-advanced-python/lectures/`, …), one lecture + one glossary per exercise.
 
 ---
 
@@ -32,7 +30,7 @@
 pip install -r requirements.txt
 
 # 2. Start with Phase 1
-cd 01-core-python
+cd 01-core-python/basics/01-introduction
 python 01-introduction.py
 
 # 3. Follow the learning path
@@ -49,71 +47,73 @@ python run_smoke_tests.py
 ```
 python/
 ├── 01-core-python/                  # 📘 Phase 1: Python Fundamentals
-│   ├── 01-introduction.py → 41-inner-classes.py
-│   ├── practice_all.py / practice_no_solutions.py
-│   └── lectures/                    # lecture + glossary per topic
+│   ├── basics/                      # 16 topics: Introduction to Collections
+│   │   ├── 01-introduction/
+│   │   │   ├── 01-introduction.py
+│   │   │   ├── 01-introduction-lecture.md
+│   │   │   └── 01-introduction-glossary.md
+│   │   └── ... (16 topics)
+│   ├── control-flow/                # 4 topics: Conditionals and Loops
+│   ├── functions/                   # 14 topics: Functions, Modules, Error Handling
+│   ├── oop/                         # 5 topics: Object-Oriented Programming
+│   ├── advanced/                    # 13 topics: Advanced Topics
+│   ├── practice/                    # Practice problems
+│   └── README.md
 │
 ├── 02-advanced-python/              # 🔬 Phase 2: Advanced Python
-│   ├── 01-decorators.py → 20-patterns.py
-│   └── lectures/
+│   ├── 01-decorators/
+│   │   ├── 01-decorators.py
+│   │   ├── 01-decorators-lecture.md
+│   │   └── 01-decorators-glossary.md
+│   └── ... (34 topics)
 │
 ├── 03-libraries/                    # 📊 Phase 3: Data Science Libraries
-│   ├── numpy/        (53 files + lectures)
-│   ├── pandas/       (72 files + lectures)
-│   ├── matplotlib/   (47 files + lectures)
-│   └── scipy/        (30 files + lectures)
+│   ├── numpy/                       # 34 topics: Arrays, ufuncs, linear algebra
+│   │   ├── 01-introduction/
+│   │   └── ... (34 topics)
+│   ├── pandas/                      # DataFrames, cleaning, analysis
+│   │   ├── basics/                  # 24 topics: W3Schools series
+│   │   ├── advanced/                # 21 topics: Professional series
+│   │   ├── production/              # 6 topics: Method chaining, memory, pitfalls
+│   │   └── case-studies/            # 2 topics: Real-world examples
+│   ├── matplotlib/                  # Visualization
+│   │   ├── basics/                  # 12 topics: W3Schools series
+│   │   ├── advanced/                # 16 topics: OO API, styling, ML viz
+│   │   └── 3d/                      # 5 topics: 3D plotting
+│   ├── scipy/                       # 16 topics: Scientific computing
+│   └── polars/                      # 6 topics: Modern DataFrame library
 │
 ├── 04-databases/                    # 🗄️ Phase 4: Database Integration
-│   ├── mysql/        (12 files, sqlite3 stand-in)
-│   ├── mongodb/      (11 files, dict stand-in)
-│   ├── postgres/     (PostgreSQL exercises)
-│   ├── redis/        (Redis exercises)
-│   ├── sql-fundamentals/ (SQL fundamentals)
-│   ├── sqlalchemy/   (SQLAlchemy ORM)
-│   └── vector-stores/ (Vector store exercises)
+│   ├── sql-fundamentals/            # 14 topics: Core SQL concepts
+│   ├── sql-sqlite/                  # 12 topics: SQLite exercises
+│   ├── postgresql/                  # 6 topics: PostgreSQL exercises
+│   ├── mongodb/                     # 12 topics: MongoDB exercises
+│   ├── redis/                       # 8 topics: Caching, pub/sub, sessions
+│   ├── sqlalchemy/                  # 10 topics: ORM patterns
+│   └── vector-stores/               # 8 topics: Embeddings, similarity search
 │
 ├── 05-web-frameworks/               # 🌐 Phase 5: Backend Development
-│   ├── fastapi/      (52 files + exercises + lectures)
-│   └── django/       (20 files, reference-only — Django not required)
+│   ├── fastapi/                     # 52 topics: Routing, auth, websockets
+│   └── django/                      # 20 topics: Reference guides
 │
 ├── 06-data-structures-algorithms/   # ⚙️ Phase 6: DSA
-│   ├── 01-introduction.py → 20-merge-sort.py
-│   └── lectures/
+│   ├── 01-introduction/
+│   │   ├── 01-introduction.py
+│   │   ├── 01-introduction-lecture.md
+│   │   └── 01-introduction-glossary.md
+│   └── ... (20 topics)
 │
 ├── 07-machine-learning/             # 🤖 Phase 7: Machine Learning
-│   ├── 01-getting-started.py → 40-transformers-from-scratch.py
-│   └── lectures/
+│   ├── fundamentals/                # 23 topics: Basic ML concepts
+│   ├── advanced/                    # 12 topics: Pipelines, metrics, tuning
+│   └── deep-learning/               # 5 topics: PyTorch, neural nets, transformers
 │
 ├── 08-mlops/                        # 🚀 Phase 8: MLOps (Production ML)
-│   ├── 01-reproducibility.py → 16-case-study-e2e.py
-│   └── lectures/                    # full-detail lectures + glossaries
-│
 ├── 09-genai/                        # 🧠 Phase 9: GenAI (LLMs, RAG, Agents)
-│   ├── 01-llm-fundamentals.py → 25-case-study-extraction.py
-│   └── lectures/                    # full-detail lectures + glossaries
-│
-├── supplementary/                   # 📚 Quizzes + interview prep
-│   ├── quizzes/                     # self-assessment per topic
-│   └── interviews/                  # Q&A + coding challenges
-│
+├── supplementary/                   # 📚 Quizzes (80) + Interview prep (18)
 ├── projects/                        # 🏆 Capstone Mini-Projects
-│   ├── 01-calculator/
-│   ├── 02-file-manager/
-│   ├── 03-api-server/
-│   ├── 04-data-analyzer/
-│   └── 05-ml-pipeline/
-│
-├── tests/                           # ✅ Unit tests (pytest)
-├── _dev/                            # 🛠️ Dev utilities
-│   ├── validate_structure.py
-│   ├── check_typos.py
-│   └── update_readmes.py
-│
-├── docs/mastery-plan/               # 📈 Baseline audit + 40-week roadmap
-├── requirements.txt                 # 📦 All dependencies
-├── learning_path.md                 # 🗺️ Full learning map
-├── run_smoke_tests.py               # ✅ Smoke test runner
-└── README.md                        # 📖 This file
+├── tests/                           # ✅ Unit tests (328 passing)
+└── learning_path.md                 # 🗺️ Full learning map
 ```
 
 ---
@@ -130,13 +130,13 @@ See **[learning_path.md](learning_path.md)** for the complete, week-by-week lear
 
 | If you want to... | Start here |
 |-------------------|------------|
-| Learn Python from scratch | `01-core-python/01-introduction.py` |
-| Master advanced Python | `02-advanced-python/01-decorators.py` |
-| Do data science | `03-libraries/numpy/01-introduction.py` |
-| Build web APIs | `05-web-frameworks/fastapi/01-introduction.py` |
-| Learn SQL/NoSQL | `04-databases/mysql/01-getting-started.py` |
-| Practice algorithms | `06-data-structures-algorithms/01-introduction.py` |
-| Build ML models | `07-machine-learning/01-getting-started.py` |
+| Learn Python from scratch | `01-core-python/basics/01-introduction/01-introduction.py` |
+| Master advanced Python | `02-advanced-python/01-decorators/01-decorators.py` |
+| Do data science | `03-libraries/numpy/01-introduction/01-introduction.py` |
+| Build web APIs | `05-web-frameworks/fastapi/01-introduction/01-introduction.py` |
+| Learn SQL/NoSQL | `04-databases/sql-fundamentals/01-relational-model/01-relational-model.py` |
+| Practice algorithms | `06-data-structures-algorithms/01-introduction/01-introduction.py` |
+| Build ML models | `07-machine-learning/fundamentals/01-getting-started/01-getting-started.py` |
 | Ship ML to production | `08-mlops/01-reproducibility.py` |
 | Build LLM/RAG/agents | `09-genai/01-llm-fundamentals.py` |
 | Prep for interviews | `supplementary/interviews/` |

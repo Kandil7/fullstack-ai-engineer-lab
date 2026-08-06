@@ -1,49 +1,113 @@
-# Python Machine Learning Exercises
+# 🤖 Phase 7: Machine Learning
 
-W3Schools Python ML Tutorial exercises with working examples.
+40 self-contained topic directories organized into 3 levels covering ML from fundamentals through deep learning.
 
-| # | File | Topics |
-|---|------|--------|
-| 1 | 01-getting-started.py | What is ML, types of ML, workflow, scikit-learn overview |
-| 2 | 02-data-mining.py | Data mining concepts, pattern discovery, clustering, association rules |
-| 3 | 03-data-set.py | Dataset structure, features/targets, train/test split, pandas DataFrames |
-| 4 | 04-clean-data.py | Missing values, duplicates, normalization, feature scaling |
-| 5 | 05-linear-regression.py | Simple linear regression, best fit line, sklearn LinearRegression |
-| 6 | 06-polynomial-regression.py | Polynomial features, curved relationships, degree selection |
-| 7 | 08-multiple-regression.py | Multiple features, coefficient interpretation, R-squared score |
-| 8 | 09-scale.py | StandardScaler, MinMaxScaler, when to scale |
-| 9 | 10-train-test.py | train_test_split, why split data, test size, random state |
-| 10 | 11-decision-tree.py | DecisionTreeClassifier, tree visualization, gini/entropy |
-| 11 | 12-confusion-matrix.py | Confusion matrix, accuracy, precision, recall, F1 score |
-| 12 | 13-correlation.py | Correlation matrix, feature correlation with target |
-| 13 | 14-linear-regression-example.py | Complete linear regression project end-to-end |
-| 14 | 15-logistic-regression.py | LogisticRegression, sigmoid, binary classification |
-| 15 | 16-k-means.py | KMeans clustering, elbow method, inertia |
-| 16 | 17-hierarchical-clustering.py | AgglomerativeClustering, linkage concepts |
-| 17 | 18-pca.py | Principal Component Analysis, dimensionality reduction |
-| 18 | 19-naive-bayes.py | GaussianNB, Bayes theorem, classification |
-| 19 | 20-random-forest.py | RandomForestClassifier, ensemble methods, feature importance |
-| 20 | 21-svm.py | SVM classifier, hyperplane concept, kernel trick |
-| 21 | 22-cross-validation.py | KFold, cross_val_score, stratified split |
-| 22 | 23-k-nearest-neighbors.py | KNeighborsClassifier, distance metrics, choosing K |
+## 📋 Directory Structure
 
-## Requirements
+Each topic directory contains:
+- `NN-topic-name.py` — Exercise (runnable code)
+- `NN-topic-name-lecture.md` — Lecture (detailed explanation)
+- `NN-topic-name-glossary.md` — Glossary (key terms)
 
-```bash
-pip install numpy scikit-learn pandas
+```
+07-machine-learning/
+├── fundamentals/                 # 23 topics: Basic ML concepts
+│   ├── 01-getting-started/
+│   │   ├── 01-getting-started.py
+│   │   ├── 01-getting-started-lecture.md
+│   │   └── 01-getting-started-glossary.md
+│   └── ... (23 topics)
+│
+├── advanced/                     # 12 topics: Pipelines, metrics, tuning
+│   ├── 24-sklearn-pipelines/
+│   └── ... (12 topics)
+│
+└── deep-learning/                # 5 topics: PyTorch, neural nets, transformers
+    ├── 36-pytorch-tensors/
+    └── ... (5 topics)
 ```
 
-## Running Examples
+## 📚 Topics
+
+### fundamentals/ (01-23): Basic ML Concepts
+| # | Topic | Description |
+|---|-------|-------------|
+| 01 | Getting Started | ML overview, workflow |
+| 02 | Data Mining | Data collection, exploration |
+| 03 | Data Set | Dataset creation, loading |
+| 04 | Clean Data | Preprocessing, handling missing values |
+| 05 | Linear Regression | Simple linear regression |
+| 06 | Polynomial Regression | Non-linear regression |
+| 07 | R-Squared | Model evaluation metrics |
+| 08 | Multiple Regression | Multiple features |
+| 09 | Scale | Feature scaling, normalization |
+| 10 | Train/Test Split | Data splitting strategies |
+| 11 | Decision Tree | Tree-based classification |
+| 12 | Confusion Matrix | Classification metrics |
+| 13 | Correlation | Feature relationships |
+| 14 | Linear Regression Example | Complete workflow |
+| 15 | Logistic Regression | Binary classification |
+| 16 | K-Means | Clustering |
+| 17 | Hierarchical Clustering | Agglomerative clustering |
+| 18 | PCA | Dimensionality reduction |
+| 19 | Naive Bayes | Probabilistic classification |
+| 20 | Random Forest | Ensemble methods |
+| 21 | SVM | Support vector machines |
+| 22 | Cross Validation | Model validation |
+| 23 | K-Nearest Neighbors | Instance-based learning |
+
+### advanced/ (24-35): Advanced Techniques
+| # | Topic | Description |
+|---|-------|-------------|
+| 24 | Sklearn Pipelines | Pipeline API, chaining |
+| 25 | Data Leakage | Preventing data leakage |
+| 26 | Validation Strategies | Advanced validation |
+| 27 | Metrics Deep Dive | Comprehensive metrics |
+| 28 | Calibration | Probability calibration |
+| 29 | Imbalanced Learning | Handling class imbalance |
+| 30 | Gradient Boosting | XGBoost, LightGBM |
+| 31 | Feature Engineering | Feature creation |
+| 32 | Feature Selection | Feature importance |
+| 33 | Hyperparameter Tuning | Grid/random search |
+| 34 | Ensembling | Model ensembles |
+| 35 | Explainability | SHAP, LIME |
+
+### deep-learning/ (36-40): PyTorch & Neural Networks
+| # | Topic | Description |
+|---|-------|-------------|
+| 36 | PyTorch Tensors | Tensor operations |
+| 37 | PyTorch Training Loop | Training workflow |
+| 38 | Neural Network Basics | NN architecture |
+| 39 | Transfer Learning | Pre-trained models |
+| 40 | Transformers from Scratch | Transformer architecture |
+
+## 🚀 Quick Start
 
 ```bash
-python 01-getting-started.py
-python 05-linear-regression.py
-python 16-k-means.py
+# Install dependencies
+pip install scikit-learn numpy pandas matplotlib torch
+
+# Run any topic
+python fundamentals/01-getting-started/01-getting-started.py
+
+# Run all fundamentals
+for d in fundamentals/[0-9]*/; do
+    py=$(ls "$d"/*.py 2>/dev/null | head -1)
+    [ -n "$py" ] && echo "=== $d ===" && python "$py"
+done
 ```
 
-## Topics Covered
+## 📖 Recommended Learning Order
 
-- **Supervised Learning**: Linear/Logistic Regression, Decision Trees, Random Forest, SVM, KNN, Naive Bayes
-- **Unsupervised Learning**: K-Means, Hierarchical Clustering, PCA
-- **Model Evaluation**: Confusion Matrix, Cross-Validation, Metrics
-- **Data Preparation**: Scaling, Cleaning, Train/Test Split
+### Level 1: Fundamentals (01-23)
+Start with the basics of ML algorithms and workflows.
+
+### Level 2: Advanced (24-35)
+Learn production ML techniques: pipelines, metrics, tuning.
+
+### Level 3: Deep Learning (36-40)
+Introduce PyTorch and neural network architectures.
+
+---
+
+*Last updated: August 2026*
