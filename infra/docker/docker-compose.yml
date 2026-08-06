@@ -38,6 +38,22 @@ services:
     networks:
       - devmate-network
 
+  # MongoDB Document Database
+  mongodb:
+    image: mongo:7
+    container_name: devmate-mongodb
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - devmate-network
+
   # Qdrant Vector Database
   qdrant:
     image: qdrant/qdrant:v1.8.0
@@ -190,6 +206,7 @@ volumes:
   postgres_data:
   redis_data:
   qdrant_data:
+  mongodb_data:
 
 networks:
   devmate-network:
