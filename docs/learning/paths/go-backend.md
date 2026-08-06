@@ -1,6 +1,6 @@
 # Learning Path: Go Backend
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-08-06
 
 **Goal:** build production-grade Go backends (auth, users, sessions) with clean layering and
 PostgreSQL. Project-based, just-in-time.
