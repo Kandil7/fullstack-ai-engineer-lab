@@ -1,6 +1,6 @@
 # Learning Path: RAG Systems with Qdrant
 
-**Last updated:** 2026-06-26
+**Last updated:** 2026-08-06
 
 **Goal:** build a production-quality Retrieval-Augmented Generation system using Qdrant
 as the vector database, covering the full pipeline from embedding to cited answers.
