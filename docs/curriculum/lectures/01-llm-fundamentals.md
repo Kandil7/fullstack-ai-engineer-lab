@@ -2,6 +2,9 @@
 
 **Week 1 of Active Track** | **Duration: 3-4 hours theory + 4-5 hours practice**
 
+> 🏋️ **Practice workbook:** [`../practice/01-llm-fundamentals-practice.md`](../practice/01-llm-fundamentals-practice.md) —
+> every section has a real-world problem and every topic has Drill → Applied (DevMate) → Stretch levels with verification.
+
 ---
 
 ## 🎯 Learning Objectives

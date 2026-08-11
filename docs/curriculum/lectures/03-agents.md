@@ -2,6 +2,9 @@
 
 **Weeks 5-6 of Active Track** | **Duration: 6-8 hours theory + 10-12 hours practice**
 
+> 🏋️ **Practice workbook:** [`../practice/03-agents-practice.md`](../practice/03-agents-practice.md) —
+> every section has a real-world problem and every topic has Drill → Applied (DevMate) → Stretch levels with verification.
+
 ---
 
 ## 🎯 Learning Objectives

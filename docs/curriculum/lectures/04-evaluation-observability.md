@@ -2,6 +2,9 @@
 
 **Weeks 2-3 (RAG) & Week 7 (Production)** | **Duration: 4-6 hours theory + 8-10 hours practice**
 
+> 🏋️ **Practice workbook:** [`../practice/04-evaluation-observability-practice.md`](../practice/04-evaluation-observability-practice.md) —
+> every section has a real-world problem and every topic has Drill → Applied (DevMate) → Stretch levels with verification.
+
 ---
 
 ## 🎯 Learning Objectives
