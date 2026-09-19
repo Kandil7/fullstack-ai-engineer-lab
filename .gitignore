@@ -70,3 +70,4 @@ projects/00-core-foundations/python/*.png
 *.sqlite3
 projects/00-core-foundations/python/*.db
 err.txt
+graphify-out/

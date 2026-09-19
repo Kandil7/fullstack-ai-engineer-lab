@@ -1,5 +1,7 @@
 # Full-Stack AI Engineer Lab
 
+[![Code Intelligence](https://img.shields.io/badge/Code-Graph-53188%20nodes%20%2F%20125142%20edges-blue)](docs/CODEBASE-INTELLIGENCE.md)
+
 A **Repo-Centric Agentic Workspace** — a learning + execution + review operating system for
 becoming a production-level Full-Stack AI Engineer. This is not a notes folder; it is an
 engineering environment where prompts, templates, workflows, ADRs, and reviews are
