@@ -44,11 +44,14 @@ data, not hunting for endpoint code:
 
 ```python
 ROLES = {
-    "admin":    {"experiments.read", "experiments.write", "users.manage"},
+    "admin": {"experiments.read", "experiments.write", "users.manage"},
     "engineer": {"experiments.read", "experiments.write"},
-    "viewer":   {"experiments.read"},
+    "viewer": {"experiments.read"},
 }
-def role_has(role, permission): return permission in ROLES.get(role, set())
+
+
+def role_has(role, permission):
+    return permission in ROLES.get(role, set())
 ```
 
 The tests are one-liners; the policy is auditable at a glance.
@@ -61,7 +64,8 @@ tenant, resource state, budget. Rules stay pure functions over
 
 ```python
 def can_cancel(user, run):
-    if user["role"] == "admin": return True
+    if user["role"] == "admin":
+        return True
     return user["role"] == "engineer" and run["owner_id"] == user["user_id"]
 ```
 
@@ -75,9 +79,14 @@ The load-bearing pattern of multi-tenant software: the tenant filter is
 
 ```python
 def get_experiment(user, exp_id):
-    return db.query(Experiment).filter_by(
-        id=exp_id, tenant_id=user["tenant_id"]   # in the WHERE, always
-    ).first()
+    return (
+        db.query(Experiment)
+        .filter_by(
+            id=exp_id,
+            tenant_id=user["tenant_id"],  # in the WHERE, always
+        )
+        .first()
+    )
 ```
 
 Two details that leak or break products:

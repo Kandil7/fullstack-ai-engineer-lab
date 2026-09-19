@@ -15,6 +15,7 @@ When to use: Integers with similar number of digits
 # 1. RADIX SORT (LSD - LEAST SIGNIFICANT DIGIT)
 # =============================================================================
 
+
 def counting_sort_by_digit(arr, exp):
     """Counting sort used for each digit position"""
     n = len(arr)
@@ -35,6 +36,7 @@ def counting_sort_by_digit(arr, exp):
 
     return output
 
+
 def radix_sort(arr):
     """Radix sort (LSD). O(d * (n + 10))"""
     if not arr:
@@ -49,6 +51,7 @@ def radix_sort(arr):
 
     return arr
 
+
 print("=== LSD Radix Sort ===")
 arr = [170, 45, 75, 90, 802, 24, 2, 66]
 print(f"Original: {arr}")
@@ -58,6 +61,7 @@ print(f"Sorted: {radix_sort(arr.copy())}")
 # =============================================================================
 # 2. RADIX SORT WITH STEPS
 # =============================================================================
+
 
 def radix_sort_steps(arr):
     """Radix sort showing each digit pass"""
@@ -73,6 +77,7 @@ def radix_sort_steps(arr):
 
     return arr, steps
 
+
 print("\n=== Radix Sort with Steps ===")
 arr = [170, 45, 75, 90, 802, 24, 2, 66]
 sorted_arr, steps = radix_sort_steps(arr)
@@ -84,6 +89,7 @@ print(f"Final: {sorted_arr}")
 # =============================================================================
 # 3. MSD RADIX SORT (MOST SIGNIFICANT DIGIT)
 # =============================================================================
+
 
 def radix_sort_msd(arr):
     """MSD Radix Sort - processes from most significant digit"""
@@ -100,7 +106,7 @@ def radix_sort_msd(arr):
         buckets = [[] for _ in range(10)]
 
         for num in arr:
-            digit = (num // (10 ** digit_pos)) % 10
+            digit = (num // (10**digit_pos)) % 10
             buckets[digit].append(num)
 
         result = []
@@ -112,6 +118,7 @@ def radix_sort_msd(arr):
 
     return msd_sort(arr, max_digits - 1)
 
+
 print("\n=== MSD Radix Sort ===")
 arr = [170, 45, 75, 90, 802, 24, 2, 66]
 print(f"Sorted: {radix_sort_msd(arr.copy())}")
@@ -120,6 +127,7 @@ print(f"Sorted: {radix_sort_msd(arr.copy())}")
 # =============================================================================
 # 4. RADIX SORT FOR NEGATIVES
 # =============================================================================
+
 
 def radix_sort_with_negatives(arr):
     """Radix sort handling negative numbers"""
@@ -140,6 +148,7 @@ def radix_sort_with_negatives(arr):
 
     return negatives + positives
 
+
 print("\n=== Radix Sort with Negatives ===")
 arr = [-170, 45, -75, 90, -802, 24, 2, -66]
 print(f"Original: {arr}")
@@ -149,6 +158,7 @@ print(f"Sorted: {radix_sort_with_negatives(arr.copy())}")
 # =============================================================================
 # 5. RADIX SORT FOR STRINGS
 # =============================================================================
+
 
 def radix_sort_strings(strings, max_len=None):
     """Radix sort for strings of equal length"""
@@ -164,7 +174,7 @@ def radix_sort_strings(strings, max_len=None):
     for pos in range(max_len - 1, -1, -1):
         # Counting sort by character at position
         count = [0] * 256  # ASCII
-        output = [''] * len(strings)
+        output = [""] * len(strings)
 
         for s in strings:
             count[ord(s[pos])] += 1
@@ -181,6 +191,7 @@ def radix_sort_strings(strings, max_len=None):
 
     return [s.strip() for s in strings]
 
+
 print("\n=== Radix Sort Strings ===")
 strings = ["banana", "apple", "cherry", "date", "elderberry"]
 # Pad to same length for demo
@@ -192,6 +203,7 @@ print(f"Sorted: {sorted_strings}")
 # =============================================================================
 # 6. RADIX SORT FOR DECIMALS
 # =============================================================================
+
 
 def radix_sort_floats(arr):
     """Radix sort for floating point numbers"""
@@ -207,10 +219,10 @@ def radix_sort_floats(arr):
         max_decimals = 0
         for f in floats:
             s = str(f)
-            if '.' in s:
-                max_decimals = max(max_decimals, len(s) - s.index('.') - 1)
+            if "." in s:
+                max_decimals = max(max_decimals, len(s) - s.index(".") - 1)
 
-        scale = 10 ** max_decimals
+        scale = 10**max_decimals
         int_arr = [int(round(f * scale)) for f in floats]
         int_arr = radix_sort(int_arr)
         return [x / scale for x in int_arr]
@@ -224,6 +236,7 @@ def radix_sort_floats(arr):
 
     return negatives + positives
 
+
 print("\n=== Radix Sort Floats ===")
 arr = [3.14, 1.41, 2.72, 0.58, 1.73]
 print(f"Original: {arr}")
@@ -233,6 +246,7 @@ print(f"Sorted: {radix_sort_floats(arr.copy())}")
 # =============================================================================
 # 7. RADIX SORT PERFORMANCE
 # =============================================================================
+
 
 def analyze_radix_sort():
     """Analyze radix sort performance"""
@@ -301,9 +315,10 @@ def analyze_radix_sort():
             merge_time = time.time() - start
 
             print(f"\nn={size}, max={max_val}:")
-            print(f"  Radix:    {radix_time*1000:.2f}ms")
-            print(f"  Counting: {count_time*1000:.2f}ms")
-            print(f"  Merge:    {merge_time*1000:.2f}ms")
+            print(f"  Radix:    {radix_time * 1000:.2f}ms")
+            print(f"  Counting: {count_time * 1000:.2f}ms")
+            print(f"  Merge:    {merge_time * 1000:.2f}ms")
+
 
 analyze_radix_sort()
 
@@ -311,6 +326,7 @@ analyze_radix_sort()
 # =============================================================================
 # 8. RADIX SORT COMPARISON
 # =============================================================================
+
 
 def compare_radix_variants():
     """Compare LSD vs MSD radix sort"""
@@ -337,8 +353,9 @@ def compare_radix_variants():
         msd_time = time.time() - start
 
         print(f"\nn={size}:")
-        print(f"  LSD: {lsd_time*1000:.2f}ms")
-        print(f"  MSD: {msd_time*1000:.2f}ms")
+        print(f"  LSD: {lsd_time * 1000:.2f}ms")
+        print(f"  MSD: {msd_time * 1000:.2f}ms")
+
 
 compare_radix_variants()
 
@@ -349,23 +366,25 @@ compare_radix_variants()
 
 print("\n=== Practical Applications ===")
 
+
 # Sort phone numbers
 def sort_phone_numbers(phones):
     """Sort phone numbers using radix sort"""
-    return radix_sort([int(p.replace('-', '').replace(' ', ''))
-                       for p in phones])
+    return radix_sort([int(p.replace("-", "").replace(" ", "")) for p in phones])
+
 
 phones = ["555-1234", "555-5678", "555-9012", "555-3456"]
 print(f"Phones: {phones}")
 sorted_phones = sort_phone_numbers(phones)
 print(f"Sorted: {sorted_phones}")
 
+
 # Sort dates (as integers YYYYMMDD)
 def sort_dates(dates):
     """Sort dates using radix sort"""
     date_ints = []
     for d in dates:
-        year, month, day = d.split('-')
+        year, month, day = d.split("-")
         date_ints.append(int(year + month + day))
 
     sorted_ints = radix_sort(date_ints)
@@ -375,6 +394,7 @@ def sort_dates(dates):
         s = str(d)
         result.append(f"{s[:4]}-{s[4:6]}-{s[6:]}")
     return result
+
 
 dates = ["2024-01-15", "2023-12-25", "2024-03-01", "2023-06-30"]
 print(f"\nDates: {dates}")

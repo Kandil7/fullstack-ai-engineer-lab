@@ -70,6 +70,7 @@ on condition variables:
 import threading
 from collections import deque
 
+
 class BoundedBuffer:
     """Thread-safe bounded buffer (producer-consumer problem)"""
 
@@ -83,7 +84,7 @@ class BoundedBuffer:
     def produce(self, item):
         with self.not_full:
             while len(self.buffer) >= self.capacity:
-                self.not_full.wait()       # <-- BLOCKS HERE, forever
+                self.not_full.wait()  # <-- BLOCKS HERE, forever
             self.buffer.append(item)
             self.not_empty.notify()
 
@@ -102,7 +103,7 @@ different threads*. The original demo called both on the **same thread**:
 ```python
 buffer = BoundedBuffer(3)
 for i in range(5):
-    buffer.produce(i)          # blocks forever on the 4th item!
+    buffer.produce(i)  # blocks forever on the 4th item!
 ```
 
 `produce()` fills the buffer to capacity 3, then waits on `not_full` for a
@@ -129,7 +130,8 @@ when you add a **timeout**:
 ```python
 import queue
 
-q = queue.Queue(maxsize=2)     # the bound = the backpressure limit
+q = queue.Queue(maxsize=2)  # the bound = the backpressure limit
+
 
 def bounded_put(q_: queue.Queue, item: int, timeout: float = 0.05) -> bool:
     """Try to enqueue; return False instead of hanging forever. O(1)."""
@@ -139,11 +141,12 @@ def bounded_put(q_: queue.Queue, item: int, timeout: float = 0.05) -> bool:
     except queue.Full:
         return False
 
+
 q.put(1)
 q.put(2)
-print(bounded_put(q, 3))       # full -> returns False, does NOT hang
-print(q.get(), q.get())        # drain
-print(bounded_put(q, 3))       # now there is room -> True
+print(bounded_put(q, 3))  # full -> returns False, does NOT hang
+print(q.get(), q.get())  # drain
+print(bounded_put(q, 3))  # now there is room -> True
 ```
 
 ```text
@@ -170,9 +173,11 @@ create 1,000 threads:
 import time
 from concurrent.futures import ThreadPoolExecutor
 
+
 def fetch(url_id: int) -> int:
-    time.sleep(0.01)            # simulated network latency
+    time.sleep(0.01)  # simulated network latency
     return url_id * 2
+
 
 with ThreadPoolExecutor(max_workers=4) as pool:
     results = list(pool.map(fetch, range(8)))
@@ -203,15 +208,17 @@ the partial results back into one ordered result:
 ```python
 from concurrent.futures import ThreadPoolExecutor
 
+
 def fan_out_fan_in(items, workers):
     chunk_size = max(1, len(items) // workers)
-    chunks = [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]
+    chunks = [items[i : i + chunk_size] for i in range(0, len(items), chunk_size)]
     with ThreadPoolExecutor(max_workers=workers) as pool:
         partials = list(pool.map(lambda c: [x * 2 for x in c], chunks))
     merged = []
     for part in partials:
-        merged.extend(part)      # chunks re-merged in submission order
+        merged.extend(part)  # chunks re-merged in submission order
     return merged
+
 
 print(fan_out_fan_in(list(range(10)), 4))
 ```
@@ -235,9 +242,9 @@ A token bucket allows bursts up to `capacity`, then enforces a steady
 import time
 from typing import Callable
 
+
 class TokenBucket:
-    def __init__(self, capacity: int, rate: float,
-                 now: Callable[[], float] = time.monotonic):
+    def __init__(self, capacity: int, rate: float, now: Callable[[], float] = time.monotonic):
         self.capacity = capacity
         self.rate = rate
         self._now = now
@@ -263,14 +270,16 @@ sleeping: `time.monotonic` in production, a fake clock in tests:
 ```python
 fake_now = {"t": 0.0}
 
+
 def fake_clock() -> float:
     return fake_now["t"]
 
+
 bucket = TokenBucket(capacity=3, rate=1.0, now=fake_clock)
-print([bucket.try_acquire() for _ in range(3)])   # burst of 3 allowed
-print(bucket.try_acquire())                        # 4th -> refused
-fake_now["t"] += 1.0                               # 1 second passes
-print(bucket.try_acquire())                        # exactly 1 token
+print([bucket.try_acquire() for _ in range(3)])  # burst of 3 allowed
+print(bucket.try_acquire())  # 4th -> refused
+fake_now["t"] += 1.0  # 1 second passes
+print(bucket.try_acquire())  # exactly 1 token
 ```
 
 ```text
@@ -294,14 +303,13 @@ one trial call; success closes it, failure reopens it.
 
 ```python
 class CircuitBreaker:
-    def __init__(self, fn, threshold=3, cooldown=1.0,
-                 now=time.monotonic):
+    def __init__(self, fn, threshold=3, cooldown=1.0, now=time.monotonic):
         self.fn = fn
         self.threshold = threshold
         self.cooldown = cooldown
         self._now = now
         self.failures = 0
-        self.state = "closed"        # closed | open | half_open
+        self.state = "closed"  # closed | open | half_open
         self.open_until = 0.0
         self.short_circuited = 0
 
@@ -331,16 +339,20 @@ Demo with a fake clock — no waiting:
 ```python
 calls = {"n": 0}
 
+
 def flaky():
     calls["n"] += 1
     if calls["n"] <= 3:
         raise ConnectionError("provider down")
     return 42
 
+
 fake_clock = {"t": 0.0}
+
 
 def breaker_clock():
     return fake_clock["t"]
+
 
 breaker = CircuitBreaker(flaky, threshold=3, cooldown=1.0, now=breaker_clock)
 for _ in range(3):
@@ -348,16 +360,16 @@ for _ in range(3):
         breaker.call()
     except ConnectionError:
         pass
-print(breaker.state)                        # open after 3 failures
+print(breaker.state)  # open after 3 failures
 before = calls["n"]
 try:
     breaker.call()
 except RuntimeError:
     pass
-print(breaker.short_circuited, calls["n"] == before)   # fail fast, provider untouched
-fake_clock["t"] += 1.0                      # cooldown elapsed
-print(breaker.call())                       # half-open trial succeeds
-print(breaker.state)                        # closed again
+print(breaker.short_circuited, calls["n"] == before)  # fail fast, provider untouched
+fake_clock["t"] += 1.0  # cooldown elapsed
+print(breaker.call())  # half-open trial succeeds
+print(breaker.state)  # closed again
 ```
 
 ```text
@@ -383,8 +395,8 @@ synchronize into waves.
 ```python
 import random
 
-def retry_with_jitter(fn, attempts=4, base_delay=0.1,
-                      sleep=time.sleep, rng=None):
+
+def retry_with_jitter(fn, attempts=4, base_delay=0.1, sleep=time.sleep, rng=None):
     rng = rng or random.Random(0)
     last_error = None
     for attempt in range(attempts):
@@ -393,7 +405,7 @@ def retry_with_jitter(fn, attempts=4, base_delay=0.1,
         except Exception as exc:
             last_error = exc
             if attempt + 1 < attempts:
-                delay = rng.uniform(0.0, base_delay * (2 ** attempt))
+                delay = rng.uniform(0.0, base_delay * (2**attempt))
                 sleep(delay)
     raise RuntimeError(f"failed after {attempts} attempts: {last_error}")
 ```
@@ -404,10 +416,13 @@ waiting:
 ```python
 delays = []
 
+
 def log_sleep(d):
     delays.append(d)
 
+
 state = {"n": 0}
+
 
 def flaky_twice():
     state["n"] += 1
@@ -415,8 +430,9 @@ def flaky_twice():
         raise TimeoutError("429")
     return 7
 
+
 print(retry_with_jitter(flaky_twice, sleep=log_sleep))
-print(delays)   # attempt 0 window [0, 0.1], attempt 1 window [0, 0.2]
+print(delays)  # attempt 0 window [0, 0.1], attempt 1 window [0, 0.2]
 ```
 
 ```text
@@ -440,6 +456,7 @@ drained:
 import threading
 import queue
 
+
 class Worker:
     def __init__(self, q_):
         self.q = q_
@@ -458,14 +475,15 @@ class Worker:
     def stop(self):
         self.stop_event.set()
 
+
 work_q = queue.Queue()
 for i in range(5):
     work_q.put(i)
 worker = Worker(work_q)
 t = threading.Thread(target=worker.run)
 t.start()
-time.sleep(0.01)          # let it consume a couple of items
-worker.stop()             # graceful: no NEW work, drain the REST
+time.sleep(0.01)  # let it consume a couple of items
+worker.stop()  # graceful: no NEW work, drain the REST
 t.join(timeout=2.0)
 print(sorted(worker.processed))
 ```
@@ -483,6 +501,7 @@ retried without duplication.
 def apply_twice_equals_once(ops):
     """Idempotent dedup: repeating an idempotent op changes nothing."""
     return sorted(set(ops))
+
 
 print(apply_twice_equals_once(["a", "b", "a"]))
 ```
@@ -514,7 +533,7 @@ path, so "waiting forever" is structurally impossible.
 ```python
 lock_a = threading.Lock()
 lock_b = threading.Lock()
-print(lock_a.acquire(timeout=0.05))   # uncontended -> True, never hangs
+print(lock_a.acquire(timeout=0.05))  # uncontended -> True, never hangs
 print(lock_b.acquire(timeout=0.05))
 lock_a.release()
 lock_b.release()
@@ -535,20 +554,19 @@ does not sink the ship):
 ```python
 from concurrent.futures import ThreadPoolExecutor
 
+
 def run_bulkhead(chunks):
     results = []
-    with ThreadPoolExecutor(max_workers=2) as pool_a, \
-            ThreadPoolExecutor(max_workers=2) as pool_b:
+    with ThreadPoolExecutor(max_workers=2) as pool_a, ThreadPoolExecutor(max_workers=2) as pool_b:
         mid = len(chunks) // 2
-        futs_a = [pool_a.submit(lambda c: [x + 1 for x in c], c)
-                  for c in chunks[:mid]]
-        futs_b = [pool_b.submit(lambda c: [x + 1 for x in c], c)
-                  for c in chunks[mid:]]
+        futs_a = [pool_a.submit(lambda c: [x + 1 for x in c], c) for c in chunks[:mid]]
+        futs_b = [pool_b.submit(lambda c: [x + 1 for x in c], c) for c in chunks[mid:]]
         results = [f.result() for f in futs_a + futs_b]
     merged = []
     for r in results:
         merged.extend(r)
     return merged
+
 
 print(run_bulkhead([[1, 2], [3, 4]]))
 ```

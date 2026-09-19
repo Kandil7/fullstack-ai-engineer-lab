@@ -35,8 +35,8 @@ import numpy as np
 arr = np.array([1, 2, 3, 4, 5])
 view = arr[1:3]
 
-print(view.base is arr)   # True — view is derived from arr
-print(view.base)          # [1 2 3 4 5] — original array
+print(view.base is arr)  # True — view is derived from arr
+print(view.base)  # [1 2 3 4 5] — original array
 
 copy = arr[1:3].copy()
 print(copy.base is None)  # True — copy has no parent
@@ -75,11 +75,11 @@ Memory layout where elements are stored in adjacent locations.
 arr = np.arange(20).reshape(4, 5)
 
 # C-contiguous (row-major)
-print(arr.flags['C_CONTIGUOUS'])  # True
+print(arr.flags["C_CONTIGUOUS"])  # True
 
 # Non-contiguous slice
 view = arr[::2, ::2]
-print(view.flags['C_CONTIGUOUS'])  # False
+print(view.flags["C_CONTIGUOUS"])  # False
 ```
 
 **Related:** strides, memory layout, view
@@ -282,7 +282,7 @@ print(np.shares_memory(arr, view))  # True
 # Modify view — original modified
 view[0, 0] = 999
 print(arr)  # [[999   2   3]
-            #  [  4   5   6]]
+#  [  4   5   6]]
 ```
 
 **Related:** view, reshape
@@ -306,8 +306,8 @@ view[0] = 999
 print(arr)  # [ 1 999  3  4  5]
 
 # View attributes
-print(view.base is arr)    # True
-print(view.shape)          # (2,)
+print(view.base is arr)  # True
+print(view.shape)  # (2,)
 print(view.dtype == arr.dtype)  # True
 ```
 

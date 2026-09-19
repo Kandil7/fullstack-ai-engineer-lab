@@ -22,16 +22,15 @@ x = np.arange(1, 13)  # Months
 y = [15, 18, 22, 25, 28, 30, 32, 31, 28, 24, 19, 16]
 
 plt.figure(figsize=(10, 6))
-plt.fill_between(x, y, color='steelblue', alpha=0.4)
-plt.plot(x, y, 'b-', linewidth=2, marker='o', markersize=8)
-plt.title('Monthly Temperature')
-plt.xlabel('Month')
-plt.ylabel('Temperature (°C)')
+plt.fill_between(x, y, color="steelblue", alpha=0.4)
+plt.plot(x, y, "b-", linewidth=2, marker="o", markersize=8)
+plt.title("Monthly Temperature")
+plt.xlabel("Month")
+plt.ylabel("Temperature (°C)")
 plt.grid(True, alpha=0.3)
 
 # Add labels for months
-months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 plt.xticks(x, months)
 plt.show()
 ```
@@ -43,9 +42,9 @@ plt.show()
 ```python
 x = np.arange(1, 13)
 categories = {
-    'Product A': [10, 12, 15, 18, 20, 22, 25, 24, 22, 20, 18, 15],
-    'Product B': [5, 6, 8, 10, 12, 14, 15, 14, 12, 10, 8, 6],
-    'Product C': [3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4],
+    "Product A": [10, 12, 15, 18, 20, 22, 25, 24, 22, 20, 18, 15],
+    "Product B": [5, 6, 8, 10, 12, 14, 15, 14, 12, 10, 8, 6],
+    "Product C": [3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4],
 }
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
@@ -56,7 +55,7 @@ for label, values in categories.items():
     ax1.fill_between(x, y_stack, y_stack + values, alpha=0.7, label=label)
     y_stack += values
 
-ax1.set_title('Manual Stacked Area')
+ax1.set_title("Manual Stacked Area")
 ax1.legend()
 ax1.grid(True, alpha=0.3)
 
@@ -64,7 +63,7 @@ ax1.grid(True, alpha=0.3)
 labels = list(categories.keys())
 values = list(categories.values())
 ax2.stackplot(x, *values, labels=labels, alpha=0.7)
-ax2.set_title('stackplot()')
+ax2.set_title("stackplot()")
 ax2.legend()
 ax2.grid(True, alpha=0.3)
 

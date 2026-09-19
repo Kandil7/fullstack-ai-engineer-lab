@@ -101,7 +101,7 @@ print("arctan2:", np.degrees(angles))
 ```python
 import numpy as np
 
-angles = np.array([0, np.pi/6, np.pi/4, np.pi/3, np.pi/2])
+angles = np.array([0, np.pi / 6, np.pi / 4, np.pi / 3, np.pi / 2])
 print("cos:", np.cos(angles).round(4))
 # Output: [1.     0.8661 0.7071 0.5    0.    ]
 ```
@@ -118,7 +118,7 @@ print("cos:", np.cos(angles).round(4))
 ```python
 import numpy as np
 
-radians = np.array([0, np.pi/6, np.pi/4, np.pi/3, np.pi/2])
+radians = np.array([0, np.pi / 6, np.pi / 4, np.pi / 3, np.pi / 2])
 degrees = np.degrees(radians)
 print("Degrees:", degrees.round(2))
 # Output: [ 0.  30.  45.  60.  90.]
@@ -154,7 +154,7 @@ print("tanh:", np.tanh(values).round(4))
 ```python
 import numpy as np
 
-t = np.linspace(0, 2*np.pi, 100)
+t = np.linspace(0, 2 * np.pi, 100)
 phase = np.pi / 4  # 45 degrees
 wave = np.sin(t + phase)
 
@@ -191,7 +191,7 @@ print("Radians:", radians.round(4))
 ```python
 import numpy as np
 
-angles = np.array([0, np.pi/6, np.pi/4, np.pi/3, np.pi/2])
+angles = np.array([0, np.pi / 6, np.pi / 4, np.pi / 3, np.pi / 2])
 print("sin:", np.sin(angles).round(4))
 # Output: [0.     0.5    0.7071 0.866  1.    ]
 ```
@@ -208,7 +208,7 @@ print("sin:", np.sin(angles).round(4))
 ```python
 import numpy as np
 
-angles = np.array([0, np.pi/6, np.pi/4, np.pi/3])
+angles = np.array([0, np.pi / 6, np.pi / 4, np.pi / 3])
 print("tan:", np.tan(angles).round(4))
 # Output: [0.     0.5774 1.     1.7321]
 ```
@@ -225,8 +225,8 @@ print("tan:", np.tan(angles).round(4))
 ```python
 import numpy as np
 
-x = np.linspace(0, 2*np.pi, 100)
-identity = np.sin(x)**2 + np.cos(x)**2
+x = np.linspace(0, 2 * np.pi, 100)
+identity = np.sin(x) ** 2 + np.cos(x) ** 2
 print("sin² + cos²:", identity.round(10))  # All 1.0
 ```
 
@@ -243,7 +243,7 @@ print("sin² + cos²:", identity.round(10))  # All 1.0
 import numpy as np
 
 # Points on unit circle
-theta = np.linspace(0, 2*np.pi, 8, endpoint=False)
+theta = np.linspace(0, 2 * np.pi, 8, endpoint=False)
 x = np.cos(theta)
 y = np.sin(theta)
 

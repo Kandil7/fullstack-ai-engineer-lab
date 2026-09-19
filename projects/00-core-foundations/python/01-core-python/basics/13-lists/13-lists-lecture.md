@@ -38,14 +38,14 @@ Access elements using indices (0-based).
 fruits = ["apple", "banana", "cherry", "date"]
 
 # Indexing
-print(fruits[0])   # apple
+print(fruits[0])  # apple
 print(fruits[-1])  # date (last element)
 
 # Slicing
-print(fruits[0:2])   # ['apple', 'banana']
-print(fruits[1:3])   # ['banana', 'cherry']
-print(fruits[:2])    # ['apple', 'banana']
-print(fruits[2:])    # ['cherry', 'date']
+print(fruits[0:2])  # ['apple', 'banana']
+print(fruits[1:3])  # ['banana', 'cherry']
+print(fruits[:2])  # ['apple', 'banana']
+print(fruits[2:])  # ['cherry', 'date']
 ```
 
 ### 3.3 List Modification
@@ -121,7 +121,7 @@ evens = [x for x in range(20) if x % 2 == 0]
 upper_fruits = [fruit.upper() for fruit in fruits]
 
 # Nested lists
-matrix = [[i*j for j in range(3)] for i in range(3)]
+matrix = [[i * j for j in range(3)] for i in range(3)]
 ```
 
 ### 3.6 List Operations
@@ -142,9 +142,9 @@ repeated = list1 * 3  # [1, 2, 3, 1, 2, 3, 1, 2, 3]
 ```python
 numbers = [1, 2, 3, 4, 5]
 
-print(3 in numbers)      # True
+print(3 in numbers)  # True
 print(6 not in numbers)  # True
-print(len(numbers))      # 5
+print(len(numbers))  # 5
 ```
 
 ## 4. Code Examples
@@ -204,11 +204,7 @@ print(f"Count of 1: {numbers.count(1)}")
 ### Example 4: Nested Lists
 ```python
 # Matrix (2D list)
-matrix = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9]
-]
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
 # Access elements
 print(matrix[0][0])  # 1
@@ -247,6 +243,7 @@ print(list1)  # [[99, 2], [3, 4]] - Modified!
 
 # Deep copy - independent objects
 import copy
+
 list1 = [[1, 2], [3, 4]]
 list2 = copy.deepcopy(list1)
 list2[0][0] = 99

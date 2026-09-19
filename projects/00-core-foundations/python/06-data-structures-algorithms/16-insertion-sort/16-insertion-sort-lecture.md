@@ -285,7 +285,7 @@ for i in range(1, len(arr)):
 class OnlineSorter:
     def __init__(self):
         self.sorted_data = []
-    
+
     def insert(self, value):
         """Insert a new value while maintaining sorted order."""
         self.sorted_data.append(value)
@@ -297,9 +297,10 @@ class OnlineSorter:
             self.sorted_data[j + 1] = self.sorted_data[j]
             j -= 1
         self.sorted_data[j + 1] = key
-    
+
     def get_sorted(self):
         return self.sorted_data
+
 
 # Usage
 sorter = OnlineSorter()
@@ -327,11 +328,13 @@ for value in [5, 2, 8, 1, 9]:
 import time
 import random
 
+
 def benchmark_sort(sort_func, data, name):
     start = time.time()
     sort_func(data.copy())
     end = time.time()
     print(f"{name}: {end - start:.6f} seconds")
+
 
 # Generate test data
 n = 1000
@@ -339,7 +342,7 @@ random_data = [random.randint(0, n) for _ in range(n)]
 nearly_sorted = list(range(n))
 # Swap a few elements
 for _ in range(10):
-    i, j = random.randint(0, n-1), random.randint(0, n-1)
+    i, j = random.randint(0, n - 1), random.randint(0, n - 1)
     nearly_sorted[i], nearly_sorted[j] = nearly_sorted[j], nearly_sorted[i]
 
 print("Random data:")

@@ -11,12 +11,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
 starter_spec = importlib.util.spec_from_file_location(
-    "starter", Path(__file__).parent / "starter.py")
+    "starter", Path(__file__).parent / "starter.py"
+)
 starter_module = importlib.util.module_from_spec(starter_spec)
 starter_spec.loader.exec_module(starter_module)
 
 solution_spec = importlib.util.spec_from_file_location(
-    "solution", Path(__file__).parent / "solution.py")
+    "solution", Path(__file__).parent / "solution.py"
+)
 solution_module = importlib.util.module_from_spec(solution_spec)
 solution_spec.loader.exec_module(solution_module)
 

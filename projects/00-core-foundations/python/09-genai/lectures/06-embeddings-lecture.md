@@ -78,10 +78,12 @@ Cosine similarity measures the angle between vectors (0 = unrelated,
 ```python
 import numpy as np
 
+
 def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
     """Cosine similarity between two vectors (the standard semantic metric)."""
-    denom = (np.linalg.norm(a) * np.linalg.norm(b))
+    denom = np.linalg.norm(a) * np.linalg.norm(b)
     return float(np.dot(a, b) / denom) if denom else 0.0
+
 
 # mock embeddings of similar vs unrelated sentences
 happy = np.array([1.0, 0.8, 0.2, 0.0])
@@ -126,7 +128,7 @@ dims: 1536   (small model default; 3-small supports 512/1536 via dimensions)
 ```python
 from sentence_transformers import SentenceTransformer
 
-model = SentenceTransformer("all-MiniLM-L6-v2")   # 384 dims, runs offline
+model = SentenceTransformer("all-MiniLM-L6-v2")  # 384 dims, runs offline
 vecs = model.encode(["The cat sat on the mat.", "A dog barked loudly."])
 print("dims:", vecs.shape[1])
 ```
@@ -177,9 +179,11 @@ def dedupe(docs: list[str], embed_fn, threshold: float = 0.95) -> list[str]:
         if all(cosine_similarity(v, w) < threshold for w in kept):
             kept.append(v) if False else None
     # (kept-vector tracking simplified; see exercise)
-    return [d for i, d in enumerate(docs) if all(
-        i != j and cosine_similarity(vecs[i], vecs[j]) < threshold
-        for j in range(i))]
+    return [
+        d
+        for i, d in enumerate(docs)
+        if all(i != j and cosine_similarity(vecs[i], vecs[j]) < threshold for j in range(i))
+    ]
 ```
 
 Output:

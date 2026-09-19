@@ -47,6 +47,7 @@ Accuracy = (TP + TN) / (TP + TN + FP + FN)
 **Example:**
 ```python
 from sklearn.metrics import accuracy_score
+
 y_actual = [1, 0, 1, 1, 0]
 y_predicted = [1, 0, 1, 0, 0]
 accuracy = accuracy_score(y_actual, y_predicted)
@@ -65,6 +66,7 @@ print(f"Accuracy: {accuracy:.2%}")  # 80.00%
 **Example:**
 ```python
 from sklearn.tree import DecisionTreeClassifier
+
 # Predicting if an email is spam (1) or not (0)
 model = DecisionTreeClassifier()
 model.fit(X_train, y_train)  # y contains 0s and 1s
@@ -79,6 +81,7 @@ predictions = model.predict(X_test)  # Predicted classes
 **Example:**
 ```python
 from sklearn.cluster import KMeans
+
 kmeans = KMeans(n_clusters=3)
 clusters = kmeans.fit_predict(X)  # Assigns each point to a cluster
 ```
@@ -95,6 +98,7 @@ clusters = kmeans.fit_predict(X)  # Assigns each point to a cluster
 **Example:**
 ```python
 from sklearn.datasets import load_iris
+
 iris = load_iris()
 print(f"Shape: {iris.data.shape}")  # (150, 4)
 print(f"Features: {iris.feature_names}")
@@ -109,10 +113,10 @@ print(f"Features: {iris.feature_names}")
 ```python
 # Conceptual — uses libraries like TensorFlow or PyTorch
 import tensorflow as tf
-model = tf.keras.Sequential([
-    tf.keras.layers.Dense(64, activation='relu'),
-    tf.keras.layers.Dense(10, activation='softmax')
-])
+
+model = tf.keras.Sequential(
+    [tf.keras.layers.Dense(64, activation="relu"), tf.keras.layers.Dense(10, activation="softmax")]
+)
 ```
 
 **Related Terms:** Neural Network, Machine Learning, Artificial Intelligence
@@ -128,10 +132,12 @@ model = tf.keras.Sequential([
 ```python
 # In house price prediction:
 # Features: square_feet, bedrooms, age, location
-X = np.array([
-    [1500, 3, 10, 1],  # Sample 1
-    [2000, 4, 5, 2]    # Sample 2
-])
+X = np.array(
+    [
+        [1500, 3, 10, 1],  # Sample 1
+        [2000, 4, 5, 2],  # Sample 2
+    ]
+)
 # Columns 0-3 are features
 ```
 
@@ -147,6 +153,7 @@ X = np.array([
 **Example:**
 ```python
 from sklearn.neighbors import KNeighborsClassifier
+
 # n_neighbors is a hyperparameter
 knn = KNeighborsClassifier(n_neighbors=5)  # Set k=5 before training
 knn.fit(X_train, y_train)
@@ -164,6 +171,7 @@ knn.fit(X_train, y_train)
 **Example:**
 ```python
 from sklearn.neighbors import KNeighborsClassifier
+
 knn = KNeighborsClassifier(n_neighbors=3)
 knn.fit(X_train, y_train)
 prediction = knn.predict(new_sample)
@@ -192,8 +200,9 @@ y = [1, 0, 1, 0, 0, 1]  # 1=spam, 0=not spam
 **Example:**
 ```python
 from sklearn.preprocessing import LabelEncoder
+
 le = LabelEncoder()
-categories = ['cat', 'dog', 'bird']
+categories = ["cat", "dog", "bird"]
 encoded = le.fit_transform(categories)  # [1, 2, 0]
 print(le.classes_)  # ['bird', 'cat', 'dog']
 ```
@@ -213,8 +222,10 @@ print(le.classes_)  # ['bird', 'cat', 'dog']
 def is_spam(email):
     return "buy now" in email.lower()  # Manual rules
 
+
 # Machine Learning
 from sklearn.naive_bayes import MultinomialNB
+
 model = MultinomialNB()
 model.fit(X_train_text, y_train)  # Learns rules from data
 prediction = model.predict(X_test_text)
@@ -228,6 +239,7 @@ prediction = model.predict(X_test_text)
 **Example:**
 ```python
 from sklearn.linear_model import LinearRegression
+
 model = LinearRegression()  # Create model
 model.fit(X_train, y_train)  # Train model
 predictions = model.predict(X_test)  # Use model
@@ -245,9 +257,10 @@ predictions = model.predict(X_test)  # Use model
 **Example:**
 ```python
 import numpy as np
+
 arr = np.array([1, 2, 3, 4, 5])
-print(arr.mean())    # 3.0
-print(arr.std())     # 1.4142...
+print(arr.mean())  # 3.0
+print(arr.std())  # 1.4142...
 print(np.random.rand(3, 3))  # 3x3 random matrix
 ```
 
@@ -263,8 +276,9 @@ print(np.random.rand(3, 3))  # 3x3 random matrix
 **Example:**
 ```python
 from sklearn.preprocessing import OneHotEncoder
+
 encoder = OneHotEncoder(sparse=False)
-categories = [['red'], ['blue'], ['green']]
+categories = [["red"], ["blue"], ["green"]]
 encoded = encoder.fit_transform(categories)
 # [[1, 0, 0],  # red
 #  [0, 1, 0],  # blue
@@ -280,11 +294,12 @@ encoded = encoder.fit_transform(categories)
 ```python
 # Overfitting example
 from sklearn.tree import DecisionTreeClassifier
+
 # No depth limit — will memorize training data
 overfit_model = DecisionTreeClassifier(max_depth=None)
 overfit_model.fit(X_train, y_train)
 print(f"Train accuracy: {overfit_model.score(X_train, y_train):.2%}")  # 100%
-print(f"Test accuracy: {overfit_model.score(X_test, y_test):.2%}")    # Lower
+print(f"Test accuracy: {overfit_model.score(X_test, y_test):.2%}")  # Lower
 ```
 
 **Related Terms:** Underfitting, Regularization, Cross-Validation
@@ -299,11 +314,10 @@ print(f"Test accuracy: {overfit_model.score(X_test, y_test):.2%}")    # Lower
 **Example:**
 ```python
 import pandas as pd
-df = pd.DataFrame({
-    'name': ['Alice', 'Bob', 'Charlie'],
-    'age': [25, 30, 35],
-    'salary': [50000, 60000, 70000]
-})
+
+df = pd.DataFrame(
+    {"name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35], "salary": [50000, 60000, 70000]}
+)
 print(df.head())
 print(df.describe())
 ```
@@ -316,11 +330,12 @@ print(df.describe())
 **Example:**
 ```python
 from sklearn.linear_model import LinearRegression
+
 model = LinearRegression()
 model.fit(X, y)
 # These are learned parameters:
 print(f"Coefficients (slope): {model.coef_}")  # Learned from data
-print(f"Intercept: {model.intercept_}")        # Learned from data
+print(f"Intercept: {model.intercept_}")  # Learned from data
 ```
 
 **Related Terms:** Hyperparameter, Coefficient, Weight
@@ -348,6 +363,7 @@ for pred in predictions:
 **Example:**
 ```python
 from sklearn.linear_model import LinearRegression
+
 model = LinearRegression()
 model.fit(X_train, y_train)  # y contains continuous values (e.g., prices)
 predictions = model.predict(X_test)  # Predicted prices
@@ -365,11 +381,13 @@ predictions = model.predict(X_test)  # Predicted prices
 **Example:**
 ```python
 # Each row is a sample
-X = np.array([
-    [1500, 3, 10],  # Sample 1: 1500 sqft, 3 bedrooms, 10 years old
-    [2000, 4, 5],   # Sample 2
-    [1200, 2, 15]   # Sample 3
-])
+X = np.array(
+    [
+        [1500, 3, 10],  # Sample 1: 1500 sqft, 3 bedrooms, 10 years old
+        [2000, 4, 5],  # Sample 2
+        [1200, 2, 15],  # Sample 3
+    ]
+)
 print(f"Number of samples: {len(X)}")  # 3
 ```
 
@@ -399,9 +417,10 @@ score = r2_score(y_test, model.predict(X_test))
 ```python
 # Labeled data: X (features) + y (correct answers)
 X = [[1], [2], [3], [4], [5]]  # Inputs
-y = [2, 4, 6, 8, 10]           # Known outputs
+y = [2, 4, 6, 8, 10]  # Known outputs
 
 from sklearn.linear_model import LinearRegression
+
 model = LinearRegression()
 model.fit(X, y)  # Learn mapping from X to y
 model.predict([[6]])  # Predict: array([12.])
@@ -419,8 +438,8 @@ model.predict([[6]])  # Predict: array([12.])
 **Example:**
 ```python
 # In house price prediction
-X = df[['square_feet', 'bedrooms']]  # Features
-y = df['price']                       # Target (what we predict)
+X = df[["square_feet", "bedrooms"]]  # Features
+y = df["price"]  # Target (what we predict)
 ```
 
 **Related Terms:** Feature, Label, Dependent Variable
@@ -443,8 +462,11 @@ model.fit(X_train, y_train)  # This is the training step
 **Example:**
 ```python
 from sklearn.model_selection import train_test_split
+
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2  # 80% training, 20% test
+    X,
+    y,
+    test_size=0.2,  # 80% training, 20% test
 )
 ```
 
@@ -461,11 +483,12 @@ X_train, X_test, y_train, y_test = train_test_split(
 ```python
 # Underfitting: linear model on non-linear data
 from sklearn.linear_model import LinearRegression
+
 model = LinearRegression()
 # Data follows a curve, but we're fitting a straight line
 model.fit(X_train, y_train)
 print(f"Train R²: {model.score(X_train, y_train):.2f}")  # Low
-print(f"Test R²: {model.score(X_test, y_test):.2f}")    # Also low
+print(f"Test R²: {model.score(X_test, y_test):.2f}")  # Also low
 ```
 
 **Related Terms:** Overfitting, Bias, Model Complexity
@@ -476,6 +499,7 @@ print(f"Test R²: {model.score(X_test, y_test):.2f}")    # Also low
 **Example:**
 ```python
 from sklearn.cluster import KMeans
+
 # No labels provided — algorithm finds natural groups
 kmeans = KMeans(n_clusters=3)
 clusters = kmeans.fit_predict(X)  # X has no y labels
@@ -499,9 +523,9 @@ clusters = kmeans.fit_predict(X)  # X has no y labels
 
 ```python
 # Core ML libraries
-import numpy as np                          # Numerical computing
-import pandas as pd                         # Data manipulation
-from sklearn import datasets                # Built-in datasets
+import numpy as np  # Numerical computing
+import pandas as pd  # Data manipulation
+from sklearn import datasets  # Built-in datasets
 
 # Preprocessing
 from sklearn.preprocessing import LabelEncoder, StandardScaler

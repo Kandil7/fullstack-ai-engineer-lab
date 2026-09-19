@@ -26,6 +26,7 @@ path = f"{root}/{name}/{sha256(content)}"
 **Definition**: The fixed-length output of a hash function.
 ```python
 import hashlib
+
 print(hashlib.sha256(b"data").hexdigest()[:8])
 ```
 **Related**: CAS

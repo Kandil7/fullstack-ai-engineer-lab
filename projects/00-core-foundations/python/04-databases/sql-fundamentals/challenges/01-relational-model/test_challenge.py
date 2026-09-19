@@ -11,12 +11,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
 starter_spec = importlib.util.spec_from_file_location(
-    "starter", Path(__file__).parent / "starter.py")
+    "starter", Path(__file__).parent / "starter.py"
+)
 starter_module = importlib.util.module_from_spec(starter_spec)
 starter_spec.loader.exec_module(starter_module)
 
 solution_spec = importlib.util.spec_from_file_location(
-    "solution", Path(__file__).parent / "solution.py")
+    "solution", Path(__file__).parent / "solution.py"
+)
 solution_module = importlib.util.module_from_spec(solution_spec)
 solution_spec.loader.exec_module(solution_module)
 
@@ -51,18 +53,15 @@ class TestCreateRelationalSchema:
         solution_module.create_relational_schema(conn)
         conn.execute("INSERT INTO students (name) VALUES ('ana')")
         conn.execute("INSERT INTO courses (title) VALUES ('sql')")
-        conn.execute(
-            "INSERT INTO enrollments (student_id, course_id) VALUES (1, 1)")
+        conn.execute("INSERT INTO enrollments (student_id, course_id) VALUES (1, 1)")
         with pytest.raises(sqlite3.IntegrityError):
-            conn.execute(
-                "INSERT INTO enrollments (student_id, course_id) VALUES (1, 1)")
+            conn.execute("INSERT INTO enrollments (student_id, course_id) VALUES (1, 1)")
 
     def test_enrollments_foreign_keys(self):
         conn = fresh_conn()
         solution_module.create_relational_schema(conn)
         with pytest.raises(sqlite3.IntegrityError):
-            conn.execute(
-                "INSERT INTO enrollments (student_id, course_id) VALUES (999, 1)")
+            conn.execute("INSERT INTO enrollments (student_id, course_id) VALUES (999, 1)")
 
 
 class TestEnforceKeys:
@@ -84,8 +83,7 @@ class TestEnforceKeys:
         conn = sqlite3.connect(":memory:")
         conn.execute("CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT)")
         conn.execute("CREATE TABLE courses (id INTEGER PRIMARY KEY, title TEXT)")
-        conn.execute(
-            "CREATE TABLE enrollments (student_id INTEGER, course_id INTEGER)")
+        conn.execute("CREATE TABLE enrollments (student_id INTEGER, course_id INTEGER)")
         # No FK enforcement available; function must still return a dict.
         result = solution_module.enforce_keys(conn)
         assert isinstance(result, dict)
@@ -95,8 +93,7 @@ class TestEnforceKeys:
 class TestPurgeAbandonedCourses:
     def _setup(self, conn):
         solution_module.create_relational_schema(conn)
-        conn.executemany("INSERT INTO courses (title) VALUES (?)",
-                         [("c1",), ("c2",), ("c3",)])
+        conn.executemany("INSERT INTO courses (title) VALUES (?)", [("c1",), ("c2",), ("c3",)])
         conn.execute("INSERT INTO students (name) VALUES ('ana')")
         conn.execute("INSERT INTO enrollments (student_id, course_id) VALUES (1, 1)")
 
@@ -116,8 +113,7 @@ class TestPurgeAbandonedCourses:
     def test_keeps_all_when_everyone_enrolled(self):
         conn = fresh_conn()
         solution_module.create_relational_schema(conn)
-        conn.executemany("INSERT INTO courses (title) VALUES (?)",
-                         [("a",), ("b",)])
+        conn.executemany("INSERT INTO courses (title) VALUES (?)", [("a",), ("b",)])
         conn.execute("INSERT INTO students (name) VALUES ('ana')")
         conn.execute("INSERT INTO enrollments (student_id, course_id) VALUES (1, 1)")
         conn.execute("INSERT INTO enrollments (student_id, course_id) VALUES (1, 2)")
@@ -126,8 +122,7 @@ class TestPurgeAbandonedCourses:
     def test_handles_null_enrollment_rows(self):
         conn = fresh_conn()
         self._setup(conn)
-        conn.execute(
-            "INSERT INTO enrollments (student_id, course_id) VALUES (1, NULL)")
+        conn.execute("INSERT INTO enrollments (student_id, course_id) VALUES (1, NULL)")
         remaining = solution_module.purge_abandoned_courses(conn)
         assert remaining == ["c1"]
 

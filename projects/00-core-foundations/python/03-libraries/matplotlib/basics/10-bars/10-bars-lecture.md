@@ -19,15 +19,15 @@ Bar charts compare discrete categories or track changes over time. Matplotlib su
 import matplotlib.pyplot as plt
 import numpy as np
 
-categories = ['Apples', 'Bananas', 'Cherries', 'Dates', 'Elderberries']
+categories = ["Apples", "Bananas", "Cherries", "Dates", "Elderberries"]
 values = [25, 40, 15, 30, 20]
 
 plt.figure(figsize=(10, 6))
-plt.bar(categories, values, color='steelblue', edgecolor='black', alpha=0.8)
-plt.title('Fruit Sales')
-plt.xlabel('Fruit')
-plt.ylabel('Units Sold')
-plt.grid(axis='y', alpha=0.3)
+plt.bar(categories, values, color="steelblue", edgecolor="black", alpha=0.8)
+plt.title("Fruit Sales")
+plt.xlabel("Fruit")
+plt.ylabel("Units Sold")
+plt.grid(axis="y", alpha=0.3)
 plt.show()
 ```
 
@@ -37,14 +37,14 @@ plt.show()
 
 ```python
 # Horizontal bars
-plt.barh(categories, values, color='coral', edgecolor='black')
+plt.barh(categories, values, color="coral", edgecolor="black")
 
 # Grouped bars
 x = np.arange(len(categories))
 width = 0.35
 
-plt.bar(x - width/2, values_2023, width, label='2023', color='steelblue')
-plt.bar(x + width/2, values_2024, width, label='2024', color='coral')
+plt.bar(x - width / 2, values_2023, width, label="2023", color="steelblue")
+plt.bar(x + width / 2, values_2024, width, label="2024", color="coral")
 plt.xticks(x, categories)
 plt.legend()
 ```
@@ -54,10 +54,15 @@ plt.legend()
 ## 3. Stacked Bars
 
 ```python
-plt.bar(categories, values_A, label='Product A', color='steelblue')
-plt.bar(categories, values_B, bottom=values_A, label='Product B', color='coral')
-plt.bar(categories, values_C, bottom=np.array(values_A) + np.array(values_B),
-        label='Product C', color='green')
+plt.bar(categories, values_A, label="Product A", color="steelblue")
+plt.bar(categories, values_B, bottom=values_A, label="Product B", color="coral")
+plt.bar(
+    categories,
+    values_C,
+    bottom=np.array(values_A) + np.array(values_B),
+    label="Product C",
+    color="green",
+)
 plt.legend()
 ```
 
@@ -68,8 +73,15 @@ plt.legend()
 ```python
 means = [25, 40, 15]
 errors = [3, 5, 2]
-plt.bar(categories[:3], means, yerr=errors, capsize=5,
-        color='steelblue', edgecolor='black', error_kw={'linewidth': 2})
+plt.bar(
+    categories[:3],
+    means,
+    yerr=errors,
+    capsize=5,
+    color="steelblue",
+    edgecolor="black",
+    error_kw={"linewidth": 2},
+)
 ```
 
 ---

@@ -53,6 +53,7 @@ Perfectly correlated models (rho=1) gain nothing.
 
 ```python
 import numpy as np
+
 preds_a = np.array([0.9, 0.1, 0.8, 0.2])
 preds_b = np.array([0.8, 0.2, 0.9, 0.1])
 print("avg:", np.round((preds_a + preds_b) / 2, 2))
@@ -73,10 +74,13 @@ confidence.
 from sklearn.ensemble import VotingClassifier
 
 voting_hard = VotingClassifier(
-    estimators=[("rf", RandomForestClassifier(random_state=0)),
-                ("gb", GradientBoostingClassifier(random_state=0)),
-                ("lr", LogisticRegression(max_iter=1000))],
-    voting="hard").fit(Xtr, ytr)
+    estimators=[
+        ("rf", RandomForestClassifier(random_state=0)),
+        ("gb", GradientBoostingClassifier(random_state=0)),
+        ("lr", LogisticRegression(max_iter=1000)),
+    ],
+    voting="hard",
+).fit(Xtr, ytr)
 ```
 
 Output:
@@ -91,9 +95,7 @@ pulls the ensemble its way. This preserves information, which is why soft voting
 almost always beats hard voting.
 
 ```python
-voting_soft = VotingClassifier(
-    estimators=[...],
-    voting="soft", weights=[1, 1, 1]).fit(Xtr, ytr)
+voting_soft = VotingClassifier(estimators=[...], voting="soft", weights=[1, 1, 1]).fit(Xtr, ytr)
 # roc_auc on probabilities
 ```
 
@@ -117,11 +119,14 @@ new data.
 from sklearn.ensemble import StackingClassifier
 
 stack = StackingClassifier(
-    estimators=[("rf", RandomForestClassifier(random_state=0)),
-                ("gb", GradientBoostingClassifier(random_state=0)),
-                ("svc", SVC(probability=True, random_state=0))],
+    estimators=[
+        ("rf", RandomForestClassifier(random_state=0)),
+        ("gb", GradientBoostingClassifier(random_state=0)),
+        ("svc", SVC(probability=True, random_state=0)),
+    ],
     final_estimator=LogisticRegression(max_iter=1000),
-    cv=5).fit(Xtr, ytr)
+    cv=5,
+).fit(Xtr, ytr)
 ```
 
 Output:

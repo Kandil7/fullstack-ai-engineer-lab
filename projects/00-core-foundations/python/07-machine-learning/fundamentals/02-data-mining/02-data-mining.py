@@ -36,6 +36,7 @@ print(f"Pattern 1: {len(pattern1)} samples with feature 1 > 0.5")
 
 # Cluster pattern
 from sklearn.cluster import KMeans
+
 kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
 clusters = kmeans.fit_predict(data)
 print(f"Pattern 2: Found {len(np.unique(clusters))} clusters")
@@ -69,15 +70,16 @@ print(f"Inertia (within-cluster sum of squares): {inertia:.2f}")
 print("\nExample 5: Association Rules")
 # Simulated transaction data
 transactions = [
-    ['bread', 'milk', 'eggs'],
-    ['bread', 'butter', 'jam'],
-    ['milk', 'butter', 'eggs'],
-    ['bread', 'milk', 'butter'],
-    ['bread', 'milk', 'butter', 'eggs']
+    ["bread", "milk", "eggs"],
+    ["bread", "butter", "jam"],
+    ["milk", "butter", "eggs"],
+    ["bread", "milk", "butter"],
+    ["bread", "milk", "butter", "eggs"],
 ]
 
 # Count item frequencies
 from collections import Counter
+
 all_items = [item for transaction in transactions for item in transaction]
 item_counts = Counter(all_items)
 print("Item frequencies:")
@@ -122,6 +124,7 @@ anomaly = np.array([[5, 5]])
 
 # Simple distance-based detection
 from sklearn.neighbors import LocalOutlierFactor
+
 lof = LocalOutlierFactor(n_neighbors=20)
 predictions = lof.fit_predict(np.vstack([normal_data, anomaly]))
 
@@ -138,11 +141,12 @@ print("\nExample 8: Feature Extraction")
 documents = [
     "machine learning is great",
     "data mining is useful",
-    "machine learning and data mining"
+    "machine learning and data mining",
 ]
 
 # Simple bag of words
 from sklearn.feature_extraction.text import CountVectorizer
+
 vectorizer = CountVectorizer()
 X = vectorizer.fit_transform(documents)
 
@@ -175,11 +179,11 @@ print(normalized)
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Data mining: Discovering patterns in large datasets")
 print("- Key techniques: Clustering, classification, association rules")
 print("- Pattern discovery helps understand data structure")
 print("- Feature extraction converts raw data to useful features")
 print("- Data preprocessing is crucial for effective mining")
-print("="*60)
+print("=" * 60)

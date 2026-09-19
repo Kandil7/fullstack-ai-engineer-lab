@@ -205,13 +205,15 @@ from datetime import datetime
 app = FastAPI()
 start_time = datetime.now()
 
+
 @app.get("/health")
 async def health_check():
     """Liveness probe - is the service running?"""
     return {
         "status": "healthy",
-        "uptime": (datetime.now() - start_time).total_seconds()
+        "uptime": (datetime.now() - start_time).total_seconds(),
     }
+
 
 @app.get("/ready")
 async def readiness_check():
@@ -219,7 +221,7 @@ async def readiness_check():
     # Check dependencies
     db_ok = check_database()
     cache_ok = check_cache()
-    
+
     if db_ok and cache_ok:
         return {"ready": True}
     else:
@@ -329,21 +331,23 @@ import joblib
 app = FastAPI()
 model = joblib.load("model.pkl")
 
+
 class PredictionRequest(BaseModel):
     features: list
+
 
 class PredictionResponse(BaseModel):
     prediction: float
     confidence: float
 
+
 @app.post("/predict", response_model=PredictionResponse)
 async def predict(request: PredictionRequest):
     prediction = model.predict([request.features])
     confidence = model.predict_proba([request.features]).max()
-    
+
     return PredictionResponse(
-        prediction=float(prediction[0]),
-        confidence=float(confidence)
+        prediction=float(prediction[0]), confidence=float(confidence)
     )
 ```
 
@@ -366,12 +370,14 @@ async def predict(request: PredictionRequest):
 import time
 from contextlib import contextmanager
 
+
 @contextmanager
 def measure_latency():
     start = time.time()
     yield
     latency = (time.time() - start) * 1000  # ms
     return latency
+
 
 # Usage
 with measure_latency() as latency:
@@ -398,20 +404,21 @@ print(f"Latency: {latency:.0f}ms")
 import time
 from concurrent.futures import ThreadPoolExecutor
 
+
 def measure_throughput(system_fn, requests, max_workers=10):
     """Measure system throughput."""
     start = time.time()
-    
+
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         results = list(executor.map(system_fn, requests))
-    
+
     elapsed = time.time() - start
     throughput = len(requests) / elapsed
-    
+
     return {
         "requests_per_second": throughput,
         "total_requests": len(requests),
-        "total_time_seconds": elapsed
+        "total_time_seconds": elapsed,
     }
 ```
 
@@ -434,21 +441,22 @@ from prometheus_client import Counter, Histogram
 import logging
 
 # Metrics
-REQUEST_COUNT = Counter('requests_total', 'Total requests', ['endpoint'])
-REQUEST_LATENCY = Histogram('request_latency_seconds', 'Request latency')
+REQUEST_COUNT = Counter("requests_total", "Total requests", ["endpoint"])
+REQUEST_LATENCY = Histogram("request_latency_seconds", "Request latency")
 
 # Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 # Usage
 @app.post("/query")
 async def query(request: QueryRequest):
-    REQUEST_COUNT.labels(endpoint='/query').inc()
-    
+    REQUEST_COUNT.labels(endpoint="/query").inc()
+
     with REQUEST_LATENCY.time():
         result = process(request)
-    
+
     logger.info(f"Query processed: {request.query[:50]}")
     return result
 ```
@@ -520,10 +528,12 @@ API_KEY = "sk-1234567890"
 
 # ✅ GOOD: Environment variables
 import os
+
 API_KEY = os.getenv("OPENAI_API_KEY")
 
 # ✅ BETTER: Secret manager
 from google.cloud import secretmanager
+
 
 def get_secret(secret_name):
     client = secretmanager.SecretManagerServiceClient()
@@ -698,11 +708,7 @@ result = classifier("I love this product!")
 print(result)  # [{'label': 'POSITIVE', 'score': 0.9998}]
 
 # Batch inference
-results = classifier([
-    "Great product!",
-    "Terrible experience.",
-    "It's okay."
-])
+results = classifier(["Great product!", "Terrible experience.", "It's okay."])
 ```
 
 **Related Terms:** Training, Prediction, Serving

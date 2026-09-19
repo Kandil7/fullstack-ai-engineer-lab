@@ -30,6 +30,7 @@ and returns an eager DataFrame. The boundary where bytes actually move.
 **Example**:
 ```python
 import polars as pl
+
 lf = pl.LazyFrame({"a": [1, 2, 3]}).filter(pl.col("a") > 1)
 print(lf.collect().rows())
 ```
@@ -44,6 +45,7 @@ executing it — a cheap compile check for pipelines.
 **Example**:
 ```python
 import polars as pl
+
 lf = pl.LazyFrame({"a": [1], "b": ["x"]}).select("a")
 print(lf.collect_schema().names())
 ```
@@ -63,6 +65,7 @@ bottom-up: scan at the bottom, final projection at the top.
 **Example**:
 ```python
 import polars as pl
+
 lf = pl.LazyFrame({"a": [1, 2]}).filter(pl.col("a") > 1)
 print("FILTER" in lf.explain(optimized=True))
 ```
@@ -83,6 +86,7 @@ references plus pending transformations. Executes at collect() or a sink.
 **Example**:
 ```python
 import polars as pl
+
 lf = pl.scan_csv("data.csv")
 print(type(lf).__name__)
 ```

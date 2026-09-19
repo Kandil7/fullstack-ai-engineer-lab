@@ -78,9 +78,7 @@ response = client.messages.create(
     max_tokens=1024,
     temperature=0.1,
     system="You are a helpful code assistant.",
-    messages=[
-        {"role": "user", "content": "Explain dependency injection in Python"}
-    ]
+    messages=[{"role": "user", "content": "Explain dependency injection in Python"}],
 )
 
 print(response.content[0].text)
@@ -91,18 +89,20 @@ print(response.content[0].text)
 import asyncio
 import anthropic
 
+
 async def stream_response(prompt: str):
     client = anthropic.AsyncAnthropic()
-    
+
     async with client.messages.stream(
         model="claude-3-5-sonnet-20241022",
         max_tokens=1024,
         temperature=0.1,
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
     ) as stream:
         async for text in stream.text_stream:
             print(text, end="", flush=True)
         print()  # Newline at end
+
 
 # Usage
 asyncio.run(stream_response("Write a haiku about debugging"))
@@ -113,6 +113,7 @@ asyncio.run(stream_response("Write a haiku about debugging"))
 from pydantic import BaseModel
 from typing import List
 
+
 class CodeExplanation(BaseModel):
     language: str
     complexity: str  # "simple", "moderate", "complex"
@@ -120,17 +121,25 @@ class CodeExplanation(BaseModel):
     summary: str
     line_by_line: List[str]
 
+
 # With Anthropic
 response = client.messages.create(
     model="claude-3-5-sonnet-20241022",
     max_tokens=1024,
-    tools=[{
-        "name": "explain_code",
-        "description": "Explain code with structured output",
-        "input_schema": CodeExplanation.model_json_schema()
-    }],
+    tools=[
+        {
+            "name": "explain_code",
+            "description": "Explain code with structured output",
+            "input_schema": CodeExplanation.model_json_schema(),
+        }
+    ],
     tool_choice={"type": "tool", "name": "explain_code"},
-    messages=[{"role": "user", "content": "Explain this: def fib(n): return n if n<2 else fib(n-1)+fib(n-2)"}]
+    messages=[
+        {
+            "role": "user",
+            "content": "Explain this: def fib(n): return n if n<2 else fib(n-1)+fib(n-2)",
+        }
+    ],
 )
 
 # Parse structured result
@@ -148,20 +157,21 @@ import asyncio
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter
 
+
 class ResilientLLMClient:
     def __init__(self):
         self.client = httpx.AsyncClient(timeout=60.0)
-    
+
     @retry(
         wait=wait_exponential_jitter(initial=1, max=30),
         stop=stop_after_attempt(3),
-        retry=lambda e: isinstance(e, (httpx.TimeoutException, httpx.NetworkError))
+        retry=lambda e: isinstance(e, (httpx.TimeoutException, httpx.NetworkError)),
     )
     async def complete(self, messages, model, **kwargs):
         response = await self.client.post(
             "https://api.anthropic.com/v1/messages",
             json={"model": model, "messages": messages, **kwargs},
-            headers={"x-api-key": self.api_key, "anthropic-version": "2023-06-01"}
+            headers={"x-api-key": self.api_key, "anthropic-version": "2023-06-01"},
         )
         response.raise_for_status()
         return response.json()
@@ -172,11 +182,13 @@ class ResilientLLMClient:
 from dataclasses import dataclass
 from typing import Dict
 
+
 @dataclass
 class TokenUsage:
     prompt_tokens: int
     completion_tokens: int
     total_tokens: int
+
 
 # Pricing per 1M tokens (update regularly)
 PRICING = {
@@ -186,18 +198,20 @@ PRICING = {
     "gpt-4o-mini": {"input": 0.15, "output": 0.60},
 }
 
+
 def calculate_cost(model: str, usage: TokenUsage) -> float:
     pricing = PRICING.get(model, {"input": 0, "output": 0})
     input_cost = (usage.prompt_tokens / 1_000_000) * pricing["input"]
     output_cost = (usage.completion_tokens / 1_000_000) * pricing["output"]
     return input_cost + output_cost
 
+
 # Track every call
 class CostTracker:
     def __init__(self):
         self.total_cost = 0.0
         self.call_count = 0
-    
+
     def record(self, model: str, usage: TokenUsage):
         cost = calculate_cost(model, usage)
         self.total_cost += cost
@@ -209,9 +223,11 @@ class CostTracker:
 ```python
 from enum import Enum
 
+
 class Provider(Enum):
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
+
 
 class MultiProviderClient:
     def __init__(self):
@@ -220,10 +236,10 @@ class MultiProviderClient:
             Provider.OPENAI: OpenAIProvider(),
         }
         self.fallback_order = [Provider.ANTHROPIC, Provider.OPENAI]
-    
+
     async def complete(self, messages, **kwargs):
         last_error = None
-        
+
         for provider in self.fallback_order:
             try:
                 return await self.providers[provider].complete(messages, **kwargs)
@@ -237,7 +253,7 @@ class MultiProviderClient:
                 last_error = e
                 print(f"{provider.value} error: {e}")
                 continue
-        
+
         raise Exception(f"All providers failed. Last error: {last_error}")
 ```
 
@@ -265,25 +281,31 @@ Output format: {output_format}
 FEW_SHOT_EXAMPLES = [
     {
         "input": "How do I read a file in Python?",
-        "output": "Use `open()` with a context manager:\n\n```python\nwith open('file.txt', 'r') as f:\n    content = f.read()\n```"
+        "output": "Use `open()` with a context manager:\n\n```python\nwith open('file.txt', 'r') as f:\n    content = f.read()\n```",
     },
     {
         "input": "What's the difference between list and tuple?",
-        "output": "**List**: Mutable, ordered, allows duplicates. `[1, 2, 3]`\n**Tuple**: Immutable, ordered, allows duplicates. `(1, 2, 3)`\n\nUse tuples for fixed collections, lists for dynamic ones."
+        "output": "**List**: Mutable, ordered, allows duplicates. `[1, 2, 3]`\n**Tuple**: Immutable, ordered, allows duplicates. `(1, 2, 3)`\n\nUse tuples for fixed collections, lists for dynamic ones.",
     },
 ]
 
+
 def build_prompt(user_question: str) -> List[Dict]:
-    messages = [{"role": "system", "content": SYSTEM_PROMPT.format(
-        domain="Python backend development",
-        language="Python",
-        output_format="Markdown with code blocks"
-    )}]
-    
+    messages = [
+        {
+            "role": "system",
+            "content": SYSTEM_PROMPT.format(
+                domain="Python backend development",
+                language="Python",
+                output_format="Markdown with code blocks",
+            ),
+        }
+    ]
+
     for ex in FEW_SHOT_EXAMPLES:
         messages.append({"role": "user", "content": ex["input"]})
         messages.append({"role": "assistant", "content": ex["output"]})
-    
+
     messages.append({"role": "user", "content": user_question})
     return messages
 ```

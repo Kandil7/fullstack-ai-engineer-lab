@@ -24,8 +24,10 @@
 ```python
 import numpy as np
 
+
 def add_five(x):
     return x + 5
+
 
 # Create ufunc from Python function
 add_five_ufunc = np.frompyfunc(add_five, 1, 1)
@@ -48,9 +50,11 @@ print(result)
 ```python
 import numpy as np
 
+
 # Function with 2 inputs
 def add(x, y):
     return x + y
+
 
 ufunc = np.frompyfunc(add, 2, 1)  # nin=2
 arr1 = np.array([1, 2, 3])
@@ -72,8 +76,10 @@ print(result)
 ```python
 import numpy as np
 
+
 def divmod_custom(x, y):
     return x // y, x % y
+
 
 # Function with 2 outputs
 ufunc = np.frompyfunc(divmod_custom, 2, 2)  # nout=2
@@ -99,8 +105,10 @@ print("Remainder:", remainder.astype(int))
 ```python
 import numpy as np
 
+
 def square(x):
-    return x ** 2
+    return x**2
+
 
 ufunc = np.frompyfunc(square, 1, 1)
 arr = np.array([1, 2, 3, 4, 5])
@@ -129,8 +137,10 @@ print("Float dtype:", result_float.dtype)  # float64
 ```python
 import numpy as np
 
+
 def extract_domain(email):
-    return email.split('@')[1]
+    return email.split("@")[1]
+
 
 domain_ufunc = np.frompyfunc(extract_domain, 1, 1)
 
@@ -152,6 +162,7 @@ print(domains)
 ```python
 import numpy as np
 
+
 def tax_bracket(income):
     if income <= 10000:
         return income * 0.10
@@ -159,6 +170,7 @@ def tax_bracket(income):
         return 10000 * 0.10 + (income - 10000) * 0.12
     else:
         return 10000 * 0.10 + 30000 * 0.12 + (income - 40000) * 0.22
+
 
 tax_ufunc = np.frompyfunc(tax_bracket, 1, 1)
 
@@ -180,10 +192,12 @@ print("Taxes:", taxes.round(2))
 ```python
 import numpy as np
 
+
 def safe_divide(x, y):
     if y == 0:
         return np.nan
     return x / y
+
 
 ufunc = np.frompyfunc(safe_divide, 2, 1)
 arr1 = np.array([10, 20, 30])
@@ -205,8 +219,10 @@ print(result)
 ```python
 import numpy as np
 
+
 def classify(x):
     return "positive" if x > 0 else "non-positive"
+
 
 classify_ufunc = np.frompyfunc(classify, 1, 1)
 

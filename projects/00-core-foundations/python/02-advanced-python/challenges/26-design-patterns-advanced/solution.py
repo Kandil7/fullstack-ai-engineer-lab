@@ -49,22 +49,22 @@ class _Insert:
         self._buf, self._offset, self._text = buf, offset, text
 
     def apply(self) -> None:
-        self._buf[self._offset:self._offset] = list(self._text)
+        self._buf[self._offset : self._offset] = list(self._text)
 
     def revert(self) -> None:
-        del self._buf[self._offset:self._offset + len(self._text)]
+        del self._buf[self._offset : self._offset + len(self._text)]
 
 
 class _Delete:
     def __init__(self, buf: list[str], offset: int, count: int) -> None:
         self._buf, self._offset = buf, offset
-        self._removed = buf[offset:offset + count]   # captured at construction
+        self._removed = buf[offset : offset + count]  # captured at construction
 
     def apply(self) -> None:
-        del self._buf[self._offset:self._offset + len(self._removed)]
+        del self._buf[self._offset : self._offset + len(self._removed)]
 
     def revert(self) -> None:
-        self._buf[self._offset:self._offset] = list(self._removed)
+        self._buf[self._offset : self._offset] = list(self._removed)
 
 
 class Editor:
@@ -103,8 +103,7 @@ class Editor:
 
 @runtime_checkable
 class LLMClient(Protocol):
-    def complete(self, prompt: str, temperature: float = 0.0) -> str:
-        ...
+    def complete(self, prompt: str, temperature: float = 0.0) -> str: ...
 
 
 class RealLLMClient:
@@ -119,7 +118,7 @@ class FakeLLMClient:
 
 class Summarizer:
     def __init__(self, llm: LLMClient) -> None:
-        self._llm = llm                 # injected, never constructed here
+        self._llm = llm  # injected, never constructed here
 
     def summarize(self, text: str) -> str:
         return self._llm.complete(f"summarize: {text}")

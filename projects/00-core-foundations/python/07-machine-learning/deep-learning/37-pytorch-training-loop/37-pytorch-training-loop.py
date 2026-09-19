@@ -23,6 +23,7 @@ from torch.utils.data import Dataset, DataLoader, TensorDataset
 
 torch.manual_seed(0)
 
+
 # ============================================================
 # 1. nn.Module — define the model
 # ============================================================
@@ -77,7 +78,7 @@ def train_one_epoch(m, dataloader, crit, opt) -> float:
 print("\nExample 3: canonical training loop")
 for epoch in range(3):
     loss = train_one_epoch(model, loader, criterion, optimizer)
-    print(f"  epoch {epoch+1}: loss {loss:.4f}")
+    print(f"  epoch {epoch + 1}: loss {loss:.4f}")
 
 # ============================================================
 # 4. The debug trick: overfit a single batch first

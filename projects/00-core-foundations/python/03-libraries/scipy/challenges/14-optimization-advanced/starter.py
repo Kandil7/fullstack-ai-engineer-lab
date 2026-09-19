@@ -12,13 +12,11 @@ def minimize_box(func, x0: float, lo: float, hi: float) -> float:
     raise NotImplementedError
 
 
-def fit_robust_line(x: np.ndarray, y: np.ndarray,
-                    loss: str) -> tuple[float, float]:
+def fit_robust_line(x: np.ndarray, y: np.ndarray, loss: str) -> tuple[float, float]:
     """Least-squares line fit with the given robust loss."""
     raise NotImplementedError
 
 
-def allocate_weights(mu: np.ndarray, cov: np.ndarray,
-                     risk_free: float) -> np.ndarray:
+def allocate_weights(mu: np.ndarray, cov: np.ndarray, risk_free: float) -> np.ndarray:
     """Max-Sharpe long-only fully-invested weights via SLSQP."""
     raise NotImplementedError

@@ -88,7 +88,7 @@ contours) and its green/orange region is hostile to red-green colorblind
 readers.
 
 ```python
-im = ax.imshow(data, cmap="viridis")   # honest magnitude
+im = ax.imshow(data, cmap="viridis")  # honest magnitude
 fig.colorbar(im, ax=ax)
 ```
 
@@ -105,8 +105,10 @@ a plateau, an anomaly, or the chosen operating point.
 ```python
 i_min = int(np.argmin(y))
 ax.annotate(
-    "observed min", xy=(x[i_min], y[i_min]),
-    xytext=(7.5, 30), fontsize=10,
+    "observed min",
+    xy=(x[i_min], y[i_min]),
+    xytext=(7.5, 30),
+    fontsize=10,
     arrowprops={"arrowstyle": "->", "color": "tab:red"},
 )
 ```

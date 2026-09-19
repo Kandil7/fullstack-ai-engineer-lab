@@ -27,40 +27,36 @@ import numpy as np
 # 0D array (scalar)
 scalar = np.array(42)
 print(scalar.shape)  # ()
-print(scalar.ndim)   # 0
+print(scalar.ndim)  # 0
 
 # 1D array (vector)
 arr_1d = np.array([1, 2, 3, 4, 5])
 print(arr_1d.shape)  # (5,)
-print(arr_1d.ndim)   # 1
+print(arr_1d.ndim)  # 1
 
 # 2D array (matrix)
-arr_2d = np.array([[1, 2, 3],
-                   [4, 5, 6]])
+arr_2d = np.array([[1, 2, 3], [4, 5, 6]])
 print(arr_2d.shape)  # (2, 3) — 2 rows, 3 columns
-print(arr_2d.ndim)   # 2
+print(arr_2d.ndim)  # 2
 
 # 3D array (tensor)
-arr_3d = np.array([[[1, 2], [3, 4]],
-                   [[5, 6], [7, 8]]])
+arr_3d = np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
 print(arr_3d.shape)  # (2, 2, 2) — 2 blocks, 2 rows, 2 columns
-print(arr_3d.ndim)   # 3
+print(arr_3d.ndim)  # 3
 ```
 
 ### 1.2 Shape Components
 
 ```python
-arr = np.array([[1, 2, 3, 4],
-                [5, 6, 7, 8],
-                [9, 10, 11, 12]])
+arr = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]])
 
-print(f"Shape: {arr.shape}")        # (3, 4)
-print(f"Rows (axis 0): {arr.shape[0]}")   # 3
-print(f"Columns (axis 1): {arr.shape[1]}") # 4
-print(f"Ndim: {arr.ndim}")          # 2
-print(f"Size: {arr.size}")          # 12
+print(f"Shape: {arr.shape}")  # (3, 4)
+print(f"Rows (axis 0): {arr.shape[0]}")  # 3
+print(f"Columns (axis 1): {arr.shape[1]}")  # 4
+print(f"Ndim: {arr.ndim}")  # 2
+print(f"Size: {arr.size}")  # 12
 print(f"Itemsize: {arr.itemsize}")  # 8
-print(f"Nbytes: {arr.nbytes}")      # 96
+print(f"Nbytes: {arr.nbytes}")  # 96
 ```
 
 ---
@@ -72,12 +68,12 @@ print(f"Nbytes: {arr.nbytes}")      # 96
 ```python
 scalar = np.array(42)
 print(scalar.shape)  # ()
-print(scalar.ndim)   # 0
-print(scalar.size)   # 1
+print(scalar.ndim)  # 0
+print(scalar.size)  # 1
 
 # Scalar operations
-print(scalar + 10)   # 52
-print(scalar * 2)    # 84
+print(scalar + 10)  # 52
+print(scalar * 2)  # 84
 ```
 
 ### 2.2 1D Arrays (Vectors)
@@ -85,29 +81,27 @@ print(scalar * 2)    # 84
 ```python
 vector = np.array([1, 2, 3, 4, 5])
 print(vector.shape)  # (5,)
-print(vector.ndim)   # 1
-print(vector.size)   # 5
+print(vector.ndim)  # 1
+print(vector.size)  # 5
 
 # Row vector vs column vector
-row = vector.reshape(1, -1)    # (1, 5)
-col = vector.reshape(-1, 1)    # (5, 1)
-print(f"Row: {row.shape}")     # (1, 5)
-print(f"Col: {col.shape}")     # (5, 1)
+row = vector.reshape(1, -1)  # (1, 5)
+col = vector.reshape(-1, 1)  # (5, 1)
+print(f"Row: {row.shape}")  # (1, 5)
+print(f"Col: {col.shape}")  # (5, 1)
 ```
 
 ### 2.3 2D Arrays (Matrices)
 
 ```python
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 print(matrix.shape)  # (3, 3)
-print(matrix.ndim)   # 2
+print(matrix.ndim)  # 2
 
 # Common matrix shapes
-print(np.zeros((3, 4)).shape)   # (3, 4) — 3×4 matrix
-print(np.ones((5,)).shape)      # (5,) — 1D array (NOT a row vector!)
-print(np.eye(3).shape)          # (3, 3) — identity matrix
+print(np.zeros((3, 4)).shape)  # (3, 4) — 3×4 matrix
+print(np.ones((5,)).shape)  # (5,) — 1D array (NOT a row vector!)
+print(np.eye(3).shape)  # (3, 3) — identity matrix
 ```
 
 ### 2.4 3D Arrays (Tensors)
@@ -115,16 +109,16 @@ print(np.eye(3).shape)          # (3, 3) — identity matrix
 ```python
 tensor = np.random.rand(2, 3, 4)
 print(tensor.shape)  # (2, 3, 4)
-print(tensor.ndim)   # 3
+print(tensor.ndim)  # 3
 
 # Common 3D shapes
 # Image: (height, width, channels)
 img = np.zeros((100, 200, 3))
-print(img.shape)     # (100, 200, 3)
+print(img.shape)  # (100, 200, 3)
 
 # Batch of images: (batch, height, width, channels)
 batch = np.zeros((32, 100, 200, 3))
-print(batch.shape)   # (32, 100, 200, 3)
+print(batch.shape)  # (32, 100, 200, 3)
 ```
 
 ---
@@ -137,13 +131,13 @@ print(batch.shape)   # (32, 100, 200, 3)
 arr = np.array([[1, 2, 3], [4, 5, 6]])
 
 # All shape-related attributes
-print(f"shape:    {arr.shape}")      # (2, 3)
-print(f"ndim:     {arr.ndim}")       # 2
-print(f"size:     {arr.size}")       # 6
-print(f"itemsize: {arr.itemsize}")   # 8 bytes
-print(f"nbytes:   {arr.nbytes}")     # 48 bytes
-print(f"dtype:    {arr.dtype}")      # int64
-print(f"strides:  {arr.strides}")    # (24, 8) bytes
+print(f"shape:    {arr.shape}")  # (2, 3)
+print(f"ndim:     {arr.ndim}")  # 2
+print(f"size:     {arr.size}")  # 6
+print(f"itemsize: {arr.itemsize}")  # 8 bytes
+print(f"nbytes:   {arr.nbytes}")  # 48 bytes
+print(f"dtype:    {arr.dtype}")  # int64
+print(f"strides:  {arr.strides}")  # (24, 8) bytes
 
 # Total elements
 print(f"Total elements: {np.prod(arr.shape)}")  # 6
@@ -155,10 +149,9 @@ print(f"Total elements: {np.prod(arr.shape)}")  # 6
 def validate_shape(arr, expected_shape):
     """Validate array shape matches expected."""
     if arr.shape != expected_shape:
-        raise ValueError(
-            f"Expected shape {expected_shape}, got {arr.shape}"
-        )
+        raise ValueError(f"Expected shape {expected_shape}, got {arr.shape}")
     return True
+
 
 # Usage
 arr = np.zeros((3, 4))
@@ -174,8 +167,8 @@ validate_shape(arr, (3, 4))  # OK
 
 ```python
 # Rule 1: Arrays with different ndim — prepend 1s to smaller shape
-a = np.array([1, 2, 3])          # shape (3,)
-b = np.array([[1], [2], [3]])    # shape (3, 1)
+a = np.array([1, 2, 3])  # shape (3,)
+b = np.array([[1], [2], [3]])  # shape (3, 1)
 
 # Broadcasting: (3,) → (1, 3) → (3, 3)
 #               (3, 1) → (3, 3)
@@ -192,16 +185,16 @@ print(c)
 ```python
 # Broadcasting compatible
 a = np.zeros((3, 4))
-b = np.zeros((4,))        # Broadcasts to (3, 4)
+b = np.zeros((4,))  # Broadcasts to (3, 4)
 c = a + b
 
 a = np.zeros((3, 4))
-b = np.zeros((3, 1))      # Broadcasts to (3, 4)
+b = np.zeros((3, 1))  # Broadcasts to (3, 4)
 c = a + b
 
 # Broadcasting incompatible
 a = np.zeros((3, 4))
-b = np.zeros((3, 2))      # Cannot broadcast!
+b = np.zeros((3, 2))  # Cannot broadcast!
 # a + b  # ValueError: operands could not be broadcast together
 ```
 
@@ -317,8 +310,8 @@ print(matrix[0, 0])  # 1
 
 ### Mistake 2: Shape Mismatch in Operations
 ```python
-a = np.array([1, 2, 3])      # (3,)
-b = np.array([1, 2, 3, 4])   # (4,)
+a = np.array([1, 2, 3])  # (3,)
+b = np.array([1, 2, 3, 4])  # (4,)
 # a + b  # ValueError: operands could not be broadcast together
 ```
 
@@ -434,8 +427,8 @@ arr = np.array([1, 2, 3, 4, 5])
 # c) From (1, 5) to (5,)
 # d) From (5, 1) to (5,)
 
-row = arr[np.newaxis, :]     # (1, 5)
-col = arr[:, np.newaxis]     # (5, 1)
+row = arr[np.newaxis, :]  # (1, 5)
+col = arr[:, np.newaxis]  # (5, 1)
 
 squeezed_row = np.squeeze(row)  # (5,)
 squeezed_col = np.squeeze(col)  # (5,)

@@ -93,10 +93,10 @@ vector: multiply element-wise, then sum.
 ```python
 import torch
 
-user  = torch.tensor([0.90, 0.10, 0.85])   # taste
+user = torch.tensor([0.90, 0.10, 0.85])  # taste
 movie = torch.tensor([0.98, -0.90, 0.72])  # attributes
 
-prediction = (user * movie).sum()   # dot product
+prediction = (user * movie).sum()  # dot product
 # 0.90*0.98 + 0.10*(-0.90) + 0.85*0.72 = 1.404
 ```
 
@@ -127,8 +127,8 @@ one-hot for user #2      embedding matrix (3 users x 3 factors)
 
 ```python
 emb = torch.nn.Embedding(num_embeddings=3, embedding_dim=3)
-idx = torch.tensor([2])          # want row 2
-vec = emb(idx)                   # differentiable lookup, shape (1, 3)
+idx = torch.tensor([2])  # want row 2
+vec = emb(idx)  # differentiable lookup, shape (1, 3)
 ```
 
 ### 5. Bias Terms
@@ -156,6 +156,7 @@ reaches its ceiling — the extra headroom lets the model actually hit 5.0.
 ```python
 def sigmoid_range(x, lo, hi):
     return torch.sigmoid(x) * (hi - lo) + lo
+
 
 # collab_learner uses y_range=(0, 5.5) so real 5.0 ratings are reachable
 ```
@@ -213,6 +214,7 @@ enough interactions accrue.
 
 ```python
 """End-to-end MovieLens recommender using the fastai collab API."""
+
 from fastai.collab import CollabDataLoaders, collab_learner
 from fastai.data.external import untar_data, URLs
 import pandas as pd
@@ -236,7 +238,7 @@ dls = CollabDataLoaders.from_df(
 
 # A collab_learner wires up embeddings + bias + sigmoid range for us.
 learn = collab_learner(dls, n_factors=50, y_range=(0, 5.5))
-learn.fine_tune(5, wd=0.1)          # weight decay to curb overfitting
+learn.fine_tune(5, wd=0.1)  # weight decay to curb overfitting
 
 # Predict a rating for one (user, movie) pair.
 dl = learn.dls.test_dl(pd.DataFrame({"user": [1], "movie": [100]}))
@@ -248,6 +250,7 @@ print(f"Predicted rating: {preds.item():.2f}")
 
 ```python
 """Reimplement what collab_learner does, as a plain nn.Module."""
+
 import torch
 from torch import nn
 
@@ -304,6 +307,7 @@ from fastai.losses import MSELossFlat
 
 ```python
 """Read meaning out of a trained collab model: bias ranking, PCA, similarity."""
+
 import torch
 
 # Assume `learn` is a trained collab_learner; grab the movie index->title map.
@@ -317,18 +321,20 @@ print("Universally liked (high bias):", [movies[i] for i in best])
 print("Universally disliked (low bias):", [movies[i] for i in worst])
 
 # --- (b) PCA of movie factors: emergent interpretable axes ----------------
-factors = learn.model.movie_factors.weight        # (n_movies, n_factors)
-factors = factors - factors.mean(dim=0)            # center for PCA
+factors = learn.model.movie_factors.weight  # (n_movies, n_factors)
+factors = factors - factors.mean(dim=0)  # center for PCA
 u, s, v = torch.pca_lowrank(factors, q=3)
-movie_pca = factors @ v[:, :3]                     # project to 3 components
+movie_pca = factors @ v[:, :3]  # project to 3 components
 # movie_pca[:, 0] often sorts blockbuster <-> arthouse.
+
 
 # --- (c) Similar movies via distance in factor space ----------------------
 def similar_movies(idx: int, k: int = 5) -> list:
     """Return the k movies whose factor vectors are closest to `idx`."""
     dists = torch.norm(factors - factors[idx], dim=1)
-    nearest = dists.argsort()[1 : k + 1]           # skip itself at position 0
+    nearest = dists.argsort()[1 : k + 1]  # skip itself at position 0
     return [movies[i] for i in nearest]
+
 
 print("Similar to movie 0:", similar_movies(0))
 ```
@@ -340,7 +346,7 @@ print("Similar to movie 0:", similar_movies(0))
 ### 1. Forgetting the Bias Term
 ```python
 # BAD: pure dot product cannot express "universally good/bad" cleanly
-res = (users * movies).sum(dim=1)          # no baseline for user/movie
+res = (users * movies).sum(dim=1)  # no baseline for user/movie
 
 # GOOD: add per-user and per-movie bias so baselines are learnable
 res = (users * movies).sum(dim=1, keepdim=True)
@@ -359,10 +365,10 @@ learn = collab_learner(dls, n_factors=50, y_range=(0, 5.5))
 ### 3. Skipping Weight Decay (Overfitting)
 ```python
 # BAD: collab models memorize training ratings; valid loss climbs
-learn.fine_tune(5)                          # wd defaults may be too low here
+learn.fine_tune(5)  # wd defaults may be too low here
 
 # GOOD: regularize so learned factors generalize
-learn.fine_tune(5, wd=0.1)                  # penalize large weights
+learn.fine_tune(5, wd=0.1)  # penalize large weights
 ```
 
 ---

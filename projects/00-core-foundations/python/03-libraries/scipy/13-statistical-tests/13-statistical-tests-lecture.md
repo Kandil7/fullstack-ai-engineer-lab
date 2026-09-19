@@ -97,7 +97,7 @@ test on the same data.
 ```python
 before = rng.normal(loc=100.0, scale=10.0, size=40)
 after = before + rng.normal(loc=4.0, scale=5.0, size=40)
-print(stats.ttest_rel(before, after))      # significant
+print(stats.ttest_rel(before, after))  # significant
 ```
 
 **Assumption check:** if the data (or the paired differences)
@@ -114,10 +114,12 @@ family-wise error (k=4 groups → 6 tests → ~26% chance of at
 least one false positive at alpha=0.05).
 
 ```python
-g1 = rng.normal(size=50); g2 = rng.normal(size=50)
-g3 = rng.normal(size=50); g4 = rng.normal(loc=1.5, size=50)
-print(stats.f_oneway(g1, g2, g3))       # p large: no effect
-print(stats.f_oneway(g1, g2, g3, g4))   # p ~ 1e-15: effect
+g1 = rng.normal(size=50)
+g2 = rng.normal(size=50)
+g3 = rng.normal(size=50)
+g4 = rng.normal(loc=1.5, size=50)
+print(stats.f_oneway(g1, g2, g3))  # p large: no effect
+print(stats.f_oneway(g1, g2, g3, g4))  # p ~ 1e-15: effect
 ```
 
 ANOVA only says "some group differs" — post-hoc tests (Tukey,
@@ -160,7 +162,7 @@ Two families:
 
 ```python
 _, obs = np.unique(rng.integers(1, 7, size=600), return_counts=True)
-print(stats.chisquare(obs))          # fair die: p large
+print(stats.chisquare(obs))  # fair die: p large
 ```
 
 - **Independence / contingency** — `stats.chi2_contingency(
@@ -187,8 +189,8 @@ kurtosis). Both return (statistic, p); `p < 0.05` → reject
 normality.
 
 ```python
-print(stats.shapiro(rng.normal(size=300)))    # p ~ 0.4: normal
-print(stats.shapiro(rng.uniform(size=300)))   # p ~ 1e-8: not normal
+print(stats.shapiro(rng.normal(size=300)))  # p ~ 0.4: normal
+print(stats.shapiro(rng.uniform(size=300)))  # p ~ 1e-8: not normal
 ```
 
 **Engineering judgment:** with large n (thousands+), even tiny
@@ -210,7 +212,7 @@ surprising r is given n.
 ```python
 x = rng.normal(size=200)
 y = 3.0 * x + rng.normal(scale=0.5, size=200)
-print(stats.pearsonr(x, y))     # r ~ 0.99, p ~ 1e-150
+print(stats.pearsonr(x, y))  # r ~ 0.99, p ~ 1e-150
 ```
 
 Spearman survives outliers and non-linearity that Pearson
@@ -240,11 +242,12 @@ def bonferroni(pvals):
     p = np.asarray(pvals, dtype=float)
     return np.minimum(1.0, p * p.size)
 
+
 def benjamini_hochberg(pvals):
     p = np.asarray(pvals, dtype=float)
     order = np.argsort(p)
     adj = p[order] * p.size / np.arange(1, p.size + 1)
-    adj = np.minimum.accumulate(adj[::-1])[::-1]   # monotone
+    adj = np.minimum.accumulate(adj[::-1])[::-1]  # monotone
     out = np.empty_like(adj)
     out[order] = np.minimum(adj, 1.0)
     return out
@@ -273,12 +276,14 @@ approximation, equal n):
 ```python
 from scipy import stats as st
 
+
 def sample_size_t2(d, alpha=0.05, power=0.8):
     za2 = st.norm.ppf(1 - alpha / 2)
     zb = st.norm.ppf(power)
-    return 2.0 * (za2 + zb) ** 2 / d ** 2
+    return 2.0 * (za2 + zb) ** 2 / d**2
 
-print(sample_size_t2(0.5))     # ~63 per group
+
+print(sample_size_t2(0.5))  # ~63 per group
 ```
 
 d=0.5 needs ~63/group; d=0.2 needs ~393; halving the effect
@@ -413,30 +418,31 @@ from scipy import stats as st
 import numpy as np
 
 # means
-st.ttest_1samp(x, popmean=0.0)          # one sample
-st.ttest_ind(a, b)                       # Welch by default
-st.ttest_rel(before, after)              # paired
+st.ttest_1samp(x, popmean=0.0)  # one sample
+st.ttest_ind(a, b)  # Welch by default
+st.ttest_rel(before, after)  # paired
 
 # 3+ groups
-st.f_oneway(g1, g2, g3)                  # parametric
-st.kruskal(g1, g2, g3)                   # rank-based
+st.f_oneway(g1, g2, g3)  # parametric
+st.kruskal(g1, g2, g3)  # rank-based
 
 # non-parametric two-sample / paired
-st.mannwhitneyu(a, b)                    # independent ranks
+st.mannwhitneyu(a, b)  # independent ranks
 st.wilcoxon(before, after, method="approx")
 
 # counts
-st.chisquare(obs)                        # goodness of fit
-st.chi2_contingency(table)               # independence
+st.chisquare(obs)  # goodness of fit
+st.chi2_contingency(table)  # independence
 
 # assumptions + correlation
-st.shapiro(x)                            # normality (n < 5000)
-st.pearsonr(x, y); st.spearmanr(x, y)    # correlation + p
+st.shapiro(x)  # normality (n < 5000)
+st.pearsonr(x, y)
+st.spearmanr(x, y)  # correlation + p
 
 # corrections (implement: Section 8) and power (Section 9)
-p_corr = bonferroni(pvals)               # min(1, p * k)
+p_corr = bonferroni(pvals)  # min(1, p * k)
 p_bh = benjamini_hochberg(pvals)
-n = sample_size_t2(d=0.5, power=0.8)     # ~63 per group
+n = sample_size_t2(d=0.5, power=0.8)  # ~63 per group
 ```
 
 ## Next Steps

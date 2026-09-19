@@ -30,9 +30,7 @@ def _load(name: str):
     """
     parent = Path(__file__).parent.name.replace("-", "_")
     modname = f"{name}_{parent}"
-    spec = importlib.util.spec_from_file_location(
-        modname, Path(__file__).parent / f"{name}.py"
-    )
+    spec = importlib.util.spec_from_file_location(modname, Path(__file__).parent / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[modname] = module
     spec.loader.exec_module(module)
@@ -112,10 +110,7 @@ class TestIngestBatch:
 
 class TestRequestAndBridge:
     async def test_request_returns_confirmation(self, engine):
-        assert (
-            await solution.simulate_async_request(engine, "bert", "h-0100")
-            == "stored h-0100"
-        )
+        assert await solution.simulate_async_request(engine, "bert", "h-0100") == "stored h-0100"
 
     async def test_request_persists_row(self, engine):
         await solution.simulate_async_request(engine, "bert", "h-0100")
@@ -130,7 +125,4 @@ class TestRequestAndBridge:
         await solution.simulate_async_request(engine, "bert", "h-0200")
         with pytest.raises(IntegrityError):
             await solution.simulate_async_request(engine, "bert", "h-0200")
-        assert (
-            await solution.simulate_async_request(engine, "gpt2", "h-0201")
-            == "stored h-0201"
-        )
+        assert await solution.simulate_async_request(engine, "gpt2", "h-0201") == "stored h-0201"

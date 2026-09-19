@@ -32,8 +32,7 @@ rng = np.random.default_rng(13)
 class HNSWLite:
     """Compact HNSW-lite with landmark entry points (same as 04)."""
 
-    def __init__(self, M: int = 8, ef_construction: int = 24,
-                 seed: int = 42) -> None:
+    def __init__(self, M: int = 8, ef_construction: int = 24, seed: int = 42) -> None:
         self._M = M
         self._ef = ef_construction
         self._vectors: np.ndarray | None = None
@@ -89,23 +88,22 @@ class HNSWLite:
 vectors, meta = make_corpus(n=800, dim=32, n_clusters=6, seed=13)
 # add production-ish fields: price in [0,100], created_day in [0..29]
 for i, m in enumerate(meta):
-    m["price"] = float((i * 37) % 101)           # deterministic, spread
+    m["price"] = float((i * 37) % 101)  # deterministic, spread
     m["created_day"] = int((i * 13) % 30)
 
 queries = vectors[:10]
 truth = brute_force_knn(queries, vectors, k=10, metric="l2")
 
 filters = {
-    "none":                lambda m: True,
-    "tenant=a":            lambda m: m["tenant"] == "a",
-    "tag=ml":              lambda m: "ml" in m["tags"],
-    "price<=10":           lambda m: m["price"] <= 10,
+    "none": lambda m: True,
+    "tenant=a": lambda m: m["tenant"] == "a",
+    "tag=ml": lambda m: "ml" in m["tags"],
+    "price<=10": lambda m: m["price"] <= 10,
     "tenant=a & price<=10": lambda m: m["tenant"] == "a" and m["price"] <= 10,
 }
 for name, f in filters.items():
     n_hit = sum(1 for m in meta if f(m))
-    print(f"filter {name!r:22s} matches {n_hit:3d}/{len(meta)} "
-          f"({100 * n_hit / len(meta):4.1f}%)")
+    print(f"filter {name!r:22s} matches {n_hit:3d}/{len(meta)} ({100 * n_hit / len(meta):4.1f}%)")
 
 # Output:
 # filter 'none'                 matches 800/800 (100.0%)
@@ -135,11 +133,11 @@ for name, f in filters.items():
     for qi, q in enumerate(queries):
         hits = post_filtered(hns, q, f)
         survivors += len(hits)
-        exact = [i for i in np.argsort(np.linalg.norm(vectors - q, axis=1))
-                 if f(meta[i])][:5]
+        exact = [i for i in np.argsort(np.linalg.norm(vectors - q, axis=1)) if f(meta[i])][:5]
         exact_ok += 1 if set(hits) == set(exact) else 0
-    print(f"  {name!r:22s} avg survivors={survivors / len(queries):.1f}/5  "
-          f"exact-match={exact_ok}/10")
+    print(
+        f"  {name!r:22s} avg survivors={survivors / len(queries):.1f}/5  exact-match={exact_ok}/10"
+    )
 
 # Output:
 # post-filter (ef=10): avg survivors in top-10, then exact-match rate
@@ -149,11 +147,11 @@ for name, f in filters.items():
 #   'price<=10'             avg survivors=1.0/5  exact-match=0/10
 #   'tenant=a & price<=10'  avg survivors=0.4/5  exact-match=0/10
 
+
 # ============================================================
 # 3. Oversampling fixes it — measured curves
 # ============================================================
-def filtered_with_oversample(q: np.ndarray, f, k: int = 5,
-                             oversample: int = 1) -> list[int]:
+def filtered_with_oversample(q: np.ndarray, f, k: int = 5, oversample: int = 1) -> list[int]:
     nb = hns.search(q, ef_search=k * oversample * 2)
     return [i for i in nb if f(meta[i])][:k]
 
@@ -165,12 +163,10 @@ for name, f in filters.items():
         ok = 0
         for q in queries:
             hits = filtered_with_oversample(q, f, oversample=os_)
-            exact = [i for i in np.argsort(np.linalg.norm(vectors - q, axis=1))
-                     if f(meta[i])][:5]
+            exact = [i for i in np.argsort(np.linalg.norm(vectors - q, axis=1)) if f(meta[i])][:5]
             ok += 1 if set(hits) == set(exact) else 0
         row.append(f"{ok}/10")
-    print(f"  {name!r:22s} os=1 {row[0]} | os=2 {row[1]} | "
-          f"os=4 {row[2]} | os=8 {row[3]}")
+    print(f"  {name!r:22s} os=1 {row[0]} | os=2 {row[1]} | os=4 {row[2]} | os=8 {row[3]}")
 
 # Output:
 # oversample curves: exact filtered top-5 matches / 10 queries
@@ -190,9 +186,12 @@ for name, f in filters.items():
 sub_indexes: dict[str, HNSWLite] = {}
 slices: dict[str, list[int]] = {}
 for t in ("tenant-a", "tenant-b", "tag-ml", "tag-db"):
-    ids = [i for i, m in enumerate(meta)
-           if (t.startswith("tenant") and m["tenant"] == t[-1]) or
-           (t.startswith("tag") and t[4:] in m["tags"])]
+    ids = [
+        i
+        for i, m in enumerate(meta)
+        if (t.startswith("tenant") and m["tenant"] == t[-1])
+        or (t.startswith("tag") and t[4:] in m["tags"])
+    ]
     sub = HNSWLite(M=8, ef_construction=24)
     sub.build(vectors[ids])
     sub_indexes[t] = sub
@@ -206,8 +205,7 @@ for key, f in (("tenant-a", filters["tenant=a"]), ("tag-ml", filters["tag=ml"]))
     for q in queries:
         hits = sub.search(q, ef_search=20)[:5]
         mapped = [ids[i] for i in hits]
-        exact = [i for i in np.argsort(np.linalg.norm(vectors - q, axis=1))
-                 if f(meta[i])][:5]
+        exact = [i for i in np.argsort(np.linalg.norm(vectors - q, axis=1)) if f(meta[i])][:5]
         ok += 1 if set(mapped) == set(exact) else 0
     print(f"  {key!r:12s} (sub-index on {len(ids)} docs): {ok}/10")
 
@@ -226,13 +224,18 @@ for key, f in (("tenant-a", filters["tenant=a"]), ("tag-ml", filters["tag=ml"]))
 # filterable metadata + oversampling, or a binary/coarse index on the
 # most selective field.
 combo_ok = sum(
-    1 for q in queries
-    if set(filtered_with_oversample(q, filters["tenant=a & price<=10"],
-                                    oversample=8)) ==
-    set([i for i in np.argsort(np.linalg.norm(vectors - q, axis=1))
-         if filters["tenant=a & price<=10"](meta[i])][:5]))
-print(f"\ncombo filter (5.2%) with os=8: {combo_ok}/10 exact — "
-      f"the oversample is doing the work")
+    1
+    for q in queries
+    if set(filtered_with_oversample(q, filters["tenant=a & price<=10"], oversample=8))
+    == set(
+        [
+            i
+            for i in np.argsort(np.linalg.norm(vectors - q, axis=1))
+            if filters["tenant=a & price<=10"](meta[i])
+        ][:5]
+    )
+)
+print(f"\ncombo filter (5.2%) with os=8: {combo_ok}/10 exact — the oversample is doing the work")
 
 # Output:
 # combo filter (5.2%) with os=8: 5/10 exact — the oversample is doing the work
@@ -249,6 +252,7 @@ print(f"\ncombo filter (5.2%) with os=8: {combo_ok}/10 exact — "
 # MISTAKE: ignoring that filters change the effective geometry:
 #   a filter can make two far clusters neighbors (only price<=10 docs).
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
@@ -256,37 +260,44 @@ def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # selectivity ordering must match the design
     sel = {n: sum(1 for m in meta if f(m)) / len(meta) for n, f in filters.items()}
-    assert sel["none"] > sel["tenant=a"] > sel["tag=ml"] > \
-        sel["price<=10"] > sel["tenant=a & price<=10"], \
-        "filter selectivity must follow the designed ordering"
+    assert (
+        sel["none"]
+        > sel["tenant=a"]
+        > sel["tag=ml"]
+        > sel["price<=10"]
+        > sel["tenant=a & price<=10"]
+    ), "filter selectivity must follow the designed ordering"
 
     # starvation: selective filters must yield fewer survivors
     surv = {}
     for name, f in filters.items():
-        surv[name] = np.mean([len(post_filtered(hns, q, f))
-                              for q in queries])
-    assert surv["price<=10"] < surv["tag=ml"] < surv["none"], \
+        surv[name] = np.mean([len(post_filtered(hns, q, f)) for q in queries])
+    assert surv["price<=10"] < surv["tag=ml"] < surv["none"], (
         "more selective filters must starve more"
+    )
 
     # oversampling must be monotone for the selective filters
     def os_exact(os_: int, f) -> int:
         return sum(
-            1 for q in queries
-            if set(filtered_with_oversample(q, f, oversample=os_)) ==
-            set([i for i in np.argsort(np.linalg.norm(vectors - q, axis=1))
-                 if f(meta[i])][:5]))
+            1
+            for q in queries
+            if set(filtered_with_oversample(q, f, oversample=os_))
+            == set([i for i in np.argsort(np.linalg.norm(vectors - q, axis=1)) if f(meta[i])][:5])
+        )
 
     f_price = filters["price<=10"]
-    assert os_exact(8, f_price) >= os_exact(4, f_price) >= os_exact(1, f_price), \
+    assert os_exact(8, f_price) >= os_exact(4, f_price) >= os_exact(1, f_price), (
         "oversampling must not hurt filtered exactness"
+    )
 
     # pre-filter sub-index must beat plain post-filter on the tag filter
     tag_post = os_exact(1, filters["tag=ml"])
     assert tag_post <= 8, "post-filter at os=1 must trail the sub-index"
 
     # AND-filter is the hard case: os=1 must fail it badly
-    assert os_exact(1, filters["tenant=a & price<=10"]) <= 2, \
+    assert os_exact(1, filters["tenant=a & price<=10"]) <= 2, (
         "composite selective filter must starve at os=1"
+    )
 
     print("[OK] 06-metadata-filtering: all checks passed")
 

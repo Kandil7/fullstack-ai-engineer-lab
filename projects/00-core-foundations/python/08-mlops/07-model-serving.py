@@ -29,9 +29,11 @@ from typing import Any
 # A model in memory is a service; a model loaded per request is a 10x
 # latency disaster. The pattern: load at import/startup, keep it global.
 
+
 @dataclass
 class SimpleModel:
     """Stand-in for a real model - predict is deliberately slow."""
+
     name: str
     load_ms: float = 500.0
     predict_ms: float = 2.0
@@ -49,7 +51,7 @@ class SimpleModel:
 # Example 1: the anti-pattern - load per request
 def predict_antipattern(model_name: str, x: float) -> float:
     start = time.perf_counter()
-    m = SimpleModel.load(model_name)   # 500ms EVERY request
+    m = SimpleModel.load(model_name)  # 500ms EVERY request
     result = m.predict(x)
     elapsed_ms = (time.perf_counter() - start) * 1000
     return round(elapsed_ms, 1)
@@ -81,6 +83,7 @@ assert elapsed < 100, "hot path must be fast"
 # GPUs shine on batches. Collect requests for a few ms, then run them
 # together. Throughput up, per-request latency often *down* at load.
 
+
 @dataclass
 class Batcher:
     max_batch: int = 8
@@ -108,6 +111,7 @@ assert results == [2.0, 4.0, 6.0, 8.0]
 # Each worker holds a copy of the model. 8 workers x 4GB model = 32GB.
 # Tune concurrency to the memory budget.
 
+
 @dataclass
 class ServingPlan:
     model_gb: float
@@ -130,6 +134,7 @@ assert plan.fits_budget()
 big = ServingPlan(4.0, 6, 16.0)
 assert not big.fits_budget(), "6 workers x 4GB > 16GB must fail"
 
+
 # ============================================================
 # 4. Latency Budget
 # ============================================================
@@ -146,8 +151,7 @@ class LatencyBudget:
         return self.total() <= slo_ms
 
 
-budget = LatencyBudget({"network": 10.0, "preprocess": 5.0,
-                        "inference": 20.0, "postprocess": 5.0})
+budget = LatencyBudget({"network": 10.0, "preprocess": 5.0, "inference": 20.0, "postprocess": 5.0})
 print("\nExample 5: latency budget")
 print(f"  total: {budget.total()}ms vs SLO 60ms -> {budget.meets_slo(60.0)}")
 assert budget.meets_slo(60.0)
@@ -158,7 +162,7 @@ assert not LatencyBudget({"inference": 90.0}).meets_slo(60.0)
 # ============================================================
 # The canonical FastAPI skeleton (import-checkable; run with uvicorn):
 
-FASTAPI_SKELETON = '''
+FASTAPI_SKELETON = """
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -171,7 +175,8 @@ class Input(BaseModel):
 @app.post("/predict")
 def predict(body: Input) -> dict[str, float]:
     return {"result": MODEL.predict(body.x)}   # no per-request load
-'''
+"""
+
 
 def validate_skeleton(skeleton: str) -> tuple[bool, list[str]]:
     issues = []

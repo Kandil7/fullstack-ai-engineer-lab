@@ -35,6 +35,7 @@ data the model describes. Every row has exactly one value per attribute.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)")
 # attributes: id (INTEGER), name (TEXT), age (INTEGER)

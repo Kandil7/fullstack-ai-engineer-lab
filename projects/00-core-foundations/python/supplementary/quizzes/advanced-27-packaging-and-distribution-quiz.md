@@ -102,6 +102,7 @@ def parse(v):
         parts.append(0)
     return tuple(parts + ([int(rc)] if rc else [2**63]))
 
+
 print(parse("1.2.0rc1") < parse("1.2.0"))
 ```
 
@@ -134,6 +135,7 @@ def normalize(v):
     while len(parts) < 3:
         parts.append(0)
     return tuple(parts)
+
 
 print(normalize("1.26") == normalize("1.26.0"))
 ```
@@ -217,6 +219,7 @@ def compare(a, b):
     while len(pb) < 3:
         pb.append(0)
     return -1 if pa < pb else (1 if pa > pb else 0)
+
 
 print(compare("1.26", "1.26.0"))
 ```
@@ -310,6 +313,7 @@ def latest(available, spec):
         if ok and (best is None or v > best):
             best = v
     return best
+
 
 print(latest(["1.9.9", "1.10.0"], "<2"))
 ```

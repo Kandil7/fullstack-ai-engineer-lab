@@ -49,7 +49,7 @@ a few more. Commands are simple verbs: `SET`, `GET`, `LPUSH`, `SADD`, `ZADD`.
 ```python
 from redis_client import get_client
 
-r = get_client()          # dict-backed stand-in; identical API to redis-py
+r = get_client()  # dict-backed stand-in; identical API to redis-py
 r.set("user:42:name", "sara")
 print(r.get("user:42:name"))
 
@@ -71,7 +71,7 @@ construction. `INCR` is safe with 1,000 concurrent clients without transactions.
 ```python
 r.set("hits", 0)
 for _ in range(100):
-    r.incr("hits")        # atomic read-modify-write — no lost updates
+    r.incr("hits")  # atomic read-modify-write — no lost updates
 print(r.get("hits"))
 
 # Output:
@@ -91,8 +91,8 @@ caches, counters, and every "blob" use case.
 
 ```python
 r.set("count", 10)
-r.incr("count")            # 11
-r.incrby("count", 4)       # 15
+r.incr("count")  # 11
+r.incrby("count", 4)  # 15
 print(r.get("count"), r.get("count").__class__.__name__)
 
 # Output:
@@ -107,8 +107,8 @@ TTL) and a database (bounded by disk).
 
 ```python
 r.set("temp", "x", ex=5)
-print(r.ttl("temp"))       # 5, 4, 3 ... counting down
-r.expire("temp", 100)      # extend an existing key
+print(r.ttl("temp"))  # 5, 4, 3 ... counting down
+r.expire("temp", 100)  # extend an existing key
 print(r.ttl("temp"))
 
 # Output:
@@ -126,9 +126,9 @@ locks). `SET key value XX` only writes if the key **exists** (update-only). Both
 are atomic, which makes them safe against races:
 
 ```python
-r.set("job", "a", nx=True)     # first writer wins
+r.set("job", "a", nx=True)  # first writer wins
 print(r.get("job"))
-r.set("job", "b", nx=True)     # ignored — key exists
+r.set("job", "b", nx=True)  # ignored — key exists
 print(r.get("job"))
 
 # Output:

@@ -32,7 +32,7 @@ it warns and the write may not reach the frame.
 ```python
 # WRONG
 sub = df[df["a"] > 1]
-sub["flag"] = 1          # df["flag"] unchanged
+sub["flag"] = 1  # df["flag"] unchanged
 ```
 **Related**: `SettingWithCopyWarning`, `.loc`
 
@@ -58,7 +58,7 @@ float64, int+string -> object. pandas 2.2 warns on incompatible setitem;
 **Example**:
 ```python
 df["id"] = [1, 2, 3]
-df.loc[2, "id"] = "oops"   # dtype becomes object
+df.loc[2, "id"] = "oops"  # dtype becomes object
 ```
 **Related**: `.loc`
 
@@ -77,7 +77,7 @@ pd.Series([1, 2], index=[0, 1]) + pd.Series([10, 20], index=[1, 2])
 None instead of the frame — breaking chains, saving nothing.
 **Example**:
 ```python
-df.dropna(inplace=True).assign(x=1)   # AttributeError: 'NoneType'
+df.dropna(inplace=True).assign(x=1)  # AttributeError: 'NoneType'
 ```
 **Related**: chained assignment
 
@@ -119,7 +119,7 @@ builds a Series and runs Python — the slowest row loop.
 one or both sides — a 2x3 duplicate-key merge yields 6 rows.
 **Example**:
 ```python
-len(orders.merge(profile, on="cust"))   # > len(orders)
+len(orders.merge(profile, on="cust"))  # > len(orders)
 ```
 **Related**: `is_unique`, contract check
 
@@ -165,7 +165,7 @@ each gap as NaN instead (and is the future default).
 **Example**:
 ```python
 s = pd.Series([10.0, float("nan"), 20.0])
-print(s.pct_change().tolist())               # [nan, 0.0, 1.0] -- fabricated
+print(s.pct_change().tolist())  # [nan, 0.0, 1.0] -- fabricated
 print(s.pct_change(fill_method=None).tolist())  # [nan, nan, nan] -- honest
 ```
 **Related**: NaN

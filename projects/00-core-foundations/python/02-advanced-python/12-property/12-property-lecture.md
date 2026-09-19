@@ -32,30 +32,31 @@ Properties use decorators to define getter, setter, and deleter methods that are
 class Circle:
     def __init__(self, radius):
         self._radius = radius  # Use setter for validation
-    
+
     @property
     def radius(self):
         """Get the radius."""
         return self._radius
-    
+
     @radius.setter
     def radius(self, value):
         """Set the radius with validation."""
         if value < 0:
             raise ValueError("Radius cannot be negative")
         self._radius = value
-    
+
     @property
     def area(self):
         """Computed property - area."""
-        return 3.14159 * self._radius ** 2
+        return 3.14159 * self._radius**2
+
 
 # Usage
 c = Circle(5)
-print(c.radius)    # 5 (getter)
-print(c.area)      # 78.53975 (computed)
-c.radius = 10      # setter (validated)
-print(c.area)      # 314.159
+print(c.radius)  # 5 (getter)
+print(c.area)  # 78.53975 (computed)
+c.radius = 10  # setter (validated)
+print(c.area)  # 314.159
 ```
 
 #### Read-Only Property
@@ -64,11 +65,12 @@ print(c.area)      # 314.159
 class BankAccount:
     def __init__(self, balance):
         self._balance = balance
-    
+
     @property
     def balance(self):
         """Read-only property - no setter defined."""
         return self._balance
+
 
 account = BankAccount(1000)
 print(account.balance)  # 1000
@@ -92,28 +94,29 @@ class Temperature:
     def __init__(self, celsius):
         self._celsius = None
         self.celsius = celsius  # Use setter for validation
-    
+
     @property
     def celsius(self):
         return self._celsius
-    
+
     @celsius.setter
     def celsius(self, value):
         if value < -273.15:
             raise ValueError("Temperature below absolute zero")
         self._celsius = value
-    
+
     @property
     def fahrenheit(self):
-        return self._celsius * 9/5 + 32
-    
+        return self._celsius * 9 / 5 + 32
+
     @fahrenheit.setter
     def fahrenheit(self, value):
-        self.celsius = (value - 32) * 5/9
-    
+        self.celsius = (value - 32) * 5 / 9
+
     @property
     def kelvin(self):
         return self._celsius + 273.15
+
 
 # Usage
 t = Temperature(100)
@@ -132,36 +135,37 @@ class User:
         self.name = name  # Uses setter
         self.email = email
         self.age = age
-    
+
     @property
     def name(self):
         return self._name
-    
+
     @name.setter
     def name(self, value):
         if not isinstance(value, str) or len(value) < 2:
             raise ValueError("Name must be at least 2 characters")
         self._name = value.strip().title()
-    
+
     @property
     def email(self):
         return self._email
-    
+
     @email.setter
     def email(self, value):
         if "@" not in value or "." not in value:
             raise ValueError("Invalid email format")
         self._email = value.lower()
-    
+
     @property
     def age(self):
         return self._age
-    
+
     @age.setter
     def age(self, value):
         if not isinstance(value, int) or value < 0 or value > 150:
             raise ValueError("Age must be between 0 and 150")
         self._age = value
+
 
 # Usage
 user = User("alice", "Alice@Example.COM", 25)
@@ -184,30 +188,31 @@ class Product:
         self.price = price
         self.quantity = quantity
         self.discount = discount
-    
+
     @property
     def subtotal(self):
         return self.price * self.quantity
-    
+
     @property
     def discount_amount(self):
         return self.subtotal * (self.discount / 100)
-    
+
     @property
     def total(self):
         return self.subtotal - self.discount_amount
-    
+
     @property
     def margin(self):
         if self.price == 0:
             return 0
         return ((self.price - self.cost) / self.price) * 100
 
+
 # Usage
 product = Product("Widget", 10.00, 5, 10)
-print(f"Subtotal: ${product.subtotal}")      # $50.00
-print(f"Discount: ${product.discount_amount}") # $5.00
-print(f"Total: ${product.total}")            # $45.00
+print(f"Subtotal: ${product.subtotal}")  # $50.00
+print(f"Discount: ${product.discount_amount}")  # $5.00
+print(f"Total: ${product.total}")  # $45.00
 ```
 
 ---
@@ -224,7 +229,7 @@ class DataAnalyzer:
         self._data = data
         self._sorted_cache = None
         self._stats_cache = None
-    
+
     @property
     def sorted_data(self):
         """Sort data only once."""
@@ -232,7 +237,7 @@ class DataAnalyzer:
             print("Sorting data (first access)...")
             self._sorted_cache = sorted(self._data)
         return self._sorted_cache
-    
+
     @property
     def statistics(self):
         """Compute statistics only once."""
@@ -245,17 +250,18 @@ class DataAnalyzer:
                 "mean": sum(self._data) / len(self._data),
             }
         return self._stats_cache
-    
+
     def invalidate_cache(self):
         """Clear all cached values."""
         self._sorted_cache = None
         self._stats_cache = None
 
+
 # Usage
 analyzer = DataAnalyzer([3, 1, 4, 1, 5, 9, 2, 6])
 print(analyzer.sorted_data)  # Computes
 print(analyzer.sorted_data)  # Uses cache
-print(analyzer.statistics)   # Computes
+print(analyzer.statistics)  # Computes
 ```
 
 #### Using functools.cached_property
@@ -264,20 +270,22 @@ print(analyzer.statistics)   # Computes
 from functools import cached_property
 import math
 
+
 class Circle:
     def __init__(self, radius):
         self.radius = radius
-    
+
     @cached_property
     def area(self):
         """Automatically cached after first access."""
         print("Computing area...")
-        return math.pi * self.radius ** 2
-    
+        return math.pi * self.radius**2
+
     @cached_property
     def circumference(self):
         print("Computing circumference...")
         return 2 * math.pi * self.radius
+
 
 # Usage
 c = Circle(5)
@@ -298,23 +306,24 @@ class CachedData:
     def __init__(self, data):
         self._data = data
         self._cache = {}
-    
+
     @property
     def processed(self):
         if "processed" not in self._cache:
             print("Processing data...")
             self._cache["processed"] = [x * 2 for x in self._data]
         return self._cache["processed"]
-    
+
     @processed.deleter
     def processed(self):
         print("Clearing processed cache")
         self._cache.pop("processed", None)
 
+
 # Usage
 data = CachedData([1, 2, 3])
 print(data.processed)  # Computes
-del data.processed     # Clears cache
+del data.processed  # Clears cache
 print(data.processed)  # Recomputes
 ```
 
@@ -326,24 +335,25 @@ class DatabaseConnection:
         self._host = host
         self._port = port
         self._connection = None
-    
+
     @property
     def connection(self):
         if self._connection is None:
             print(f"Connecting to {self._host}:{self._port}...")
             self._connection = f"Connection({self._host}:{self._port})"
         return self._connection
-    
+
     @connection.deleter
     def connection(self):
         if self._connection is not None:
             print("Closing connection...")
             self._connection = None
 
+
 # Usage
 db = DatabaseConnection("localhost", 5432)
 print(db.connection)  # Connects
-del db.connection     # Closes
+del db.connection  # Closes
 print(db.connection)  # Reconnects
 ```
 
@@ -358,33 +368,35 @@ class Animal:
     def __init__(self, name, sound):
         self._name = name
         self._sound = sound
-    
+
     @property
     def name(self):
         return self._name
-    
+
     @property
     def description(self):
         return f"{self.name} says {self._sound}"
+
 
 class Dog(Animal):
     def __init__(self, name, breed):
         super().__init__(name, "Woof")
         self._breed = breed
-    
+
     @property
     def breed(self):
         return self._breed
-    
+
     @property
     def description(self):
         # Override parent property
         return f"{self.name} ({self.breed}) says {self._sound}"
 
+
 # Usage
 dog = Dog("Rex", "German Shepherd")
-print(dog.name)         # Rex (inherited getter)
-print(dog.breed)        # German Shepherd (new getter)
+print(dog.name)  # Rex (inherited getter)
+print(dog.breed)  # German Shepherd (new getter)
 print(dog.description)  # Rex (German Shepherd) says Woof (overridden)
 ```
 
@@ -398,21 +410,23 @@ print(dog.description)  # Rex (German Shepherd) says Woof (overridden)
 class BadCircle:
     def __init__(self, radius):
         self.radius = radius  # Calls setter
-    
+
     @property
     def radius(self):
         return self._radius
-    
+
     @radius.setter
     def radius(self, value):
         if value < 0:
             raise ValueError("Radius cannot be negative")
         self._radius = value
 
+
 # WRONG - bypasses validation
 class BadCircle2:
     def __init__(self, radius):
         self._radius = radius  # Direct assignment, no validation!
+
 
 c = BadCircle2(-5)  # No error, but invalid state
 ```
@@ -424,6 +438,7 @@ class Bad:
     @property
     def value(self):
         return self.value  # Infinite recursion!
+
 
 # CORRECT
 class Good:
@@ -438,25 +453,26 @@ class Good:
 class Bad:
     def __init__(self, value):
         self.value = value
-    
+
     @property
     def value(self):
         return self._value
-    
+
     @value.setter
     def value(self, value):
         # Might fail if value is None
         self._value = value.upper()
 
+
 # CORRECT
 class Good:
     def __init__(self, value):
         self.value = value
-    
+
     @property
     def value(self):
         return self._value
-    
+
     @value.setter
     def value(self, value):
         if value is not None:
@@ -493,7 +509,7 @@ class DataProcessor:
     @cached_property
     def expensive_computation(self):
         # Only computed once, then cached
-        return sum(x ** 2 for x in range(1000000))
+        return sum(x**2 for x in range(1000000))
 ```
 
 ### 3. Document Property Behavior
@@ -521,9 +537,11 @@ class User:
 def full_name(self):
     return f"{self.first_name} {self.last_name}"
 
+
 # BAD - method when no arguments needed
 def get_full_name(self):
     return f"{self.first_name} {self.last_name}"
+
 
 # GOOD - method when arguments needed
 def calculate_tax(self, rate):
@@ -543,6 +561,7 @@ class Email:
     - Auto-lowercase on set
     - Provide username and domain properties
     """
+
     def __init__(self, address):
         # Your code here
         pass
@@ -557,6 +576,7 @@ class Calculator:
     - fibonacci(n)
     - prime_check(n)
     """
+
     def __init__(self, n):
         # Your code here
         pass
@@ -572,6 +592,7 @@ class Config:
     - debug (boolean)
     - timeout (positive number)
     """
+
     def __init__(self, host, port, debug=False, timeout=30):
         # Your code here
         pass

@@ -49,10 +49,11 @@ class AsyncDatabase:
     async def __aenter__(self):
         self.connection = await create_connection()
         return self.connection
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.connection.close()
         return False
+
 
 async def main():
     async with AsyncDatabase() as conn:
@@ -95,15 +96,16 @@ class AsyncCounter:
     def __init__(self, stop):
         self.current = 0
         self.stop = stop
-    
+
     def __aiter__(self):
         return self  # Returns self as the async iterator
-    
+
     async def __anext__(self):
         if self.current >= self.stop:
             raise StopAsyncIteration
         self.current += 1
         return self.current - 1
+
 
 async def main():
     async for num in AsyncCounter(5):
@@ -151,21 +153,25 @@ class AsyncFileReader:
 ```python
 import asyncio
 
+
 # Coroutines are awaitable
 async def my_coro():
     return 42
 
+
 # Tasks are awaitable
 task = asyncio.create_task(my_coro())
+
 
 # Custom awaitable
 class AsyncResult:
     def __init__(self, value):
         self.value = value
-    
+
     def __await__(self):
         yield  # Suspends once
         return self.value
+
 
 async def main():
     result = await AsyncResult(100)
@@ -184,6 +190,7 @@ async def main():
 ```python
 import asyncio
 
+
 async def long_task():
     try:
         for i in range(100):
@@ -193,15 +200,17 @@ async def long_task():
         print("Task cancelled, cleaning up...")
         raise  # Re-raise to properly mark as cancelled
 
+
 async def main():
     task = asyncio.create_task(long_task())
     await asyncio.sleep(3)
     task.cancel()
-    
+
     try:
         await task
     except asyncio.CancelledError:
         print("Task was cancelled successfully")
+
 
 asyncio.run(main())
 ```
@@ -218,6 +227,7 @@ asyncio.run(main())
 ```python
 import asyncio
 
+
 async def worker():
     try:
         while True:
@@ -226,11 +236,12 @@ async def worker():
         print("Cleaning up before exit")
         raise  # Always re-raise to mark task as cancelled
 
+
 async def main():
     task = asyncio.create_task(worker())
     await asyncio.sleep(2)
     task.cancel()
-    
+
     await task  # Raises CancelledError if not caught in worker
 ```
 
@@ -246,11 +257,13 @@ async def main():
 ```python
 import asyncio
 
+
 async def io_task(name, duration):
     print(f"{name} started")
     await asyncio.sleep(duration)  # I/O wait
     print(f"{name} finished")
     return f"{name}: {duration}s"
+
 
 async def main():
     # Concurrent execution - tasks interleave during sleeps
@@ -276,6 +289,7 @@ async def main():
 from contextlib import asynccontextmanager
 import asyncio
 
+
 @asynccontextmanager
 async def async_database(url):
     conn = await create_connection(url)
@@ -283,6 +297,7 @@ async def async_database(url):
         yield conn
     finally:
         await conn.close()
+
 
 async def main():
     async with async_database("postgresql://...") as conn:
@@ -301,10 +316,12 @@ async def main():
 ```python
 import asyncio
 
+
 async def async_range(n):
     for i in range(n):
         await asyncio.sleep(0.1)
         yield i
+
 
 async def main():
     async for num in async_range(5):
@@ -323,21 +340,24 @@ async def main():
 ```python
 import asyncio
 
+
 async def background_work():
     await asyncio.sleep(5)
     return "Background complete"
 
+
 async def main():
     # Task starts running immediately
     task = asyncio.create_task(background_work())
-    
+
     # Do other work while task runs
     print("Foreground work...")
     await asyncio.sleep(1)
-    
+
     # Get result when needed
     result = await task
     print(result)  # "Background complete"
+
 
 asyncio.run(main())
 ```
@@ -354,9 +374,11 @@ asyncio.run(main())
 ```python
 import asyncio
 
+
 async def fetch(url):
     await asyncio.sleep(1)
     return f"Data from {url}"
+
 
 async def main():
     # Run concurrently
@@ -371,7 +393,7 @@ async def main():
     results = await asyncio.gather(
         fetch("api1.com"),
         failing_fetch(),
-        return_exceptions=True  # Exceptions returned as values
+        return_exceptions=True,  # Exceptions returned as values
     )
 ```
 
@@ -387,12 +409,14 @@ async def main():
 ```python
 import asyncio
 
+
 async def producer(queue):
     for i in range(5):
         await queue.put(f"item-{i}")
         print(f"Produced: item-{i}")
         await asyncio.sleep(0.1)
     await queue.put(None)  # Sentinel
+
 
 async def consumer(queue):
     while True:
@@ -403,9 +427,11 @@ async def consumer(queue):
         await asyncio.sleep(0.2)
         queue.task_done()
 
+
 async def main():
     queue = asyncio.Queue()
     await asyncio.gather(producer(queue), consumer(queue))
+
 
 asyncio.run(main())
 ```
@@ -422,19 +448,22 @@ asyncio.run(main())
 ```python
 import asyncio
 
+
 async def fetch(url, sem):
     async with sem:  # Acquires semaphore (blocks if at limit)
         print(f"Fetching {url}")
         await asyncio.sleep(1)
         return f"Data from {url}"
 
+
 async def main():
     sem = asyncio.Semaphore(3)  # Max 3 concurrent
-    
+
     urls = [f"api.com/{i}" for i in range(10)]
     tasks = [fetch(url, sem) for url in urls]
     results = await asyncio.gather(*tasks)
     print(f"Fetched {len(results)} URLs")
+
 
 asyncio.run(main())
 ```
@@ -452,17 +481,20 @@ asyncio.run(main())
 import asyncio
 import time
 
+
 def cpu_intensive():
     time.sleep(2)  # Blocking sync function
     return "Result from CPU work"
 
+
 async def main():
     # This would block the event loop:
     # result = cpu_intensive()
-    
+
     # Use to_thread instead:
     result = await asyncio.to_thread(cpu_intensive)
     print(result)
+
 
 asyncio.run(main())
 ```
@@ -479,15 +511,18 @@ asyncio.run(main())
 ```python
 import asyncio
 
+
 async def slow_operation():
     await asyncio.sleep(10)
     return "Done"
+
 
 async def main():
     try:
         result = await asyncio.wait_for(slow_operation(), timeout=2.0)
     except asyncio.TimeoutError:
         print("Operation timed out!")
+
 
 asyncio.run(main())
 ```
@@ -504,9 +539,11 @@ asyncio.run(main())
 ```python
 import asyncio
 
+
 async def worker(name, delay):
     await asyncio.sleep(delay)
     return f"{name} done"
+
 
 async def main():
     tasks = [
@@ -514,16 +551,13 @@ async def main():
         asyncio.create_task(worker("B", 1)),
         asyncio.create_task(worker("C", 2)),
     ]
-    
+
     # Wait for first completed
-    done, pending = await asyncio.wait(
-        tasks,
-        return_when=asyncio.FIRST_COMPLETED
-    )
-    
+    done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+
     print(f"First done: {done.pop().result()}")
     print(f"Still pending: {len(pending)}")
-    
+
     # Wait for all
     done, _ = await asyncio.wait(pending)
 ```
@@ -540,6 +574,7 @@ async def main():
 ```python
 import asyncio
 
+
 async def async_fetch_pages(url, max_pages=10):
     """Async generator fetching paginated data."""
     page = 1
@@ -548,6 +583,7 @@ async def async_fetch_pages(url, max_pages=10):
         data = f"Page {page} data"
         yield data
         page += 1
+
 
 async def main():
     async for page_data in async_fetch_pages("api.com/data"):
@@ -566,13 +602,14 @@ async def main():
 ```python
 import asyncio
 
+
 class AsyncLineReader:
     def __init__(self, lines):
         self.lines = iter(lines)
-    
+
     def __aiter__(self):
         return self
-    
+
     async def __anext__(self):
         try:
             line = next(self.lines)
@@ -580,6 +617,7 @@ class AsyncLineReader:
             return line
         except StopIteration:
             raise StopAsyncIteration
+
 
 async def main():
     reader = AsyncLineReader(["line1", "line2", "line3"])
@@ -599,11 +637,13 @@ async def main():
 ```python
 import asyncio
 
+
 async def greet(name):
     """This is a coroutine function."""
     print(f"Hello, {name}!")
     await asyncio.sleep(1)
     return f"Goodbye, {name}!"
+
 
 # Calling returns a coroutine object (doesn't run yet)
 coro = greet("Alice")
@@ -624,10 +664,12 @@ result = asyncio.run(coro)
 ```python
 import asyncio
 
+
 async def main():
     print("Running on event loop")
     await asyncio.sleep(1)
     print("Done")
+
 
 # Method 1: asyncio.run (creates and closes loop)
 asyncio.run(main())
@@ -638,6 +680,7 @@ try:
     loop.run_until_complete(main())
 finally:
     loop.close()
+
 
 # Method 3: Get running loop (inside async context)
 async def check_loop():
@@ -658,14 +701,17 @@ async def check_loop():
 import asyncio
 import time
 
+
 async def non_blocking_example():
     print("Start")
     # Non-blocking: yields control to event loop
     await asyncio.sleep(1)
     print("End")
 
+
 # This would be blocking (bad):
 # time.sleep(1)  # Blocks entire event loop!
+
 
 async def main():
     # Multiple non-blocking operations overlap
@@ -690,16 +736,17 @@ async def main():
 class AsyncCountdown:
     def __init__(self, start):
         self.current = start
-    
+
     def __aiter__(self):
         return self
-    
+
     async def __anext__(self):
         if self.current <= 0:
             raise StopAsyncIteration
         await asyncio.sleep(0.1)
         self.current -= 1
         return self.current + 1
+
 
 async def main():
     async for num in AsyncCountdown(3):
@@ -718,17 +765,19 @@ async def main():
 ```python
 import asyncio
 
+
 async def background():
     await asyncio.sleep(2)
     return "Background result"
 
+
 async def main():
     # Create task (starts immediately)
     task = asyncio.create_task(background())
-    
+
     # Check status
     print(task.done())  # False
-    
+
     # Get result (waits if needed)
     result = await task
     print(result)  # "Background result"

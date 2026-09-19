@@ -62,12 +62,9 @@ print(s)
 ```python
 import pandas as pd
 
-population = pd.Series({
-    "Tokyo": 13960000,
-    "Delhi": 11030000,
-    "Shanghai": 24870000,
-    "Sao Paulo": 12330000
-})
+population = pd.Series(
+    {"Tokyo": 13960000, "Delhi": 11030000, "Shanghai": 24870000, "Sao Paulo": 12330000}
+)
 print(population)
 # Tokyo       13960000
 # Delhi       11030000
@@ -93,9 +90,7 @@ print(s.dtype)  # float32
 import pandas as pd
 
 temps = pd.Series(
-    [72, 68, 75, 80, 65],
-    index=["Mon", "Tue", "Wed", "Thu", "Fri"],
-    name="Temperature"
+    [72, 68, 75, 80, 65], index=["Mon", "Tue", "Wed", "Thu", "Fri"], name="Temperature"
 )
 print(temps.name)  # Temperature
 ```
@@ -109,10 +104,7 @@ print(temps.name)  # Temperature
 ```python
 import pandas as pd
 
-s = pd.Series(
-    [72, 68, 75, 80, 65],
-    index=["Mon", "Tue", "Wed", "Thu", "Fri"]
-)
+s = pd.Series([72, 68, 75, 80, 65], index=["Mon", "Tue", "Wed", "Thu", "Fri"])
 
 # Single label
 print(s.loc["Wed"])  # 75
@@ -186,10 +178,10 @@ s1 = pd.Series([1, 2, 3, 4])
 s2 = pd.Series([10, 20, 30, 40])
 
 # Element-wise operations
-print(s1 + s2)    # Addition
-print(s1 * s2)    # Multiplication
-print(s2 - s1)    # Subtraction
-print(s2 / s1)    # Division
+print(s1 + s2)  # Addition
+print(s1 * s2)  # Multiplication
+print(s2 - s1)  # Subtraction
+print(s2 / s1)  # Division
 
 # With scalar
 print(s1 * 10)
@@ -206,10 +198,10 @@ import pandas as pd
 
 s = pd.Series([72, 68, 75, 80, 65])
 
-print(s > 70)     # Boolean Series
-print(s >= 70)    # Boolean Series
-print(s == 75)    # Boolean Series
-print(s != 72)    # Boolean Series
+print(s > 70)  # Boolean Series
+print(s >= 70)  # Boolean Series
+print(s == 75)  # Boolean Series
+print(s != 72)  # Boolean Series
 ```
 
 ### Mathematical Functions
@@ -220,14 +212,14 @@ import numpy as np
 
 s = pd.Series([1, 4, 9, 16, 25])
 
-print(np.sqrt(s))      # Square root
-print(np.log(s))       # Natural log
-print(np.exp(s))       # Exponential
-print(s.sum())         # Sum
-print(s.mean())        # Mean
-print(s.std())         # Standard deviation
-print(s.min())         # Minimum
-print(s.max())         # Maximum
+print(np.sqrt(s))  # Square root
+print(np.log(s))  # Natural log
+print(np.exp(s))  # Exponential
+print(s.sum())  # Sum
+print(s.mean())  # Mean
+print(s.std())  # Standard deviation
+print(s.min())  # Minimum
+print(s.max())  # Maximum
 ```
 
 ---
@@ -242,7 +234,7 @@ import numpy as np
 
 s = pd.Series([1, 2, np.nan, 4, np.nan, 6])
 
-print(s.isnull())          # Boolean mask of nulls
+print(s.isnull())  # Boolean mask of nulls
 # 0    False
 # 1    False
 # 2     True
@@ -250,13 +242,13 @@ print(s.isnull())          # Boolean mask of nulls
 # 4     True
 # 5    False
 
-print(s.dropna())          # Remove nulls
+print(s.dropna())  # Remove nulls
 # 0    1.0
 # 1    2.0
 # 3    4.0
 # 5    6.0
 
-print(s.fillna(0))         # Fill nulls with 0
+print(s.fillna(0))  # Fill nulls with 0
 # 0    1.0
 # 1    2.0
 # 2    0.0
@@ -272,15 +264,12 @@ print(s.fillna(s.mean()))  # Fill with mean
 ```python
 import pandas as pd
 
-s = pd.Series(
-    [72, 68, 75, 80, 65],
-    index=["Mon", "Tue", "Wed", "Thu", "Fri"]
-)
+s = pd.Series([72, 68, 75, 80, 65], index=["Mon", "Tue", "Wed", "Thu", "Fri"])
 
-print(s.sort_values())         # Sort by values
+print(s.sort_values())  # Sort by values
 print(s.sort_values(ascending=False))  # Descending
-print(s.sort_index())          # Sort by index
-print(s.rank())                # Rank values
+print(s.sort_index())  # Sort by index
+print(s.rank())  # Rank values
 ```
 
 ### Aggregation
@@ -290,15 +279,15 @@ import pandas as pd
 
 s = pd.Series([72, 68, 75, 80, 65])
 
-print(s.sum())        # 360
-print(s.mean())       # 72.0
-print(s.median())     # 72.0
-print(s.std())        # 5.52
-print(s.min())        # 65
-print(s.max())        # 80
-print(s.count())      # 5
-print(s.nunique())    # 5
-print(s.unique())     # [72 68 75 80 65]
+print(s.sum())  # 360
+print(s.mean())  # 72.0
+print(s.median())  # 72.0
+print(s.std())  # 5.52
+print(s.min())  # 65
+print(s.max())  # 80
+print(s.count())  # 5
+print(s.nunique())  # 5
+print(s.unique())  # [72 68 75 80 65]
 ```
 
 ### String Operations
@@ -360,7 +349,7 @@ import pandas as pd
 
 s = pd.Series([1, 4, 9, 16, 25])
 
-print(s.apply(lambda x: x ** 2))
+print(s.apply(lambda x: x**2))
 # 0     1
 # 1    16
 # 2    81
@@ -392,10 +381,9 @@ import pandas as pd
 
 # Monthly sales data
 sales = pd.Series(
-    [45000, 52000, 38000, 61000, 55000, 48000,
-     67000, 72000, 58000, 63000, 71000, 85000],
+    [45000, 52000, 38000, 61000, 55000, 48000, 67000, 72000, 58000, 63000, 71000, 85000],
     index=pd.date_range("2024-01", periods=12, freq="MS"),
-    name="Monthly Sales"
+    name="Monthly Sales",
 )
 
 # Summary statistics

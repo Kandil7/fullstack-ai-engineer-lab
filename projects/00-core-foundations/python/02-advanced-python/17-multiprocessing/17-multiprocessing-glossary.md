@@ -27,21 +27,23 @@
 ```python
 import multiprocessing
 
+
 def fill_array(shared_arr, index, value):
     shared_arr[index] = value
 
+
 if __name__ == "__main__":
-    arr = multiprocessing.Array('i', [0, 0, 0, 0, 0])
-    
+    arr = multiprocessing.Array("i", [0, 0, 0, 0, 0])
+
     processes = []
     for i in range(5):
         p = multiprocessing.Process(target=fill_array, args=(arr, i, i * 10))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
-    
+
     print(f"Array: {list(arr)}")  # [0, 10, 20, 30, 40]
 ```
 
@@ -64,10 +66,12 @@ if __name__ == "__main__":
 import multiprocessing
 import time
 
+
 def background_task():
     while True:
         print("Background...")
         time.sleep(0.1)
+
 
 if __name__ == "__main__":
     daemon = multiprocessing.Process(target=background_task, daemon=True)
@@ -90,23 +94,29 @@ import multiprocessing
 import threading
 import time
 
+
 def cpu_bound(n):
     return sum(i * i for i in range(n))
+
 
 # Threading - limited by GIL
 start = time.time()
 t1 = threading.Thread(target=cpu_bound, args=(10_000_000,))
 t2 = threading.Thread(target=cpu_bound, args=(10_000_000,))
-t1.start(); t2.start()
-t1.join(); t2.join()
+t1.start()
+t2.start()
+t1.join()
+t2.join()
 print(f"Threading: {time.time() - start:.2f}s")
 
 # Multiprocessing - true parallelism
 start = time.time()
 p1 = multiprocessing.Process(target=cpu_bound, args=(10_000_000,))
 p2 = multiprocessing.Process(target=cpu_bound, args=(10_000_000,))
-p1.start(); p2.start()
-p1.join(); p2.join()
+p1.start()
+p2.start()
+p1.join()
+p2.join()
 print(f"Multiprocessing: {time.time() - start:.2f}s")
 ```
 
@@ -123,20 +133,22 @@ print(f"Multiprocessing: {time.time() - start:.2f}s")
 import multiprocessing
 import time
 
+
 def worker(name, delay):
     time.sleep(delay)
     print(f"{name} done")
 
+
 if __name__ == "__main__":
     p1 = multiprocessing.Process(target=worker, args=("P1", 0.2))
     p2 = multiprocessing.Process(target=worker, args=("P2", 0.1))
-    
+
     p1.start()
     p2.start()
-    
+
     p1.join()  # Wait for P1
     p2.join()  # Wait for P2
-    
+
     print("All processes done")
 ```
 
@@ -152,24 +164,26 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def increment(shared_val, n, lock):
     for _ in range(n):
         with lock:
             shared_val.value += 1
 
+
 if __name__ == "__main__":
-    counter = multiprocessing.Value('i', 0)
+    counter = multiprocessing.Value("i", 0)
     lock = multiprocessing.Lock()
-    
+
     processes = []
     for _ in range(4):
         p = multiprocessing.Process(target=increment, args=(counter, 1000, lock))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
-    
+
     print(f"Counter: {counter.value}")  # 4000
 ```
 
@@ -185,25 +199,24 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def update_dict(shared_dict, key, value):
     shared_dict[key] = value
+
 
 if __name__ == "__main__":
     manager = multiprocessing.Manager()
     shared_dict = manager.dict()
-    
+
     processes = []
     for i in range(5):
-        p = multiprocessing.Process(
-            target=update_dict,
-            args=(shared_dict, f"key{i}", i * 10)
-        )
+        p = multiprocessing.Process(target=update_dict, args=(shared_dict, f"key{i}", i * 10))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
-    
+
     print(f"Dict: {dict(shared_dict)}")
 ```
 
@@ -227,20 +240,23 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def square(n):
-    return n ** 2
+    return n**2
+
 
 if __name__ == "__main__":
     with multiprocessing.Pool(processes=4) as pool:
         numbers = [1, 2, 3, 4, 5]
-        
+
         # map - returns results in order
         results = pool.map(square, numbers)
         print(f"Squares: {results}")
-        
+
         # starmap - unpacks arguments
         def power(base, exp):
-            return base ** exp
+            return base**exp
+
         results = pool.starmap(power, [(2, 3), (3, 4)])
         print(f"Powers: {results}")
 ```
@@ -267,10 +283,12 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def sender(conn):
     conn.send({"message": "Hello"})
     conn.send(None)  # Sentinel
     conn.close()
+
 
 def receiver(conn):
     while True:
@@ -279,15 +297,16 @@ def receiver(conn):
             break
         print(f"Received: {msg}")
 
+
 if __name__ == "__main__":
     parent_conn, child_conn = multiprocessing.Pipe()
-    
+
     p1 = multiprocessing.Process(target=sender, args=(parent_conn,))
     p2 = multiprocessing.Process(target=receiver, args=(child_conn,))
-    
+
     p1.start()
     p2.start()
-    
+
     p1.join()
     p2.join()
 ```
@@ -311,8 +330,10 @@ if __name__ == "__main__":
 import multiprocessing
 import os
 
+
 def worker(name):
     print(f"[{name}] PID: {os.getpid()}")
+
 
 if __name__ == "__main__":
     processes = []
@@ -320,7 +341,7 @@ if __name__ == "__main__":
         p = multiprocessing.Process(target=worker, args=(f"P-{i}",))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
 ```
@@ -344,10 +365,12 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def producer(q, count):
     for i in range(count):
         q.put(f"item-{i}")
     q.put(None)  # Sentinel
+
 
 def consumer(q):
     while True:
@@ -356,15 +379,16 @@ def consumer(q):
             break
         print(f"Processed: {item}")
 
+
 if __name__ == "__main__":
     q = multiprocessing.Queue()
-    
+
     prod = multiprocessing.Process(target=producer, args=(q, 5))
     cons = multiprocessing.Process(target=consumer, args=(q,))
-    
+
     prod.start()
     cons.start()
-    
+
     prod.join()
     cons.join()
 ```
@@ -387,10 +411,12 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 # WITHOUT LOCK - Race condition
 def unsafe_increment(shared_val, n):
     for _ in range(n):
         shared_val.value += 1  # Not atomic!
+
 
 # WITH LOCK - Safe
 def safe_increment(shared_val, n, lock):
@@ -398,19 +424,20 @@ def safe_increment(shared_val, n, lock):
         with lock:
             shared_val.value += 1
 
+
 if __name__ == "__main__":
-    counter = multiprocessing.Value('i', 0)
+    counter = multiprocessing.Value("i", 0)
     lock = multiprocessing.Lock()
-    
+
     processes = []
     for _ in range(4):
         p = multiprocessing.Process(target=safe_increment, args=(counter, 1000, lock))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
-    
+
     print(f"Counter: {counter.value}")  # 4000
 ```
 
@@ -426,13 +453,15 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def worker():
     print("Working in process")
+
 
 if __name__ == "__main__":
     p = multiprocessing.Process(target=worker)
     p.start()  # Begins execution
-    p.join()   # Wait for completion
+    p.join()  # Wait for completion
 ```
 
 **Related Terms**: join, lifecycle, run
@@ -447,23 +476,25 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def increment(shared_val, n):
     for _ in range(n):
         with shared_val.get_lock():
             shared_val.value += 1
 
+
 if __name__ == "__main__":
-    counter = multiprocessing.Value('i', 0)  # 'i' = int
-    
+    counter = multiprocessing.Value("i", 0)  # 'i' = int
+
     processes = []
     for _ in range(4):
         p = multiprocessing.Process(target=increment, args=(counter, 1000))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
-    
+
     print(f"Counter: {counter.value}")  # 4000
 ```
 
@@ -539,8 +570,10 @@ Multiprocessing
 ```python
 import multiprocessing
 
+
 def process(item):
     return item * 2
+
 
 if __name__ == "__main__":
     with multiprocessing.Pool(4) as pool:
@@ -551,10 +584,12 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def producer(q):
     for item in items:
         q.put(item)
     q.put(None)
+
 
 def consumer(q):
     while True:
@@ -568,6 +603,7 @@ def consumer(q):
 ```python
 import multiprocessing
 
+
 def safe_increment(counter, lock, n):
     for _ in range(n):
         with lock:
@@ -578,12 +614,16 @@ def safe_increment(counter, lock, n):
 ```python
 import multiprocessing
 
+
 def map_function(item):
     return (item, 1)
 
+
 def reduce_function(results):
     from collections import Counter
+
     return Counter(dict(results))
+
 
 if __name__ == "__main__":
     with multiprocessing.Pool(4) as pool:

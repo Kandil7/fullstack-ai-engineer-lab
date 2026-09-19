@@ -30,6 +30,7 @@ from typing import Any, Callable
 # an LLM can emit valid JSON that is still wrong (missing fields, wrong
 # types, out-of-range values).
 
+
 @dataclass
 class ExtractionSchema:
     name: str
@@ -73,6 +74,7 @@ assert len(invoice.validate(bad)) >= 2
 # The LLM returns text; we must parse JSON (tolerating markdown fences
 # and stray prose) and validate it against the schema.
 
+
 def parse_llm_json(text: str) -> dict[str, Any]:
     """Extract the first JSON object from an LLM response."""
     # strip markdown code fences
@@ -97,6 +99,7 @@ assert parsed["id"] == "INV-2"
 # The reliable pattern: ask -> parse -> validate -> retry with the
 # error message fed back as a correction -> give up after N attempts.
 
+
 @dataclass
 class LLMExtractor:
     schema: ExtractionSchema
@@ -120,8 +123,7 @@ class LLMExtractor:
             errors = self.schema.validate(data)
             if not errors:
                 return data
-        raise ValueError(f"LLM failed to produce valid output after "
-                         f"{self.max_retries} attempts")
+        raise ValueError(f"LLM failed to produce valid output after {self.max_retries} attempts")
 
 
 # Example 3: self-correcting extraction
@@ -136,6 +138,7 @@ assert result["amount"] == 45.0 and extractor.calls == 2
 # ============================================================
 # Instead of asking for JSON in prose, declare a *tool* the model can
 # call. The API enforces the argument structure.
+
 
 def tool_schema(name: str, description: str, parameters: dict) -> dict:
     return {
@@ -171,9 +174,13 @@ assert search_tool["function"]["parameters"]["required"] == ["query"]
 # Gate structured extraction behind a bounded retry loop with an
 # escalation: fall back to a deterministic regex parser before giving up.
 
-def robust_extract(text: str, schema: ExtractionSchema,
-                   llm: LLMExtractor, regex_fallback: Callable[[str], dict] | None
-                   ) -> dict[str, Any]:
+
+def robust_extract(
+    text: str,
+    schema: ExtractionSchema,
+    llm: LLMExtractor,
+    regex_fallback: Callable[[str], dict] | None,
+) -> dict[str, Any]:
     try:
         return llm.extract(text)
     except ValueError:
@@ -218,9 +225,11 @@ def _verify() -> None:
     assert ts["type"] == "function" and ts["function"]["name"] == "f"
 
     fallback_called = {"n": 0}
+
     def fb(text: str) -> dict:
         fallback_called["n"] += 1
         return {"a": 0, "b": "fallback"}
+
     ex = LLMExtractor(s, max_retries=1)
     ex._ask = lambda p: "not json at all"  # type: ignore[assignment]
     out = robust_extract("x", s, ex, fb)

@@ -15,6 +15,7 @@ When to use: Small range of integer values
 # 1. BASIC COUNTING SORT
 # =============================================================================
 
+
 def counting_sort(arr):
     """Basic counting sort for non-negative integers"""
     if not arr:
@@ -34,6 +35,7 @@ def counting_sort(arr):
 
     return sorted_arr
 
+
 print("=== Basic Counting Sort ===")
 arr = [4, 2, 2, 8, 3, 3, 1]
 print(f"Original: {arr}")
@@ -43,6 +45,7 @@ print(f"Sorted: {counting_sort(arr)}")
 # =============================================================================
 # 2. COUNTING SORT WITH NEGATIVES
 # =============================================================================
+
 
 def counting_sort_with_negatives(arr):
     """Counting sort handling negative numbers"""
@@ -71,6 +74,7 @@ def counting_sort_with_negatives(arr):
 
     return output
 
+
 print("\n=== Counting Sort with Negatives ===")
 arr = [-5, -1, 3, -3, 0, 4, 2, -2]
 print(f"Original: {arr}")
@@ -80,6 +84,7 @@ print(f"Sorted: {counting_sort_with_negatives(arr)}")
 # =============================================================================
 # 3. STABLE COUNTING SORT
 # =============================================================================
+
 
 def counting_sort_stable(arr):
     """Stable counting sort - preserves relative order"""
@@ -105,6 +110,7 @@ def counting_sort_stable(arr):
 
     return output
 
+
 print("\n=== Stable Counting Sort ===")
 arr = [4, 2, 2, 8, 3, 3, 1]
 print(f"Original: {arr}")
@@ -114,6 +120,7 @@ print(f"Stable sorted: {counting_sort_stable(arr)}")
 # =============================================================================
 # 4. COUNTING SORT FOR RANGE [0, k]
 # =============================================================================
+
 
 def counting_sort_range(arr, k):
     """Counting sort for range [0, k]"""
@@ -129,6 +136,7 @@ def counting_sort_range(arr, k):
 
     return sorted_arr
 
+
 print("\n=== Counting Sort with Range ===")
 arr = [2, 1, 1, 0, 3, 2, 3, 0]
 print(f"Original: {arr}")
@@ -138,6 +146,7 @@ print(f"Sorted: {counting_sort_range(arr, 3)}")
 # =============================================================================
 # 5. SORT STRINGS USING COUNTING SORT
 # =============================================================================
+
 
 def counting_sort_strings(strings):
     """Sort strings by first character using counting sort"""
@@ -154,6 +163,7 @@ def counting_sort_strings(strings):
     sorted_strings = sorted(strings, key=lambda s: s[0].lower())
     return sorted_strings
 
+
 print("\n=== Counting Sort Strings ===")
 strings = ["banana", "apple", "cherry", "avocado", "blueberry"]
 print(f"Original: {strings}")
@@ -164,6 +174,7 @@ print(f"Sorted: {counting_sort_strings(strings)}")
 # 6. FREQUENCY SORT
 # =============================================================================
 
+
 def frequency_sort(arr):
     """Sort elements by frequency (most frequent first)"""
     from collections import Counter
@@ -172,6 +183,7 @@ def frequency_sort(arr):
 
     # Sort by frequency (descending), then by value
     return sorted(arr, key=lambda x: (-count[x], x))
+
 
 print("\n=== Frequency Sort ===")
 arr = [2, 3, 5, 3, 7, 9, 5, 3, 7]
@@ -182,6 +194,7 @@ print(f"Frequency sorted: {frequency_sort(arr)}")
 # =============================================================================
 # 7. COUNTING SORT WITH KEY
 # =============================================================================
+
 
 def counting_sort_by_key(arr, key_func):
     """Counting sort with custom key function"""
@@ -209,14 +222,9 @@ def counting_sort_by_key(arr, key_func):
 
     return output
 
+
 print("\n=== Counting Sort by Key ===")
-students = [
-    ("Alice", 85),
-    ("Bob", 92),
-    ("Charlie", 78),
-    ("Diana", 92),
-    ("Eve", 85)
-]
+students = [("Alice", 85), ("Bob", 92), ("Charlie", 78), ("Diana", 92), ("Eve", 85)]
 print(f"Original: {students}")
 sorted_students = counting_sort_by_key(students, lambda x: x[1])
 print(f"Sorted by grade: {sorted_students}")
@@ -225,6 +233,7 @@ print(f"Sorted by grade: {sorted_students}")
 # =============================================================================
 # 8. RADIX SORT USING COUNTING SORT
 # =============================================================================
+
 
 def counting_sort_by_digit(arr, exp):
     """Counting sort used as subroutine for radix sort"""
@@ -246,6 +255,7 @@ def counting_sort_by_digit(arr, exp):
 
     return output
 
+
 def radix_sort(arr):
     """Radix sort using counting sort as subroutine"""
     if not arr:
@@ -260,6 +270,7 @@ def radix_sort(arr):
 
     return arr
 
+
 print("\n=== Radix Sort ===")
 arr = [170, 45, 75, 90, 802, 24, 2, 66]
 print(f"Original: {arr}")
@@ -269,6 +280,7 @@ print(f"Sorted: {radix_sort(arr.copy())}")
 # =============================================================================
 # 9. COUNTING SORT PERFORMANCE
 # =============================================================================
+
 
 def compare_sorting_algorithms():
     """Compare counting sort with comparison sorts"""
@@ -332,14 +344,15 @@ def compare_sorting_algorithms():
                 start = time.time()
                 bubble_sort(test)
                 bubble_time = time.time() - start
-                bubble_str = f"{bubble_time*1000:.2f}ms"
+                bubble_str = f"{bubble_time * 1000:.2f}ms"
             else:
                 bubble_str = "N/A"
 
             print(f"\nn={size}, max={max_val}:")
-            print(f"  Counting: {count_time*1000:.2f}ms")
-            print(f"  Merge:    {merge_time*1000:.2f}ms")
+            print(f"  Counting: {count_time * 1000:.2f}ms")
+            print(f"  Merge:    {merge_time * 1000:.2f}ms")
             print(f"  Bubble:   {bubble_str}")
+
 
 compare_sorting_algorithms()
 
@@ -349,6 +362,7 @@ compare_sorting_algorithms()
 # =============================================================================
 
 print("\n=== Practical Applications ===")
+
 
 # Sort colors (Dutch National Flag problem)
 def sort_colors(arr):
@@ -365,8 +379,10 @@ def sort_colors(arr):
 
     return arr
 
+
 arr = [2, 0, 2, 1, 1, 0]
 print(f"Sort colors {arr}: {sort_colors(arr.copy())}")
+
 
 # Find missing number
 def find_missing(arr, n):
@@ -381,7 +397,9 @@ def find_missing(arr, n):
             return i
     return -1
 
+
 print(f"Missing in [1,2,4,5] from 1..5: {find_missing([1, 2, 4, 5], 5)}")
+
 
 # Sort by absolute value
 def sort_by_absolute(arr):
@@ -397,6 +415,7 @@ def sort_by_absolute(arr):
         sorted_arr.extend([i - max_val] * c)
 
     return sorted_arr
+
 
 arr = [-3, -1, 4, -2, 5, 0]
 print(f"Sort by absolute value {arr}: {sort_by_absolute(arr)}")

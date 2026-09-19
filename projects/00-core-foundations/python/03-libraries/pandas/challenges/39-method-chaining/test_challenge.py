@@ -16,9 +16,7 @@ import os
 from pathlib import Path
 
 TARGET = "solution" if os.environ.get("CHALLENGE_USE_SOLUTION") == "1" else "starter"
-_spec = importlib.util.spec_from_file_location(
-    TARGET, Path(__file__).parent / f"{TARGET}.py"
-)
+_spec = importlib.util.spec_from_file_location(TARGET, Path(__file__).parent / f"{TARGET}.py")
 mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(mod)
 
@@ -64,22 +62,24 @@ class TestFeatureChain:
     """Silver: callable ranks the filtered frame; NaN rows dropped."""
 
     def _free_only(self) -> pd.DataFrame:
-        return pd.DataFrame({
-            "spend": [400.0, 350.0, 200.0, 50.0, 300.0],
-            "plan": ["pro", "pro", "free", "free", "free"],
-        })
+        return pd.DataFrame(
+            {
+                "spend": [400.0, 350.0, 200.0, 50.0, 300.0],
+                "plan": ["pro", "pro", "free", "free", "free"],
+            }
+        )
 
     def test_rank_on_filtered_frame(self) -> None:
         frame = self._free_only()
         result = mod.feature_chain(frame)
         # The frame is sorted by spend descending; check rank by spend value.
         ranks = dict(zip(result["spend"].tolist(), result["rank"].tolist()))
-        assert ranks[300.0] == 1.0 and ranks[200.0] == 2.0 and ranks[50.0] == 3.0, \
+        assert ranks[300.0] == 1.0 and ranks[200.0] == 2.0 and ranks[50.0] == 3.0, (
             "rank must be computed on the FILTERED frame (callable)"
+        )
 
     def test_nan_rows_dropped(self) -> None:
-        frame = pd.DataFrame({"spend": [1.0, np.nan, 3.0],
-                              "plan": ["free", "free", "free"]})
+        frame = pd.DataFrame({"spend": [1.0, np.nan, 3.0], "plan": ["free", "free", "free"]})
         result = mod.feature_chain(frame)
         assert len(result) == 2
         assert result["spend"].tolist() == [3.0, 1.0]  # sorted desc
@@ -93,8 +93,10 @@ class TestFeatureChain:
     def test_sorted_descending(self) -> None:
         frame = self._free_only()
         result = mod.feature_chain(frame)
-        assert result["spend"].is_monotonic_decreasing or \
-            result["spend"].iloc[0] >= result["spend"].iloc[-1]
+        assert (
+            result["spend"].is_monotonic_decreasing
+            or result["spend"].iloc[0] >= result["spend"].iloc[-1]
+        )
 
     def test_empty_result_keeps_columns(self) -> None:
         frame = pd.DataFrame({"spend": [0.0, -1.0], "plan": ["a", "b"]})
@@ -106,21 +108,21 @@ class TestFeatureChain:
     def test_log_spend_matches_formula(self) -> None:
         frame = self._free_only()
         result = mod.feature_chain(frame)
-        assert np.allclose(result["log_spend"].values,
-                           np.log1p(result["spend"].values))
+        assert np.allclose(result["log_spend"].values, np.log1p(result["spend"].values))
 
 
 class TestAddRankAfterFilter:
     """Gold: rank post-query; ranking first then filtering fails."""
 
     def test_rank_excludes_filtered_rows(self) -> None:
-        frame = pd.DataFrame({
-            "spend": [400.0, 350.0, 200.0, 50.0, 300.0],
-            "plan": ["pro", "pro", "free", "free", "free"],
-        })
+        frame = pd.DataFrame(
+            {
+                "spend": [400.0, 350.0, 200.0, 50.0, 300.0],
+                "plan": ["pro", "pro", "free", "free", "free"],
+            }
+        )
         result = mod.add_rank_after_filter(frame, "plan == 'free'", "spend")
-        assert result["rank"].tolist() == [2.0, 3.0, 1.0], \
-            "rank must be computed AFTER the query"
+        assert result["rank"].tolist() == [2.0, 3.0, 1.0], "rank must be computed AFTER the query"
 
     def test_rank_spend_above_threshold(self) -> None:
         frame = pd.DataFrame({"spend": [400.0, 350.0, 200.0, 50.0, 300.0]})
@@ -131,8 +133,7 @@ class TestAddRankAfterFilter:
     def test_filter_preserves_index(self) -> None:
         frame = pd.DataFrame({"spend": [1.0, 2.0, 3.0, 4.0, 5.0]})
         result = mod.add_rank_after_filter(frame, "spend >= 3", "spend")
-        assert result.index.tolist() == [2, 3, 4], \
-            "query must preserve the original index labels"
+        assert result.index.tolist() == [2, 3, 4], "query must preserve the original index labels"
 
 
 class TestPipeThrough:
@@ -156,8 +157,7 @@ class TestPipeThrough:
         add_one = lambda f: f.assign(v=f["v"] + 1)
         times_ten = lambda f: f.assign(v=f["v"] * 10)
         result = mod.pipe_through(frame, add_one, times_ten)
-        assert result["v"].tolist() == [20.0, 30.0], \
-            "transforms must apply in the given order"
+        assert result["v"].tolist() == [20.0, 30.0], "transforms must apply in the given order"
 
 
 if __name__ == "__main__":

@@ -14,11 +14,12 @@ import time
 # 1. reduce() - Apply Function Cumulatively
 # =============================================================================
 
+
 def demo_reduce():
     """Demonstrate functools.reduce."""
     # Sum of squares
     numbers = [1, 2, 3, 4, 5]
-    sum_of_squares = reduce(lambda acc, x: acc + x ** 2, numbers, 0)
+    sum_of_squares = reduce(lambda acc, x: acc + x**2, numbers, 0)
     print(f"  Sum of squares: {sum_of_squares}")
 
     # Find maximum
@@ -40,9 +41,10 @@ def demo_reduce():
 # 2. partial() - Partial Function Application
 # =============================================================================
 
+
 def power(base: float, exponent: float) -> float:
     """Calculate base raised to exponent."""
-    return base ** exponent
+    return base**exponent
 
 
 def demo_partial():
@@ -71,6 +73,7 @@ def demo_partial():
 # 3. lru_cache() - Memoization
 # =============================================================================
 
+
 @lru_cache(maxsize=128)
 def fibonacci(n: int) -> int:
     """Calculate Fibonacci number with caching."""
@@ -83,7 +86,7 @@ def fibonacci(n: int) -> int:
 def expensive_computation(x: int, y: int) -> int:
     """Simulate expensive computation."""
     time.sleep(0.001)  # Small delay to simulate work
-    return x ** y
+    return x**y
 
 
 def demo_lru_cache():
@@ -114,6 +117,7 @@ def demo_lru_cache():
 # =============================================================================
 # 4. total_ordering - Comparison Decorator
 # =============================================================================
+
 
 @total_ordering
 class Temperature:
@@ -157,19 +161,23 @@ def demo_total_ordering():
 # 5. wraps() - Preserve Function Metadata
 # =============================================================================
 
+
 def log_execution(func: Callable) -> Callable:
     """Decorator that logs function execution."""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         print(f"  Calling {func.__name__}")
         result = func(*args, **kwargs)
         print(f"  {func.__name__} returned {result}")
         return result
+
     return wrapper
 
 
 def demo_wraps():
     """Demonstrate wraps decorator."""
+
     @log_execution
     def add(a: int, b: int) -> int:
         """Add two numbers."""
@@ -183,6 +191,7 @@ def demo_wraps():
 # =============================================================================
 # 6. cached_property - Cached Instance Attribute
 # =============================================================================
+
 
 class DataProcessor:
     """Example using cached_property."""
@@ -220,13 +229,16 @@ def demo_cached_property():
 # 7. Function Composition
 # =============================================================================
 
+
 def compose(*functions: Callable) -> Callable:
     """Compose multiple functions into one."""
+
     def composed(arg):
         result = arg
         for func in reversed(functions):
             result = func(result)
         return result
+
     return composed
 
 
@@ -234,7 +246,7 @@ def demo_composition():
     """Demonstrate function composition."""
     double = lambda x: x * 2
     add_one = lambda x: x + 1
-    square = lambda x: x ** 2
+    square = lambda x: x**2
 
     # Compose: square(add_one(double(x)))
     transform = compose(square, add_one, double)

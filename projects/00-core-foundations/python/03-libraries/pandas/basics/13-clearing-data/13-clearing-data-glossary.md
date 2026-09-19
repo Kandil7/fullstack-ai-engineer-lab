@@ -31,7 +31,7 @@
 **Backward Fill (`bfill`)**
 Fills missing values with the next valid observation. Useful for time series where future values can represent current state.
 ```python
-df['price'] = df['price'].bfill()
+df["price"] = df["price"].bfill()
 ```
 
 ### C
@@ -39,7 +39,7 @@ df['price'] = df['price'].bfill()
 **Coerce (errors='coerce')**
 A parameter in `to_numeric()` and `to_datetime()` that converts unparseable values to NaN instead of raising an error.
 ```python
-df['amount'] = pd.to_numeric(df['amount'], errors='coerce')
+df["amount"] = pd.to_numeric(df["amount"], errors="coerce")
 ```
 
 ### D
@@ -62,7 +62,7 @@ df.info()
 **describe(include='all')**
 Generates statistics for all columns including object (string) columns, showing unique counts, top values, and frequency.
 ```python
-df.describe(include='all')
+df.describe(include="all")
 ```
 
 **Duplicate Rows**
@@ -72,7 +72,7 @@ Rows that are identical across all columns, or identical across a subset of key 
 df.duplicated().sum()
 
 # Duplicates on specific keys
-df.duplicated(subset=['email'])
+df.duplicated(subset=["email"])
 ```
 
 ### F
@@ -80,13 +80,13 @@ df.duplicated(subset=['email'])
 **Fill Value**
 A replacement value used with `fillna()` to substitute missing data. Can be a scalar, dictionary, or Series.
 ```python
-df.fillna({'price': 0, 'name': 'Unknown', 'score': df['score'].mean()})
+df.fillna({"price": 0, "name": "Unknown", "score": df["score"].mean()})
 ```
 
 **Forward Fill (`ffill`)**
 Propagates the last valid observation forward to fill gaps. Common in time series data.
 ```python
-df['temperature'] = df['temperature'].ffill()
+df["temperature"] = df["temperature"].ffill()
 ```
 
 ### I
@@ -94,16 +94,16 @@ df['temperature'] = df['temperature'].ffill()
 **IQR (Interquartile Range)**
 The range between the 25th and 75th percentiles. Used to detect outliers: values below Q1−1.5×IQR or above Q3+1.5×IQR are outliers.
 ```python
-Q1 = df['price'].quantile(0.25)
-Q3 = df['price'].quantile(0.75)
+Q1 = df["price"].quantile(0.25)
+Q3 = df["price"].quantile(0.75)
 IQR = Q3 - Q1
-outliers = df[(df['price'] < Q1 - 1.5*IQR) | (df['price'] > Q3 + 1.5*IQR)]
+outliers = df[(df["price"] < Q1 - 1.5 * IQR) | (df["price"] > Q3 + 1.5 * IQR)]
 ```
 
 **Interpolation**
 Estimates missing values based on surrounding data. Linear interpolation draws a straight line between known points.
 ```python
-df['stock'] = df['stock'].interpolate(method='linear')
+df["stock"] = df["stock"].interpolate(method="linear")
 ```
 
 ### M
@@ -132,15 +132,15 @@ df_clean = df_clean.dropna()
 **Placeholder Values**
 Strings like "N/A", "-", "unknown", or empty strings that represent missing data but are not actual NaN. Must be replaced with NaN before using `fillna()` or `dropna()`.
 ```python
-df = df.replace(['N/A', '-', '', 'unknown'], np.nan)
+df = df.replace(["N/A", "-", "", "unknown"], np.nan)
 ```
 
 **Pipeline (Cleaning)**
 A sequence of data cleaning steps wrapped in a reusable function. Ensures consistency and reproducibility.
 ```python
 def clean_data(df):
-    df = df.replace(['N/A', ''], np.nan)
-    df = df.dropna(subset=['id'])
+    df = df.replace(["N/A", ""], np.nan)
+    df = df.dropna(subset=["id"])
     df = df.drop_duplicates()
     return df
 ```
@@ -150,13 +150,13 @@ def clean_data(df):
 **rename()**
 Changes column names or index labels. Accepts a dictionary mapping old names to new names.
 ```python
-df = df.rename(columns={'old': 'new', 'Price ($)': 'price_usd'})
+df = df.rename(columns={"old": "new", "Price ($)": "price_usd"})
 ```
 
 **replace()**
 Substitutes specific values throughout the DataFrame. Useful for converting placeholder strings to NaN.
 ```python
-df = df.replace({'N/A': np.nan, '-': np.nan})
+df = df.replace({"N/A": np.nan, "-": np.nan})
 ```
 
 ### S
@@ -164,13 +164,13 @@ df = df.replace({'N/A': np.nan, '-': np.nan})
 **String Cleaning**
 Operations on text columns: stripping whitespace, normalizing case, removing special characters. Done with the `.str` accessor.
 ```python
-df['name'] = df['name'].str.strip().str.title()
+df["name"] = df["name"].str.strip().str.title()
 ```
 
 **strip()**
 Removes leading and trailing whitespace from string values.
 ```python
-df['name'] = df['name'].str.strip()
+df["name"] = df["name"].str.strip()
 ```
 
 ### T
@@ -178,8 +178,8 @@ df['name'] = df['name'].str.strip()
 **Type Conversion (astype)**
 Changes the dtype of a column. Use `pd.to_numeric()` or `pd.to_datetime()` for safer conversion with error handling.
 ```python
-df['quantity'] = df['quantity'].astype(int)          # Direct cast
-df['amount'] = pd.to_numeric(df['amount'], errors='coerce')  # Safe cast
+df["quantity"] = df["quantity"].astype(int)  # Direct cast
+df["amount"] = pd.to_numeric(df["amount"], errors="coerce")  # Safe cast
 ```
 
 ### Z
@@ -188,7 +188,8 @@ df['amount'] = pd.to_numeric(df['amount'], errors='coerce')  # Safe cast
 Number of standard deviations from the mean. Values with |z| > 3 are commonly considered outliers.
 ```python
 from scipy import stats
-z = np.abs(stats.zscore(df['price']))
+
+z = np.abs(stats.zscore(df["price"]))
 df_clean = df[z < 3]
 ```
 
@@ -203,30 +204,30 @@ import pandas as pd
 import numpy as np
 
 # Load messy data
-df = pd.read_csv('messy_data.csv')
+df = pd.read_csv("messy_data.csv")
 
 # Step 1: Replace placeholders
-df = df.replace(['N/A', 'n/a', '-', '', 'unknown'], np.nan)
+df = df.replace(["N/A", "n/a", "-", "", "unknown"], np.nan)
 
 # Step 2: Inspect
 print("Missing values:\n", df.isnull().sum())
 
 # Step 3: Drop rows missing critical fields
-df = df.dropna(subset=['id', 'date'])
+df = df.dropna(subset=["id", "date"])
 
 # Step 4: Fill remaining
-df['category'] = df['category'].fillna('Other')
-df['price'] = df['price'].fillna(df['price'].median())
+df["category"] = df["category"].fillna("Other")
+df["price"] = df["price"].fillna(df["price"].median())
 
 # Step 5: Fix types
-df['price'] = pd.to_numeric(df['price'], errors='coerce')
-df['date'] = pd.to_datetime(df['date'], errors='coerce')
+df["price"] = pd.to_numeric(df["price"], errors="coerce")
+df["date"] = pd.to_datetime(df["date"], errors="coerce")
 
 # Step 6: Remove duplicates
 df = df.drop_duplicates()
 
 # Step 7: Clean strings
-for col in df.select_dtypes(include='object'):
+for col in df.select_dtypes(include="object"):
     df[col] = df[col].str.strip().str.title()
 
 # Step 8: Validate
@@ -238,24 +239,27 @@ print(df.describe())
 ### Example 2: Outlier Detection
 
 ```python
-def flag_outliers(df, columns, method='iqr', threshold=1.5):
+def flag_outliers(df, columns, method="iqr", threshold=1.5):
     """Add boolean columns flagging outliers."""
     for col in columns:
-        if method == 'iqr':
+        if method == "iqr":
             Q1 = df[col].quantile(0.25)
             Q3 = df[col].quantile(0.75)
             IQR = Q3 - Q1
-            df[f'{col}_outlier'] = (df[col] < Q1 - threshold*IQR) | \
-                                    (df[col] > Q3 + threshold*IQR)
-        elif method == 'zscore':
+            df[f"{col}_outlier"] = (df[col] < Q1 - threshold * IQR) | (
+                df[col] > Q3 + threshold * IQR
+            )
+        elif method == "zscore":
             from scipy import stats
+
             z = np.abs(stats.zscore(df[col].dropna()))
-            df[f'{col}_outlier'] = False
-            df.loc[df[col].notna(), f'{col}_outlier'] = z > threshold
+            df[f"{col}_outlier"] = False
+            df.loc[df[col].notna(), f"{col}_outlier"] = z > threshold
     return df
 
-df = flag_outliers(df, ['price', 'quantity'], method='iqr')
-print(df[['price', 'price_outlier']].query('price_outlier == True'))
+
+df = flag_outliers(df, ["price", "quantity"], method="iqr")
+print(df[["price", "price_outlier"]].query("price_outlier == True"))
 ```
 
 ---

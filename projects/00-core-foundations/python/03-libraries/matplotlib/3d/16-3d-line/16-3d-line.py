@@ -3,14 +3,17 @@ Matplotlib 3D Line Plots - W3Schools Exercises
 ================================================
 3D line plotting and parametric curves.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -48,7 +51,7 @@ def exercise_02():
     # Use scatter with connected segments
     for i in range(len(t) - 1):
         color = plt.cm.hsv(i / len(t))
-        ax.plot(x[i:i+2], y[i:i+2], z[i:i+2], color=color, linewidth=1.5)
+        ax.plot(x[i : i + 2], y[i : i + 2], z[i : i + 2], color=color, linewidth=1.5)
     ax.set_title("Exercise 2: Color-Changing 3D Curve")
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
@@ -95,7 +98,7 @@ def exercise_04():
         x = np.cumsum(np.random.randn(300) * 0.1)
         y = np.cumsum(np.random.randn(300) * 0.1)
         z = np.cumsum(np.random.randn(300) * 0.1) + i * 2
-        ax.plot(x, y, z, color=c, linewidth=1.5, label=f"Path {i+1}")
+        ax.plot(x, y, z, color=c, linewidth=1.5, label=f"Path {i + 1}")
 
     ax.legend()
     ax.set_title("Exercise 4: Multiple 3D Trajectories")

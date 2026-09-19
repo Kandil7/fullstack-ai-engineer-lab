@@ -42,6 +42,7 @@ conn.commit()
 print(f"Table 'employees' created with {len(employees)} rows.")
 print()
 
+
 def show_employees(label=""):
     if label:
         print(f"--- {label} ---")
@@ -49,6 +50,7 @@ def show_employees(label=""):
     for row in cursor.fetchall():
         print(f"  {row}")
     print()
+
 
 show_employees("Initial data")
 

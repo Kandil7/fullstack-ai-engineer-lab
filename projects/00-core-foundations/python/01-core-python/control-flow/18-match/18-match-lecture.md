@@ -52,6 +52,7 @@ def http_status(status):
         case _:
             return f"Unknown: {status}"
 
+
 print(http_status(200))  # OK
 print(http_status(418))  # Unknown: 418
 
@@ -78,10 +79,11 @@ def describe(value):
         case list():
             print(f"List of {len(value)} items")
 
-describe(42)           # Integer: 42
-describe(3.14)         # Float: 3.14
-describe("hello")      # String: hello
-describe([1, 2, 3])    # List of 3 items
+
+describe(42)  # Integer: 42
+describe(3.14)  # Float: 3.14
+describe("hello")  # String: hello
+describe([1, 2, 3])  # List of 3 items
 ```
 
 ### 4. Class Patterns
@@ -92,6 +94,7 @@ class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
 
 def classify_point(point):
     match point:
@@ -106,10 +109,11 @@ def classify_point(point):
         case Point(x=x, y=y):
             return f"Point at ({x}, {y})"
 
-print(classify_point(Point(0, 0)))      # Origin
-print(classify_point(Point(0, 5)))      # On Y-axis at 5
-print(classify_point(Point(3, 3)))      # On diagonal at (3, 3)
-print(classify_point(Point(2, 4)))      # Point at (2, 4)
+
+print(classify_point(Point(0, 0)))  # Origin
+print(classify_point(Point(0, 5)))  # On Y-axis at 5
+print(classify_point(Point(3, 3)))  # On diagonal at (3, 3)
+print(classify_point(Point(2, 4)))  # Point at (2, 4)
 ```
 
 ### 5. Sequence Patterns
@@ -127,10 +131,12 @@ def describe_list(items):
         case [x, *rest]:
             print(f"First: {x}, rest: {rest}")
 
-describe_list([])              # Empty list
-describe_list([42])            # Single item: 42
-describe_list([1, 2])          # Two items: 1 and 2
-describe_list([1, 2, 3, 4])    # First: 1, rest: [2, 3, 4]
+
+describe_list([])  # Empty list
+describe_list([42])  # Single item: 42
+describe_list([1, 2])  # Two items: 1 and 2
+describe_list([1, 2, 3, 4])  # First: 1, rest: [2, 3, 4]
+
 
 # Tuple matching
 def process_point(point):
@@ -143,6 +149,7 @@ def process_point(point):
             return f"Y-axis: {y}"
         case (x, y):
             return f"Point: ({x}, {y})"
+
 
 print(process_point((0, 0)))  # Origin
 print(process_point((5, 0)))  # X-axis: 5
@@ -166,9 +173,10 @@ def handle_event(event):
         case _:
             print("Invalid event")
 
-handle_event({"type": "click", "x": 100, "y": 200})   # Click at (100, 200)
-handle_event({"type": "keypress", "key": "enter"})      # Key pressed: enter
-handle_event({"type": "scroll", "direction": "up"})     # Scrolling up
+
+handle_event({"type": "click", "x": 100, "y": 200})  # Click at (100, 200)
+handle_event({"type": "keypress", "key": "enter"})  # Key pressed: enter
+handle_event({"type": "scroll", "direction": "up"})  # Scrolling up
 
 # Extra keys are ignored
 handle_event({"type": "click", "x": 10, "y": 20, "button": "left"})
@@ -190,10 +198,11 @@ def categorize_number(n):
         case x:
             return f"Positive odd: {x}"
 
+
 print(categorize_number(-5))  # Negative: -5
-print(categorize_number(0))   # Zero
-print(categorize_number(4))   # Positive even: 4
-print(categorize_number(7))   # Positive odd: 7
+print(categorize_number(0))  # Zero
+print(categorize_number(4))  # Positive even: 4
+print(categorize_number(7))  # Positive odd: 7
 ```
 
 ### 8. Complex Nested Patterns
@@ -215,11 +224,12 @@ def process_command(command):
         case _:
             return f"Unknown command: {command}"
 
-print(process_command(["quit"]))                        # Exiting
-print(process_command(["help", "python"]))              # Help for: python
-print(process_command(["move", "north", 5]))            # Moving north by 5 steps
-print(process_command(["set", "color", "red"]))         # Setting color = red
-print(process_command(["delete", "file.txt"]))          # Unknown command: [...]
+
+print(process_command(["quit"]))  # Exiting
+print(process_command(["help", "python"]))  # Help for: python
+print(process_command(["move", "north", 5]))  # Moving north by 5 steps
+print(process_command(["set", "color", "red"]))  # Setting color = red
+print(process_command(["delete", "file.txt"]))  # Unknown command: [...]
 ```
 
 ---
@@ -248,10 +258,11 @@ def parse_json_value(value):
         case _:
             return str(value)
 
-print(parse_json_value(None))              # null
-print(parse_json_value(True))              # true
-print(parse_json_value(42))                # 42
-print(parse_json_value("hello"))           # "hello"
+
+print(parse_json_value(None))  # null
+print(parse_json_value(True))  # true
+print(parse_json_value(42))  # 42
+print(parse_json_value("hello"))  # "hello"
 print(parse_json_value([1, "two", None]))  # [1, "two", null]
 ```
 
@@ -273,9 +284,10 @@ def process_state(state, action):
         case _:
             return state  # No change
 
-print(process_state("idle", "start"))    # running
-print(process_state("running", "pause")) # paused
-print(process_state("paused", "stop"))   # idle
+
+print(process_state("idle", "start"))  # running
+print(process_state("running", "pause"))  # paused
+print(process_state("paused", "stop"))  # idle
 ```
 
 ### Example 3: Data Validation
@@ -294,6 +306,7 @@ def validate_user(data):
         case _:
             return "Invalid data format"
 
+
 print(validate_user({"name": "Alice", "age": 30, "email": "alice@test.com"}))
 # Valid user: Alice
 print(validate_user({"name": "Bob"}))
@@ -310,15 +323,18 @@ class Number:
     def __init__(self, value):
         self.value = value
 
+
 class Add:
     def __init__(self, left, right):
         self.left = left
         self.right = right
 
+
 class Multiply:
     def __init__(self, left, right):
         self.left = left
         self.right = right
+
 
 def evaluate(expr):
     match expr:
@@ -330,6 +346,7 @@ def evaluate(expr):
             return evaluate(l) * evaluate(r)
         case _:
             raise ValueError(f"Unknown expression: {expr}")
+
 
 # (3 + 4) * 5
 expr = Multiply(Add(Number(3), Number(4)), Number(5))
@@ -347,6 +364,7 @@ print(evaluate(expr))  # 35
 
 # For older Python, use if/elif
 import sys
+
 if sys.version_info >= (3, 10):
     # Can use match
     pass
@@ -422,6 +440,7 @@ def parse_color(color_str):
     # Your code here using match
     pass
 
+
 # Expected: (255, 0, 0)
 print(parse_color("red"))
 print(parse_color("rgb(255, 0, 0)"))
@@ -434,8 +453,10 @@ Write a function that calculates the area of different shapes given as tuples: (
 ```python
 def shape_area(shape):
     import math
+
     # Your code here using match
     pass
+
 
 # Expected: ~78.54
 print(shape_area(("circle", 5)))
@@ -450,6 +471,7 @@ Write a function that evaluates expressions given as tuples: ("add", a, b), ("mu
 def calculate(expr):
     # Your code here using match
     pass
+
 
 # Expected: 8
 print(calculate(("add", 3, 5)))

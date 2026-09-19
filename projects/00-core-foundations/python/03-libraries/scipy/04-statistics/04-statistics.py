@@ -12,11 +12,17 @@ Topics:
 """
 
 import numpy as np
+
 # Ensure output directory exists (Tier 0 fix: Windows + CI)
 import os
-os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
+os.makedirs(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy",
+    exist_ok=True,
+)
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import stats
@@ -64,8 +70,13 @@ axes[1].set_title("Sample Histogram vs PDF")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_distributions.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_distributions.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_distributions.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_distributions.png"
+)
 
 # ============================================================
 # Example 2: Comparing Multiple Distributions
@@ -75,11 +86,11 @@ print("Example 2: Comparing Multiple Distributions")
 print("=" * 60)
 
 distributions = {
-    "Normal(0,1)":     stats.norm(0, 1),
-    "Uniform(0,1)":    stats.uniform(0, 1),
-    "Exponential(1)":  stats.expon(0, 1),
-    "Beta(2,5)":       stats.beta(2, 5),
-    "Gamma(2,1)":      stats.gamma(2, 0, 1),
+    "Normal(0,1)": stats.norm(0, 1),
+    "Uniform(0,1)": stats.uniform(0, 1),
+    "Exponential(1)": stats.expon(0, 1),
+    "Beta(2,5)": stats.beta(2, 5),
+    "Gamma(2,1)": stats.gamma(2, 0, 1),
 }
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
@@ -102,16 +113,23 @@ axes[1].set_ylabel("F(x)")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_multi_dist.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_multi_dist.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_multi_dist.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_multi_dist.png"
+)
 
 # Quick stats summary for each
 print(f"\n{'Distribution':<20s} {'Mean':>8s} {'Std':>8s} {'Skew':>8s} {'Kurt':>8s}")
 print("-" * 52)
 for name, dist in distributions.items():
     rvs = dist.rvs(size=10000, random_state=42)
-    print(f"{name:<20s} {rvs.mean():8.4f} {rvs.std():8.4f} "
-          f"{stats.skew(rvs):8.4f} {stats.kurtosis(rvs):8.4f}")
+    print(
+        f"{name:<20s} {rvs.mean():8.4f} {rvs.std():8.4f} "
+        f"{stats.skew(rvs):8.4f} {stats.kurtosis(rvs):8.4f}"
+    )
 
 # ============================================================
 # Example 3: Descriptive Statistics
@@ -122,10 +140,12 @@ print("=" * 60)
 
 # Generate sample data (exam scores)
 np.random.seed(42)
-exam_scores = np.concatenate([
-    np.random.normal(72, 12, 80),   # Main group
-    np.random.normal(90, 5, 20),    # High performers
-])
+exam_scores = np.concatenate(
+    [
+        np.random.normal(72, 12, 80),  # Main group
+        np.random.normal(90, 5, 20),  # High performers
+    ]
+)
 exam_scores = np.clip(exam_scores, 0, 100)
 
 # Full descriptive statistics
@@ -191,7 +211,7 @@ print(f"  p-value:     {p_val3:.4f}")
 
 # --- Chi-square test ---
 observed = np.array([50, 30, 20])
-expected = np.array([1/3, 1/3, 1/3]) * observed.sum()
+expected = np.array([1 / 3, 1 / 3, 1 / 3]) * observed.sum()
 chi2_result = stats.chisquare(observed, f_exp=expected)
 chi2, p_chi2 = chi2_result
 dof = len(observed) - 1
@@ -230,17 +250,20 @@ print(f"  Std error:     {std_err:.4f}")
 # Plot regression
 fig, ax = plt.subplots(figsize=(8, 5))
 ax.scatter(x, y, alpha=0.5, s=20, label="Data points")
-ax.plot(x, slope * x + intercept, "r-", linewidth=2,
-        label=f"Fit: y={slope:.2f}x + {intercept:.2f}")
+ax.plot(x, slope * x + intercept, "r-", linewidth=2, label=f"Fit: y={slope:.2f}x + {intercept:.2f}")
 ax.set_title("Linear Regression with scipy.stats.linregress")
 ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_regression.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_regression.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_regression.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_04_regression.png"
+)
 
 print("\n[OK] SciPy statistics module covered!")
 print("   Next: 05-integration.py for numerical integration.")
-

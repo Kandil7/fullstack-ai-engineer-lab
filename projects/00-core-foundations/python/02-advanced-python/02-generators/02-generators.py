@@ -13,6 +13,7 @@ from typing import Iterator, Generator, Optional
 # 1. Basic Generator Functions
 # =============================================================================
 
+
 def countdown(n: int) -> Generator[int, None, None]:
     """Count down from n to 1."""
     print(f"  Starting countdown from {n}")
@@ -41,6 +42,7 @@ def read_large_file(filepath: str) -> Generator[str, None, None]:
 # 2. Generator with send()
 # =============================================================================
 
+
 def accumulator() -> Generator[int, None, None]:
     """Accumulate values sent to it."""
     total = 0
@@ -64,20 +66,22 @@ def coroutine_example():
 # 3. Generator Expressions
 # =============================================================================
 
+
 def generator_vs_list():
     """Compare memory usage of generators vs lists."""
     # List comprehension - stores all values in memory
-    list_comp = [x ** 2 for x in range(1000000)]
+    list_comp = [x**2 for x in range(1000000)]
     print(f"  List size: {sys.getsizeof(list_comp):,} bytes")
 
     # Generator expression - stores only the generator object
-    gen_exp = (x ** 2 for x in range(1000000))
+    gen_exp = (x**2 for x in range(1000000))
     print(f"  Generator size: {sys.getsizeof(gen_exp)} bytes")
 
 
 # =============================================================================
 # 4. Generator Pipelines
 # =============================================================================
+
 
 def read_data() -> Generator[str, None, None]:
     """Stage 1: Read raw data."""
@@ -110,6 +114,7 @@ def transform_data(data: Generator) -> Generator[dict, None, None]:
 # =============================================================================
 # 5. Infinite Sequences
 # =============================================================================
+
 
 def infinite_counter(start: int = 0, step: int = 1) -> Generator[int, None, None]:
     """Infinite counter starting from a value."""
@@ -168,12 +173,7 @@ if __name__ == "__main__":
 
     # 4. Generator pipeline
     print("\n--- Generator Pipeline ---")
-    pipeline = transform_data(
-        filter_data(
-            parse_data(read_data()),
-            min_value=4
-        )
-    )
+    pipeline = transform_data(filter_data(parse_data(read_data()), min_value=4))
     for item in pipeline:
         print(f"  {item['label']}")
 

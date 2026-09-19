@@ -29,6 +29,7 @@ Pydantic models are the backbone of FastAPI's data handling. They define the sha
 ```python
 from pydantic import BaseModel
 
+
 class Item(BaseModel):
     name: str
     description: str | None = None
@@ -72,10 +73,12 @@ def create_item(item: Item):
 def read_item(item_id: int):
     return {"item_id": item_id}
 
+
 # Query parameter: comes after ? in the URL
 @app.get("/items/")
 def read_items(skip: int = 0, limit: int = 10):
     return {"skip": skip, "limit": limit}
+
 
 # Both together
 @app.get("/items/{item_id}")
@@ -110,8 +113,10 @@ FastAPI returns 200 by default, but you can override it:
 def create_item(item: Item):
     return item
 
+
 # Using HTTPException for error responses
 from fastapi import HTTPException
+
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int):
@@ -146,6 +151,7 @@ fake_items_db: list[dict] = [
     {"id": 2, "name": "Phone", "price": 699.99},
 ]
 
+
 # Reading from it
 @app.get("/items/{item_id}")
 def read_item(item_id: int):
@@ -160,6 +166,7 @@ A health check endpoint is a standard pattern in production APIs:
 
 ```python
 from datetime import datetime
+
 
 @app.get("/health")
 def health_check():
@@ -182,18 +189,22 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Items API")
 
+
 class Item(BaseModel):
     name: str
     price: float
     description: str | None = None
 
+
 # In-memory database
 items_db: list[dict] = []
 next_id = 1
 
+
 @app.get("/")
 def root():
     return {"message": "Items API", "tips": ["Use /docs for interactive docs"]}
+
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int):
@@ -202,10 +213,12 @@ def read_item(item_id: int):
         raise HTTPException(status_code=404, detail="Item not found")
     return items_db[item_id - 1]
 
+
 @app.get("/items/")
 def read_items(skip: int = 0, limit: int = 10):
     """Get a list of items with pagination."""
     return items_db[skip : skip + limit]
+
 
 @app.post("/items/", status_code=201)
 def create_item(item: Item) -> dict:
@@ -214,6 +227,7 @@ def create_item(item: Item) -> dict:
     item_dict["id"] = len(items_db) + 1
     items_db.append(item_dict)
     return item_dict
+
 
 @app.put("/items/{item_id}")
 def update_item(item_id: int, item: Item):
@@ -224,6 +238,7 @@ def update_item(item_id: int, item: Item):
     item_dict["id"] = item_id
     items_db[item_id - 1] = item_dict
     return item_dict
+
 
 @app.delete("/items/{item_id}")
 def delete_item(item_id: int):
@@ -239,13 +254,15 @@ def delete_item(item_id: int):
 ```python
 from pydantic import BaseModel
 
+
 class User(BaseModel):
     name: str
     email: str
     age: int
     bio: str | None = None  # Optional
     is_active: bool = True  # Has default
-    tags: list[str] = []    # Has default
+    tags: list[str] = []  # Has default
+
 
 # Valid requests:
 # {"name": "Alice", "email": "alice@test.com", "age": 30}
@@ -285,7 +302,6 @@ def read_items(skip: int = 0, limit: int = 10):
 ```python
 # Wrong: Can't have a query param before a path param
 @app.get("/items/{item_id}/?q=search")
-
 # Correct: Path params come first, query params after
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: str | None = None):
@@ -298,6 +314,7 @@ def read_item(item_id: int, q: str | None = None):
 @app.get("/items/{item_id}")
 def read_item(item_id: int):
     return fake_items_db[item_id - 1]  # IndexError if not found!
+
 
 # Correct: Validate existence
 @app.get("/items/{item_id}")
@@ -314,6 +331,7 @@ def read_item(item_id: int):
 def create_item(item: Item):
     items_db.append(item)  # TypeError!
 
+
 # Correct: Convert to dict first
 @app.post("/items/")
 def create_item(item: Item):
@@ -329,6 +347,7 @@ def create_item(item: Item):
 def update_item(item_id: int, item: Item):
     # Client must send ALL fields
     ...
+
 
 # PATCH = partial update (only changed fields)
 @app.patch("/items/{item_id}")

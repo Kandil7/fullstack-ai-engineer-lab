@@ -51,9 +51,7 @@ class TestDedup:
         out = target.dedup_chunks(items)
         elapsed = time.perf_counter() - start
         assert len(out) == 1000
-        assert elapsed < 2.0, (
-            f"dedup took {elapsed:.2f}s: O(n^2) in-list scan, use a set"
-        )
+        assert elapsed < 2.0, f"dedup took {elapsed:.2f}s: O(n^2) in-list scan, use a set"
 
 
 class TestHashJoin:
@@ -88,9 +86,7 @@ class TestHashJoin:
         elapsed = time.perf_counter() - start
         assert len(joined) == n
         assert joined[0] == (0, "t0")
-        assert elapsed < 1.0, (
-            f"join took {elapsed:.2f}s: nested scan is O(n^2), use a dict"
-        )
+        assert elapsed < 1.0, f"join took {elapsed:.2f}s: nested scan is O(n^2), use a dict"
 
 
 class TestFibStats:
@@ -110,9 +106,7 @@ class TestFibStats:
     def test_twenty_five(self):
         result, calls = target.fib_stats(25)
         assert result == 75025
-        assert calls <= 60, (
-            f"{calls} calls at n=25: naive fib makes 242,785 — memoize"
-        )
+        assert calls <= 60, f"{calls} calls at n=25: naive fib makes 242,785 — memoize"
 
 
 if __name__ == "__main__":

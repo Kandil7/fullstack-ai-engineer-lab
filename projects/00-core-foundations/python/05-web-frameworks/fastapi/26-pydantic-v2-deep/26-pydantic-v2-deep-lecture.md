@@ -155,6 +155,7 @@ class StrictId(BaseModel):
     model_config = ConfigDict(strict=True)
     user_id: int
 
+
 # StrictId(user_id="42") -> ValidationError (rejected, not coerced)
 ```
 
@@ -172,8 +173,8 @@ Not everything is a model. A list of IDs, a bare string, a dict — wrap with
 
 ```python
 IntList = TypeAdapter(list[int])
-IntList.validate_python([1, 2, 3])      # [1, 2, 3]
-IntList.validate_python([1, "x"])       # ValidationError
+IntList.validate_python([1, 2, 3])  # [1, 2, 3]
+IntList.validate_python([1, "x"])  # ValidationError
 ```
 
 Output:
@@ -192,6 +193,7 @@ class LegacyAPI(BaseModel):
     user_id: int
     user_name: str = Field(serialization_alias="userName")
 
+
 LegacyAPI(user_id=1, user_name="ada").model_dump(by_alias=True)
 # -> {"user_id": 1, "userName": "ada"}
 ```
@@ -208,6 +210,8 @@ Output:
 # WRONG — one list shared by every instance
 class Bad(BaseModel):
     tags: list[str] = []
+
+
 # CORRECT
 class Good(BaseModel):
     tags: list[str] = Field(default_factory=list)
@@ -218,6 +222,8 @@ class Good(BaseModel):
 # WRONG — ValidationError is raised by Pydantic, not by you
 def v(cls, x):
     raise RuntimeError("bad")
+
+
 # CORRECT — raise ValueError/AssertionError inside validators
 ```
 
@@ -225,7 +231,10 @@ def v(cls, x):
 ```python
 # WRONG — 'after' sees int 3, strip() fails with AttributeError
 @field_validator("qty")
-def coerce(cls, v): return v.strip()
+def coerce(cls, v):
+    return v.strip()
+
+
 # CORRECT — mode="before" sees the raw string
 ```
 

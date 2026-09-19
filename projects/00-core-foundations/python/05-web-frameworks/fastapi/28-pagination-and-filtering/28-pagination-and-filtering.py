@@ -40,21 +40,17 @@ class Page(BaseModel):
 # 1. Offset pagination — the classic, and its scaling problem
 # ============================================================
 @app.get("/api/offset", response_model=Page)
-def offset_page(limit: int = Query(20, ge=1, le=100),
-                offset: int = Query(0, ge=0)) -> Page:
+def offset_page(limit: int = Query(20, ge=1, le=100), offset: int = Query(0, ge=0)) -> Page:
     """Offset/limit. Fine for small tables; O(offset) scans at scale."""
-    items = DB[offset:offset + limit]
-    return Page(items=items,
-                has_more=offset + limit < len(DB),
-                total=len(DB))
+    items = DB[offset : offset + limit]
+    return Page(items=items, has_more=offset + limit < len(DB), total=len(DB))
 
 
 # ============================================================
 # 2. Keyset (cursor) pagination — stable under writes and scale
 # ============================================================
 @app.get("/api/keyset", response_model=Page)
-def keyset_page(limit: int = Query(20, ge=1, le=100),
-                cursor: str | None = None) -> Page:
+def keyset_page(limit: int = Query(20, ge=1, le=100), cursor: str | None = None) -> Page:
     """Cursor = opaque token encoding the last-seen id.
 
     WHERE id > :last ORDER BY id LIMIT :n — an index range scan, O(limit),
@@ -64,19 +60,23 @@ def keyset_page(limit: int = Query(20, ge=1, le=100),
     start = int(cursor) if cursor else -1
     items = [r for r in DB if r["id"] > start][:limit]
     last_id = items[-1]["id"] if items else start
-    return Page(items=items,
-                next_cursor=str(last_id) if len(items) == limit else None,
-                has_more=len(items) == limit)
+    return Page(
+        items=items,
+        next_cursor=str(last_id) if len(items) == limit else None,
+        has_more=len(items) == limit,
+    )
 
 
 # ============================================================
 # 3. Filtering — a small, explicit filter DSL
 # ============================================================
 @app.get("/api/search", response_model=Page)
-def search(name_contains: str | None = Query(None),
-           min_score: int | None = Query(None, ge=0, le=999),
-           sort: str = Query("id", pattern="^(id|score|name)$"),
-           limit: int = Query(20, ge=1, le=100)) -> Page:
+def search(
+    name_contains: str | None = Query(None),
+    min_score: int | None = Query(None, ge=0, le=999),
+    sort: str = Query("id", pattern="^(id|score|name)$"),
+    limit: int = Query(20, ge=1, le=100),
+) -> Page:
     """Explicit query parameters: readable, documentable, safe.
 
     Alternative DSLs (filters=score:gt:100) trade readability for
@@ -168,6 +168,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("28-pagination-and-filtering:app", host="127.0.0.1", port=8000)
     else:
         _verify()

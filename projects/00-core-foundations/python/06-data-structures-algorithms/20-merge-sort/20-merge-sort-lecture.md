@@ -61,41 +61,42 @@ When array has 0 or 1 elements, it's already sorted.
 def merge_sort(arr):
     """
     Basic merge sort implementation.
-    
+
     Time Complexity: O(n log n) in all cases
     Space Complexity: O(n) for temporary arrays
-    
+
     Args:
         arr: List to sort
-    
+
     Returns:
         Sorted list
     """
     if len(arr) <= 1:
         return arr
-    
+
     # Divide
     mid = len(arr) // 2
     left = merge_sort(arr[:mid])
     right = merge_sort(arr[mid:])
-    
+
     # Conquer (merge)
     return merge(left, right)
+
 
 def merge(left, right):
     """
     Merge two sorted arrays into one sorted array.
-    
+
     Args:
         left: First sorted array
         right: Second sorted array
-    
+
     Returns:
         Merged sorted array
     """
     result = []
     i = j = 0
-    
+
     # Compare elements and merge
     while i < len(left) and j < len(right):
         if left[i] <= right[j]:
@@ -104,12 +105,13 @@ def merge(left, right):
         else:
             result.append(right[j])
             j += 1
-    
+
     # Add remaining elements
     result.extend(left[i:])
     result.extend(right[j:])
-    
+
     return result
+
 
 # Example usage
 arr = [38, 27, 43, 3, 9, 82, 10]
@@ -124,9 +126,9 @@ print("Sorted array:", sorted_arr)
 def merge_sort_inplace(arr, left=0, right=None):
     """
     In-place merge sort that modifies the original array.
-    
+
     Uses auxiliary space for merging but sorts in-place.
-    
+
     Args:
         arr: Array to sort (modified in-place)
         left: Starting index
@@ -134,21 +136,22 @@ def merge_sort_inplace(arr, left=0, right=None):
     """
     if right is None:
         right = len(arr)
-    
+
     if right - left > 1:
         mid = (left + right) // 2
-        
+
         # Sort halves in-place
         merge_sort_inplace(arr, left, mid)
         merge_sort_inplace(arr, mid, right)
-        
+
         # Merge in-place
         merge_inplace(arr, left, mid, right)
+
 
 def merge_inplace(arr, left, mid, right):
     """
     Merge two sorted subarrays in-place.
-    
+
     Args:
         arr: Array containing subarrays
         left: Start of first subarray
@@ -158,10 +161,10 @@ def merge_inplace(arr, left, mid, right):
     # Create temporary arrays
     left_arr = arr[left:mid]
     right_arr = arr[mid:right]
-    
+
     i = j = 0
     k = left
-    
+
     # Merge back into original array
     while i < len(left_arr) and j < len(right_arr):
         if left_arr[i] <= right_arr[j]:
@@ -171,17 +174,18 @@ def merge_inplace(arr, left, mid, right):
             arr[k] = right_arr[j]
             j += 1
         k += 1
-    
+
     # Copy remaining elements
     while i < len(left_arr):
         arr[k] = left_arr[i]
         i += 1
         k += 1
-    
+
     while j < len(right_arr):
         arr[k] = right_arr[j]
         j += 1
         k += 1
+
 
 # Example usage
 arr = [38, 27, 43, 3, 9, 82, 10]
@@ -196,24 +200,24 @@ print("Sorted array:", arr)
 def merge_sort_optimized(arr):
     """
     Optimized merge sort with multiple improvements.
-    
+
     1. Uses insertion sort for small subarrays
     2. Checks if array is already sorted
     3. Skips merge if halves are already in order
-    
+
     Args:
         arr: List to sort
-    
+
     Returns:
         Sorted list
     """
     if len(arr) <= 1:
         return arr
-    
+
     # Use insertion sort for small arrays
     if len(arr) <= 10:
         return insertion_sort(arr)
-    
+
     # Check if already sorted
     mid = len(arr) // 2
     if arr[mid - 1] <= arr[mid]:
@@ -221,12 +225,13 @@ def merge_sort_optimized(arr):
         left = merge_sort_optimized(arr[:mid])
         right = merge_sort_optimized(arr[mid:])
         return left + right
-    
+
     # Divide and conquer
     left = merge_sort_optimized(arr[:mid])
     right = merge_sort_optimized(arr[mid:])
-    
+
     return merge(left, right)
+
 
 def insertion_sort(arr):
     """Helper insertion sort for small arrays."""
@@ -239,11 +244,12 @@ def insertion_sort(arr):
         arr[j + 1] = key
     return arr
 
+
 def merge(left, right):
     """Merge two sorted arrays."""
     result = []
     i = j = 0
-    
+
     while i < len(left) and j < len(right):
         if left[i] <= right[j]:
             result.append(left[i])
@@ -251,10 +257,11 @@ def merge(left, right):
         else:
             result.append(right[j])
             j += 1
-    
+
     result.extend(left[i:])
     result.extend(right[j:])
     return result
+
 
 # Example usage
 arr = [38, 27, 43, 3, 9, 82, 10, 1, 5, 7]
@@ -269,40 +276,41 @@ print("Sorted array:", sorted_arr)
 def merge_sort_bottom_up(arr):
     """
     Bottom-up merge sort (iterative version).
-    
+
     Avoids recursion by merging subarrays of increasing size.
-    
+
     Args:
         arr: List to sort
-    
+
     Returns:
         Sorted list
     """
     n = len(arr)
     size = 1
-    
+
     # Merge subarrays of increasing size
     while size < n:
         for left in range(0, n, 2 * size):
             mid = min(left + size, n)
             right = min(left + 2 * size, n)
-            
+
             if mid < right:
                 # Merge arr[left:mid] and arr[mid:right]
                 merge_inplace(arr, left, mid, right)
-        
+
         size *= 2
-    
+
     return arr
+
 
 def merge_inplace(arr, left, mid, right):
     """Merge two sorted subarrays."""
     left_arr = arr[left:mid]
     right_arr = arr[mid:right]
-    
+
     i = j = 0
     k = left
-    
+
     while i < len(left_arr) and j < len(right_arr):
         if left_arr[i] <= right_arr[j]:
             arr[k] = left_arr[i]
@@ -311,16 +319,17 @@ def merge_inplace(arr, left, mid, right):
             arr[k] = right_arr[j]
             j += 1
         k += 1
-    
+
     while i < len(left_arr):
         arr[k] = left_arr[i]
         i += 1
         k += 1
-    
+
     while j < len(right_arr):
         arr[k] = right_arr[j]
         j += 1
         k += 1
+
 
 # Example usage
 arr = [38, 27, 43, 3, 9, 82, 10]
@@ -334,47 +343,50 @@ print("Sorted array:", sorted_arr)
 ```python
 class ListNode:
     """Node for linked list."""
+
     def __init__(self, val=0, next=None):
         self.val = val
         self.next = next
 
+
 def merge_sort_linked_list(head):
     """
     Merge sort for linked lists.
-    
+
     Efficient for linked lists due to O(1) merge operation.
-    
+
     Args:
         head: Head of linked list
-    
+
     Returns:
         Head of sorted linked list
     """
     if not head or not head.next:
         return head
-    
+
     # Find middle using slow/fast pointers
     slow, fast = head, head.next
     while fast and fast.next:
         slow = slow.next
         fast = fast.next.next
-    
+
     # Split into two halves
     mid = slow.next
     slow.next = None
-    
+
     # Recursively sort halves
     left = merge_sort_linked_list(head)
     right = merge_sort_linked_list(mid)
-    
+
     # Merge sorted halves
     return merge_linked_lists(left, right)
+
 
 def merge_linked_lists(l1, l2):
     """Merge two sorted linked lists."""
     dummy = ListNode(0)
     current = dummy
-    
+
     while l1 and l2:
         if l1.val <= l2.val:
             current.next = l1
@@ -383,9 +395,10 @@ def merge_linked_lists(l1, l2):
             current.next = l2
             l2 = l2.next
         current = current.next
-    
+
     current.next = l1 or l2
     return dummy.next
+
 
 # Helper function to create linked list from array
 def create_linked_list(arr):
@@ -398,6 +411,7 @@ def create_linked_list(arr):
         current = current.next
     return head
 
+
 # Helper function to convert linked list to array
 def linked_list_to_array(head):
     arr = []
@@ -405,6 +419,7 @@ def linked_list_to_array(head):
         arr.append(head.val)
         head = head.next
     return arr
+
 
 # Example usage
 arr = [38, 27, 43, 3, 9, 82, 10]
@@ -421,27 +436,28 @@ print("Sorted array:", sorted_arr)
 def merge_sort_strings(arr):
     """
     Merge sort for strings (lexicographic order).
-    
+
     Args:
         arr: List of strings to sort
-    
+
     Returns:
         Sorted list
     """
     if len(arr) <= 1:
         return arr
-    
+
     mid = len(arr) // 2
     left = merge_sort_strings(arr[:mid])
     right = merge_sort_strings(arr[mid:])
-    
+
     return merge_strings(left, right)
+
 
 def merge_strings(left, right):
     """Merge two sorted string arrays."""
     result = []
     i = j = 0
-    
+
     while i < len(left) and j < len(right):
         if left[i] <= right[j]:
             result.append(left[i])
@@ -449,10 +465,11 @@ def merge_strings(left, right):
         else:
             result.append(right[j])
             j += 1
-    
+
     result.extend(left[i:])
     result.extend(right[j:])
     return result
+
 
 # Example usage
 arr = ["banana", "apple", "cherry", "date", "fig"]
@@ -471,6 +488,7 @@ def merge_sort_wrong(arr):
     left = merge_sort_wrong(arr[:mid])
     right = merge_sort_wrong(arr[mid:])
     return merge(left, right)
+
 
 # CORRECT: Check for base case
 def merge_sort_correct(arr):
@@ -496,6 +514,7 @@ def merge_wrong(left, right):
             result.append(right[j])
             j += 1
     return result  # Missing remaining elements!
+
 
 # CORRECT: Add remaining elements
 def merge_correct(left, right):

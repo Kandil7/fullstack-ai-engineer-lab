@@ -61,23 +61,19 @@ urlpatterns = [
 # Examples:
 path_converters_example = [
     # str - default converter
-    path('articles/<str:title>/', 'view_article'),
+    path("articles/<str:title>/", "view_article"),
     # Matches: /articles/hello-world/, /articles/django-tips/
-
     # int
-    path('posts/<int:id>/', 'view_post'),
+    path("posts/<int:id>/", "view_post"),
     # Matches: /posts/1/, /posts/42/
-
     # slug
-    path('pages/<slug:slug>/', 'view_page'),
+    path("pages/<slug:slug>/", "view_page"),
     # Matches: /pages/about/, /pages/contact-us/
-
     # uuid
-    path('users/<uuid:user_id>/', 'view_user'),
+    path("users/<uuid:user_id>/", "view_user"),
     # Matches: /users/550e8400-e29b-41d4-a716-446655440000/
-
     # path (includes /)
-    path('files/<path:filepath>/', 'view_file'),
+    path("files/<path:filepath>/", "view_file"),
     # Matches: /files/docs/readme.txt/, /files/a/b/c/
 ]
 
@@ -205,27 +201,21 @@ path_converters_example = [
 # blog/urls.py:
 from django.urls import path
 
-app_name = 'blog'
+app_name = "blog"
 
 urlpatterns = [
     # List all posts
-    path('', views.post_list, name='post_list'),
-
+    path("", views.post_list, name="post_list"),
     # View single post by slug
-    path('post/<slug:slug>/', views.post_detail, name='post_detail'),
-
+    path("post/<slug:slug>/", views.post_detail, name="post_detail"),
     # Create new post
-    path('post/new/', views.post_create, name='post_create'),
-
+    path("post/new/", views.post_create, name="post_create"),
     # Edit post
-    path('post/<slug:slug>/edit/', views.post_edit, name='post_edit'),
-
+    path("post/<slug:slug>/edit/", views.post_edit, name="post_edit"),
     # Delete post
-    path('post/<slug:slug>/delete/', views.post_delete, name='post_delete'),
-
+    path("post/<slug:slug>/delete/", views.post_delete, name="post_delete"),
     # Category filter
-    path('category/<slug:slug>/', views.category_posts, name='category_posts'),
-
+    path("category/<slug:slug>/", views.category_posts, name="category_posts"),
     # Search
-    path('search/', views.search_posts, name='search_posts'),
+    path("search/", views.search_posts, name="search_posts"),
 ]

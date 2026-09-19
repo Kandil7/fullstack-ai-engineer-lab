@@ -45,12 +45,13 @@ import re
 # SECTION 1: JWT Security Best Practices
 # =============================================================
 
+
 class JWTConfig:
     """JWT configuration with security best practices."""
 
     def __init__(self):
         self.algorithm = "HS256"
-        self.access_token_ttl = 15 * 60      # 15 minutes (short-lived)
+        self.access_token_ttl = 15 * 60  # 15 minutes (short-lived)
         self.refresh_token_ttl = 7 * 24 * 3600  # 7 days
         self.issuer = "ai-platform"
         self.audience = "ai-api"
@@ -82,10 +83,7 @@ class SecureJWTManager:
         self._token_blacklist: Set[str] = set()
 
     def create_access_token(
-        self,
-        user_id: str,
-        roles: List[str],
-        metadata: Optional[Dict] = None
+        self, user_id: str, roles: List[str], metadata: Optional[Dict] = None
     ) -> str:
         """Create a secure access token."""
         now = time.time()
@@ -113,7 +111,9 @@ class SecureJWTManager:
         secret = self.config._key_rotation_keys[kid]
 
         headers = {"kid": kid, "alg": self.config.algorithm}
-        return jwt.encode(payload, secret, algorithm=self.config.algorithm, headers=headers)
+        return jwt.encode(
+            payload, secret, algorithm=self.config.algorithm, headers=headers
+        )
 
     def create_refresh_token(self, user_id: str) -> str:
         """Create a secure refresh token with rotation support."""
@@ -133,7 +133,9 @@ class SecureJWTManager:
         kid = list(self.config._key_rotation_keys.keys())[-1]
         secret = self.config._key_rotation_keys[kid]
         headers = {"kid": kid, "alg": self.config.algorithm}
-        return jwt.encode(payload, secret, algorithm=self.config.algorithm, headers=headers)
+        return jwt.encode(
+            payload, secret, algorithm=self.config.algorithm, headers=headers
+        )
 
     def validate_token(self, token: str) -> Dict:
         """Validate and decode a JWT token with full security checks."""
@@ -187,7 +189,9 @@ class SecureJWTManager:
         except jwt.InvalidTokenError:
             pass
 
-    def rotate_refresh_token(self, old_refresh_token: str, user_id: str, roles: List[str]) -> Dict:
+    def rotate_refresh_token(
+        self, old_refresh_token: str, user_id: str, roles: List[str]
+    ) -> Dict:
         """
         Rotate refresh token and issue new access token.
         Security: Old refresh token is invalidated.
@@ -214,12 +218,14 @@ class SecureJWTManager:
 
 class SecurityError(Exception):
     """Custom security error."""
+
     pass
 
 
 # =============================================================
 # SECTION 2: OAuth2 Implementation for AI Services
 # =============================================================
+
 
 class OAuth2Flow(Enum):
     AUTHORIZATION_CODE = "authorization_code"
@@ -361,7 +367,11 @@ class OAuth2Server:
         if code_data["code_challenge"]:
             if not code_verifier:
                 raise SecurityError("Code verifier required for PKCE")
-            if not self._verify_pkce(code_data["code_challenge"], code_verifier, code_data["code_challenge_method"]):
+            if not self._verify_pkce(
+                code_data["code_challenge"],
+                code_verifier,
+                code_data["code_challenge_method"],
+            ):
                 raise SecurityError("PKCE verification failed")
 
         # Mark code as used
@@ -371,7 +381,10 @@ class OAuth2Server:
         access_token = self.jwt_manager.create_access_token(
             user_id=client_id,
             roles=["oauth2_client"],
-            metadata={"scopes": code_data["scopes"], "grant_type": "authorization_code"},
+            metadata={
+                "scopes": code_data["scopes"],
+                "grant_type": "authorization_code",
+            },
         )
 
         refresh_token = self.jwt_manager.create_refresh_token(client_id)
@@ -442,9 +455,11 @@ class OAuth2Server:
     def _verify_pkce(self, challenge: str, verifier: str, method: str) -> bool:
         """Verify PKCE code challenge."""
         if method == "S256":
-            computed = base64.urlsafe_b64encode(
-                hashlib.sha256(verifier.encode()).digest()
-            ).rstrip(b"=").decode()
+            computed = (
+                base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest())
+                .rstrip(b"=")
+                .decode()
+            )
             return hmac.compare_digest(computed, challenge)
         elif method == "plain":
             return hmac.compare_digest(verifier, challenge)
@@ -452,7 +467,9 @@ class OAuth2Server:
 
     def _invalidate_client_tokens(self, client_id: str):
         """Invalidate all tokens for a client (security measure)."""
-        to_remove = [t for t, tok in self._tokens.items() if tok.scope and client_id in t]
+        to_remove = [
+            t for t, tok in self._tokens.items() if tok.scope and client_id in t
+        ]
         for t in to_remove:
             self.jwt_manager.revoke_token(t)
 
@@ -461,11 +478,12 @@ class OAuth2Server:
 # SECTION 3: API Key Management
 # =============================================================
 
+
 @dataclass
 class APIKey:
     key_id: str
     key_hash: str  # We never store raw keys
-    prefix: str   # First 8 chars for identification
+    prefix: str  # First 8 chars for identification
     user_id: str
     scopes: Set[str]
     created_at: float
@@ -597,6 +615,7 @@ class APIKeyManager:
 # SECTION 4: Role-Based Access Control (RBAC)
 # =============================================================
 
+
 @dataclass
 class Permission:
     resource: str
@@ -630,54 +649,64 @@ class RBACManager:
     def _setup_default_roles(self):
         """Setup default roles for AI platform."""
         # Viewer: Read-only access
-        self.add_role(Role(
-            name="viewer",
-            permissions=[
-                Permission("models", {"read"}),
-                Permission("data", {"read"}),
-                Permission("logs", {"read"}),
-            ],
-        ))
+        self.add_role(
+            Role(
+                name="viewer",
+                permissions=[
+                    Permission("models", {"read"}),
+                    Permission("data", {"read"}),
+                    Permission("logs", {"read"}),
+                ],
+            )
+        )
 
         # Developer: Can run inference
-        self.add_role(Role(
-            name="developer",
-            permissions=[
-                Permission("models", {"read", "inference"}),
-                Permission("data", {"read"}),
-                Permission("experiments", {"read", "write"}),
-            ],
-            inherits=["viewer"],
-        ))
+        self.add_role(
+            Role(
+                name="developer",
+                permissions=[
+                    Permission("models", {"read", "inference"}),
+                    Permission("data", {"read"}),
+                    Permission("experiments", {"read", "write"}),
+                ],
+                inherits=["viewer"],
+            )
+        )
 
         # Data Scientist: Can train models
-        self.add_role(Role(
-            name="data_scientist",
-            permissions=[
-                Permission("models", {"read", "write", "train"}),
-                Permission("data", {"read", "write"}),
-                Permission("experiments", {"read", "write", "delete"}),
-            ],
-            inherits=["developer"],
-        ))
+        self.add_role(
+            Role(
+                name="data_scientist",
+                permissions=[
+                    Permission("models", {"read", "write", "train"}),
+                    Permission("data", {"read", "write"}),
+                    Permission("experiments", {"read", "write", "delete"}),
+                ],
+                inherits=["developer"],
+            )
+        )
 
         # Admin: Full access
-        self.add_role(Role(
-            name="admin",
-            permissions=[
-                Permission("*", {"read", "write", "delete", "admin"}),
-            ],
-            inherits=["data_scientist"],
-        ))
+        self.add_role(
+            Role(
+                name="admin",
+                permissions=[
+                    Permission("*", {"read", "write", "delete", "admin"}),
+                ],
+                inherits=["data_scientist"],
+            )
+        )
 
         # API Service: Limited to inference
-        self.add_role(Role(
-            name="api_service",
-            permissions=[
-                Permission("models", {"read", "inference"}),
-                Permission("predictions", {"write"}),
-            ],
-        ))
+        self.add_role(
+            Role(
+                name="api_service",
+                permissions=[
+                    Permission("models", {"read", "inference"}),
+                    Permission("predictions", {"write"}),
+                ],
+            )
+        )
 
     def add_role(self, role: Role):
         """Add or update a role."""
@@ -733,8 +762,9 @@ class RBACManager:
 
         # Check direct permissions
         for perm in role.permissions:
-            if (perm.resource in ("*", resource) and
-                    (action in perm.actions or "*" in perm.actions)):
+            if perm.resource in ("*", resource) and (
+                action in perm.actions or "*" in perm.actions
+            ):
                 if self._evaluate_conditions(perm.conditions, context):
                     return True
 
@@ -803,6 +833,7 @@ class RBACManager:
 # SECTION 5: Session Management & Token Rotation
 # =============================================================
 
+
 @dataclass
 class Session:
     session_id: str
@@ -830,9 +861,9 @@ class SessionManager:
 
     def __init__(
         self,
-        session_ttl: int = 3600,          # 1 hour
+        session_ttl: int = 3600,  # 1 hour
         max_sessions: int = 5,
-        rotation_interval: int = 900,     # 15 minutes
+        rotation_interval: int = 900,  # 15 minutes
     ):
         self.session_ttl = session_ttl
         self.max_sessions = max_sessions
@@ -975,8 +1006,10 @@ class SessionManager:
 # SECTION 6: Authentication Decorators & Middleware
 # =============================================================
 
+
 def require_auth(*required_scopes):
     """Decorator for requiring authentication and specific scopes."""
+
     def decorator(func: Callable):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -989,12 +1022,15 @@ def require_auth(*required_scopes):
             # Would use JWT manager to validate in production
             # For demo, we check scope presence
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 def require_role(role_name: str):
     """Decorator for requiring a specific role."""
+
     def decorator(func: Callable):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -1002,13 +1038,16 @@ def require_role(role_name: str):
             if role_name not in user_roles:
                 raise SecurityError(f"Requires role: {role_name}")
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 # =============================================================
 # DEMONSTRATIONS
 # =============================================================
+
 
 def demo_jwt_security():
     """Demonstrate JWT security best practices."""
@@ -1083,7 +1122,9 @@ def demo_oauth2():
 
     # Token introspection
     introspection = oauth2.introspect_token(token.access_token)
-    print(f"Token introspection: active={introspection['active']}, sub={introspection.get('sub')}")
+    print(
+        f"Token introspection: active={introspection['active']}, sub={introspection.get('sub')}"
+    )
 
     print("\n[OK] OAuth2 implementation demonstrated")
 
@@ -1144,7 +1185,9 @@ def demo_rbac():
     print("Alice (data_scientist):")
     print(f"  Can train models: {rbac.check_permission('alice', 'models', 'train')}")
     print(f"  Can write data: {rbac.check_permission('alice', 'data', 'write')}")
-    print(f"  Can delete experiments: {rbac.check_permission('alice', 'experiments', 'delete')}")
+    print(
+        f"  Can delete experiments: {rbac.check_permission('alice', 'experiments', 'delete')}"
+    )
 
     print("\nBob (developer):")
     print(f"  Can run inference: {rbac.check_permission('bob', 'models', 'inference')}")
@@ -1153,7 +1196,9 @@ def demo_rbac():
 
     print("\nCharlie (viewer):")
     print(f"  Can read models: {rbac.check_permission('charlie', 'models', 'read')}")
-    print(f"  Can run inference: {rbac.check_permission('charlie', 'models', 'inference')}")
+    print(
+        f"  Can run inference: {rbac.check_permission('charlie', 'models', 'inference')}"
+    )
 
     # Get all permissions
     print("\nAlice's full permissions:")
@@ -1311,4 +1356,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n[FAIL] Error: {e}")
         import traceback
+
         traceback.print_exc()

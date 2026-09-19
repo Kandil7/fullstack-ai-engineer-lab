@@ -17,6 +17,7 @@ Stable: Yes
 # 1. BASIC INSERTION SORT
 # =============================================================================
 
+
 def insertion_sort(arr):
     """Basic insertion sort. O(n^2) time, O(1) space"""
     for i in range(1, len(arr)):
@@ -32,6 +33,7 @@ def insertion_sort(arr):
 
     return arr
 
+
 print("=== Basic Insertion Sort ===")
 arr = [12, 11, 13, 5, 6]
 print(f"Original: {arr}")
@@ -41,6 +43,7 @@ print(f"Sorted: {insertion_sort(arr.copy())}")
 # =============================================================================
 # 2. INSERTION SORT WITH STEPS
 # =============================================================================
+
 
 def insertion_sort_steps(arr):
     """Insertion sort showing each step"""
@@ -60,6 +63,7 @@ def insertion_sort_steps(arr):
 
     return arr, steps
 
+
 print("\n=== Insertion Sort with Steps ===")
 arr = [5, 2, 4, 6, 1, 3]
 sorted_arr, steps = insertion_sort_steps(arr)
@@ -71,6 +75,7 @@ print(f"Final: {sorted_arr}")
 # =============================================================================
 # 3. BINARY INSERTION SORT
 # =============================================================================
+
 
 def binary_insertion_sort(arr):
     """Use binary search to find insertion position. O(n^2) but fewer comparisons"""
@@ -93,6 +98,7 @@ def binary_insertion_sort(arr):
 
     return arr
 
+
 print("\n=== Binary Insertion Sort ===")
 arr = [37, 23, 0, 31, 22, 10, 13]
 print(f"Original: {arr}")
@@ -102,6 +108,7 @@ print(f"Sorted: {binary_insertion_sort(arr.copy())}")
 # =============================================================================
 # 4. INSERTION SORT DESCENDING
 # =============================================================================
+
 
 def insertion_sort_descending(arr):
     """Sort in descending order"""
@@ -117,6 +124,7 @@ def insertion_sort_descending(arr):
 
     return arr
 
+
 print("\n=== Descending Insertion Sort ===")
 arr = [12, 11, 13, 5, 6]
 print(f"Descending: {insertion_sort_descending(arr.copy())}")
@@ -125,6 +133,7 @@ print(f"Descending: {insertion_sort_descending(arr.copy())}")
 # =============================================================================
 # 5. COUNTING OPERATIONS
 # =============================================================================
+
 
 def insertion_sort_counted(arr):
     """Insertion sort counting comparisons and shifts"""
@@ -149,6 +158,7 @@ def insertion_sort_counted(arr):
 
     return arr, comparisons, shifts
 
+
 print("\n=== Insertion Sort Statistics ===")
 test_cases = [
     [12, 11, 13, 5, 6],
@@ -165,6 +175,7 @@ for arr in test_cases:
 # =============================================================================
 # 6. SHELL SORT (INSERTION SORT VARIANT)
 # =============================================================================
+
 
 def shell_sort(arr):
     """Shell sort - insertion sort with diminishing gaps. O(n^1.25)"""
@@ -186,6 +197,7 @@ def shell_sort(arr):
 
     return arr
 
+
 print("\n=== Shell Sort ===")
 arr = [12, 34, 54, 2, 3, 17, 9, 81]
 print(f"Original: {arr}")
@@ -196,10 +208,12 @@ print(f"Sorted: {shell_sort(arr.copy())}")
 # 7. INSERTION SORT ON LINKED LIST
 # =============================================================================
 
+
 class Node:
     def __init__(self, data):
         self.data = data
         self.next = None
+
 
 def insertion_sort_linked_list(head):
     """Insertion sort on linked list. O(n^2)"""
@@ -216,6 +230,7 @@ def insertion_sort_linked_list(head):
 
     return sorted_head
 
+
 def sorted_insert(head, node):
     """Insert node into sorted linked list"""
     if not head or node.data <= head.data:
@@ -230,12 +245,14 @@ def sorted_insert(head, node):
     current.next = node
     return head
 
+
 def linked_list_to_list(head):
     result = []
     while head:
         result.append(head.data)
         head = head.next
     return result
+
 
 print("\n=== Insertion Sort on Linked List ===")
 values = [12, 11, 13, 5, 6]
@@ -253,18 +270,16 @@ print(f"Sorted: {linked_list_to_list(head)}")
 # 8. INSERTION SORT FOR 2D ARRAY
 # =============================================================================
 
+
 def insertion_sort_2d(matrix):
     """Sort each row of a 2D array"""
     for row in matrix:
         insertion_sort(row)
     return matrix
 
+
 print("\n=== Insertion Sort 2D Array ===")
-matrix = [
-    [5, 2, 8],
-    [1, 9, 3],
-    [7, 4, 6]
-]
+matrix = [[5, 2, 8], [1, 9, 3], [7, 4, 6]]
 print("Before:")
 for row in matrix:
     print(f"  {row}")
@@ -278,6 +293,7 @@ for row in matrix:
 # =============================================================================
 # 9. PARTIAL INSERTION SORT
 # =============================================================================
+
 
 def partial_insertion_sort(arr, k):
     """Sort only the first k elements. O(k^2)"""
@@ -293,6 +309,7 @@ def partial_insertion_sort(arr, k):
 
     return arr
 
+
 print("\n=== Partial Insertion Sort ===")
 arr = [5, 3, 8, 1, 9, 2, 7, 4, 6]
 print(f"Original: {arr}")
@@ -302,6 +319,7 @@ print(f"Sort first 4: {partial_insertion_sort(arr.copy(), 4)}")
 # =============================================================================
 # 10. INSERTION SORT PERFORMANCE
 # =============================================================================
+
 
 def analyze_insertion_sort():
     """Analyze insertion sort on different inputs"""
@@ -335,9 +353,10 @@ def analyze_insertion_sort():
         reverse_time = time.time() - start
 
         print(f"\nn={size}:")
-        print(f"  Random:       {random_time*1000:.2f}ms")
-        print(f"  Nearly sorted: {nearly_time*1000:.2f}ms")
-        print(f"  Reverse:      {reverse_time*1000:.2f}ms")
+        print(f"  Random:       {random_time * 1000:.2f}ms")
+        print(f"  Nearly sorted: {nearly_time * 1000:.2f}ms")
+        print(f"  Reverse:      {reverse_time * 1000:.2f}ms")
+
 
 analyze_insertion_sort()
 
@@ -347,6 +366,7 @@ analyze_insertion_sort()
 # =============================================================================
 
 print("\n=== Practical Applications ===")
+
 
 # Sort while maintaining relative order
 def stable_sort_custom(arr, key_func):
@@ -364,11 +384,13 @@ def stable_sort_custom(arr, key_func):
 
     return arr
 
+
 # Sort tuples by second element
 students = [("Alice", 85), ("Bob", 92), ("Charlie", 78), ("Diana", 92)]
 print(f"Students: {students}")
 sorted_students = stable_sort_custom(students.copy(), lambda x: x[1])
 print(f"Sorted by grade: {sorted_students}")
+
 
 # Insert into sorted list
 def insert_into_sorted(sorted_arr, value):
@@ -382,6 +404,7 @@ def insert_into_sorted(sorted_arr, value):
 
     sorted_arr[i + 1] = value
     return sorted_arr
+
 
 sorted_list = [1, 3, 5, 7, 9]
 print(f"\nInsert 4 into {sorted_list}: {insert_into_sorted(sorted_list.copy(), 4)}")

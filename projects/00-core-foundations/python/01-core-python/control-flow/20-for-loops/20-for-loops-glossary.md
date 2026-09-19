@@ -165,6 +165,7 @@ def find_in_list(items, target):
     else:
         return False  # Loop completed without finding target
 
+
 print(find_in_list([1, 2, 3], 2))  # True
 print(find_in_list([1, 2, 3], 5))  # False
 ```
@@ -182,6 +183,7 @@ def countdown(n):
     while n > 0:
         yield n
         n -= 1
+
 
 for num in countdown(5):
     print(num)  # 5, 4, 3, 2, 1
@@ -201,15 +203,16 @@ class Counter:
     def __init__(self, max_val):
         self.max_val = max_val
         self.current = 0
-    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         if self.current >= self.max_val:
             raise StopIteration
         self.current += 1
         return self.current
+
 
 for num in Counter(5):
     print(num)  # 1, 2, 3, 4, 5
@@ -320,10 +323,10 @@ for row in matrix:
 
 **Example**:
 ```python
-range(5)       # 0, 1, 2, 3, 4
-range(1, 6)    # 1, 2, 3, 4, 5
-range(0, 10, 2)# 0, 2, 4, 6, 8
-range(5, 0, -1)# 5, 4, 3, 2, 1
+range(5)  # 0, 1, 2, 3, 4
+range(1, 6)  # 1, 2, 3, 4, 5
+range(0, 10, 2)  # 0, 2, 4, 6, 8
+range(5, 0, -1)  # 5, 4, 3, 2, 1
 ```
 
 **Related**: for loop, numeric sequence, indexing
@@ -339,7 +342,7 @@ range(5, 0, -1)# 5, 4, 3, 2, 1
 items = [1, 2, 3, 4, 5]
 first, *rest = items
 print(first)  # 1
-print(rest)   # [2, 3, 4, 5]
+print(rest)  # [2, 3, 4, 5]
 
 # In for loop
 for first, *middle, last in [[1, 2, 3], [4, 5, 6]]:
@@ -421,6 +424,7 @@ def common_elements(list1, list2):
             result.append(item)
     return result
 
+
 print(common_elements([1, 2, 3, 4], [3, 4, 5, 6]))  # [3, 4]
 ```
 
@@ -434,6 +438,7 @@ def add_matrices(a, b):
             row.append(a[i][j] + b[i][j])
         result.append(row)
     return result
+
 
 a = [[1, 2], [3, 4]]
 b = [[5, 6], [7, 8]]

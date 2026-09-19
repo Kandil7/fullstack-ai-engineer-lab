@@ -34,22 +34,24 @@ class SimpleDescriptor:
         if obj is None:
             return self  # Accessed on class
         return f"Getting value from {obj}"
-    
+
     def __set__(self, obj, value):
         """Called when attribute is set."""
         print(f"Setting value: {value}")
-    
+
     def __delete__(self, obj):
         """Called when attribute is deleted."""
         print("Deleting attribute")
 
+
 class MyClass:
     attr = SimpleDescriptor()
 
+
 obj = MyClass()
-print(obj.attr)      # Getting value from <__main__.MyClass object>
-obj.attr = "hello"   # Setting value: hello
-del obj.attr         # Deleting attribute
+print(obj.attr)  # Getting value from <__main__.MyClass object>
+obj.attr = "hello"  # Setting value: hello
+del obj.attr  # Deleting attribute
 ```
 
 #### Understanding the Parameters
@@ -57,16 +59,18 @@ del obj.attr         # Deleting attribute
 ```python
 class Descriptive:
     def __get__(self, obj, objtype=None):
-        print(f"self: {self}")           # The descriptor instance
-        print(f"obj: {obj}")             # Instance being accessed (None if class)
-        print(f"objtype: {objtype}")     # Class being accessed
+        print(f"self: {self}")  # The descriptor instance
+        print(f"obj: {obj}")  # Instance being accessed (None if class)
+        print(f"objtype: {objtype}")  # Class being accessed
         return "value"
-    
+
     def __set__(self, obj, value):
         print(f"Setting on {obj}: {value}")
 
+
 class Example:
     x = Descriptive()
+
 
 # Access on instance
 obj = Example()
@@ -87,39 +91,37 @@ Create descriptors that validate values before allowing assignment.
 ```python
 class Validated:
     """Descriptor that validates values."""
-    
+
     def __init__(self, validator, error_msg="Invalid value"):
         self.validator = validator
         self.error_msg = error_msg
         self.name = None
-    
+
     def __set_name__(self, owner, name):
         """Called when descriptor is assigned to a class attribute."""
         self.name = name
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         return obj.__dict__.get(self.name)
-    
+
     def __set__(self, obj, value):
         if not self.validator(value):
             raise ValueError(f"{self.name}: {self.error_msg}")
         obj.__dict__[self.name] = value
 
+
 class PositiveNumber(Validated):
     def __init__(self):
         super().__init__(
-            lambda x: isinstance(x, (int, float)) and x > 0,
-            "must be a positive number"
+            lambda x: isinstance(x, (int, float)) and x > 0, "must be a positive number"
         )
+
 
 class NonEmptyString(Validated):
     def __init__(self):
-        super().__init__(
-            lambda x: isinstance(x, str) and len(x) > 0,
-            "must be a non-empty string"
-        )
+        super().__init__(lambda x: isinstance(x, str) and len(x) > 0, "must be a non-empty string")
 ```
 
 #### Practical Example
@@ -129,14 +131,15 @@ class Product:
     name = NonEmptyString()
     price = PositiveNumber()
     quantity = PositiveNumber()
-    
+
     def __init__(self, name, price, quantity):
         self.name = name
         self.price = price
         self.quantity = quantity
-    
+
     def __repr__(self):
         return f"Product({self.name!r}, ${self.price}, qty={self.quantity})"
+
 
 # Valid product
 p = Product("Laptop", 999.99, 10)
@@ -158,36 +161,37 @@ Enforce type constraints on attribute assignment.
 ```python
 class Typed:
     """Descriptor that enforces type checking."""
-    
+
     def __init__(self, expected_type):
         self.expected_type = expected_type
         self.name = None
-    
+
     def __set_name__(self, owner, name):
         self.name = name
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         return obj.__dict__.get(self.name)
-    
+
     def __set__(self, obj, value):
         if not isinstance(value, self.expected_type):
             raise TypeError(
-                f"{self.name} must be {self.expected_type.__name__}, "
-                f"got {type(value).__name__}"
+                f"{self.name} must be {self.expected_type.__name__}, got {type(value).__name__}"
             )
         obj.__dict__[self.name] = value
+
 
 class Employee:
     name = Typed(str)
     age = Typed(int)
     salary = Typed(float)
-    
+
     def __init__(self, name, age, salary):
         self.name = name
         self.age = age
         self.salary = salary
+
 
 # Valid assignment
 emp = Employee("Alice", 30, 75000.0)
@@ -209,24 +213,25 @@ Create descriptors that compute values dynamically.
 ```python
 class ComputedAttribute:
     """Descriptor that computes value from other attributes."""
-    
+
     def __init__(self, func):
         self.func = func
         self.name = None
-    
+
     def __set_name__(self, owner, name):
         self.name = name
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         return self.func(obj)
 
+
 class Employee:
     def __init__(self, name, salary):
         self.name = name
         self.salary = salary
-    
+
     @ComputedAttribute
     def tax_rate(self):
         if self.salary > 100000:
@@ -234,13 +239,14 @@ class Employee:
         elif self.salary > 50000:
             return 0.25
         return 0.15
-    
+
     @ComputedAttribute
     def annual_tax(self):
         return self.salary * self.tax_rate
 
+
 emp = Employee("Alice", 75000)
-print(f"Tax rate: {emp.tax_rate}")   # 0.25
+print(f"Tax rate: {emp.tax_rate}")  # 0.25
 print(f"Annual tax: ${emp.annual_tax:,.2f}")  # $18,750.00
 ```
 
@@ -253,41 +259,43 @@ Cache expensive computations to avoid redundant calculations.
 ```python
 class CachedResult:
     """Descriptor that caches computed results."""
-    
+
     def __init__(self, func):
         self.func = func
         self.name = None
         self.cache_attr = None
-    
+
     def __set_name__(self, owner, name):
         self.name = name
         self.cache_attr = f"_cached_{name}"
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         if not hasattr(obj, self.cache_attr):
             setattr(obj, self.cache_attr, self.func(obj))
         return getattr(obj, self.cache_attr)
-    
+
     def __delete__(self, obj):
         if hasattr(obj, self.cache_attr):
             delattr(obj, self.cache_attr)
 
+
 class DataProcessor:
     def __init__(self, data):
         self.data = data
-    
+
     @CachedResult
     def expensive_computation(self):
         """This only runs once, then result is cached."""
         print("Computing...")
-        return sum(x ** 2 for x in self.data)
+        return sum(x**2 for x in self.data)
+
 
 proc = DataProcessor(range(1000))
 print(proc.expensive_computation)  # "Computing..." then result
 print(proc.expensive_computation)  # Uses cache (no "Computing...")
-del proc.expensive_computation      # Clears cache
+del proc.expensive_computation  # Clears cache
 print(proc.expensive_computation)  # "Computing..." again
 ```
 
@@ -302,20 +310,22 @@ Understanding the difference affects attribute lookup priority.
 ```python
 class DataDescriptor:
     """Data descriptor takes priority over instance attributes."""
-    
+
     def __set_name__(self, owner, name):
         self.name = name
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         return obj.__dict__.get(f"_{self.name}", "from data descriptor")
-    
+
     def __set__(self, obj, value):
         obj.__dict__[f"_{self.name}"] = value
 
+
 class Example:
     data = DataDescriptor()
+
 
 obj = Example()
 obj.data = "instance value"  # Goes to descriptor __set__
@@ -327,17 +337,19 @@ print(obj.data)  # "from data descriptor" (descriptor wins)
 ```python
 class NonDataDescriptor:
     """Non-data descriptor can be overridden by instance attributes."""
-    
+
     def __set_name__(self, owner, name):
         self.name = name
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         return f"from non-data descriptor: {self.name}"
 
+
 class Example:
     non_data = NonDataDescriptor()
+
 
 obj = Example()
 print(obj.non_data)  # "from non-data descriptor: non_data"
@@ -365,20 +377,21 @@ class Product:
     name = NonEmptyString()
     price = PositiveNumber()
     quantity = PositiveNumber()
-    
+
     def __init__(self, name, price, quantity):
         self.name = name
         self.price = price
         self.quantity = quantity
-    
+
     @CachedResult
     def total_value(self):
         """Expensive computation - cached."""
         print(f"Computing total value for {self.name}...")
         return self.price * self.quantity
-    
+
     def __repr__(self):
         return f"Product({self.name!r}, ${self.price}, qty={self.quantity})"
+
 
 product = Product("Laptop", 999.99, 10)
 print(f"Total value: ${product.total_value():,.2f}")
@@ -392,12 +405,12 @@ class Employee:
     name = Typed(str)
     age = Typed(int)
     salary = Typed(float)
-    
+
     def __init__(self, name, age, salary):
         self.name = name
         self.age = age
         self.salary = salary
-    
+
     @ComputedAttribute
     def tax_rate(self):
         if self.salary > 100000:
@@ -405,10 +418,11 @@ class Employee:
         elif self.salary > 50000:
             return 0.25
         return 0.15
-    
+
     @ComputedAttribute
     def annual_tax(self):
         return self.salary * self.tax_rate
+
 
 emp = Employee("Alice", 30, 75000)
 print(f"Employee: {emp.name}, age {emp.age}")
@@ -428,11 +442,12 @@ class Bad:
         # self.name is None - error!
         return obj.__dict__.get(self.name)
 
+
 # CORRECT
 class Good:
     def __set_name__(self, owner, name):
         self.name = name  # Now we know the attribute name
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
@@ -445,14 +460,15 @@ class Good:
 class Bad:
     def __get__(self, obj, objtype=None):
         # Fails when accessed on class: obj is None
-        return obj.__dict__['attr']
+        return obj.__dict__["attr"]
+
 
 # CORRECT
 class Good:
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self  # Return descriptor itself
-        return obj.__dict__.get('attr')
+        return obj.__dict__.get("attr")
 ```
 
 ### 3. Infinite Recursion
@@ -462,12 +478,13 @@ class Bad:
     def __get__(self, obj, objtype=None):
         return self.attr  # Recursive call!
 
+
 # CORRECT - use __dict__ directly
 class Good:
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
-        return obj.__dict__.get('_value')
+        return obj.__dict__.get("_value")
 ```
 
 ---
@@ -509,6 +526,7 @@ class Range:
     Create a descriptor that validates values are within a range.
     Usage: age = Range(min_val=0, max_val=150)
     """
+
     def __init__(self, min_val, max_val):
         # Your code here
         pass
@@ -519,10 +537,11 @@ class Range:
 class UnitConverter:
     """
     Create a descriptor that automatically converts units.
-    Usage: 
+    Usage:
         celsius = UnitConverter('celsius')
         fahrenheit = UnitConverter('fahrenheit')
     """
+
     def __init__(self, unit):
         # Your code here
         pass
@@ -535,6 +554,7 @@ class Observable:
     Create a descriptor that notifies when attribute changes.
     Usage: name = Observable(callback=on_change)
     """
+
     def __init__(self, callback=None):
         # Your code here
         pass

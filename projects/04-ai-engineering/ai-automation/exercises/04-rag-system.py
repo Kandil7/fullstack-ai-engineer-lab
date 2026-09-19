@@ -26,9 +26,11 @@ import numpy as np
 # 1. Document Models
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Document:
     """A source document."""
+
     id: str
     content: str
     metadata: dict = field(default_factory=dict)
@@ -38,6 +40,7 @@ class Document:
 @dataclass
 class Chunk:
     """A chunk of text from a document."""
+
     id: str
     content: str
     document_id: str
@@ -49,6 +52,7 @@ class Chunk:
 @dataclass
 class RetrievalResult:
     """A retrieval result with score and source."""
+
     chunk: Chunk
     score: float
     rerank_score: float | None = None
@@ -57,6 +61,7 @@ class RetrievalResult:
 @dataclass
 class RAGResponse:
     """The final RAG response."""
+
     answer: str
     sources: list[RetrievalResult]
     context_used: str
@@ -66,6 +71,7 @@ class RAGResponse:
 # ---------------------------------------------------------------------------
 # 2. Document Chunking Strategies
 # ---------------------------------------------------------------------------
+
 
 class ChunkingStrategy(Enum):
     FIXED_SIZE = "fixed_size"
@@ -93,7 +99,7 @@ class DocumentChunker:
     @staticmethod
     def sentence_based(text: str, max_chunk_size: int = 1000) -> list[str]:
         """Split text by sentences, grouping them into chunks."""
-        sentences = re.split(r'(?<=[.!?])\s+', text)
+        sentences = re.split(r"(?<=[.!?])\s+", text)
         chunks = []
         current_chunk = []
         current_size = 0
@@ -112,8 +118,12 @@ class DocumentChunker:
         return chunks
 
     @staticmethod
-    def recursive(text: str, chunk_size: int = 500, overlap: int = 50,
-                  separators: list[str] | None = None) -> list[str]:
+    def recursive(
+        text: str,
+        chunk_size: int = 500,
+        overlap: int = 50,
+        separators: list[str] | None = None,
+    ) -> list[str]:
         """Recursively split by separators (paragraphs -> sentences -> chars)."""
         if separators is None:
             separators = ["\n\n", "\n", ". ", " "]
@@ -147,7 +157,7 @@ class DocumentChunker:
     @staticmethod
     def markdown_aware(text: str, max_chunk_size: int = 1000) -> list[str]:
         """Split markdown by headers, preserving structure."""
-        sections = re.split(r'\n(?=#{1,4}\s)', text)
+        sections = re.split(r"\n(?=#{1,4}\s)", text)
         chunks = []
         current_chunk = ""
 
@@ -165,8 +175,12 @@ class DocumentChunker:
         return chunks
 
     @classmethod
-    def chunk(cls, text: str, strategy: ChunkingStrategy = ChunkingStrategy.RECURSIVE,
-              **kwargs) -> list[str]:
+    def chunk(
+        cls,
+        text: str,
+        strategy: ChunkingStrategy = ChunkingStrategy.RECURSIVE,
+        **kwargs,
+    ) -> list[str]:
         """Chunk text using the specified strategy."""
         strategies = {
             ChunkingStrategy.FIXED_SIZE: cls.fixed_size,
@@ -181,6 +195,7 @@ class DocumentChunker:
 # 3. Embedding Engine
 # ---------------------------------------------------------------------------
 
+
 class EmbeddingEngine:
     """Generate embeddings for text chunks."""
 
@@ -188,11 +203,13 @@ class EmbeddingEngine:
         self.use_local = use_local
         if use_local:
             from sentence_transformers import SentenceTransformer
+
             self.model_name = model or "all-MiniLM-L6-v2"
             self.model = SentenceTransformer(self.model_name)
             self.dimension = self.model.get_sentence_embedding_dimension()
         else:
             from openai import OpenAI
+
             self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
             self.model_name = model or "text-embedding-3-small"
             self.dimension = 1536
@@ -211,7 +228,7 @@ class EmbeddingEngine:
             # Batch in groups of 100
             all_embs = []
             for i in range(0, len(texts), 100):
-                batch = texts[i:i+100]
+                batch = texts[i : i + 100]
                 resp = self.client.embeddings.create(model=self.model_name, input=batch)
                 all_embs.extend([d.embedding for d in resp.data])
             return all_embs
@@ -220,6 +237,7 @@ class EmbeddingEngine:
 # ---------------------------------------------------------------------------
 # 4. Vector Store
 # ---------------------------------------------------------------------------
+
 
 class VectorStore:
     """Simple vector store using Qdrant (in-memory or server)."""
@@ -244,17 +262,19 @@ class VectorStore:
         for chunk in chunks:
             if chunk.embedding is None:
                 continue
-            points.append(PointStruct(
-                id=hash(chunk.id) % (2**63),
-                vector=chunk.embedding,
-                payload={
-                    "chunk_id": chunk.id,
-                    "content": chunk.content,
-                    "document_id": chunk.document_id,
-                    "chunk_index": chunk.chunk_index,
-                    **chunk.metadata,
-                },
-            ))
+            points.append(
+                PointStruct(
+                    id=hash(chunk.id) % (2**63),
+                    vector=chunk.embedding,
+                    payload={
+                        "chunk_id": chunk.id,
+                        "content": chunk.content,
+                        "document_id": chunk.document_id,
+                        "chunk_index": chunk.chunk_index,
+                        **chunk.metadata,
+                    },
+                )
+            )
 
         self.client.upsert(collection_name=self.collection, points=points)
 
@@ -271,8 +291,11 @@ class VectorStore:
                 "chunk_id": hit.payload.get("chunk_id"),
                 "content": hit.payload.get("content"),
                 "document_id": hit.payload.get("document_id"),
-                "metadata": {k: v for k, v in hit.payload.items()
-                             if k not in ("chunk_id", "content", "document_id")},
+                "metadata": {
+                    k: v
+                    for k, v in hit.payload.items()
+                    if k not in ("chunk_id", "content", "document_id")
+                },
             }
             for hit in results
         ]
@@ -281,6 +304,7 @@ class VectorStore:
 # ---------------------------------------------------------------------------
 # 5. Retrieval Engine
 # ---------------------------------------------------------------------------
+
 
 class RetrievalEngine:
     """Retrieve relevant chunks for a query."""
@@ -313,6 +337,7 @@ class RetrievalEngine:
 # 6. Reranker
 # ---------------------------------------------------------------------------
 
+
 class CrossEncoderReranker:
     """Rerank retrieval results using cross-encoder scoring."""
 
@@ -321,8 +346,9 @@ class CrossEncoderReranker:
         # In production, use cross-encoder models like ms-marco-MiniLM-L-6-v2
         pass
 
-    def rerank(self, query: str, results: list[RetrievalResult],
-               top_k: int = 3) -> list[RetrievalResult]:
+    def rerank(
+        self, query: str, results: list[RetrievalResult], top_k: int = 3
+    ) -> list[RetrievalResult]:
         """Rerank results based on query-document relevance."""
         for result in results:
             # Heuristic scoring based on:
@@ -345,9 +371,9 @@ class CrossEncoderReranker:
 
             # Combined rerank score
             result.rerank_score = (
-                0.4 * result.score +      # Original retrieval score
-                0.4 * term_overlap +       # Query-term overlap
-                0.2 * length_score         # Length preference
+                0.4 * result.score  # Original retrieval score
+                + 0.4 * term_overlap  # Query-term overlap
+                + 0.2 * length_score  # Length preference
             )
 
         results.sort(key=lambda x: x.rerank_score or 0, reverse=True)
@@ -358,13 +384,16 @@ class CrossEncoderReranker:
 # 7. Generation Engine
 # ---------------------------------------------------------------------------
 
+
 class GenerationEngine:
     """Generate answers using retrieved context."""
 
     def __init__(self, model: str = "gpt-4o-mini"):
         self.model = model
 
-    def generate(self, query: str, context_chunks: list[RetrievalResult]) -> RAGResponse:
+    def generate(
+        self, query: str, context_chunks: list[RetrievalResult]
+    ) -> RAGResponse:
         """Generate an answer given a query and context."""
         start = time.time()
 
@@ -372,9 +401,7 @@ class GenerationEngine:
         context_parts = []
         for i, result in enumerate(context_chunks, 1):
             source = result.chunk.metadata.get("source", result.chunk.document_id)
-            context_parts.append(
-                f"[Source {i}: {source}]\n{result.chunk.content}"
-            )
+            context_parts.append(f"[Source {i}: {source}]\n{result.chunk.content}")
         context = "\n\n".join(context_parts)
 
         # Build prompt
@@ -390,6 +417,7 @@ Answer (be specific, cite sources when possible):"""
 
         # Generate response
         from openai import OpenAI
+
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         response = client.chat.completions.create(
@@ -414,11 +442,13 @@ Answer (be specific, cite sources when possible):"""
 # 8. Complete RAG Pipeline
 # ---------------------------------------------------------------------------
 
+
 class RAGPipeline:
     """End-to-end RAG system combining all components."""
 
-    def __init__(self, use_local_embeddings: bool = True,
-                 generation_model: str = "gpt-4o-mini"):
+    def __init__(
+        self, use_local_embeddings: bool = True, generation_model: str = "gpt-4o-mini"
+    ):
         self.chunker = DocumentChunker()
         self.embedder = EmbeddingEngine(use_local=use_local_embeddings)
         self.store = VectorStore(
@@ -433,9 +463,12 @@ class RAGPipeline:
         self._chunks: list[Chunk] = []
         self._next_chunk_id = 0
 
-    def ingest(self, documents: list[Document],
-               chunking_strategy: ChunkingStrategy = ChunkingStrategy.RECURSIVE,
-               chunk_size: int = 500) -> int:
+    def ingest(
+        self,
+        documents: list[Document],
+        chunking_strategy: ChunkingStrategy = ChunkingStrategy.RECURSIVE,
+        chunk_size: int = 500,
+    ) -> int:
         """Ingest documents into the RAG system."""
         all_chunks = []
 
@@ -471,8 +504,9 @@ class RAGPipeline:
 
         return len(all_chunks)
 
-    def query(self, query: str, *, top_k: int = 5, rerank: bool = True,
-              context_limit: int = 3) -> RAGResponse:
+    def query(
+        self, query: str, *, top_k: int = 5, rerank: bool = True, context_limit: int = 3
+    ) -> RAGResponse:
         """Query the RAG system."""
         # Retrieve
         results = self.retriever.retrieve(query, top_k=top_k)
@@ -499,14 +533,19 @@ class RAGPipeline:
 # 9. RAG Evaluation
 # ---------------------------------------------------------------------------
 
+
 class RAGEvaluator:
     """Evaluate RAG system quality."""
 
     def __init__(self):
         pass
 
-    def evaluate_retrieval(self, query: str, retrieved_chunks: list[RetrievalResult],
-                           relevant_ids: list[str]) -> dict:
+    def evaluate_retrieval(
+        self,
+        query: str,
+        retrieved_chunks: list[RetrievalResult],
+        relevant_ids: list[str],
+    ) -> dict:
         """Evaluate retrieval quality."""
         retrieved_ids = [r.chunk.id for r in retrieved_chunks]
 
@@ -558,6 +597,7 @@ class RAGEvaluator:
 # ---------------------------------------------------------------------------
 # 10. Demo Functions
 # ---------------------------------------------------------------------------
+
 
 def demo_chunking():
     """Demo: Different chunking strategies."""
@@ -619,34 +659,34 @@ def demo_retrieval():
         Document(
             id="doc1",
             content="Python is a high-level programming language known for its simplicity. "
-                    "It supports multiple paradigms including object-oriented, functional, and "
-                    "procedural programming. Python is widely used in data science, web development, "
-                    "and automation.",
+            "It supports multiple paradigms including object-oriented, functional, and "
+            "procedural programming. Python is widely used in data science, web development, "
+            "and automation.",
             metadata={"topic": "programming", "language": "python"},
             source="Python Guide",
         ),
         Document(
             id="doc2",
             content="Machine learning is a subset of artificial intelligence that enables systems "
-                    "to learn from data. Key concepts include supervised learning, unsupervised "
-                    "learning, and reinforcement learning. Popular algorithms include neural networks, "
-                    "decision trees, and support vector machines.",
+            "to learn from data. Key concepts include supervised learning, unsupervised "
+            "learning, and reinforcement learning. Popular algorithms include neural networks, "
+            "decision trees, and support vector machines.",
             metadata={"topic": "ai", "level": "beginner"},
             source="ML Handbook",
         ),
         Document(
             id="doc3",
             content="RAG (Retrieval-Augmented Generation) combines search with language models. "
-                    "It retrieves relevant documents and uses them as context for generation. "
-                    "This approach reduces hallucination and keeps responses factual.",
+            "It retrieves relevant documents and uses them as context for generation. "
+            "This approach reduces hallucination and keeps responses factual.",
             metadata={"topic": "rag", "level": "intermediate"},
             source="RAG Tutorial",
         ),
         Document(
             id="doc4",
             content="Vector databases store embeddings for efficient similarity search. "
-                    "Popular options include Pinecone, Weaviate, Qdrant, and ChromaDB. "
-                    "They support metadata filtering and hybrid search.",
+            "Popular options include Pinecone, Weaviate, Qdrant, and ChromaDB. "
+            "They support metadata filtering and hybrid search.",
             metadata={"topic": "databases", "level": "intermediate"},
             source="Vector DB Guide",
         ),
@@ -680,12 +720,24 @@ def demo_reranking():
 
     # Reuse documents
     documents = [
-        Document("d1", "RAG combines retrieval and generation for accurate answers.",
-                 metadata={"topic": "rag"}, source="RAG Guide"),
-        Document("d2", "Vector embeddings capture semantic meaning of text for search.",
-                 metadata={"topic": "embeddings"}, source="Embeddings Book"),
-        Document("d3", "Fine-tuning trains a model on specific domain data.",
-                 metadata={"topic": "training"}, source="Training Guide"),
+        Document(
+            "d1",
+            "RAG combines retrieval and generation for accurate answers.",
+            metadata={"topic": "rag"},
+            source="RAG Guide",
+        ),
+        Document(
+            "d2",
+            "Vector embeddings capture semantic meaning of text for search.",
+            metadata={"topic": "embeddings"},
+            source="Embeddings Book",
+        ),
+        Document(
+            "d3",
+            "Fine-tuning trains a model on specific domain data.",
+            metadata={"topic": "training"},
+            source="Training Guide",
+        ),
     ]
 
     pipeline.ingest(documents)
@@ -703,7 +755,9 @@ def demo_reranking():
     reranked = pipeline.reranker.rerank(query, results, top_k=3)
     print("\nWith reranking:")
     for r in reranked:
-        print(f"  Original: {r.score:.4f} -> Reranked: {r.rerank_score:.4f} | {r.chunk.content[:50]}...")
+        print(
+            f"  Original: {r.score:.4f} -> Reranked: {r.rerank_score:.4f} | {r.chunk.content[:50]}..."
+        )
 
 
 def demo_full_pipeline():
@@ -716,7 +770,9 @@ def demo_full_pipeline():
 
     # Ingest knowledge base
     documents = [
-        Document("kb1", """Retrieval-Augmented Generation (RAG) is a technique that enhances 
+        Document(
+            "kb1",
+            """Retrieval-Augmented Generation (RAG) is a technique that enhances 
 language models by retrieving relevant information from external knowledge bases before 
 generating responses. RAG was introduced by Facebook AI Research (FAIR) in 2020 and has 
 since become a standard approach for building knowledge-intensive AI applications.
@@ -731,9 +787,11 @@ RAG offers several advantages over fine-tuning:
 - Easy knowledge base updates
 - Transparent and auditable responses
 - Cost-effective for domain-specific applications""",
-            source="RAG Documentation"
+            source="RAG Documentation",
         ),
-        Document("kb2", """Vector embeddings are numerical representations of text that capture 
+        Document(
+            "kb2",
+            """Vector embeddings are numerical representations of text that capture 
 semantic meaning. When text is converted to embeddings, similar concepts end up close together 
 in vector space. This enables semantic search, where you can find relevant documents based 
 on meaning rather than exact keyword matches.
@@ -745,9 +803,11 @@ Common embedding models include:
 
 Vector databases like Qdrant, Pinecone, and Weaviat store these embeddings and enable 
 efficient similarity search at scale.""",
-            source="Embeddings Guide"
+            source="Embeddings Guide",
         ),
-        Document("kb3", """Document chunking is critical for RAG performance. Poor chunking 
+        Document(
+            "kb3",
+            """Document chunking is critical for RAG performance. Poor chunking 
 leads to irrelevant context and degraded answers. Best practices include:
 
 1. Chunk Size: 200-1000 characters typically works well
@@ -757,7 +817,7 @@ leads to irrelevant context and degraded answers. Best practices include:
 
 Recursive splitting is often the best default strategy, as it tries to maintain 
 semantic coherence while respecting size limits.""",
-            source="Chunking Best Practices"
+            source="Chunking Best Practices",
         ),
     ]
 
@@ -772,7 +832,9 @@ semantic coherence while respecting size limits.""",
     print(f"\nAnswer: {response.answer}")
     print(f"\nSources used: {len(response.sources)}")
     for i, source in enumerate(response.sources, 1):
-        print(f"  [{i}] {source.chunk.metadata.get('source', 'unknown')} (score: {source.score:.4f})")
+        print(
+            f"  [{i}] {source.chunk.metadata.get('source', 'unknown')} (score: {source.score:.4f})"
+        )
     print(f"\nLatency: {response.latency_ms:.0f}ms")
 
 

@@ -13,11 +13,17 @@ Topics:
 """
 
 import numpy as np
+
 # Ensure output directory exists (Tier 0 fix: Windows + CI)
 import os
-os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
+os.makedirs(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy",
+    exist_ok=True,
+)
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import fft as sp_fft
@@ -41,7 +47,7 @@ signal_noisy = signal + 0.3 * np.random.randn(len(t))
 
 # Compute FFT
 fft_vals = sp_fft.fft(signal_noisy)
-freqs = sp_fft.fftfreq(len(t), 1/fs)
+freqs = sp_fft.fftfreq(len(t), 1 / fs)
 
 # Keep only positive frequencies
 pos_mask = freqs >= 0
@@ -77,8 +83,13 @@ axes[1].set_ylabel("Magnitude")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_basic_fft.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_basic_fft.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_basic_fft.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_basic_fft.png"
+)
 
 # ============================================================
 # Example 2: Power Spectral Density
@@ -90,7 +101,7 @@ print("=" * 60)
 # Generate a signal with multiple components
 np.random.seed(42)
 fs = 1000
-t = np.arange(0, 2, 1/fs)
+t = np.arange(0, 2, 1 / fs)
 
 # Complex signal: chirp + sinusoid + noise
 chirp_freq = np.linspace(10, 200, len(t))
@@ -102,13 +113,14 @@ signal_psd = chirp + tone + noise
 # Compute PSD using Welch's method (via scipy.signal)
 # Use manual periodogram if welch not available
 fft_result = sp_fft.fft(signal_psd)
-freqs_full = sp_fft.fftfreq(len(t), 1/fs)
-psd = np.abs(fft_result)**2 / len(t)
+freqs_full = sp_fft.fftfreq(len(t), 1 / fs)
+psd = np.abs(fft_result) ** 2 / len(t)
 pos_mask = freqs_full > 0
 
 # Also compute using scipy.signal if available
 try:
     from scipy.signal import welch as scipy_welch
+
     f_welch, psd_welch = scipy_welch(signal_psd, fs=fs, nperseg=512)
     use_welch = True
 except ImportError:
@@ -126,12 +138,17 @@ ax.axvline(x=50, color="r", linestyle="--", alpha=0.7, label="50 Hz tone")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_psd.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_psd.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_psd.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_psd.png"
+)
 
 print(f"Signal length: {len(t)} samples")
 print(f"Sampling rate: {fs} Hz")
-print(f"Frequency resolution: {fs/len(t):.2f} Hz")
+print(f"Frequency resolution: {fs / len(t):.2f} Hz")
 
 # ============================================================
 # Example 3: 2D FFT (Image Processing)
@@ -147,9 +164,11 @@ x = np.arange(size)
 X, Y = np.meshgrid(x, x)
 
 # Image with horizontal and diagonal lines
-image = np.sin(2 * np.pi * 20 * Y / size) + \
-        0.5 * np.sin(2 * np.pi * 15 * (X + Y) / size) + \
-        0.3 * np.random.randn(size, size)
+image = (
+    np.sin(2 * np.pi * 20 * Y / size)
+    + 0.5 * np.sin(2 * np.pi * 15 * (X + Y) / size)
+    + 0.3 * np.random.randn(size, size)
+)
 
 # 2D FFT
 fft_2d = sp_fft.fft2(image)
@@ -168,8 +187,13 @@ axes[1].set_title("2D FFT Magnitude (log scale)")
 axes[1].set_xlabel("u (frequency)")
 axes[1].set_ylabel("v (frequency)")
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_2d_fft.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_2d_fft.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_2d_fft.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_2d_fft.png"
+)
 
 # Low-pass filtering in frequency domain
 rows, cols = image.shape
@@ -179,7 +203,7 @@ cutoff = 30  # Low-pass cutoff frequency
 # Create low-pass filter mask
 mask = np.zeros((rows, cols))
 Y_grid, X_grid = np.ogrid[:rows, :cols]
-mask_area = (X_grid - ccol)**2 + (Y_grid - crow)**2 <= cutoff**2
+mask_area = (X_grid - ccol) ** 2 + (Y_grid - crow) ** 2 <= cutoff**2
 mask[mask_area] = 1
 
 # Apply filter and inverse FFT
@@ -197,8 +221,13 @@ for ax in axes:
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_lowpass.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_lowpass.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_lowpass.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_lowpass.png"
+)
 
 # ============================================================
 # Example 4: Windowing Functions
@@ -229,21 +258,26 @@ for ax, name in zip(axes, window_names):
     ax.grid(True, alpha=0.3)
     ax.set_ylim(-0.1, 1.1)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_windows.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_windows.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_windows.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_windows.png"
+)
 
 # Effect of windowing on spectral leakage
 np.random.seed(42)
 fs = 1000
-t = np.arange(0, 1, 1/fs)
+t = np.arange(0, 1, 1 / fs)
 freq = 50.5  # Not an integer number of cycles -> leakage
 signal_win = np.sin(2 * np.pi * freq * t)
 
 fig, axes = plt.subplots(1, 2, figsize=(12, 4))
 # No window
 fft_no_win = sp_fft.fft(signal_win)
-freqs_win = sp_fft.fftfreq(len(t), 1/fs)
-axes[0].plot(freqs_win[:len(t)//2], np.abs(fft_no_win[:len(t)//2]), "b-")
+freqs_win = sp_fft.fftfreq(len(t), 1 / fs)
+axes[0].plot(freqs_win[: len(t) // 2], np.abs(fft_no_win[: len(t) // 2]), "b-")
 axes[0].set_title("No window (spectral leakage)")
 axes[0].set_xlabel("Frequency (Hz)")
 axes[0].set_xlim(0, 100)
@@ -252,14 +286,19 @@ axes[0].grid(True, alpha=0.3)
 # With Blackman window
 w = windows.blackman(len(signal_win))
 fft_win = sp_fft.fft(signal_win * w)
-axes[1].plot(freqs_win[:len(t)//2], np.abs(fft_win[:len(t)//2]), "r-")
+axes[1].plot(freqs_win[: len(t) // 2], np.abs(fft_win[: len(t) // 2]), "r-")
 axes[1].set_title("Blackman window (reduced leakage)")
 axes[1].set_xlabel("Frequency (Hz)")
 axes[1].set_xlim(0, 100)
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_window_effect.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_window_effect.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_window_effect.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_window_effect.png"
+)
 
 # ============================================================
 # Example 5: FFT-based Convolution
@@ -294,8 +333,8 @@ print(f"Signal A length: {len(signal_a)}")
 print(f"Signal B length: {len(signal_b)}")
 print(f"Result length:   {len(result_direct)}")
 print(f"Max difference:  {max_error:.2e}")
-print(f"np.convolve time: {time_direct*1000:.3f} ms")
-print(f"fftconvolve time: {time_fft*1000:.3f} ms")
+print(f"np.convolve time: {time_direct * 1000:.3f} ms")
+print(f"fftconvolve time: {time_fft * 1000:.3f} ms")
 print(f"Speedup: {time_direct / max(time_fft, 1e-10):.1f}x")
 
 # Plot input signals and convolution result
@@ -313,9 +352,13 @@ axes[2].set_title(f"Convolution result (length={len(result_fft)})")
 axes[2].set_xlabel("Sample")
 axes[2].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_convolution.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_convolution.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_convolution.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_09_convolution.png"
+)
 
 print("\n[OK] SciPy FFT module covered!")
 print("   Next: 10-spatial-data.py for spatial computations.")
-

@@ -6,6 +6,7 @@ Answers with full explanations and distractor analysis at the end.
 Shared data (seeded, used below):
 ```python
 import numpy as np
+
 rng = np.random.default_rng(42)
 n = 1000
 y_true = np.concatenate([np.zeros(700), np.ones(300)]).astype(int)
@@ -33,6 +34,7 @@ y_score = np.concatenate([rng.normal(0.0, 1.0, 700), rng.normal(2.2, 1.0, 300)])
 **E3 (code-output).** What prints?
 ```python
 from sklearn.metrics import roc_curve
+
 fpr, tpr, _ = roc_curve(y_true, y_score)
 print(fpr[0] == 0.0, tpr[0] == 0.0)
 print(abs(fpr[-1] - 1.0) < 1e-12, abs(tpr[-1] - 1.0) < 1e-12)
@@ -46,6 +48,7 @@ print(abs(fpr[-1] - 1.0) < 1e-12, abs(tpr[-1] - 1.0) < 1e-12)
 **E4 (code-output).** What prints?
 ```python
 import numpy as np
+
 y_true = np.array([5.0, 7.0])
 y_pred = np.array([4.5, 8.0])
 print((y_true - y_pred).tolist())
@@ -66,6 +69,7 @@ print((y_true - y_pred).tolist())
 **E6 (code-output).** What prints?
 ```python
 from sklearn.metrics import auc, roc_curve
+
 fpr, tpr, _ = roc_curve(y_true, y_score)
 print(round(float(auc(fpr, tpr)), 4))
 ```
@@ -97,6 +101,7 @@ magnitude) indicates:
 **M3 (code-output).** What prints?
 ```python
 from sklearn.metrics import confusion_matrix
+
 y_pred = np.clip(y_true + rng.choice([-1, 0, 0, 0, 1], 1000), 0, 2)
 cm = confusion_matrix(y_true, y_pred, labels=[0, 1, 2])
 print(cm.shape)
@@ -135,6 +140,7 @@ print(0.0 <= float(auc(*roc_curve(y_true, y_score)[:2])) <= 1.0)
 **M7 (code-output).** What prints?
 ```python
 import numpy as np
+
 train = np.array([0.94, 0.95, 0.96])
 valid = np.array([0.93, 0.90, 0.87])
 print(train[-1] > train[0], valid[-1] < valid[0])
@@ -167,6 +173,7 @@ print(train[-1] > train[0], valid[-1] < valid[0])
 ```python
 import numpy as np
 from sklearn.metrics import auc, roc_curve
+
 fpr, tpr, _ = roc_curve(y_true, y_score)
 order = np.argsort(y_score)[::-1]
 y_t = y_true[order]

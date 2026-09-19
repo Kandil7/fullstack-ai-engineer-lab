@@ -34,7 +34,9 @@ class BadRequestError(RuntimeError):
 # ---------------------------------------------------------------------------
 
 
-def track_cost(price_per_1k_tokens: float) -> Callable[[Callable[..., Usage]], Callable[..., Usage]]:
+def track_cost(
+    price_per_1k_tokens: float,
+) -> Callable[[Callable[..., Usage]], Callable[..., Usage]]:
     """Decorator factory: accumulate USD spend from each response's "tokens".
 
     The decorated callable must expose:

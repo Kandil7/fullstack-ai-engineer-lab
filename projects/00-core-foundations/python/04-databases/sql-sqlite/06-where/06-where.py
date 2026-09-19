@@ -127,7 +127,9 @@ print()
 
 # Example 10: NOT IN - exclude values in a list
 print("=== NOT IN Operator ===")
-cursor.execute("SELECT name, category FROM products WHERE category NOT IN ('Electronics', 'Furniture')")
+cursor.execute(
+    "SELECT name, category FROM products WHERE category NOT IN ('Electronics', 'Furniture')"
+)
 for row in cursor.fetchall():
     print(f"  {row[0]}: {row[1]}")
 print("(No results if all categories are Electronics or Furniture)")
@@ -164,7 +166,9 @@ print()
 
 # Example 14: OR - either condition can be true
 print("=== OR Operator ===")
-cursor.execute("SELECT name, category, price FROM products WHERE category = 'Furniture' OR price < 50")
+cursor.execute(
+    "SELECT name, category, price FROM products WHERE category = 'Furniture' OR price < 50"
+)
 for row in cursor.fetchall():
     print(f"  {row[0]} ({row[1]}): ${row[2]}")
 print()

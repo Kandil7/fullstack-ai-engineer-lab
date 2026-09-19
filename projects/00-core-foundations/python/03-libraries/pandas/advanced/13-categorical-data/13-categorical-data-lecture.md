@@ -45,9 +45,9 @@ df = pd.DataFrame({"region": ["north", "south", "north", "east", "south"]})
 df["region"] = df["region"].astype("category")
 
 # Inspect
-df["region"].dtype                     # CategoricalDtype
-df["region"].cat.categories            # Index(['east', 'north', 'south'], dtype='object')
-df["region"].cat.codes                 # integer codes (0 = 'east', ...)
+df["region"].dtype  # CategoricalDtype
+df["region"].cat.categories  # Index(['east', 'north', 'south'], dtype='object')
+df["region"].cat.codes  # integer codes (0 = 'east', ...)
 ```
 
 Key `cat` accessor methods:
@@ -112,11 +112,13 @@ ordered categorical's codes so the numeric order matches the semantic order.
 ## 4. Real-World Use Case — User Acquisition Analysis
 
 ```python
-df = pd.DataFrame({
-    "user_id": range(1, 1001),
-    "plan": np.random.choice(["free", "pro", "enterprise"], 1000, p=[0.7, 0.25, 0.05]),
-    "region": np.random.choice(["emea", "amer", "apac"], 1000),
-})
+df = pd.DataFrame(
+    {
+        "user_id": range(1, 1001),
+        "plan": np.random.choice(["free", "pro", "enterprise"], 1000, p=[0.7, 0.25, 0.05]),
+        "region": np.random.choice(["emea", "amer", "apac"], 1000),
+    }
+)
 
 # 1. Compact storage
 df["plan"] = df["plan"].astype("category")

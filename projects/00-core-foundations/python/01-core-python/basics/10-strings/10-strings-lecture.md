@@ -19,7 +19,7 @@ Strings can be created using single quotes, double quotes, or triple quotes.
 
 ```python
 # Single quotes
-name = 'Alice'
+name = "Alice"
 
 # Double quotes
 greeting = "Hello, World!"
@@ -29,8 +29,8 @@ multi_line = """This is a
 multi-line string"""
 
 # Triple single quotes
-also_multi = '''This is also
-multi-line'''
+also_multi = """This is also
+multi-line"""
 ```
 
 ### 3.2 String Immutability
@@ -51,15 +51,15 @@ Access characters using indices (0-based).
 text = "Hello, World!"
 
 # Indexing
-print(text[0])   # H
+print(text[0])  # H
 print(text[-1])  # ! (last character)
 
 # Slicing
-print(text[0:5])   # Hello
+print(text[0:5])  # Hello
 print(text[7:12])  # World
-print(text[:5])    # Hello (start to index 5)
-print(text[7:])    # World! (index 7 to end)
-print(text[::2])   # Hlo ol! (every 2nd character)
+print(text[:5])  # Hello (start to index 5)
+print(text[7:])  # World! (index 7 to end)
+print(text[::2])  # Hlo ol! (every 2nd character)
 ```
 
 ### 3.4 String Methods
@@ -67,29 +67,29 @@ print(text[::2])   # Hlo ol! (every 2nd character)
 **Case methods:**
 ```python
 text = "Hello, World!"
-print(text.upper())      # HELLO, WORLD!
-print(text.lower())      # hello, world!
-print(text.title())      # Hello, World!
-print(text.capitalize()) # Hello, world!
-print(text.swapcase())   # hELLO, wORLD!
+print(text.upper())  # HELLO, WORLD!
+print(text.lower())  # hello, world!
+print(text.title())  # Hello, World!
+print(text.capitalize())  # Hello, world!
+print(text.swapcase())  # hELLO, wORLD!
 ```
 
 **Search methods:**
 ```python
 text = "Hello, World!"
-print(text.find("World"))    # 7
+print(text.find("World"))  # 7
 print(text.find("Python"))  # -1 (not found)
-print(text.count("l"))      # 3
+print(text.count("l"))  # 3
 print(text.startswith("Hello"))  # True
-print(text.endswith("!"))    # True
+print(text.endswith("!"))  # True
 ```
 
 **Modify methods:**
 ```python
 text = "  Hello, World!  "
-print(text.strip())     # "Hello, World!" (removes whitespace)
-print(text.lstrip())    # "Hello, World!  "
-print(text.rstrip())    # "  Hello, World!"
+print(text.strip())  # "Hello, World!" (removes whitespace)
+print(text.lstrip())  # "Hello, World!  "
+print(text.rstrip())  # "  Hello, World!"
 print(text.replace("World", "Python"))  # "  Hello, Python!  "
 ```
 
@@ -109,11 +109,11 @@ print(words)  # ['Hello', 'World', 'Python']
 
 **Joining:**
 ```python
-fruits = ['apple', 'banana', 'cherry']
+fruits = ["apple", "banana", "cherry"]
 text = ", ".join(fruits)
 print(text)  # "apple, banana, cherry"
 
-words = ['Hello', 'World']
+words = ["Hello", "World"]
 sentence = " ".join(words)
 print(sentence)  # "Hello World"
 ```
@@ -159,14 +159,14 @@ print("Alice" in greeting)  # True
 ```python
 # Text processing
 text = "  Hello, World!  "
-print(text.strip())           # "Hello, World!"
-print(text.strip().upper())   # "HELLO, WORLD!"
-print(text.strip().lower())   # "hello, world!"
+print(text.strip())  # "Hello, World!"
+print(text.strip().upper())  # "HELLO, WORLD!"
+print(text.strip().lower())  # "hello, world!"
 
 # Search and replace
 email = "user@example.com"
 print(email.replace("@", "[at]"))  # "user[at]example.com"
-print(email.find("@"))            # 4
+print(email.find("@"))  # 4
 ```
 
 ### Example 3: Split and Join

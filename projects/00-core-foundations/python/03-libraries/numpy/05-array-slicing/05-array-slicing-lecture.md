@@ -28,16 +28,16 @@ import numpy as np
 arr = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
 
 # Basic slicing — elements 1 to 4 (stop is exclusive)
-print(arr[1:5])      # [20 30 40 50]
+print(arr[1:5])  # [20 30 40 50]
 
 # From start to index 5
-print(arr[:5])       # [10 20 30 40 50]
+print(arr[:5])  # [10 20 30 40 50]
 
 # From index 3 to end
-print(arr[3:])       # [40 50 60 70 80 90 100]
+print(arr[3:])  # [40 50 60 70 80 90 100]
 
 # Entire array (copy)
-print(arr[:])        # [10 20 30 40 50 60 70 80 90 100]
+print(arr[:])  # [10 20 30 40 50 60 70 80 90 100]
 ```
 
 ### Step Value
@@ -46,19 +46,19 @@ print(arr[:])        # [10 20 30 40 50 60 70 80 90 100]
 arr = np.arange(10)  # [0 1 2 3 4 5 6 7 8 9]
 
 # Every 2nd element
-print(arr[::2])      # [0 2 4 6 8]
+print(arr[::2])  # [0 2 4 6 8]
 
 # Every 3rd element
-print(arr[::3])      # [0 3 6 9]
+print(arr[::3])  # [0 3 6 9]
 
 # With start and stop
-print(arr[1:8:2])    # [1 3 5 7]
+print(arr[1:8:2])  # [1 3 5 7]
 
 # Reversed array
-print(arr[::-1])     # [9 8 7 6 5 4 3 2 1 0]
+print(arr[::-1])  # [9 8 7 6 5 4 3 2 1 0]
 
 # Reversed with step
-print(arr[::-2])     # [9 7 5 3 1]
+print(arr[::-2])  # [9 7 5 3 1]
 ```
 
 ---
@@ -68,13 +68,10 @@ print(arr[::-2])     # [9 7 5 3 1]
 ### Row and Column Slicing
 
 ```python
-matrix = np.array([[1, 2, 3, 4],
-                   [5, 6, 7, 8],
-                   [9, 10, 11, 12],
-                   [13, 14, 15, 16]])
+matrix = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]])
 
 # First row
-print(matrix[0])        # [1 2 3 4]
+print(matrix[0])  # [1 2 3 4]
 
 # First two rows
 print(matrix[:2])
@@ -87,7 +84,7 @@ print(matrix[-2:])
 #  [13 14 15 16]]
 
 # First column
-print(matrix[:, 0])     # [1 5 9 13]
+print(matrix[:, 0])  # [1 5 9 13]
 
 # First two columns
 print(matrix[:, :2])
@@ -105,10 +102,7 @@ print(matrix[1:3, 1:3])
 ### Row-wise and Column-wise Slicing
 
 ```python
-matrix = np.array([[1, 2, 3, 4],
-                   [5, 6, 7, 8],
-                   [9, 10, 11, 12],
-                   [13, 14, 15, 16]])
+matrix = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]])
 
 # Every other row
 print(matrix[::2])
@@ -145,22 +139,22 @@ print(matrix[:, ::-1])
 arr = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
 
 # Last 3 elements
-print(arr[-3:])       # [80 90 100]
+print(arr[-3:])  # [80 90 100]
 
 # Everything except last 3
-print(arr[:-3])       # [10 20 30 40 50 60 70]
+print(arr[:-3])  # [10 20 30 40 50 60 70]
 
 # From 3rd to last to end
-print(arr[-3::1])     # [80 90 100]
+print(arr[-3::1])  # [80 90 100]
 
 # Reversed last 5
-print(arr[-5::-1])    # [50 40 30 20 10]
+print(arr[-5::-1])  # [50 40 30 20 10]
 
 # 2D negative slicing
 matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Last row
-print(matrix[-1])     # [7 8 9]
+print(matrix[-1])  # [7 8 9]
 
 # Last column
 print(matrix[:, -1])  # [3 6 9]
@@ -182,22 +176,22 @@ arr_3d = np.random.rand(2, 3, 4)
 
 # Select all along first two axes, specific third
 print(arr_3d[:, :, 0].shape)  # (2, 3)
-print(arr_3d[..., 0].shape)   # (2, 3) — equivalent!
+print(arr_3d[..., 0].shape)  # (2, 3) — equivalent!
 
 # Select all along first axis, specific second and third
 print(arr_3d[0, :, :].shape)  # (3, 4)
-print(arr_3d[0, ...].shape)   # (3, 4) — equivalent!
+print(arr_3d[0, ...].shape)  # (3, 4) — equivalent!
 ```
 
 ### 4.2 np.newaxis for Dimension Expansion
 
 ```python
 arr = np.array([1, 2, 3, 4, 5])
-print(arr.shape)       # (5,)
+print(arr.shape)  # (5,)
 
 # Add new axis at position 1
 col = arr[:, np.newaxis]
-print(col.shape)       # (5, 1)
+print(col.shape)  # (5, 1)
 print(col)
 # [[1]
 #  [2]
@@ -207,13 +201,13 @@ print(col)
 
 # Add new axis at position 0
 row = arr[np.newaxis, :]
-print(row.shape)       # (1, 5)
-print(row)             # [[1 2 3 4 5]]
+print(row.shape)  # (1, 5)
+print(row)  # [[1 2 3 4 5]]
 
 # For broadcasting
-a = np.array([1, 2, 3])      # (3,)
-b = np.array([10, 20])       # (2,)
-c = a[:, np.newaxis] + b     # (3, 2)
+a = np.array([1, 2, 3])  # (3,)
+b = np.array([10, 20])  # (2,)
+c = a[:, np.newaxis] + b  # (3, 2)
 print(c)
 # [[11 21]
 #  [12 22]
@@ -256,7 +250,7 @@ print(view)  # [20 30]
 
 # Modify the view
 view[0] = 999
-print(arr)   # [ 10 999  30  40  50] — original is modified!
+print(arr)  # [ 10 999  30  40  50] — original is modified!
 
 # Check if they share memory
 print(np.shares_memory(arr, view))  # True
@@ -273,7 +267,7 @@ print(copy)  # [20 30]
 
 # Modify the copy
 copy[0] = 999
-print(arr)   # [10 20 30 40 50] — original is NOT modified
+print(arr)  # [10 20 30 40 50] — original is NOT modified
 
 # Check memory
 print(np.shares_memory(arr, copy))  # False
@@ -295,8 +289,8 @@ copy = arr[::2].copy()
 print(f"Copy size: {sys.getsizeof(copy)}")  # Large!
 
 # Shares memory check
-print(np.shares_memory(arr, view))   # True
-print(np.shares_memory(arr, copy))   # False
+print(np.shares_memory(arr, view))  # True
+print(np.shares_memory(arr, copy))  # False
 ```
 
 ---
@@ -353,9 +347,7 @@ print(reshaped)
 ### 7.2 Diagonal Extraction
 
 ```python
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Main diagonal
 diag = matrix[np.arange(3), np.arange(3)]
@@ -372,14 +364,12 @@ print(anti)  # [3 5 7]
 ### 7.3 Upper and Lower Triangular
 
 ```python
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Upper triangle (excluding diagonal)
 for i in range(3):
-    for j in range(i+1, 3):
-        print(f"matrix[{i},{j}] = {matrix[i,j]}")
+    for j in range(i + 1, 3):
+        print(f"matrix[{i},{j}] = {matrix[i, j]}")
 # matrix[0,1] = 2
 # matrix[0,2] = 3
 # matrix[1,2] = 6
@@ -387,7 +377,7 @@ for i in range(3):
 # Lower triangle (excluding diagonal)
 for i in range(3):
     for j in range(i):
-        print(f"matrix[{i},{j}] = {matrix[i,j]}")
+        print(f"matrix[{i},{j}] = {matrix[i, j]}")
 # matrix[1,0] = 4
 # matrix[2,0] = 7
 # matrix[2,1] = 8
@@ -420,7 +410,7 @@ print(arr)  # [1 2 3 4 5] — unchanged
 ```python
 arr = np.array([1, 2, 3, 4, 5])
 # arr[1.5:3.5]  # TypeError: slice indices must be integers
-arr[1:4]        # Correct
+arr[1:4]  # Correct
 ```
 
 ### Mistake 4: Confusing Slicing and Indexing
@@ -428,7 +418,7 @@ arr[1:4]        # Correct
 arr = np.array([10, 20, 30, 40, 50])
 
 # Indexing — returns scalar
-print(type(arr[0]))    # <class 'numpy.int64'>
+print(type(arr[0]))  # <class 'numpy.int64'>
 
 # Slicing — returns array
 print(type(arr[0:1]))  # <class 'numpy.ndarray'>
@@ -463,20 +453,24 @@ arr = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 # e) Get elements from index 2 to 8 with step 3
 
 # Solutions:
-print(arr[3:8])    # [3 4 5 6 7]
-print(arr[::2])    # [0 2 4 6 8]
-print(arr[::-1])   # [9 8 7 6 5 4 3 2 1 0]
-print(arr[-4:])    # [6 7 8 9]
+print(arr[3:8])  # [3 4 5 6 7]
+print(arr[::2])  # [0 2 4 6 8]
+print(arr[::-1])  # [9 8 7 6 5 4 3 2 1 0]
+print(arr[-4:])  # [6 7 8 9]
 print(arr[2:8:3])  # [2 5]
 ```
 
 ### Exercise 2: 2D Slicing
 ```python
-matrix = np.array([[1, 2, 3, 4, 5],
-                   [6, 7, 8, 9, 10],
-                   [11, 12, 13, 14, 15],
-                   [16, 17, 18, 19, 20],
-                   [21, 22, 23, 24, 25]])
+matrix = np.array(
+    [
+        [1, 2, 3, 4, 5],
+        [6, 7, 8, 9, 10],
+        [11, 12, 13, 14, 15],
+        [16, 17, 18, 19, 20],
+        [21, 22, 23, 24, 25],
+    ]
+)
 
 # a) Get top-left 3×3
 # b) Get bottom-right 2×2
@@ -504,12 +498,12 @@ copy = arr[1:4].copy()
 view[0] = 99
 
 # Question: What is arr now? What about copy?
-print(arr)    # [ 1 99  3  4  5]
-print(copy)   # [2 3 4]
+print(arr)  # [ 1 99  3  4  5]
+print(copy)  # [2 3 4]
 
 # Verify memory sharing
-print(np.shares_memory(arr, view))   # True
-print(np.shares_memory(arr, copy))   # False
+print(np.shares_memory(arr, view))  # True
+print(np.shares_memory(arr, copy))  # False
 ```
 
 ### Exercise 4: Advanced Slicing

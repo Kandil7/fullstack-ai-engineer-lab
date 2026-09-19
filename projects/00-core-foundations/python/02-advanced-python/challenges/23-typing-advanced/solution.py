@@ -21,8 +21,10 @@ T = TypeVar("T")
 def build_schema(func) -> dict:
     """Introspect a callable into {name, params, return}."""
     sig = inspect.signature(func)
-    params = [(p.name, p.default if p.default is not inspect.Parameter.empty else None)
-              for p in sig.parameters.values()]
+    params = [
+        (p.name, p.default if p.default is not inspect.Parameter.empty else None)
+        for p in sig.parameters.values()
+    ]
     return {
         "name": func.__name__,
         "params": params,
@@ -38,8 +40,7 @@ def signature_matches(func, expected: list[str]) -> bool:
 
 @runtime_checkable
 class Retriever(Protocol):
-    def retrieve(self, query: str, k: int = 5) -> list[str]:
-        ...
+    def retrieve(self, query: str, k: int = 5) -> list[str]: ...
 
 
 class QdrantRetriever:

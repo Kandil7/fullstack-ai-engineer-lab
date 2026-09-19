@@ -35,11 +35,11 @@ from sqlalchemy.ext.asyncio import create_async_engine
 # Create engine with connection pooling
 engine = create_async_engine(
     "postgresql+asyncpg://user:pass@localhost/db",
-    pool_size=20,        # Maximum connections in pool
-    max_overflow=10,     # Extra connections beyond pool_size
-    pool_timeout=30,     # Seconds to wait for connection
-    pool_recycle=1800,   # Recycle connections after 30 min
-    pool_pre_ping=True   # Test connections before use
+    pool_size=20,  # Maximum connections in pool
+    max_overflow=10,  # Extra connections beyond pool_size
+    pool_timeout=30,  # Seconds to wait for connection
+    pool_recycle=1800,  # Recycle connections after 30 min
+    pool_pre_ping=True,  # Test connections before use
 )
 
 # Check pool status
@@ -61,6 +61,7 @@ print(f"Checked out: {engine.pool.checkedout()}")
 from sqlalchemy.orm import Session
 from . import models, schemas
 
+
 # CREATE
 def create_item(db: Session, item: schemas.ItemCreate):
     db_item = models.Item(**item.model_dump())
@@ -69,9 +70,11 @@ def create_item(db: Session, item: schemas.ItemCreate):
     db.refresh(db_item)
     return db_item
 
+
 # READ
 def get_item(db: Session, item_id: int):
     return db.query(models.Item).filter(models.Item.id == item_id).first()
+
 
 # UPDATE
 def update_item(db: Session, item_id: int, item_update: schemas.ItemUpdate):
@@ -82,6 +85,7 @@ def update_item(db: Session, item_id: int, item_update: schemas.ItemUpdate):
             setattr(db_item, key, value)
         db.commit()
     return db_item
+
 
 # DELETE
 def delete_item(db: Session, item_id: int):
@@ -135,6 +139,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 from .database import get_db
 
+
 # Database session dependency
 def get_db():
     db = SessionLocal()
@@ -142,6 +147,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 # Using dependency in route
 @app.get("/items/{item_id}")
@@ -151,12 +157,13 @@ def read_item(item_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Item not found")
     return db_item
 
+
 # Multiple dependencies
 @app.post("/items/")
 def create_item(
     item: schemas.ItemCreate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_user),
 ):
     return crud.create_item(db=db, item=item)
 ```
@@ -175,22 +182,16 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
 
 # Synchronous engine
-sync_engine = create_engine(
-    "postgresql://user:pass@localhost/db",
-    echo=True,
-    pool_size=5
-)
+sync_engine = create_engine("postgresql://user:pass@localhost/db", echo=True, pool_size=5)
 
 # Async engine
 async_engine = create_async_engine(
-    "postgresql+asyncpg://user:pass@localhost/db",
-    echo=True,
-    pool_size=5,
-    future=True
+    "postgresql+asyncpg://user:pass@localhost/db", echo=True, pool_size=5, future=True
 )
 
 # Engine with events
 from sqlalchemy import event
+
 
 @event.listens_for(engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -231,20 +232,22 @@ alembic current
 from alembic import op
 import sqlalchemy as sa
 
+
 def upgrade():
     op.create_table(
-        'users',
-        sa.Column('id', sa.Integer, primary_key=True),
-        sa.Column('email', sa.String, unique=True, nullable=False),
-        sa.Column('username', sa.String, unique=True),
-        sa.Column('hashed_password', sa.String, nullable=False),
-        sa.Column('created_at', sa.DateTime, default=sa.func.now())
+        "users",
+        sa.Column("id", sa.Integer, primary_key=True),
+        sa.Column("email", sa.String, unique=True, nullable=False),
+        sa.Column("username", sa.String, unique=True),
+        sa.Column("hashed_password", sa.String, nullable=False),
+        sa.Column("created_at", sa.DateTime, default=sa.func.now()),
     )
-    op.create_index('ix_users_email', 'users', ['email'])
+    op.create_index("ix_users_email", "users", ["email"])
+
 
 def downgrade():
-    op.drop_index('ix_users_email')
-    op.drop_table('users')
+    op.drop_index("ix_users_email")
+    op.drop_table("users")
 ```
 
 **Related Terms**: Alembic, Schema, Table
@@ -261,28 +264,30 @@ from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 from .database import Base
 
+
 class User(Base):
     __tablename__ = "users"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
     username = Column(String, unique=True)
     is_active = Column(Boolean, default=True)
-    
+
     # Relationship
     posts = relationship("Post", back_populates="owner")
-    
+
     def __repr__(self):
         return f"<User {self.email}>"
 
+
 class Post(Base):
     __tablename__ = "posts"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
     content = Column(String)
     owner_id = Column(Integer, ForeignKey("users.id"))
-    
+
     # Relationship
     owner = relationship("User", back_populates="posts")
 ```
@@ -308,15 +313,18 @@ user = db.query(models.User).filter(models.User.id == 1).first()
 active_users = db.query(models.User).filter(models.User.is_active == True).all()
 
 # Complex filtering
-filtered = db.query(models.User).filter(
-    and_(
-        models.User.is_active == True,
-        or_(
-            models.User.email.contains("@example.com"),
-            models.User.username.startswith("admin")
+filtered = (
+    db.query(models.User)
+    .filter(
+        and_(
+            models.User.is_active == True,
+            or_(
+                models.User.email.contains("@example.com"), models.User.username.startswith("admin")
+            ),
         )
     )
-).all()
+    .all()
+)
 
 # Ordering
 sorted_users = db.query(models.User).order_by(models.User.created_at.desc()).all()
@@ -354,11 +362,13 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
+
 # Request schema
 class ProductCreate(BaseModel):
     name: str
     price: float
     category_id: Optional[int] = None
+
 
 # Response schema
 class ProductResponse(BaseModel):
@@ -366,9 +376,10 @@ class ProductResponse(BaseModel):
     name: str
     price: float
     created_at: datetime
-    
+
     class Config:
         from_attributes = True
+
 
 # Update schema
 class ProductUpdate(BaseModel):
@@ -389,6 +400,7 @@ class ProductUpdate(BaseModel):
 from sqlalchemy.orm import Session
 from .database import SessionLocal
 
+
 # Synchronous session
 def get_db():
     db = SessionLocal()
@@ -397,10 +409,12 @@ def get_db():
     finally:
         db.close()
 
+
 # Async session
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
 
 async def get_async_db():
     async with async_session() as session:
@@ -410,6 +424,7 @@ async def get_async_db():
         except Exception:
             await session.rollback()
             raise
+
 
 # Using session in route
 @app.get("/users/{user_id}")
@@ -432,35 +447,38 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
+
 # Define table structure
 class Order(Base):
     __tablename__ = "orders"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     order_number = Column(String(50), unique=True, nullable=False)
     total_amount = Column(Float, nullable=False)
     status = Column(String(20), default="pending")
     created_at = Column(DateTime, default=datetime.utcnow)
     user_id = Column(Integer, ForeignKey("users.id"))
-    
+
     # Relationships
     user = relationship("User", back_populates="orders")
     items = relationship("OrderItem", back_populates="order")
 
+
 # Table constraints
 from sqlalchemy import UniqueConstraint, CheckConstraint
 
+
 class Reservation(Base):
     __tablename__ = "reservations"
-    
+
     id = Column(Integer, primary_key=True)
     table_number = Column(Integer)
     date = Column(DateTime)
     guest_count = Column(Integer)
-    
+
     __table_args__ = (
-        UniqueConstraint('table_number', 'date', name='uq_table_date'),
-        CheckConstraint('guest_count > 0', name='ck_positive_guests')
+        UniqueConstraint("table_number", "date", name="uq_table_date"),
+        CheckConstraint("guest_count > 0", name="ck_positive_guests"),
     )
 ```
 
@@ -477,33 +495,36 @@ class Reservation(Base):
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
+
 def transfer_funds(db: Session, from_account: int, to_account: int, amount: float):
     try:
         # Start transaction
         from_user = db.query(Account).filter(Account.id == from_account).first()
         to_user = db.query(Account).filter(Account.id == to_account).first()
-        
+
         if not from_user or not to_user:
             raise ValueError("Account not found")
-        
+
         if from_user.balance < amount:
             raise ValueError("Insufficient funds")
-        
+
         # Perform operations
         from_user.balance -= amount
         to_user.balance += amount
-        
+
         # Commit transaction
         db.commit()
         return {"status": "success", "message": f"Transferred {amount}"}
-        
+
     except (ValueError, SQLAlchemyError) as e:
         # Rollback on error
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
 
+
 # Using context manager
 from contextlib import contextmanager
+
 
 @contextmanager
 def transactional_session(db: Session):
@@ -533,15 +554,16 @@ def create_item(db: Session, item: ItemCreate):
     db.refresh(db_item)  # Get updated data
     return db_item
 
+
 # Multiple operations in one commit
 def create_user_with_profile(db: Session, user: UserCreate, profile: ProfileCreate):
     db_user = User(**user.model_dump())
     db.add(db_user)
     db.flush()  # Get ID without committing
-    
+
     db_profile = Profile(user_id=db_user.id, **profile.model_dump())
     db.add(db_profile)
-    
+
     db.commit()  # Both user and profile saved together
     return db_user
 ```
@@ -562,18 +584,20 @@ def risky_operation(db: Session):
         user = User(name="test")
         db.add(user)
         db.flush()  # Get ID
-        
+
         # This might fail
         perform_dangerous_operation()
-        
+
         db.commit()
     except Exception as e:
         # Undo all changes
         db.rollback()
         raise
 
+
 # Automatic rollback with context manager
 from contextlib import asynccontextmanager
+
 
 @asynccontextmanager
 async def safe_session(session: AsyncSession):
@@ -623,32 +647,34 @@ def create_with_related(db: Session, parent_data, child_data):
 ```python
 from sqlalchemy import Column, Integer, String, Index
 
+
 class Product(Base):
     __tablename__ = "products"
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
     category = Column(String(50))
     price = Column(Float)
-    
+
     # Single column index
     __table_args__ = (
-        Index('ix_products_category', 'category'),
-        Index('ix_products_price', 'price'),
+        Index("ix_products_category", "category"),
+        Index("ix_products_price", "price"),
     )
+
 
 # Composite index
 class Order(Base):
     __tablename__ = "orders"
-    
+
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer)
     status = Column(String(20))
     created_at = Column(DateTime)
-    
+
     __table_args__ = (
-        Index('ix_orders_user_status', 'user_id', 'status'),
-        Index('ix_orders_created', 'created_at'),
+        Index("ix_orders_user_status", "user_id", "status"),
+        Index("ix_orders_created", "created_at"),
     )
 ```
 
@@ -665,33 +691,36 @@ class Order(Base):
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
+
 class Author(Base):
     __tablename__ = "authors"
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
-    
+
     # One-to-many relationship
     books = relationship("Book", back_populates="author")
 
+
 class Book(Base):
     __tablename__ = "books"
-    
+
     id = Column(Integer, primary_key=True)
     title = Column(String(200))
     author_id = Column(Integer, ForeignKey("authors.id"))  # Foreign key
-    
+
     # Many-to-one relationship
     author = relationship("Author", back_populates="books")
+
 
 # Composite foreign key
 class OrderItem(Base):
     __tablename__ = "order_items"
-    
+
     id = Column(Integer, primary_key=True)
     order_id = Column(Integer, ForeignKey("orders.id"))
     product_id = Column(Integer, ForeignKey("products.id"))
-    
+
     order = relationship("Order")
     product = relationship("Product")
 ```

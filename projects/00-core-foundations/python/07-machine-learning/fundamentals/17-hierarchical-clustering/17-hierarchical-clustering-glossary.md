@@ -36,8 +36,7 @@
 from sklearn.cluster import AgglomerativeClustering
 import numpy as np
 
-X = np.array([[1, 2], [1.5, 1.8], [5, 8],
-              [8, 8], [1, 0.6], [9, 11]])
+X = np.array([[1, 2], [1.5, 1.8], [5, 8], [8, 8], [1, 0.6], [9, 11]])
 
 # Agglomerative clustering
 clustering = AgglomerativeClustering(n_clusters=2)
@@ -72,7 +71,7 @@ import numpy as np
 X, _ = make_blobs(n_samples=100, centers=3, random_state=42)
 
 # Apply agglomerative clustering
-clustering = AgglomerativeClustering(n_clusters=3, linkage='ward')
+clustering = AgglomerativeClustering(n_clusters=3, linkage="ward")
 labels = clustering.fit_predict(X)
 
 sil = silhouette_score(X, labels)
@@ -100,6 +99,7 @@ Split: [1, 2, 3, 4] and [5, 6, 7, 8]
 Split: [1, 2] and [3, 4] | [5, 6] and [7, 8]
 Split: [1] [2] [3] [4] [5] [6] [7] [8]
 """
+
 print("Divisive: Top-down approach")
 print("Start with one cluster, recursively split")
 ```
@@ -129,7 +129,7 @@ import numpy as np
 
 X, _ = make_moons(n_samples=200, noise=0.1, random_state=42)
 
-methods = ['ward', 'complete', 'average', 'single']
+methods = ["ward", "complete", "average", "single"]
 for method in methods:
     clustering = AgglomerativeClustering(n_clusters=2, linkage=method)
     labels = clustering.fit_predict(X)
@@ -161,21 +161,21 @@ np.random.seed(42)
 X = np.random.randn(50, 2)
 
 # Ward linkage
-Z = linkage(X, method='ward')
+Z = linkage(X, method="ward")
 
 plt.figure(figsize=(8, 4))
 plt.subplot(1, 2, 1)
-dendrogram(Z, truncate_mode='lastp', p=10)
-plt.title('Ward Linkage')
+dendrogram(Z, truncate_mode="lastp", p=10)
+plt.title("Ward Linkage")
 
 # Single linkage for comparison
-Z_single = linkage(X, method='single')
+Z_single = linkage(X, method="single")
 plt.subplot(1, 2, 2)
-dendrogram(Z_single, truncate_mode='lastp', p=10)
-plt.title('Single Linkage')
+dendrogram(Z_single, truncate_mode="lastp", p=10)
+plt.title("Single Linkage")
 
 plt.tight_layout()
-plt.savefig('linkage_comparison.png', dpi=100)
+plt.savefig("linkage_comparison.png", dpi=100)
 plt.show()
 ```
 
@@ -202,11 +202,10 @@ d(A,B) = max{d(a,b) : a ∈ A, b ∈ B}
 from sklearn.cluster import AgglomerativeClustering
 import numpy as np
 
-X = np.array([[1, 2], [1.5, 1.8], [2, 2.2],
-              [8, 8], [8.5, 8.2], [9, 8]])
+X = np.array([[1, 2], [1.5, 1.8], [2, 2.2], [8, 8], [8.5, 8.2], [9, 8]])
 
 # Complete linkage produces compact clusters
-clustering = AgglomerativeClustering(n_clusters=2, linkage='complete')
+clustering = AgglomerativeClustering(n_clusters=2, linkage="complete")
 labels = clustering.fit_predict(X)
 
 for i in range(2):
@@ -237,10 +236,9 @@ d(A,B) = (1/|A|·|B|) Σ d(a,b) for a ∈ A, b ∈ B
 from sklearn.cluster import AgglomerativeClustering
 import numpy as np
 
-X = np.array([[1, 2], [1.5, 1.8], [2, 2.2],
-              [8, 8], [8.5, 8.2], [9, 8]])
+X = np.array([[1, 2], [1.5, 1.8], [2, 2.2], [8, 8], [8.5, 8.2], [9, 8]])
 
-clustering = AgglomerativeClustering(n_clusters=2, linkage='average')
+clustering = AgglomerativeClustering(n_clusters=2, linkage="average")
 labels = clustering.fit_predict(X)
 
 print(f"Labels: {labels}")
@@ -275,10 +273,11 @@ import numpy as np
 # Single linkage works well with non-convex shapes
 X, _ = make_moons(n_samples=200, noise=0.1, random_state=42)
 
-clustering = AgglomerativeClustering(n_clusters=2, linkage='single')
+clustering = AgglomerativeClustering(n_clusters=2, linkage="single")
 labels = clustering.fit_predict(X)
 
 from sklearn.metrics import silhouette_score
+
 sil = silhouette_score(X, labels)
 print(f"Single linkage silhouette: {sil:.4f}")
 ```
@@ -307,26 +306,26 @@ np.random.seed(42)
 X, _ = make_blobs(n_samples=50, centers=3, random_state=42)
 
 # Create linkage matrix
-Z = linkage(X, method='ward')
+Z = linkage(X, method="ward")
 
 # Plot dendrogram
 plt.figure(figsize=(10, 6))
 dendrogram(
     Z,
-    truncate_mode='lastp',  # Show only last 20 merges
+    truncate_mode="lastp",  # Show only last 20 merges
     p=20,
     leaf_rotation=90,
     leaf_font_size=10,
     show_contracted=True,
-    color_threshold=7
+    color_threshold=7,
 )
-plt.title('Hierarchical Clustering Dendrogram')
-plt.xlabel('Sample Index or Cluster Size')
-plt.ylabel('Distance')
-plt.axhline(y=7, color='r', linestyle='--', label='Cut for 3 clusters')
+plt.title("Hierarchical Clustering Dendrogram")
+plt.xlabel("Sample Index or Cluster Size")
+plt.ylabel("Distance")
+plt.axhline(y=7, color="r", linestyle="--", label="Cut for 3 clusters")
 plt.legend()
 plt.tight_layout()
-plt.savefig('dendrogram_example.png', dpi=100)
+plt.savefig("dendrogram_example.png", dpi=100)
 plt.show()
 ```
 
@@ -353,11 +352,10 @@ plt.show()
 from scipy.cluster.hierarchy import linkage
 import numpy as np
 
-X = np.array([[1, 2], [1.5, 1.8], [5, 8],
-              [8, 8], [1, 0.6], [9, 11]])
+X = np.array([[1, 2], [1.5, 1.8], [5, 8], [8, 8], [1, 0.6], [9, 11]])
 
 # Create linkage matrix
-Z = linkage(X, method='ward')
+Z = linkage(X, method="ward")
 
 print("Linkage Matrix (last 5 rows):")
 print("  [cluster1, cluster2, distance, count]")
@@ -385,11 +383,11 @@ import numpy as np
 np.random.seed(42)
 X, _ = make_blobs(n_samples=50, centers=3, random_state=42)
 
-Z = linkage(X, method='ward')
+Z = linkage(X, method="ward")
 
 # Cut at different heights
 for height in [5, 7, 10]:
-    labels = fcluster(Z, t=height, criterion='distance')
+    labels = fcluster(Z, t=height, criterion="distance")
     n_clusters = len(np.unique(labels))
     print(f"Cut height {height}: {n_clusters} clusters")
 
@@ -415,7 +413,7 @@ np.random.seed(42)
 X, _ = make_blobs(n_samples=50, centers=3, random_state=42)
 
 # Calculate cophenetic correlation
-Z = linkage(X, method='ward')
+Z = linkage(X, method="ward")
 c, coph_dists = cophenet(Z, pdist(X))
 
 print(f"Cophenetic correlation: {c:.4f}")
@@ -447,11 +445,11 @@ import numpy as np
 X = np.random.randn(100, 5)
 
 # Euclidean (default)
-clustering_euc = AgglomerativeClustering(n_clusters=3, metric='euclidean')
+clustering_euc = AgglomerativeClustering(n_clusters=3, metric="euclidean")
 labels_euc = clustering_euc.fit_predict(X)
 
 # Manhattan
-clustering_man = AgglomerativeClustering(n_clusters=3, metric='manhattan')
+clustering_man = AgglomerativeClustering(n_clusters=3, metric="manhattan")
 labels_man = clustering_man.fit_predict(X)
 
 sil_euc = silhouette_score(X, labels_euc)
@@ -482,28 +480,33 @@ print(f"Manhattan: {sil_man:.4f}")
 ```python
 # Agglomerative Clustering
 from sklearn.cluster import AgglomerativeClustering
-clustering = AgglomerativeClustering(n_clusters=3, linkage='ward')
+
+clustering = AgglomerativeClustering(n_clusters=3, linkage="ward")
 labels = clustering.fit_predict(X)
 
 # Linkage Matrix
 from scipy.cluster.hierarchy import linkage
-Z = linkage(X, method='ward')
+
+Z = linkage(X, method="ward")
 
 # Dendrogram
 from scipy.cluster.hierarchy import dendrogram
+
 dendrogram(Z)
 
 # Cut Dendrogram
 from scipy.cluster.hierarchy import fcluster
-labels = fcluster(Z, t=7, criterion='distance')
+
+labels = fcluster(Z, t=7, criterion="distance")
 
 # Cophenetic Correlation
 from scipy.cluster.hierarchy import cophenet
 from scipy.spatial.distance import pdist
+
 c, _ = cophenet(Z, pdist(X))
 
 # Different Linkage Methods
-for method in ['ward', 'complete', 'average', 'single']:
+for method in ["ward", "complete", "average", "single"]:
     clustering = AgglomerativeClustering(n_clusters=3, linkage=method)
 ```
 

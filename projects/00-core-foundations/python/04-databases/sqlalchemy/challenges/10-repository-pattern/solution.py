@@ -109,9 +109,7 @@ class SqlExperimentRepository:
         return experiment.id
 
     def get(self, name: str) -> Experiment | None:
-        return self.session.scalars(
-            select(Experiment).where(Experiment.name == name)
-        ).first()
+        return self.session.scalars(select(Experiment).where(Experiment.name == name)).first()
 
     def list_all(self) -> list[Experiment]:
         return list(self.session.scalars(select(Experiment).order_by(Experiment.id)))
@@ -128,9 +126,7 @@ class SqlExperimentRepository:
         return True
 
 
-def register_batch_with_transaction(
-    session: Session, experiments: list[Experiment]
-) -> list[int]:
+def register_batch_with_transaction(session: Session, experiments: list[Experiment]) -> list[int]:
     """All-or-nothing batch registration; raise ValueError on duplicates."""
     try:
         session.add_all(experiments)

@@ -70,8 +70,8 @@ streams the pending backlog makes it visible and actionable.
 subscribers listen on.
 **Example**:
 ```python
-r.subscribe("events:documents")          # listen
-r.publish("events:documents", "doc-1")   # announce
+r.subscribe("events:documents")  # listen
+r.publish("events:documents", "doc-1")  # announce
 ```
 ```text
 # no history: subscribers only see what arrives while connected
@@ -129,7 +129,7 @@ connected is gone — the core limitation of the model.
 **Example**:
 ```python
 late = r.subscribe("events:documents")  # joins after doc-1 was published
-print(late.get_message())               # doc-2 arrives; doc-1 is lost
+print(late.get_message())  # doc-2 arrives; doc-1 is lost
 ```
 ```text
 # the stream exists precisely because of this
@@ -228,7 +228,7 @@ the group's pending set.
 **Example**:
 ```python
 group.ack("worker-1", "1-0")  # mark entry 1-0 finished
-print(group.pending())        # decremented
+print(group.pending())  # decremented
 ```
 ```text
 # ack is the "done" signal in at-least-once delivery
@@ -256,7 +256,7 @@ and audit primitive.
 **Example**:
 ```python
 entries = stream.xrange(0, 1)  # first two entries
-print(len(entries))            # -> 2
+print(len(entries))  # -> 2
 ```
 ```text
 # read-only: does not move any consumer group position

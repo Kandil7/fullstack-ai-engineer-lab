@@ -64,8 +64,8 @@ print()
 # Builder carries compilers + dev headers (~800MB+). Runtime needs only
 # the wheels. The size delta is pull time and cold start.
 
-def image_size_mb(base_mb: int, pip_wheels_mb: int, build_tools_mb: int,
-                  multi_stage: bool) -> int:
+
+def image_size_mb(base_mb: int, pip_wheels_mb: int, build_tools_mb: int, multi_stage: bool) -> int:
     """Single-stage includes build tools in the final image."""
     return base_mb + pip_wheels_mb + (0 if multi_stage else build_tools_mb)
 
@@ -85,12 +85,14 @@ print()
 # only when requirements change (the common case: code changes daily,
 # requirements rarely).
 
-def cached_layers(rebuild_count: int, cacheable_steps: int, total_steps: int,
-                  deps_first: bool) -> int:
+
+def cached_layers(
+    rebuild_count: int, cacheable_steps: int, total_steps: int, deps_first: bool
+) -> int:
     """Steps re-executed over rebuild_count rebuilds."""
     # deps_first: the deps layer is cacheable across rebuilds
     if deps_first:
-        per_rebuild = total_steps - 1     # only the code COPY + CMD rebuild
+        per_rebuild = total_steps - 1  # only the code COPY + CMD rebuild
         return per_rebuild * rebuild_count
     # code first: every rebuild re-runs dependency install too
     return total_steps * rebuild_count
@@ -120,6 +122,7 @@ output/
 .env
 """
 
+
 def context_size(files: list[tuple[str, int]], ignore: list[str]) -> int:
     """Total bytes sent to the daemon, minus ignored entries."""
     total = 0
@@ -130,12 +133,16 @@ def context_size(files: list[tuple[str, int]], ignore: list[str]) -> int:
 
 
 print("=== 4. .dockerignore ===")
-files = [("app/main.py", 2_000), (".git/objects/pack/a.pack", 50_000_000),
-         ("output/model.pt", 400_000_000), ("app/__init__.py", 500),
-         (".env", 200)]
+files = [
+    ("app/main.py", 2_000),
+    (".git/objects/pack/a.pack", 50_000_000),
+    ("output/model.pt", 400_000_000),
+    ("app/__init__.py", 500),
+    (".env", 200),
+]
 ignored = ["__pycache__/", ".git/", "output/", ".env"]
 sent = context_size(files, ignored)
-print(f"context sent: {sent/1e6:.1f}MB (from ~450MB of files)")
+print(f"context sent: {sent / 1e6:.1f}MB (from ~450MB of files)")
 print()
 
 # ============================================================
@@ -147,6 +154,7 @@ print()
 # the default choice unless you audit every dependency's wheels.
 
 ALPINE_RISK = {"numpy", "pydantic-core", "orjson", "psycopg2-binary"}
+
 
 def wheel_available_on_alpine(pkg: str) -> bool:
     """True if a prebuilt wheel for the package exists for musl."""
@@ -177,6 +185,7 @@ print()
 # MISTAKE: no .dockerignore — .git + outputs bloat context; .env leaks
 # CORRECT: ignore caches, VCS, secrets, outputs
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -200,8 +209,12 @@ def _verify() -> None:
 
     # 4. .dockerignore math
     sent = context_size(
-        [("app/main.py", 2000), (".git/p", 50_000_000), ("output/m.pt", 400_000_000),
-         (".env", 200)],
+        [
+            ("app/main.py", 2000),
+            (".git/p", 50_000_000),
+            ("output/m.pt", 400_000_000),
+            (".env", 200),
+        ],
         ["__pycache__/", ".git/", "output/", ".env"],
     )
     assert sent == 2000, "only app code ships"
@@ -222,4 +235,4 @@ if __name__ == "__main__":
         print("2. Deps-first COPY order = cacheable dependency layer")
         print("3. slim not alpine (musl breaks manylinux wheels)")
         print("4. Non-root + .dockerignore = smaller, safer images")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

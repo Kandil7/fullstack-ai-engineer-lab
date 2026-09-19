@@ -46,12 +46,12 @@ from typing import Callable
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE evals (id INTEGER PRIMARY KEY, metric TEXT, value REAL)")
 try:
-    with conn:                                # commit on success
+    with conn:  # commit on success
         conn.execute("INSERT INTO evals (metric, value) VALUES (?, ?)", ("acc", 0.91))
         conn.execute("INSERT INTO evals (metric, value) VALUES (?, ?)", ("f1", 0.87))
     with conn:
         conn.execute("INSERT INTO evals (metric, value) VALUES (?, ?)", ("bad", 1.0))
-        raise RuntimeError("abort mid-batch") # -> rollback
+        raise RuntimeError("abort mid-batch")  # -> rollback
 except RuntimeError:
     pass
 rows = conn.execute("SELECT metric FROM evals ORDER BY metric").fetchall()
@@ -72,7 +72,7 @@ with conn:
     conn.execute("SAVEPOINT batch_1")
     conn.execute("INSERT INTO ingest (batch) VALUES (?)", ("row-1",))
     conn.execute("INSERT INTO ingest (batch) VALUES (?)", ("row-2",))
-    conn.execute("ROLLBACK TO batch_1")       # undo batch_1 only
+    conn.execute("ROLLBACK TO batch_1")  # undo batch_1 only
     conn.execute("INSERT INTO ingest (batch) VALUES (?)", ("row-3",))
 count = conn.execute("SELECT COUNT(*) FROM ingest").fetchone()[0]
 print(f"2. rows after partial rollback: {count} (row-1/row-2 undone)")
@@ -107,7 +107,9 @@ try:
     after_snapshot = b.execute("SELECT v FROM stats WHERE k = 'rows'").fetchone()[0]
     b.execute("COMMIT")
     after_commit = b.execute("SELECT v FROM stats WHERE k = 'rows'").fetchone()[0]
-    print(f"3. MVCC snapshot: before={before}, during txn={after_snapshot}, after commit={after_commit}")
+    print(
+        f"3. MVCC snapshot: before={before}, during txn={after_snapshot}, after commit={after_commit}"
+    )
 finally:
     a.close()
     b.close()
@@ -123,10 +125,9 @@ print()
 # retry. sqlite3 demonstrates the failure with two writers and
 # busy_timeout, then the retry loop that production code needs.
 
+
 # Example 4: retry loop for a contended update (busy -> retry)
-def update_with_retry(
-    db_path: str, key: str, max_attempts: int = 12
-) -> int:
+def update_with_retry(db_path: str, key: str, max_attempts: int = 12) -> int:
     """Increment key inside a transaction, retrying on 'database is locked'.
 
     WAL mode + a busy timeout makes writers WAIT instead of failing
@@ -168,8 +169,10 @@ try:
     tune.close()
     # Two threads hammering the same row — retries make it converge
     results: list[int] = []
+
     def worker() -> None:
         results.append(update_with_retry(db_path, "counter"))
+
     threads = [threading.Thread(target=worker) for _ in range(4)]
     for t in threads:
         t.start()
@@ -199,6 +202,8 @@ print()
 
 # Example 5: single-writer gate in pure Python (advisory-lock shape)
 _gate = threading.Lock()
+
+
 def exclusive_reindex() -> str:
     """One worker at a time — advisory lock analog (pg_advisory_lock)."""
     if not _gate.acquire(blocking=False):
@@ -237,7 +242,9 @@ try:
     size_deleted = os.path.getsize(db_path)
     conn.execute("VACUUM")
     size_vacuumed = os.path.getsize(db_path)
-    print(f"6. file: after insert={size_before}B, after delete={size_deleted}B, after VACUUM={size_vacuumed}B")
+    print(
+        f"6. file: after insert={size_before}B, after delete={size_deleted}B, after VACUUM={size_vacuumed}B"
+    )
     print("   VACUUM reclaimed:", size_deleted - size_vacuumed, "bytes")
     conn.close()
     os.remove(db_path)
@@ -245,14 +252,13 @@ except OSError:
     pass  # cleanup raced on Windows; the demo already printed
 print()
 
+
 # ============================================================
 # 7. Real Postgres transactions (guarded — skips when no server)
 # ============================================================
 def pg_demo() -> None:
     """SERIALIZABLE + retry, SELECT FOR UPDATE, advisory lock; [skip] when down."""
-    dsn = os.environ.get(
-        "PGDSN", "postgresql://postgres:postgres@localhost:5432/postgres"
-    )
+    dsn = os.environ.get("PGDSN", "postgresql://postgres:postgres@localhost:5432/postgres")
     try:
         import psycopg
     except ImportError:
@@ -284,8 +290,11 @@ def pg_demo() -> None:
                 pg.commit()
                 # Advisory lock — single-worker gate, no rows touched
                 cur.execute("SELECT pg_try_advisory_lock(%s)", (42,))
-                print("7. real Postgres: serializable+retry ok, FOR UPDATE ok,",
-                      "advisory lock acquired:", cur.fetchone()[0] is True)
+                print(
+                    "7. real Postgres: serializable+retry ok, FOR UPDATE ok,",
+                    "advisory lock acquired:",
+                    cur.fetchone()[0] is True,
+                )
                 cur.execute("SELECT pg_advisory_unlock(%s)", (42,))
     except Exception as exc:  # noqa: BLE001
         print(
@@ -315,6 +324,7 @@ print()
 # MISTAKE: catching ALL errors and retrying -> retrying real bugs forever;
 #   CORRECT: retry only 40001/40P01 (serialization/deadlock)
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -330,8 +340,9 @@ def _verify() -> None:
                 raise RuntimeError("abort")
         except RuntimeError:
             pass
-        assert conn.execute("SELECT COUNT(*) FROM e").fetchone()[0] == 0, \
+        assert conn.execute("SELECT COUNT(*) FROM e").fetchone()[0] == 0, (
             "rollback must undo the batch"
+        )
 
         # 2. Savepoints roll back only their own work
         with conn:
@@ -361,8 +372,9 @@ def _verify() -> None:
         during = b.execute("SELECT v FROM s WHERE k = 'k'").fetchone()[0]
         b.execute("COMMIT")
         after = b.execute("SELECT v FROM s WHERE k = 'k'").fetchone()[0]
-        assert (before, during, after) == (1, 1, 2), \
+        assert (before, during, after) == (1, 1, 2), (
             "WAL snapshot must freeze the read view until COMMIT"
+        )
         a.close()
         b.close()
     finally:
@@ -384,8 +396,10 @@ def _verify() -> None:
         tune.execute("PRAGMA journal_mode=WAL")
         tune.close()
         results: list[int] = []
+
         def worker() -> None:
             results.append(update_with_retry(db_path, "counter"))
+
         threads = [threading.Thread(target=worker) for _ in range(4)]
         for t in threads:
             t.start()
@@ -410,9 +424,7 @@ def _verify() -> None:
     try:
         conn = sqlite3.connect(db_path)
         conn.execute("CREATE TABLE b (id INTEGER PRIMARY KEY, payload TEXT)")
-        conn.executemany(
-            "INSERT INTO b (payload) VALUES (?)", [("y" * 200,) for _ in range(1500)]
-        )
+        conn.executemany("INSERT INTO b (payload) VALUES (?)", [("y" * 200,) for _ in range(1500)])
         conn.commit()
         size_insert = os.path.getsize(db_path)
         conn.execute("DELETE FROM b WHERE id > 150")
@@ -433,8 +445,9 @@ def _verify() -> None:
     assert exclusive_reindex() == "reindexed", "first worker must run"
     _gate.acquire(blocking=False)
     try:
-        assert exclusive_reindex().startswith("skipped"), \
+        assert exclusive_reindex().startswith("skipped"), (
             "second worker must be refused while the lock is held"
+        )
     finally:
         _gate.release()
 
@@ -451,4 +464,4 @@ if __name__ == "__main__":
         print("3. MVCC snapshots let readers ignore writers")
         print("4. Read-modify-write needs FOR UPDATE or SERIALIZABLE + retry")
         print("5. Dead row versions bloat files; VACUUM reclaims")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

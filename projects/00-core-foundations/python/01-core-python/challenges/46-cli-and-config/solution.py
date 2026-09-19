@@ -1,4 +1,5 @@
 """Challenge 46 solution — reference implementation with reasoning comments."""
+
 from __future__ import annotations
 
 
@@ -40,7 +41,7 @@ def resolve(layers: list[dict | None]) -> dict:
         if not layer:
             continue
         for key, value in layer.items():
-            merged.setdefault(key, value)   # first (highest) layer wins
+            merged.setdefault(key, value)  # first (highest) layer wins
     return merged
 
 

@@ -27,26 +27,26 @@ plt.figure(figsize=(12, 8))
 
 # Four main line styles
 plt.subplot(2, 2, 1)
-plt.plot(x, np.sin(x), '-', linewidth=2, label='Solid (-)')
-plt.plot(x, np.sin(x) + 1, '--', linewidth=2, label='Dashed (--)')
+plt.plot(x, np.sin(x), "-", linewidth=2, label="Solid (-)")
+plt.plot(x, np.sin(x) + 1, "--", linewidth=2, label="Dashed (--)")
 plt.legend()
 
 plt.subplot(2, 2, 2)
-plt.plot(x, np.sin(x), '-.', linewidth=2, label='Dash-Dot (-.)')
-plt.plot(x, np.sin(x) + 1, ':', linewidth=2, label='Dotted (:)')
+plt.plot(x, np.sin(x), "-.", linewidth=2, label="Dash-Dot (-.)")
+plt.plot(x, np.sin(x) + 1, ":", linewidth=2, label="Dotted (:)")
 plt.legend()
 
 # Line widths
 plt.subplot(2, 2, 3)
 for w in [0.5, 1, 2, 3, 5]:
-    plt.plot(x, np.sin(x) + w/5, linewidth=w, label=f'width={w}')
+    plt.plot(x, np.sin(x) + w / 5, linewidth=w, label=f"width={w}")
 plt.legend()
 
 # Custom dash patterns
 plt.subplot(2, 2, 4)
-plt.plot(x, np.sin(x), linestyle=(0, (5, 5)), linewidth=2, label='(5,5)')
-plt.plot(x, np.sin(x) + 1, linestyle=(0, (10, 5)), linewidth=2, label='(10,5)')
-plt.plot(x, np.sin(x) + 2, linestyle=(0, (3, 5, 10, 5)), linewidth=2, label='(3,5,10,5)')
+plt.plot(x, np.sin(x), linestyle=(0, (5, 5)), linewidth=2, label="(5,5)")
+plt.plot(x, np.sin(x) + 1, linestyle=(0, (10, 5)), linewidth=2, label="(10,5)")
+plt.plot(x, np.sin(x) + 2, linestyle=(0, (3, 5, 10, 5)), linewidth=2, label="(3,5,10,5)")
 plt.legend()
 
 plt.tight_layout()
@@ -56,11 +56,11 @@ plt.tight_layout()
 
 ```python
 # (offset, (on_length, off_length, on_length, off_length, ...))
-linestyle=(0, (5, 5))        # 5pt on, 5pt off
-linestyle=(0, (10, 5))       # 10pt on, 5pt off
-linestyle=(0, (3, 5, 10, 5)) # 3on, 5off, 10on, 5off
-linestyle='dashed'           # Equivalent to (0, (6, 3))
-linestyle='dotted'           # Equivalent to (0, (3, 3))
+linestyle = (0, (5, 5))  # 5pt on, 5pt off
+linestyle = (0, (10, 5))  # 10pt on, 5pt off
+linestyle = (0, (3, 5, 10, 5))  # 3on, 5off, 10on, 5off
+linestyle = "dashed"  # Equivalent to (0, (6, 3))
+linestyle = "dotted"  # Equivalent to (0, (3, 3))
 ```
 
 ---
@@ -76,12 +76,12 @@ plt.figure(figsize=(10, 6))
 # Viridis colormap for 10 lines
 colors = cm.viridis(np.linspace(0, 1, 10))
 for i, color in enumerate(colors):
-    y = np.sin(x - i/2)
-    plt.plot(x, y, color=color, linewidth=2, label=f'Phase {i/2:.1f}')
+    y = np.sin(x - i / 2)
+    plt.plot(x, y, color=color, linewidth=2, label=f"Phase {i / 2:.1f}")
 
 plt.legend(ncol=2, fontsize=8)
-plt.title('Using Colormaps for Multiple Lines')
-plt.colorbar(plt.cm.ScalarMappable(cmap='viridis'), label='Phase')
+plt.title("Using Colormaps for Multiple Lines")
+plt.colorbar(plt.cm.ScalarMappable(cmap="viridis"), label="Phase")
 plt.show()
 ```
 
@@ -92,19 +92,19 @@ plt.show()
 ```python
 plt.figure(figsize=(10, 6))
 x = np.linspace(0, 10, 100)
-plt.plot(x, np.sin(x), linewidth=2, color='steelblue')
+plt.plot(x, np.sin(x), linewidth=2, color="steelblue")
 
 # Helper lines
-plt.axhline(y=0, color='gray', linestyle=':', alpha=0.7)        # Horizontal
-plt.axvline(x=np.pi, color='red', linestyle='--', alpha=0.5)    # Vertical
-plt.axhline(y=0.5, xmin=0.25, xmax=0.75, color='green')         # Partial horizontal
-plt.axvline(x=2*np.pi, ymin=0.2, ymax=0.8, color='orange')      # Partial vertical
+plt.axhline(y=0, color="gray", linestyle=":", alpha=0.7)  # Horizontal
+plt.axvline(x=np.pi, color="red", linestyle="--", alpha=0.5)  # Vertical
+plt.axhline(y=0.5, xmin=0.25, xmax=0.75, color="green")  # Partial horizontal
+plt.axvline(x=2 * np.pi, ymin=0.2, ymax=0.8, color="orange")  # Partial vertical
 
 # Span fill
-plt.axhspan(ymin=-0.5, ymax=0.5, alpha=0.1, color='gray')       # Horizontal span
-plt.axvspan(xmin=2, xmax=4, alpha=0.1, color='green')           # Vertical span
+plt.axhspan(ymin=-0.5, ymax=0.5, alpha=0.1, color="gray")  # Horizontal span
+plt.axvspan(xmin=2, xmax=4, alpha=0.1, color="green")  # Vertical span
 
-plt.title('Helper Lines and Spans')
+plt.title("Helper Lines and Spans")
 plt.show()
 ```
 
@@ -113,21 +113,21 @@ plt.show()
 ## 4. Fill Between
 
 ```python
-x = np.linspace(0, 2*np.pi, 100)
+x = np.linspace(0, 2 * np.pi, 100)
 y = np.sin(x)
 
 plt.figure(figsize=(10, 6))
-plt.plot(x, y, 'b-', linewidth=2, label='sin(x)')
+plt.plot(x, y, "b-", linewidth=2, label="sin(x)")
 
 # Fill between curve and axis
-plt.fill_between(x, y, 0, where=(y > 0), color='green', alpha=0.3, label='Positive')
-plt.fill_between(x, y, 0, where=(y < 0), color='red', alpha=0.3, label='Negative')
+plt.fill_between(x, y, 0, where=(y > 0), color="green", alpha=0.3, label="Positive")
+plt.fill_between(x, y, 0, where=(y < 0), color="red", alpha=0.3, label="Negative")
 
 # Fill between two curves
-plt.fill_between(x, y, y + 0.5, alpha=0.2, color='purple', label='±0.5 band')
+plt.fill_between(x, y, y + 0.5, alpha=0.2, color="purple", label="±0.5 band")
 
 plt.legend()
-plt.title('Fill Between Applications')
+plt.title("Fill Between Applications")
 plt.show()
 ```
 

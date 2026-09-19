@@ -6,12 +6,15 @@ Answers with full explanations and distractor analysis at the end.
 Shared frame for most questions:
 ```python
 import polars as pl
-df = pl.DataFrame({
-    "name": ["alice", "bob", "carol", "dan"],
-    "campaign": ["a", "b", "c", "a"],
-    "score": [0.9, 0.4, 0.7, 0.2],
-    "spend": [10, 20, 30, 40],
-})
+
+df = pl.DataFrame(
+    {
+        "name": ["alice", "bob", "carol", "dan"],
+        "campaign": ["a", "b", "c", "a"],
+        "score": [0.9, 0.4, 0.7, 0.2],
+        "spend": [10, 20, 30, 40],
+    }
+)
 ```
 
 ---
@@ -98,9 +101,11 @@ print(df.select(pl.col("score").rank(descending=True))["score"].to_list())
 
 **M3 (code-output).** What prints?
 ```python
-print(df.select(
-    pl.when(pl.col("score") > 0.5).then(pl.lit("high")).otherwise(pl.lit("low")).alias("band")
-)["band"].to_list())
+print(
+    df.select(
+        pl.when(pl.col("score") > 0.5).then(pl.lit("high")).otherwise(pl.lit("low")).alias("band")
+    )["band"].to_list()
+)
 ```
 
 - A) `['high', 'low', 'high', 'low']`
@@ -110,11 +115,16 @@ print(df.select(
 
 **M4 (code-output).** What prints?
 ```python
-print(df.group_by("campaign").agg(
-    pl.col("score").mean().alias("m"),
-    pl.col("spend").sum().alias("s"),
-    pl.len().alias("c"),
-).sort("campaign").rows())
+print(
+    df.group_by("campaign")
+    .agg(
+        pl.col("score").mean().alias("m"),
+        pl.col("spend").sum().alias("s"),
+        pl.len().alias("c"),
+    )
+    .sort("campaign")
+    .rows()
+)
 ```
 
 - A) `[('a', 0.55, 50, 2), ('b', 0.4, 20, 1), ('c', 0.7, 30, 1)]`
@@ -172,8 +182,11 @@ creates:
 
 **H1 (code-output).** What prints?
 ```python
-print(df.with_columns(pl.col("spend").rank(descending=True).alias("r"))
-      .select("campaign", "score", "r").rows())
+print(
+    df.with_columns(pl.col("spend").rank(descending=True).alias("r"))
+    .select("campaign", "score", "r")
+    .rows()
+)
 ```
 
 - A) `[('a', 0.9, 4.0), ('b', 0.4, 3.0), ('c', 0.7, 2.0), ('a', 0.2, 1.0)]`

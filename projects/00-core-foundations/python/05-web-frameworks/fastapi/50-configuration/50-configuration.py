@@ -34,6 +34,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # pydantic-settings maps env vars onto typed fields with validation.
 # A mis-typed env value is a startup error, not a runtime mystery.
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="APP_", env_file=".env")
 
@@ -71,13 +72,17 @@ print()
 # defaults < .env file < real environment variables < explicit args.
 # Real env beats the .env file, so containers can override everything.
 
+
 def precedence(source: str) -> dict:
     """Simulate the pydantic-settings lookup order."""
     chain = ["defaults", ".env file", "environment", "explicit args"]
     value = {"provider": "openai", "base_url": "https://api.openai.com/v1"}
-    if source == "explicit": value["provider"] = "azure"
-    elif source == "env":    value["provider"] = "azure"   # env overrides .env
-    elif source == "dotenv": value["provider"] = "azure"   # .env overrides default
+    if source == "explicit":
+        value["provider"] = "azure"
+    elif source == "env":
+        value["provider"] = "azure"  # env overrides .env
+    elif source == "dotenv":
+        value["provider"] = "azure"  # .env overrides default
     return {"chain": chain, "winner": value["provider"]}
 
 
@@ -92,6 +97,7 @@ print()
 # API keys NEVER appear in code or committed config. They arrive via
 # env (containers) or a secret manager (K8s secrets, vault) injected
 # at startup. Missing secrets fail fast.
+
 
 def load_secret(name: str, store: dict[str, str]) -> str:
     value = store.get(name, os.environ.get(name, ""))
@@ -115,10 +121,11 @@ print()
 # One schema, per-env values. The image is identical; the env decides.
 
 ENV_CONFIGS = {
-    "dev":  {"debug": True,  "max_tokens": 2048,  "log_level": "DEBUG"},
+    "dev": {"debug": True, "max_tokens": 2048, "log_level": "DEBUG"},
     "staging": {"debug": False, "max_tokens": 4096, "log_level": "INFO"},
-    "prod": {"debug": False, "max_tokens": 8192,  "log_level": "INFO"},
+    "prod": {"debug": False, "max_tokens": 8192, "log_level": "INFO"},
 }
+
 
 def config_for(env: str) -> dict:
     base = {"debug": False, "max_tokens": 2048, "log_level": "INFO"}
@@ -137,6 +144,7 @@ print()
 # Flags gate unfinished/risky features. They are CONFIG, not code
 # branches to delete: a flag can be flipped without a deploy, and a
 # gradual rollout (percent) catches regressions early.
+
 
 class FeatureFlags:
     def __init__(self, overrides: dict[str, bool] | None = None) -> None:
@@ -175,6 +183,7 @@ print()
 #
 # MISTAKE: feature branches to remove later — deletion is a deploy
 # CORRECT: flags with defaults; remove the flag, not a delete-branch
+
 
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
@@ -237,4 +246,4 @@ if __name__ == "__main__":
         print("3. Secrets from env/manager, never code")
         print("4. Per-env VALUES, not per-env code")
         print("5. Feature flags as runtime dials")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

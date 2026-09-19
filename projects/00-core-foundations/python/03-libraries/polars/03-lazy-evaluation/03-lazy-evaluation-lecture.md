@@ -50,9 +50,9 @@ operations, not the data.
 import polars as pl
 
 lf = pl.scan_csv("events.csv")
-print(type(lf).__name__)                 # LazyFrame - no data yet
-print(lf.collect_schema().names())       # schema from the header only
-print(lf.collect().height)               # NOW the file is read
+print(type(lf).__name__)  # LazyFrame - no data yet
+print(lf.collect_schema().names())  # schema from the header only
+print(lf.collect().height)  # NOW the file is read
 ```
 
 ```text
@@ -81,7 +81,7 @@ lf = (
     .agg(pl.col("token_count").mean())
     .sort("prompt_type")
 )
-result = lf.collect()   # one execution pass over the whole plan
+result = lf.collect()  # one execution pass over the whole plan
 print(result.height)
 ```
 
@@ -105,8 +105,8 @@ import polars as pl
 
 lf = pl.scan_csv("events.csv").filter(pl.col("split") == "valid")
 plan = lf.explain(optimized=True)
-print("SELECTION" in plan)   # filter pushed into the scan?
-print("SELECT" in plan)      # projection node present?
+print("SELECTION" in plan)  # filter pushed into the scan?
+print("SELECT" in plan)  # projection node present?
 ```
 
 ```text
@@ -197,7 +197,7 @@ decide:
 import polars as pl
 
 lf = pl.scan_csv("events.csv").filter(pl.col("split") == "valid")
-small = lf.collect()                       # small output: fine
+small = lf.collect()  # small output: fine
 print(small.height)
 ```
 
@@ -246,11 +246,11 @@ column prunes entire files.
 ```python
 import polars as pl
 
-corpus = pl.scan_parquet("corpus/")              # all shards
+corpus = pl.scan_parquet("corpus/")  # all shards
 print(corpus.select(pl.len()).collect(engine="streaming")[0, 0])
 
 chat = corpus.filter(pl.col("prompt_type") == "chat")
-print(chat.collect_schema().names())             # never reads full data
+print(chat.collect_schema().names())  # never reads full data
 ```
 
 ```text

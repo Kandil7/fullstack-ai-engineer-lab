@@ -57,6 +57,7 @@ Before using PyTorch's `torch.mm`, Part 2 implements matrix multiplication in pu
 from numba import njit
 import numpy as np
 
+
 @njit
 def matmul(A: np.ndarray, B: np.ndarray) -> np.ndarray:
     """Matrix multiply: C[i,j] = sum_k A[i,k] * B[k,j]"""
@@ -82,8 +83,10 @@ You met ResNets in Lecture 01 (transfer learning) and Lecture 08 (the ResBlock).
 ```python
 import torch.nn as nn
 
+
 class ResBlock(nn.Module):
     """out = ReLU(x + F(x)). Only needs to learn the residual (change)."""
+
     def __init__(self, ch: int):
         super().__init__()
         self.conv1 = nn.Conv2d(ch, ch, 3, padding=1)
@@ -132,6 +135,7 @@ An **autoencoder** learns to compress an input into a lower-dimensional latent r
 import torch
 import torch.nn as nn
 
+
 class VAEEncoder(nn.Module):
     """Encode input to mean + log_var, then sample via reparameterisation."""
 
@@ -139,7 +143,9 @@ class VAEEncoder(nn.Module):
         super().__init__()
         self.fc = nn.Linear(in_dim, latent_dim * 2)  # 2x: mean + log_var
 
-    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def forward(
+        self, x: torch.Tensor
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         h = self.fc(x)
         mean, log_var = h.chunk(2, dim=-1)
         # Reparameterisation trick: z = mean + std * epsilon
@@ -317,11 +323,15 @@ def ddpm_step(
         alpha: 1 - beta at timestep t.
     """
     # Predicted x_0 from current x_t and noise prediction
-    x_0_pred = (x_t - torch.sqrt(1 - alpha_bar[t]) * noise_pred) / torch.sqrt(alpha_bar[t])
+    x_0_pred = (x_t - torch.sqrt(1 - alpha_bar[t]) * noise_pred) / torch.sqrt(
+        alpha_bar[t]
+    )
 
     # Compute mean of q(x_{t-1} | x_t, x_0)
     coeff1 = torch.sqrt(alpha_bar[t - 1] if t > 0 else torch.tensor(1.0)) * beta[t]
-    coeff2 = torch.sqrt(alpha[t]) * (1 - alpha_bar[t - 1] if t > 0 else torch.tensor(0.0))
+    coeff2 = torch.sqrt(alpha[t]) * (
+        1 - alpha_bar[t - 1] if t > 0 else torch.tensor(0.0)
+    )
     mean = (coeff1 * x_0_pred + coeff2 * x_t) / (1 - alpha_bar[t])
 
     # If t > 0, add noise (otherwise final step, no noise)
@@ -350,7 +360,11 @@ class SinusoidalTimeEmbedding(nn.Module):
 
     def forward(self, t: torch.Tensor) -> torch.Tensor:
         half = self.dim // 2
-        freqs = torch.exp(-torch.arange(half, dtype=torch.float32) * torch.log(torch.tensor(10000.0)) / half)
+        freqs = torch.exp(
+            -torch.arange(half, dtype=torch.float32)
+            * torch.log(torch.tensor(10000.0))
+            / half
+        )
         args = t[:, None].float() * freqs[None, :].to(t.device)
         return torch.cat([torch.sin(args), torch.cos(args)], dim=-1)
 

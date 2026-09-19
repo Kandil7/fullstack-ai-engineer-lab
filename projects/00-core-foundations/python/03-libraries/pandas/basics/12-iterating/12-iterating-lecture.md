@@ -43,11 +43,13 @@ for i in range(len(df)):
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42],
-    "City": ["New York", "London", "Paris"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie"],
+        "Age": [28, 35, 42],
+        "City": ["New York", "London", "Paris"],
+    }
+)
 
 # iterrows() returns (index, Series) pairs
 for index, row in df.iterrows():
@@ -76,10 +78,7 @@ import numpy as np
 import time
 
 # Create large DataFrame
-df = pd.DataFrame({
-    "A": np.random.randint(0, 100, 100000),
-    "B": np.random.randint(0, 100, 100000)
-})
+df = pd.DataFrame({"A": np.random.randint(0, 100, 100000), "B": np.random.randint(0, 100, 100000)})
 
 # Method 1: iterrows
 start = time.time()
@@ -108,11 +107,7 @@ print(f"vectorized: {time.time() - start:.4f}s")
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Age": [28, 35],
-    "City": ["New York", "London"]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob"], "Age": [28, 35], "City": ["New York", "London"]})
 
 # Iterate over column names
 for col in df.columns:
@@ -141,11 +136,7 @@ for col in df.columns:
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "A": [1, 2, 3, 4, 5],
-    "B": [10, 20, 30, 40, 50],
-    "C": [100, 200, 300, 400, 500]
-})
+df = pd.DataFrame({"A": [1, 2, 3, 4, 5], "B": [10, 20, 30, 40, 50], "C": [100, 200, 300, 400, 500]})
 
 # Apply function to each column
 print(df.apply(lambda x: x.max()))
@@ -173,10 +164,8 @@ def classify_age(age):
     else:
         return "Senior"
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31]
-})
+
+df = pd.DataFrame({"Name": ["Alice", "Bob", "Charlie", "Diana"], "Age": [28, 35, 42, 31]})
 
 df["Category"] = df["Age"].apply(classify_age)
 print(df)
@@ -191,7 +180,7 @@ print(df)
 
 ```python
 # Square each value
-print(df["Age"].apply(lambda x: x ** 2))
+print(df["Age"].apply(lambda x: x**2))
 
 # Conditional
 print(df["Age"].apply(lambda x: "Senior" if x >= 35 else "Junior"))
@@ -206,10 +195,7 @@ print(df["Age"].apply(lambda x: "Senior" if x >= 35 else "Junior"))
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Department": ["Eng", "Mkt", "Eng"]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob", "Charlie"], "Department": ["Eng", "Mkt", "Eng"]})
 
 # Map values
 dept_mapping = {"Eng": "Engineering", "Mkt": "Marketing", "Sales": "Sales"}
@@ -242,14 +228,11 @@ print(df)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "A": [1, 2, 3],
-    "B": [4, 5, 6]
-})
+df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
 
 # Apply function to every element
 # Note: applymap is deprecated, use map instead
-df_squared = df.map(lambda x: x ** 2)
+df_squared = df.map(lambda x: x**2)
 print(df_squared)
 #    A   B
 # 0  1  16
@@ -267,10 +250,7 @@ print(df_squared)
 import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    "A": [1, 2, 3, 4, 5],
-    "B": [10, 20, 30, 40, 50]
-})
+df = pd.DataFrame({"A": [1, 2, 3, 4, 5], "B": [10, 20, 30, 40, 50]})
 
 # Vectorized — fast
 df["C"] = df["A"] + df["B"]
@@ -289,6 +269,7 @@ def complex_calculation(row):
         return "Large"
     else:
         return "Normal"
+
 
 df["Category"] = df.apply(complex_calculation, axis=1)
 ```
@@ -319,20 +300,21 @@ import pandas as pd
 import numpy as np
 
 # Sample data
-df = pd.DataFrame({
-    "Product": ["Laptop", "Phone", "Tablet", "Monitor", "Keyboard"],
-    "Price": [999, 699, 449, 299, 79],
-    "Quantity": [5, 12, 8, 15, 25],
-    "Category": ["Electronics", "Electronics", "Electronics", "Peripherals", "Peripherals"]
-})
+df = pd.DataFrame(
+    {
+        "Product": ["Laptop", "Phone", "Tablet", "Monitor", "Keyboard"],
+        "Price": [999, 699, 449, 299, 79],
+        "Quantity": [5, 12, 8, 15, 25],
+        "Category": ["Electronics", "Electronics", "Electronics", "Peripherals", "Peripherals"],
+    }
+)
 
 # Vectorized operations
 df["Total_Value"] = df["Price"] * df["Quantity"]
 df["Price_Category"] = pd.cut(
-    df["Price"],
-    bins=[0, 100, 500, 1000],
-    labels=["Budget", "Mid-Range", "Premium"]
+    df["Price"], bins=[0, 100, 500, 1000], labels=["Budget", "Mid-Range", "Premium"]
 )
+
 
 # Apply for complex logic
 def get_recommendation(row):
@@ -343,13 +325,11 @@ def get_recommendation(row):
     else:
         return "Standard Price"
 
+
 df["Recommendation"] = df.apply(get_recommendation, axis=1)
 
 # Map for categorical mapping
-category_map = {
-    "Electronics": "Tech",
-    "Peripherals": "Accessories"
-}
+category_map = {"Electronics": "Tech", "Peripherals": "Accessories"}
 df["Category_Group"] = df["Category"].map(category_map)
 
 print(df)
@@ -388,7 +368,7 @@ df["A_doubled"] = df["A"] * 2
 # df.applymap(lambda x: x ** 2)
 
 # Good — use map
-df.map(lambda x: x ** 2)
+df.map(lambda x: x**2)
 ```
 
 ---

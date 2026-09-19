@@ -23,13 +23,14 @@ from torch import Tensor
 # 1. Autograd basics: requires_grad_, backward, grad
 # ---------------------------------------------------------------------------
 
+
 def autograd_demo() -> Tensor:
     """Show that PyTorch computes gradients for us.
 
     For y = x**2, dy/dx = 2x, so at x=3 the gradient is 6.
     """
     x = torch.tensor(3.0).requires_grad_()
-    y = x ** 2
+    y = x**2
     y.backward()  # backpropagation fills x.grad
     print(f"[1] x=3, y=x^2 -> x.grad = {x.grad.item()} (expected 6.0)")
 
@@ -42,10 +43,11 @@ def autograd_demo() -> Tensor:
 # 2. The model and the loss function (MSE)
 # ---------------------------------------------------------------------------
 
+
 def quadratic(t: Tensor, params: Tensor) -> Tensor:
     """A quadratic model a*t^2 + b*t + c parameterised by params=(a,b,c)."""
     a, b, c = params
-    return a * t ** 2 + b * t + c
+    return a * t**2 + b * t + c
 
 
 def mse(preds: Tensor, targets: Tensor) -> Tensor:
@@ -57,12 +59,13 @@ def mse(preds: Tensor, targets: Tensor) -> Tensor:
 # 3. Synthetic data: roller-coaster speed vs time (noisy quadratic)
 # ---------------------------------------------------------------------------
 
+
 def make_quadratic_data() -> tuple[Tensor, Tensor]:
     """Return (time, speed) where speed is a noisy quadratic of time."""
     torch.manual_seed(42)
     time = torch.arange(0, 20, 1).float()
     true_a, true_b, true_c = 1.0, -15.0, 60.0
-    speed = true_a * time ** 2 + true_b * time + true_c
+    speed = true_a * time**2 + true_b * time + true_c
     speed = speed + 5 * torch.randn(len(time))  # measurement noise
     return time, speed
 
@@ -71,17 +74,18 @@ def make_quadratic_data() -> tuple[Tensor, Tensor]:
 # 4. The 7-step SGD loop (by hand) to fit the quadratic
 # ---------------------------------------------------------------------------
 
+
 def fit_quadratic(time: Tensor, speed: Tensor, lr: float, epochs: int) -> Tensor:
     """Fit a*t^2 + b*t + c with hand-written SGD. Returns learned params."""
     params = torch.randn(3).requires_grad_()  # STEP 1: init
 
     for epoch in range(epochs):
-        preds = quadratic(time, params)       # STEP 2: predict
-        loss = mse(preds, speed)              # STEP 3: loss
-        loss.backward()                       # STEP 4: gradients
+        preds = quadratic(time, params)  # STEP 2: predict
+        loss = mse(preds, speed)  # STEP 3: loss
+        loss.backward()  # STEP 4: gradients
         with torch.no_grad():
-            params -= lr * params.grad        # STEP 5: step downhill
-        params.grad.zero_()                   # zero grads for next iteration
+            params -= lr * params.grad  # STEP 5: step downhill
+        params.grad.zero_()  # zero grads for next iteration
         if epoch % max(1, epochs // 5) == 0:
             print(f"    epoch {epoch:4d}  loss {loss.item():10.2f}")
 
@@ -105,6 +109,7 @@ def learning_rate_experiment(time: Tensor, speed: Tensor) -> None:
 # 5. From linear to neural net: add a ReLU nonlinearity
 # ---------------------------------------------------------------------------
 
+
 def relu(t: Tensor) -> Tensor:
     """Rectified Linear Unit: keep positives, clamp negatives to zero."""
     return t.clamp(min=0)
@@ -114,7 +119,7 @@ def make_parabola_data() -> tuple[Tensor, Tensor]:
     """Return (x, y) where y is a noisy parabola -- not linearly fittable."""
     torch.manual_seed(0)
     x = torch.linspace(-3, 3, 100).unsqueeze(1)  # shape (100, 1)
-    y = x ** 2 + torch.randn_like(x) * 0.3
+    y = x**2 + torch.randn_like(x) * 0.3
     return x, y
 
 
@@ -123,7 +128,9 @@ def init_param(size: tuple[int, ...] | int, std: float = 1.0) -> Tensor:
     return (torch.randn(size) * std).requires_grad_()
 
 
-def fit_neural_net(x: Tensor, y: Tensor, n_hidden: int, lr: float, epochs: int) -> float:
+def fit_neural_net(
+    x: Tensor, y: Tensor, n_hidden: int, lr: float, epochs: int
+) -> float:
     """Fit y with a linear -> ReLU -> linear net. Returns final loss."""
     w1 = init_param((1, n_hidden), std=1.0)
     b1 = init_param(n_hidden, std=1.0)
@@ -155,6 +162,7 @@ def fit_neural_net(x: Tensor, y: Tensor, n_hidden: int, lr: float, epochs: int) 
 # 6. The PyTorch way: nn.Sequential + optimizer (MNIST 3s-vs-7s shapes)
 # ---------------------------------------------------------------------------
 
+
 def fit_pytorch_way(epochs: int = 20) -> float:
     """Rebuild the net with nn.Linear/nn.Sequential and torch.optim.SGD.
 
@@ -181,10 +189,9 @@ def fit_pytorch_way(epochs: int = 20) -> float:
         preds = model(train_x).sigmoid()  # sigmoid -> probability in (0,1)
         loss = loss_fn(preds, train_y)
         loss.backward()
-        opt.step()        # STEP 5 for every parameter at once
-        opt.zero_grad()   # optimizer wraps grad.zero_() for us
-        acc = (((model(train_x).sigmoid() > 0.5) == (train_y > 0.5))
-               .float().mean())
+        opt.step()  # STEP 5 for every parameter at once
+        opt.zero_grad()  # optimizer wraps grad.zero_() for us
+        acc = ((model(train_x).sigmoid() > 0.5) == (train_y > 0.5)).float().mean()
         if epoch % 5 == 0:
             print(f"    epoch {epoch:2d}  loss {loss.item():.4f}  acc {acc.item():.3f}")
 
@@ -195,6 +202,7 @@ def fit_pytorch_way(epochs: int = 20) -> float:
 # ---------------------------------------------------------------------------
 # main
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     print("== 1. Autograd basics ==")

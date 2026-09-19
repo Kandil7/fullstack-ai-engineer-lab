@@ -157,12 +157,9 @@ Seq Scan on users  (cost=0.00..1.02 rows=1 width=64)
 ```python
 # Python (psycopg2)
 import psycopg2
+
 conn = psycopg2.connect(
-    host="localhost",
-    port=5432,
-    database="mydb",
-    user="user",
-    password="pass"
+    host="localhost", port=5432, database="mydb", user="user", password="pass"
 )
 ```
 

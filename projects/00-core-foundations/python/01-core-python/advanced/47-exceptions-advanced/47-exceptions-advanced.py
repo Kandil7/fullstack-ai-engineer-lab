@@ -104,6 +104,7 @@ except AIServiceError as e:
 # the successes. ExceptionGroup carries all failures; except* handles them
 # by type without aborting the rest.
 
+
 # Example 3: collecting failures from a fan-out
 def embed_all(texts: list[str]) -> list[str]:
     failures: list[Exception] = []
@@ -149,6 +150,7 @@ print("\nsuppress(FileNotFoundError): removal attempted safely")
 # ============================================================
 # A return inside `finally` OVERRIDES the return in `try`. This is almost
 # never what you want in production, but understanding it prevents the bug.
+
 
 # Example 5: finally overriding a return
 def sneaky() -> str:
@@ -218,6 +220,7 @@ print(f"\nflaky call result: {call_with_retry(flaky)} (attempts: {attempts})")
 # operation, handle the failure. LBYL (Look Before You Leap) races — the state
 # can change between the check and the use.
 
+
 # Example 7: EAFP beats LBYL
 def safe_divide(a: float, b: float) -> float:
     try:
@@ -251,15 +254,16 @@ print(f"safe_divide(4, 2): {safe_divide(4, 2)}")
 # CORRECT:
 #   good = retry only RetryableError, cap attempts, jitter delays
 
+
 # ============================================================
 # Self-Verification
 # ============================================================
 def _verify() -> None:
     # Hierarchy and classification
-    assert classify(ContextWindowExceeded("x")) == "fatal", \
+    assert classify(ContextWindowExceeded("x")) == "fatal", (
         "subclass must be caught as its base type"
-    assert classify(RetryableError("y")) == "retry", \
-        "RetryableError must classify as retry"
+    )
+    assert classify(RetryableError("y")) == "retry", "RetryableError must classify as retry"
 
     # Chaining sets __cause__
     try:
@@ -277,8 +281,7 @@ def _verify() -> None:
     # suppress swallows only the named type
     with suppress(FileNotFoundError):
         os.remove("outputs/dbs/does-not-exist.tmp")
-    assert not os.path.exists("outputs/dbs/does-not-exist.tmp"), \
-        "suppress must not raise"
+    assert not os.path.exists("outputs/dbs/does-not-exist.tmp"), "suppress must not raise"
 
     # finally overrides return
     assert sneaky() == "from finally", "finally return overrides try return"

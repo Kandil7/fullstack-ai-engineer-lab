@@ -31,7 +31,9 @@ import timeit
 # Example 1: shallow sizes
 small = [0, 1, 2, 3]
 print(f"list of 4: {sys.getsizeof(small)} bytes")
-print(f"empty dict: {sys.getsizeof({})} bytes, dict of 4: {sys.getsizeof({'a': 1, 'b': 2, 'c': 3, 'd': 4})} bytes")
+print(
+    f"empty dict: {sys.getsizeof({})} bytes, dict of 4: {sys.getsizeof({'a': 1, 'b': 2, 'c': 3, 'd': 4})} bytes"
+)
 print(f"int 2**62: {sys.getsizeof(2**62)} bytes, float: {sys.getsizeof(1.5)} bytes")
 
 # Output:
@@ -45,6 +47,7 @@ print(f"int 2**62: {sys.getsizeof(2**62)} bytes, float: {sys.getsizeof(1.5)} byt
 # Every normal instance carries a __dict__ (~104+ bytes). __slots__ replaces
 # it with fixed descriptors — less memory, faster attribute access, and no
 # new attributes. For a million records, this is the difference.
+
 
 # Example 2: the win, measured
 class WithDict:
@@ -61,7 +64,9 @@ class WithSlots:
         self.y = y
 
 
-print(f"\nwith __dict__: {sys.getsizeof(WithDict(0, 0)) + sys.getsizeof(WithDict(0, 0).__dict__)} bytes total")
+print(
+    f"\nwith __dict__: {sys.getsizeof(WithDict(0, 0)) + sys.getsizeof(WithDict(0, 0).__dict__)} bytes total"
+)
 print(f"with __slots__: {sys.getsizeof(WithSlots(0, 0))} bytes")
 
 try:
@@ -105,6 +110,7 @@ print(f"s1 is s2 (interning): {s1 is s2}")
 # str is immutable; s += x copies the whole string each time. Building in a
 # loop is quadratic. "".join is linear. The fix is one line.
 
+
 # Example 5: measured
 def concat_loop(n: int) -> str:
     s = ""
@@ -132,6 +138,7 @@ print(f"join      : {t_join:.3f}s  ({t_loop / max(t_join, 1e-9):.0f}x faster)")
 # ============================================================
 # A generator holds one value; a list holds all. Streaming a 10GB corpus
 # works with generators; a list would OOM.
+
 
 # Example 6: constant vs linear memory
 def iter_lines(path_lines: int) -> int:
@@ -166,6 +173,7 @@ print(f"\nHeader without copying payload: {header}")
 # does NOT parallelize with threads (they take turns); I/O-bound work frees
 # the GIL while waiting, so threads help. CPU parallelism needs processes.
 
+
 # Example 8: demonstrating the GIL effect
 def spin(n: int) -> int:
     total = 0
@@ -179,6 +187,7 @@ print(f"\nSingle-thread spin: {t_1:.3f}s")
 
 # Output (indicative):
 # Single-thread spin: 0.063s
+
 
 # ============================================================
 # 8. Production Pattern — Embedding Memory Estimate
@@ -222,6 +231,7 @@ for bits in (64, 32, 16, 8):
 # CORRECT:
 #   good = if x == 1000: ...
 
+
 # ============================================================
 # Self-Verification
 # ============================================================
@@ -229,8 +239,9 @@ def _verify() -> None:
     # __slots__ saves memory (instance + instance dict) and blocks new attrs
     wd = WithDict(0, 0)
     ws = WithSlots(0, 0)
-    assert sys.getsizeof(wd) + sys.getsizeof(wd.__dict__) > sys.getsizeof(ws), \
+    assert sys.getsizeof(wd) + sys.getsizeof(wd.__dict__) > sys.getsizeof(ws), (
         "__slots__ instances must be smaller including the dict"
+    )
     try:
         WithSlots(0, 0).extra = 1  # type: ignore[attr-defined]
         assert False, "__slots__ must prevent new attributes"
@@ -256,15 +267,17 @@ def _verify() -> None:
     assert memoryview(payload)[:2].tobytes() == b"AB"
 
     # Embedding memory math: 1M x 768 float32 = ~3.07 GB
-    assert embedding_ram_bytes(1_000_000, 768, 32) == 1_000_000 * 768 * 4, \
+    assert embedding_ram_bytes(1_000_000, 768, 32) == 1_000_000 * 768 * 4, (
         "rows * dim * bytes-per-element"
-    assert embedding_ram_bytes(1_000_000, 768, 16) == 1_000_000 * 768 * 2, \
+    )
+    assert embedding_ram_bytes(1_000_000, 768, 16) == 1_000_000 * 768 * 2, (
         "float16 halves the footprint"
+    )
 
     # join is faster than += (relative check, not wall-clock)
-    assert timeit.timeit(lambda: join_build(2000), number=50) < \
-        timeit.timeit(lambda: concat_loop(2000), number=50), \
-        "join must beat += for repeated concatenation"
+    assert timeit.timeit(lambda: join_build(2000), number=50) < timeit.timeit(
+        lambda: concat_loop(2000), number=50
+    ), "join must beat += for repeated concatenation"
 
     print("[OK] 52-memory-and-performance: all checks passed")
 

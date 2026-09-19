@@ -23,11 +23,10 @@ import numpy as np
 data = [np.random.normal(0, std, 100) for std in [1, 2, 3]]
 
 plt.figure(figsize=(10, 6))
-plt.boxplot(data, labels=['Group A', 'Group B', 'Group C'],
-            patch_artist=True)
-plt.title('Distribution Comparison')
-plt.ylabel('Value')
-plt.grid(True, axis='y', alpha=0.3)
+plt.boxplot(data, labels=["Group A", "Group B", "Group C"], patch_artist=True)
+plt.title("Distribution Comparison")
+plt.ylabel("Value")
+plt.grid(True, axis="y", alpha=0.3)
 plt.show()
 ```
 
@@ -54,19 +53,20 @@ plt.show()
 ## 2. Customized Box Plot
 
 ```python
-plt.boxplot(data,
-    patch_artist=True,           # Fill boxes with color
-    showmeans=True,              # Show mean marker
-    meanline=True,               # Show mean as line
-    notch=True,                  # Notched box (shows CI of median)
-    vert=True,                   # Vertical (False for horizontal)
-    widths=0.6,                  # Box width
-    showfliers=True,             # Show outliers
-    boxprops={'facecolor': 'steelblue', 'alpha': 0.7},
-    medianprops={'color': 'red', 'linewidth': 2},
-    whiskerprops={'color': 'black', 'linewidth': 1.5},
-    capprops={'color': 'black', 'linewidth': 1.5},
-    flierprops={'marker': 'o', 'markerfacecolor': 'red', 'markersize': 6}
+plt.boxplot(
+    data,
+    patch_artist=True,  # Fill boxes with color
+    showmeans=True,  # Show mean marker
+    meanline=True,  # Show mean as line
+    notch=True,  # Notched box (shows CI of median)
+    vert=True,  # Vertical (False for horizontal)
+    widths=0.6,  # Box width
+    showfliers=True,  # Show outliers
+    boxprops={"facecolor": "steelblue", "alpha": 0.7},
+    medianprops={"color": "red", "linewidth": 2},
+    whiskerprops={"color": "black", "linewidth": 1.5},
+    capprops={"color": "black", "linewidth": 1.5},
+    flierprops={"marker": "o", "markerfacecolor": "red", "markersize": 6},
 )
 ```
 
@@ -80,7 +80,7 @@ bp = plt.boxplot(data, patch_artist=True)
 for i, dataset in enumerate(data, 1):
     # Add jittered points
     jitter = np.random.normal(i, 0.04, len(dataset))
-    plt.scatter(jitter, dataset, alpha=0.4, s=15, color='black')
+    plt.scatter(jitter, dataset, alpha=0.4, s=15, color="black")
 ```
 
 ---

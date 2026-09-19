@@ -51,10 +51,10 @@ Every array carries: a pointer to a data buffer, a `shape`, a `dtype`
 import numpy as np
 
 arr = np.zeros((4, 6), dtype=np.float64)
-print(arr.shape)          # (4, 6)
-print(arr.itemsize)       # 8
-print(arr.strides)        # (48, 8)
-print(arr.nbytes)         # 192
+print(arr.shape)  # (4, 6)
+print(arr.itemsize)  # 8
+print(arr.strides)  # (48, 8)
+print(arr.nbytes)  # 192
 ```
 
 ```
@@ -81,10 +81,10 @@ The two layouts have swapped stride patterns.
 c_arr = np.zeros((3, 4), dtype=np.float32)
 f_arr = np.asfortranarray(c_arr)
 
-print(c_arr.strides)    # (16, 4)   -- last axis: 1 float (4 B)
-print(f_arr.strides)    # (4, 12)   -- first axis contiguous
-print(c_arr.flags.c_contiguous)   # True
-print(f_arr.flags.f_contiguous)   # True
+print(c_arr.strides)  # (16, 4)   -- last axis: 1 float (4 B)
+print(f_arr.strides)  # (4, 12)   -- first axis contiguous
+print(c_arr.flags.c_contiguous)  # True
+print(f_arr.flags.f_contiguous)  # True
 ```
 
 ```
@@ -113,13 +113,13 @@ base = np.arange(24).reshape(4, 6)
 row_view = base[1:3, :]
 t_view = base.T
 
-print(row_view.base is not None)   # True -- a view
-print(t_view.base is not None)     # True
-print(t_view.strides)              # (8, 48) -- swapped
+print(row_view.base is not None)  # True -- a view
+print(t_view.base is not None)  # True
+print(t_view.strides)  # (8, 48) -- swapped
 
 # Writes through the view reach the base:
 row_view[0, 0] = -1
-print(base[1, 0] == -1)            # True
+print(base[1, 0] == -1)  # True
 ```
 
 ```
@@ -145,8 +145,8 @@ indexing that cannot be expressed as (slice, stride, shape) copies.**
 fancy = base[[0, 2], :]
 cast = base.astype(np.float64)
 
-print(fancy.base is None)   # True -- fancy indexing copies
-print(cast.base is None)    # True -- dtype change copies
+print(fancy.base is None)  # True -- fancy indexing copies
+print(cast.base is None)  # True -- dtype change copies
 ```
 
 ```
@@ -168,9 +168,9 @@ the same buffer order; otherwise it copies. Test with `base`, never
 assume.
 
 ```python
-a = np.arange(12).reshape(3, 4)      # C-contiguous
-print(a.reshape(4, 3).base is a)     # True -- view
-print(a.T.reshape(12).base is a)     # False -- copy (layout clash)
+a = np.arange(12).reshape(3, 4)  # C-contiguous
+print(a.reshape(4, 3).base is a)  # True -- view
+print(a.T.reshape(12).base is a)  # False -- copy (layout clash)
 ```
 
 ```
@@ -193,11 +193,11 @@ C-contiguous, and a **copy** otherwise. It is the standard idiom for
 
 ```python
 base = np.arange(24).reshape(4, 6)
-t = base.T                     # F-order view
+t = base.T  # F-order view
 
-print(np.ascontiguousarray(base) is base)   # True -- no copy
-print(np.ascontiguousarray(t) is not t)     # True -- copy
-print(np.ascontiguousarray(t).strides)      # (48, 8) -- C layout
+print(np.ascontiguousarray(base) is base)  # True -- no copy
+print(np.ascontiguousarray(t) is not t)  # True -- copy
+print(np.ascontiguousarray(t).strides)  # (48, 8) -- C layout
 ```
 
 ```
@@ -222,11 +222,15 @@ memory traffic for the same logical work.
 
 ```python
 import time
+
 big = np.random.default_rng(42).normal(size=(4000, 4000))
 
+
 def timed(label, fn):
-    t0 = time.perf_counter(); fn()
+    t0 = time.perf_counter()
+    fn()
     print(f"{label:<28s} {time.perf_counter() - t0:.4f}s")
+
 
 timed("row sum (contiguous)", lambda: big.sum(axis=1))
 timed("col sum (strided)  ", lambda: big.sum(axis=0))
@@ -256,13 +260,13 @@ parent buffer, so two arrays can both claim memory that exists once.
 
 ```python
 a = np.zeros((1000, 1000), dtype=np.float64)
-b = a[:, 0]                # view
-c = a[:, :2].copy()        # copy
+b = a[:, 0]  # view
+c = a[:, :2].copy()  # copy
 
-print(a.nbytes)            # 8000000
-print(b.nbytes)            # 8000      -- logical, not allocated
-print(c.nbytes)            # 16000     -- owns its buffer
-print(b.base is a)         # True
+print(a.nbytes)  # 8000000
+print(b.nbytes)  # 8000      -- logical, not allocated
+print(c.nbytes)  # 16000     -- owns its buffer
+print(b.base is a)  # True
 ```
 
 ```
@@ -291,8 +295,9 @@ def require_c_contiguous(x: np.ndarray) -> np.ndarray:
     """
     return np.ascontiguousarray(x)
 
+
 data = np.random.default_rng(0).normal(size=(500, 300))
-print(require_c_contiguous(data) is data)          # True
+print(require_c_contiguous(data) is data)  # True
 print(require_c_contiguous(data.T) is not data.T)  # True
 ```
 

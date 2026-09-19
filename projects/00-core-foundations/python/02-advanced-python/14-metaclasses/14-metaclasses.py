@@ -12,6 +12,7 @@ from typing import Any, Dict
 # 1. type() Function
 # =============================================================================
 
+
 def demo_type():
     """Demonstrate type() for class creation."""
     # type can create classes dynamically
@@ -30,6 +31,7 @@ def demo_type():
 # 2. Custom Metaclass
 # =============================================================================
 
+
 class ValidationMeta(type):
     """Metaclass that validates class attributes."""
 
@@ -37,14 +39,14 @@ class ValidationMeta(type):
         # Skip for base classes
         if bases:
             # Check for required attributes
-            if 'required_attr' not in namespace:
+            if "required_attr" not in namespace:
                 raise TypeError(f"Class {name} must define 'required_attr'")
 
             # Validate attribute types
             for key, value in namespace.items():
-                if key.startswith('_'):
+                if key.startswith("_"):
                     continue
-                if callable(value) and not key.startswith('_'):
+                if callable(value) and not key.startswith("_"):
                     # Add validation to methods
                     original = value
 
@@ -59,11 +61,13 @@ class ValidationMeta(type):
 
 class BaseAPI(metaclass=ValidationMeta):
     """Base class requiring required_attr."""
+
     required_attr = True
 
 
 class UserAPI(BaseAPI):
     """User API - must define required_attr."""
+
     required_attr = True
 
     def get_user(self, id: int) -> dict:
@@ -73,6 +77,7 @@ class UserAPI(BaseAPI):
 # =============================================================================
 # 3. Singleton Metaclass
 # =============================================================================
+
 
 class SingletonMeta(type):
     """Metaclass implementing singleton pattern."""
@@ -99,6 +104,7 @@ class Database(metaclass=SingletonMeta):
 # 4. Class Registry Metaclass
 # =============================================================================
 
+
 class RegistryMeta(type):
     """Metaclass that registers subclasses."""
 
@@ -122,6 +128,7 @@ class RegistryMeta(type):
 
 class Serializer(metaclass=RegistryMeta):
     """Base serializer class."""
+
     def serialize(self, data) -> str:
         raise NotImplementedError
 
@@ -129,6 +136,7 @@ class Serializer(metaclass=RegistryMeta):
 class JSONSerializer(Serializer):
     def serialize(self, data) -> str:
         import json
+
         return json.dumps(data)
 
 
@@ -148,20 +156,18 @@ class CSVSerializer(Serializer):
 # 5. Auto-Representation Metaclass
 # =============================================================================
 
+
 class ReprMeta(type):
     """Metaclass that adds __repr__ to classes."""
 
     def __new__(mcs, name, bases, namespace):
-        fields = [
-            k for k, v in namespace.items()
-            if not k.startswith('_') and not callable(v)
-        ]
+        fields = [k for k, v in namespace.items() if not k.startswith("_") and not callable(v)]
 
         def __repr__(self):
             attrs = ", ".join(f"{f}={getattr(self, f)!r}" for f in fields)
             return f"{name}({attrs})"
 
-        namespace['__repr__'] = __repr__
+        namespace["__repr__"] = __repr__
         return super().__new__(mcs, name, bases, namespace)
 
 
@@ -180,6 +186,7 @@ class Person(metaclass=ReprMeta):
 # =============================================================================
 # 6. __new__ vs __init__
 # =============================================================================
+
 
 class DemoNew(metaclass=type):
     """Demonstrate __new__ vs __init__."""

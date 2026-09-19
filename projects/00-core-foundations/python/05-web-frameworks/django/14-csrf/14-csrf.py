@@ -95,12 +95,13 @@ from django.views.decorators.csrf import csrf_protect
 @csrf_protect
 def submit_form(request):
     """CSRF is enforced automatically for POST."""
-    if request.method == 'POST':
+    if request.method == "POST":
         # Process form data
-        name = request.POST.get('name')
+        name = request.POST.get("name")
         # ...
-        return redirect('success')
-    return render(request, 'form.html')
+        return redirect("success")
+    return render(request, "form.html")
+
 
 # --- Exempt view from CSRF (use carefully!) ---
 from django.views.decorators.csrf import csrf_exempt
@@ -109,11 +110,12 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def api_webhook(request):
     """Webhook endpoint - CSRF not needed (no user session)."""
-    if request.method == 'POST':
+    if request.method == "POST":
         # Process webhook data
         data = request.body
-        return JsonResponse({'status': 'ok'})
-    return JsonResponse({'error': 'POST only'}, status=405)
+        return JsonResponse({"status": "ok"})
+    return JsonResponse({"error": "POST only"}, status=405)
+
 
 # When to use @csrf_exempt:
 #   - Webhook endpoints (no user session)

@@ -35,7 +35,7 @@ print(np.abs(arr))
 # Output: [3 2 1 0 1 2 3]
 
 # Complex numbers
-complex_arr = np.array([1+2j, 3-4j])
+complex_arr = np.array([1 + 2j, 3 - 4j])
 print(np.abs(complex_arr))
 # Output: [2.236 5.   ]
 ```
@@ -394,7 +394,7 @@ print(np.subtract(a, b))
 ```python
 import numpy as np
 
-angles = np.array([0, np.pi/6, np.pi/4, np.pi/3, np.pi/2])
+angles = np.array([0, np.pi / 6, np.pi / 4, np.pi / 3, np.pi / 2])
 print("Sin:", np.sin(angles))
 print("Cos:", np.cos(angles))
 print("Tan:", np.tan(angles))
@@ -417,12 +417,12 @@ arr = np.arange(1000000)
 
 # Slow: loop
 start = time.time()
-result1 = [x ** 2 for x in arr]
+result1 = [x**2 for x in arr]
 loop_time = time.time() - start
 
 # Fast: vectorized
 start = time.time()
-result2 = arr ** 2
+result2 = arr**2
 vector_time = time.time() - start
 
 print(f"Loop: {loop_time:.4f}s, Vectorized: {vector_time:.4f}s")

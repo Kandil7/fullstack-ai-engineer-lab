@@ -14,6 +14,7 @@ Reference: https://www.w3schools.com/python/python_classes.asp
 # They help organize code logically and improve encapsulation.
 # The inner class is part of the outer class's namespace.
 
+
 # ============================================================
 # Defining Inner Classes
 # ============================================================
@@ -34,9 +35,11 @@ class Outer:
         def show(self):
             print(f"Inner class value: {self.value}")
 
+
 # Example 2: Create instances
 outer = Outer("OuterObject")
 outer.inner.show()
+
 
 # ============================================================
 # Accessing Outer Class from Inner Class
@@ -64,12 +67,14 @@ class School:
         self.students.append(student)
         return student
 
+
 # Example 4: Use the nested class
 my_school = School("Python Academy")
 student1 = my_school.add_student("Alice")
 student2 = my_school.add_student("Bob")
 student1.display()
 student2.display()
+
 
 # ============================================================
 # Accessing Inner Class from Outer Class
@@ -96,9 +101,11 @@ class Computer:
         print(f"Computer: {self.brand}")
         print(f"  {self.cpu.info()}")
 
+
 # Example 6: Access inner class from outer
 my_computer = Computer("Dell")
 my_computer.specs()
+
 
 # ============================================================
 # Inner Class Use Cases: Iterators
@@ -131,11 +138,13 @@ class NumberRange:
     def __iter__(self):
         return self.Iterator(self.start, self.end)
 
+
 # Example 8: Use the iterator
 print("\nNumber range iterator:")
 for num in NumberRange(1, 6):
     print(num, end=" ")
 print()
+
 
 # ============================================================
 # Inner Class Use Cases: Builders
@@ -169,6 +178,7 @@ class QueryBuilder:
             if self.conditions:
                 query += " WHERE " + " AND ".join(self.conditions)
             return query
+
 
 # Example 10: Use the builder
 query = QueryBuilder("users")

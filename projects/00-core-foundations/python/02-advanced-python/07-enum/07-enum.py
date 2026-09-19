@@ -13,8 +13,10 @@ from typing import Optional
 # 1. Basic Enum
 # =============================================================================
 
+
 class Color(Enum):
     """Basic color enumeration."""
+
     RED = 1
     GREEN = 2
     BLUE = 3
@@ -22,6 +24,7 @@ class Color(Enum):
 
 class Direction(Enum):
     """Cardinal directions."""
+
     NORTH = "N"
     SOUTH = "S"
     EAST = "E"
@@ -32,8 +35,10 @@ class Direction(Enum):
 # 2. Auto Values
 # =============================================================================
 
+
 class Status(Enum):
     """Status with auto-generated values."""
+
     PENDING = auto()
     RUNNING = auto()
     COMPLETED = auto()
@@ -42,6 +47,7 @@ class Status(Enum):
 
 class Priority(IntEnum):
     """Integer enum for comparison operations."""
+
     LOW = 1
     MEDIUM = 2
     HIGH = 3
@@ -53,18 +59,27 @@ class Priority(IntEnum):
 # =============================================================================
 
 Animal = Enum("Animal", ["CAT", "DOG", "BIRD", "FISH"])
-Month = Enum("Month", {
-    "JANUARY": 1, "FEBRUARY": 2, "MARCH": 3,
-    "APRIL": 4, "MAY": 5, "JUNE": 6,
-})
+Month = Enum(
+    "Month",
+    {
+        "JANUARY": 1,
+        "FEBRUARY": 2,
+        "MARCH": 3,
+        "APRIL": 4,
+        "MAY": 5,
+        "JUNE": 6,
+    },
+)
 
 
 # =============================================================================
 # 4. String Enum with Methods
 # =============================================================================
 
+
 class HttpStatus(Enum):
     """HTTP status codes with descriptions."""
+
     OK = (200, "Success")
     NOT_FOUND = (404, "Resource not found")
     UNAUTHORIZED = (401, "Authentication required")
@@ -93,8 +108,10 @@ class HttpStatus(Enum):
 # 5. Flag Enums
 # =============================================================================
 
+
 class Permission(Flag):
     """File system permissions."""
+
     READ = auto()
     WRITE = auto()
     EXECUTE = auto()
@@ -103,6 +120,7 @@ class Permission(Flag):
 
 class LogLevel(IntFlag):
     """Logging levels that can be combined."""
+
     DEBUG = 1
     INFO = 2
     WARNING = 4
@@ -115,8 +133,10 @@ class LogLevel(IntFlag):
 # 6. Enum with Methods
 # =============================================================================
 
+
 class HttpMethod(Enum):
     """HTTP methods with metadata."""
+
     GET = ("safe", True, False)
     POST = ("unsafe", False, True)
     PUT = ("unsafe", False, True)

@@ -2,12 +2,12 @@
 Tracing and observability with Langfuse integration.
 """
 
-import os
 import uuid
+from collections.abc import AsyncGenerator, Generator
 from contextlib import asynccontextmanager, contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, Optional, Generator, AsyncGenerator
+from typing import Any
 
 from devmate.config import settings
 
@@ -15,47 +15,50 @@ from devmate.config import settings
 @dataclass
 class Span:
     """A single trace span."""
+
     trace_id: str
     span_id: str
-    parent_span_id: Optional[str]
+    parent_span_id: str | None
     name: str
     start_time: datetime
-    end_time: Optional[datetime] = None
-    attributes: Dict[str, Any] = field(default_factory=dict)
+    end_time: datetime | None = None
+    attributes: dict[str, Any] = field(default_factory=dict)
     events: list = field(default_factory=list)
     status: str = "ok"
-    error: Optional[str] = None
-    
-    def set_attribute(self, key: str, value: Any):
+    error: str | None = None
+
+    def set_attribute(self, key: str, value: Any) -> None:
         """Set a span attribute."""
         self.attributes[key] = value
-    
-    def add_event(self, name: str, attributes: Optional[Dict[str, Any]] = None):
+
+    def add_event(self, name: str, attributes: dict[str, Any] | None = None) -> None:
         """Add an event to the span."""
-        self.events.append({
-            "name": name,
-            "timestamp": datetime.utcnow().isoformat(),
-            "attributes": attributes or {},
-        })
-    
-    def set_status(self, status: str, error: Optional[str] = None):
+        self.events.append(
+            {
+                "name": name,
+                "timestamp": datetime.utcnow().isoformat(),
+                "attributes": attributes or {},
+            }
+        )
+
+    def set_status(self, status: str, error: str | None = None) -> None:
         """Set span status."""
         self.status = status
         if error:
             self.error = error
             self.attributes["error"] = error
-    
-    def finish(self):
+
+    def finish(self) -> None:
         """Mark span as finished."""
         self.end_time = datetime.utcnow()
-    
+
     def duration_ms(self) -> float:
         """Get span duration in milliseconds."""
         if self.end_time:
             return (self.end_time - self.start_time).total_seconds() * 1000
         return 0.0
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         return {
             "trace_id": self.trace_id,
             "span_id": self.span_id,
@@ -74,24 +77,25 @@ class Span:
 @dataclass
 class Trace:
     """A complete trace with multiple spans."""
+
     trace_id: str
     name: str
     start_time: datetime
-    spans: Dict[str, Span] = field(default_factory=dict)
-    root_span_id: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    
-    def add_span(self, span: Span):
+    spans: dict[str, Span] = field(default_factory=dict)
+    root_span_id: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+    def add_span(self, span: Span) -> None:
         """Add a span to the trace."""
         self.spans[span.span_id] = span
         if self.root_span_id is None:
             self.root_span_id = span.span_id
-    
-    def get_span(self, span_id: str) -> Optional[Span]:
+
+    def get_span(self, span_id: str) -> Span | None:
         """Get a span by ID."""
         return self.spans.get(span_id)
-    
-    def to_dict(self) -> Dict[str, Any]:
+
+    def to_dict(self) -> dict[str, Any]:
         return {
             "trace_id": self.trace_id,
             "name": self.name,
@@ -104,40 +108,40 @@ class Trace:
 
 class Tracer:
     """Tracing system with optional Langfuse export."""
-    
-    def __init__(self):
+
+    def __init__(self) -> None:
         self.enabled = settings.tracing_enabled
-        self._traces: Dict[str, Trace] = {}
-        self._current_trace_id: Optional[str] = None
-        self._current_span_id: Optional[str] = None
+        self._traces: dict[str, Trace] = {}
+        self._current_trace_id: str | None = None
+        self._current_span_id: str | None = None
         self._langfuse_client = None
         self._init_langfuse()
-    
-    def _init_langfuse(self):
+
+    def _init_langfuse(self) -> None:
         """Initialize Langfuse client if configured."""
         if not self.enabled:
             return
-        
+
         public_key = settings.langfuse_public_key
         secret_key = settings.langfuse_secret_key
-        
+
         if public_key and secret_key:
             try:
                 from langfuse import Langfuse
+
                 self._langfuse_client = Langfuse(
                     public_key=public_key,
                     secret_key=secret_key,
                     host=settings.langfuse_host,
                 )
-                print(f"Langfuse initialized: {settings.langfuse_host}")
             except ImportError:
-                print("Langfuse not installed. Run: pip install langfuse")
-            except Exception as e:
-                print(f"Failed to initialize Langfuse: {e}")
+                pass
+            except Exception:
+                pass
         else:
-            print("Langfuse keys not configured. Tracing will be local only.")
-    
-    def start_trace(self, name: str, metadata: Optional[Dict[str, Any]] = None) -> Trace:
+            pass
+
+    def start_trace(self, name: str, metadata: dict[str, Any] | None = None) -> Trace:
         """Start a new trace."""
         trace_id = str(uuid.uuid4())
         trace = Trace(
@@ -149,13 +153,13 @@ class Tracer:
         self._traces[trace_id] = trace
         self._current_trace_id = trace_id
         return trace
-    
-    def get_current_trace(self) -> Optional[Trace]:
+
+    def get_current_trace(self) -> Trace | None:
         """Get the currently active trace."""
         if self._current_trace_id:
             return self._traces.get(self._current_trace_id)
         return None
-    
+
     @contextmanager
     def trace(self, name: str, **attributes) -> Generator[Span, None, None]:
         """Context manager for synchronous tracing."""
@@ -168,7 +172,7 @@ class Tracer:
             raise
         finally:
             self.end_span(span)
-    
+
     @asynccontextmanager
     async def trace_async(self, name: str, **attributes) -> AsyncGenerator[Span, None]:
         """Async context manager for tracing."""
@@ -181,19 +185,19 @@ class Tracer:
             raise
         finally:
             self.end_span(span)
-    
+
     def start_span(
         self,
         name: str,
-        parent_span_id: Optional[str] = None,
+        parent_span_id: str | None = None,
         **attributes,
     ) -> Span:
         """Start a new span."""
         trace_id = self._current_trace_id or str(uuid.uuid4())
         span_id = str(uuid.uuid4())[:16]
-        
+
         parent = parent_span_id or self._current_span_id
-        
+
         span = Span(
             trace_id=trace_id,
             span_id=span_id,
@@ -202,7 +206,7 @@ class Tracer:
             start_time=datetime.utcnow(),
             attributes=attributes,
         )
-        
+
         # Get or create trace
         if trace_id not in self._traces:
             self._traces[trace_id] = Trace(
@@ -210,35 +214,35 @@ class Tracer:
                 name=name,
                 start_time=datetime.utcnow(),
             )
-        
+
         self._traces[trace_id].add_span(span)
         self._current_span_id = span_id
-        
+
         return span
-    
-    def end_span(self, span: Span):
+
+    def end_span(self, span: Span) -> None:
         """End a span."""
         span.finish()
         self._current_span_id = span.parent_span_id
-        
+
         # Export to Langfuse if available
         if self._langfuse_client:
             self._export_span_to_langfuse(span)
-    
-    def _export_span_to_langfuse(self, span: Span):
+
+    def _export_span_to_langfuse(self, span: Span) -> None:
         """Export span to Langfuse."""
         try:
             trace = self._traces.get(span.trace_id)
             if not trace:
                 return
-            
+
             langfuse_trace = self._langfuse_client.trace(
                 id=span.trace_id,
                 name=trace.name,
                 metadata=trace.metadata,
             )
-            
-            langfuse_span = langfuse_trace.span(
+
+            langfuse_trace.span(
                 id=span.span_id,
                 name=span.name,
                 parent_span_id=span.parent_span_id,
@@ -248,20 +252,20 @@ class Tracer:
                 level="ERROR" if span.status == "error" else "DEFAULT",
                 status_message=span.error,
             )
-            
+
             self._langfuse_client.flush()
-        except Exception as e:
-            print(f"Failed to export to Langfuse: {e}")
-    
-    def get_trace(self, trace_id: str) -> Optional[Trace]:
+        except Exception:
+            pass
+
+    def get_trace(self, trace_id: str) -> Trace | None:
         """Get a trace by ID."""
         return self._traces.get(trace_id)
-    
+
     def get_recent_traces(self, limit: int = 100) -> list:
         """Get recent traces."""
         return list(self._traces.values())[-limit:]
-    
-    def clear(self):
+
+    def clear(self) -> None:
         """Clear all traces (for testing)."""
         self._traces.clear()
         self._current_trace_id = None
@@ -273,25 +277,29 @@ tracer = Tracer()
 
 
 # Convenience decorators
-def traced(name: Optional[str] = None, **attributes):
+def traced(name: str | None = None, **attributes):
     """Decorator to trace a function."""
+
     def decorator(func):
         trace_name = name or f"{func.__module__}.{func.__qualname__}"
-        
+
         if asyncio.iscoroutinefunction(func):
+
             async def async_wrapper(*args, **kwargs):
                 async with tracer.trace_async(trace_name, **attributes) as span:
                     span.set_attribute("function", func.__qualname__)
                     return await func(*args, **kwargs)
+
             return async_wrapper
-        else:
-            def sync_wrapper(*args, **kwargs):
-                with tracer.trace(trace_name, **attributes) as span:
-                    span.set_attribute("function", func.__qualname__)
-                    return func(*args, **kwargs)
-            return sync_wrapper
-    
+
+        def sync_wrapper(*args, **kwargs):
+            with tracer.trace(trace_name, **attributes) as span:
+                span.set_attribute("function", func.__qualname__)
+                return func(*args, **kwargs)
+
+        return sync_wrapper
+
     return decorator
 
 
-import asyncio
+import asyncio  # noqa: E402

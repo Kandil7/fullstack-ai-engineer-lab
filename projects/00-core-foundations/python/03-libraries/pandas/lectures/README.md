@@ -132,14 +132,15 @@ Most examples use these sample datasets:
 import pandas as pd
 
 # Sales data
-df = pd.read_csv('sales.csv')
+df = pd.read_csv("sales.csv")
 
 # Titanic dataset (built-in via seaborn)
 import seaborn as sns
-df = sns.load_dataset('titanic')
+
+df = sns.load_dataset("titanic")
 
 # Iris dataset
-df = sns.load_dataset('iris')
+df = sns.load_dataset("iris")
 ```
 
 ---

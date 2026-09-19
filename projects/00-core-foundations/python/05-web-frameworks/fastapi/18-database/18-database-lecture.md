@@ -64,14 +64,16 @@ Always use environment variables for database configuration:
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 
+
 class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./app.db"
     DATABASE_ECHO: bool = False
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
-    
+
     class Config:
         env_file = ".env"
+
 
 @lru_cache()
 def get_settings():
@@ -89,20 +91,16 @@ from sqlalchemy.orm import sessionmaker
 # Create engine with connection pooling
 engine = create_async_engine(
     "postgresql+asyncpg://user:password@localhost/dbname",
-    pool_size=20,          # Maximum connections in pool
-    max_overflow=10,       # Extra connections allowed
-    pool_timeout=30,       # Seconds to wait for connection
-    pool_recycle=1800,     # Recycle connections after 30 min
-    pool_pre_ping=True,    # Verify connections before use
-    echo=settings.DATABASE_ECHO  # SQL logging
+    pool_size=20,  # Maximum connections in pool
+    max_overflow=10,  # Extra connections allowed
+    pool_timeout=30,  # Seconds to wait for connection
+    pool_recycle=1800,  # Recycle connections after 30 min
+    pool_pre_ping=True,  # Verify connections before use
+    echo=settings.DATABASE_ECHO,  # SQL logging
 )
 
 # Create session factory
-async_session = sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False
-)
+async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 ```
 
 ---
@@ -122,13 +120,14 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./app.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}  # SQLite specific
+    connect_args={"check_same_thread": False},  # SQLite specific
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Base class for all models
 Base = declarative_base()
+
 
 # Dependency for FastAPI
 def get_db():
@@ -150,22 +149,16 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase
 DATABASE_URL = "sqlite+aiosqlite:///./app.db"
 # For PostgreSQL: "postgresql+asyncpg://user:password@localhost/dbname"
 
-engine = create_async_engine(
-    DATABASE_URL,
-    echo=True,
-    future=True
-)
+engine = create_async_engine(DATABASE_URL, echo=True, future=True)
 
 # Async session factory
-async_session = sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False
-)
+async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
 
 # Base class
 class Base(DeclarativeBase):
     pass
+
 
 # Async dependency
 async def get_async_db():
@@ -186,32 +179,34 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
+
 class User(Base):
     __tablename__ = "users"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     # Relationships
     posts = relationship("Post", back_populates="owner")
-    
+
     def __repr__(self):
         return f"<User {self.email}>"
 
+
 class Post(Base):
     __tablename__ = "posts"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
     content = Column(String)
     published = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     owner_id = Column(Integer, ForeignKey("users.id"))
-    
+
     # Relationships
     owner = relationship("User", back_populates="posts")
 ```
@@ -224,27 +219,32 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from . import models, schemas
 
+
 # Create
 def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(
         email=user.email,
         username=user.username,
-        hashed_password=f"hashed_{user.password}"  # Use proper hashing!
+        hashed_password=f"hashed_{user.password}",  # Use proper hashing!
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
 
+
 # Read
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
+
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
 
+
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
+
 
 # Update
 def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
@@ -256,6 +256,7 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
         db.commit()
         db.refresh(db_user)
     return db_user
+
 
 # Delete
 def delete_user(db: Session, user_id: int):
@@ -278,10 +279,12 @@ from . import models, schemas, crud
 
 app = FastAPI(title="Database Demo API")
 
+
 # Create tables (run once)
 @app.on_event("startup")
 def startup():
     Base.metadata.create_all(bind=engine)
+
 
 # Create user
 @app.post("/users/", response_model=schemas.User)
@@ -291,6 +294,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     return crud.create_user(db=db, user=user)
 
+
 # Get user
 @app.get("/users/{user_id}", response_model=schemas.User)
 def read_user(user_id: int, db: Session = Depends(get_db)):
@@ -298,6 +302,7 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
+
 
 # Get multiple users
 @app.get("/users/", response_model=list[schemas.User])
@@ -317,6 +322,7 @@ from .database import get_db
 
 router = APIRouter()
 
+
 @router.get("/health/database")
 def database_health(db: Session = Depends(get_db)):
     try:
@@ -329,15 +335,11 @@ def database_health(db: Session = Depends(get_db)):
                 "type": "postgresql",
                 "pool_size": engine.pool.size(),
                 "checked_in": engine.pool.checkedin(),
-                "checked_out": engine.pool.checkedout()
-            }
+                "checked_out": engine.pool.checkedout(),
+            },
         }
     except Exception as e:
-        return {
-            "status": "unhealthy",
-            "database": "disconnected",
-            "error": str(e)
-        }
+        return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
 ```
 
 ---
@@ -351,6 +353,7 @@ def database_health(db: Session = Depends(get_db)):
 def get_db():
     db = SessionLocal()
     yield db  # If exception occurs, session won't close
+
 
 # GOOD: Use context manager or try/finally
 def get_db():
@@ -382,6 +385,7 @@ def get_db():
     yield db
     db.close()
 
+
 # GOOD: Reuse engine with connection pooling
 engine = create_async_engine(DATABASE_URL, pool_size=5)
 ```
@@ -396,6 +400,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()  # What if this fails?
     return db_user
+
 
 # GOOD: Handle exceptions
 @app.post("/users/")

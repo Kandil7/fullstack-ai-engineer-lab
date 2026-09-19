@@ -77,10 +77,10 @@ arr = np.array([1, 2, 3, 4, 5])
 
 # Element-wise operations
 print("\nOriginal:", arr)
-print("Add 10:", arr + 10)         # [11 12 13 14 15]
-print("Multiply by 2:", arr * 2)    # [ 2  4  6  8 10]
-print("Square:", arr ** 2)          # [ 1  4  9 16 25]
-print("Square root:", np.sqrt(arr)) # [1.   1.41 1.73 2.   2.24]
+print("Add 10:", arr + 10)  # [11 12 13 14 15]
+print("Multiply by 2:", arr * 2)  # [ 2  4  6  8 10]
+print("Square:", arr**2)  # [ 1  4  9 16 25]
+print("Square root:", np.sqrt(arr))  # [1.   1.41 1.73 2.   2.24]
 # Output:
 # Original: [1 2 3 4 5]
 # Add 10: [11 12 13 14 15]
@@ -144,12 +144,12 @@ print("Dimensions:", arr_3d.ndim)  # 3
 
 arr = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
 print("\nArray:\n", arr)
-print("Shape:", arr.shape)      # (2, 5) - 2 rows, 5 columns
-print("Size:", arr.size)        # 10 - total elements
-print("ndim:", arr.ndim)        # 2 - number of dimensions
-print("Dtype:", arr.dtype)     # int64 on Linux/macOS, int32 on Windows (platform-dependent)
+print("Shape:", arr.shape)  # (2, 5) - 2 rows, 5 columns
+print("Size:", arr.size)  # 10 - total elements
+print("ndim:", arr.ndim)  # 2 - number of dimensions
+print("Dtype:", arr.dtype)  # int64 on Linux/macOS, int32 on Windows (platform-dependent)
 print("Item size:", arr.itemsize)  # 8 on Linux/macOS, 4 on Windows (platform-dependent)
-print("Nbytes:", arr.nbytes)   # 80 on Linux/macOS, 40 on Windows (platform-dependent)
+print("Nbytes:", arr.nbytes)  # 80 on Linux/macOS, 40 on Windows (platform-dependent)
 # Output:
 # Array:
 #  [[ 1  2  3  4  5]

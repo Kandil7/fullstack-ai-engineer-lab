@@ -84,10 +84,10 @@ print("\n--- Debug Format ---")
 x = 42
 name = "Alice"
 
-print(f"{x = }")        # x = 42
-print(f"{name = }")     # name = 'Alice'
-print(f"{x + 1 = }")    # x + 1 = 43
-print(f"{x * 2 = }")    # x * 2 = 84
+print(f"{x = }")  # x = 42
+print(f"{name = }")  # name = 'Alice'
+print(f"{x + 1 = }")  # x + 1 = 43
+print(f"{x * 2 = }")  # x * 2 = 84
 
 # ============================================================
 # .format() Method
@@ -261,10 +261,10 @@ print(f"Padded: {text:_>20}")
 # Summary
 # ============================================================
 print("\n--- Summary ---")
-print("1. f-strings: f\"{variable}\" - most readable and Pythonic")
-print("2. .format(): \"{}\".format(value) - flexible and powerful")
-print("3. % operator: \"%s\" % value - old style, still works")
-print("4. Template: Template(\"$\").safe_substitute() - safe for user input")
-print("5. f-strings support expressions: f\"{2+2}\"")
+print('1. f-strings: f"{variable}" - most readable and Pythonic')
+print('2. .format(): "{}".format(value) - flexible and powerful')
+print('3. % operator: "%s" % value - old style, still works')
+print('4. Template: Template("$").safe_substitute() - safe for user input')
+print('5. f-strings support expressions: f"{2+2}"')
 print("6. Format specifiers: :.2f, :>, :<, :^, :, :b, :x, :%")
-print("7. Debug format (3.8+): f\"{variable = }\"")
+print('7. Debug format (3.8+): f"{variable = }"')

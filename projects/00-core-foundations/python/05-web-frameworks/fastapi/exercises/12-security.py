@@ -37,8 +37,7 @@ def verify_api_key(api_key: Optional[str] = Security(api_key_header)):
     """Dependency that validates the API key."""
     if not api_key or api_key not in API_KEYS:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Invalid or missing API key"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid or missing API key"
         )
     return api_key
 
@@ -133,6 +132,7 @@ USER_ROLES = {
 
 def role_required(allowed_roles: list[str]):
     """Factory that creates a dependency checking for a specific role."""
+
     def role_checker(x_api_key: Optional[str] = Header(default=None)):
         if not x_api_key:
             raise HTTPException(status_code=401, detail="Missing X-API-Key header")
@@ -149,6 +149,7 @@ def role_required(allowed_roles: list[str]):
         if user_role not in allowed_roles:
             raise HTTPException(status_code=403, detail=f"Role '{user_role}' not allowed")
         return username
+
     return role_checker
 
 

@@ -47,17 +47,28 @@ class Product(BaseModel):
 PRODUCTS: dict[str, Product] = {}
 
 
-@app.get("/products", tags=["products"], operation_id="listProducts",
-         summary="List all products", responses={200: {"description": "OK"}})
+@app.get(
+    "/products",
+    tags=["products"],
+    operation_id="listProducts",
+    summary="List all products",
+    responses={200: {"description": "OK"}},
+)
 def list_products(limit: int = 10) -> list[Product]:
     return list(PRODUCTS.values())[:limit]
 
 
-@app.post("/products", tags=["products"], operation_id="createProduct",
-          status_code=201, response_model=Product,
-          responses={401: {"description": "Missing bearer token"}})
-def create_product(product: Product,
-                   credentials: HTTPAuthorizationCredentials = Security(bearer)) -> Product:
+@app.post(
+    "/products",
+    tags=["products"],
+    operation_id="createProduct",
+    status_code=201,
+    response_model=Product,
+    responses={401: {"description": "Missing bearer token"}},
+)
+def create_product(
+    product: Product, credentials: HTTPAuthorizationCredentials = Security(bearer)
+) -> Product:
     """Requires a bearer token — visible in the OpenAPI security scheme."""
     if credentials.credentials != "admin-token":
         raise HTTPException(status_code=401, detail="Invalid token")
@@ -71,7 +82,7 @@ def create_product(product: Product,
 def generate_python_client(openapi: dict) -> str:
     """A tiny illustration: real tools (openapi-python-client, kiota)
     parse the same schema into full SDKs."""
-    lines = ["class InventoryClient:", "    \"\"\"Typed client generated from OpenAPI.\"\"\""]
+    lines = ["class InventoryClient:", '    """Typed client generated from OpenAPI."""']
     for path, methods in openapi.get("paths", {}).items():
         for method, spec in methods.items():
             if method not in ("get", "post", "put", "delete"):
@@ -129,6 +140,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("31-openapi-and-clients:app", host="127.0.0.1", port=8000)
     else:
         _verify()

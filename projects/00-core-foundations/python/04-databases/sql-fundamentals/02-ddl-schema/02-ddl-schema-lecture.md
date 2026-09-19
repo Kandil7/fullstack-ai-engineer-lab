@@ -51,6 +51,7 @@ exactly.
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("PRAGMA foreign_keys = ON")
 conn.execute("""
@@ -96,10 +97,12 @@ Every table is registered in `sqlite_master`; column details come from
 it.
 
 ```python
-print(conn.execute(
-    "SELECT type, name FROM sqlite_master WHERE type = ? AND name = ?",
-    ("table", "events"),
-).fetchall())
+print(
+    conn.execute(
+        "SELECT type, name FROM sqlite_master WHERE type = ? AND name = ?",
+        ("table", "events"),
+    ).fetchall()
+)
 for col in conn.execute("PRAGMA table_info(events)").fetchall():
     print(col)
 ```
@@ -127,7 +130,7 @@ UNIQUE to deduplicate on it, and NULL rows slip through as "duplicates".
 conn.execute("CREATE TABLE dedup (token TEXT UNIQUE)")
 conn.execute("INSERT INTO dedup (token) VALUES (?)", ("emb-a",))
 conn.execute("INSERT INTO dedup (token) VALUES (NULL)")
-conn.execute("INSERT INTO dedup (token) VALUES (NULL)")   # allowed!
+conn.execute("INSERT INTO dedup (token) VALUES (NULL)")  # allowed!
 print(conn.execute("SELECT * FROM dedup").fetchall())
 ```
 
@@ -179,9 +182,11 @@ conn.execute("ALTER TABLE events ADD COLUMN created_at TEXT")
 conn.execute("UPDATE events SET created_at = ? WHERE created_at IS NULL", ("2026-08-06",))
 print(conn.execute("SELECT name, created_at FROM events").fetchall())
 conn.execute("DROP TABLE dedup")
-print(conn.execute(
-    "SELECT name FROM sqlite_master WHERE type = ? AND name = ?", ("table", "dedup")
-).fetchall())
+print(
+    conn.execute(
+        "SELECT name FROM sqlite_master WHERE type = ? AND name = ?", ("table", "dedup")
+    ).fetchall()
+)
 ```
 
 ```

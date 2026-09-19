@@ -44,15 +44,19 @@ D) Through environment variables
 ```python
 class Tool:
     registry = {}
+
     def __init_subclass__(cls, **kw):
         super().__init_subclass__(**kw)
         cls.registry[cls.__name__.lower()] = cls
 
+
 class Search(Tool):
     pass
 
+
 class Calculator(Tool):
     pass
+
 
 print(sorted(Tool.registry))
 ```
@@ -72,10 +76,13 @@ D) `[]`
 class Insert:
     def __init__(self, buf, offset, text):
         self._buf, self._offset, self._text = buf, offset, text
+
     def execute(self):
         self._buf.insert(self._offset, self._text)
+
     def undo(self):
         del self._buf[self._offset]
+
 
 buf = ["a", "c"]
 cmd = Insert(buf, 1, "b")
@@ -123,8 +130,10 @@ D) Threads behind a pool
 class Greeter:
     def __init__(self, name):
         self._name = name
+
     def greet(self):
         return f"hi {self._name}"
+
 
 print(Greeter("ana").greet())
 ```
@@ -157,12 +166,15 @@ class LLM:
     def complete(self, prompt):
         return "real:" + prompt
 
+
 class FakeLLM:
     def complete(self, prompt):
         return "fake:" + prompt
 
+
 def run(llm):
     return llm.complete("x")
+
 
 print(run(LLM()), run(FakeLLM()))
 ```
@@ -206,11 +218,14 @@ D) Only the registry file may change
 class FixedChunker:
     def __init__(self, size):
         self._size = size
+
     def chunk(self, text):
-        return [text[i:i + self._size] for i in range(0, len(text), self._size)]
+        return [text[i : i + self._size] for i in range(0, len(text), self._size)]
+
 
 def index(text, chunker):
     return chunker.chunk(text)
+
 
 print(index("abcdef", FixedChunker(2)))
 ```
@@ -242,10 +257,13 @@ D) No imports needed
 class Append:
     def __init__(self, buf, item):
         self._buf, self._item = buf, item
+
     def execute(self):
         self._buf.append(self._item)
+
     def undo(self):
         self._buf.pop()
+
 
 buf = []
 history = []
@@ -283,15 +301,19 @@ D) An abstract class with no implementations
 ```python
 class Tool:
     registry = {}
+
     def __init_subclass__(cls, **kw):
         super().__init_subclass__(**kw)
         cls.registry[cls.__name__.lower()] = cls
+
     def run(self, args):
         raise NotImplementedError
+
 
 class Calculator(Tool):
     def run(self, args):
         return str(args.get("a", 0) + args.get("b", 0))
+
 
 print(Tool.registry["calculator"]().run({"a": 2, "b": 3}))
 ```
@@ -336,11 +358,14 @@ class Engine:
     def move(self):
         return "moving"
 
+
 class Car:
     def __init__(self, engine):
         self._engine = engine
+
     def drive(self):
         return self._engine.move()
+
 
 print(Car(Engine()).drive())
 ```

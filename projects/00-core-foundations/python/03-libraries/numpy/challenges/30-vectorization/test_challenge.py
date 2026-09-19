@@ -39,8 +39,7 @@ def assert_no_python_loops(func) -> None:
     tree = ast.parse(src)
     for node in ast.walk(tree):
         assert not isinstance(
-            node, (ast.For, ast.While, ast.ListComp, ast.SetComp,
-                   ast.DictComp, ast.GeneratorExp)
+            node, (ast.For, ast.While, ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)
         ), f"{func.__name__} must be vectorized: no Python loops"
 
 
@@ -119,8 +118,7 @@ class TestCleanScores:
 class TestSoftmaxRows:
     def test_known_values(self):
         out = solution.softmax_rows(np.array([[1.0, 2.0, 3.0]]))
-        assert np.allclose(out, [[0.09003057, 0.24472847, 0.66524096]],
-                           atol=1e-8)
+        assert np.allclose(out, [[0.09003057, 0.24472847, 0.66524096]], atol=1e-8)
 
     def test_rows_sum_to_one(self):
         rng = np.random.default_rng(3)
@@ -168,8 +166,7 @@ class TestSoftmaxRows:
         finally:
             tracemalloc.stop()
         assert out.shape == (50_000, 64)
-        assert peak < 100 * 1024 * 1024, \
-            f"peak memory {peak / 1e6:.0f} MB exceeds 100 MB limit"
+        assert peak < 100 * 1024 * 1024, f"peak memory {peak / 1e6:.0f} MB exceeds 100 MB limit"
 
     def test_no_python_loops(self):
         assert_no_python_loops(solution.softmax_rows)

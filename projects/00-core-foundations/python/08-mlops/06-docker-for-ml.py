@@ -30,6 +30,7 @@ from dataclasses import dataclass
 # slow-changing steps (base image, pip install) BEFORE fast-changing
 # steps (your code).
 
+
 @dataclass
 class Layer:
     instruction: str
@@ -74,6 +75,7 @@ assert good[1].instruction.startswith("RUN pip"), "pip install before copying co
 # Build stage installs the compiler toolchain; the runtime stage copies
 # only the artifacts. The result: a small, clean serving image.
 
+
 @dataclass
 class BuildPlan:
     stages: list[str]
@@ -92,7 +94,7 @@ class Stage:
 
 # Example 2: multi-stage shrinks the image
 stages = [
-    Stage("builder", "build", 1200.0),   # compilers, cuda toolkit
+    Stage("builder", "build", 1200.0),  # compilers, cuda toolkit
     Stage("runtime", "runtime", 480.0),  # only runtime libs + artifacts
 ]
 plan = BuildPlan(stages)
@@ -106,6 +108,7 @@ assert plan.runtime_size_mb() == 480.0
 # ============================================================
 # Training images need the CUDA runtime AND the driver's userspace libs.
 # nvidia/cuda base image + --gpus all at runtime.
+
 
 @dataclass
 class GPUCapability:
@@ -129,6 +132,7 @@ assert cap.can_train_on_gpu()
 # ============================================================
 # Pin exact versions in requirements, not ranges. "numpy>=1.26" is a
 # different image every week.
+
 
 def freeze_requirements() -> list[str]:
     return ["numpy==2.1.3", "pandas==2.2.3", "scikit-learn==1.5.2", "torch==2.5.1"]

@@ -35,6 +35,7 @@ vectors, meta = make_corpus(n=400, dim=32, n_clusters=8, seed=7)
 queries = vectors[:5]
 truth = brute_force_knn(queries, vectors, k=10, metric="l2")
 
+
 # The naive version everyone writes first: compute ALL distances, then
 # np.argsort -> O(n*d) compute + O(n log n) sort per query.
 def knn_sort(q: np.ndarray, data: np.ndarray, k: int) -> tuple[np.ndarray, np.ndarray]:
@@ -55,6 +56,7 @@ print(f"full-sort kNN: top-10 ids {idx.tolist()}, dists {dists.round(3).tolist()
 # np.argpartition puts the k smallest in positions 0..k-1 in O(n) —
 # we never pay the full sort. For k << n this is the standard trick
 # (this is what faiss / sklearn's brute-force backends do).
+
 
 def knn_partition(q: np.ndarray, data: np.ndarray, k: int) -> tuple[np.ndarray, np.ndarray]:
     dists = np.linalg.norm(data - q, axis=1)
@@ -92,8 +94,10 @@ print(f"cosine(big, small) = {cosine_sim(big, small):.2f}  <- magnitude-blind")
 # = 2 - 2*cos(a,b) when both have unit norm).
 unit_a = big / np.linalg.norm(big)
 unit_b = small / np.linalg.norm(small)
-print(f"after L2-norm:      L2 = {l2_dist(unit_a, unit_b):.4f}, "
-      f"cosine = {cosine_sim(unit_a, unit_b):.4f}")
+print(
+    f"after L2-norm:      L2 = {l2_dist(unit_a, unit_b):.4f}, "
+    f"cosine = {cosine_sim(unit_a, unit_b):.4f}"
+)
 
 # Output:
 # after L2-norm:      L2 = 0.0000, cosine = 1.0000
@@ -121,7 +125,7 @@ print(f"\nties sorted (stable): ids {tie_idx.tolist()}  <- first duplicate wins"
 for k in (1, 5, 10, 25):
     t0 = _time.perf_counter()
     knn_partition(queries[0], vectors, k)
-    print(f"k={k:2d}  retrieval cost {( _time.perf_counter() - t0) * 1e3:6.2f} ms")
+    print(f"k={k:2d}  retrieval cost {(_time.perf_counter() - t0) * 1e3:6.2f} ms")
 
 # Output:
 # k=1   retrieval cost   0.20 ms
@@ -157,8 +161,7 @@ tenant_q = vectors[0]
 mine = tenants == tenants[0]
 subset = vectors[mine]
 sub_idx, _ = knn_partition(tenant_q, subset, 5)
-print(f"\nfiltered exact kNN (tenant has {subset.shape[0]} docs): "
-      f"ids {sub_idx.tolist()}")
+print(f"\nfiltered exact kNN (tenant has {subset.shape[0]} docs): ids {sub_idx.tolist()}")
 
 # Output:
 # filtered exact kNN (tenant has 103 docs): ids [0, 29, 87, 22, 8]
@@ -174,28 +177,26 @@ print(f"\nfiltered exact kNN (tenant has {subset.shape[0]} docs): "
 # MISTAKE: jumping to ANN before measuring — for <10^5 vectors exact
 #   search is often faster AND exact.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # argpartition must reproduce the full-sort result exactly
-    assert np.array_equal(part_idx, idx), \
-        "argpartition + re-sort must match np.argsort exactly"
+    assert np.array_equal(part_idx, idx), "argpartition + re-sort must match np.argsort exactly"
 
     # magnitude-blindness: cosine sees identical directions as 1.0
-    assert np.isclose(cosine_sim(big, small), 1.0), \
+    assert np.isclose(cosine_sim(big, small), 1.0), (
         "cosine must ignore magnitude for parallel vectors"
-    assert l2_dist(big, small) > 3.0, \
-        "L2 must see the magnitude difference"
+    )
+    assert l2_dist(big, small) > 3.0, "L2 must see the magnitude difference"
 
     # normalized L2 distance equals 0 for parallel unit vectors
-    assert l2_dist(unit_a, unit_b) < 1e-6, \
-        "L2 of parallel unit vectors is 0"
+    assert l2_dist(unit_a, unit_b) < 1e-6, "L2 of parallel unit vectors is 0"
 
     # ties: stable sort keeps insertion order for equal distances
-    assert tie_idx.tolist() == [0, 2, 1], \
-        "stable argsort must put the earlier duplicate first"
+    assert tie_idx.tolist() == [0, 2, 1], "stable argsort must put the earlier duplicate first"
 
     # scaling: larger n must not beat smaller n in wall-clock order
     # (measured with a fresh monotonic counter, no sleep)
@@ -207,15 +208,13 @@ def _verify() -> None:
 
     t_small = measure(1000)
     t_large = measure(4000)
-    assert t_large > t_small, \
-        "exact kNN on 4x data must cost more than on 1x data"
+    assert t_large > t_small, "exact kNN on 4x data must cost more than on 1x data"
 
     # correctness vs brute_force_knn from vector_utils
     alt = brute_force_knn(queries[:2], vectors, k=10, metric="l2")
     for i in range(2):
         mine, _ = knn_sort(queries[i], vectors, 10)
-        assert np.array_equal(mine, alt[i]), \
-            "knn_sort must agree with brute_force_knn"
+        assert np.array_equal(mine, alt[i]), "knn_sort must agree with brute_force_knn"
 
     # k=1 returns the exact self-match for a corpus vector
     top1, _ = knn_sort(vectors[0], vectors, 1)

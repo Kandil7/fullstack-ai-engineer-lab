@@ -152,11 +152,7 @@ import pandas as pd
 import numpy as np
 
 np.random.seed(42)
-df = pd.DataFrame({
-    'A': np.random.randn(100),
-    'B': np.random.randn(100),
-    'C': np.random.randn(100)
-})
+df = pd.DataFrame({"A": np.random.randn(100), "B": np.random.randn(100), "C": np.random.randn(100)})
 
 # Calculate correlation matrix
 corr_matrix = df.corr()
@@ -252,15 +248,16 @@ x1 = np.random.randn(n)
 x2 = x1 * 0.9 + np.random.randn(n) * 0.1  # Highly correlated with x1
 x3 = np.random.randn(n)  # Independent
 
-df = pd.DataFrame({'x1': x1, 'x2': x2, 'x3': x3})
+df = pd.DataFrame({"x1": x1, "x2": x2, "x3": x3})
+
 
 # Calculate VIF
 def calculate_vif(df):
     vif_data = pd.DataFrame()
     vif_data["feature"] = df.columns
-    vif_data["VIF"] = [variance_inflation_factor(df.values, i) 
-                       for i in range(df.shape[1])]
+    vif_data["VIF"] = [variance_inflation_factor(df.values, i) for i in range(df.shape[1])]
     return vif_data
+
 
 print(calculate_vif(df))
 # x1 and x2 will have high VIF (>5-10)
@@ -305,7 +302,7 @@ x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 y = np.array([2, 4, 5, 7, 8, 10, 11, 13, 14, 16])
 
 r = np.corrcoef(x, y)[0, 1]
-r_squared = r ** 2
+r_squared = r**2
 
 print(f"Correlation (r): {r:.4f}")
 print(f"R-squared: {r_squared:.4f}")
@@ -362,11 +359,11 @@ n = 100
 x = np.zeros(n)
 x[0] = np.random.randn()
 for i in range(1, n):
-    x[i] = 0.7 * x[i-1] + np.random.randn()  # AR(1) process
+    x[i] = 0.7 * x[i - 1] + np.random.randn()  # AR(1) process
 
 # Calculate autocorrelation
-df = pd.DataFrame({'value': x})
-autocorr = df['value'].autocorr(lag=1)
+df = pd.DataFrame({"value": x})
+autocorr = df["value"].autocorr(lag=1)
 print(f"Autocorrelation (lag=1): {autocorr:.4f}")
 # Output: ~0.7 (as expected)
 ```
@@ -392,7 +389,7 @@ x1 = np.random.randn(n)
 x2 = x1 * 0.5 + np.random.randn(n) * 0.5
 x3 = x2 * 0.5 + np.random.randn(n) * 0.5
 
-df = pd.DataFrame({'x1': x1, 'x2': x2, 'x3': x3})
+df = pd.DataFrame({"x1": x1, "x2": x2, "x3": x3})
 
 # Regular correlation
 print("Regular correlations:")
@@ -437,11 +434,11 @@ f4 = np.random.randn(n) * 0.1  # Weak correlation with target
 
 target = f1 * 2 + f3 + np.random.randn(n) * 0.5
 
-df = pd.DataFrame({'f1': f1, 'f2': f2, 'f3': f3, 'f4': f4, 'target': target})
+df = pd.DataFrame({"f1": f1, "f2": f2, "f3": f3, "f4": f4, "target": target})
 
 # Apply threshold
 threshold = 0.3
-corr_with_target = df.corr()['target'].drop('target').abs()
+corr_with_target = df.corr()["target"].drop("target").abs()
 selected = corr_with_target[corr_with_target > threshold].index.tolist()
 
 print(f"Features with |correlation| > {threshold}:")
@@ -523,22 +520,27 @@ print(f"With outlier: {r_outlier:.4f}")
 ```python
 # Pearson correlation
 import numpy as np
+
 r = np.corrcoef(x, y)[0, 1]
 
 # With p-value
 from scipy.stats import pearsonr
+
 r, p = pearsonr(x, y)
 
 # Spearman correlation
 from scipy.stats import spearmanr
+
 rho, p = spearmanr(x, y)
 
 # Kendall correlation
 from scipy.stats import kendalltau
+
 tau, p = kendalltau(x, y)
 
 # Correlation matrix
 import pandas as pd
+
 corr_matrix = df.corr()
 
 # Covariance matrix
@@ -546,6 +548,7 @@ cov_matrix = np.cov(x, y)
 
 # VIF calculation
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+
 vif = variance_inflation_factor(X.values, i)
 ```
 

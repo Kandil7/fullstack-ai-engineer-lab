@@ -14,6 +14,7 @@
 ```python
 from collections import deque
 
+
 def bfs(graph, start):
     visited = {start}
     queue = deque([start])
@@ -83,11 +84,12 @@ class CircularQueue:
 
 ```python
 from collections import deque
+
 dq = deque([1, 2, 3])
-dq.append(4)      # Add to right: [1, 2, 3, 4]
+dq.append(4)  # Add to right: [1, 2, 3, 4]
 dq.appendleft(0)  # Add to left: [0, 1, 2, 3, 4]
-dq.pop()           # Remove right: [0, 1, 2, 3]
-dq.popleft()       # Remove left: [1, 2, 3]
+dq.pop()  # Remove right: [0, 1, 2, 3]
+dq.popleft()  # Remove left: [1, 2, 3]
 ```
 
 ### Dequeue (Operation)
@@ -97,6 +99,7 @@ dq.popleft()       # Remove left: [1, 2, 3]
 
 ```python
 from collections import deque
+
 queue = deque(["A", "B", "C"])
 item = queue.popleft()  # Returns "A"
 ```
@@ -112,8 +115,9 @@ item = queue.popleft()  # Returns "A"
 
 ```python
 from collections import deque
+
 queue = deque()
-queue.append("first")   # Enqueue
+queue.append("first")  # Enqueue
 queue.append("second")  # Enqueue
 ```
 
@@ -138,6 +142,7 @@ if not queue:
 
 ```python
 from collections import deque
+
 queue = deque(["Alice", "Bob", "Charlie"])
 print(queue.popleft())  # "Alice" — first in, first out
 ```
@@ -182,6 +187,7 @@ print(heapq.heappop(heap))  # 1 (smallest first — min-heap)
 ```python
 from collections import deque
 
+
 def level_order(root):
     if not root:
         return []
@@ -210,6 +216,7 @@ def level_order(root):
 
 ```python
 from collections import deque
+
 
 def max_sliding_window(nums, k):
     dq = deque()  # Stores indices of decreasing values
@@ -247,14 +254,18 @@ front = queue[0]  # Peek: returns 1 without removing
 ```python
 import heapq
 
+
 class PriorityQueue:
     def __init__(self):
         self._heap = []
+
     def push(self, item, priority):
         heapq.heappush(self._heap, (priority, item))
+
     def pop(self):
         return heapq.heappop(self._heap)[1]
-    
+
+
 pq = PriorityQueue()
 pq.push("low", 5)
 pq.push("high", 1)
@@ -272,10 +283,11 @@ print(pq.pop())  # "high" — lowest priority number = highest priority
 
 ```python
 from collections import deque
+
 queue = deque()
-queue.append("A")   # Enqueue
-queue.append("B")   # Enqueue
-queue.popleft()     # Dequeue: returns "A"
+queue.append("A")  # Enqueue
+queue.append("B")  # Enqueue
+queue.popleft()  # Dequeue: returns "A"
 ```
 
 ### Queue Overflow
@@ -300,6 +312,7 @@ queue.popleft()     # Dequeue: returns "A"
 
 ```python
 from queue import SimpleQueue
+
 q = SimpleQueue()
 q.put(1)
 q.put(2)
@@ -313,6 +326,7 @@ print(q.get())  # 1
 
 ```python
 from collections import deque
+
 
 def first_negative_in_window(arr, k):
     """Find first negative number in every window of size k."""

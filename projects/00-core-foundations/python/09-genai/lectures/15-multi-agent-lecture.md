@@ -61,9 +61,9 @@ what), **synthesize** (merge results into the final answer).
 
 ```python
 def orchestrator(task: str, workers: dict, llm_client, max_steps: int = 6) -> str:
-    plan = decompose(task, llm_client)                # L3 JSON: sub-tasks + worker
+    plan = decompose(task, llm_client)  # L3 JSON: sub-tasks + worker
     results = {}
-    for sub in plan["subtasks"]:                      # (parallelize in prod)
+    for sub in plan["subtasks"]:  # (parallelize in prod)
         results[sub["id"]] = workers[sub["worker"]](sub["instruction"])
     return synthesize(task, plan, results, llm_client)
 ```
@@ -107,6 +107,7 @@ a typed result (L3 discipline) so the orchestrator can merge reliably:
 ```python
 from pydantic import BaseModel
 
+
 class WorkerResult(BaseModel):
     worker: str
     subtask_id: str
@@ -114,9 +115,9 @@ class WorkerResult(BaseModel):
     data: dict = {}
     citations: list[str] = []
 
+
 def worker_result(worker: str, subtask_id: str, summary: str, **kw) -> WorkerResult:
-    return WorkerResult(worker=worker, subtask_id=subtask_id,
-                        summary=summary, **kw)
+    return WorkerResult(worker=worker, subtask_id=subtask_id, summary=summary, **kw)
 ```
 
 Output:
@@ -137,11 +138,14 @@ order must be deterministic so the system is reproducible (Phase 8 L1):
 ```python
 import asyncio
 
+
 async def run_parallel(workers: dict, subtasks: list) -> list[WorkerResult]:
     """Run independent sub-tasks concurrently; merge in plan order."""
+
     async def run(s):
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, workers[s["worker"]], s["instruction"])
+
     results = await asyncio.gather(*(run(s) for s in subtasks))
     # deterministic merge: sort by plan order (subtask_id)
     return sorted(results, key=lambda r: r.subtask_id)
@@ -176,8 +180,7 @@ def run_with_retry(worker_fn, instruction, retries: int = 2) -> WorkerResult:
             raise ValueError("empty worker result")
         except Exception as e:
             if attempt == retries:
-                return WorkerResult(worker="?", subtask_id="?",
-                                    summary=f"FAILED: {e}")
+                return WorkerResult(worker="?", subtask_id="?", summary=f"FAILED: {e}")
     raise RuntimeError("unreachable")
 ```
 
@@ -220,13 +223,14 @@ worker" must never drag the whole system over budget.
 The decision is measured, not fashionable:
 
 ```python
-def decide_single_vs_multi(single_score: float, multi_score: float,
-                           cost_ratio: float, threshold: float = 0.05) -> str:
+def decide_single_vs_multi(
+    single_score: float, multi_score: float, cost_ratio: float, threshold: float = 0.05
+) -> str:
     """Choose multi-agent only if it beats single by more than threshold
     despite the cost ratio."""
     gain = multi_score - single_score
-    return ("multi-agent" if gain >= threshold and cost_ratio < 3.0
-            else "single-agent")
+    return "multi-agent" if gain >= threshold and cost_ratio < 3.0 else "single-agent"
+
 
 print(decide_single_vs_multi(0.80, 0.86, 2.5))
 ```

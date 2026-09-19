@@ -47,13 +47,15 @@ from sklearn.preprocessing import StandardScaler
 print("=== 1. Model loaded at startup ===")
 _start = time.perf_counter()
 X_train, y_train = make_classification(n_samples=300, n_features=8, random_state=1)
-MODEL = Pipeline([
-    ("scaler", StandardScaler()),
-    ("clf", LogisticRegression(max_iter=500)),
-])
+MODEL = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("clf", LogisticRegression(max_iter=500)),
+    ]
+)
 MODEL.fit(X_train, y_train)
 load_s = time.perf_counter() - _start
-print(f"model loaded in {load_s*1000:.0f}ms — ONCE, at startup, shared by all requests")
+print(f"model loaded in {load_s * 1000:.0f}ms — ONCE, at startup, shared by all requests")
 print()
 
 # ============================================================
@@ -63,8 +65,10 @@ print()
 # lazy imports). Warmup fires a dummy prediction at startup so the
 # first REAL request is fast.
 
+
 def warmup(model: Pipeline, n_features: int = 8) -> float:
     import numpy as np
+
     dummy = np.zeros((1, n_features), dtype=np.float64)
     t0 = time.perf_counter()
     model.predict(dummy)
@@ -73,7 +77,7 @@ def warmup(model: Pipeline, n_features: int = 8) -> float:
 
 print("=== 2. Warmup ===")
 warm_s = warmup(MODEL)
-print(f"warmup prediction: {warm_s*1000:.2f}ms (paid once, before traffic)")
+print(f"warmup prediction: {warm_s * 1000:.2f}ms (paid once, before traffic)")
 print()
 
 # ============================================================
@@ -82,6 +86,7 @@ print()
 # The contract is explicit and versioned in the URL and the schema:
 # v1 takes a fixed feature vector and returns a proba. Breaking changes
 # get a NEW version, not a broken v1.
+
 
 class PredictRequest(BaseModel):
     features: list[float] = Field(min_length=8, max_length=8)
@@ -95,9 +100,11 @@ class PredictResponse(BaseModel):
 
 app = FastAPI(title="model-server", version="1.0.0")
 
+
 @app.post("/v1/predict", response_model=PredictResponse)
 def predict(req: PredictRequest) -> PredictResponse:
     import numpy as np
+
     X = np.asarray(req.features, dtype=np.float64).reshape(1, -1)
     pred = int(MODEL.predict(X)[0])
     proba = float(MODEL.predict_proba(X)[0][1])
@@ -120,8 +127,10 @@ print()
 # cost less than 32 single calls. Latency per item rises slightly;
 # throughput rises a lot.
 
+
 def batched_predict(model: Pipeline, n: int = 32) -> float:
     import numpy as np
+
     X = np.random.default_rng(0).normal(size=(n, 8))
     t0 = time.perf_counter()
     model.predict(X)
@@ -131,8 +140,8 @@ def batched_predict(model: Pipeline, n: int = 32) -> float:
 single_total = sum(warmup(MODEL) for _ in range(32))
 batch_total = batched_predict(MODEL, 32)
 print("=== 4. Batching ===")
-print(f"32 single calls: {single_total*1000:.2f}ms total")
-print(f"1 batch of 32   : {batch_total*1000:.2f}ms total")
+print(f"32 single calls: {single_total * 1000:.2f}ms total")
+print(f"1 batch of 32   : {batch_total * 1000:.2f}ms total")
 print(f"speedup         : {single_total / max(batch_total, 1e-9):.1f}x")
 print()
 
@@ -148,8 +157,9 @@ current, peak = tracemalloc.get_traced_memory()
 tracemalloc.stop()
 model_mb = current / 1e6
 
+
 def max_workers(ram_gb: float, model_mb: float, overhead_mb: float = 300) -> int:
-    per_worker = (model_mb + overhead_mb) / 1e3   # MB -> GB
+    per_worker = (model_mb + overhead_mb) / 1e3  # MB -> GB
     return max(1, int(ram_gb / per_worker))
 
 
@@ -166,12 +176,13 @@ print()
 # GPU: amortizes over BATCHES (transfer cost split across items);
 #      only wins when utilization is high.
 
-def cpu_vs_gpu(per_item_cpu_ms: float, per_item_gpu_ms: float,
-               transfer_ms: float, batch: int) -> dict:
+
+def cpu_vs_gpu(
+    per_item_cpu_ms: float, per_item_gpu_ms: float, transfer_ms: float, batch: int
+) -> dict:
     cpu = per_item_cpu_ms * batch
     gpu = transfer_ms + per_item_gpu_ms * batch
-    return {"cpu_total_ms": round(cpu, 1), "gpu_total_ms": round(gpu, 1),
-            "gpu_wins": gpu < cpu}
+    return {"cpu_total_ms": round(cpu, 1), "gpu_total_ms": round(gpu, 1), "gpu_wins": gpu < cpu}
 
 
 print("=== 6. GPU vs CPU ===")
@@ -197,6 +208,7 @@ print()
 # MISTAKE: changing /predict in place — clients break silently
 # CORRECT: version the contract; add v2, keep v1
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -205,6 +217,7 @@ def _verify() -> None:
 
     # 1. Model is a real fitted pipeline
     import numpy as np
+
     assert hasattr(MODEL, "predict"), "model must be callable"
     y = MODEL.predict(np.zeros((1, 8), dtype=np.float64))
     assert y.shape == (1,), "single-row prediction shape"
@@ -221,8 +234,9 @@ def _verify() -> None:
     assert 0.0 <= body["probability"] <= 1.0, "probability in [0,1]"
 
     # 4. Contract enforcement: wrong feature count -> 422
-    assert client.post("/v1/predict", json={"features": [1.0]}).status_code == 422, \
+    assert client.post("/v1/predict", json={"features": [1.0]}).status_code == 422, (
         "schema must reject wrong arity"
+    )
     assert client.post("/v1/predict", json={"features": [0.5] * 9}).status_code == 422
 
     # 5. Batching improves throughput
@@ -232,8 +246,7 @@ def _verify() -> None:
 
     # 6. Memory math caps workers
     assert max_workers(8.0, model_mb) >= 1, "at least one worker"
-    assert max_workers(8.0, model_mb) <= max_workers(16.0, model_mb), \
-        "more RAM -> more workers"
+    assert max_workers(8.0, model_mb) <= max_workers(16.0, model_mb), "more RAM -> more workers"
 
     # 7. GPU math: batching flips the decision
     assert cpu_vs_gpu(8, 2, 5, 1)["gpu_wins"] is False, "GPU loses at batch 1"
@@ -251,4 +264,4 @@ if __name__ == "__main__":
         print("2. Warmup before traffic; version the /predict contract")
         print("3. Batch for throughput; GPU wins on batches, not singles")
         print("4. Memory math: workers × model <= RAM")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

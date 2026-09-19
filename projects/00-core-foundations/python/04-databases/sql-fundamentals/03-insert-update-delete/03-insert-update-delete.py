@@ -158,6 +158,7 @@ print()
 # MISTAKE: upsert without the conflict target: ON CONFLICT DO UPDATE ... alone
 #   requires a UNIQUE/PK to conflict on; always name it: ON CONFLICT (entity)
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -165,7 +166,9 @@ def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     conn = sqlite3.connect(":memory:")
     try:
-        conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, k TEXT NOT NULL UNIQUE, v INTEGER NOT NULL)")
+        conn.execute(
+            "CREATE TABLE t (id INTEGER PRIMARY KEY, k TEXT NOT NULL UNIQUE, v INTEGER NOT NULL)"
+        )
 
         # 1. RETURNING returns the written row, including generated id
         row = conn.execute(
@@ -178,39 +181,48 @@ def _verify() -> None:
             "INSERT INTO t (k, v) VALUES (?, ?) ON CONFLICT (k) DO UPDATE SET v = excluded.v",
             ("a", 5),
         )
-        assert conn.execute("SELECT v FROM t WHERE k = ?", ("a",)).fetchone()[0] == 5, \
+        assert conn.execute("SELECT v FROM t WHERE k = ?", ("a",)).fetchone()[0] == 5, (
             "upsert must update on conflict"
+        )
 
         # 3. ...and is idempotent on re-run (still one row)
         conn.execute(
             "INSERT INTO t (k, v) VALUES (?, ?) ON CONFLICT (k) DO UPDATE SET v = excluded.v",
             ("a", 5),
         )
-        assert conn.execute("SELECT COUNT(*) FROM t WHERE k = ?", ("a",)).fetchone()[0] == 1, \
+        assert conn.execute("SELECT COUNT(*) FROM t WHERE k = ?", ("a",)).fetchone()[0] == 1, (
             "upsert re-run must not duplicate rows"
+        )
 
         # 4. DO NOTHING keeps the first writer's value
         conn.execute("INSERT INTO t (k, v) VALUES (?, ?) ON CONFLICT (k) DO NOTHING", ("a", 9))
-        assert conn.execute("SELECT v FROM t WHERE k = ?", ("a",)).fetchone()[0] == 5, \
+        assert conn.execute("SELECT v FROM t WHERE k = ?", ("a",)).fetchone()[0] == 5, (
             "DO NOTHING must keep the original value"
+        )
 
         # 5. Bulk insert inserts all rows
         conn.executemany("INSERT INTO t (k, v) VALUES (?, ?)", [(f"k{i}", i) for i in range(100)])
-        assert conn.execute("SELECT COUNT(*) FROM t").fetchone()[0] == 101, \
+        assert conn.execute("SELECT COUNT(*) FROM t").fetchone()[0] == 101, (
             "executemany must insert the full batch"
+        )
 
         # 6. Portable DELETE with LIMIT removes exactly the requested number
         conn.execute(
             "DELETE FROM t WHERE rowid IN (SELECT rowid FROM t WHERE v >= ? ORDER BY rowid LIMIT ?)",
             (50, 10),
         )
-        assert conn.execute("SELECT COUNT(*) FROM t WHERE v >= 50").fetchone()[0] == 40, \
+        assert conn.execute("SELECT COUNT(*) FROM t WHERE v >= 50").fetchone()[0] == 40, (
             "portable DELETE must delete exactly LIMIT rows"
+        )
 
         # 7. Parameterized statements are safe by construction (no crash on quotes)
         conn.execute("INSERT INTO t (k, v) VALUES (?, ?)", ("O'Reilly; DROP TABLE t; --", 0))
-        assert conn.execute("SELECT COUNT(*) FROM t WHERE k = ?", ("O'Reilly; DROP TABLE t; --",)).fetchone()[0] == 1, \
-            "parameterized insert must store hostile text as data"
+        assert (
+            conn.execute(
+                "SELECT COUNT(*) FROM t WHERE k = ?", ("O'Reilly; DROP TABLE t; --",)
+            ).fetchone()[0]
+            == 1
+        ), "parameterized insert must store hostile text as data"
     finally:
         conn.close()
     print("[OK] 03-insert-update-delete: all checks passed")
@@ -225,4 +237,4 @@ if __name__ == "__main__":
         print("2. ON CONFLICT makes ingestion idempotent (upsert)")
         print("3. executemany bulk-loads; never loop single inserts")
         print("4. Portable DELETE...LIMIT bounds transactions and locks")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

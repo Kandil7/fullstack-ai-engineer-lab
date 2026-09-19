@@ -28,15 +28,18 @@
 ```python
 class Watch:
     alive = 0
+
     def __init__(self) -> None:
         type(self).alive += 1
+
     def __del__(self) -> None:
         type(self).alive -= 1
+
 
 a = Watch()
 b = a
 del a
-print(Watch.alive, end=" ")   # still referenced by b
+print(Watch.alive, end=" ")  # still referenced by b
 del b
 print(Watch.alive)
 ```
@@ -52,6 +55,7 @@ print(Watch.alive)
 class Plain:
     def __init__(self, x: int) -> None:
         self.x = x
+
 
 p = Plain(1)
 print(p.__dict__, p.x)
@@ -71,6 +75,7 @@ class Slotted:
     def __init__(self, x: int) -> None:
         self.x = x
 
+
 s = Slotted(1)
 print(hasattr(s, "__dict__"), s.x)
 ```
@@ -86,8 +91,10 @@ False 1
 ```python
 import gc
 
+
 class Node:
     pass
+
 
 a, b = Node(), Node()
 a.peer, b.peer = b, a
@@ -118,8 +125,10 @@ True True
 ```python
 import gc
 
+
 class A:
     pass
+
 
 x, y = A(), A()
 x.other, y.other = y, x
@@ -137,7 +146,7 @@ print(gc.collect())
 ```python
 import gc
 
-print(gc.get_count())          # (objects in gen0, gen1, gen2)
+print(gc.get_count())  # (objects in gen0, gen1, gen2)
 gc.collect()
 print(gc.get_count())
 ```
@@ -153,8 +162,10 @@ print(gc.get_count())
 ```python
 kept: list[bytes] = []
 
+
 def batch(n: int) -> None:
-    kept.append(b"x" * 1024 * 100)   # leaked: lives in the global
+    kept.append(b"x" * 1024 * 100)  # leaked: lives in the global
+
 
 batch(1)
 print(len(kept), "chunks retained")
@@ -171,7 +182,7 @@ print(len(kept), "chunks retained")
 import sys
 
 x = [1, 2, 3]
-print(sys.getrefcount(x) - 1, end=" ")   # -1 for the call frame
+print(sys.getrefcount(x) - 1, end=" ")  # -1 for the call frame
 y = x
 print(sys.getrefcount(x) - 1)
 ```
@@ -202,14 +213,16 @@ print(round(current / 1024), "KB current", round(peak / 1024), "KB peak")
 ```python
 import weakref
 
+
 class Entry:
     pass
 
+
 cache: weakref.WeakValueDictionary[int, Entry] = weakref.WeakValueDictionary()
-cache[1] = Entry()          # temporary: dies instantly
+cache[1] = Entry()  # temporary: dies instantly
 print(len(cache))
 
-e = Entry()                 # strong owner
+e = Entry()  # strong owner
 cache[2] = e
 print(len(cache))
 del e
@@ -229,7 +242,7 @@ print(len(cache))
 import tracemalloc
 
 tracemalloc.start()
-big = [b"y" * 1024 for _ in range(5_000)]     # ~5 MB
+big = [b"y" * 1024 for _ in range(5_000)]  # ~5 MB
 current, _ = tracemalloc.get_traced_memory()
 print(round(current / 1024), "KB traced")
 ```
@@ -244,8 +257,10 @@ print(round(current / 1024), "KB traced")
 ```python
 import weakref
 
+
 class Key:
     pass
+
 
 k = Key()
 d: weakref.WeakKeyDictionary[Key, str] = weakref.WeakKeyDictionary()
@@ -266,14 +281,16 @@ print(len(d))
 ```python
 import weakref
 
+
 class Entry:
     pass
+
 
 e = Entry()
 ref = weakref.ref(e)
 print(ref() is e)
 del e
-print(ref() is None)          # the reference is now dead
+print(ref() is None)  # the reference is now dead
 ```
 ```text
 True
@@ -287,9 +304,11 @@ True
 ```python
 import weakref
 
+
 class Entry:
     def __init__(self, text: str) -> None:
         self.text = text
+
 
 cache: weakref.WeakValueDictionary[int, Entry] = weakref.WeakValueDictionary()
 e = Entry("history")

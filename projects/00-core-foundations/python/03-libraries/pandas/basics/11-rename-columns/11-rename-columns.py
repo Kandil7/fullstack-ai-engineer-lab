@@ -5,6 +5,7 @@ W3Schools: https://www.w3schools.com/python/pandas_dataframe_rename.asp
 Learn to rename DataFrame columns using rename(), direct assignment,
 and other techniques.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -12,13 +13,15 @@ import numpy as np
 # Sample data
 # ---------------------------------------------------------------------------
 
-df = pd.DataFrame({
-    "First Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Last Name": ["Smith", "Jones", "Brown", "Wilson"],
-    "Age In Years": [25, 30, 35, 28],
-    "Annual Salary ($)": [70000, 80000, 95000, 75000],
-    "Department Name": ["Engineering", "Marketing", "Engineering", "Sales"],
-})
+df = pd.DataFrame(
+    {
+        "First Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Last Name": ["Smith", "Jones", "Brown", "Wilson"],
+        "Age In Years": [25, 30, 35, 28],
+        "Annual Salary ($)": [70000, 80000, 95000, 75000],
+        "Department Name": ["Engineering", "Marketing", "Engineering", "Sales"],
+    }
+)
 
 print("Original DataFrame:")
 print(df)
@@ -33,13 +36,15 @@ print("=" * 60)
 print("Example 1: rename() with a Dictionary")
 print("=" * 60)
 
-df_renamed = df.rename(columns={
-    "First Name": "first_name",
-    "Last Name": "last_name",
-    "Age In Years": "age",
-    "Annual Salary ($)": "salary",
-    "Department Name": "department",
-})
+df_renamed = df.rename(
+    columns={
+        "First Name": "first_name",
+        "Last Name": "last_name",
+        "Age In Years": "age",
+        "Annual Salary ($)": "salary",
+        "Department Name": "department",
+    }
+)
 print("Renamed columns:")
 print(df_renamed)
 print(f"Columns: {list(df_renamed.columns)}")
@@ -125,10 +130,7 @@ print()
 
 # Using set_axis with a list
 df_set = df.copy()
-df_set = df_set.set_axis(
-    ["fname", "lname", "age", "salary", "dept"],
-    axis=1
-)
+df_set = df_set.set_axis(["fname", "lname", "age", "salary", "dept"], axis=1)
 print("Using set_axis():")
 print(df_set.head(2))
 print()

@@ -40,6 +40,7 @@ A database connector is a software library that enables communication between Py
 
 # For learning, sqlite3 is built-in and SQL syntax is nearly identical:
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 ```
 

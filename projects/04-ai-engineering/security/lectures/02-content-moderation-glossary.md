@@ -35,22 +35,22 @@ class AppealSystem:
     def __init__(self):
         self.appeals = []
 
-    def submit_appeal(self, moderation_id: str, user_id: str,
-                      reason: str) -> str:
+    def submit_appeal(self, moderation_id: str, user_id: str, reason: str) -> str:
         """User submits an appeal against a moderation decision."""
         appeal_id = f"appeal_{len(self.appeals) + 1}"
-        self.appeals.append({
-            "id": appeal_id,
-            "moderation_id": moderation_id,
-            "user_id": user_id,
-            "reason": reason,
-            "status": "pending",
-            "submitted_at": datetime.utcnow(),
-        })
+        self.appeals.append(
+            {
+                "id": appeal_id,
+                "moderation_id": moderation_id,
+                "user_id": user_id,
+                "reason": reason,
+                "status": "pending",
+                "submitted_at": datetime.utcnow(),
+            }
+        )
         return appeal_id
 
-    def review_appeal(self, appeal_id: str, reviewer: str,
-                      decision: str, notes: str):
+    def review_appeal(self, appeal_id: str, reviewer: str, decision: str, notes: str):
         """Human reviewer decides on the appeal."""
         for appeal in self.appeals:
             if appeal["id"] == appeal_id:
@@ -72,8 +72,9 @@ class AppealSystem:
 **Example**:
 ```python
 class BiasDetector:
-    def analyze_demographic_bias(self, moderation_results: list,
-                                  demographic_data: dict) -> dict:
+    def analyze_demographic_bias(
+        self, moderation_results: list, demographic_data: dict
+    ) -> dict:
         """Analyze if moderation decisions show demographic bias."""
         # Group results by demographic
         group_stats = {}
@@ -90,14 +91,13 @@ class BiasDetector:
         flag_rates = {}
         for group, stats in group_stats.items():
             flag_rates[group] = (
-                stats["flagged"] / stats["total"]
-                if stats["total"] > 0 else 0
+                stats["flagged"] / stats["total"] if stats["total"] > 0 else 0
             )
 
         # Identify disparities
         max_rate = max(flag_rates.values()) if flag_rates else 0
         min_rate = min(flag_rates.values()) if flag_rates else 0
-        disparity_ratio = max_rate / min_rate if min_rate > 0 else float('inf')
+        disparity_ratio = max_rate / min_rate if min_rate > 0 else float("inf")
 
         return {
             "flag_rates_by_group": flag_rates,
@@ -353,17 +353,28 @@ false_positives = {
 
 **Example**:
 ```python
-def calculate_f1(true_positives: int, false_positives: int,
-                  false_negatives: int) -> float:
+def calculate_f1(
+    true_positives: int, false_positives: int, false_negatives: int
+) -> float:
     """Calculate F1 score."""
-    precision = true_positives / (true_positives + false_positives) \
-        if (true_positives + false_positives) > 0 else 0
-    recall = true_positives / (true_positives + false_negatives) \
-        if (true_positives + false_negatives) > 0 else 0
+    precision = (
+        true_positives / (true_positives + false_positives)
+        if (true_positives + false_positives) > 0
+        else 0
+    )
+    recall = (
+        true_positives / (true_positives + false_negatives)
+        if (true_positives + false_negatives) > 0
+        else 0
+    )
 
-    f1 = 2 * (precision * recall) / (precision + recall) \
-        if (precision + recall) > 0 else 0
+    f1 = (
+        2 * (precision * recall) / (precision + recall)
+        if (precision + recall) > 0
+        else 0
+    )
     return f1
+
 
 # Example
 tp, fp, fn = 85, 10, 5
@@ -383,9 +394,9 @@ print(f"F1 Score: {f1:.2f}")  # F1 Score: 0.92
 ```python
 class HumanInTheLoop:
     def __init__(self):
-        self.auto_allow_threshold = 0.3   # Below this = auto allow
-        self.auto_block_threshold = 0.9   # Above this = auto block
-        self.review_threshold = 0.3       # Between = human review
+        self.auto_allow_threshold = 0.3  # Below this = auto allow
+        self.auto_block_threshold = 0.9  # Above this = auto block
+        self.review_threshold = 0.3  # Between = human review
 
     def moderate(self, content: str, confidence: float) -> dict:
         """Route content based on confidence."""
@@ -417,22 +428,27 @@ class ReviewQueue:
     def __init__(self):
         self.queue = []
 
-    def add_item(self, content: str, confidence: float,
-                 user_id: str, priority: str = "normal"):
+    def add_item(
+        self, content: str, confidence: float, user_id: str, priority: str = "normal"
+    ):
         """Add item to review queue."""
-        self.queue.append({
-            "content": content,
-            "confidence": confidence,
-            "user_id": user_id,
-            "priority": priority,
-            "added_at": datetime.utcnow(),
-            "status": "pending",
-        })
+        self.queue.append(
+            {
+                "content": content,
+                "confidence": confidence,
+                "user_id": user_id,
+                "priority": priority,
+                "added_at": datetime.utcnow(),
+                "status": "pending",
+            }
+        )
         # Sort by priority and confidence
-        self.queue.sort(key=lambda x: (
-            {"high": 0, "normal": 1, "low": 2}[x["priority"]],
-            -x["confidence"]
-        ))
+        self.queue.sort(
+            key=lambda x: (
+                {"high": 0, "normal": 1, "low": 2}[x["priority"]],
+                -x["confidence"],
+            )
+        )
 
     def get_next(self) -> dict:
         """Get next item for review."""
@@ -602,8 +618,12 @@ solutions = [
 ```python
 def calculate_precision(true_positives: int, false_positives: int) -> float:
     """Calculate precision."""
-    return true_positives / (true_positives + false_positives) \
-        if (true_positives + false_positives) > 0 else 0
+    return (
+        true_positives / (true_positives + false_positives)
+        if (true_positives + false_positives) > 0
+        else 0
+    )
+
 
 # Example
 # 100 items flagged as harmful
@@ -626,8 +646,12 @@ print(f"Precision: {precision:.2f}")  # Precision: 0.90
 ```python
 def calculate_recall(true_positives: int, false_negatives: int) -> float:
     """Calculate recall."""
-    return true_positives / (true_positives + false_negatives) \
-        if (true_positives + false_negatives) > 0 else 0
+    return (
+        true_positives / (true_positives + false_negatives)
+        if (true_positives + false_negatives) > 0
+        else 0
+    )
+
 
 # Example
 # 100 harmful items in the dataset
@@ -680,15 +704,16 @@ sensitive_content_categories = {
 class SpamDetector:
     def __init__(self):
         self.spam_indicators = {
-            "repeated_chars": r'(.)\1{4,}',  # More than 4 repeated chars
-            "excessive_links": r'https?://\S+.*https?://\S+.*https?://\S+',
-            "all_caps": r'^[A-Z\s!?]{20,}$',
-            "common_spam": r'\b(buy now|click here|free money|act now)\b',
+            "repeated_chars": r"(.)\1{4,}",  # More than 4 repeated chars
+            "excessive_links": r"https?://\S+.*https?://\S+.*https?://\S+",
+            "all_caps": r"^[A-Z\s!?]{20,}$",
+            "common_spam": r"\b(buy now|click here|free money|act now)\b",
         }
 
     def is_spam(self, text: str) -> dict:
         """Check if text is spam."""
         import re
+
         matches = []
         for name, pattern in self.spam_indicators.items():
             if re.search(pattern, text, re.IGNORECASE):
@@ -755,10 +780,12 @@ class TriggerWarningSystem:
         triggers = []
         for category, description in self.TRIGGER_CATEGORIES.items():
             if self._contains_trigger(text, category):
-                triggers.append({
-                    "category": category,
-                    "description": description,
-                })
+                triggers.append(
+                    {
+                        "category": category,
+                        "description": description,
+                    }
+                )
         return triggers
 
     def _contains_trigger(self, text: str, category: str) -> bool:

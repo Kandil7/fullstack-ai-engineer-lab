@@ -71,9 +71,9 @@ print(even_squares)  # {0: 0, 2: 4, 4: 16, 6: 36, 8: 64}
 **Example**:
 ```python
 # Stop value 5 is NOT included
-print(list(range(5)))       # [0, 1, 2, 3, 4]
-print(list(range(1, 6)))    # [1, 2, 3, 4, 5]
-print(list(range(0, 10, 3)))# [0, 3, 6, 9]
+print(list(range(5)))  # [0, 1, 2, 3, 4]
+print(list(range(1, 6)))  # [1, 2, 3, 4, 5]
+print(list(range(0, 10, 3)))  # [0, 3, 6, 9]
 ```
 
 **Related**: inclusive start, off-by-one, stop parameter
@@ -106,8 +106,8 @@ print(next(gen))  # 4
 **Example**:
 ```python
 # Start value 2 IS included
-print(list(range(2, 6)))    # [2, 3, 4, 5]
-print(list(range(10, 0, -1)))# [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+print(list(range(2, 6)))  # [2, 3, 4, 5]
+print(list(range(10, 0, -1)))  # [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 ```
 
 **Related**: exclusive stop, start parameter
@@ -194,6 +194,7 @@ matrix = [[j for j in range(3)] for i in range(3)]
 # Range object — very small memory
 r = range(1_000_000)
 import sys
+
 print(sys.getsizeof(r))  # ~48 bytes
 
 # List — stores all values
@@ -245,8 +246,8 @@ print(list(range(10, 0, -2)))  # [10, 8, 6, 4, 2]
 
 **Example**:
 ```python
-range(stop)          # 0 to stop-1
-range(start, stop)   # start to stop-1
+range(stop)  # 0 to stop-1
+range(start, stop)  # start to stop-1
 range(start, stop, step)  # with custom increment
 ```
 
@@ -261,11 +262,11 @@ range(start, stop, step)  # with custom increment
 ```python
 r = range(0, 100, 5)
 print(type(r))  # <class 'range'>
-print(len(r))   # 20
+print(len(r))  # 20
 print(25 in r)  # True
 print(r.start)  # 0
-print(r.stop)   # 100
-print(r.step)   # 5
+print(r.stop)  # 100
+print(r.step)  # 5
 ```
 
 **Related**: range, iterator, memory efficient
@@ -283,6 +284,7 @@ for _ in range(5):
 
 # Repeat with delay
 import time
+
 for i in range(3):
     print(f"Attempt {i + 1}")
     time.sleep(1)
@@ -299,9 +301,9 @@ for i in range(3):
 ```python
 # Range is a sequence type
 r = range(5)
-print(3 in r)     # True
-print(r[2])       # 2
-print(len(r))     # 5
+print(3 in r)  # True
+print(r[2])  # 2
+print(len(r))  # 5
 
 # Other sequence types
 my_list = [1, 2, 3]  # List
@@ -340,13 +342,14 @@ def sieve(limit):
     """Sieve of Eratosthenes."""
     is_prime = [True] * (limit + 1)
     is_prime[0] = is_prime[1] = False
-    
+
     for i in range(2, int(limit**0.5) + 1):
         if is_prime[i]:
-            for j in range(i*i, limit + 1, i):
+            for j in range(i * i, limit + 1, i):
                 is_prime[j] = False
-    
+
     return [i for i in range(limit + 1) if is_prime[i]]
+
 
 print(sieve(30))  # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
 ```
@@ -362,7 +365,7 @@ print(sieve(30))  # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
 ```python
 # Slicing a list
 my_list = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-print(my_list[::2])   # [0, 2, 4, 6, 8] — every 2nd
+print(my_list[::2])  # [0, 2, 4, 6, 8] — every 2nd
 print(my_list[1::2])  # [1, 3, 5, 7, 9] — every 2nd starting at 1
 print(my_list[::-1])  # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0] — reversed
 

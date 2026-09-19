@@ -39,8 +39,10 @@ By the end of this lecture, you will be able to:
 ```python
 import timeit
 
+
 def build_list(n: int) -> list[int]:
     return list(range(n))
+
 
 def demo_timeit() -> float:
     ns = {"build_list": build_list}
@@ -63,11 +65,13 @@ Use `min()` of several repeats: it is the most stable estimator (the minimum is 
 ```python
 import cProfile, pstats, io
 
+
 def process_logs(rows: int) -> int:
     total = 0
     for i in range(rows):
         total += i * 2
     return total
+
 
 def demo_profile() -> str:
     pr = cProfile.Profile()
@@ -95,15 +99,16 @@ The phase doc's canonical case is joining a naive O(n²) audit list against an i
 ```python
 def naive_join(records: list[dict], index: list[dict]) -> list[tuple]:
     joined: list[tuple] = []
-    for r in records:                      # O(n)
-        for entry in index:                # O(n) -- nested scan
+    for r in records:  # O(n)
+        for entry in index:  # O(n) -- nested scan
             if entry["chunk_id"] == r["chunk_id"]:
                 joined.append((r["chunk_id"], entry["text"]))
                 break
     return joined
 
+
 def hash_join(records: list[dict], index: list[dict]) -> list[tuple]:
-    by_id = {e["chunk_id"]: e["text"] for e in index}   # O(n) once
+    by_id = {e["chunk_id"]: e["text"] for e in index}  # O(n) once
     return [(r["chunk_id"], by_id[r["chunk_id"]]) for r in records]  # O(1) each
 ```
 
@@ -132,6 +137,7 @@ def fib_cached(n: int, memo: dict[int, int] | None = None) -> int:
     memo[n] = fib_cached(n - 1, memo) + fib_cached(n - 2, memo)
     return memo[n]
 
+
 def fib_uncached(n: int) -> int:
     return n if n < 2 else fib_uncached(n - 1) + fib_uncached(n - 2)
 ```
@@ -151,15 +157,18 @@ A Python-level loop over a million floats pays the interpreter for every element
 ```python
 import math
 
+
 def loop_stddev(values: list[float]) -> float:
     mean = sum(values) / len(values)
     var = sum((v - mean) ** 2 for v in values) / (len(values) - 1)
     return math.sqrt(var)
 
+
 def demo_vectorize() -> tuple[float, float]:
     data = [float(i % 100) / 3.0 for i in range(2_000_000)]
     loop = loop_stddev(data)
     import statistics
+
     fast = statistics.pstdev(data) if False else loop  # placeholder; see exercise
     return loop, fast
 ```
@@ -180,9 +189,10 @@ The rule for when to vectorize: the operation is element-wise or reduction-shape
 def concat_join(n: int) -> str:
     return "".join("c" for _ in range(n))
 
+
 def concat_plus_with_refs(n: int) -> str:
     s = ""
-    refs: list[str] = []          # hold every intermediate -> forces copies
+    refs: list[str] = []  # hold every intermediate -> forces copies
     for _ in range(n):
         s = s + "c"
         refs.append(s)

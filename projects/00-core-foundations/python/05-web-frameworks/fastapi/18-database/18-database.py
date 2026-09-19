@@ -19,6 +19,7 @@ from sqlalchemy.orm import sessionmaker, Session
 
 # ----- Database setup -----
 import pathlib
+
 DB_PATH = pathlib.Path(__file__).parent.parent.parent / "outputs" / "dbs" / "fastapi_demo.db"
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
@@ -29,6 +30,7 @@ Base = declarative_base()
 # ----- ORM Model -----
 class ItemDB(Base):
     """SQLAlchemy model for items table."""
+
     __tablename__ = "items"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -198,6 +200,7 @@ Testing with curl:
     Database file: fastapi_demo.db (SQLite)
 """
 
+
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server).
 
@@ -280,6 +283,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

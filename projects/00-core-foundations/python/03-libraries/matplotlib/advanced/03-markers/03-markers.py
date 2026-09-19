@@ -3,14 +3,17 @@ Matplotlib Markers - W3Schools Exercises
 ==========================================
 Deep dive into marker customization.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -19,9 +22,16 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 def exercise_01():
     """Create a visual reference chart of all basic marker types."""
     markers = {
-        "o": "circle", "s": "square", "^": "triangle_up",
-        "v": "triangle_down", "D": "diamond", "P": "plus_filled",
-        "*": "star", "X": "x_filled", "p": "pentagon", "h": "hexagon",
+        "o": "circle",
+        "s": "square",
+        "^": "triangle_up",
+        "v": "triangle_down",
+        "D": "diamond",
+        "P": "plus_filled",
+        "*": "star",
+        "X": "x_filled",
+        "p": "pentagon",
+        "h": "hexagon",
     }
     positions = np.arange(len(markers))
 
@@ -29,8 +39,9 @@ def exercise_01():
     plt.plot(positions, [0] * len(markers), " ")
     for i, (m, name) in enumerate(markers.items()):
         plt.plot(i, 0, marker=m, markersize=20, color="steelblue")
-        plt.annotate(name, (i, 0), textcoords="offset points", xytext=(0, -30),
-                     ha="center", fontsize=9)
+        plt.annotate(
+            name, (i, 0), textcoords="offset points", xytext=(0, -30), ha="center", fontsize=9
+        )
     plt.title("Exercise 1: Marker Reference Chart")
     plt.yticks([])
     plt.xticks([])
@@ -56,8 +67,15 @@ def exercise_02():
     plt.figure(figsize=(10, 5))
     for i, cfg in enumerate(configs):
         plt.subplot(1, 4, i + 1)
-        plt.plot(x, y, "o", markersize=15, markerfacecolor=cfg["mfc"],
-                 markeredgecolor=cfg["mec"], markeredgewidth=cfg["mew"])
+        plt.plot(
+            x,
+            y,
+            "o",
+            markersize=15,
+            markerfacecolor=cfg["mfc"],
+            markeredgecolor=cfg["mec"],
+            markeredgewidth=cfg["mew"],
+        )
         plt.title(f"mfc={cfg['mfc']}\nmec={cfg['mec']}\nmew={cfg['mew']}", fontsize=9)
         plt.ylim(0, 6)
     plt.suptitle("Exercise 2: Marker Face/Edge Colors", fontsize=13)
@@ -76,8 +94,9 @@ def exercise_03():
     sizes = np.random.choice([20, 80, 200, 500], size=30)
 
     plt.figure(figsize=(8, 8))
-    plt.scatter(x, y, s=sizes, c=x + y, cmap="coolwarm", alpha=0.7,
-                edgecolors="black", linewidth=0.5)
+    plt.scatter(
+        x, y, s=sizes, c=x + y, cmap="coolwarm", alpha=0.7, edgecolors="black", linewidth=0.5
+    )
     plt.colorbar(label="x + y")
     plt.title("Exercise 3: Variable Marker Sizes")
     plt.xlabel("X")

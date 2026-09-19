@@ -4,6 +4,7 @@ Why ast and not regex: the AST knows structure. A regex can't tell a real
 `except:` from one inside a string literal; the AST can. Everything here
 is a single parse + single walk, which is what keeps it O(N).
 """
+
 from __future__ import annotations
 
 import ast
@@ -43,8 +44,9 @@ def _count_decisions(node: ast.AST) -> int:
     """Cyclomatic decision points inside a subtree: O(subtree size)."""
     count = 0
     for child in ast.walk(node):
-        if isinstance(child, (ast.If, ast.For, ast.While,
-                              ast.ExceptHandler, ast.IfExp, ast.Assert)):
+        if isinstance(
+            child, (ast.If, ast.For, ast.While, ast.ExceptHandler, ast.IfExp, ast.Assert)
+        ):
             count += 1
         elif isinstance(child, ast.BoolOp):
             count += len(child.values) - 1
@@ -53,12 +55,10 @@ def _count_decisions(node: ast.AST) -> int:
 
 def _top_level_functions(tree: ast.Module) -> list[ast.FunctionDef]:
     """Top-level function definitions only, in source order."""
-    return [n for n in tree.body
-            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
+    return [n for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]
 
 
-def analyze(source: str, max_complexity: int = 10
-            ) -> dict[str, list[tuple[int, str]]]:
+def analyze(source: str, max_complexity: int = 10) -> dict[str, list[tuple[int, str]]]:
     """Return {"B006": ..., "E722": ..., "C901": ...} with ONE ast.parse.
 
     All three rules share one parse and one walk over tree.body — the
@@ -81,15 +81,15 @@ def analyze(source: str, max_complexity: int = 10
         complexity = 1 + _count_decisions(fn)
         if complexity > max_complexity:
             result["C901"].append(
-                (fn.lineno, f"{fn.name}: complexity {complexity} > {max_complexity}"))
+                (fn.lineno, f"{fn.name}: complexity {complexity} > {max_complexity}")
+            )
 
     return result
 
 
 def _suppressed_lines(source: str) -> set[int]:
     """Line numbers carrying a noqa comment of any form."""
-    return {i + 1 for i, line in enumerate(source.splitlines())
-            if "# noqa" in line}
+    return {i + 1 for i, line in enumerate(source.splitlines()) if "# noqa" in line}
 
 
 class _LintVisitor(ast.NodeVisitor):
@@ -129,8 +129,7 @@ class _LintVisitor(ast.NodeVisitor):
         self.visit_count += 1
         super().generic_visit(node)
 
-    def finish(self, source: str, suppressed: set[int],
-               max_complexity: int) -> None:
+    def finish(self, source: str, suppressed: set[int], max_complexity: int) -> None:
         """Post-pass rules that need full-tree or text context."""
         for i, line in enumerate(source.splitlines()):
             if len(line) > self.max_line_length:
@@ -138,21 +137,21 @@ class _LintVisitor(ast.NodeVisitor):
         for fn in _top_level_functions(self.tree):  # type: ignore[attr-defined]
             complexity = 1 + _count_decisions(fn)
             if complexity > max_complexity:
-                self._add("C901", fn.lineno,
-                          f"{fn.name}: complexity {complexity} > {max_complexity}")
+                self._add(
+                    "C901", fn.lineno, f"{fn.name}: complexity {complexity} > {max_complexity}"
+                )
         self._apply_noqa(suppressed)
 
     def _apply_noqa(self, suppressed: set[int]) -> None:
         for rule in list(self.violations):
-            self.violations[rule] = [
-                v for v in self.violations[rule] if v[0] not in suppressed]
+            self.violations[rule] = [v for v in self.violations[rule] if v[0] not in suppressed]
             if not self.violations[rule]:
                 del self.violations[rule]
 
 
-def lint_source(source: str,
-                config: dict[str, list[str]] | None = None
-                ) -> dict[str, list[tuple[int, str]]]:
+def lint_source(
+    source: str, config: dict[str, list[str]] | None = None
+) -> dict[str, list[tuple[int, str]]]:
     """Full linter: select/ignore config, noqa suppression, E999 safety.
 
     Why a NodeVisitor instead of repeated ast.walk: one pass over the tree,
@@ -162,10 +161,10 @@ def lint_source(source: str,
     selected = set(config.get("select", list(RULES)))
     ignored = set(config.get("ignore", []))
     active = {r for r in selected if r not in ignored}
-    max_len = int(config.get("max_line_length", [88])[0]) \
-        if config.get("max_line_length") else 88
-    max_complexity = int(config.get("max_complexity", [10])[0]) \
-        if config.get("max_complexity") else 10
+    max_len = int(config.get("max_line_length", [88])[0]) if config.get("max_line_length") else 88
+    max_complexity = (
+        int(config.get("max_complexity", [10])[0]) if config.get("max_complexity") else 10
+    )
 
     try:
         tree = ast.parse(source)

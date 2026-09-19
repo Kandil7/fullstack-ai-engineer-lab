@@ -39,13 +39,14 @@ adversarial_examples = {
     "unicode_attack": "hello\u200bworld",  # Zero-width space
 }
 
+
 def detect_adversarial(text: str) -> bool:
     """Simple adversarial input detection."""
     # Check for common attack patterns
     patterns = [
-        r'ignore\s+(all\s+)?previous',
-        r'you\s+are\s+now\s+',
-        r'decode\s+(this\s+)?base64',
+        r"ignore\s+(all\s+)?previous",
+        r"you\s+are\s+now\s+",
+        r"decode\s+(this\s+)?base64",
     ]
     return any(re.search(p, text, re.IGNORECASE) for p in patterns)
 ```
@@ -63,17 +64,21 @@ def detect_adversarial(text: str) -> bool:
 # Allowlist for user roles
 ALLOWED_ROLES = {"admin", "user", "viewer", "moderator"}
 
+
 def validate_role(role: str) -> bool:
     """Validate user role against allowlist."""
     return role in ALLOWED_ROLES
 
+
 # Allowlist for file extensions
 ALLOWED_EXTENSIONS = {".txt", ".pdf", ".png", ".jpg"}
+
 
 def validate_file_extension(filename: str) -> bool:
     """Validate file extension against allowlist."""
     ext = os.path.splitext(filename)[1].lower()
     return ext in ALLOWED_EXTENSIONS
+
 
 # Allowlist for API endpoints
 ALLOWED_ENDPOINTS = [
@@ -104,7 +109,7 @@ def validate_boundary(value: str, field_name: str) -> dict:
         errors.append(f"{field_name} exceeds maximum length")
 
     # Character check
-    if '\x00' in value:
+    if "\x00" in value:
         errors.append(f"{field_name} contains null bytes")
 
     # Whitespace check
@@ -112,6 +117,7 @@ def validate_boundary(value: str, field_name: str) -> dict:
         errors.append(f"{field_name} is only whitespace")
 
     return {"valid": len(errors) == 0, "errors": errors}
+
 
 # Example usage
 result = validate_boundary("Hello World", "username")
@@ -140,6 +146,7 @@ SQL_INJECTION_PATTERNS = [
     r"(;|'|\"|\")",
     r"(SELECT|INSERT|UPDATE|DELETE|DROP)",
 ]
+
 
 def check_blocklist(text: str) -> dict:
     """Check text against blocklists."""
@@ -171,6 +178,7 @@ def check_blocklist(text: str) -> dict:
 # Python is generally safe from buffer overflows
 # but we still need to handle oversized inputs
 
+
 class SafeBuffer:
     def __init__(self, max_size: int = 1024):
         self.max_size = max_size
@@ -192,6 +200,7 @@ class SafeBuffer:
     def read(self) -> str:
         """Read buffer contents."""
         return self.buffer
+
 
 # Usage
 buffer = SafeBuffer(max_size=100)
@@ -217,6 +226,7 @@ encodings = {
     "utf-16": "16-bit Unicode (with BOM)",
 }
 
+
 # Encoding security issues
 def validate_encoding(text: str) -> dict:
     """Validate character encoding."""
@@ -224,16 +234,16 @@ def validate_encoding(text: str) -> dict:
 
     # Check for mixed encodings
     try:
-        text.encode('utf-8')
+        text.encode("utf-8")
     except UnicodeEncodeError:
         issues.append("Invalid UTF-8 characters detected")
 
     # Check for BOM (Byte Order Mark)
-    if text.startswith(('\ufeff', '\ufffe')):
+    if text.startswith(("\ufeff", "\ufffe")):
         issues.append("BOM detected - potential encoding attack")
 
     # Check for null bytes
-    if '\x00' in text:
+    if "\x00" in text:
         issues.append("Null bytes detected - potential injection")
 
     return {"valid": len(issues) == 0, "issues": issues}
@@ -251,14 +261,15 @@ def validate_encoding(text: str) -> dict:
 ```python
 # Common confusable characters
 confusables = {
-    'a': ['а', 'ɑ', 'α'],  # Cyrillic, Latin, Greek
-    'e': ['е', 'ε'],
-    'o': ['о', 'ο'],
-    'p': ['р', 'ρ'],
-    'c': ['с', 'ϲ'],
-    'x': ['х', 'χ'],
-    'i': ['і', 'ι'],
+    "a": ["а", "ɑ", "α"],  # Cyrillic, Latin, Greek
+    "e": ["е", "ε"],
+    "o": ["о", "ο"],
+    "p": ["р", "ρ"],
+    "c": ["с", "ϲ"],
+    "x": ["х", "χ"],
+    "i": ["і", "ι"],
 }
+
 
 def detect_confusables(text: str) -> list:
     """Detect confusable characters in text."""
@@ -266,13 +277,16 @@ def detect_confusables(text: str) -> list:
     for i, char in enumerate(text):
         for ascii_char, similar_chars in confusables.items():
             if char in similar_chars and char != ascii_char:
-                detected.append({
-                    "position": i,
-                    "confusable": char,
-                    "looks_like": ascii_char,
-                    "warning": "Potential homoglyph attack",
-                })
+                detected.append(
+                    {
+                        "position": i,
+                        "confusable": char,
+                        "looks_like": ascii_char,
+                        "warning": "Potential homoglyph attack",
+                    }
+                )
     return detected
+
 
 # Example
 text = "раypal"  # Contains Cyrillic 'р' and 'а'
@@ -293,21 +307,24 @@ print(detect_confusables(text))
 ```python
 # Control characters to watch for
 DANGEROUS_CONTROL_CHARS = {
-    '\x00': "Null byte - can terminate strings early",
-    '\x01': "Start of Heading",
-    '\x08': "Backspace",
-    '\x09': "Tab",
-    '\x0a': "Line Feed",
-    '\x0d': "Carriage Return",
-    '\x1b': "Escape",
-    '\x7f': "Delete",
+    "\x00": "Null byte - can terminate strings early",
+    "\x01": "Start of Heading",
+    "\x08": "Backspace",
+    "\x09": "Tab",
+    "\x0a": "Line Feed",
+    "\x0d": "Carriage Return",
+    "\x1b": "Escape",
+    "\x7f": "Delete",
 }
+
 
 def sanitize_control_chars(text: str) -> str:
     """Remove dangerous control characters."""
     import re
+
     # Remove all control characters except common whitespace
-    return re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', text)
+    return re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
+
 
 # Example
 text = "Hello\x00World"
@@ -327,18 +344,21 @@ print(repr(clean))  # 'HelloWorld'
 ```python
 from pydantic import BaseModel, Field, validator
 
+
 class UserData(BaseModel):
     """Validate user data."""
-    username: str = Field(..., min_length=3, max_length=50, pattern=r'^[a-zA-Z0-9_]+$')
-    email: str = Field(..., pattern=r'^[\w.-]+@[\w.-]+\.\w+$')
+
+    username: str = Field(..., min_length=3, max_length=50, pattern=r"^[a-zA-Z0-9_]+$")
+    email: str = Field(..., pattern=r"^[\w.-]+@[\w.-]+\.\w+$")
     age: int = Field(..., ge=0, le=150)
 
-    @validator('username')
+    @validator("username")
     def validate_username(cls, v):
         """Additional username validation."""
-        if v.lower() in ['admin', 'root', 'system']:
-            raise ValueError('Username not allowed')
+        if v.lower() in ["admin", "root", "system"]:
+            raise ValueError("Username not allowed")
         return v
+
 
 # Usage
 try:
@@ -364,22 +384,25 @@ def check_hex_encoding(text: str) -> dict:
 
     # Look for hex patterns
     hex_patterns = [
-        (r'\\x[0-9a-fA-F]{2}', "Hex escape sequence"),
-        (r'0x[0-9a-fA-F]+', "Hex literal"),
-        (r'%[0-9a-fA-F]{2}', "URL-encoded hex"),
+        (r"\\x[0-9a-fA-F]{2}", "Hex escape sequence"),
+        (r"0x[0-9a-fA-F]+", "Hex literal"),
+        (r"%[0-9a-fA-F]{2}", "URL-encoded hex"),
     ]
 
     findings = []
     for pattern, description in hex_patterns:
         matches = re.findall(pattern, text)
         if matches:
-            findings.append({
-                "pattern": description,
-                "count": len(matches),
-                "samples": matches[:3],
-            })
+            findings.append(
+                {
+                    "pattern": description,
+                    "count": len(matches),
+                    "samples": matches[:3],
+                }
+            )
 
     return {"has_hex": len(findings) > 0, "findings": findings}
+
 
 # Example
 text = "Hello\\x41\\x42\\x43"  # Hex for ABC
@@ -399,28 +422,30 @@ result = check_hex_encoding(text)
 ```python
 # Homoglyph examples
 homoglyphs = {
-    "Latin 'a'": ['а', 'ɑ', 'α'],  # Cyrillic, Latin, Greek
-    "Latin 'e'": ['е', 'ε'],
-    "Latin 'o'": ['о', 'ο'],
-    "Latin 'p'": ['р', 'ρ'],
-    "Latin 'c'": ['с', 'ϲ'],
+    "Latin 'a'": ["а", "ɑ", "α"],  # Cyrillic, Latin, Greek
+    "Latin 'e'": ["е", "ε"],
+    "Latin 'o'": ["о", "ο"],
+    "Latin 'p'": ["р", "ρ"],
+    "Latin 'c'": ["с", "ϲ"],
 }
+
 
 def normalize_homoglyphs(text: str) -> str:
     """Replace homoglyphs with ASCII equivalents."""
     # This is simplified - real implementation uses Unicode tables
     replacements = {
-        'а': 'a',  # Cyrillic а
-        'е': 'e',  # Cyrillic е
-        'о': 'o',  # Cyrillic о
-        'р': 'p',  # Cyrillic р
-        'с': 'c',  # Cyrillic с
+        "а": "a",  # Cyrillic а
+        "е": "e",  # Cyrillic е
+        "о": "o",  # Cyrillic о
+        "р": "p",  # Cyrillic р
+        "с": "c",  # Cyrillic с
     }
 
     result = []
     for char in text:
         result.append(replacements.get(char, char))
-    return ''.join(result)
+    return "".join(result)
+
 
 # Example
 text = "раypal"  # Looks like "paypal" but uses Cyrillic
@@ -440,6 +465,7 @@ print(normalized)  # "paypal"
 ```python
 import html
 
+
 def sanitize_html(text: str) -> str:
     """Sanitize HTML content."""
     # Escape HTML entities
@@ -447,14 +473,16 @@ def sanitize_html(text: str) -> str:
 
     # Remove any remaining tags
     import re
-    text = re.sub(r'<[^>]+>', '', text)
+
+    text = re.sub(r"<[^>]+>", "", text)
 
     return text
+
 
 def sanitize_for_display(text: str) -> str:
     """Sanitize text for safe HTML display."""
     # Allow basic formatting but escape dangerous content
-    allowed_tags = {'b', 'i', 'u', 'em', 'strong', 'p', 'br'}
+    allowed_tags = {"b", "i", "u", "em", "strong", "p", "br"}
 
     import re
 
@@ -462,16 +490,18 @@ def sanitize_for_display(text: str) -> str:
         tag = match.group(1)
         if tag.lower().split()[0] in allowed_tags:
             return match.group(0)
-        return ''
+        return ""
 
     # Remove disallowed tags
-    text = re.sub(r'<(/?)(\w+)([^>]*)>', replace_tag, text)
+    text = re.sub(r"<(/?)(\w+)([^>]*)>", replace_tag, text)
 
     # Escape attributes
-    text = re.sub(r'(\w+)\s*=\s*["\'][^"\']*["\']',
-                  lambda m: html.escape(m.group(0)), text)
+    text = re.sub(
+        r'(\w+)\s*=\s*["\'][^"\']*["\']', lambda m: html.escape(m.group(0)), text
+    )
 
     return text
+
 
 # Example
 text = "<script>alert('XSS')</script>Hello <b>World</b>"
@@ -495,16 +525,18 @@ def normalize_input_encoding(text: str) -> str:
 
     # Normalize to NFC (Canonical Decomposition + Canonical Composition)
     # This ensures consistent representation
-    text = unicodedata.normalize('NFC', text)
+    text = unicodedata.normalize("NFC", text)
 
     # Convert to lowercase for case-insensitive comparison
     text = text.lower()
 
     # Remove zero-width characters
     import re
-    text = re.sub(r'[\u200b-\u200f\u2028-\u202f\u2060-\u2064\ufeff]', '', text)
+
+    text = re.sub(r"[\u200b-\u200f\u2028-\u202f\u2060-\u2064\ufeff]", "", text)
 
     return text
+
 
 # Example of encoding bypass
 text1 = "admin"  # Normal
@@ -530,22 +562,26 @@ def check_null_bytes(text: str) -> dict:
     """Check for null byte injection."""
     issues = []
 
-    if '\x00' in text:
-        issues.append({
-            "issue": "null_byte_detected",
-            "count": text.count('\x00'),
-            "severity": "high",
-        })
+    if "\x00" in text:
+        issues.append(
+            {
+                "issue": "null_byte_detected",
+                "count": text.count("\x00"),
+                "severity": "high",
+            }
+        )
 
         # Show position of null bytes
-        positions = [i for i, c in enumerate(text) if c == '\x00']
+        positions = [i for i, c in enumerate(text) if c == "\x00"]
         issues[0]["positions"] = positions
 
     return {"safe": len(issues) == 0, "issues": issues}
 
+
 def sanitize_null_bytes(text: str) -> str:
     """Remove null bytes from text."""
-    return text.replace('\x00', '')
+    return text.replace("\x00", "")
+
 
 # Example of null byte attack
 filename = "safe.txt\x00.exe"  # Looks like .txt but is .exe
@@ -568,22 +604,25 @@ print(clean_filename)  # "safe.txt.exe" (now visible)
 ```python
 import unicodedata
 
+
 def normalize_input(text: str) -> str:
     """Normalize input for consistent validation."""
     # Step 1: Unicode normalization
-    text = unicodedata.normalize('NFKC', text)
+    text = unicodedata.normalize("NFKC", text)
 
     # Step 2: Case normalization
     text = text.lower()
 
     # Step 3: Whitespace normalization
     import re
-    text = re.sub(r'\s+', ' ', text).strip()
+
+    text = re.sub(r"\s+", " ", text).strip()
 
     # Step 4: Remove control characters
-    text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', text)
+    text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
 
     return text
+
 
 # Example
 text = "  Hello   World  \t\n"
@@ -609,15 +648,15 @@ class PositiveSecurityModel:
     def __init__(self):
         # Define allowed patterns
         self.allowed_patterns = {
-            "username": r'^[a-z][a-z0-9_]{2,49}$',
-            "email": r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$',
-            "phone": r'^\+?[1-9]\d{1,14}$',
+            "username": r"^[a-z][a-z0-9_]{2,49}$",
+            "email": r"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$",
+            "phone": r"^\+?[1-9]\d{1,14}$",
         }
 
         # Define allowed characters per field
         self.allowed_chars = {
-            "username": set('abcdefghijklmnopqrstuvwxyz0123456789_'),
-            "email": set('abcdefghijklmnopqrstuvwxyz0123456789._%+-@'),
+            "username": set("abcdefghijklmnopqrstuvwxyz0123456789_"),
+            "email": set("abcdefghijklmnopqrstuvwxyz0123456789._%+-@"),
         }
 
     def validate(self, field: str, value: str) -> bool:
@@ -626,6 +665,7 @@ class PositiveSecurityModel:
             return False  # Unknown field - reject
 
         import re
+
         return bool(re.match(self.allowed_patterns[field], value))
 ```
 
@@ -659,17 +699,21 @@ class SanitizationPipeline:
         for stage_name, stage_func in self.stages:
             try:
                 current_text, message = stage_func(current_text)
-                result["stages"].append({
-                    "name": stage_name,
-                    "success": True,
-                    "message": message,
-                })
+                result["stages"].append(
+                    {
+                        "name": stage_name,
+                        "success": True,
+                        "message": message,
+                    }
+                )
             except ValueError as e:
-                result["stages"].append({
-                    "name": stage_name,
-                    "success": False,
-                    "error": str(e),
-                })
+                result["stages"].append(
+                    {
+                        "name": stage_name,
+                        "success": False,
+                        "error": str(e),
+                    }
+                )
                 result["sanitized"] = ""
                 return result
 
@@ -685,25 +729,29 @@ class SanitizationPipeline:
     def normalize_encoding(self, text: str) -> tuple:
         """Normalize character encoding."""
         import unicodedata
-        return unicodedata.normalize('NFKC', text), "Encoding normalized"
+
+        return unicodedata.normalize("NFKC", text), "Encoding normalized"
 
     def remove_control_chars(self, text: str) -> tuple:
         """Remove control characters."""
         import re
-        cleaned = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', text)
+
+        cleaned = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
         return cleaned, f"Removed {len(text) - len(cleaned)} control chars"
 
     def escape_html(self, text: str) -> tuple:
         """Escape HTML entities."""
         import html
+
         return html.escape(text), "HTML escaped"
 
     def check_injections(self, text: str) -> tuple:
         """Check for injection patterns."""
         import re
+
         patterns = [
-            r'ignore\s+(all\s+)?previous',
-            r'you\s+are\s+now\s+',
+            r"ignore\s+(all\s+)?previous",
+            r"you\s+are\s+now\s+",
         ]
         for pattern in patterns:
             if re.search(pattern, text, re.IGNORECASE):
@@ -724,8 +772,10 @@ class SanitizationPipeline:
 from pydantic import BaseModel, Field
 from typing import Optional, List
 
+
 class AIRequestSchema(BaseModel):
     """Schema for AI API requests."""
+
     prompt: str = Field(..., min_length=1, max_length=4096)
     model: str = Field(..., pattern="^(gpt-4|claude-3|llama-3)$")
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
@@ -737,13 +787,10 @@ class AIRequestSchema(BaseModel):
         # Strict mode - reject extra fields
         extra = "forbid"
 
+
 # Usage
 try:
-    request = AIRequestSchema(
-        prompt="Hello, world!",
-        model="gpt-4",
-        temperature=0.5
-    )
+    request = AIRequestSchema(prompt="Hello, world!", model="gpt-4", temperature=0.5)
     print("Valid:", request.dict())
 except ValidationError as e:
     print("Invalid:", e.errors())
@@ -763,6 +810,7 @@ except ValidationError as e:
 def unsafe_query(username: str) -> str:
     return f"SELECT * FROM users WHERE username = '{username}'"
 
+
 # Attack: username = "admin' OR '1'='1"
 # Result: SELECT * FROM users WHERE username = 'admin' OR '1'='1'
 # This returns ALL users!
@@ -770,12 +818,13 @@ def unsafe_query(username: str) -> str:
 # SAFE: Parameterized queries
 import sqlite3
 
+
 def safe_query(username: str) -> str:
-    conn = sqlite3.connect('db.sqlite')
+    conn = sqlite3.connect("db.sqlite")
     cursor = conn.cursor()
     cursor.execute(
         "SELECT * FROM users WHERE username = ?",
-        (username,)  # Parameterized - safe
+        (username,),  # Parameterized - safe
     )
     return cursor.fetchone()
 ```
@@ -797,12 +846,13 @@ def safe_truncate(text: str, max_length: int) -> str:
 
     # Truncate at last space before max_length
     truncated = text[:max_length]
-    last_space = truncated.rfind(' ')
+    last_space = truncated.rfind(" ")
 
     if last_space > max_length * 0.8:  # If we're not cutting too much
         truncated = truncated[:last_space]
 
     return truncated + "..."
+
 
 # Example
 text = "This is a long message that needs to be truncated safely"
@@ -825,9 +875,10 @@ def validate_type(value: any, expected_type: type, field_name: str) -> dict:
     if not isinstance(value, expected_type):
         return {
             "valid": False,
-            "error": f"{field_name} must be {expected_type.__name__}, got {type(value).__name__}"
+            "error": f"{field_name} must be {expected_type.__name__}, got {type(value).__name__}",
         }
     return {"valid": True}
+
 
 # Usage
 result = validate_type("hello", str, "username")
@@ -836,6 +887,7 @@ result = validate_type("hello", str, "username")
 result = validate_type(123, str, "username")
 # {'valid': False, 'error': 'username must be str, got int'}
 
+
 # Type coercion (use carefully)
 def safe_coerce(value: any, target_type: type) -> tuple:
     """Safely coerce value to target type."""
@@ -843,6 +895,7 @@ def safe_coerce(value: any, target_type: type) -> tuple:
         return target_type(value), None
     except (ValueError, TypeError) as e:
         return None, str(e)
+
 
 value, error = safe_coerce("123", int)
 # (123, None)
@@ -863,7 +916,8 @@ value, error = safe_coerce("abc", int)
 ```python
 import unicodedata
 
-def normalize_unicode(text: str, form: str = 'NFKC') -> str:
+
+def normalize_unicode(text: str, form: str = "NFKC") -> str:
     """
     Normalize Unicode text.
 
@@ -874,6 +928,7 @@ def normalize_unicode(text: str, form: str = 'NFKC') -> str:
     - NFKD: Compatibility Decomposition
     """
     return unicodedata.normalize(form, text)
+
 
 # Examples of why normalization matters
 examples = [
@@ -901,23 +956,27 @@ for original, variant in examples:
 ```python
 from urllib.parse import quote, unquote
 
+
 def check_url_encoding(text: str) -> dict:
     """Check for URL-encoded content."""
     import re
 
     # Find URL-encoded sequences
-    encoded_pattern = r'%[0-9a-fA-F]{2}'
+    encoded_pattern = r"%[0-9a-fA-F]{2}"
     matches = re.findall(encoded_pattern, text)
 
     findings = []
     for match in matches:
         decoded = unquote(match)
-        findings.append({
-            "encoded": match,
-            "decoded": decoded,
-        })
+        findings.append(
+            {
+                "encoded": match,
+                "decoded": decoded,
+            }
+        )
 
     return {"has_encoding": len(findings) > 0, "findings": findings}
+
 
 # Example
 text = "search=%3Cscript%3Ealert(1)%3C/script%3E"  # XSS in URL encoding

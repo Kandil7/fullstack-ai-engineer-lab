@@ -45,7 +45,7 @@ X_train, X_test = train_test_split(X_scaled, test_size=0.2)
 X_train, X_test = train_test_split(X, test_size=0.2)
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)  # Only training data
-X_test_scaled = scaler.transform(X_test)         # Use training statistics
+X_test_scaled = scaler.transform(X_test)  # Use training statistics
 ```
 
 **Related Terms:** Train/Test Split, Fit, Transform, Preprocessing
@@ -225,8 +225,8 @@ scaler = StandardScaler()
 scaled = scaler.fit_transform(data)
 
 print("Standardized:\n", scaled)
-print("Mean:", scaled.mean(axis=0))   # [0, 0]
-print("Std:", scaled.std(axis=0))     # [1, 1]
+print("Mean:", scaled.mean(axis=0))  # [0, 0]
+print("Std:", scaled.std(axis=0))  # [1, 1]
 ```
 
 **Properties:**
@@ -253,6 +253,7 @@ X_standardized = (X - mean) / std
 
 # Using sklearn
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
 X_standardized = scaler.fit_transform(X)
 ```
@@ -294,10 +295,7 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # Option 2: Pipeline (recommended)
-pipe = Pipeline([
-    ('scaler', StandardScaler()),
-    ('model', LinearRegression())
-])
+pipe = Pipeline([("scaler", StandardScaler()), ("model", LinearRegression())])
 pipe.fit(X_train, y_train)
 predictions = pipe.predict(X_test)
 ```

@@ -93,10 +93,11 @@ import hashlib
 @dataclass
 class Document:
     """A document with metadata."""
+
     content: str
     metadata: dict
     doc_id: str = None
-    
+
     def __post_init__(self):
         if self.doc_id is None:
             self.doc_id = hashlib.md5(self.content.encode()).hexdigest()
@@ -104,85 +105,87 @@ class Document:
 
 class DocumentLoader:
     """Load documents from various sources."""
-    
+
     def load_text(self, file_path: str) -> Document:
         """Load plain text file."""
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
-        
+
         return Document(
             content=content,
-            metadata={
-                "source": file_path,
-                "type": "text",
-                "size": len(content)
-            }
+            metadata={"source": file_path, "type": "text", "size": len(content)},
         )
-    
+
     def load_pdf(self, file_path: str) -> List[Document]:
         """Load PDF file."""
         import PyPDF2
-        
+
         documents = []
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             pdf_reader = PyPDF2.PdfReader(f)
-            
+
             for page_num, page in enumerate(pdf_reader.pages):
                 content = page.extract_text()
                 if content:
-                    documents.append(Document(
-                        content=content,
-                        metadata={
-                            "source": file_path,
-                            "type": "pdf",
-                            "page": page_num + 1
-                        }
-                    ))
-        
+                    documents.append(
+                        Document(
+                            content=content,
+                            metadata={
+                                "source": file_path,
+                                "type": "pdf",
+                                "page": page_num + 1,
+                            },
+                        )
+                    )
+
         return documents
-    
+
     def load_markdown(self, file_path: str) -> List[Document]:
         """Load markdown file, split by sections."""
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
-        
+
         # Split by headers
-        sections = content.split('\n## ')
+        sections = content.split("\n## ")
         documents = []
-        
+
         for i, section in enumerate(sections):
             if i == 0:
                 # First section might not have header
                 header = "Introduction"
                 body = section
             else:
-                lines = section.split('\n', 1)
+                lines = section.split("\n", 1)
                 header = lines[0].strip()
                 body = lines[1] if len(lines) > 1 else ""
-            
-            documents.append(Document(
-                content=f"## {header}\n{body}" if i > 0 else body,
-                metadata={
-                    "source": file_path,
-                    "type": "markdown",
-                    "section": header
-                }
-            ))
-        
+
+            documents.append(
+                Document(
+                    content=f"## {header}\n{body}" if i > 0 else body,
+                    metadata={
+                        "source": file_path,
+                        "type": "markdown",
+                        "section": header,
+                    },
+                )
+            )
+
         return documents
-    
-    def load_directory(self, dir_path: str, glob_pattern: str = "*.md") -> List[Document]:
+
+    def load_directory(
+        self, dir_path: str, glob_pattern: str = "*.md"
+    ) -> List[Document]:
         """Load all matching files from a directory."""
         documents = []
         path = Path(dir_path)
-        
+
         for file_path in path.glob(glob_pattern):
             if file_path.is_file():
-                if file_path.suffix == '.md':
+                if file_path.suffix == ".md":
                     documents.extend(self.load_markdown(str(file_path)))
-                elif file_path.suffix == '.txt':
+                elif file_path.suffix == ".txt":
                     documents.append(self.load_text(str(file_path)))
-        
+
         return documents
 ```
 
@@ -197,65 +200,56 @@ import re
 
 class TextChunker:
     """Various chunking strategies."""
-    
+
     @staticmethod
-    def fixed_size(
-        text: str,
-        chunk_size: int = 1000,
-        overlap: int = 100
-    ) -> List[str]:
+    def fixed_size(text: str, chunk_size: int = 1000, overlap: int = 100) -> List[str]:
         """Split into fixed-size chunks with overlap."""
         words = text.split()
         chunks = []
-        
+
         for i in range(0, len(words), chunk_size - overlap):
-            chunk = " ".join(words[i:i + chunk_size])
+            chunk = " ".join(words[i : i + chunk_size])
             chunks.append(chunk)
-        
+
         return chunks
-    
+
     @staticmethod
-    def sentence_based(
-        text: str,
-        max_sentences: int = 5
-    ) -> List[str]:
+    def sentence_based(text: str, max_sentences: int = 5) -> List[str]:
         """Split by sentences, grouping into chunks."""
         # Simple sentence splitting
-        sentences = re.split(r'(?<=[.!?])\s+', text)
+        sentences = re.split(r"(?<=[.!?])\s+", text)
         chunks = []
         current_chunk = []
-        
+
         for sentence in sentences:
             current_chunk.append(sentence)
             if len(current_chunk) >= max_sentences:
                 chunks.append(" ".join(current_chunk))
                 current_chunk = []
-        
+
         if current_chunk:
             chunks.append(" ".join(current_chunk))
-        
+
         return chunks
-    
+
     @staticmethod
     def recursive(
-        text: str,
-        chunk_size: int = 1000,
-        separators: List[str] = None
+        text: str, chunk_size: int = 1000, separators: List[str] = None
     ) -> List[str]:
         """Recursively split by separators."""
         if separators is None:
             separators = ["\n\n", "\n", ". ", " "]
-        
+
         if len(text) <= chunk_size:
             return [text]
-        
+
         # Try each separator
         for separator in separators:
             if separator in text:
                 parts = text.split(separator)
                 chunks = []
                 current = ""
-                
+
                 for part in parts:
                     if len(current) + len(part) < chunk_size:
                         current += part + separator
@@ -263,10 +257,10 @@ class TextChunker:
                         if current:
                             chunks.append(current.strip())
                         current = part + separator
-                
+
                 if current:
                     chunks.append(current.strip())
-                
+
                 # Recursively chunk if needed
                 final_chunks = []
                 for chunk in chunks:
@@ -276,58 +270,55 @@ class TextChunker:
                         )
                     else:
                         final_chunks.append(chunk)
-                
+
                 return final_chunks
-        
+
         # Fallback: split by words
         words = text.split()
         chunks = []
         current = []
-        
+
         for word in words:
             current.append(word)
             if len(" ".join(current)) >= chunk_size:
                 chunks.append(" ".join(current))
                 current = []
-        
+
         if current:
             chunks.append(" ".join(current))
-        
+
         return chunks
-    
+
     @staticmethod
-    def semantic(
-        text: str,
-        similarity_threshold: float = 0.5
-    ) -> List[str]:
+    def semantic(text: str, similarity_threshold: float = 0.5) -> List[str]:
         """Split where semantic similarity drops."""
         from sentence_transformers import SentenceTransformer
         import numpy as np
-        
-        model = SentenceTransformer('all-MiniLM-L6-v2')
-        
+
+        model = SentenceTransformer("all-MiniLM-L6-v2")
+
         # Split into sentences
-        sentences = re.split(r'(?<=[.!?])\s+', text)
+        sentences = re.split(r"(?<=[.!?])\s+", text)
         embeddings = model.encode(sentences)
-        
+
         chunks = []
         current_chunk = [sentences[0]]
-        
+
         for i in range(1, len(sentences)):
             # Calculate similarity with previous sentence
-            similarity = np.dot(embeddings[i-1], embeddings[i]) / (
-                np.linalg.norm(embeddings[i-1]) * np.linalg.norm(embeddings[i])
+            similarity = np.dot(embeddings[i - 1], embeddings[i]) / (
+                np.linalg.norm(embeddings[i - 1]) * np.linalg.norm(embeddings[i])
             )
-            
+
             if similarity < similarity_threshold:
                 chunks.append(" ".join(current_chunk))
                 current_chunk = [sentences[i]]
             else:
                 current_chunk.append(sentences[i])
-        
+
         if current_chunk:
             chunks.append(" ".join(current_chunk))
-        
+
         return chunks
 ```
 
@@ -346,6 +337,7 @@ import chromadb
 @dataclass
 class RetrievalResult:
     """A retrieval result with score and metadata."""
+
     content: str
     score: float
     metadata: dict
@@ -354,98 +346,88 @@ class RetrievalResult:
 
 class Retriever:
     """Document retrieval with multiple strategies."""
-    
+
     def __init__(self, collection_name: str = "documents"):
         self.client = OpenAI()
         self.chroma_client = chromadb.Client()
         self.collection = self.chroma_client.create_collection(
-            name=collection_name,
-            metadata={"hnsw:space": "cosine"}
+            name=collection_name, metadata={"hnsw:space": "cosine"}
         )
-    
+
     def _get_embedding(self, text: str) -> List[float]:
         """Generate embedding for text."""
         response = self.client.embeddings.create(
-            model="text-embedding-3-small",
-            input=text
+            model="text-embedding-3-small", input=text
         )
         return response.data[0].embedding
-    
+
     def add_documents(self, documents: List[dict]):
         """Add documents to the index."""
         texts = [doc["content"] for doc in documents]
         embeddings = [self._get_embedding(text) for text in texts]
-        
+
         self.collection.add(
             documents=texts,
             embeddings=embeddings,
             metadatas=[doc.get("metadata", {}) for doc in documents],
-            ids=[doc.get("id", f"doc_{i}") for i, doc in enumerate(documents)]
+            ids=[doc.get("id", f"doc_{i}") for i, doc in enumerate(documents)],
         )
-    
+
     def retrieve(
         self,
         query: str,
         top_k: int = 5,
         filters: Optional[dict] = None,
-        score_threshold: float = 0.0
+        score_threshold: float = 0.0,
     ) -> List[RetrievalResult]:
         """Basic semantic retrieval."""
-        
+
         query_embedding = self._get_embedding(query)
-        
+
         results = self.collection.query(
-            query_embeddings=[query_embedding],
-            n_results=top_k,
-            where=filters
+            query_embeddings=[query_embedding], n_results=top_k, where=filters
         )
-        
+
         retrieval_results = []
         for i in range(len(results["ids"][0])):
             score = 1 - results["distances"][0][i]  # Convert to similarity
-            
+
             if score >= score_threshold:
-                retrieval_results.append(RetrievalResult(
-                    content=results["documents"][0][i],
-                    score=score,
-                    metadata=results["metadatas"][0][i],
-                    doc_id=results["ids"][0][i]
-                ))
-        
+                retrieval_results.append(
+                    RetrievalResult(
+                        content=results["documents"][0][i],
+                        score=score,
+                        metadata=results["metadatas"][0][i],
+                        doc_id=results["ids"][0][i],
+                    )
+                )
+
         return retrieval_results
-    
+
     def retrieve_with_reranking(
-        self,
-        query: str,
-        initial_k: int = 20,
-        final_k: int = 5
+        self, query: str, initial_k: int = 20, final_k: int = 5
     ) -> List[RetrievalResult]:
         """Retrieve more results, then rerank."""
-        
+
         # Get initial results
         initial_results = self.retrieve(query, top_k=initial_k)
-        
+
         # Rerank using cross-encoder (simplified)
         # In production, use a cross-encoder model
-        reranked = sorted(
-            initial_results,
-            key=lambda x: x.score,
-            reverse=True
-        )[:final_k]
-        
+        reranked = sorted(initial_results, key=lambda x: x.score, reverse=True)[
+            :final_k
+        ]
+
         return reranked
-    
+
     def retrieve_hybrid(
-        self,
-        query: str,
-        top_k: int = 5,
-        semantic_weight: float = 0.7
+        self, query: str, top_k: int = 5, semantic_weight: float = 0.7
     ) -> List[RetrievalResult]:
         """Combine semantic and keyword search."""
-        
+
         # Semantic search
         semantic_results = self.retrieve(query, top_k=top_k * 2)
-        
+
         # Keyword search (simplified - using metadata)
         # In production, use BM25 or similar
         keyword_results = []
@@ -453,18 +435,22 @@ class Retriever:
             # Simple keyword matching
             query_words = query.lower().split()
             content_words = result.content.lower().split()
-            keyword_score = sum(1 for w in query_words if w in content_words) / len(query_words)
+            keyword_score = sum(1 for w in query_words if w in content_words) / len(
+                query_words
+            )
             keyword_results.append((result, keyword_score))
-        
+
         # Combine scores
         combined = []
         for result, kw_score in keyword_results:
-            combined_score = semantic_weight * result.score + (1 - semantic_weight) * kw_score
+            combined_score = (
+                semantic_weight * result.score + (1 - semantic_weight) * kw_score
+            )
             combined.append((result, combined_score))
-        
+
         # Sort by combined score
         combined.sort(key=lambda x: x[1], reverse=True)
-        
+
         return [result for result, score in combined[:top_k]]
 ```
 
@@ -480,6 +466,7 @@ from dataclasses import dataclass
 @dataclass
 class Context:
     """Constructed context for RAG generation."""
+
     prompt: str
     sources: List[str]
     total_tokens: int
@@ -487,18 +474,15 @@ class Context:
 
 class ContextBuilder:
     """Build context from retrieved documents."""
-    
+
     def __init__(self, max_context_tokens: int = 3000):
         self.max_context_tokens = max_context_tokens
-    
+
     def build_context(
-        self,
-        query: str,
-        documents: List[dict],
-        template: str = None
+        self, query: str, documents: List[dict], template: str = None
     ) -> Context:
         """Build context from query and documents."""
-        
+
         if template is None:
             template = """Answer the question based on the provided context.
 
@@ -508,55 +492,44 @@ Context:
 Question: {question}
 
 Answer:"""
-        
+
         # Format documents as context
         context_parts = []
         sources = []
         current_tokens = 0
-        
+
         for i, doc in enumerate(documents):
-            doc_text = f"[{i+1}] {doc['content']}"
+            doc_text = f"[{i + 1}] {doc['content']}"
             doc_tokens = len(doc_text.split())  # Approximate
-            
+
             if current_tokens + doc_tokens > self.max_context_tokens:
                 break
-            
+
             context_parts.append(doc_text)
-            sources.append(doc.get("metadata", {}).get("source", f"Document {i+1}"))
+            sources.append(doc.get("metadata", {}).get("source", f"Document {i + 1}"))
             current_tokens += doc_tokens
-        
+
         context = "\n\n".join(context_parts)
-        
+
         # Build final prompt
-        prompt = template.format(
-            context=context,
-            question=query
-        )
-        
-        return Context(
-            prompt=prompt,
-            sources=sources,
-            total_tokens=current_tokens
-        )
-    
-    def build_context_with_citations(
-        self,
-        query: str,
-        documents: List[dict]
-    ) -> str:
+        prompt = template.format(context=context, question=query)
+
+        return Context(prompt=prompt, sources=sources, total_tokens=current_tokens)
+
+    def build_context_with_citations(self, query: str, documents: List[dict]) -> str:
         """Build context with inline citations."""
-        
+
         prompt = """Answer the question based on the provided context.
 Include citations in your response using [1], [2], etc.
 
 Context:
 """
-        
+
         for i, doc in enumerate(documents):
-            prompt += f"[{i+1}] {doc['content']}\n\n"
-        
+            prompt += f"[{i + 1}] {doc['content']}\n\n"
+
         prompt += f"Question: {query}\nAnswer:"
-        
+
         return prompt
 ```
 
@@ -573,6 +546,7 @@ from openai import OpenAI
 @dataclass
 class RAGResponse:
     """A RAG-generated response with metadata."""
+
     answer: str
     sources: List[str]
     confidence: float
@@ -582,26 +556,22 @@ class RAGResponse:
 
 class RAGGenerator:
     """Generate answers using RAG."""
-    
+
     def __init__(self, model: str = "gpt-4"):
         self.client = OpenAI()
         self.model = model
-    
+
     def generate(
-        self,
-        query: str,
-        context: str,
-        sources: List[str],
-        temperature: float = 0.3
+        self, query: str, context: str, sources: List[str], temperature: float = 0.3
     ) -> RAGResponse:
         """Generate an answer from query and context."""
-        
+
         messages = [
             {
                 "role": "system",
                 "content": """You are a helpful assistant that answers questions 
 based on provided context. Always cite your sources using [1], [2], etc.
-If the context doesn't contain enough information, say so clearly."""
+If the context doesn't contain enough information, say so clearly.""",
             },
             {
                 "role": "user",
@@ -610,52 +580,48 @@ If the context doesn't contain enough information, say so clearly."""
 
 Question: {query}
 
-Answer based on the context above. Cite sources where applicable."""
-            }
+Answer based on the context above. Cite sources where applicable.""",
+            },
         ]
-        
+
         response = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=temperature
+            model=self.model, messages=messages, temperature=temperature
         )
-        
+
         answer = response.choices[0].message.content
-        
+
         # Simple confidence estimation
         confidence = self._estimate_confidence(answer, context)
-        
+
         return RAGResponse(
             answer=answer,
             sources=sources,
             confidence=confidence,
             model=self.model,
-            tokens_used=response.usage.total_tokens
+            tokens_used=response.usage.total_tokens,
         )
-    
+
     def generate_with_sources(
-        self,
-        query: str,
-        retrieved_docs: List[dict]
+        self, query: str, retrieved_docs: List[dict]
     ) -> RAGResponse:
         """Generate answer with explicit source tracking."""
-        
+
         # Build context with source references
         context_parts = []
         sources = []
-        
+
         for i, doc in enumerate(retrieved_docs):
-            context_parts.append(f"[Source {i+1}]: {doc['content']}")
-            sources.append(doc.get("metadata", {}).get("source", f"Doc {i+1}"))
-        
+            context_parts.append(f"[Source {i + 1}]: {doc['content']}")
+            sources.append(doc.get("metadata", {}).get("source", f"Doc {i + 1}"))
+
         context = "\n\n".join(context_parts)
-        
+
         messages = [
             {
                 "role": "system",
                 "content": """You are a helpful assistant. Answer questions using 
 the provided sources. Always reference sources as [Source 1], [Source 2], etc.
-Be precise and only use information from the sources."""
+Be precise and only use information from the sources.""",
             },
             {
                 "role": "user",
@@ -664,27 +630,24 @@ Be precise and only use information from the sources."""
 
 Question: {query}
 
-Provide a comprehensive answer citing the relevant sources."""
-            }
+Provide a comprehensive answer citing the relevant sources.""",
+            },
         ]
-        
+
         response = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=0.3
+            model=self.model, messages=messages, temperature=0.3
         )
-        
+
         return RAGResponse(
             answer=response.choices[0].message.content,
             sources=sources,
             confidence=self._estimate_confidence(
-                response.choices[0].message.content,
-                context
+                response.choices[0].message.content, context
             ),
             model=self.model,
-            tokens_used=response.usage.total_tokens
+            tokens_used=response.usage.total_tokens,
         )
-    
+
     def _estimate_confidence(self, answer: str, context: str) -> float:
         """Simple confidence estimation."""
         # Check if answer mentions "I don't know" or similar
@@ -693,17 +656,19 @@ Provide a comprehensive answer citing the relevant sources."""
             "i'm not sure",
             "the context doesn't",
             "no information",
-            "cannot determine"
+            "cannot determine",
         ]
-        
+
         answer_lower = answer.lower()
-        uncertainty_count = sum(1 for phrase in uncertain_phrases if phrase in answer_lower)
-        
+        uncertainty_count = sum(
+            1 for phrase in uncertain_phrases if phrase in answer_lower
+        )
+
         if uncertainty_count > 0:
             return 0.3
-        
+
         # Check citation count
-        citation_count = answer.count("[") 
+        citation_count = answer.count("[")
         if citation_count >= 2:
             return 0.8
         elif citation_count == 1:
@@ -722,6 +687,7 @@ Provide a comprehensive answer citing the relevant sources."""
 """
 Production-ready RAG system with all components.
 """
+
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict, Any
 from pathlib import Path
@@ -733,6 +699,7 @@ import chromadb
 @dataclass
 class RAGConfig:
     """Configuration for RAG system."""
+
     embedding_model: str = "text-embedding-3-small"
     llm_model: str = "gpt-4"
     chunk_size: int = 500
@@ -745,10 +712,11 @@ class RAGConfig:
 @dataclass
 class Document:
     """Document with content and metadata."""
+
     content: str
     metadata: Dict[str, Any] = field(default_factory=dict)
     doc_id: str = ""
-    
+
     def __post_init__(self):
         if not self.doc_id:
             self.doc_id = hashlib.md5(self.content.encode()).hexdigest()[:12]
@@ -756,202 +724,192 @@ class Document:
 
 class RAGSystem:
     """Complete RAG system with ingestion, retrieval, and generation."""
-    
+
     def __init__(self, config: RAGConfig = None):
         self.config = config or RAGConfig()
         self.openai_client = OpenAI()
         self.chroma_client = chromadb.Client()
         self.collection = self.chroma_client.create_collection(
-            name="rag_documents",
-            metadata={"hnsw:space": "cosine"}
+            name="rag_documents", metadata={"hnsw:space": "cosine"}
         )
-    
+
     # ========== INGESTION ==========
-    
+
     def ingest_text(self, text: str, metadata: Dict = None) -> str:
         """Ingest raw text."""
         chunks = self._chunk_text(text)
-        
+
         for i, chunk in enumerate(chunks):
             doc = Document(
                 content=chunk,
                 metadata=metadata or {},
-                doc_id=f"text_{hashlib.md5(chunk.encode()).hexdigest()[:8]}"
+                doc_id=f"text_{hashlib.md5(chunk.encode()).hexdigest()[:8]}",
             )
             self._add_document(doc)
-        
+
         return f"Ingested {len(chunks)} chunks"
-    
+
     def ingest_file(self, file_path: str) -> str:
         """Ingest a file."""
         path = Path(file_path)
-        
-        with open(path, 'r', encoding='utf-8') as f:
+
+        with open(path, "r", encoding="utf-8") as f:
             content = f.read()
-        
+
         metadata = {
             "source": str(path),
             "filename": path.name,
-            "extension": path.suffix
+            "extension": path.suffix,
         }
-        
+
         return self.ingest_text(content, metadata)
-    
+
     def ingest_documents(self, documents: List[Document]) -> str:
         """Ingest multiple documents."""
         total_chunks = 0
-        
+
         for doc in documents:
             chunks = self._chunk_text(doc.content)
             for chunk in chunks:
                 chunk_doc = Document(
                     content=chunk,
                     metadata={**doc.metadata, "chunk_of": doc.doc_id},
-                    doc_id=f"{doc.doc_id}_{hashlib.md5(chunk.encode()).hexdigest()[:6]}"
+                    doc_id=f"{doc.doc_id}_{hashlib.md5(chunk.encode()).hexdigest()[:6]}",
                 )
                 self._add_document(chunk_doc)
                 total_chunks += 1
-        
+
         return f"Ingested {total_chunks} chunks from {len(documents)} documents"
-    
+
     def _chunk_text(self, text: str) -> List[str]:
         """Chunk text using configured strategy."""
         words = text.split()
         chunks = []
-        
-        for i in range(0, len(words), self.config.chunk_size - self.config.chunk_overlap):
-            chunk = " ".join(words[i:i + self.config.chunk_size])
+
+        for i in range(
+            0, len(words), self.config.chunk_size - self.config.chunk_overlap
+        ):
+            chunk = " ".join(words[i : i + self.config.chunk_size])
             chunks.append(chunk)
-        
+
         return chunks
-    
+
     def _add_document(self, doc: Document):
         """Add a document to the vector store."""
         embedding = self._get_embedding(doc.content)
-        
+
         self.collection.add(
             documents=[doc.content],
             embeddings=[embedding],
             metadatas=[doc.metadata],
-            ids=[doc.doc_id]
+            ids=[doc.doc_id],
         )
-    
+
     # ========== RETRIEVAL ==========
-    
+
     def retrieve(
-        self,
-        query: str,
-        top_k: int = None,
-        filters: Dict = None
+        self, query: str, top_k: int = None, filters: Dict = None
     ) -> List[Dict]:
         """Retrieve relevant documents."""
         top_k = top_k or self.config.top_k
-        
+
         query_embedding = self._get_embedding(query)
-        
+
         results = self.collection.query(
-            query_embeddings=[query_embedding],
-            n_results=top_k,
-            where=filters
+            query_embeddings=[query_embedding], n_results=top_k, where=filters
         )
-        
+
         retrieved = []
         for i in range(len(results["ids"][0])):
-            retrieved.append({
-                "content": results["documents"][0][i],
-                "score": 1 - results["distances"][0][i],
-                "metadata": results["metadatas"][0][i],
-                "doc_id": results["ids"][0][i]
-            })
-        
+            retrieved.append(
+                {
+                    "content": results["documents"][0][i],
+                    "score": 1 - results["distances"][0][i],
+                    "metadata": results["metadatas"][0][i],
+                    "doc_id": results["ids"][0][i],
+                }
+            )
+
         return retrieved
-    
+
     # ========== GENERATION ==========
-    
+
     def generate(
-        self,
-        query: str,
-        context_docs: List[Dict] = None,
-        temperature: float = None
+        self, query: str, context_docs: List[Dict] = None, temperature: float = None
     ) -> Dict:
         """Generate answer with RAG."""
         temperature = temperature or self.config.temperature
-        
+
         # Retrieve if not provided
         if context_docs is None:
             context_docs = self.retrieve(query)
-        
+
         # Build context
         context = self._build_context(query, context_docs)
-        
+
         # Generate
         messages = [
             {
                 "role": "system",
                 "content": """You are a helpful assistant that answers questions 
 based on provided context. Always cite sources using [1], [2], etc.
-If the context doesn't contain enough information, say so."""
+If the context doesn't contain enough information, say so.""",
             },
-            {
-                "role": "user",
-                "content": context
-            }
+            {"role": "user", "content": context},
         ]
-        
+
         response = self.openai_client.chat.completions.create(
-            model=self.config.llm_model,
-            messages=messages,
-            temperature=temperature
+            model=self.config.llm_model, messages=messages, temperature=temperature
         )
-        
+
         answer = response.choices[0].message.content
-        
+
         # Extract sources
-        sources = list(set(
-            doc.get("metadata", {}).get("source", "Unknown")
-            for doc in context_docs
-        ))
-        
+        sources = list(
+            set(
+                doc.get("metadata", {}).get("source", "Unknown") for doc in context_docs
+            )
+        )
+
         return {
             "answer": answer,
             "sources": sources,
             "context_docs": context_docs,
-            "tokens_used": response.usage.total_tokens
+            "tokens_used": response.usage.total_tokens,
         }
-    
+
     def _build_context(self, query: str, documents: List[Dict]) -> str:
         """Build context string for generation."""
         context_parts = []
-        
+
         for i, doc in enumerate(documents):
-            context_parts.append(f"[{i+1}] {doc['content']}")
-        
+            context_parts.append(f"[{i + 1}] {doc['content']}")
+
         context = "\n\n".join(context_parts)
-        
+
         return f"""Context:
 {context}
 
 Question: {query}
 
 Answer based on the context above. Cite sources using [1], [2], etc."""
-    
+
     # ========== HELPERS ==========
-    
+
     def _get_embedding(self, text: str) -> List[float]:
         """Generate embedding for text."""
         response = self.openai_client.embeddings.create(
-            model=self.config.embedding_model,
-            input=text
+            model=self.config.embedding_model, input=text
         )
         return response.data[0].embedding
-    
+
     def get_stats(self) -> Dict:
         """Get system statistics."""
         return {
             "total_documents": self.collection.count(),
             "embedding_model": self.config.embedding_model,
             "llm_model": self.config.llm_model,
-            "chunk_size": self.config.chunk_size
+            "chunk_size": self.config.chunk_size,
         }
 
 
@@ -975,6 +933,7 @@ print("Sources:", result["sources"])
 """
 Evaluate RAG system quality.
 """
+
 from dataclasses import dataclass
 from typing import List
 from openai import OpenAI
@@ -983,6 +942,7 @@ from openai import OpenAI
 @dataclass
 class EvalCase:
     """A test case for RAG evaluation."""
+
     question: str
     expected_answer: str
     relevant_doc_ids: List[str]
@@ -991,6 +951,7 @@ class EvalCase:
 @dataclass
 class EvalResult:
     """Evaluation result for a single case."""
+
     question: str
     generated_answer: str
     expected_answer: str
@@ -1001,59 +962,54 @@ class EvalResult:
 
 class RAGEvaluator:
     """Evaluate RAG system quality."""
-    
+
     def __init__(self, rag_system):
         self.rag = rag_system
         self.client = OpenAI()
-    
-    def evaluate(
-        self,
-        eval_cases: List[EvalCase]
-    ) -> List[EvalResult]:
+
+    def evaluate(self, eval_cases: List[EvalCase]) -> List[EvalResult]:
         """Evaluate RAG on test cases."""
-        
+
         results = []
-        
+
         for case in eval_cases:
             # Get RAG response
             rag_result = self.rag.generate(case.question)
-            
+
             # Evaluate using LLM-as-judge
             relevance = self._evaluate_relevance(
                 case.question,
                 rag_result["answer"],
-                [doc["content"] for doc in rag_result["context_docs"]]
+                [doc["content"] for doc in rag_result["context_docs"]],
             )
-            
+
             faithfulness = self._evaluate_faithfulness(
                 rag_result["answer"],
-                [doc["content"] for doc in rag_result["context_docs"]]
+                [doc["content"] for doc in rag_result["context_docs"]],
             )
-            
+
             correctness = self._evaluate_correctness(
-                rag_result["answer"],
-                case.expected_answer
+                rag_result["answer"], case.expected_answer
             )
-            
-            results.append(EvalResult(
-                question=case.question,
-                generated_answer=rag_result["answer"],
-                expected_answer=case.expected_answer,
-                relevance_score=relevance,
-                faithfulness_score=faithfulness,
-                answer_correctness=correctness
-            ))
-        
+
+            results.append(
+                EvalResult(
+                    question=case.question,
+                    generated_answer=rag_result["answer"],
+                    expected_answer=case.expected_answer,
+                    relevance_score=relevance,
+                    faithfulness_score=faithfulness,
+                    answer_correctness=correctness,
+                )
+            )
+
         return results
-    
+
     def _evaluate_relevance(
-        self,
-        question: str,
-        answer: str,
-        contexts: List[str]
+        self, question: str, answer: str, contexts: List[str]
     ) -> float:
         """Evaluate if answer is relevant to question."""
-        
+
         prompt = f"""Rate the relevance of this answer to the question.
 
 Question: {question}
@@ -1065,25 +1021,21 @@ Rate on a scale of 0-1:
 - 1: Fully relevant
 
 Provide only the numerical score."""
-        
+
         response = self.client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.0
+            temperature=0.0,
         )
-        
+
         try:
             return float(response.choices[0].message.content.strip())
         except ValueError:
             return 0.5
-    
-    def _evaluate_faithfulness(
-        self,
-        answer: str,
-        contexts: List[str]
-    ) -> float:
+
+    def _evaluate_faithfulness(self, answer: str, contexts: List[str]) -> float:
         """Evaluate if answer is grounded in context."""
-        
+
         prompt = f"""Evaluate if this answer is faithful to the provided context.
 
 Context:
@@ -1097,25 +1049,21 @@ Rate on a scale of 0-1:
 - 1: Answer is fully supported by context
 
 Provide only the numerical score."""
-        
+
         response = self.client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.0
+            temperature=0.0,
         )
-        
+
         try:
             return float(response.choices[0].message.content.strip())
         except ValueError:
             return 0.5
-    
-    def _evaluate_correctness(
-        self,
-        generated: str,
-        expected: str
-    ) -> float:
+
+    def _evaluate_correctness(self, generated: str, expected: str) -> float:
         """Evaluate correctness against expected answer."""
-        
+
         prompt = f"""Compare these two answers and rate their similarity.
 
 Generated: {generated}
@@ -1127,39 +1075,41 @@ Rate on a scale of 0-1:
 - 1: Essentially identical
 
 Provide only the numerical score."""
-        
+
         response = self.client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.0
+            temperature=0.0,
         )
-        
+
         try:
             return float(response.choices[0].message.content.strip())
         except ValueError:
             return 0.5
-    
+
     def summarize_results(self, results: List[EvalResult]) -> dict:
         """Summarize evaluation results."""
-        
+
         if not results:
             return {"error": "No results"}
-        
+
         return {
             "total_cases": len(results),
             "avg_relevance": sum(r.relevance_score for r in results) / len(results),
-            "avg_faithfulness": sum(r.faithfulness_score for r in results) / len(results),
-            "avg_correctness": sum(r.answer_correctness for r in results) / len(results),
+            "avg_faithfulness": sum(r.faithfulness_score for r in results)
+            / len(results),
+            "avg_correctness": sum(r.answer_correctness for r in results)
+            / len(results),
             "min_relevance": min(r.relevance_score for r in results),
             "min_faithfulness": min(r.faithfulness_score for r in results),
             "worst_cases": [
                 {
                     "question": r.question,
                     "relevance": r.relevance_score,
-                    "faithfulness": r.faithfulness_score
+                    "faithfulness": r.faithfulness_score,
                 }
                 for r in sorted(results, key=lambda x: x.relevance_score)[:3]
-            ]
+            ],
         }
 ```
 

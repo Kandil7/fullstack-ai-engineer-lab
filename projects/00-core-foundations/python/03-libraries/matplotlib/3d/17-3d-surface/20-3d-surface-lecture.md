@@ -30,19 +30,16 @@ Z = np.sinc(R / np.pi)
 
 fig = plt.figure(figsize=(12, 5))
 
-ax1 = fig.add_subplot(1, 2, 1, projection='3d')
-surf1 = ax1.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0,
-                         antialiased=True)
-ax1.set_title('Sombrero Function')
+ax1 = fig.add_subplot(1, 2, 1, projection="3d")
+surf1 = ax1.plot_surface(X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=True)
+ax1.set_title("Sombrero Function")
 fig.colorbar(surf1, ax=ax1, shrink=0.5)
 
 # With wireframe overlay
-ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-surf2 = ax2.plot_surface(X, Y, Z, cmap=cm.viridis, linewidth=0,
-                         antialiased=True, alpha=0.8)
-ax2.plot_wireframe(X[::5, ::5], Y[::5, ::5], Z[::5, ::5],
-                   color='black', linewidth=0.3, alpha=0.3)
-ax2.set_title('Surface + Wireframe Overlay')
+ax2 = fig.add_subplot(1, 2, 2, projection="3d")
+surf2 = ax2.plot_surface(X, Y, Z, cmap=cm.viridis, linewidth=0, antialiased=True, alpha=0.8)
+ax2.plot_wireframe(X[::5, ::5], Y[::5, ::5], Z[::5, ::5], color="black", linewidth=0.3, alpha=0.3)
+ax2.set_title("Surface + Wireframe Overlay")
 fig.colorbar(surf2, ax=ax2, shrink=0.5)
 
 plt.tight_layout()
@@ -55,15 +52,14 @@ plt.show()
 
 ```python
 fig = plt.figure(figsize=(12, 8))
-ax = fig.add_subplot(111, projection='3d')
+ax = fig.add_subplot(111, projection="3d")
 
-surf = ax.plot_surface(X, Y, Z, cmap='viridis', alpha=0.7,
-                       linewidth=0, antialiased=True)
+surf = ax.plot_surface(X, Y, Z, cmap="viridis", alpha=0.7, linewidth=0, antialiased=True)
 
 # Contour projections on all three planes
-ax.contour(X, Y, Z, zdir='z', offset=-0.5, cmap='viridis', linewidths=1)
-ax.contour(X, Y, Z, zdir='x', offset=-4, cmap='viridis', linewidths=1)
-ax.contour(X, Y, Z, zdir='y', offset=4, cmap='viridis', linewidths=1)
+ax.contour(X, Y, Z, zdir="z", offset=-0.5, cmap="viridis", linewidths=1)
+ax.contour(X, Y, Z, zdir="x", offset=-4, cmap="viridis", linewidths=1)
+ax.contour(X, Y, Z, zdir="y", offset=4, cmap="viridis", linewidths=1)
 
 ax.set_xlim(-4, 4)
 ax.set_ylim(-4, 4)
@@ -81,16 +77,18 @@ plt.show()
 import matplotlib.animation as animation
 
 fig = plt.figure(figsize=(10, 8))
-ax = fig.add_subplot(111, projection='3d')
+ax = fig.add_subplot(111, projection="3d")
+
 
 def animate_surface(frame):
     ax.clear()
     phase = frame / 20.0
     Z_animated = np.sin(np.sqrt(X**2 + Y**2) - phase)
-    ax.plot_surface(X, Y, Z_animated, cmap='viridis', linewidth=0)
+    ax.plot_surface(X, Y, Z_animated, cmap="viridis", linewidth=0)
     ax.set_zlim(-1.5, 1.5)
     ax.view_init(elev=30, azim=frame)
-    return ax,
+    return (ax,)
+
 
 ani = animation.FuncAnimation(fig, animate_surface, frames=60, interval=100)
 plt.show()

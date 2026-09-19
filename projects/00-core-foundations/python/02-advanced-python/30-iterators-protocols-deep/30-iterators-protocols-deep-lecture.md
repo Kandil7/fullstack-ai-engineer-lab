@@ -74,6 +74,7 @@ class Countdown:
         self.current -= 1
         return value
 
+
 print(list(Countdown(3)))
 ```
 
@@ -86,10 +87,10 @@ Output:
 The desugaring of `for x in obj:` is:
 
 ```python
-it = iter(obj)            # obj.__iter__()
+it = iter(obj)  # obj.__iter__()
 while True:
     try:
-        x = next(it)      # it.__next__()
+        x = next(it)  # it.__next__()
     except StopIteration:
         break
 ```
@@ -113,6 +114,7 @@ class SliceByIndex:
 
     def __getitem__(self, index: int) -> int:
         return self.items[index]
+
 
 print(list(SliceByIndex([10, 20, 30])))
 ```
@@ -140,6 +142,7 @@ is the exact pattern behind PyTorch `Dataset`: implement
 ```python
 from collections.abc import Sequence
 
+
 class EmbeddingDataset(Sequence):
     def __init__(self, ids, vectors):
         self._ids = ids
@@ -152,6 +155,7 @@ class EmbeddingDataset(Sequence):
         if isinstance(index, slice):
             return list(zip(self._ids[index], self._vectors[index]))
         return (self._ids[index], self._vectors[index])
+
 
 ds = EmbeddingDataset([0, 1, 2], [(1.0,), (2.0,), (3.0,)])
 print(len(ds), ds[1], (2, (3.0,)) in ds, ds[1:3], list(reversed(ds)))
@@ -187,6 +191,7 @@ class Membership:
 
     def __call__(self, prefix: str) -> list[str]:
         return [v for v in self.values if v.startswith(prefix.lower())]
+
 
 m = Membership(["Alpha", "Beta"])
 print("ALPHA" in m)
@@ -225,7 +230,8 @@ class ManagedVector:
 
     def __exit__(self, exc_type, exc, tb) -> bool:
         self.open = False
-        return False   # never swallow errors
+        return False  # never swallow errors
+
 
 with ManagedVector("emb") as store:
     print("inside:", store.open)
@@ -259,22 +265,24 @@ cannot find the entry, and a duplicate sneaks in. Both are corruption.
 ```python
 class MutableKey:
     """DELIBERATELY BROKEN: hash follows a mutable field."""
+
     def __init__(self, value):
         self.value = value
 
     def __hash__(self):
-        return hash(self.value)      # changes when value changes!
+        return hash(self.value)  # changes when value changes!
 
     def __eq__(self, other):
         return isinstance(other, MutableKey) and self.value == other.value
+
 
 key = MutableKey("a")
 table = {key: 1}
 key.value = "b"
 fresh = MutableKey("b")
-print(fresh == key)                  # equal...
-print(fresh in table)                # ...yet not found!
-print(len(table))                    # entry still there, orphaned
+print(fresh == key)  # equal...
+print(fresh in table)  # ...yet not found!
+print(len(table))  # entry still there, orphaned
 ```
 
 Output:
@@ -306,6 +314,7 @@ Sorting itself only requires `__lt__`.
 ```python
 import functools
 
+
 @functools.total_ordering
 class Score:
     def __init__(self, value):
@@ -316,6 +325,7 @@ class Score:
 
     def __lt__(self, other):
         return self.value < other.value
+
 
 a, b = Score(1.0), Score(2.0)
 print(a < b, a <= b, b > a, a >= a)
@@ -346,7 +356,8 @@ class LazyConfig:
         self.known = known
 
     def __getattr__(self, name: str) -> int:
-        return self.known.get(name, 0)   # default for missing keys
+        return self.known.get(name, 0)  # default for missing keys
+
 
 cfg = LazyConfig({"batch": 32})
 print(cfg.batch, cfg.lr)
@@ -374,6 +385,7 @@ The same bargain as `Sequence`: three dunders, full interface.
 ```python
 from collections.abc import Mapping
 
+
 class CaseInsensitiveMap(Mapping):
     def __init__(self, data):
         self._data = {k.lower(): v for k, v in data.items()}
@@ -386,6 +398,7 @@ class CaseInsensitiveMap(Mapping):
 
     def __iter__(self):
         return iter(self._data)
+
 
 cm = CaseInsensitiveMap({"Rate": 10})
 print(cm.get("rate"), dict(cm.items()))
@@ -412,11 +425,13 @@ frozen data objects so items are safe to share.
 ```python
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class RetrievedChunk:
     doc_id: int
     text: str
     score: float
+
 
 class ChunkDataset(Sequence):
     def __init__(self, chunks):
@@ -441,7 +456,8 @@ the two methods you wrote. That is the protocol layer earning its keep.
 ```python
 # WRONG — hash changes while the object sits in a dict
 def __hash__(self):
-    return hash(self.value)   # value mutates later
+    return hash(self.value)  # value mutates later
+
 
 # CORRECT — frozen dataclass, or hash on immutable fields
 @dataclass(frozen=True)
@@ -455,8 +471,10 @@ class Key:
 class Key:
     def __eq__(self, other): ...
 
+
 # CORRECT — define both
-def __hash__(self): return hash(self.value)
+def __hash__(self):
+    return hash(self.value)
 ```
 
 ### Mistake 3: Infinite recursion in __getattribute__
@@ -464,6 +482,7 @@ def __hash__(self): return hash(self.value)
 # WRONG — self.value re-enters __getattribute__
 def __getattribute__(self, name):
     return self.value
+
 
 # CORRECT — always delegate to the base
 def __getattribute__(self, name):
@@ -476,6 +495,7 @@ def __getattribute__(self, name):
 def __getitem__(self, i):
     return self.items[i % len(self.items)]
 
+
 # CORRECT — raise IndexError past the end
 def __getitem__(self, i):
     return self.items[i]
@@ -484,7 +504,9 @@ def __getitem__(self, i):
 ### Mistake 5: Ignoring slices in __getitem__
 ```python
 # WRONG — ds[1:3] crashes because slice is not an int
-def __getitem__(self, i): return self._ids[i]
+def __getitem__(self, i):
+    return self._ids[i]
+
 
 # CORRECT — handle slice explicitly
 def __getitem__(self, i):
@@ -497,7 +519,8 @@ def __getitem__(self, i):
 ```python
 # WRONG — `with x as y:` binds the RETURN value
 def __enter__(self):
-    return self.open_state   # y is now a bool
+    return self.open_state  # y is now a bool
+
 
 # CORRECT — return self (or a purpose-built handle)
 def __enter__(self):

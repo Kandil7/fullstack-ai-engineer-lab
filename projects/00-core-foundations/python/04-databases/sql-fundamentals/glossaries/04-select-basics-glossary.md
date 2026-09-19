@@ -34,6 +34,7 @@ indexes.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)")
 conn.execute("INSERT INTO t (name, age) VALUES (?, ?)", ("alice", 30))

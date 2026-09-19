@@ -42,6 +42,7 @@ def timed(label: str, func) -> None:
 # Complexity: both are O(n) work; the loop adds O(n) interpreter
 # overhead -- that constant factor is the 10-100x.
 
+
 # Example 1: elementwise transform, two spellings
 def relu_loop(values: np.ndarray) -> np.ndarray:
     """ReLU via an explicit Python loop (slow reference)."""
@@ -59,8 +60,7 @@ def relu_vec(values: np.ndarray) -> np.ndarray:
 x = rng.normal(size=1_000_000)
 timed("relu_loop", lambda: relu_loop(x))
 timed("relu_vec ", lambda: relu_vec(x))
-print("loop == vectorized:",
-      np.array_equal(relu_loop(x), relu_vec(x)))
+print("loop == vectorized:", np.array_equal(relu_loop(x), relu_vec(x)))
 
 # Output (times vary by machine -- the ORDER does not):
 #   relu_loop                    0.09s
@@ -74,6 +74,7 @@ print("loop == vectorized:",
 # np.where(cond, a, b) selects elementwise without any Python
 # branch. The scalar 'if' version cannot run on arrays at all.
 
+
 # Example 2: clip with branches vs np.where vs np.clip
 def clip_where(values: np.ndarray, lo: float, hi: float) -> np.ndarray:
     """Clip via np.where -- vectorized, reads as an if-else."""
@@ -81,14 +82,13 @@ def clip_where(values: np.ndarray, lo: float, hi: float) -> np.ndarray:
 
 
 data = rng.normal(size=100_000)
-print("clip_where == np.clip:",
-      np.array_equal(clip_where(data, -1.0, 1.0),
-                     np.clip(data, -1.0, 1.0)))
+print(
+    "clip_where == np.clip:", np.array_equal(clip_where(data, -1.0, 1.0), np.clip(data, -1.0, 1.0))
+)
 
 # Example 3: sign function via where
 signed = np.where(data > 0, 1.0, np.where(data < 0, -1.0, 0.0))
-print("sign via where == np.sign:",
-      np.array_equal(signed, np.sign(data)))
+print("sign via where == np.sign:", np.array_equal(signed, np.sign(data)))
 
 # Output:
 # clip_where == np.clip: True
@@ -105,15 +105,14 @@ print("sign via where == np.sign:",
 # Example 4: zero out negative values -- the masking idiom
 scores = rng.normal(size=1_000_000)
 mask = scores < 0
-scores[mask] = 0.0                      # vectorized scatter
+scores[mask] = 0.0  # vectorized scatter
 print("masked update:", bool((scores >= 0).all()))
 
 # Example 5: masked reductions -- counts and conditional sums
 vals = rng.normal(size=1_000_000)
 print("count > 0:", int((vals > 0).sum()))
 print("sum of positives:", round(float(vals[vals > 0].sum()), 3))
-print("same via where:", np.allclose(vals[vals > 0].sum(),
-                                     np.where(vals > 0, vals, 0.0).sum()))
+print("same via where:", np.allclose(vals[vals > 0].sum(), np.where(vals > 0, vals, 0.0).sum()))
 
 # Output:
 # masked update: True
@@ -133,19 +132,14 @@ print("same via where:", np.allclose(vals[vals > 0].sum(),
 # Example 6: the five classic einsums
 A = rng.normal(size=(4, 5))
 B = rng.normal(size=(5, 6))
-print("matmul einsum == @:",
-      np.allclose(np.einsum("ij,jk->ik", A, B), A @ B))
+print("matmul einsum == @:", np.allclose(np.einsum("ij,jk->ik", A, B), A @ B))
 print("trace einsum:", np.einsum("ii->", np.ones((5, 5))) == 5.0)
-print("outer einsum shape:",
-      np.einsum("i,j->ij", np.ones(3), np.ones(4)).shape)
-print("transpose einsum == .T:",
-      np.array_equal(np.einsum("ij->ji", A), A.T))
+print("outer einsum shape:", np.einsum("i,j->ij", np.ones(3), np.ones(4)).shape)
+print("transpose einsum == .T:", np.array_equal(np.einsum("ij->ji", A), A.T))
 
 # Example 7: batch matmul with einsum vs @
 batches = rng.normal(size=(8, 4, 5))
-print("batch einsum == @:",
-      np.allclose(np.einsum("bij,jk->bik", batches, B),
-                  batches @ B))
+print("batch einsum == @:", np.allclose(np.einsum("bij,jk->bik", batches, B), batches @ B))
 
 # Output:
 # matmul einsum == @: True
@@ -164,6 +158,7 @@ print("batch einsum == @:",
 # outer axis, vectorize the inner work. Complexity: O(rows) loop
 # iterations, each O(row work) compiled -- far better than a
 # doubly-nested Python loop.
+
 
 # Example 8: ragged rows -- loop outer, vectorize inner
 def row_stats_ragged(rows: list[np.ndarray]) -> np.ndarray:
@@ -191,6 +186,7 @@ print("ragged stats shape:", row_stats_ragged(ragged).shape)  # (4, 2)
 # the explicit loop. It exists for API convenience (matching the
 # ufunc call signature), not for speed.
 
+
 # Example 9: np.vectorize vs the explicit loop vs vectorized
 def f(x: float) -> float:
     """A scalar piecewise function."""
@@ -201,12 +197,9 @@ f_vec = np.vectorize(f)
 small = rng.normal(size=200_000)
 
 timed("np.vectorize", lambda: f_vec(small))
-timed("explicit loop", lambda: np.fromiter((f(v) for v in small),
-                                           dtype=float))
+timed("explicit loop", lambda: np.fromiter((f(v) for v in small), dtype=float))
 timed("vectorized   ", lambda: np.where(small > 0, small * 2, -small))
-print("all three agree:",
-      bool(np.allclose(f_vec(small),
-                       np.where(small > 0, small * 2, -small))))
+print("all three agree:", bool(np.allclose(f_vec(small), np.where(small > 0, small * 2, -small))))
 
 # Output (times vary -- np.vectorize is NEVER fastest):
 #   np.vectorize                  0.19s
@@ -225,6 +218,7 @@ print("all three agree:",
 # Complexity: all ops are O(B * T * D); no Python loop over the
 # batch. Memory: one (B, T, D) batch plus (B, D) output.
 
+
 def mean_pool(embeddings: np.ndarray, mask: np.ndarray) -> np.ndarray:
     """Mean-pool embeddings over the token axis, ignoring padding.
 
@@ -238,17 +232,16 @@ def mean_pool(embeddings: np.ndarray, mask: np.ndarray) -> np.ndarray:
     return sums / np.maximum(counts, 1.0)
 
 
-emb = rng.normal(size=(16, 32, 64))           # 16 sentences x 32 tokens
+emb = rng.normal(size=(16, 32, 64))  # 16 sentences x 32 tokens
 tok_mask = rng.integers(0, 2, size=(16, 32), dtype=bool)
 pooled = mean_pool(emb, tok_mask)
-print("pooled shape:", pooled.shape)          # (16, 64)
+print("pooled shape:", pooled.shape)  # (16, 64)
 
 # Sanity: pooling a single padded row equals mean of its tokens.
 row = emb[0]
 m = tok_mask[0]
 manual = row[m].mean(axis=0)
-print("matches manual mean:",
-      np.allclose(pooled[0], manual))
+print("matches manual mean:", np.allclose(pooled[0], manual))
 
 # Output:
 # pooled shape: (16, 64)
@@ -281,42 +274,44 @@ def _verify() -> None:
     # Loop and vectorized rewrites must agree exactly.
     rng = np.random.default_rng(42)
     x = rng.normal(size=10_000)
-    assert np.array_equal(relu_loop(x), relu_vec(x)), \
-        "loop and vectorized ReLU must agree"
+    assert np.array_equal(relu_loop(x), relu_vec(x)), "loop and vectorized ReLU must agree"
 
     # np.where equivalence with branches for scalar logic.
-    assert np.allclose(clip_where(x, -1.0, 1.0), np.clip(x, -1.0, 1.0)), \
+    assert np.allclose(clip_where(x, -1.0, 1.0), np.clip(x, -1.0, 1.0)), (
         "np.where clip must match np.clip"
+    )
 
     # Masking: update and reduction agree with np.where.
     vals = rng.normal(size=10_000)
     mask = vals > 0
-    assert np.allclose(vals[mask].sum(), np.where(vals > 0, vals, 0).sum()), \
+    assert np.allclose(vals[mask].sum(), np.where(vals > 0, vals, 0).sum()), (
         "masked sum must match where-sum"
+    )
 
     # einsum correctness against @, .T, and batch matmul.
     A = rng.normal(size=(4, 5))
     B = rng.normal(size=(5, 6))
-    assert np.allclose(np.einsum("ij,jk->ik", A, B), A @ B), \
-        "einsum matmul must equal @"
-    assert np.array_equal(np.einsum("ij->ji", A), A.T), \
-        "einsum transpose must equal .T"
+    assert np.allclose(np.einsum("ij,jk->ik", A, B), A @ B), "einsum matmul must equal @"
+    assert np.array_equal(np.einsum("ij->ji", A), A.T), "einsum transpose must equal .T"
     batch = rng.normal(size=(8, 4, 5))
-    assert np.allclose(np.einsum("bij,jk->bik", batch, B), batch @ B), \
+    assert np.allclose(np.einsum("bij,jk->bik", batch, B), batch @ B), (
         "einsum batch matmul must equal batched @"
+    )
 
     # np.vectorize agrees with the vectorized rewrite (values only;
     # speed is printed, never asserted -- wall clock is not CI-safe).
-    assert np.allclose(f_vec(x), np.where(x > 0, x * 2, -x)), \
+    assert np.allclose(f_vec(x), np.where(x > 0, x * 2, -x)), (
         "np.vectorize must agree numerically with the ufunc version"
+    )
 
     # Mean-pooling matches a manual token-mean.
     emb = rng.normal(size=(16, 32, 64))
     tok_mask = rng.integers(0, 2, size=(16, 32), dtype=bool)
     pooled = mean_pool(emb, tok_mask)
     assert pooled.shape == (16, 64), "pooled shape must be (B, D)"
-    assert np.allclose(pooled[0], emb[0][tok_mask[0]].mean(axis=0)), \
+    assert np.allclose(pooled[0], emb[0][tok_mask[0]].mean(axis=0)), (
         "pooling must equal manual masked mean"
+    )
 
     print("[OK] 30-vectorization: all checks passed")
 
@@ -329,4 +324,4 @@ if __name__ == "__main__":
         print("1. Rewrite loops as ufuncs / np.where / masks.")
         print("2. einsum names axes explicitly; check with @ and .T.")
         print("3. np.vectorize is a loop in disguise -- never for speed.")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

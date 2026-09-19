@@ -62,11 +62,12 @@ from sqlalchemy import create_engine, String, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 from sqlalchemy.pool import StaticPool
 
-engine = create_engine("sqlite://", connect_args={"check_same_thread": False},
-                       poolclass=StaticPool)
+engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
+
 
 class Base(DeclarativeBase):
     pass
+
 
 class User(Base):
     __tablename__ = "users"
@@ -74,13 +75,14 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
     role: Mapped[str] = mapped_column(String(20), default="annotator")
 
+
 Base.metadata.create_all(engine)
 
 with Session(bind=engine) as session:
     ada = User(name="ada", role="annotator")
-    session.add(ada)          # pending: no SQL yet
-    ada.role = "reviewer"     # still pending; change is tracked
-    session.commit()          # INSERT users ... (with the final role)
+    session.add(ada)  # pending: no SQL yet
+    ada.role = "reviewer"  # still pending; change is tracked
+    session.commit()  # INSERT users ... (with the final role)
     print(f"committed user id={ada.id} role={ada.role}")
 # Output:
 # committed user id=1 role=reviewer
@@ -96,7 +98,7 @@ of the same row.
 ```python
 with Session(bind=engine) as session:
     first = session.get(User, 1)
-    second = session.get(User, 1)   # no SQL: served from the identity map
+    second = session.get(User, 1)  # no SQL: served from the identity map
     print(f"same object: {first is second}")
 # Output:
 # same object: True
@@ -118,12 +120,10 @@ query can see them — even before you call `flush()` yourself.
 with Session(bind=engine) as session:
     grace = User(name="grace")
     session.add(grace)
-    session.flush()                        # INSERT issued NOW
-    found = session.scalars(
-        select(User).where(User.name == "grace")
-    ).first()
+    session.flush()  # INSERT issued NOW
+    found = session.scalars(select(User).where(User.name == "grace")).first()
     print(f"flush-then-query found pending row: {found is grace}")
-    session.rollback()                     # undo the INSERT
+    session.rollback()  # undo the INSERT
 # Output:
 # flush-then-query found pending row: True
 ```
@@ -136,8 +136,11 @@ with Session(bind=engine) as session:
     ghost = User(name="ghost")
     session.add(ghost)
     session.rollback()
-print(f"ghost rows after rollback: {len(
-    Session(bind=engine).scalars(select(User).where(User.name == "ghost")).all())}")
+print(
+    f"ghost rows after rollback: {
+        len(Session(bind=engine).scalars(select(User).where(User.name == 'ghost')).all())
+    }"
+)
 # Output:
 # ghost rows after rollback: 0
 ```
@@ -155,13 +158,14 @@ def detached_error_demo(name: str) -> str:
     session = Session(bind=engine)
     u = User(name=name)
     session.add(u)
-    session.commit()          # expiry: attribute values dropped
-    session.close()           # now u is detached
+    session.commit()  # expiry: attribute values dropped
+    session.close()  # now u is detached
     try:
-        _ = u.role            # expired + detached -> DetachedInstanceError
+        _ = u.role  # expired + detached -> DetachedInstanceError
     except Exception as exc:
         return type(exc).__name__
     return "no error"
+
 
 print(f"detached expired attribute -> {detached_error_demo('bob')}")
 # Output:
@@ -196,6 +200,7 @@ def get_db():
         yield session
     finally:
         session.close()  # guaranteed: no leaked connections
+
 
 def handle_request(session: Session, name: str) -> int:
     user = User(name=name)

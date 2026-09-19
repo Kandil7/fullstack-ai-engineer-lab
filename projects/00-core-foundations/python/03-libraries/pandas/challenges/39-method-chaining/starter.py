@@ -25,8 +25,7 @@ def feature_chain(frame: pd.DataFrame) -> pd.DataFrame:
     raise NotImplementedError
 
 
-def add_rank_after_filter(frame: pd.DataFrame, filter_expr: str,
-                          col: str) -> pd.DataFrame:
+def add_rank_after_filter(frame: pd.DataFrame, filter_expr: str, col: str) -> pd.DataFrame:
     """Query the frame, then add a descending rank computed post-filter."""
     raise NotImplementedError
 

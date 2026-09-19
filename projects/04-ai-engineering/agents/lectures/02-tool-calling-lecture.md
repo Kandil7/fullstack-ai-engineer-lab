@@ -72,17 +72,17 @@ weather_tool_schema = {
             "properties": {
                 "city": {
                     "type": "string",
-                    "description": "City name, e.g., 'Paris', 'New York', 'Tokyo'"
+                    "description": "City name, e.g., 'Paris', 'New York', 'Tokyo'",
                 },
                 "units": {
                     "type": "string",
                     "enum": ["celsius", "fahrenheit"],
-                    "description": "Temperature units (default: celsius)"
-                }
+                    "description": "Temperature units (default: celsius)",
+                },
             },
-            "required": ["city"]
-        }
-    }
+            "required": ["city"],
+        },
+    },
 }
 ```
 
@@ -125,14 +125,17 @@ weather_tool_schema = {
 Complete Tool Calling Implementation
 Handles tool definition, registration, execution, and error handling.
 """
+
 import json
 import inspect
 from typing import Any, Callable, Dict, List, Optional, get_type_hints
 from dataclasses import dataclass
 from enum import Enum
 
+
 class ParameterType(Enum):
     """Supported parameter types."""
+
     STRING = "string"
     NUMBER = "number"
     INTEGER = "integer"
@@ -144,19 +147,17 @@ class ParameterType(Enum):
 @dataclass
 class ToolParameter:
     """Definition of a single tool parameter."""
+
     name: str
     type: ParameterType
     description: str
     required: bool = True
     default: Any = None
     enum_values: Optional[List[str]] = None
-    
+
     def to_schema(self) -> dict:
         """Convert to JSON Schema format."""
-        schema = {
-            "type": self.type.value,
-            "description": self.description
-        }
+        schema = {"type": self.type.value, "description": self.description}
         if self.enum_values:
             schema["enum"] = self.enum_values
         if self.default is not None:
@@ -167,23 +168,24 @@ class ToolParameter:
 @dataclass
 class ToolDefinition:
     """Complete tool definition including schema and implementation."""
+
     name: str
     description: str
     parameters: List[ToolParameter]
     function: Callable
     requires_confirmation: bool = False
     category: str = "general"
-    
+
     def to_openai_schema(self) -> dict:
         """Convert to OpenAI function calling format."""
         properties = {}
         required = []
-        
+
         for param in self.parameters:
             properties[param.name] = param.to_schema()
             if param.required:
                 required.append(param.name)
-        
+
         return {
             "type": "function",
             "function": {
@@ -192,48 +194,52 @@ class ToolDefinition:
                 "parameters": {
                     "type": "object",
                     "properties": properties,
-                    "required": required
-                }
-            }
+                    "required": required,
+                },
+            },
         }
 
 
 class ToolRegistry:
     """
     Registry for managing and executing tools.
-    
+
     Handles:
     - Tool registration from functions or manual schemas
     - Schema generation for LLMs
     - Tool execution with validation
     - Error handling and logging
     """
-    
+
     def __init__(self):
         self.tools: Dict[str, ToolDefinition] = {}
         self.execution_log: List[dict] = []
-    
-    def register_function(self, func: Callable, name: str = None, 
-                          description: str = None,
-                          requires_confirmation: bool = False):
+
+    def register_function(
+        self,
+        func: Callable,
+        name: str = None,
+        description: str = None,
+        requires_confirmation: bool = False,
+    ):
         """
         Auto-register a Python function as a tool.
-        
+
         Uses type hints and docstrings to generate schema.
         """
         tool_name = name or func.__name__
         tool_desc = description or func.__doc__ or f"Execute {tool_name}"
-        
+
         # Extract parameters from type hints
         hints = get_type_hints(func)
         sig = inspect.signature(func)
         parameters = []
-        
+
         for param_name, param in sig.parameters.items():
             # Skip 'self' parameter
-            if param_name == 'self':
+            if param_name == "self":
                 continue
-            
+
             # Determine type
             param_type = hints.get(param_name, str)
             type_mapping = {
@@ -242,47 +248,54 @@ class ToolRegistry:
                 float: ParameterType.NUMBER,
                 bool: ParameterType.BOOLEAN,
                 list: ParameterType.ARRAY,
-                dict: ParameterType.OBJECT
+                dict: ParameterType.OBJECT,
             }
             ptype = type_mapping.get(param_type, ParameterType.STRING)
-            
+
             # Check if required
             required = param.default == inspect.Parameter.empty
             default = None if required else param.default
-            
-            parameters.append(ToolParameter(
-                name=param_name,
-                type=ptype,
-                description=f"The {param_name} parameter",
-                required=required,
-                default=default
-            ))
-        
+
+            parameters.append(
+                ToolParameter(
+                    name=param_name,
+                    type=ptype,
+                    description=f"The {param_name} parameter",
+                    required=required,
+                    default=default,
+                )
+            )
+
         tool = ToolDefinition(
             name=tool_name,
             description=tool_desc,
             parameters=parameters,
             function=func,
-            requires_confirmation=requires_confirmation
+            requires_confirmation=requires_confirmation,
         )
-        
+
         self.tools[tool_name] = tool
         return tool
-    
-    def register_manual(self, name: str, description: str, 
-                       parameters: List[ToolParameter],
-                       function: Callable, **kwargs):
+
+    def register_manual(
+        self,
+        name: str,
+        description: str,
+        parameters: List[ToolParameter],
+        function: Callable,
+        **kwargs,
+    ):
         """Register a tool with manual schema definition."""
         tool = ToolDefinition(
             name=name,
             description=description,
             parameters=parameters,
             function=function,
-            **kwargs
+            **kwargs,
         )
         self.tools[name] = tool
         return tool
-    
+
     def get_schemas_for_llm(self, category: str = None) -> List[dict]:
         """Get all tool schemas in OpenAI format."""
         schemas = []
@@ -290,11 +303,11 @@ class ToolRegistry:
             if category is None or tool.category == category:
                 schemas.append(tool.to_openai_schema())
         return schemas
-    
+
     def execute(self, tool_name: str, arguments: dict) -> str:
         """
         Execute a tool with validation and error handling.
-        
+
         Returns:
             Tool result as string, or error message
         """
@@ -303,9 +316,9 @@ class ToolRegistry:
             error = f"Unknown tool: {tool_name}"
             self._log_execution(tool_name, arguments, error, success=False)
             return error
-        
+
         tool = self.tools[tool_name]
-        
+
         # Validate required parameters
         for param in tool.parameters:
             if param.required and param.name not in arguments:
@@ -315,30 +328,33 @@ class ToolRegistry:
                     error = f"Missing required parameter: {param.name}"
                     self._log_execution(tool_name, arguments, error, success=False)
                     return error
-        
+
         # Execute with error handling
         try:
             result = tool.function(**arguments)
             result_str = str(result)
             self._log_execution(tool_name, arguments, result_str, success=True)
             return result_str
-            
+
         except Exception as e:
             error = f"Tool execution failed: {type(e).__name__}: {str(e)}"
             self._log_execution(tool_name, arguments, error, success=False)
             return error
-    
-    def _log_execution(self, tool_name: str, arguments: dict, 
-                      result: str, success: bool):
+
+    def _log_execution(
+        self, tool_name: str, arguments: dict, result: str, success: bool
+    ):
         """Log tool execution for debugging."""
-        self.execution_log.append({
-            "tool": tool_name,
-            "arguments": arguments,
-            "result": result[:500],  # Truncate long results
-            "success": success,
-            "timestamp": __import__('time').time()
-        })
-    
+        self.execution_log.append(
+            {
+                "tool": tool_name,
+                "arguments": arguments,
+                "result": result[:500],  # Truncate long results
+                "success": success,
+                "timestamp": __import__("time").time(),
+            }
+        )
+
     def get_log(self) -> List[dict]:
         """Get execution history."""
         return self.execution_log.copy()
@@ -349,12 +365,14 @@ class ToolRegistry:
 # Create registry
 registry = ToolRegistry()
 
+
 # Register tools using decorators
 @registry.register_function
 def search_web(query: str, num_results: int = 5) -> str:
     """Search the web and return results."""
     # Simulated search results
     return f"Found {num_results} results for: {query}"
+
 
 @registry.register_function
 def calculate(expression: str) -> str:
@@ -366,17 +384,19 @@ def calculate(expression: str) -> str:
         return f"Result: {expression} = {result}"
     return "Error: Invalid characters in expression"
 
+
 @registry.register_function
 def read_file(filepath: str) -> str:
     """Read contents of a file."""
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath, "r") as f:
             content = f.read()
         return content[:1000]  # Truncate for safety
     except FileNotFoundError:
         return f"Error: File not found: {filepath}"
     except Exception as e:
         return f"Error reading file: {str(e)}"
+
 
 # Register with manual schema
 registry.register_manual(
@@ -385,12 +405,18 @@ registry.register_manual(
     parameters=[
         ToolParameter("user_id", ParameterType.STRING, "Target user ID"),
         ToolParameter("message", ParameterType.STRING, "Notification message"),
-        ToolParameter("priority", ParameterType.STRING, "Priority level", 
-                     required=False, default="normal",
-                     enum_values=["low", "normal", "high", "urgent"])
+        ToolParameter(
+            "priority",
+            ParameterType.STRING,
+            "Priority level",
+            required=False,
+            default="normal",
+            enum_values=["low", "normal", "high", "urgent"],
+        ),
     ],
-    function=lambda user_id, message, priority="normal": 
+    function=lambda user_id, message, priority="normal": (
         f"Notification sent to {user_id}: [{priority}] {message}"
+    ),
 )
 
 # Get schemas for LLM
@@ -419,51 +445,55 @@ for entry in registry.get_log():
 Tool Chaining: Using multiple tools in sequence.
 Demonstrates how agents can compose tools for complex tasks.
 """
+
 from typing import List, Callable
 from dataclasses import dataclass
+
 
 @dataclass
 class ToolChainStep:
     """A single step in a tool chain."""
+
     tool_name: str
     input_mapping: dict  # Maps step outputs to tool inputs
     description: str
 
+
 class ToolChain:
     """
     Executes a sequence of tools, passing outputs between steps.
-    
+
     Useful for:
     - Multi-step workflows
     - Data pipelines
     - Complex task decomposition
     """
-    
+
     def __init__(self, registry):
         self.registry = registry
         self.steps: List[ToolChainStep] = []
         self.results: dict = {}
-    
+
     def add_step(self, tool_name: str, input_mapping: dict, description: str = ""):
         """Add a step to the chain."""
         self.steps.append(ToolChainStep(tool_name, input_mapping, description))
         return self  # Allow chaining
-    
+
     def execute(self, initial_inputs: dict = None) -> dict:
         """
         Execute the entire chain.
-        
+
         Args:
             initial_inputs: Starting values for the chain
-            
+
         Returns:
             Dictionary of all step results
         """
         self.results = initial_inputs or {}
-        
+
         for i, step in enumerate(self.steps):
-            print(f"\n--- Step {i+1}: {step.description} ---")
-            
+            print(f"\n--- Step {i + 1}: {step.description} ---")
+
             # Map inputs based on configuration
             step_inputs = {}
             for param_name, source in step.input_mapping.items():
@@ -474,22 +504,22 @@ class ToolChain:
                 else:
                     # Literal value
                     step_inputs[param_name] = source
-            
+
             print(f"  Inputs: {step_inputs}")
-            
+
             # Execute step
             result = self.registry.execute(step.tool_name, step_inputs)
-            self.results[f"step_{i+1}"] = result
-            
+            self.results[f"step_{i + 1}"] = result
+
             print(f"  Result: {result[:100]}")
-        
+
         return self.results
-    
+
     def visualize(self) -> str:
         """Visualize the chain as ASCII art."""
         lines = ["Tool Chain:"]
         for i, step in enumerate(self.steps):
-            lines.append(f"  {i+1}. {step.tool_name}")
+            lines.append(f"  {i + 1}. {step.tool_name}")
             lines.append(f"     │ {step.description}")
             if i < len(self.steps) - 1:
                 lines.append(f"     ▼")
@@ -503,41 +533,36 @@ research_chain = ToolChain(registry)
 research_chain.add_step(
     "search_web",
     {"query": "$topic", "num_results": "5"},
-    description="Search for information"
+    description="Search for information",
 )
 research_chain.add_step(
     "calculate",
     {"expression": "'Result count: ' + $step_1.count('Result')"},
-    description="Count results"
+    description="Count results",
 )
 research_chain.add_step(
     "send_notification",
     {"user_id": "$user", "message": "$step_1"},
-    description="Send report"
+    description="Send report",
 )
 
 print(research_chain.visualize())
-results = research_chain.execute({
-    "topic": "AI agents",
-    "user": "user123"
-})
+results = research_chain.execute({"topic": "AI agents", "user": "user123"})
 
 # Example 2: Data Processing Chain
 data_chain = ToolChain(registry)
 data_chain.add_step(
-    "read_file",
-    {"filepath": "$input_file"},
-    description="Read input data"
+    "read_file", {"filepath": "$input_file"}, description="Read input data"
 )
 data_chain.add_step(
     "calculate",
     {"expression": "'Length: ' + str(len($step_1))"},
-    description="Calculate statistics"
+    description="Calculate statistics",
 )
 data_chain.add_step(
     "send_notification",
     {"user_id": "$owner", "message": "$step_2"},
-    description="Notify owner"
+    description="Notify owner",
 )
 
 print("\n" + data_chain.visualize())
@@ -550,9 +575,11 @@ print("\n" + data_chain.visualize())
 Error-Resilient Tool Calling
 Handles failures, retries, and fallbacks gracefully.
 """
+
 import time
 from typing import Optional, Callable
 from enum import Enum
+
 
 class RetryStrategy(Enum):
     NONE = "none"
@@ -564,89 +591,94 @@ class RetryStrategy(Enum):
 class ResilientToolExecutor:
     """
     Executes tools with retry logic, fallbacks, and circuit breakers.
-    
+
     Features:
     - Automatic retries with backoff
     - Fallback to alternative tools
     - Circuit breaker pattern
     - Detailed error logging
     """
-    
+
     def __init__(self, registry, max_retries: int = 3):
         self.registry = registry
         self.max_retries = max_retries
         self.failure_counts: dict = {}
         self.circuit_breakers: dict = {}
         self.fallbacks: dict = {}
-    
+
     def register_fallback(self, primary_tool: str, fallback_tool: str):
         """Register a fallback tool for when primary fails."""
         self.fallbacks[primary_tool] = fallback_tool
-    
-    def execute_with_retry(self, tool_name: str, arguments: dict,
-                          strategy: RetryStrategy = RetryStrategy.EXPONENTIAL_BACKOFF) -> str:
+
+    def execute_with_retry(
+        self,
+        tool_name: str,
+        arguments: dict,
+        strategy: RetryStrategy = RetryStrategy.EXPONENTIAL_BACKOFF,
+    ) -> str:
         """
         Execute a tool with retry logic.
-        
+
         Args:
             tool_name: Tool to execute
             arguments: Tool arguments
             strategy: How to handle failures
-            
+
         Returns:
             Tool result or error message
         """
         # Check circuit breaker
         if self._is_circuit_open(tool_name):
             return self._try_fallback(tool_name, arguments, "Circuit breaker open")
-        
+
         last_error = None
-        
+
         for attempt in range(self.max_retries + 1):
             try:
                 result = self.registry.execute(tool_name, arguments)
-                
+
                 # Check if result indicates failure
                 if not result.startswith("Error"):
                     # Success - reset failure count
                     self.failure_counts[tool_name] = 0
                     return result
-                
+
                 last_error = result
-                
+
             except Exception as e:
                 last_error = f"{type(e).__name__}: {str(e)}"
-            
+
             # Log attempt
             print(f"  Attempt {attempt + 1} failed: {last_error}")
-            
+
             # Update failure count
             self.failure_counts[tool_name] = self.failure_counts.get(tool_name, 0) + 1
-            
+
             # Check if we should continue retrying
             if attempt < self.max_retries:
                 if strategy == RetryStrategy.EXPONENTIAL_BACKOFF:
-                    wait_time = 2 ** attempt
+                    wait_time = 2**attempt
                     print(f"  Waiting {wait_time}s before retry...")
                     time.sleep(wait_time)
                 elif strategy == RetryStrategy.IMMEDIATE:
                     continue
                 else:
                     break
-        
+
         # All retries exhausted - try fallback
         return self._try_fallback(tool_name, arguments, last_error)
-    
-    def _try_fallback(self, tool_name: str, arguments: dict, 
-                     original_error: str) -> str:
+
+    def _try_fallback(
+        self, tool_name: str, arguments: dict, original_error: str
+    ) -> str:
         """Attempt to use a fallback tool."""
         if tool_name in self.fallbacks:
             fallback = self.fallbacks[tool_name]
             print(f"  Trying fallback: {fallback}")
             return self.registry.execute(fallback, arguments)
-        
+
         return f"Tool '{tool_name}' failed after retries: {original_error}"
-    
+
     def _is_circuit_open(self, tool_name: str) -> bool:
         """Check if circuit breaker is tripped."""
         failure_count = self.failure_counts.get(tool_name, 0)
@@ -654,15 +686,14 @@ class ResilientToolExecutor:
             print(f"  Circuit breaker open for {tool_name}")
             return True
         return False
-    
+
     def get_health_report(self) -> dict:
         """Get health status of all tools."""
         return {
             "failure_counts": self.failure_counts.copy(),
             "circuit_breakers": {
-                tool: self._is_circuit_open(tool)
-                for tool in self.registry.tools
-            }
+                tool: self._is_circuit_open(tool) for tool in self.registry.tools
+            },
         }
 
 
@@ -675,9 +706,7 @@ executor.register_fallback("search_web", "read_file")  # Fallback to local docs
 
 # Execute with resilience
 result = executor.execute_with_retry(
-    "search_web",
-    {"query": "nonexistent"},
-    strategy=RetryStrategy.EXPONENTIAL_BACKOFF
+    "search_web", {"query": "nonexistent"}, strategy=RetryStrategy.EXPONENTIAL_BACKOFF
 )
 print(f"Result: {result}")
 
@@ -693,17 +722,14 @@ print(json.dumps(executor.get_health_report(), indent=2))
 ### Mistake 1: Vague Tool Descriptions
 ```python
 # ❌ BAD: Description doesn't explain when to use the tool
-{
-    "name": "search",
-    "description": "Searches stuff"
-}
+{"name": "search", "description": "Searches stuff"}
 
 # ✅ GOOD: Clear, specific description with use cases
 {
     "name": "web_search",
     "description": "Search the web for current information. Use this when you need to find "
-                   "recent news, factual information, or anything not in your training data. "
-                   "Returns a list of relevant web pages with snippets."
+    "recent news, factual information, or anything not in your training data. "
+    "Returns a list of relevant web pages with snippets.",
 }
 ```
 
@@ -713,11 +739,13 @@ print(json.dumps(executor.get_health_report(), indent=2))
 def calculate(expression):
     return eval(expression)  # Security risk!
 
+
 # ✅ GOOD: Validate before execution
 def calculate(expression: str) -> str:
     import re
+
     # Only allow safe characters
-    if not re.match(r'^[\d\s\+\-\*\/\.\(\)]+$', expression):
+    if not re.match(r"^[\d\s\+\-\*\/\.\(\)]+$", expression):
         return "Error: Invalid characters in expression"
     try:
         result = eval(expression, {"__builtins__": {}}, {})
@@ -732,6 +760,7 @@ def calculate(expression: str) -> str:
 def agent_act(action):
     result = tools[action.name](action.input)
     return result  # What if this throws?
+
 
 # ✅ GOOD: Graceful error handling
 def agent_act(action):
@@ -751,7 +780,7 @@ def agent_act(action):
 # ❌ BAD: Description promises more than tool delivers
 {
     "name": "search",
-    "description": "Search the entire internet and return comprehensive results"
+    "description": "Search the entire internet and return comprehensive results",
 }
 # But the tool only searches a small local database
 
@@ -759,8 +788,8 @@ def agent_act(action):
 {
     "name": "search_local_docs",
     "description": "Search the local documentation database. Contains official "
-                   "project documentation up to v2.0. For internet searches, "
-                   "use the 'web_search' tool instead."
+    "project documentation up to v2.0. For internet searches, "
+    "use the 'web_search' tool instead.",
 }
 ```
 

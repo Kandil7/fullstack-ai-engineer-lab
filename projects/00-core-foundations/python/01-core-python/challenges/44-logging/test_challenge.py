@@ -12,12 +12,14 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 
+
 def _load(name: str):
     spec = importlib.util.spec_from_file_location(name, HERE / f"{name}.py")
     mod = importlib.util.module_from_spec(spec)
     sys.modules[name] = mod
     spec.loader.exec_module(mod)
     return mod
+
 
 solution = _load("solution")
 import pytest
@@ -91,8 +93,9 @@ class TestCorrelatedLogger:
             log.info(f"event {i}")
         lines = [ln for ln in log.captured().splitlines() if ln.strip()]
         assert len(lines) == 100
-        assert all("[rid-x1] event" in ln for ln in lines), \
+        assert all("[rid-x1] event" in ln for ln in lines), (
             "every emitted line must carry the request ID prefix"
+        )
 
     def test_distinct_ids_isolated(self):
         a = solution.CorrelatedLogger("challenge44.iso_a", "AAA")

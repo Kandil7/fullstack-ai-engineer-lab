@@ -32,14 +32,16 @@
 ```python
 from datetime import timedelta
 
+
 def create_access_token(user_id: str):
     expire = datetime.utcnow() + timedelta(minutes=15)
     payload = {
         "sub": user_id,
         "exp": expire,
-        "type": "access"  # Distinguish from refresh token
+        "type": "access",  # Distinguish from refresh token
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
 
 # Usage
 token = create_access_token("user123")
@@ -87,16 +89,17 @@ def create_token(user_id: str):
     payload = {
         "sub": user_id,
         "aud": "api.example.com",  # Validate audience
-        "exp": datetime.utcnow() + timedelta(minutes=30)
+        "exp": datetime.utcnow() + timedelta(minutes=30),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
 
 # Verification
 decoded = jwt.decode(
     token,
     SECRET_KEY,
     algorithms=["HS256"],
-    audience="api.example.com"  # Validates audience
+    audience="api.example.com",  # Validates audience
 )
 ```
 
@@ -115,11 +118,13 @@ from fastapi.security import HTTPBearer
 
 security = HTTPBearer()
 
+
 @app.get("/protected/")
-async def protected(credentials = Security(security)):
+async def protected(credentials=Security(security)):
     token = credentials.credentials
     # token is the JWT without "Bearer " prefix
     return {"token": token[:20] + "..."}
+
 
 # Client sends:
 # Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
@@ -140,18 +145,22 @@ from typing import Set
 # In-memory blacklist (use Redis in production)
 blacklisted_tokens: Set[str] = set()
 
+
 def blacklist_token(token: str):
     """Add token to blacklist"""
     blacklisted_tokens.add(token)
+
 
 def is_blacklisted(token: str) -> bool:
     """Check if token is blacklisted"""
     return token in blacklisted_tokens
 
+
 @app.post("/logout")
 async def logout(token: str = Depends(oauth2_scheme)):
     blacklist_token(token)
     return {"message": "Logged out"}
+
 
 # Check on each request
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -173,17 +182,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 def create_token(user):
     payload = {
         # Registered claims (standard)
-        "sub": user.id,           # Subject
-        "iat": datetime.utcnow(), # Issued at
+        "sub": user.id,  # Subject
+        "iat": datetime.utcnow(),  # Issued at
         "exp": datetime.utcnow() + timedelta(hours=1),  # Expiration
-        "iss": "myapp.com",       # Issuer
-        "aud": "api.myapp.com",   # Audience
-        "jti": str(uuid.uuid4()), # JWT ID
-        
+        "iss": "myapp.com",  # Issuer
+        "aud": "api.myapp.com",  # Audience
+        "jti": str(uuid.uuid4()),  # JWT ID
         # Custom claims
         "email": user.email,
         "roles": user.roles,
-        "permissions": ["read", "write"]
+        "permissions": ["read", "write"],
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 ```
@@ -221,14 +229,16 @@ app.add_middleware(
 ```python
 from datetime import datetime, timedelta
 
+
 def create_token(user_id: str, expires_in: int = 30):
     """Create token with expiration"""
     payload = {
         "sub": user_id,
         "exp": datetime.utcnow() + timedelta(minutes=expires_in),
-        "iat": datetime.utcnow()
+        "iat": datetime.utcnow(),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
 
 # Token expires in 30 minutes
 token = create_token("user123")
@@ -249,9 +259,9 @@ token = create_token("user123", expires_in=60)
 ```python
 # Example JWT Header (Base64 decoded)
 {
-    "alg": "HS256",    # Signing algorithm
-    "typ": "JWT",      # Token type
-    "kid": "key-id"    # Key ID (optional)
+    "alg": "HS256",  # Signing algorithm
+    "typ": "JWT",  # Token type
+    "kid": "key-id",  # Key ID (optional)
 }
 
 # Encode/Decode
@@ -276,13 +286,11 @@ encoded = base64.urlsafe_b64encode(json.dumps(header).encode()).decode()
 import hmac
 import hashlib
 
+
 def hmac_sign(message: str, secret: str) -> str:
     """HMAC signature"""
-    return hmac.new(
-        secret.encode(),
-        message.encode(),
-        hashlib.sha256
-    ).hexdigest()
+    return hmac.new(secret.encode(), message.encode(), hashlib.sha256).hexdigest()
+
 
 # In JWT context (handled by jose library)
 token = jwt.encode(payload, secret, algorithm="HS256")  # Uses HMAC-SHA256
@@ -302,16 +310,17 @@ def create_token(user_id: str):
     payload = {
         "sub": user_id,
         "iss": "https://auth.myapp.com",  # Issuer
-        "exp": datetime.utcnow() + timedelta(hours=1)
+        "exp": datetime.utcnow() + timedelta(hours=1),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
 
 # Verification
 decoded = jwt.decode(
     token,
     SECRET_KEY,
     algorithms=["HS256"],
-    issuer="https://auth.myapp.com"  # Validates issuer
+    issuer="https://auth.myapp.com",  # Validates issuer
 )
 ```
 
@@ -330,9 +339,10 @@ def create_token(user_id: str):
     payload = {
         "sub": user_id,
         "iat": now,  # Issued at
-        "exp": now + timedelta(minutes=30)
+        "exp": now + timedelta(minutes=30),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
 
 # Decode and check
 decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
@@ -354,11 +364,7 @@ from jose import jwt
 from datetime import datetime, timedelta
 
 # Create token
-payload = {
-    "sub": "user123",
-    "name": "John Doe",
-    "exp": datetime.utcnow() + timedelta(hours=1)
-}
+payload = {"sub": "user123", "name": "John Doe", "exp": datetime.utcnow() + timedelta(hours=1)}
 token = jwt.encode(payload, "secret-key", algorithm="HS256")
 # Returns: "eyJhbGciOiJIUzI1NiIs..."
 
@@ -379,18 +385,21 @@ decoded = jwt.decode(token, "secret-key", algorithms=["HS256"])
 ```python
 import uuid
 
+
 def create_token(user_id: str):
     payload = {
         "sub": user_id,
         "jti": str(uuid.uuid4()),  # Unique token ID
-        "exp": datetime.utcnow() + timedelta(minutes=30)
+        "exp": datetime.utcnow() + timedelta(minutes=30),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
 
 # Store JTI for blacklisting
 def blacklist_token(jti: str):
     # Store in Redis with TTL matching token expiration
     redis.setex(f"blacklist:{jti}", 1800, "revoked")
+
 
 def is_blacklisted(jti: str) -> bool:
     return redis.exists(f"blacklist:{jti}")
@@ -411,9 +420,10 @@ def create_token(user_id: str):
     payload = {
         "sub": user_id,
         "nbf": now,  # Not valid before now
-        "exp": now + timedelta(hours=1)
+        "exp": now + timedelta(hours=1),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
 
 # Token is valid immediately
 # If nbf is in the future, token won't be valid until that time
@@ -434,6 +444,7 @@ from fastapi.security import OAuth2PasswordBearer
 # JWT as OAuth2 bearer token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 @app.get("/protected/")
 async def protected(token: str = Depends(oauth2_scheme)):
     # token contains JWT
@@ -453,14 +464,14 @@ async def protected(token: str = Depends(oauth2_scheme)):
 ```python
 # JWT Payload (Base64 decoded)
 {
-    "sub": "user123",           # Subject (user ID)
-    "name": "John Doe",        # Custom claim
-    "email": "john@example.com",# Custom claim
-    "roles": ["admin"],         # Custom claim
-    "iat": 1516239022,         # Issued at
-    "exp": 1516242622,         # Expiration
-    "iss": "myapp.com",        # Issuer
-    "aud": "api.myapp.com"     # Audience
+    "sub": "user123",  # Subject (user ID)
+    "name": "John Doe",  # Custom claim
+    "email": "john@example.com",  # Custom claim
+    "roles": ["admin"],  # Custom claim
+    "iat": 1516239022,  # Issued at
+    "exp": 1516242622,  # Expiration
+    "iss": "myapp.com",  # Issuer
+    "aud": "api.myapp.com",  # Audience
 }
 ```
 
@@ -476,34 +487,27 @@ async def protected(token: str = Depends(oauth2_scheme)):
 ```python
 def create_tokens(user_id: str):
     access_token = jwt.encode(
-        {
-            "sub": user_id,
-            "type": "access",
-            "exp": datetime.utcnow() + timedelta(minutes=15)
-        },
+        {"sub": user_id, "type": "access", "exp": datetime.utcnow() + timedelta(minutes=15)},
         SECRET_KEY,
-        algorithm="HS256"
+        algorithm="HS256",
     )
-    
+
     refresh_token = jwt.encode(
-        {
-            "sub": user_id,
-            "type": "refresh",
-            "exp": datetime.utcnow() + timedelta(days=7)
-        },
+        {"sub": user_id, "type": "refresh", "exp": datetime.utcnow() + timedelta(days=7)},
         SECRET_KEY,
-        algorithm="HS256"
+        algorithm="HS256",
     )
-    
+
     return {"access_token": access_token, "refresh_token": refresh_token}
+
 
 @app.post("/token/refresh")
 async def refresh(refresh_token: str):
     payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=["HS256"])
-    
+
     if payload["type"] != "refresh":
         raise HTTPException(401, "Invalid token type")
-    
+
     # Create new tokens
     return create_tokens(payload["sub"])
 ```
@@ -554,9 +558,10 @@ def create_token(user_id: str, username: str):
     payload = {
         "sub": user_id,  # User's unique ID
         "username": username,
-        "exp": datetime.utcnow() + timedelta(hours=1)
+        "exp": datetime.utcnow() + timedelta(hours=1),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
 
 # Decode and get user
 decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
@@ -579,22 +584,25 @@ import redis
 
 redis_client = redis.Redis()
 
+
 def blacklist_token(token: str, ttl: int):
     """Blacklist token with TTL matching expiration"""
     jti = get_jti_from_token(token)
     redis_client.setex(f"blacklist:{jti}", ttl, "revoked")
+
 
 def is_token_blacklisted(token: str) -> bool:
     """Check if token is blacklisted"""
     jti = get_jti_from_token(token)
     return redis_client.exists(f"blacklist:{jti}")
 
+
 @app.post("/logout")
 async def logout(token: str = Depends(oauth2_scheme)):
     # Get token TTL
     payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
     ttl = payload["exp"] - datetime.utcnow().seconds
-    
+
     blacklist_token(token, ttl)
     return {"message": "Logged out"}
 ```
@@ -612,15 +620,16 @@ async def logout(token: str = Depends(oauth2_scheme)):
 def rotate_tokens(refresh_token: str):
     """Issue new access and refresh tokens"""
     payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=["HS256"])
-    
+
     if payload["type"] != "refresh":
         raise HTTPException(401, "Invalid token type")
-    
+
     # Blacklist old refresh token
     blacklist_token(refresh_token)
-    
+
     # Create new token pair
     return create_tokens(payload["sub"])
+
 
 @app.post("/token/refresh")
 async def refresh(refresh_token: str):
@@ -645,9 +654,7 @@ async def protected(token: str = Depends(oauth2_scheme)):
         raise HTTPException(
             status_code=401,
             detail="Could not validate credentials",
-            headers={
-                "WWW-Authenticate": 'Bearer realm="api", error="invalid_token"'
-            }
+            headers={"WWW-Authenticate": 'Bearer realm="api", error="invalid_token"'},
         )
 ```
 
@@ -681,21 +688,26 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 # Models
 class Token(BaseModel):
     access_token: str
     token_type: str
 
+
 class TokenData(BaseModel):
     username: Optional[str] = None
+
 
 class User(BaseModel):
     username: str
     email: str
     disabled: bool = False
 
+
 class UserInDB(User):
     hashed_password: str
+
 
 # Fake database
 fake_users_db = {
@@ -707,13 +719,16 @@ fake_users_db = {
     }
 }
 
+
 # Helper functions
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
+
 def get_user(db, username: str):
     if username in db:
         return UserInDB(**db[username])
+
 
 def authenticate_user(fake_db, username: str, password: str):
     user = get_user(fake_db, username)
@@ -723,6 +738,7 @@ def authenticate_user(fake_db, username: str, password: str):
         return False
     return user
 
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
@@ -731,6 +747,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
@@ -750,10 +767,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return user
 
+
 async def get_current_active_user(current_user: User = Depends(get_current_user)):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
 
 # Routes
 @app.post("/token", response_model=Token)
@@ -771,6 +790,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+
 @app.get("/users/me", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user
@@ -782,30 +802,19 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 def create_tokens(user_id: str):
     """Create access and refresh token pair"""
     access_token = jwt.encode(
-        {
-            "sub": user_id,
-            "type": "access",
-            "exp": datetime.utcnow() + timedelta(minutes=15)
-        },
+        {"sub": user_id, "type": "access", "exp": datetime.utcnow() + timedelta(minutes=15)},
         SECRET_KEY,
-        algorithm="HS256"
+        algorithm="HS256",
     )
-    
+
     refresh_token = jwt.encode(
-        {
-            "sub": user_id,
-            "type": "refresh",
-            "exp": datetime.utcnow() + timedelta(days=7)
-        },
+        {"sub": user_id, "type": "refresh", "exp": datetime.utcnow() + timedelta(days=7)},
         SECRET_KEY,
-        algorithm="HS256"
+        algorithm="HS256",
     )
-    
-    return {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "token_type": "bearer"
-    }
+
+    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+
 
 @app.post("/token/refresh")
 async def refresh_token(refresh_token: str):
@@ -816,7 +825,7 @@ async def refresh_token(refresh_token: str):
             raise HTTPException(401, "Invalid token type")
     except JWTError:
         raise HTTPException(401, "Invalid refresh token")
-    
+
     return create_tokens(payload["sub"])
 ```
 
@@ -837,15 +846,15 @@ eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9
 
 ```python
 payload = {
-    "sub": "user123",      # Subject (required)
-    "exp": 1234567890,     # Expiration (required)
-    "iat": 1234567890,     # Issued at
-    "nbf": 1234567890,     # Not before
-    "iss": "myapp.com",    # Issuer
-    "aud": "api.myapp.com", # Audience
-    "jti": "unique-id",    # JWT ID
-    "roles": ["admin"],    # Custom
-    "permissions": ["read"] # Custom
+    "sub": "user123",  # Subject (required)
+    "exp": 1234567890,  # Expiration (required)
+    "iat": 1234567890,  # Issued at
+    "nbf": 1234567890,  # Not before
+    "iss": "myapp.com",  # Issuer
+    "aud": "api.myapp.com",  # Audience
+    "jti": "unique-id",  # JWT ID
+    "roles": ["admin"],  # Custom
+    "permissions": ["read"],  # Custom
 }
 ```
 
@@ -856,6 +865,7 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 @app.get("/protected")
 async def protected(token: str = Depends(oauth2_scheme)):

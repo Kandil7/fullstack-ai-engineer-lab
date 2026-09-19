@@ -15,11 +15,7 @@ def streaming_count(path: str) -> dict[str, object]:
     only the running total in memory — the canonical larger-than-memory
     pattern. The flag makes the contract explicit for readers.
     """
-    rows = (
-        pl.scan_csv(path)
-        .select(pl.len())
-        .collect(engine="streaming")[0, 0]
-    )
+    rows = pl.scan_csv(path).select(pl.len()).collect(engine="streaming")[0, 0]
     return {"rows": int(rows), "streaming": True}
 
 

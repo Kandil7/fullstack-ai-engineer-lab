@@ -73,7 +73,9 @@ class SideQuest:
     what_i_learned: str
     code_example: str = ""
     tags: list[str] = field(default_factory=list)
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     def to_flashcard(self) -> tuple[str, str]:
         """Generate a Q/A pair for spaced repetition."""
@@ -86,9 +88,13 @@ class SideQuestLog:
     def __init__(self) -> None:
         self._quests: list[SideQuest] = []
 
-    def add(self, topic: str, context: str, learned: str, tags: list[str] | None = None) -> SideQuest:
+    def add(
+        self, topic: str, context: str, learned: str, tags: list[str] | None = None
+    ) -> SideQuest:
         """Record a side quest."""
-        q = SideQuest(topic=topic, context=context, what_i_learned=learned, tags=tags or [])
+        q = SideQuest(
+            topic=topic, context=context, what_i_learned=learned, tags=tags or []
+        )
         self._quests.append(q)
         return q
 
@@ -169,7 +175,12 @@ class PolyaReview:
 
     def score(self) -> tuple[int, int]:
         """Return (questions_answered_yes, total_questions)."""
-        all_q = self.step1_understand + self.step2_plan + self.step3_execute + self.step4_review
+        all_q = (
+            self.step1_understand
+            + self.step2_plan
+            + self.step3_execute
+            + self.step4_review
+        )
         # In a real scenario, you'd mark items as checked; here we return total count.
         return (0, len(all_q))
 
@@ -299,10 +310,14 @@ def main() -> None:
 
     # Compare
     print("Comparison:")
-    print(f"  Vibe:       {vibe.understanding_gained}/10 understanding, {vibe.bugs_introduced} bugs, "
-          f"debt={vibe.lines_generated - vibe.lines_read}")
-    print(f"  Deliberate: {deliberate.understanding_gained}/10 understanding, {deliberate.bugs_introduced} bugs, "
-          f"debt={deliberate.lines_generated - deliberate.lines_read}")
+    print(
+        f"  Vibe:       {vibe.understanding_gained}/10 understanding, {vibe.bugs_introduced} bugs, "
+        f"debt={vibe.lines_generated - vibe.lines_read}"
+    )
+    print(
+        f"  Deliberate: {deliberate.understanding_gained}/10 understanding, {deliberate.bugs_introduced} bugs, "
+        f"debt={deliberate.lines_generated - deliberate.lines_read}"
+    )
 
     # EXERCISE: add `written_notes` and `flashcards_created` fields to CodingSession
     # and update the simulations. Then compare the long-term knowledge retention

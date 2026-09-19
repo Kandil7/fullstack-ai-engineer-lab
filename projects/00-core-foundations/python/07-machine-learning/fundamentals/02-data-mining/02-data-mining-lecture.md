@@ -134,7 +134,7 @@ X, y = make_blobs(n_samples=300, centers=4, cluster_std=0.60, random_state=42)
 kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
 kmeans.fit(X)
 
-labels = kmeans.labels_          # Cluster assignments
+labels = kmeans.labels_  # Cluster assignments
 centers = kmeans.cluster_centers_  # Cluster centers
 
 print(f"Data points: {len(X)}")
@@ -156,11 +156,11 @@ from collections import Counter
 
 # Transaction data
 transactions = [
-    ['bread', 'milk', 'eggs'],
-    ['bread', 'butter', 'jam'],
-    ['milk', 'butter', 'eggs'],
-    ['bread', 'milk', 'butter'],
-    ['bread', 'milk', 'butter', 'eggs']
+    ["bread", "milk", "eggs"],
+    ["bread", "butter", "jam"],
+    ["milk", "butter", "eggs"],
+    ["bread", "milk", "butter"],
+    ["bread", "milk", "butter", "eggs"],
 ]
 
 # Count item frequencies
@@ -169,10 +169,11 @@ item_counts = Counter(all_items)
 
 print("Item frequencies:")
 for item, count in item_counts.most_common():
-    print(f"  {item}: {count} ({count/len(transactions)*100:.0f}%)")
+    print(f"  {item}: {count} ({count / len(transactions) * 100:.0f}%)")
 
 # Calculate support for item pairs
 from itertools import combinations
+
 pair_counts = Counter()
 for transaction in transactions:
     for pair in combinations(transaction, 2):
@@ -245,7 +246,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 documents = [
     "machine learning is great",
     "data mining is useful",
-    "machine learning and data mining"
+    "machine learning and data mining",
 ]
 
 # Convert text to numerical features (Bag of Words)

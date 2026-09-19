@@ -32,17 +32,15 @@ starter = _load("starter_16", os.path.join(HERE, "starter.py"))
 
 # ---------------------------------------------------------------- helpers
 
+
 def _assert_no_python_loops(mod):
     for name in ("starter", "solution"):
-        tree = ast.parse(
-            open(os.path.join(HERE, name + ".py"), encoding="utf-8").read()
-        )
+        tree = ast.parse(open(os.path.join(HERE, name + ".py"), encoding="utf-8").read())
         banned = [
             n
             for n in ast.walk(tree)
             if isinstance(
-                n, (ast.For, ast.While, ast.ListComp, ast.DictComp,
-                    ast.SetComp, ast.GeneratorExp)
+                n, (ast.For, ast.While, ast.ListComp, ast.DictComp, ast.SetComp, ast.GeneratorExp)
             )
         ]
         assert not banned, f"{name}.py contains Python loops/comprehensions"
@@ -53,6 +51,7 @@ def _rand(seed, *shape):
 
 
 # ---------------------------------------------------------------- bronze
+
 
 def test_bronze_top1_known():
     Q = np.array([[0.0, 0.0]])
@@ -96,22 +95,20 @@ def test_bronze_equals_cdist_directly():
 
 # ---------------------------------------------------------------- silver
 
+
 def test_silver_cosine_orthogonal():
-    assert np.isclose(solution.cosine_pair(np.array([1.0, 0.0]),
-                                           np.array([0.0, 1.0])), 1.0)
+    assert np.isclose(solution.cosine_pair(np.array([1.0, 0.0]), np.array([0.0, 1.0])), 1.0)
 
 
 def test_silver_cosine_scale_invariant():
-    assert np.isclose(solution.cosine_pair(np.array([1.0, 0.0]),
-                                           np.array([5.0, 0.0])), 0.0)
+    assert np.isclose(solution.cosine_pair(np.array([1.0, 0.0]), np.array([5.0, 0.0])), 0.0)
 
 
 def test_silver_cosine_matches_scipy():
     rng = np.random.default_rng(3)
     u = rng.normal(size=6)
     v = rng.normal(size=6)
-    assert np.isclose(solution.cosine_pair(u, v),
-                      cdist([u], [v], "cosine")[0, 0], atol=1e-12)
+    assert np.isclose(solution.cosine_pair(u, v), cdist([u], [v], "cosine")[0, 0], atol=1e-12)
 
 
 def test_silver_cosine_zero_norm_raises():
@@ -147,6 +144,7 @@ def test_silver_spread_high_dim():
 
 
 # ---------------------------------------------------------------- gold
+
 
 def test_gold_kd_exact_vs_brute():
     rng = np.random.default_rng(7)
@@ -195,6 +193,7 @@ def test_gold_no_python_loops():
 
 
 # ---------------------------------------------------------------- starter
+
 
 def test_starter_raises_not_implemented():
     with pytest.raises(NotImplementedError):

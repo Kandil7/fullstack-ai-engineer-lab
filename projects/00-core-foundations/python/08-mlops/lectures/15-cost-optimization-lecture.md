@@ -55,14 +55,21 @@ By the end of this lecture, you will be able to:
 The arithmetic starts with **unit costs**. Compute them before optimizing:
 
 ```python
-def unit_costs(gpu_hr_cost: float, run_hours: float, runs_per_month: int,
-               storage_gb: float, gb_cost: float, preds_per_month: int,
-               pred_cost_per_million: float) -> dict[str, float]:
+def unit_costs(
+    gpu_hr_cost: float,
+    run_hours: float,
+    runs_per_month: int,
+    storage_gb: float,
+    gb_cost: float,
+    preds_per_month: int,
+    pred_cost_per_million: float,
+) -> dict[str, float]:
     return {
         "training": gpu_hr_cost * run_hours * runs_per_month,
         "storage": storage_gb * gb_cost,
         "inference": preds_per_month / 1e6 * pred_cost_per_million,
     }
+
 
 print(unit_costs(3.0, 2.0, 30, 5000, 0.023, 300_000_000, 0.80))
 ```
@@ -89,12 +96,14 @@ Training cost scales with *runs*, not just *models*. The levers:
 | Experiment budget caps | stop runaway sweeps | quota per experiment |
 
 ```python
-def training_budget(n_runs: int, run_hours: float, gpu_cost: float,
-                    cache_hit_rate: float = 0.0) -> dict[str, float]:
+def training_budget(
+    n_runs: int, run_hours: float, gpu_cost: float, cache_hit_rate: float = 0.0
+) -> dict[str, float]:
     """With a cache hit rate, many runs cost ~0 compute."""
     billed_hours = run_hours * n_runs * (1 - cache_hit_rate)
     cost = billed_hours * gpu_cost
     return {"billed_hours": billed_hours, "cost": round(cost, 2)}
+
 
 print(training_budget(30, 2.0, 3.0, cache_hit_rate=0.6))
 ```
@@ -116,11 +125,13 @@ compression (Parquet/arrow vs CSV), lifecycle policies (archive old versions
 to cold storage), and pruning stale experiments.
 
 ```python
-def storage_forecast(versions_per_month: int, avg_gb: float, months: int,
-                     gb_cost: float = 0.023) -> float:
+def storage_forecast(
+    versions_per_month: int, avg_gb: float, months: int, gb_cost: float = 0.023
+) -> float:
     """Compounding storage bill with dedup savings applied."""
     total_gb = versions_per_month * avg_gb * months * 0.35  # ~65% dedup
     return round(total_gb * gb_cost, 2)
+
 
 print(storage_forecast(20, 10, 12))
 ```
@@ -141,11 +152,11 @@ ONNX optimization, batching, caching, and right-sizing instances. The
 compounding effect:
 
 ```python
-def inference_savings(preds_per_month: int, cost_per_million: float,
-                      improvement: float) -> float:
+def inference_savings(preds_per_month: int, cost_per_million: float, improvement: float) -> float:
     """Monthly savings from an X% cost-per-prediction improvement."""
     before = preds_per_month / 1e6 * cost_per_million
     return round(before * improvement, 2)
+
 
 print("savings from 3x inference speedup:", inference_savings(300_000_000, 0.80, 0.66))
 ```
@@ -176,6 +187,7 @@ def instance_recommendation(gpu_util: float, latency_ok: bool) -> str:
         return "upgrade or batch better (saturated)"
     return "well-sized"
 
+
 print(instance_recommendation(0.18, True))
 ```
 
@@ -195,8 +207,8 @@ Every training run should log its cost (GPU hours × rate) as a metric
 def budget_status(spent: float, budget: float) -> dict:
     pct = spent / budget
     alert = "OK" if pct < 0.5 else ("WARN" if pct < 0.8 else "ALERT")
-    return {"spent": round(spent, 2), "budget": budget,
-            "pct": round(pct, 2), "alert": alert}
+    return {"spent": round(spent, 2), "budget": budget, "pct": round(pct, 2), "alert": alert}
+
 
 print(budget_status(140.0, 200.0))
 ```

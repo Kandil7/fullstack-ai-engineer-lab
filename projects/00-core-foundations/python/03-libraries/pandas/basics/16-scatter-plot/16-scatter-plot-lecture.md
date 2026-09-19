@@ -28,20 +28,22 @@ import matplotlib.pyplot as plt
 
 # Sample data
 np.random.seed(42)
-df = pd.DataFrame({
-    'study_hours': np.random.uniform(1, 10, 50),
-    'exam_score': np.random.uniform(40, 100, 50),
-    'attendance': np.random.uniform(50, 100, 50)
-})
+df = pd.DataFrame(
+    {
+        "study_hours": np.random.uniform(1, 10, 50),
+        "exam_score": np.random.uniform(40, 100, 50),
+        "attendance": np.random.uniform(50, 100, 50),
+    }
+)
 # Add some correlation
-df['exam_score'] = df['study_hours'] * 6 + np.random.normal(0, 8, 50) + 30
-df['exam_score'] = df['exam_score'].clip(0, 100)
+df["exam_score"] = df["study_hours"] * 6 + np.random.normal(0, 8, 50) + 30
+df["exam_score"] = df["exam_score"].clip(0, 100)
 
 # Basic scatter plot
-df.plot.scatter(x='study_hours', y='exam_score')
-plt.title('Study Hours vs Exam Score')
-plt.xlabel('Study Hours')
-plt.ylabel('Exam Score')
+df.plot.scatter(x="study_hours", y="exam_score")
+plt.title("Study Hours vs Exam Score")
+plt.xlabel("Study Hours")
+plt.ylabel("Exam Score")
 plt.tight_layout()
 plt.show()
 ```
@@ -56,19 +58,19 @@ plt.show()
 fig, ax = plt.subplots(figsize=(10, 6))
 
 ax.scatter(
-    df['study_hours'],
-    df['exam_score'],
-    c='steelblue',           # Color
-    marker='o',              # Marker style
-    s=50,                    # Size
-    alpha=0.7,               # Transparency
-    edgecolors='white',      # Border color
-    linewidth=0.5            # Border width
+    df["study_hours"],
+    df["exam_score"],
+    c="steelblue",  # Color
+    marker="o",  # Marker style
+    s=50,  # Size
+    alpha=0.7,  # Transparency
+    edgecolors="white",  # Border color
+    linewidth=0.5,  # Border width
 )
 
-ax.set_title('Study Hours vs Exam Score', fontsize=14)
-ax.set_xlabel('Study Hours')
-ax.set_ylabel('Exam Score')
+ax.set_title("Study Hours vs Exam Score", fontsize=14)
+ax.set_xlabel("Study Hours")
+ax.set_ylabel("Exam Score")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
@@ -80,19 +82,19 @@ plt.show()
 fig, ax = plt.subplots(figsize=(10, 6))
 
 scatter = ax.scatter(
-    df['study_hours'],
-    df['exam_score'],
-    c=df['attendance'],      # Color by attendance
-    cmap='RdYlGn',          # Red-Yellow-Green colormap
+    df["study_hours"],
+    df["exam_score"],
+    c=df["attendance"],  # Color by attendance
+    cmap="RdYlGn",  # Red-Yellow-Green colormap
     s=80,
     alpha=0.8,
-    edgecolors='gray'
+    edgecolors="gray",
 )
 
-plt.colorbar(scatter, label='Attendance (%)')
-ax.set_title('Study Hours vs Exam Score (colored by Attendance)')
-ax.set_xlabel('Study Hours')
-ax.set_ylabel('Exam Score')
+plt.colorbar(scatter, label="Attendance (%)")
+ax.set_title("Study Hours vs Exam Score (colored by Attendance)")
+ax.set_xlabel("Study Hours")
+ax.set_ylabel("Exam Score")
 plt.tight_layout()
 plt.show()
 ```
@@ -101,33 +103,31 @@ plt.show()
 
 ```python
 # Add categories
-df['performance'] = pd.cut(
-    df['exam_score'],
-    bins=[0, 60, 80, 100],
-    labels=['Below Average', 'Average', 'Above Average']
+df["performance"] = pd.cut(
+    df["exam_score"], bins=[0, 60, 80, 100], labels=["Below Average", "Average", "Above Average"]
 )
 
 fig, ax = plt.subplots(figsize=(10, 6))
 
-markers = {'Below Average': 'o', 'Average': '^', 'Above Average': 's'}
-colors = {'Below Average': '#e74c3c', 'Average': '#f39c12', 'Above Average': '#2ecc71'}
+markers = {"Below Average": "o", "Average": "^", "Above Average": "s"}
+colors = {"Below Average": "#e74c3c", "Average": "#f39c12", "Above Average": "#2ecc71"}
 
 for category in markers:
-    mask = df['performance'] == category
+    mask = df["performance"] == category
     ax.scatter(
-        df.loc[mask, 'study_hours'],
-        df.loc[mask, 'exam_score'],
+        df.loc[mask, "study_hours"],
+        df.loc[mask, "exam_score"],
         c=colors[category],
         marker=markers[category],
         s=80,
         alpha=0.7,
-        label=category
+        label=category,
     )
 
-ax.legend(title='Performance')
-ax.set_title('Study Hours vs Exam Score by Performance')
-ax.set_xlabel('Study Hours')
-ax.set_ylabel('Exam Score')
+ax.legend(title="Performance")
+ax.set_title("Study Hours vs Exam Score by Performance")
+ax.set_xlabel("Study Hours")
+ax.set_ylabel("Exam Score")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
@@ -141,23 +141,23 @@ plt.show()
 fig, ax = plt.subplots(figsize=(12, 8))
 
 # Size encoded by a third variable
-sizes = df['attendance'] * 3  # Scale up for visibility
+sizes = df["attendance"] * 3  # Scale up for visibility
 
 ax.scatter(
-    df['study_hours'],
-    df['exam_score'],
+    df["study_hours"],
+    df["exam_score"],
     s=sizes,
-    c=df['attendance'],
-    cmap='coolwarm',
+    c=df["attendance"],
+    cmap="coolwarm",
     alpha=0.6,
-    edgecolors='black',
-    linewidth=0.5
+    edgecolors="black",
+    linewidth=0.5,
 )
 
-ax.set_title('Study Hours vs Exam Score\n(Bubble size = Attendance)')
-ax.set_xlabel('Study Hours')
-ax.set_ylabel('Exam Score')
-plt.colorbar(label='Attendance (%)')
+ax.set_title("Study Hours vs Exam Score\n(Bubble size = Attendance)")
+ax.set_xlabel("Study Hours")
+ax.set_ylabel("Exam Score")
+plt.colorbar(label="Attendance (%)")
 plt.tight_layout()
 plt.show()
 ```
@@ -171,18 +171,25 @@ plt.show()
 ```python
 fig, ax = plt.subplots(figsize=(10, 6))
 
-ax.scatter(df['study_hours'], df['exam_score'], alpha=0.6, color='steelblue')
+ax.scatter(df["study_hours"], df["exam_score"], alpha=0.6, color="steelblue")
 
 # Add trend line using numpy polyfit
-z = np.polyfit(df['study_hours'], df['exam_score'], 1)
+z = np.polyfit(df["study_hours"], df["exam_score"], 1)
 p = np.poly1d(z)
-x_line = np.linspace(df['study_hours'].min(), df['study_hours'].max(), 100)
-ax.plot(x_line, p(x_line), color='red', linewidth=2, linestyle='--', label=f'Trend: y={z[0]:.1f}x+{z[1]:.1f}')
+x_line = np.linspace(df["study_hours"].min(), df["study_hours"].max(), 100)
+ax.plot(
+    x_line,
+    p(x_line),
+    color="red",
+    linewidth=2,
+    linestyle="--",
+    label=f"Trend: y={z[0]:.1f}x+{z[1]:.1f}",
+)
 
 ax.legend()
-ax.set_title('Study Hours vs Exam Score with Trend Line')
-ax.set_xlabel('Study Hours')
-ax.set_ylabel('Exam Score')
+ax.set_title("Study Hours vs Exam Score with Trend Line")
+ax.set_xlabel("Study Hours")
+ax.set_ylabel("Exam Score")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
@@ -196,12 +203,12 @@ import seaborn as sns
 # Linear regression with confidence interval
 sns.regplot(
     data=df,
-    x='study_hours',
-    y='exam_score',
-    scatter_kws={'alpha': 0.5, 'color': 'steelblue'},
-    line_kws={'color': 'red', 'linewidth': 2}
+    x="study_hours",
+    y="exam_score",
+    scatter_kws={"alpha": 0.5, "color": "steelblue"},
+    line_kws={"color": "red", "linewidth": 2},
 )
-plt.title('Study Hours vs Exam Score (with 95% CI)')
+plt.title("Study Hours vs Exam Score (with 95% CI)")
 plt.tight_layout()
 plt.show()
 ```
@@ -214,20 +221,20 @@ plt.show()
 fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
 # Plot 1: Study hours vs exam score
-axes[0].scatter(df['study_hours'], df['exam_score'], alpha=0.6, color='steelblue')
-axes[0].set_title('Study Hours vs Exam Score')
-axes[0].set_xlabel('Study Hours')
-axes[0].set_ylabel('Exam Score')
+axes[0].scatter(df["study_hours"], df["exam_score"], alpha=0.6, color="steelblue")
+axes[0].set_title("Study Hours vs Exam Score")
+axes[0].set_xlabel("Study Hours")
+axes[0].set_ylabel("Exam Score")
 axes[0].grid(True, alpha=0.3)
 
 # Plot 2: Attendance vs exam score
-axes[1].scatter(df['attendance'], df['exam_score'], alpha=0.6, color='coral')
-axes[1].set_title('Attendance vs Exam Score')
-axes[1].set_xlabel('Attendance (%)')
-axes[1].set_ylabel('Exam Score')
+axes[1].scatter(df["attendance"], df["exam_score"], alpha=0.6, color="coral")
+axes[1].set_title("Attendance vs Exam Score")
+axes[1].set_xlabel("Attendance (%)")
+axes[1].set_ylabel("Exam Score")
 axes[1].grid(True, alpha=0.3)
 
-plt.suptitle('Factors Affecting Exam Performance', fontsize=14, y=1.02)
+plt.suptitle("Factors Affecting Exam Performance", fontsize=14, y=1.02)
 plt.tight_layout()
 plt.show()
 ```

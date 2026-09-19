@@ -276,6 +276,7 @@ window = items[-64:]  # copies 64 elements per step
 
 # CORRECT - O(1) at both ends
 from collections import deque
+
 window = deque(items, maxlen=64)
 window.appendleft(x)
 ```
@@ -302,11 +303,11 @@ second = heapq.nsmallest(2, pq)[1]
 ```python
 # WRONG - the read itself inserts "missing" with value []
 d = defaultdict(list)
-_ = d["missing"]          # d now contains "missing"!
+_ = d["missing"]  # d now contains "missing"!
 
 # CORRECT - use .get() for read-only access
 d = defaultdict(list)
-_ = d.get("missing")      # None, and no key created
+_ = d.get("missing")  # None, and no key created
 ```
 
 ### Mistake 5: Forgetting `key=` in nlargest over pairs

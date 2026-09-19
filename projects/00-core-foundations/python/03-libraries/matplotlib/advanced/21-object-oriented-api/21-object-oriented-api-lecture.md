@@ -51,7 +51,7 @@ ax.set_ylabel("sin(x)")
 ax.legend()
 fig.tight_layout()
 fig.savefig("fig.png", dpi=120)
-plt.close(fig)      # release the canvas (critical in loops)
+plt.close(fig)  # release the canvas (critical in loops)
 ```
 
 Every styling call — `set_title`, `set_xlabel`, `legend`, `grid`,
@@ -75,8 +75,8 @@ correctness hazard:
 ```python
 fig1, ax1 = plt.subplots()
 fig2, ax2 = plt.subplots()
-plt.sca(ax2)                     # "set current axes"
-assert plt.gca() is ax2          # gca() follows global state
+plt.sca(ax2)  # "set current axes"
+assert plt.gca() is ax2  # gca() follows global state
 ```
 
 The fix is not "be careful with `plt.sca`" — it is to stop using the
@@ -94,8 +94,8 @@ learning-rate schedule).
 ```python
 fig = plt.figure(figsize=(6, 5))
 gs = fig.add_gridspec(2, 1, height_ratios=(3, 1), hspace=0.35)
-ax_top = fig.add_subplot(gs[0])      # 3 parts tall
-ax_bottom = fig.add_subplot(gs[1])   # 1 part tall
+ax_top = fig.add_subplot(gs[0])  # 3 parts tall
+ax_bottom = fig.add_subplot(gs[1])  # 1 part tall
 ```
 
 `hspace`/`wspace` control the gaps between panels. Because the ratios
@@ -111,12 +111,11 @@ by the labels:
 
 ```python
 fig, axd = plt.subplot_mosaic(
-    [["loss", "loss"],
-     ["grad", "hist"]],
+    [["loss", "loss"], ["grad", "hist"]],
     figsize=(8, 5),
     width_ratios=(2, 1),
 )
-axd["loss"].plot(epochs, 1.0 / np.sqrt(epochs))   # spans both columns
+axd["loss"].plot(epochs, 1.0 / np.sqrt(epochs))  # spans both columns
 axd["grad"].plot(epochs, np.sin(epochs / 3.0))
 axd["hist"].hist(rng.normal(size=500), bins=20)
 ```
@@ -138,7 +137,7 @@ exaggerated by a different scale in the other.
 fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(6, 5))
 ax1.plot(x, np.cos(x))
 ax2.plot(x, np.sin(x))
-ax1.set_xlim(2, 8)        # propagates to ax2: shared axes are JOINED
+ax1.set_xlim(2, 8)  # propagates to ax2: shared axes are JOINED
 ```
 
 Key subtlety: shared axes are *joined*, not merely *synchronized at

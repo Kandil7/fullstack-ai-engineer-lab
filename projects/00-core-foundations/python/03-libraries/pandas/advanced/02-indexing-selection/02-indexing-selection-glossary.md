@@ -26,7 +26,7 @@
 the end label — the opposite of Python's half-open convention.
 **Example**:
 ```python
-df.loc["r1":"r3"]     # includes label 'r3'
+df.loc["r1":"r3"]  # includes label 'r3'
 ```
 **Complexity**: O(1) average (index hash lookup).
 **Related**: `.iloc`, label
@@ -35,7 +35,7 @@ df.loc["r1":"r3"]     # includes label 'r3'
 **Definition**: Position-based accessor; slicing is half-open like lists.
 **Example**:
 ```python
-df.iloc[1:3]     # positions 1, 2 only
+df.iloc[1:3]  # positions 1, 2 only
 ```
 **Complexity**: O(1).
 **Related**: `.loc`, position

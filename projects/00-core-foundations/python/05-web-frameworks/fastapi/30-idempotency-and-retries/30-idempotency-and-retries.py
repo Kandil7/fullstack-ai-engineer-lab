@@ -58,12 +58,14 @@ def naive_charge(body: ChargeRequest):
 # 2. The fix: Idempotency-Key header + dedup store
 # ============================================================
 @app.post("/charges", response_model=ChargeResponse, status_code=201)
-def charge(body: ChargeRequest,
-           idempotency_key: str | None = Header(default=None, alias="Idempotency-Key")):
+def charge(
+    body: ChargeRequest, idempotency_key: str | None = Header(default=None, alias="Idempotency-Key")
+):
     """At-least-once delivery made safe: same key -> same result, once."""
     if not idempotency_key:
-        raise HTTPException(status_code=400,
-                            detail="Idempotency-Key header is required for POST /charges")
+        raise HTTPException(
+            status_code=400, detail="Idempotency-Key header is required for POST /charges"
+        )
 
     with _LOCK:
         existing = _IDEMPOTENCY.get(idempotency_key)
@@ -81,8 +83,12 @@ def charge(body: ChargeRequest,
         # First attempt: do the side effect ONCE
         charge_id = str(uuid.uuid4())
         _CHARGES.append(charge_id)
-        entry = {"charge_id": charge_id, "amount_cents": body.amount_cents,
-                 "status": "succeeded", "attempts": 1}
+        entry = {
+            "charge_id": charge_id,
+            "amount_cents": body.amount_cents,
+            "status": "succeeded",
+            "attempts": 1,
+        }
         _IDEMPOTENCY[idempotency_key] = entry
         return ChargeResponse(**entry)
 
@@ -135,15 +141,14 @@ def _verify() -> None:
         # Naive: two retries, two charges (the bug)
         r1 = client.post("/naive/charges", json={"amount_cents": 100})
         r2 = client.post("/naive/charges", json={"amount_cents": 100})
-        assert r1.json()["charge_id"] != r2.json()["charge_id"], \
+        assert r1.json()["charge_id"] != r2.json()["charge_id"], (
             "naive retry must double-charge (demonstrating the bug)"
+        )
 
         # Idempotent: same key, two requests, ONE charge
         key = "order-123"
-        a = client.post("/charges", json={"amount_cents": 500},
-                        headers={"Idempotency-Key": key})
-        b = client.post("/charges", json={"amount_cents": 500},
-                        headers={"Idempotency-Key": key})
+        a = client.post("/charges", json={"amount_cents": 500}, headers={"Idempotency-Key": key})
+        b = client.post("/charges", json={"amount_cents": 500}, headers={"Idempotency-Key": key})
         assert a.status_code == 201 and b.status_code == 201
         assert a.json()["charge_id"] == b.json()["charge_id"], "same key -> same id"
         assert a.json()["deduplicated"] is False
@@ -169,6 +174,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("30-idempotency-and-retries:app", host="127.0.0.1", port=8000)
     else:
         _verify()

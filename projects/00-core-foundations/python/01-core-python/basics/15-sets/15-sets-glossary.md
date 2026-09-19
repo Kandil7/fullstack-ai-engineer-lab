@@ -265,7 +265,7 @@ print(first_letters)  # {'A', 'B', 'C'}
 a = {1, 2}
 b = {1, 2, 3, 4}
 print(a.issubset(b))  # True
-print(a <= b)         # True
+print(a <= b)  # True
 
 # Every set is a subset of itself
 print(a.issubset(a))  # True
@@ -283,7 +283,7 @@ print(a.issubset(a))  # True
 a = {1, 2, 3, 4}
 b = {1, 2}
 print(a.issuperset(b))  # True
-print(a >= b)           # True
+print(a >= b)  # True
 ```
 
 **Related**: `issubset()`, `<=`, `>=`
@@ -373,10 +373,10 @@ only_a = product_a_buyers - product_b_buyers
 only_b = product_b_buyers - product_a_buyers
 any_buyer = product_a_buyers | product_b_buyers
 
-print(f"Bought both: {both}")      # {'bob', 'diana'}
+print(f"Bought both: {both}")  # {'bob', 'diana'}
 print(f"Only product A: {only_a}")  # {'alice', 'charlie'}
 print(f"Only product B: {only_b}")  # {'eve', 'frank'}
-print(f"Any buyer: {any_buyer}")    # all six customers
+print(f"Any buyer: {any_buyer}")  # all six customers
 ```
 
 ---

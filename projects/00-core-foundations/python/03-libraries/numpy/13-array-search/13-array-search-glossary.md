@@ -28,9 +28,7 @@ Test if all elements along an axis are True.
 ```python
 import numpy as np
 
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Test if all elements > 0
 print(np.all(matrix > 0))  # True
@@ -50,9 +48,7 @@ print(np.all(matrix > 5, axis=1))  # [False False  True]
 Test if any element along an axis is True.
 
 ```python
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Test if any element > 5
 print(np.any(matrix > 5))  # True
@@ -78,8 +74,7 @@ arr = np.array([10, 50, 30, 80, 20])
 print(np.argmax(arr))  # 3 (index of 80)
 
 # 2D example
-matrix = np.array([[1, 5, 3],
-                   [9, 2, 7]])
+matrix = np.array([[1, 5, 3], [9, 2, 7]])
 
 # Max along axis 0 (columns)
 print(np.argmax(matrix, axis=0))  # [1 0 1]
@@ -106,8 +101,7 @@ arr = np.array([10, 50, 30, 80, 20])
 print(np.argmin(arr))  # 0 (index of 10)
 
 # 2D example
-matrix = np.array([[1, 5, 3],
-                   [9, 2, 7]])
+matrix = np.array([[1, 5, 3], [9, 2, 7]])
 
 # Min along axis 0 (columns)
 print(np.argmin(matrix, axis=0))  # [0 1 0]
@@ -206,8 +200,7 @@ values = arr[indices]
 print(values)  # [3 5 7]
 
 # 2D example
-matrix = np.array([[0, 1, 0],
-                   [2, 0, 3]])
+matrix = np.array([[0, 1, 0], [2, 0, 3]])
 rows, cols = np.nonzero(matrix)
 print(f"Rows: {rows}")  # [0 1 1]
 print(f"Cols: {cols}")  # [1 0 2]
@@ -226,18 +219,18 @@ Binary search to find insertion point in sorted array.
 arr = np.array([10, 20, 30, 40, 50])
 
 # Left insertion point
-idx = np.searchsorted(arr, 25, side='left')
+idx = np.searchsorted(arr, 25, side="left")
 print(idx)  # 2
 
 # Right insertion point
-idx = np.searchsorted(arr, 25, side='right')
+idx = np.searchsorted(arr, 25, side="right")
 print(idx)  # 2
 
 # Exact value
-idx = np.searchsorted(arr, 30, side='left')
+idx = np.searchsorted(arr, 30, side="left")
 print(idx)  # 2
 
-idx = np.searchsorted(arr, 30, side='right')
+idx = np.searchsorted(arr, 30, side="right")
 print(idx)  # 3
 
 # Multiple values
@@ -259,10 +252,10 @@ Parameter for searchsorted: 'left' or 'right' insertion point.
 arr = np.array([10, 20, 30, 30, 30, 40, 50])
 
 # Left: first position where value can be inserted
-print(np.searchsorted(arr, 30, side='left'))  # 2
+print(np.searchsorted(arr, 30, side="left"))  # 2
 
 # Right: last position where value can be inserted
-print(np.searchsorted(arr, 30, side='right'))  # 5
+print(np.searchsorted(arr, 30, side="right"))  # 5
 ```
 
 **Related:** searchsorted

@@ -54,9 +54,13 @@ conn.executemany(
 
 # Example 1: IN and BETWEEN
 print("=== 1. IN / BETWEEN ===")
-r = conn.execute("SELECT name FROM items WHERE category IN (?, ?) ORDER BY id", ("tools", "optics")).fetchall()
+r = conn.execute(
+    "SELECT name FROM items WHERE category IN (?, ?) ORDER BY id", ("tools", "optics")
+).fetchall()
 print(f"IN (tools, optics): {[x[0] for x in r]}")
-r = conn.execute("SELECT name FROM items WHERE price BETWEEN ? AND ? ORDER BY id", (1.0, 50.0)).fetchall()
+r = conn.execute(
+    "SELECT name FROM items WHERE price BETWEEN ? AND ? ORDER BY id", (1.0, 50.0)
+).fetchall()
 print(f"BETWEEN 1.0 AND 50.0: {[x[0] for x in r]}")
 print()
 
@@ -121,7 +125,9 @@ print()
 
 # Example 5: the NOT IN (NULL) trap
 print("=== 5. Three-Valued Logic ===")
-conn.execute("INSERT INTO items (name, category, price, stock) VALUES (?, ?, ?, NULL)", ("mystery", "?", 1.0))
+conn.execute(
+    "INSERT INTO items (name, category, price, stock) VALUES (?, ?, ?, NULL)", ("mystery", "?", 1.0)
+)
 trap = conn.execute(
     "SELECT name FROM items WHERE category NOT IN (?, ?) AND category IS NOT NULL",
     ("tools", "electronics"),
@@ -150,6 +156,7 @@ print()
 #          means a = 1 OR (a = 2 AND b = 3) — AND binds tighter
 # CORRECT: WHERE (a = 1 OR a = 2) AND b = 3
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -168,23 +175,26 @@ def _verify() -> None:
         assert [x[0] for x in r] == [1, 3], "IN must match set membership"
 
         # 2. BETWEEN is inclusive
-        r = conn.execute("SELECT id FROM t WHERE price BETWEEN ? AND ? ORDER BY id", (10.0, 20.0)).fetchall()
+        r = conn.execute(
+            "SELECT id FROM t WHERE price BETWEEN ? AND ? ORDER BY id", (10.0, 20.0)
+        ).fetchall()
         assert [x[0] for x in r] == [1, 2], "BETWEEN must include both bounds"
 
         # 3. IS NULL vs = 0 are different predicates
-        assert conn.execute("SELECT COUNT(*) FROM t WHERE stock IS NULL").fetchone()[0] == 2, \
+        assert conn.execute("SELECT COUNT(*) FROM t WHERE stock IS NULL").fetchone()[0] == 2, (
             "IS NULL counts only NULLs"
-        assert conn.execute("SELECT COUNT(*) FROM t WHERE stock = ?", (0,)).fetchone()[0] == 1, \
+        )
+        assert conn.execute("SELECT COUNT(*) FROM t WHERE stock = ?", (0,)).fetchone()[0] == 1, (
             "= 0 counts only zeros"
+        )
 
         # 4. NULL comparison trap: x != NULL matches nothing
-        assert conn.execute("SELECT COUNT(*) FROM t WHERE stock != ?", (None,)).fetchone()[0] == 0, \
-            "!= NULL must match nothing (three-valued logic)"
+        assert (
+            conn.execute("SELECT COUNT(*) FROM t WHERE stock != ?", (None,)).fetchone()[0] == 0
+        ), "!= NULL must match nothing (three-valued logic)"
 
         # 5. NOT IN with a NULL in the list matches nothing
-        rows = conn.execute(
-            "SELECT id FROM t WHERE cat NOT IN (?, ?)", ("a", None)
-        ).fetchall()
+        rows = conn.execute("SELECT id FROM t WHERE cat NOT IN (?, ?)", ("a", None)).fetchall()
         assert rows == [], "NOT IN (a, NULL) must silently match nothing"
 
         # 6. NOT IN is safe once NULLs are excluded from the subject column
@@ -212,4 +222,4 @@ if __name__ == "__main__":
         print("2. IS NULL is the only NULL test; = NULL never matches")
         print("3. UNKNOWN propagates: NOT IN (x, NULL) matches nothing")
         print("4. AND binds tighter than OR - parenthesize")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

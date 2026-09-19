@@ -81,12 +81,12 @@ def run_batch(n: int, fail_at: int) -> tuple[int, int]:
             nonlocal completed, cancelled
             try:
                 if i < fail_at:
-                    await asyncio.sleep(0.005)   # finishes before failure
+                    await asyncio.sleep(0.005)  # finishes before failure
                 elif i == fail_at:
-                    await asyncio.sleep(0.02)    # the one that fails
+                    await asyncio.sleep(0.02)  # the one that fails
                     raise ValueError(f"task {i} failed")
                 else:
-                    await asyncio.sleep(5)       # still pending -> cancelled
+                    await asyncio.sleep(5)  # still pending -> cancelled
                 completed += 1
             except asyncio.CancelledError:
                 cancelled += 1

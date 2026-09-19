@@ -29,11 +29,12 @@ By the end of this lecture, you will be able to:
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
-        self.left = left    # Left child
+        self.left = left  # Left child
         self.right = right  # Right child
-    
+
     def __repr__(self):
         return f"TreeNode({self.val})"
+
 
 # Build example tree:
 #        1
@@ -69,11 +70,13 @@ children                 last, filled left-to-right filled
 ```python
 # ============= RECURSIVE TRAVERSALS =============
 
+
 def preorder_recursive(root):
     """Root → Left → Right"""
     if not root:
         return []
     return [root.val] + preorder_recursive(root.left) + preorder_recursive(root.right)
+
 
 def inorder_recursive(root):
     """Left → Root → Right"""
@@ -81,97 +84,104 @@ def inorder_recursive(root):
         return []
     return inorder_recursive(root.left) + [root.val] + inorder_recursive(root.right)
 
+
 def postorder_recursive(root):
     """Left → Right → Root"""
     if not root:
         return []
     return postorder_recursive(root.left) + postorder_recursive(root.right) + [root.val]
 
+
 # ============= ITERATIVE TRAVERSALS =============
+
 
 def preorder_iterative(root):
     """Using a stack — O(n) time, O(n) space."""
     if not root:
         return []
-    
+
     result = []
     stack = [root]
-    
+
     while stack:
         node = stack.pop()
         result.append(node.val)
-        
+
         # Push right first so left is processed first (LIFO)
         if node.right:
             stack.append(node.right)
         if node.left:
             stack.append(node.left)
-    
+
     return result
+
 
 def inorder_iterative(root):
     """Using a stack — O(n) time, O(n) space."""
     result = []
     stack = []
     current = root
-    
+
     while current or stack:
         # Go as far left as possible
         while current:
             stack.append(current)
             current = current.left
-        
+
         current = stack.pop()
         result.append(current.val)
-        
+
         # Visit right subtree
         current = current.right
-    
+
     return result
+
 
 def postorder_iterative(root):
     """Two-stack approach — O(n) time, O(n) space."""
     if not root:
         return []
-    
+
     stack1 = [root]
     stack2 = []
-    
+
     while stack1:
         node = stack1.pop()
         stack2.append(node.val)
-        
+
         if node.left:
             stack1.append(node.left)
         if node.right:
             stack1.append(node.right)
-    
+
     return stack2[::-1]  # Reverse for postorder
+
 
 def level_order(root):
     """BFS using a queue — O(n) time, O(n) space."""
     if not root:
         return []
-    
+
     from collections import deque
+
     result = []
     queue = deque([root])
-    
+
     while queue:
         level = []
         level_size = len(queue)
-        
+
         for _ in range(level_size):
             node = queue.popleft()
             level.append(node.val)
-            
+
             if node.left:
                 queue.append(node.left)
             if node.right:
                 queue.append(node.right)
-        
+
         result.append(level)
-    
+
     return result
 ```
 
@@ -184,6 +194,7 @@ def max_depth(root):
         return 0
     return 1 + max(max_depth(root.left), max_depth(root.right))
 
+
 def min_depth(root):
     """Minimum depth (shortest root-to-leaf path). O(n)."""
     if not root:
@@ -194,8 +205,10 @@ def min_depth(root):
         return 1 + min_depth(root.left)
     return 1 + min(min_depth(root.left), min_depth(root.right))
 
+
 def is_balanced(root):
     """Check if tree is height-balanced. O(n)."""
+
     def check(node):
         if not node:
             return 0
@@ -204,8 +217,9 @@ def is_balanced(root):
         if left == -1 or right == -1 or abs(left - right) > 1:
             return -1
         return 1 + max(left, right)
-    
+
     return check(root) != -1
+
 
 def count_nodes(root):
     """Count total nodes. O(n)."""
@@ -213,15 +227,14 @@ def count_nodes(root):
         return 0
     return 1 + count_nodes(root.left) + count_nodes(root.right)
 
+
 def is_same_tree(p, q):
     """Check if two trees are identical. O(n)."""
     if not p and not q:
         return True
     if not p or not q:
         return False
-    return (p.val == q.val and 
-            is_same_tree(p.left, q.left) and 
-            is_same_tree(p.right, q.right))
+    return p.val == q.val and is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)
 ```
 
 ---
@@ -236,17 +249,18 @@ Invert a binary tree (mirror it).
 Time: O(n), Space: O(h)
 """
 
+
 def invert_tree(root):
     if not root:
         return None
-    
+
     # Swap left and right
     root.left, root.right = root.right, root.left
-    
+
     # Recursively invert subtrees
     invert_tree(root.left)
     invert_tree(root.right)
-    
+
     return root
 ```
 
@@ -258,18 +272,18 @@ Check if tree has a root-to-leaf path with given sum.
 Time: O(n), Space: O(h)
 """
 
+
 def has_path_sum(root, target_sum):
     if not root:
         return False
-    
+
     # Leaf node — check if remaining sum matches
     if not root.left and not root.right:
         return root.val == target_sum
-    
+
     # Recurse with reduced sum
     remaining = target_sum - root.val
-    return (has_path_sum(root.left, remaining) or 
-            has_path_sum(root.right, remaining))
+    return has_path_sum(root.left, remaining) or has_path_sum(root.right, remaining)
 ```
 
 ### Example 3: Serialize and Deserialize Binary Tree
@@ -280,15 +294,18 @@ Convert binary tree to/from string representation.
 Time: O(n), Space: O(n)
 """
 
+
 def serialize(root):
     """Serialize tree to string using preorder."""
     if not root:
         return "null"
-    
+
     return f"{root.val},{serialize(root.left)},{serialize(root.right)}"
+
 
 def deserialize(data):
     """Deserialize string back to tree."""
+
     def helper(nodes):
         val = next(nodes)
         if val == "null":
@@ -297,8 +314,9 @@ def deserialize(data):
         node.left = helper(nodes)
         node.right = helper(nodes)
         return node
-    
+
     return helper(iter(data.split(",")))
+
 
 # Test
 tree_str = serialize(root)
@@ -314,16 +332,17 @@ Find LCA of two nodes in a binary tree.
 Time: O(n), Space: O(h)
 """
 
+
 def lowest_common_ancestor(root, p, q):
     if not root or root == p or root == q:
         return root
-    
+
     left = lowest_common_ancestor(root.left, p, q)
     right = lowest_common_ancestor(root.right, p, q)
-    
+
     if left and right:
         return root  # p and q are in different subtrees
-    
+
     return left if left else right
 ```
 
@@ -335,25 +354,26 @@ Find the maximum path sum in a binary tree (path can start and end at any node).
 Time: O(n), Space: O(h)
 """
 
+
 def max_path_sum(root):
-    max_sum = float('-inf')
-    
+    max_sum = float("-inf")
+
     def dfs(node):
         nonlocal max_sum
         if not node:
             return 0
-        
+
         # Get max contribution from children (ignore negative)
         left_gain = max(dfs(node.left), 0)
         right_gain = max(dfs(node.right), 0)
-        
+
         # Path through this node as the highest point
         current_path_sum = node.val + left_gain + right_gain
         max_sum = max(max_sum, current_path_sum)
-        
+
         # Return max contribution to parent
         return node.val + max(left_gain, right_gain)
-    
+
     dfs(root)
     return max_sum
 ```
@@ -368,6 +388,7 @@ def max_path_sum(root):
 def max_depth(root):
     return 1 + max(max_depth(root.left), max_depth(root.right))
 
+
 # RIGHT: Check for None first
 def max_depth(root):
     if not root:
@@ -380,7 +401,7 @@ def max_depth(root):
 # For preorder iterative, push RIGHT first:
 # This ensures LEFT is processed first (stack is LIFO)
 stack.append(node.right)  # Push right first
-stack.append(node.left)   # Then left — popped first!
+stack.append(node.left)  # Then left — popped first!
 ```
 
 ### Mistake 3: Confusing BST Property

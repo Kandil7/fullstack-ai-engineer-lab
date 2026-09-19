@@ -52,6 +52,7 @@ print()
 # you only specify what differs. Credentials belong in the environment
 # or a secret manager, never in source code.
 
+
 # Example 2: parse a Postgres DSN into its parts
 def dsn_parts(dsn: str) -> dict[str, str]:
     """Split a Postgres DSN into its named components.
@@ -108,9 +109,9 @@ cur.execute(
 )
 cur.execute(
     "INSERT INTO model_runs (model, acc) VALUES (?, ?)",
-    ("bert-base", 0.9231),          # parameterized — never f-string SQL
+    ("bert-base", 0.9231),  # parameterized — never f-string SQL
 )
-print("   rows affected by INSERT:", cur.rowcount)   # read BEFORE the next query
+print("   rows affected by INSERT:", cur.rowcount)  # read BEFORE the next query
 conn.commit()
 cur.execute("SELECT model, acc FROM model_runs")
 row = cur.fetchone()
@@ -130,12 +131,12 @@ print()
 
 # Example 4: sqlite3 transaction guard, then explicit close
 conn = sqlite3.connect(":memory:")
-with conn:                          # transaction guard: commit or rollback
+with conn:  # transaction guard: commit or rollback
     conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
     conn.execute("INSERT INTO t (v) VALUES (?)", ("hello",))
 n = conn.execute("SELECT COUNT(*) FROM t").fetchone()[0]
 print(f"4. rows after with-block commit: {n}  (connection still open)")
-conn.close()                        # explicit close — the with-block did not do it
+conn.close()  # explicit close — the with-block did not do it
 print()
 
 # ============================================================
@@ -152,7 +153,7 @@ with sqlite3.connect(":memory:") as conn:
     conn.execute("CREATE TABLE evals (id INTEGER PRIMARY KEY, score REAL)")
     conn.executemany(
         "INSERT INTO evals (score) VALUES (?)",
-        [(float(i) / 100.0,) for i in range(25)],   # one tuple per row!
+        [(float(i) / 100.0,) for i in range(25)],  # one tuple per row!
     )
     cur = conn.cursor()
     cur.execute("SELECT id, score FROM evals ORDER BY id")
@@ -174,11 +175,10 @@ print()
 # When you have Docker: `docker compose up -d postgres` (see
 # infra/docker/docker-compose.yml) and this block runs for real.
 
+
 def pg_demo() -> None:
     """Connect to a real Postgres; print [skip] when unavailable."""
-    dsn = os.environ.get(
-        "PGDSN", "postgresql://postgres:postgres@localhost:5432/postgres"
-    )
+    dsn = os.environ.get("PGDSN", "postgresql://postgres:postgres@localhost:5432/postgres")
     try:
         import psycopg  # psycopg3 — installed on this machine, harmless
     except ImportError:
@@ -192,7 +192,7 @@ def pg_demo() -> None:
                 print(f"6. connected to Postgres: {version}")
                 # Server cursor — rows stay on the server
                 with pg_conn.cursor(name="big_scan") as server_cur:
-                    server_cur.execute("SELECT 1")   # real named-cursor query
+                    server_cur.execute("SELECT 1")  # real named-cursor query
                     print("   server cursor (named) created")
     except Exception as exc:  # noqa: BLE001 — any connection failure = skip
         print(
@@ -220,6 +220,7 @@ print()
 # MISTAKE: cur.fetchall() on a 50M-row scan -> gigabytes in RAM
 # CORRECT: named server cursor + fetchmany chunking
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -237,16 +238,18 @@ def _verify() -> None:
 
     # 2. DSN parsing handles key=value form and defaults
     parts = dsn_parts("host=localhost dbname=postgres")
-    assert parts["host"] == "localhost" and parts["dbname"] == "postgres", \
+    assert parts["host"] == "localhost" and parts["dbname"] == "postgres", (
         "key=value DSN must parse"
+    )
 
     # 3. Parameterized insert + fetch round-trips data
     with sqlite3.connect(":memory:") as conn:
         conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
         conn.execute("INSERT INTO t (v) VALUES (?)", ("safe",))
         conn.commit()
-        assert conn.execute("SELECT v FROM t").fetchone()[0] == "safe", \
+        assert conn.execute("SELECT v FROM t").fetchone()[0] == "safe", (
             "parameterized INSERT must round-trip"
+        )
 
     # 4. Chunked fetchmany reads every row exactly once
     with sqlite3.connect(":memory:") as conn:
@@ -267,9 +270,10 @@ def _verify() -> None:
     with conn:
         conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
         conn.execute("INSERT INTO t (v) VALUES (?)", ("x",))
-    assert conn.execute("SELECT COUNT(*) FROM t").fetchone()[0] == 1, \
+    assert conn.execute("SELECT COUNT(*) FROM t").fetchone()[0] == 1, (
         "with-block must commit the insert"
-    conn.close()                  # the with-block left the connection open
+    )
+    conn.close()  # the with-block left the connection open
     try:
         conn.execute("SELECT 1")
         closed = False
@@ -297,4 +301,4 @@ if __name__ == "__main__":
         print("3. Cursors execute SQL and fetch rows; always bind parameters")
         print("4. with-blocks guarantee cleanup; psycopg3 needs explicit commit()")
         print("5. Server cursors chunk huge scans; client cursors buffer everything")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

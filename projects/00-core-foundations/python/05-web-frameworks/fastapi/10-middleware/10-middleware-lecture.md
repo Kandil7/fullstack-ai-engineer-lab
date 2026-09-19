@@ -99,21 +99,24 @@ import time
 
 app = FastAPI()
 
+
 class SimpleMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Process request
         start_time = time.time()
-        
+
         # Call the next middleware or endpoint
         response = await call_next(request)
-        
+
         # Process response
         process_time = time.time() - start_time
         response.headers["X-Process-Time"] = str(process_time)
-        
+
         return response
 
+
 app.add_middleware(SimpleMiddleware)
+
 
 @app.get("/")
 async def root():
@@ -130,22 +133,25 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Log request details
         logger.info(f"Request: {request.method} {request.url.path}")
         logger.info(f"Headers: {dict(request.headers)}")
-        
+
         # Process request
         response = await call_next(request)
-        
+
         # Log response details
         logger.info(f"Response: {response.status_code}")
-        
+
         return response
+
 
 app = FastAPI()
 app.add_middleware(LoggingMiddleware)
+
 
 @app.get("/users/{user_id}")
 async def get_user(user_id: int):
@@ -159,37 +165,34 @@ from fastapi import FastAPI, Request, HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
+
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Skip auth for certain paths
         if request.url.path in ["/docs", "/openapi.json", "/health"]:
             return await call_next(request)
-        
+
         # Check for authorization header
         auth_header = request.headers.get("Authorization")
         if not auth_header:
-            raise HTTPException(
-                status_code=401,
-                detail="Authorization header required"
-            )
-        
+            raise HTTPException(status_code=401, detail="Authorization header required")
+
         # Validate token (simplified)
         token = auth_header.replace("Bearer ", "")
         if not self.validate_token(token):
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid token"
-            )
-        
+            raise HTTPException(status_code=401, detail="Invalid token")
+
         # Continue to endpoint
         return await call_next(request)
-    
+
     def validate_token(self, token: str) -> bool:
         # Simplified token validation
         return len(token) > 0
 
+
 app = FastAPI()
 app.add_middleware(AuthMiddleware)
+
 
 @app.get("/protected")
 async def protected_route():
@@ -213,6 +216,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 async def root():
     return {"message": "CORS enabled!"}
@@ -225,24 +229,27 @@ from fastapi import FastAPI, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 import uuid
 
+
 class RequestIDMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Generate or extract request ID
         request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
-        
+
         # Add to request state
         request.state.request_id = request_id
-        
+
         # Process request
         response = await call_next(request)
-        
+
         # Add to response headers
         response.headers["X-Request-ID"] = request_id
-        
+
         return response
+
 
 app = FastAPI()
 app.add_middleware(RequestIDMiddleware)
+
 
 @app.get("/")
 async def root(request: Request):
@@ -260,6 +267,7 @@ app = FastAPI()
 # Enable GZip compression for responses > 1000 bytes
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+
 @app.get("/large-data")
 async def large_data():
     # This response will be compressed
@@ -276,9 +284,9 @@ app = FastAPI()
 
 # Only allow requests from specific hosts
 app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=["example.com", "www.example.com", "localhost"]
+    TrustedHostMiddleware, allowed_hosts=["example.com", "www.example.com", "localhost"]
 )
+
 
 @app.get("/")
 async def root():
@@ -296,6 +304,7 @@ async def root():
 class BadMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         return Response(content="Blocked")
+
 
 # ✅ CORRECT - Properly calls next middleware
 class GoodMiddleware(BaseHTTPMiddleware):
@@ -315,7 +324,7 @@ app.add_middleware(CORSMiddleware, ...)  # CORS won't work properly
 # ✅ CORRECT - CORS should be added first
 app = FastAPI()
 app.add_middleware(CORSMiddleware, ...)  # CORS first
-app.add_middleware(AuthMiddleware)       # Then auth
+app.add_middleware(AuthMiddleware)  # Then auth
 ```
 
 ### Mistake 3: Not Handling Exceptions
@@ -327,6 +336,7 @@ class FragileMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         return response
 
+
 # ✅ CORRECT - Proper exception handling
 class RobustMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -334,10 +344,7 @@ class RobustMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             return response
         except Exception as e:
-            return Response(
-                content=f"Error: {str(e)}",
-                status_code=500
-            )
+            return Response(content=f"Error: {str(e)}", status_code=500)
 ```
 
 ---

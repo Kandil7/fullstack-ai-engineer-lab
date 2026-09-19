@@ -51,6 +51,7 @@ D) `plt.show()`
 
 ```python
 import matplotlib.pyplot as plt
+
 plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
 plt.show()
 ```
@@ -134,7 +135,7 @@ D) `plt.points()`
 **Explanation:** `plt.scatter()` creates scatter plots. It accepts x, y coordinates, color (`c`), size (`s`), and other styling options.
 
 ```python
-plt.scatter([1, 2, 3, 4], [1, 4, 9, 16], c='red', s=100)
+plt.scatter([1, 2, 3, 4], [1, 4, 9, 16], c="red", s=100)
 ```
 
 ---
@@ -281,7 +282,7 @@ D) Rotate the plot
 **Explanation:** `plt.xticks()` and `plt.yticks()` control tick locations and labels. You can customize positions, labels, rotation, and font properties.
 
 ```python
-plt.xticks(rotation=45, ha='right')
+plt.xticks(rotation=45, ha="right")
 plt.yticks([0, 25, 50, 75, 100])
 ```
 

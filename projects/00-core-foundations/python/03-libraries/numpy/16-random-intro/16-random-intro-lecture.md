@@ -169,16 +169,16 @@ import numpy as np
 # Uniform between 0 and 1
 uniform = np.random.uniform(0, 1, size=1000)
 print("Uniform distribution:")
-print(f"  Mean: {uniform.mean():.4f}")    # ~0.5
-print(f"  Std: {uniform.std():.4f}")      # ~0.29
-print(f"  Min: {uniform.min():.4f}")      # ~0.00
-print(f"  Max: {uniform.max():.4f}")      # ~1.00
+print(f"  Mean: {uniform.mean():.4f}")  # ~0.5
+print(f"  Std: {uniform.std():.4f}")  # ~0.29
+print(f"  Min: {uniform.min():.4f}")  # ~0.00
+print(f"  Max: {uniform.max():.4f}")  # ~1.00
 
 # Uniform between custom range
 uniform_custom = np.random.uniform(10, 20, size=1000)
 print(f"\nUniform [10, 20):")
 print(f"  Mean: {uniform_custom.mean():.4f}")  # ~15.0
-print(f"  Std: {uniform_custom.std():.4f}")    # ~2.89
+print(f"  Std: {uniform_custom.std():.4f}")  # ~2.89
 ```
 
 ### 6. Practical Random Examples
@@ -223,16 +223,16 @@ import numpy as np
 
 # Generate different types of random numbers
 print("=== Random Floats ===")
-print("random():", np.random.random())        # [0, 1)
-print("rand():", np.random.rand())            # [0, 1)
-print("randf():", np.random.randf())          # [0, 1) - alias
+print("random():", np.random.random())  # [0, 1)
+print("rand():", np.random.rand())  # [0, 1)
+print("randf():", np.random.randf())  # [0, 1) - alias
 
 print("\n=== Random Integers ===")
-print("randint(0, 10):", np.random.randint(0, 10))     # [0, 10)
-print("randint(1, 100):", np.random.randint(1, 100))   # [1, 100)
+print("randint(0, 10):", np.random.randint(0, 10))  # [0, 10)
+print("randint(1, 100):", np.random.randint(1, 100))  # [1, 100)
 
 print("\n=== Random Normal ===")
-print("randn():", np.random.randn())           # Standard normal
+print("randn():", np.random.randn())  # Standard normal
 print("normal(0, 1):", np.random.normal(0, 1))  # Custom normal
 ```
 
@@ -305,7 +305,7 @@ samples = np.random.choice(categories, size=1000, p=probabilities)
 unique, counts = np.unique(samples, return_counts=True)
 print("Category distribution:")
 for cat, count in zip(unique, counts):
-    print(f"  {cat}: {count} ({count/1000:.1%})")
+    print(f"  {cat}: {count} ({count / 1000:.1%})")
 
 # Output (approximate):
 # Category distribution:
@@ -338,7 +338,7 @@ print(f"  Std: {rolls.std():.2f} (expected: ~1.71)")
 unique, counts = np.unique(rolls, return_counts=True)
 print(f"  Face distribution:")
 for face, count in zip(unique, counts):
-    print(f"    {face}: {count} ({count/10000:.1%})")
+    print(f"    {face}: {count} ({count / 10000:.1%})")
 ```
 
 ---
@@ -364,6 +364,7 @@ print(result)  # Same every time!
 # WRONG - Modifies global state
 def get_random():
     return np.random.random(5)
+
 
 # CORRECT - Use local RandomState or Generator
 def get_random(seed=None):
@@ -428,6 +429,7 @@ arr = np.random.random(100)
 
 ```python
 import numpy as np
+
 
 # Always set seed in tests
 def test_random_function():
@@ -521,7 +523,7 @@ print(f"Custom normal - Mean: {custom.mean():.3f}, Std: {custom.std():.3f}")
 
 # TODO: How many values are within 1 std of mean?
 within_1std = np.sum((custom > 40) & (custom < 60))
-print(f"Within 1 std: {within_1std} ({within_1std/10:.1f}%)")
+print(f"Within 1 std: {within_1std} ({within_1std / 10:.1f}%)")
 ```
 
 ### Exercise 3: Reproducible Random
@@ -616,15 +618,15 @@ print(f"Height stats: mean={heights.mean():.1f}, std={heights.std():.1f}")
 import numpy as np
 
 # Random floats
-arr = np.random.random(10)           # [0, 1)
+arr = np.random.random(10)  # [0, 1)
 arr = np.random.uniform(0, 100, 10)  # [0, 100)
 
 # Random integers
-arr = np.random.randint(0, 10, 10)   # [0, 10)
+arr = np.random.randint(0, 10, 10)  # [0, 10)
 
 # Normal distribution
-arr = np.random.randn(10)            # Standard normal
-arr = np.random.normal(50, 10, 10)   # Custom normal
+arr = np.random.randn(10)  # Standard normal
+arr = np.random.normal(50, 10, 10)  # Custom normal
 
 # Seed for reproducibility
 np.random.seed(42)

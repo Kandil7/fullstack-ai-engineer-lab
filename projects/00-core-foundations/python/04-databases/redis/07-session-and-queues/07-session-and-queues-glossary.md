@@ -32,7 +32,7 @@
 only promoted when they become due — scheduling without a timer.
 **Example**:
 ```python
-delay.zadd("jobs:delayed", {msg: future_ts})   # park until future_ts
+delay.zadd("jobs:delayed", {msg: future_ts})  # park until future_ts
 # every poll: promote all members with score <= now into the work list
 ```
 ```text
@@ -104,8 +104,8 @@ lease = claim("job-1", "worker-a", ttl=30)
 the FIFO queue.
 **Example**:
 ```python
-work.lpush("jobs:work", "job-3")   # head
-print(work.llen("jobs:work"))      # -> 3
+work.lpush("jobs:work", "job-3")  # head
+print(work.llen("jobs:work"))  # -> 3
 ```
 ```text
 # producers never block; backpressure shows as list growth
@@ -132,9 +132,9 @@ print(z.zpopmin("jobs:prio")[0][0])  # highest priority
 list so they become processable.
 **Example**:
 ```python
-due = delay.zpopmin_by_score(now)   # members with score <= now
+due = delay.zpopmin_by_score(now)  # members with score <= now
 for msg in due:
-    work.lpush("jobs:work", msg)    # now workable
+    work.lpush("jobs:work", msg)  # now workable
 ```
 ```text
 # the poll loop runs every tick — the delay queue's only engine
@@ -176,8 +176,8 @@ print(work.rpop("jobs:work"))  # -> job-1, retried
 the FIFO queue.
 **Example**:
 ```python
-job = work.rpop("jobs:work")   # oldest first
-print(job)                     # -> job-1
+job = work.rpop("jobs:work")  # oldest first
+print(job)  # -> job-1
 ```
 ```text
 # the natural partner of LPUSH: FIFO by construction
@@ -219,8 +219,8 @@ session fields.
 **Example**:
 ```python
 key = f"session:{sid}"
-client.hset(key, "user_id", "42")       # field per attribute
-client.expire(key, 3600)                 # lifetime bound
+client.hset(key, "user_id", "42")  # field per attribute
+client.expire(key, 3600)  # lifetime bound
 ```
 ```text
 # the sid lives in the cookie; everything else lives here
@@ -234,7 +234,7 @@ timeouts, not absolute ones.
 **Example**:
 ```python
 # on each request:
-client.expire(f"session:{sid}", 3600)   # the clock restarts
+client.expire(f"session:{sid}", 3600)  # the clock restarts
 # inactive for 1h -> gone; active forever -> stays
 ```
 ```text
@@ -262,8 +262,8 @@ print(z.zrange("jobs:prio", 0, -1))  # -> ['urgent', 'normal']
 security control that abandoned sessions do not live forever.
 **Example**:
 ```python
-client.expire(f"session:{sid}", 3600)   # 1h idle -> dead
-print(client.ttl(f"session:{sid}"))     # seconds remaining
+client.expire(f"session:{sid}", 3600)  # 1h idle -> dead
+print(client.ttl(f"session:{sid}"))  # seconds remaining
 ```
 ```text
 # combined with slide: idle timeout; without slide: absolute
@@ -277,9 +277,9 @@ with leases so crashes redeliver instead of losing work.
 **Example**:
 ```python
 while True:
-    item = claim_and_pop()      # lease-bound pop
-    process(item)               # the actual job
-    delete_if_done(item)        # ack: remove from the system
+    item = claim_and_pop()  # lease-bound pop
+    process(item)  # the actual job
+    delete_if_done(item)  # ack: remove from the system
 ```
 ```text
 # the worker contract: at-least-once, idempotent handlers
@@ -292,8 +292,8 @@ while True:
 priority and delay queues.
 **Example**:
 ```python
-z.zadd("jobs:delayed", {msg: future_ts})   # park until future_ts
-z.zadd("jobs:prio", {"urgent": 0})          # priority ordering
+z.zadd("jobs:delayed", {msg: future_ts})  # park until future_ts
+z.zadd("jobs:prio", {"urgent": 0})  # priority ordering
 ```
 ```text
 # adding is O(log n); order is always maintained
@@ -306,7 +306,7 @@ z.zadd("jobs:prio", {"urgent": 0})          # priority ordering
 priority queues; for delay queues, pop-when-due.
 **Example**:
 ```python
-member = z.zpopmin("jobs:prio")[0][0]   # lowest score first
+member = z.zpopmin("jobs:prio")[0][0]  # lowest score first
 ```
 ```text
 # with scores as timestamps, ZPOPMIN is "oldest first"

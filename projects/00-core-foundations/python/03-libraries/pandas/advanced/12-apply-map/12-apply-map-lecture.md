@@ -60,8 +60,8 @@ the vectorized methods cannot express.
 ## 3. `apply` on a DataFrame — Columns or Rows
 
 ```python
-df.apply(lambda col: col.max() - col.min(), axis=0)   # per column
-df.apply(lambda row: row["a"] / row["b"], axis=1)     # per row
+df.apply(lambda col: col.max() - col.min(), axis=0)  # per column
+df.apply(lambda row: row["a"] / row["b"], axis=1)  # per row
 ```
 
 `axis=0` (default) applies to columns; `axis=1` to rows. Row-wise apply is
@@ -70,8 +70,8 @@ the slowest common pandas operation — avoid in hot paths.
 ## 4. Element-Wise — `df.map` (3.3+) and `applymap`
 
 ```python
-df.map(lambda x: x if pd.notna(x) else 0)   # element-wise, modern form
-df.applymap(fn)                              # deprecated in pandas 3.x
+df.map(lambda x: x if pd.notna(x) else 0)  # element-wise, modern form
+df.applymap(fn)  # deprecated in pandas 3.x
 ```
 
 Element-wise mapping over the whole frame: use `df.map` on pandas >= 3, note
@@ -83,10 +83,12 @@ Element-wise mapping over the whole frame: use `df.map` on pandas >= 3, note
 def drop_dupes(df, subset): ...
 def scale(df, cols): ...
 
-df = (df
-      .pipe(drop_dupes, subset=["user_id"])
-      .pipe(scale, cols=["latency_ms"])
-      .pipe(add_window_features, col="count", windows=(3, 7)))
+
+df = (
+    df.pipe(drop_dupes, subset=["user_id"])
+    .pipe(scale, cols=["latency_ms"])
+    .pipe(add_window_features, col="count", windows=(3, 7))
+)
 ```
 
 `pipe` passes the frame to a function (with extra args) and returns the

@@ -36,15 +36,15 @@
 from typing import List
 import heapq
 
+
 class BeamSearch:
     def __init__(self, beam_width: int = 3):
         self.beam_width = beam_width
-    
-    def search(self, root, expand_fn, score_fn, 
-               is_goal_fn, max_depth: int = 5):
+
+    def search(self, root, expand_fn, score_fn, is_goal_fn, max_depth: int = 5):
         """
         Beam search from root node.
-        
+
         Args:
             root: Starting node
             expand_fn: Function to generate children
@@ -54,33 +54,31 @@ class BeamSearch:
         """
         # Initialize beam with root
         current_beam = [(score_fn(root), root)]
-        
+
         for depth in range(max_depth):
             all_candidates = []
-            
+
             # Expand each node in beam
             for score, node in current_beam:
                 if is_goal_fn(node):
                     return node, score
-                
+
                 children = expand_fn(node)
                 for child in children:
                     child_score = score_fn(child)
                     all_candidates.append((child_score, child))
-            
+
             if not all_candidates:
                 break
-            
+
             # Keep top-k candidates
-            current_beam = heapq.nlargest(
-                self.beam_width, 
-                all_candidates
-            )
-        
+            current_beam = heapq.nlargest(self.beam_width, all_candidates)
+
         # Return best from final beam
         if current_beam:
             return max(current_beam, key=lambda x: x[0])
         return None, 0
+
 
 # Usage
 beam = BeamSearch(beam_width=3)
@@ -88,7 +86,7 @@ best_node, best_score = beam.search(
     root=initial_state,
     expand_fn=generate_thoughts,
     score_fn=evaluate_thought,
-    is_goal_fn=check_if_done
+    is_goal_fn=check_if_done,
 )
 ```
 
@@ -125,15 +123,17 @@ Let's solve this step by step:
 
 Step 1: Understand the problem.
 """
-    
-def chain_of_thought_with_examples(question: str, 
-                                   examples: list) -> str:
+
+
+def chain_of_thought_with_examples(question: str, examples: list) -> str:
     """Few-shot CoT with examples."""
-    examples_text = "\n\n".join([
-        f"Q: {ex['question']}\nA: {ex['reasoning']}\nAnswer: {ex['answer']}"
-        for ex in examples
-    ])
-    
+    examples_text = "\n\n".join(
+        [
+            f"Q: {ex['question']}\nA: {ex['reasoning']}\nAnswer: {ex['answer']}"
+            for ex in examples
+        ]
+    )
+
     return f"""Here are some examples of step-by-step reasoning:
 
 {examples_text}
@@ -159,29 +159,30 @@ A: Let's think step by step.
 from typing import Dict, List, Set
 from collections import deque
 
+
 class TaskDAG:
     """Directed Acyclic Graph for task dependencies."""
-    
+
     def __init__(self):
         self.tasks: Dict[str, dict] = {}
         self.edges: Dict[str, List[str]] = {}  # task -> dependents
-    
+
     def add_task(self, task_id: str, description: str):
         """Add a task to the DAG."""
         self.tasks[task_id] = {
             "id": task_id,
             "description": description,
-            "status": "pending"
+            "status": "pending",
         }
         if task_id not in self.edges:
             self.edges[task_id] = []
-    
+
     def add_dependency(self, task_id: str, depends_on: str):
         """Add dependency: task_id depends on depends_on."""
         if depends_on not in self.edges:
             self.edges[depends_on] = []
         self.edges[depends_on].append(task_id)
-    
+
     def topological_sort(self) -> List[str]:
         """Get tasks in valid execution order."""
         # Calculate in-degrees
@@ -189,22 +190,22 @@ class TaskDAG:
         for task, dependents in self.edges.items():
             for dep in dependents:
                 in_degree[dep] = in_degree.get(dep, 0) + 1
-        
+
         # Start with tasks that have no dependencies
         queue = deque([t for t, d in in_degree.items() if d == 0])
         order = []
-        
+
         while queue:
             task = queue.popleft()
             order.append(task)
-            
+
             for dependent in self.edges.get(task, []):
                 in_degree[dependent] -= 1
                 if in_degree[dependent] == 0:
                     queue.append(dependent)
-        
+
         return order
-    
+
     def get_ready_tasks(self, completed: Set[str]) -> List[str]:
         """Get tasks whose dependencies are all completed."""
         ready = []
@@ -212,13 +213,11 @@ class TaskDAG:
             for dep in dependents:
                 if dep not in completed:
                     # Check if all dependencies of dep are completed
-                    deps_of_dep = [
-                        t for t, d in self.edges.items() 
-                        if dep in d
-                    ]
+                    deps_of_dep = [t for t, d in self.edges.items() if dep in d]
                     if all(d in completed for d in deps_of_dep):
                         ready.append(dep)
         return ready
+
 
 # Usage
 dag = TaskDAG()
@@ -247,14 +246,15 @@ print(f"Execution order: {execution_order}")  # ['A', 'B', 'C']
 @dataclass
 class GoalNode:
     """A node in the goal tree."""
+
     goal: str
     subgoals: List["GoalNode"] = field(default_factory=list)
     completed: bool = False
     result: str = None
-    
+
     def is_leaf(self) -> bool:
         return len(self.subgoals) == 0
-    
+
     def get_all_leaves(self) -> List["GoalNode"]:
         if self.is_leaf():
             return [self]
@@ -262,28 +262,30 @@ class GoalNode:
         for subgoal in self.subgoals:
             leaves.extend(subgoal.get_all_leaves())
         return leaves
-    
+
     def to_dict(self) -> dict:
         return {
             "goal": self.goal,
             "completed": self.completed,
-            "subgoals": [sg.to_dict() for sg in self.subgoals]
+            "subgoals": [sg.to_dict() for sg in self.subgoals],
         }
+
 
 class GoalTreePlanner:
     """Plans by decomposing goals into a tree."""
-    
+
     def __init__(self, llm):
         self.llm = llm
-    
-    def decompose(self, goal: str, max_depth: int = 3,
-                  current_depth: int = 0) -> GoalNode:
+
+    def decompose(
+        self, goal: str, max_depth: int = 3, current_depth: int = 0
+    ) -> GoalNode:
         """Recursively decompose goal into subgoals."""
         node = GoalNode(goal=goal)
-        
+
         if current_depth >= max_depth:
             return node  # Leaf node at max depth
-        
+
         # Ask LLM to decompose
         prompt = f"""Break this goal into 2-4 sub-goals:
 Goal: {goal}
@@ -292,7 +294,7 @@ Return JSON array of sub-goals:
 ["subgoal 1", "subgoal 2"]
 """
         response = self.llm(prompt)
-        
+
         try:
             subgoals = json.loads(response)
             for sg in subgoals:
@@ -300,7 +302,7 @@ Return JSON array of sub-goals:
                 node.subgoals.append(child)
         except:
             pass  # Keep as leaf node
-        
+
         return node
 ```
 
@@ -318,28 +320,30 @@ Return JSON array of sub-goals:
 ```python
 class Planner:
     """Base class for planning agents."""
-    
+
     def __init__(self, llm, tools: dict):
         self.llm = llm
         self.tools = tools
-    
+
     def create_plan(self, goal: str, context: dict = None) -> List[dict]:
         """Create an action plan for achieving the goal."""
         prompt = self._build_planning_prompt(goal, context)
         response = self.llm(prompt)
-        
+
         try:
             return json.loads(response)
         except:
             return [{"action": "llm_complete", "input": goal}]
-    
+
     def _build_planning_prompt(self, goal: str, context: dict) -> str:
         """Build prompt for plan generation."""
-        tools_desc = "\n".join([
-            f"- {name}: {tool.__doc__ or 'No description'}"
-            for name, tool in self.tools.items()
-        ])
-        
+        tools_desc = "\n".join(
+            [
+                f"- {name}: {tool.__doc__ or 'No description'}"
+                for name, tool in self.tools.items()
+            ]
+        )
+
         return f"""Create a plan to achieve this goal.
 
 Goal: {goal}
@@ -356,13 +360,14 @@ Return a JSON array of steps:
   }}
 ]
 """
-    
-    def replan(self, original_plan: list, completed_steps: list,
-               failed_step: dict, error: str) -> List[dict]:
+
+    def replan(
+        self, original_plan: list, completed_steps: list, failed_step: dict, error: str
+    ) -> List[dict]:
         """Create a new plan after a failure."""
         prompt = f"""The following plan has failed. Create a new plan.
 
-Original goal: {original_plan[0].get('description', 'Unknown')}
+Original goal: {original_plan[0].get("description", "Unknown")}
 Completed steps: {completed_steps}
 Failed step: {failed_step}
 Error: {error}
@@ -374,11 +379,12 @@ Create a new plan that:
 Return JSON array of new steps:
 """
         response = self.llm(prompt)
-        
+
         try:
             return json.loads(response)
         except:
             return []
+
 
 # Usage
 planner = Planner(llm=my_llm, tools=my_tools)
@@ -397,49 +403,47 @@ plan = planner.create_plan("Research and summarize AI agent papers")
 ```python
 class TreePruner:
     """Prune unpromising branches from search tree."""
-    
+
     def __init__(self, threshold: float = 0.2):
         self.threshold = threshold
-    
+
     def prune_by_score(self, nodes: list) -> list:
         """Remove nodes below score threshold."""
         return [n for n in nodes if n.score >= self.threshold]
-    
-    def prune_by_diversity(self, nodes: list, 
-                          min_similarity: float = 0.8) -> list:
+
+    def prune_by_diversity(self, nodes: list, min_similarity: float = 0.8) -> list:
         """Remove highly similar nodes, keeping diverse options."""
         if not nodes:
             return []
-        
+
         pruned = [nodes[0]]
-        
+
         for node in nodes[1:]:
             is_diverse = True
             for kept in pruned:
-                similarity = self._calculate_similarity(
-                    node.thought, kept.thought
-                )
+                similarity = self._calculate_similarity(node.thought, kept.thought)
                 if similarity > min_similarity:
                     is_diverse = False
                     break
-            
+
             if is_diverse:
                 pruned.append(node)
-        
+
         return pruned
-    
+
     def _calculate_similarity(self, text1: str, text2: str) -> float:
         """Simple text similarity."""
         words1 = set(text1.lower().split())
         words2 = set(text2.lower().split())
-        
+
         if not words1 or not words2:
             return 0.0
-        
+
         intersection = len(words1 & words2)
         union = len(words1 | words2)
-        
+
         return intersection / union
+
 
 # Usage
 pruner = TreePruner(threshold=0.3)
@@ -461,36 +465,31 @@ diverse_nodes = pruner.prune_by_diversity(promising_nodes)
 ```python
 class AdaptivePlanner:
     """Planner that can adapt to changes and failures."""
-    
+
     def __init__(self, llm, max_replans: int = 3):
         self.llm = llm
         self.max_replans = max_replans
         self.replan_count = 0
-    
+
     def execute_with_replanning(self, goal: str, executor):
         """Execute goal with automatic replanning on failure."""
         plan = self.create_plan(goal)
-        
+
         while self.replan_count < self.max_replans:
             result = executor.execute(plan)
-            
+
             if result["success"]:
                 return result
-            
+
             # Failure - need to replan
             self.replan_count += 1
             plan = self.replan(
-                goal, 
-                plan, 
-                result["completed"],
-                result["failed_step"],
-                result["error"]
+                goal, plan, result["completed"], result["failed_step"], result["error"]
             )
-        
+
         return {"success": False, "error": "Max replans exceeded"}
-    
-    def replan(self, goal, original_plan, completed, 
-               failed_step, error):
+
+    def replan(self, goal, original_plan, completed, failed_step, error):
         """Create new plan accounting for what's done."""
         prompt = f"""Original goal: {goal}
 Completed steps: {completed}
@@ -501,7 +500,7 @@ Create a new plan that achieves the remaining goal.
 Only include steps not yet completed.
 """
         response = self.llm(prompt)
-        
+
         try:
             return json.loads(response)
         except:
@@ -522,57 +521,54 @@ Only include steps not yet completed.
 ```python
 class StateSpaceSearch:
     """Search through state space to find solution path."""
-    
+
     def __init__(self, transitions, goal_test):
         self.transitions = transitions  # state -> [possible_next_states]
         self.goal_test = goal_test
-    
+
     def bfs(self, initial_state) -> list:
         """Breadth-first search through state space."""
         from collections import deque
-        
+
         queue = deque([(initial_state, [initial_state])])
         visited = {initial_state}
-        
+
         while queue:
             state, path = queue.popleft()
-            
+
             if self.goal_test(state):
                 return path
-            
+
             for next_state in self.transitions(state):
                 if next_state not in visited:
                     visited.add(next_state)
                     queue.append((next_state, path + [next_state]))
-        
+
         return None  # No path found
-    
+
     def a_star(self, initial_state, heuristic):
         """A* search with heuristic."""
         import heapq
-        
+
         open_set = [(0, initial_state, [initial_state])]
         g_scores = {initial_state: 0}
-        
+
         while open_set:
             f_score, state, path = heapq.heappop(open_set)
-            
+
             if self.goal_test(state):
                 return path
-            
+
             for next_state in self.transitions(state):
                 tentative_g = g_scores[state] + 1
-                
-                if next_state not in g_scores or \
-                   tentative_g < g_scores[next_state]:
+
+                if next_state not in g_scores or tentative_g < g_scores[next_state]:
                     g_scores[next_state] = tentative_g
                     f_score = tentative_g + heuristic(next_state)
-                    heapq.heappush(
-                        open_set, 
-                        (f_score, next_state, path + [next_state])
-                    )
-        
+                    heapq.heappush(open_set, (f_score, next_state, path + [next_state]))
+
         return None
+
 
 # Usage
 def puzzle_transitions(state):
@@ -580,9 +576,11 @@ def puzzle_transitions(state):
     # Implementation depends on puzzle type
     pass
 
+
 def puzzle_goal_test(state):
     """Check if puzzle is solved."""
     return state == goal_state
+
 
 search = StateSpaceSearch(puzzle_transitions, puzzle_goal_test)
 solution_path = search.bfs(initial_puzzle_state)
@@ -602,12 +600,11 @@ solution_path = search.bfs(initial_puzzle_state)
 ```python
 class TaskDecomposer:
     """Decompose complex tasks into sub-tasks."""
-    
+
     def __init__(self, llm):
         self.llm = llm
-    
-    def decompose(self, task: str, 
-                  max_subtasks: int = 5) -> List[dict]:
+
+    def decompose(self, task: str, max_subtasks: int = 5) -> List[dict]:
         """Break task into sub-tasks."""
         prompt = f"""Break this task into {max_subtasks} or fewer sub-tasks.
 
@@ -628,18 +625,16 @@ Return JSON array:
 ]
 """
         response = self.llm(prompt)
-        
+
         try:
             return json.loads(response)
         except:
-            return [{"name": task, "description": task, 
-                    "done_when": "Task completed"}]
+            return [{"name": task, "description": task, "done_when": "Task completed"}]
+
 
 # Usage
 decomposer = TaskDecomposer(llm=my_llm)
-subtasks = decomposer.decompose(
-    "Build a REST API with authentication"
-)
+subtasks = decomposer.decompose("Build a REST API with authentication")
 for st in subtasks:
     print(f"- {st['name']}: {st['description']}")
 ```

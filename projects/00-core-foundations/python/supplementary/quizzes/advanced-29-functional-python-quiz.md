@@ -46,10 +46,12 @@ import functools
 
 calls = {"n": 0}
 
+
 @functools.lru_cache(maxsize=None)
 def square(x):
     calls["n"] += 1
     return x * x
+
 
 square(4)
 square(4)
@@ -118,10 +120,17 @@ D) 4
 def compose(g, f):
     def composed(x):
         return g(f(x))
+
     return composed
 
-def double(x): return x * 2
-def increment(x): return x + 1
+
+def double(x):
+    return x * 2
+
+
+def increment(x):
+    return x + 1
+
 
 print(compose(double, increment)(3))
 ```
@@ -182,10 +191,12 @@ D) The attribute is ignored at runtime but kept by the type checker
 ```python
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class Chunk:
     doc_id: int
     text: str
+
 
 c = Chunk(1, "hello")
 d = Chunk(1, "hello")
@@ -218,8 +229,10 @@ D) `10_000` is not a valid argument
 ```python
 import functools
 
+
 def scale(x, factor):
     return x * factor
+
 
 halve = functools.partial(scale, factor=0.5)
 print(halve(10))
@@ -282,6 +295,7 @@ D) `sorted(rows, key=1)`
 def add(a, b):
     return a + b
 
+
 curried = lambda b: add(5, b)
 print(curried(3))
 ```
@@ -312,6 +326,7 @@ D) It makes the function slower
 ```python
 def transform(s):
     return s.strip().lower()
+
 
 print(transform(transform("  Hi  ")))
 ```

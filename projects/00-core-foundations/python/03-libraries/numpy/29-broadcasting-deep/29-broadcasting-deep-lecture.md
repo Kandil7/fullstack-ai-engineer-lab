@@ -56,17 +56,17 @@ import numpy as np
 # Rule 1: trailing alignment. (4,) pairs with the last axis of (3, 4).
 x = np.ones((3, 4))
 v = np.ones(4)
-print((x + v).shape)          # (3, 4)
+print((x + v).shape)  # (3, 4)
 
 # Rule 2: dims equal OR one is 1.
 a = np.ones((3, 1))
 b = np.ones((1, 4))
-print((a + b).shape)          # (3, 4)  -- both 1s stretch
+print((a + b).shape)  # (3, 4)  -- both 1s stretch
 
 # Rule 3: missing leading dims are treated as 1.
 big = np.ones((2, 5, 3))
 small = np.ones((5, 3))
-print((big + small).shape)    # (2, 5, 3)
+print((big + small).shape)  # (2, 5, 3)
 ```
 
 ```
@@ -87,9 +87,9 @@ The ufunc loops over the *logical* result shape and reads the size-1 operand
 repeatedly. That is why `x + v` on a 1GB `x` costs one new 1GB array, not two.
 
 ```python
-a = np.arange(3).reshape(3, 1)   # (3, 1)
-b = np.arange(4)                 # (4,)  -> (1, 4)
-c = a + b                        # logical shape (3, 4)
+a = np.arange(3).reshape(3, 1)  # (3, 1)
+b = np.arange(4)  # (4,)  -> (1, 4)
+c = a + b  # logical shape (3, 4)
 print(c)
 # [[0 1 2 3]
 #  [1 2 3 4]
@@ -119,7 +119,7 @@ inserts a size-1 axis at that position. `v[:, None]` turns `(4,)` into `(4, 1)`;
 
 ```python
 v = np.arange(4)
-print(v.shape)         # (4,)
+print(v.shape)  # (4,)
 print(v[:, None].shape)  # (4, 1)
 print(v[None, :].shape)  # (1, 4)
 
@@ -127,12 +127,12 @@ print(v[None, :].shape)  # (1, 4)
 mat = np.ones((3, 4))
 row_add = mat + v
 row_add2 = mat + v[None, :]
-print(np.array_equal(row_add, row_add2))   # True
+print(np.array_equal(row_add, row_add2))  # True
 
 # Add v as a COLUMN to a (4, 3) matrix.
 mat2 = np.ones((4, 3))
 col_add = mat2 + v[:, None]
-print(col_add.shape)     # (4, 3)
+print(col_add.shape)  # (4, 3)
 ```
 
 ```
@@ -159,10 +159,10 @@ The classic trap is the outer product:
 a = np.arange(5)
 b = np.arange(4)
 
-outer = a[:, None] * b[None, :]        # (5, 4) -- full materialized array
-print(outer.shape)                     # (5, 4)
-print(outer.nbytes, "bytes")           # 160 bytes = 5*4*8
-print(a.nbytes + b.nbytes, "bytes of input")   # 72 bytes total input
+outer = a[:, None] * b[None, :]  # (5, 4) -- full materialized array
+print(outer.shape)  # (5, 4)
+print(outer.nbytes, "bytes")  # 160 bytes = 5*4*8
+print(a.nbytes + b.nbytes, "bytes of input")  # 72 bytes total input
 ```
 
 ```
@@ -177,8 +177,8 @@ free â€” but read-only:
 
 ```python
 lazy = np.broadcast_to(a[:, None], (5, 4))
-print(lazy.base is not None)        # True -- no copy
-print(lazy.flags.writeable)         # False -- read-only
+print(lazy.base is not None)  # True -- no copy
+print(lazy.flags.writeable)  # False -- read-only
 ```
 
 ```
@@ -200,7 +200,7 @@ A 1-D array has no column-ness. Three facts follow:
 v = np.array([1.0, 2.0, 3.0])
 
 # Fact 1: .T is a no-op on 1-D data.
-print(v.T.shape)                     # (3,)
+print(v.T.shape)  # (3,)
 
 # Fact 2: mean(axis=1) on 1-D data fails.
 try:
@@ -211,12 +211,12 @@ except ValueError as e:
 # Fact 3: subtracting a row vector where a column was meant
 # either raises (lucky) or broadcasts wrongly (unlucky).
 data = np.random.default_rng(42).normal(size=(100, 3))
-row_means = data.mean(axis=1)        # (100,)
+row_means = data.mean(axis=1)  # (100,)
 try:
-    data - row_means                  # (100,3) vs (100,)
+    data - row_means  # (100,3) vs (100,)
 except ValueError as e:
     print("wrong:", str(e)[:50], "...")
-correct = data - data.mean(axis=0)    # (3,) -> fine, it IS a row op
+correct = data - data.mean(axis=0)  # (3,) -> fine, it IS a row op
 ```
 
 ```
@@ -280,8 +280,8 @@ except ValueError as e:
 
 # keepdims=True keeps (6, 1), which broadcasts along columns.
 row_centered = X - X.mean(axis=1, keepdims=True)
-print(row_centered.shape)                          # (6, 3)
-print(np.allclose(row_centered.mean(axis=1), 0))   # True
+print(row_centered.shape)  # (6, 3)
+print(np.allclose(row_centered.mean(axis=1), 0))  # True
 ```
 
 ```
@@ -302,22 +302,22 @@ batch of embeddings:
 
 ```python
 rng = np.random.default_rng(42)
-batch = rng.normal(size=(8, 5))     # 8 embeddings, dim 5
-bias = rng.normal(size=5)           # per-dim bias
+batch = rng.normal(size=(8, 5))  # 8 embeddings, dim 5
+bias = rng.normal(size=5)  # per-dim bias
 
 # 1. Add a bias vector: (8,5) + (5,) -> (8,5).
 logits = batch + bias
 
 # 2. Softmax along rows: keepdims keeps (8,1) to divide by.
-logits -= logits.max(axis=1, keepdims=True)      # numerical stability
+logits -= logits.max(axis=1, keepdims=True)  # numerical stability
 exp = np.exp(logits)
 probs = exp / exp.sum(axis=1, keepdims=True)
-print(probs.shape, probs.sum(axis=1))            # (8, 5) rows sum to 1
+print(probs.shape, probs.sum(axis=1))  # (8, 5) rows sum to 1
 
 # 3. L2-normalize embeddings: (8,5) / (8,1) -> (8,5).
 norms = np.linalg.norm(batch, axis=1, keepdims=True)
 normed = batch / norms
-print(np.allclose(np.linalg.norm(normed, axis=1), 1.0))   # True
+print(np.allclose(np.linalg.norm(normed, axis=1), 1.0))  # True
 ```
 
 ```

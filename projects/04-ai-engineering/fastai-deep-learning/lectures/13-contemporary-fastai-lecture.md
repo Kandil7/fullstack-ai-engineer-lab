@@ -112,16 +112,20 @@ from fasthtml.common import *
 
 app, rt = fast_app()
 
+
 @rt("/")
 def get():
-    return Titled("Hello, FastHTML!",
+    return Titled(
+        "Hello, FastHTML!",
         P("This page was built with Python only."),
         Button("Click me", hx_get="/clicked", hx_swap="outerHTML"),
     )
 
+
 @rt("/clicked")
 def get():
     return P("You clicked the button! No JavaScript needed.")
+
 
 serve()
 ```
@@ -161,11 +165,13 @@ fasttransform makes every transformation reversible and provides a `decode()` me
 from fasttransform import Pipeline, Resize, Normalize, ToTensor
 
 # Pipeline of reversible transformations
-pipe = Pipeline([
-    Resize(224),
-    Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ToTensor(),
-])
+pipe = Pipeline(
+    [
+        Resize(224),
+        Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ToTensor(),
+    ]
+)
 
 # Apply (encode)
 transformed = pipe(image)
@@ -252,7 +258,8 @@ app, rt = fast_app()
 
 @rt("/")
 def home():
-    return Titled("FastHTML Demo",
+    return Titled(
+        "FastHTML Demo",
         H1("Hello from FastHTML!"),
         P("This entire page was built with Python and HTMX."),
         Button("Click me!", hx_get="/click", hx_swap="outerHTML"),
@@ -261,8 +268,10 @@ def home():
 
 @rt("/click")
 def click():
-    return P("You clicked! No JavaScript was harmed in the making of this page.",
-             Style("color: green; font-weight: bold;"))
+    return P(
+        "You clicked! No JavaScript was harmed in the making of this page.",
+        Style("color: green; font-weight: bold;"),
+    )
 
 
 @rt("/api/hello/{name}")
@@ -337,9 +346,11 @@ class Pipeline:
 
 
 # Usage:
-pipe = Pipeline([
-    Normalize(min_val=0, max_val=255),
-])
+pipe = Pipeline(
+    [
+        Normalize(min_val=0, max_val=255),
+    ]
+)
 
 original = 128.0
 encoded = pipe.encode(original)
@@ -360,14 +371,14 @@ from enum import auto, Enum
 
 
 class MessageState(Enum):
-    ACTIVE = auto()     # visible to AI
-    HIDDEN = auto()     # invisible to AI
-    PINNED = auto()     # always visible, cannot be evicted
+    ACTIVE = auto()  # visible to AI
+    HIDDEN = auto()  # invisible to AI
+    PINNED = auto()  # always visible, cannot be evicted
 
 
 @dataclass
 class ContextMessage:
-    role: str        # "human", "ai", "system"
+    role: str  # "human", "ai", "system"
     content: str
     state: MessageState = MessageState.ACTIVE
 
@@ -379,7 +390,9 @@ class ManagedContext:
         self._messages: list[ContextMessage] = []
         self.max_tokens = max_tokens
 
-    def add(self, role: str, content: str, state: MessageState = MessageState.ACTIVE) -> None:
+    def add(
+        self, role: str, content: str, state: MessageState = MessageState.ACTIVE
+    ) -> None:
         self._messages.append(ContextMessage(role=role, content=content, state=state))
 
     def hide(self, index: int) -> None:
@@ -432,8 +445,8 @@ from dataclasses import dataclass
 class ProductivityMetrics:
     mode: str  # "solo", "ai-assisted", "agentic"
     perceived_productivity: float = 0.0  # 0-10 self-rating
-    actual_output_quality: float = 0.0    # 0-10 objective measure
-    code_maintainability: float = 0.0     # 0-10 expert rating
+    actual_output_quality: float = 0.0  # 0-10 objective measure
+    code_maintainability: float = 0.0  # 0-10 expert rating
     understanding_retention: float = 0.0  # 0-10 follow-up test
 
     def gap(self) -> float:
@@ -467,11 +480,13 @@ SCENARIOS = [
 ]
 
 for s in SCENARIOS:
-    print(f"{s.mode:<35s} perceived={s.perceived_productivity}/10 "
-          f"actual={s.actual_output_quality}/10 "
-          f"gap={s.gap():+.1f} "
-          f"maintain={s.code_maintainability}/10 "
-          f"understand={s.understanding_retention}/10")
+    print(
+        f"{s.mode:<35s} perceived={s.perceived_productivity}/10 "
+        f"actual={s.actual_output_quality}/10 "
+        f"gap={s.gap():+.1f} "
+        f"maintain={s.code_maintainability}/10 "
+        f"understand={s.understanding_retention}/10"
+    )
 ```
 
 ---

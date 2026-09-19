@@ -156,14 +156,15 @@ kfold = KFold(n_splits=5, shuffle=True, random_state=42)
 model = RandomForestClassifier(n_estimators=100)
 
 # Get scores for each fold
-scores = cross_val_score(model, X, y, cv=kfold, scoring='accuracy')
+scores = cross_val_score(model, X, y, cv=kfold, scoring="accuracy")
 print(f"Scores: {scores}")
 print(f"Mean: {scores.mean():.4f} ± {scores.std():.4f}")
 
 # Stratified K-Fold (for imbalanced classes)
 from sklearn.model_selection import StratifiedKFold
+
 skfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-scores = cross_val_score(model, X, y, cv=skfold, scoring='f1')
+scores = cross_val_score(model, X, y, cv=skfold, scoring="f1")
 ```
 
 **Why important:**
@@ -304,8 +305,8 @@ elastic.fit(X_train, y_train)
 ```python
 from sklearn.model_selection import GridSearchCV
 
-param_grid = {'alpha': [0.01, 0.1, 1.0, 10.0, 100.0]}
-grid = GridSearchCV(Ridge(), param_grid, cv=5, scoring='r2')
+param_grid = {"alpha": [0.01, 0.1, 1.0, 10.0, 100.0]}
+grid = GridSearchCV(Ridge(), param_grid, cv=5, scoring="r2")
 grid.fit(X_train, y_train)
 print(f"Best alpha: {grid.best_params_['alpha']}")
 ```
@@ -326,9 +327,11 @@ from sklearn.metrics import log_loss, roc_auc_score
 # Linear Regression: y = β₀ + β₁x (continuous output)
 # Logistic Regression: p(y=1) = sigmoid(β₀ + β₁x) (probability output)
 
+
 # Sigmoid function maps any value to (0, 1)
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
+
 
 # Example
 model = LogisticRegression()
@@ -374,7 +377,7 @@ undersampler = RandomUnderSampler(random_state=42)
 X_resampled, y_resampled = undersampler.fit_resample(X_train, y_train)
 
 # 2. Class weights
-model = RandomForestClassifier(class_weight='balanced')
+model = RandomForestClassifier(class_weight="balanced")
 model.fit(X_train, y_train)
 
 # 3. Evaluation metrics (accuracy is misleading for imbalanced data)
@@ -382,7 +385,7 @@ y_pred = model.predict(X_test)
 print(classification_report(y_test, y_pred))
 
 # Use F1 instead of accuracy
-f1 = f1_score(y_test, y_pred, average='weighted')
+f1 = f1_score(y_test, y_pred, average="weighted")
 ```
 
 **Metrics for imbalanced data:**
@@ -406,10 +409,10 @@ from sklearn.metrics import accuracy_score
 
 # Create and train decision tree
 tree = DecisionTreeClassifier(
-    max_depth=3,           # Limit tree depth
+    max_depth=3,  # Limit tree depth
     min_samples_split=10,  # Minimum samples to split a node
-    min_samples_leaf=5,    # Minimum samples in leaf node
-    random_state=42
+    min_samples_leaf=5,  # Minimum samples in leaf node
+    random_state=42,
 )
 tree.fit(X_train, y_train)
 
@@ -458,11 +461,11 @@ single_scores = cross_val_score(single_tree, X, y, cv=5)
 
 # Random forest (reduces overfitting)
 rf = RandomForestClassifier(
-    n_estimators=100,    # Number of trees
-    max_depth=10,        # Limit depth
-    max_features='sqrt', # Features per split (random subset)
+    n_estimators=100,  # Number of trees
+    max_depth=10,  # Limit depth
+    max_features="sqrt",  # Features per split (random subset)
     random_state=42,
-    n_jobs=-1            # Use all CPU cores
+    n_jobs=-1,  # Use all CPU cores
 )
 rf_scores = cross_val_score(rf, X, y, cv=5)
 
@@ -505,9 +508,9 @@ import numpy as np
 # Basic K-Means
 kmeans = KMeans(
     n_clusters=3,
-    init='k-means++',  # Smart initialization
-    n_init=10,         # Run 10 times, pick best
-    random_state=42
+    init="k-means++",  # Smart initialization
+    n_init=10,  # Run 10 times, pick best
+    random_state=42,
 )
 clusters = kmeans.fit_predict(X)
 
@@ -525,10 +528,11 @@ for k in K_range:
 
 # Plot elbow curve
 import matplotlib.pyplot as plt
-plt.plot(K_range, inertias, 'bo-')
-plt.xlabel('Number of Clusters (K)')
-plt.ylabel('Inertia')
-plt.title('Elbow Method')
+
+plt.plot(K_range, inertias, "bo-")
+plt.xlabel("Number of Clusters (K)")
+plt.ylabel("Inertia")
+plt.title("Elbow Method")
 plt.show()
 ```
 
@@ -562,32 +566,29 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score, calinski_harabasz_score
 import numpy as np
 
+
 def find_optimal_clusters(X, max_k=10):
     """Find optimal K using multiple methods"""
-    results = {
-        'k': [],
-        'inertia': [],
-        'silhouette': [],
-        'calinski': []
-    }
+    results = {"k": [], "inertia": [], "silhouette": [], "calinski": []}
 
     for k in range(2, max_k + 1):
         kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
         labels = kmeans.fit_predict(X)
 
-        results['k'].append(k)
-        results['inertia'].append(kmeans.inertia_)
-        results['silhouette'].append(silhouette_score(X, labels))
-        results['calinski'].append(calinski_harabasz_score(X, labels))
+        results["k"].append(k)
+        results["inertia"].append(kmeans.inertia_)
+        results["silhouette"].append(silhouette_score(X, labels))
+        results["calinski"].append(calinski_harabasz_score(X, labels))
 
     return results
+
 
 # Elbow method: Look for "elbow" in inertia plot
 # Silhouette: Higher is better (max is 1)
 # Calinski-Harabasz: Higher is better
 
 results = find_optimal_clusters(X)
-optimal_k = results['k'][np.argmax(results['silhouette'])]
+optimal_k = results["k"][np.argmax(results["silhouette"])]
 print(f"Optimal K (silhouette): {optimal_k}")
 ```
 
@@ -607,8 +608,11 @@ print(f"Optimal K (silhouette): {optimal_k}")
 
 ```python
 from sklearn.metrics import (
-    confusion_matrix, classification_report,
-    precision_score, recall_score, f1_score
+    confusion_matrix,
+    classification_report,
+    precision_score,
+    recall_score,
+    f1_score,
 )
 
 # Confusion Matrix
@@ -623,8 +627,8 @@ print(f"Confusion Matrix:\n{cm}")
 
 # Metrics
 precision = precision_score(y_test, y_pred)  # TP / (TP + FP)
-recall = recall_score(y_test, y_pred)        # TP / (TP + FN)
-f1 = f1_score(y_test, y_pred)               # 2 * (P * R) / (P + R)
+recall = recall_score(y_test, y_pred)  # TP / (TP + FN)
+f1 = f1_score(y_test, y_pred)  # 2 * (P * R) / (P + R)
 
 print(classification_report(y_test, y_pred))
 ```
@@ -664,11 +668,11 @@ roc_auc = auc(fpr, tpr)
 
 # Plot ROC curve
 plt.figure(figsize=(8, 6))
-plt.plot(fpr, tpr, color='blue', label=f'ROC Curve (AUC = {roc_auc:.4f})')
-plt.plot([0, 1], [0, 1], color='red', linestyle='--', label='Random Classifier')
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('ROC Curve')
+plt.plot(fpr, tpr, color="blue", label=f"ROC Curve (AUC = {roc_auc:.4f})")
+plt.plot([0, 1], [0, 1], color="red", linestyle="--", label="Random Classifier")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve")
 plt.legend()
 plt.show()
 
@@ -699,9 +703,8 @@ import numpy as np
 
 # Single split: High variance in estimate
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 model = GradientBoostingClassifier()
 model.fit(X_train, y_train)
 single_score = model.score(X_test, y_test)
@@ -709,10 +712,7 @@ single_score = model.score(X_test, y_test)
 # Cross-validation: More reliable estimate
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 scores = cross_validate(
-    model, X, y,
-    cv=cv,
-    scoring=['accuracy', 'f1_weighted'],
-    return_train_score=True
+    model, X, y, cv=cv, scoring=["accuracy", "f1_weighted"], return_train_score=True
 )
 
 print(f"Single split accuracy: {single_score:.4f}")
@@ -739,11 +739,10 @@ print(f"CV F1: {scores['test_f1_weighted'].mean():.4f} ± {scores['test_f1_weigh
 from sklearn.model_selection import learning_curve
 import numpy as np
 
+
 def plot_learning_curve(estimator, X, y):
     train_sizes, train_scores, val_scores = learning_curve(
-        estimator, X, y, cv=5,
-        train_sizes=np.linspace(0.1, 1.0, 10),
-        scoring='accuracy'
+        estimator, X, y, cv=5, train_sizes=np.linspace(0.1, 1.0, 10), scoring="accuracy"
     )
 
     train_mean = train_scores.mean(axis=1)
@@ -752,15 +751,16 @@ def plot_learning_curve(estimator, X, y):
     val_std = val_scores.std(axis=1)
 
     plt.figure(figsize=(10, 6))
-    plt.plot(train_sizes, train_mean, label='Training score')
-    plt.plot(train_sizes, val_mean, label='Cross-validation score')
+    plt.plot(train_sizes, train_mean, label="Training score")
+    plt.plot(train_sizes, val_mean, label="Cross-validation score")
     plt.fill_between(train_sizes, train_mean - train_std, train_mean + train_std, alpha=0.1)
     plt.fill_between(train_sizes, val_mean - val_std, val_mean + val_std, alpha=0.1)
-    plt.xlabel('Training Examples')
-    plt.ylabel('Score')
-    plt.title('Learning Curve')
+    plt.xlabel("Training Examples")
+    plt.ylabel("Score")
+    plt.title("Learning Curve")
     plt.legend()
     plt.show()
+
 
 # Overfitting signs:
 # - High training score, low validation score
@@ -833,36 +833,39 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # Log transform (for skewed distributions)
-df['log_price'] = np.log1p(df['price'])
+df["log_price"] = np.log1p(df["price"])
 
 # Binning (convert continuous to categorical)
-df['age_group'] = pd.cut(df['age'], bins=[0, 18, 35, 60, 100],
-                         labels=['child', 'young', 'middle', 'senior'])
+df["age_group"] = pd.cut(
+    df["age"], bins=[0, 18, 35, 60, 100], labels=["child", "young", "middle", "senior"]
+)
 
 # Polynomial features
 from sklearn.preprocessing import PolynomialFeatures
+
 poly = PolynomialFeatures(degree=2, interaction_only=True)
 X_poly = poly.fit_transform(X)
 
 # 2. Categorical Features
 # One-hot encoding
-df_encoded = pd.get_dummies(df, columns=['category'], drop_first=True)
+df_encoded = pd.get_dummies(df, columns=["category"], drop_first=True)
 
 # Label encoding (for ordinal features)
 le = LabelEncoder()
-df['size_encoded'] = le.fit_transform(df['size'])
+df["size_encoded"] = le.fit_transform(df["size"])
 
 # 3. Text Features
 from sklearn.feature_extraction.text import TfidfVectorizer
+
 tfidf = TfidfVectorizer(max_features=1000)
-X_text = tfidf.fit_transform(df['text'])
+X_text = tfidf.fit_transform(df["text"])
 
 # 4. Date Features
-df['date'] = pd.to_datetime(df['date'])
-df['year'] = df['date'].dt.year
-df['month'] = df['date'].dt.month
-df['day_of_week'] = df['date'].dt.dayofweek
-df['is_weekend'] = df['day_of_week'].isin([5, 6]).astype(int)
+df["date"] = pd.to_datetime(df["date"])
+df["year"] = df["date"].dt.year
+df["month"] = df["date"].dt.month
+df["day_of_week"] = df["date"].dt.dayofweek
+df["is_weekend"] = df["day_of_week"].isin([5, 6]).astype(int)
 ```
 
 **Techniques by data type:**
@@ -890,6 +893,7 @@ Build an ML pipeline that:
 4. Trains a model
 5. Evaluates with cross-validation
 """
+
 import pandas as pd
 import numpy as np
 from sklearn.pipeline import Pipeline
@@ -899,48 +903,54 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 
+
 def create_ml_pipeline(df, target_column, numerical_columns, categorical_columns):
     """Create a complete ML pipeline"""
 
     # Preprocessing for numerical data
-    numerical_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='median')),
-        ('scaler', StandardScaler())
-    ])
+    numerical_transformer = Pipeline(
+        steps=[("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler())]
+    )
 
     # Preprocessing for categorical data
-    categorical_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='most_frequent')),
-        ('onehot', OneHotEncoder(handle_unknown='ignore'))
-    ])
+    categorical_transformer = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("onehot", OneHotEncoder(handle_unknown="ignore")),
+        ]
+    )
 
     # Combine preprocessors
     preprocessor = ColumnTransformer(
         transformers=[
-            ('num', numerical_transformer, numerical_columns),
-            ('cat', categorical_transformer, categorical_columns)
-        ])
+            ("num", numerical_transformer, numerical_columns),
+            ("cat", categorical_transformer, categorical_columns),
+        ]
+    )
 
     # Create full pipeline
-    pipeline = Pipeline(steps=[
-        ('preprocessor', preprocessor),
-        ('classifier', RandomForestClassifier(n_estimators=100, random_state=42))
-    ])
+    pipeline = Pipeline(
+        steps=[
+            ("preprocessor", preprocessor),
+            ("classifier", RandomForestClassifier(n_estimators=100, random_state=42)),
+        ]
+    )
 
     return pipeline
 
+
 # Usage
-df = pd.read_csv('data.csv')
+df = pd.read_csv("data.csv")
 X = df.drop(columns=[target_column])
 y = df[target_column]
 
-numerical_cols = X.select_dtypes(include=['int64', 'float64']).columns.tolist()
-categorical_cols = X.select_dtypes(include=['object', 'category']).columns.tolist()
+numerical_cols = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
+categorical_cols = X.select_dtypes(include=["object", "category"]).columns.tolist()
 
-pipeline = create_ml_pipeline(df, 'target', numerical_cols, categorical_cols)
+pipeline = create_ml_pipeline(df, "target", numerical_cols, categorical_cols)
 
 # Cross-validation
-scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
 print(f"CV Accuracy: {scores.mean():.4f} ± {scores.std():.4f}")
 
 # Fit and predict
@@ -962,19 +972,20 @@ Build a feature selection module that:
 3. Uses recursive feature elimination
 4. Compares results
 """
-from sklearn.feature_selection import (
-    SelectKBest, f_classif, RFE
-)
+
+from sklearn.feature_selection import SelectKBest, f_classif, RFE
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 import pandas as pd
 import numpy as np
+
 
 def correlation_selection(X, y, threshold=0.1):
     """Select features based on correlation with target"""
     correlations = X.corrwith(pd.Series(y)).abs()
     selected = correlations[correlations > threshold].index.tolist()
     return selected
+
 
 def importance_selection(X, y, n_features=10):
     """Select top features by tree-based importance"""
@@ -984,6 +995,7 @@ def importance_selection(X, y, n_features=10):
     selected = importance.nlargest(n_features).index.tolist()
     return selected
 
+
 def rfe_selection(X, y, n_features=10):
     """Recursive Feature Elimination"""
     model = RandomForestClassifier(n_estimators=100, random_state=42)
@@ -992,15 +1004,18 @@ def rfe_selection(X, y, n_features=10):
     selected = X.columns[rfe.support_].tolist()
     return selected
 
+
 # Compare methods
 corr_features = correlation_selection(X_train, y_train)
 imp_features = importance_selection(X_train, y_train, n_features=10)
 rfe_features = rfe_selection(X_train, y_train, n_features=10)
 
 # Evaluate each feature set
-for name, features in [("Correlation", corr_features),
-                       ("Importance", imp_features),
-                       ("RFE", rfe_features)]:
+for name, features in [
+    ("Correlation", corr_features),
+    ("Importance", imp_features),
+    ("RFE", rfe_features),
+]:
     if len(features) > 0:
         model = RandomForestClassifier(n_estimators=100, random_state=42)
         scores = cross_val_score(model, X_train[features], y_train, cv=5)
@@ -1021,6 +1036,7 @@ Build a model comparison framework that:
 3. Reports metrics for each
 4. Identifies the best model
 """
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
@@ -1029,47 +1045,53 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_validate
 import pandas as pd
 
+
 def compare_models(X, y, models=None):
     """Compare multiple ML models"""
     if models is None:
         models = {
-            'Logistic Regression': LogisticRegression(max_iter=1000),
-            'Decision Tree': DecisionTreeClassifier(random_state=42),
-            'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
-            'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42),
-            'SVM': SVC(random_state=42),
-            'KNN': KNeighborsClassifier()
+            "Logistic Regression": LogisticRegression(max_iter=1000),
+            "Decision Tree": DecisionTreeClassifier(random_state=42),
+            "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
+            "Gradient Boosting": GradientBoostingClassifier(n_estimators=100, random_state=42),
+            "SVM": SVC(random_state=42),
+            "KNN": KNeighborsClassifier(),
         }
 
     results = []
 
     for name, model in models.items():
         scores = cross_validate(
-            model, X, y,
+            model,
+            X,
+            y,
             cv=5,
-            scoring=['accuracy', 'f1_weighted', 'roc_auc'],
-            return_train_score=True
+            scoring=["accuracy", "f1_weighted", "roc_auc"],
+            return_train_score=True,
         )
 
-        results.append({
-            'Model': name,
-            'Accuracy': scores['test_accuracy'].mean(),
-            'F1': scores['test_f1_weighted'].mean(),
-            'AUC': scores['test_roc_auc'].mean(),
-            'Train Score': scores['train_accuracy'].mean(),
-            'Overfit Gap': scores['train_accuracy'].mean() - scores['test_accuracy'].mean()
-        })
+        results.append(
+            {
+                "Model": name,
+                "Accuracy": scores["test_accuracy"].mean(),
+                "F1": scores["test_f1_weighted"].mean(),
+                "AUC": scores["test_roc_auc"].mean(),
+                "Train Score": scores["train_accuracy"].mean(),
+                "Overfit Gap": scores["train_accuracy"].mean() - scores["test_accuracy"].mean(),
+            }
+        )
 
     results_df = pd.DataFrame(results)
-    results_df = results_df.sort_values('Accuracy', ascending=False)
+    results_df = results_df.sort_values("Accuracy", ascending=False)
     return results_df
+
 
 # Run comparison
 results = compare_models(X_train, y_train)
 print(results.to_string(index=False))
 
 # Identify best model
-best_model_name = results.iloc[0]['Model']
+best_model_name = results.iloc[0]["Model"]
 print(f"\nBest Model: {best_model_name}")
 ```
 
@@ -1086,30 +1108,26 @@ Build a hyperparameter tuning module that:
 2. Uses GridSearchCV or RandomizedSearchCV
 3. Reports best parameters and scores
 """
+
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from scipy.stats import randint, uniform
 
+
 def tune_random_forest(X, y):
     """Tune Random Forest hyperparameters"""
     param_grid = {
-        'n_estimators': [50, 100, 200, 300],
-        'max_depth': [5, 10, 20, None],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4],
-        'max_features': ['sqrt', 'log2', None]
+        "n_estimators": [50, 100, 200, 300],
+        "max_depth": [5, 10, 20, None],
+        "min_samples_split": [2, 5, 10],
+        "min_samples_leaf": [1, 2, 4],
+        "max_features": ["sqrt", "log2", None],
     }
 
     rf = RandomForestClassifier(random_state=42)
 
     # Grid Search (exhaustive but slow)
-    grid_search = GridSearchCV(
-        rf, param_grid,
-        cv=5,
-        scoring='accuracy',
-        n_jobs=-1,
-        verbose=1
-    )
+    grid_search = GridSearchCV(rf, param_grid, cv=5, scoring="accuracy", n_jobs=-1, verbose=1)
     grid_search.fit(X, y)
 
     print(f"Best parameters: {grid_search.best_params_}")
@@ -1117,25 +1135,21 @@ def tune_random_forest(X, y):
 
     return grid_search.best_estimator_
 
+
 def tune_random_search(X, y, n_iter=50):
     """Faster random search"""
     param_distributions = {
-        'n_estimators': randint(50, 300),
-        'max_depth': randint(5, 30),
-        'min_samples_split': randint(2, 20),
-        'min_samples_leaf': randint(1, 10),
-        'max_features': uniform(0.1, 0.9)
+        "n_estimators": randint(50, 300),
+        "max_depth": randint(5, 30),
+        "min_samples_split": randint(2, 20),
+        "min_samples_leaf": randint(1, 10),
+        "max_features": uniform(0.1, 0.9),
     }
 
     rf = RandomForestClassifier(random_state=42)
 
     random_search = RandomizedSearchCV(
-        rf, param_distributions,
-        n_iter=n_iter,
-        cv=5,
-        scoring='accuracy',
-        n_jobs=-1,
-        random_state=42
+        rf, param_distributions, n_iter=n_iter, cv=5, scoring="accuracy", n_jobs=-1, random_state=42
     )
     random_search.fit(X, y)
 
@@ -1159,11 +1173,13 @@ Build an anomaly detection system that:
 3. Uses statistical methods (Z-score)
 4. Compares results
 """
+
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
 from scipy import stats
 import numpy as np
 import pandas as pd
+
 
 def detect_anomalies(X, contamination=0.1):
     """Multiple anomaly detection methods"""
@@ -1171,29 +1187,30 @@ def detect_anomalies(X, contamination=0.1):
 
     # 1. Isolation Forest
     iso_forest = IsolationForest(contamination=contamination, random_state=42)
-    results['iso_forest'] = iso_forest.fit_predict(X)
+    results["iso_forest"] = iso_forest.fit_predict(X)
 
     # 2. Local Outlier Factor
     lof = LocalOutlierFactor(n_neighbors=20, contamination=contamination)
-    results['lof'] = lof.fit_predict(X)
+    results["lof"] = lof.fit_predict(X)
 
     # 3. Z-score method (for each feature)
     z_scores = np.abs(stats.zscore(X))
-    results['z_score'] = (z_scores > 3).any(axis=1).astype(int)
+    results["z_score"] = (z_scores > 3).any(axis=1).astype(int)
 
     # Combine predictions (majority vote)
-    results['ensemble'] = (
-        (results['iso_forest'] == -1).astype(int) +
-        (results['lof'] == -1).astype(int) +
-        results['z_score']
+    results["ensemble"] = (
+        (results["iso_forest"] == -1).astype(int)
+        + (results["lof"] == -1).astype(int)
+        + results["z_score"]
     )
-    results['is_anomaly'] = (results['ensemble'] >= 2).astype(int)
+    results["is_anomaly"] = (results["ensemble"] >= 2).astype(int)
 
     return results
 
+
 # Usage
 results = detect_anomalies(X_test, contamination=0.05)
-anomalies = X_test[results['is_anomaly'] == 1]
+anomalies = X_test[results["is_anomaly"] == 1]
 print(f"Detected {len(anomalies)} anomalies out of {len(X_test)} samples")
 ```
 
@@ -1211,10 +1228,12 @@ Build a time series forecasting module that:
 3. Implements walk-forward validation
 4. Evaluates forecast accuracy
 """
+
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+
 
 def create_time_features(df, date_column, target_column):
     """Create time-based features"""
@@ -1222,24 +1241,25 @@ def create_time_features(df, date_column, target_column):
     df[date_column] = pd.to_datetime(df[date_column])
 
     # Extract components
-    df['year'] = df[date_column].dt.year
-    df['month'] = df[date_column].dt.month
-    df['day'] = df[date_column].dt.day
-    df['day_of_week'] = df[date_column].dt.dayofweek
-    df['is_weekend'] = df['day_of_week'].isin([5, 6]).astype(int)
+    df["year"] = df[date_column].dt.year
+    df["month"] = df[date_column].dt.month
+    df["day"] = df[date_column].dt.day
+    df["day_of_week"] = df[date_column].dt.dayofweek
+    df["is_weekend"] = df["day_of_week"].isin([5, 6]).astype(int)
 
     # Lag features
     for lag in [1, 7, 14, 28]:
-        df[f'lag_{lag}'] = df[target_column].shift(lag)
+        df[f"lag_{lag}"] = df[target_column].shift(lag)
 
     # Rolling statistics
-    df['rolling_mean_7'] = df[target_column].rolling(window=7).mean()
-    df['rolling_std_7'] = df[target_column].rolling(window=7).std()
+    df["rolling_mean_7"] = df[target_column].rolling(window=7).mean()
+    df["rolling_std_7"] = df[target_column].rolling(window=7).std()
 
     # Drop NaN rows created by lagging
     df = df.dropna()
 
     return df
+
 
 def walk_forward_validation(X, y, n_splits=5):
     """Time series cross-validation"""
@@ -1259,16 +1279,17 @@ def walk_forward_validation(X, y, n_splits=5):
 
         mae = mean_absolute_error(y_test, predictions)
         rmse = np.sqrt(mean_squared_error(y_test, predictions))
-        scores.append({'MAE': mae, 'RMSE': rmse})
+        scores.append({"MAE": mae, "RMSE": rmse})
 
     return pd.DataFrame(scores).mean()
 
-# Usage
-df = pd.read_csv('sales_data.csv')
-df_features = create_time_features(df, 'date', 'sales')
 
-X = df_features.drop(columns=['date', 'sales'])
-y = df_features['sales']
+# Usage
+df = pd.read_csv("sales_data.csv")
+df_features = create_time_features(df, "date", "sales")
+
+X = df_features.drop(columns=["date", "sales"])
+y = df_features["sales"]
 
 results = walk_forward_validation(X.values, y.values)
 print(f"Average MAE: {results['MAE']:.2f}")
@@ -1288,16 +1309,18 @@ Build model interpretation tools that:
 2. Calculates SHAP values
 3. Generates partial dependence plots
 """
+
 import shap
 import numpy as np
 import pandas as pd
 from sklearn.inspection import partial_dependence
 
+
 def interpret_model(model, X_train, X_test, feature_names):
     """Comprehensive model interpretation"""
 
     # 1. Feature Importance
-    if hasattr(model, 'feature_importances_'):
+    if hasattr(model, "feature_importances_"):
         importance = pd.Series(model.feature_importances_, index=feature_names)
         importance = importance.sort_values(ascending=False)
         print("Top 10 Feature Importances:")
@@ -1314,11 +1337,7 @@ def interpret_model(model, X_train, X_test, feature_names):
     top_features = importance.nlargest(3).index.tolist()
     for feature in top_features:
         feature_idx = list(feature_names).index(feature)
-        pd_result = partial_dependence(
-            model, X_train,
-            features=[feature_idx],
-            kind='average'
-        )
+        pd_result = partial_dependence(model, X_train, features=[feature_idx], kind="average")
         print(f"\nPartial Dependence for {feature}:")
         print(f"Values: {pd_result['grid_values'][0][:5]}")
         print(f"Average: {pd_result['average'][0][:5]}")
@@ -1437,14 +1456,20 @@ from sklearn.preprocessing import StandardScaler
 ```python
 from sklearn.metrics import (
     # Classification
-    accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, confusion_matrix, classification_report,
-
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    confusion_matrix,
+    classification_report,
     # Regression
-    mean_squared_error, mean_absolute_error, r2_score,
-
+    mean_squared_error,
+    mean_absolute_error,
+    r2_score,
     # Clustering
-    silhouette_score, calinski_harabasz_score
+    silhouette_score,
+    calinski_harabasz_score,
 )
 ```
 
@@ -1453,17 +1478,20 @@ from sklearn.metrics import (
 ```python
 # Train/test split
 from sklearn.model_selection import train_test_split
+
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
 # Cross-validation
 from sklearn.model_selection import cross_val_score
-scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+
+scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
 
 # Grid search
 from sklearn.model_selection import GridSearchCV
-grid = GridSearchCV(model, param_grid, cv=5, scoring='accuracy')
+
+grid = GridSearchCV(model, param_grid, cv=5, scoring="accuracy")
 ```
 
 ---

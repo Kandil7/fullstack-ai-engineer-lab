@@ -57,10 +57,10 @@ import numpy as np
 
 a = np.array([1.0, 2.0, 3.0])
 b = np.array([4.0, 5.0, 6.0])
-print(a @ b)                    # 32.0 -- scalar
+print(a @ b)  # 32.0 -- scalar
 A = np.arange(6.0).reshape(2, 3)
 B = np.arange(12.0).reshape(3, 4)
-print((A @ B).shape)            # (2, 4)
+print((A @ B).shape)  # (2, 4)
 ```
 
 **Cost:** O(n³) for `(n, n) @ (n, n)`; O(m·k·n) in general. BLAS
@@ -75,8 +75,8 @@ Python loops.
 
 ```python
 X = np.random.default_rng(0).normal(size=(5, 8, 4))  # 5 batches
-W = np.random.default_rng(1).normal(size=(4, 3))     # shared weights
-print((X @ W).shape)                                 # (5, 8, 3)
+W = np.random.default_rng(1).normal(size=(4, 3))  # shared weights
+print((X @ W).shape)  # (5, 8, 3)
 ```
 
 `(5, 8, 4) @ (4, 3)` → `(5, 8, 3)`: the batch dim `5` broadcasts
@@ -94,7 +94,7 @@ reshaped or the shape rule violated. When in doubt, print shapes.
 To solve `A x = b`:
 
 ```python
-x = np.linalg.solve(A, b)          # LU factorization + back-substitution
+x = np.linalg.solve(A, b)  # LU factorization + back-substitution
 ```
 
 Why not `np.linalg.inv(A) @ b`?
@@ -118,7 +118,7 @@ A = rng.normal(size=(5, 5))
 x_true = rng.normal(size=5)
 b = A @ x_true
 x = np.linalg.solve(A, b)
-print(np.allclose(x, x_true, atol=1e-10))     # True
+print(np.allclose(x, x_true, atol=1e-10))  # True
 ```
 
 ---
@@ -131,10 +131,10 @@ and rank-deficient matrices, returning `(x, residuals, rank, s)`.
 
 ```python
 t = np.linspace(0.0, 1.0, 20)
-A5 = np.column_stack([np.ones_like(t), t])          # design matrix
+A5 = np.column_stack([np.ones_like(t), t])  # design matrix
 y = 3.0 + 2.0 * t + rng.normal(scale=0.05, size=t.size)
 coef, *_ = np.linalg.lstsq(A5, y, rcond=None)
-print(np.round(coef, 4))                            # ~[3.0, 2.0]
+print(np.round(coef, 4))  # ~[3.0, 2.0]
 ```
 
 This is linear regression in one call. The same API serves
@@ -180,8 +180,8 @@ A = U diag(s) Vh      (Vh = V.T)
 
 ```python
 U, s, Vh = np.linalg.svd(A7)
-recon = (U[:, :s.size] * s) @ Vh
-print(np.allclose(recon, A7, atol=1e-12))   # True
+recon = (U[:, : s.size] * s) @ Vh
+print(np.allclose(recon, A7, atol=1e-12))  # True
 ```
 
 **Eckart-Young theorem:** the best rank-k approximation of `A` is
@@ -192,8 +192,7 @@ the tail of the singular values.
 ```python
 k = 2
 approx = U[:, :k] @ np.diag(s[:k]) @ Vh[:k, :]
-print(np.allclose(np.linalg.norm(A7 - approx),
-                  np.sqrt(np.sum(s[k:] ** 2)), rtol=1e-6))   # True
+print(np.allclose(np.linalg.norm(A7 - approx), np.sqrt(np.sum(s[k:] ** 2)), rtol=1e-6))  # True
 ```
 
 **AI relevance:** PCA, latent semantic analysis, embedding
@@ -216,9 +215,9 @@ guaranteed stable:
 
 ```python
 A8 = rng.normal(size=(5, 5))
-A_sym = A8 + A8.T                              # symmetric
+A_sym = A8 + A8.T  # symmetric
 w, V = np.linalg.eigh(A_sym)
-print(np.isrealobj(w))                          # True
+print(np.isrealobj(w))  # True
 print(np.allclose(A_sym @ V, V @ np.diag(w), atol=1e-10))  # True
 ```
 
@@ -244,9 +243,9 @@ factor and guaranteed real output.
 
 ```python
 x = np.array([3.0, -4.0])
-print(np.linalg.norm(x))                 # 5.0
-print(np.linalg.norm(x, 1))              # 7.0
-print(np.linalg.norm(x, np.inf))         # 4.0
+print(np.linalg.norm(x))  # 5.0
+print(np.linalg.norm(x, 1))  # 7.0
+print(np.linalg.norm(x, np.inf))  # 4.0
 ```
 
 The default for matrices is the Frobenius norm — the square root
@@ -267,8 +266,9 @@ def hilbert(n):
     i, j = np.indices((n, n))
     return 1.0 / (i + j + 1.0)
 
+
 H6 = hilbert(6)
-print(f"{np.linalg.cond(H6):.2e}")       # ~1.5e7 -- ill-conditioned
+print(f"{np.linalg.cond(H6):.2e}")  # ~1.5e7 -- ill-conditioned
 ```
 
 The bound: `||Δx||/||x|| ≤ cond(A) · ||Δb||/||b||`. Hilbert
@@ -400,24 +400,24 @@ diagnostic in the toolbox (`O(n²)` once the SVD is done).
 import numpy as np
 
 # multiply
-C = A @ B                      # (m,n) = (m,k) @ (k,n)
-C = X @ W                      # batched: (B,m,k) @ (k,n) -> (B,m,n)
+C = A @ B  # (m,n) = (m,k) @ (k,n)
+C = X @ W  # batched: (B,m,k) @ (k,n) -> (B,m,n)
 
 # solve / fit
-x = np.linalg.solve(A, b)      # square full-rank only
+x = np.linalg.solve(A, b)  # square full-rank only
 coef, res, rank, s = np.linalg.lstsq(A, y, rcond=None)
 
 # decompose
-Q, R = np.linalg.qr(A)                    # A = Q R, Q.T Q = I
-U, s, Vh = np.linalg.svd(A)               # A = (U[:, :s.size]*s) @ Vh
-approx = (U[:, :k] * s[:k]) @ Vh[:k, :]   # rank-k best approximation
+Q, R = np.linalg.qr(A)  # A = Q R, Q.T Q = I
+U, s, Vh = np.linalg.svd(A)  # A = (U[:, :s.size]*s) @ Vh
+approx = (U[:, :k] * s[:k]) @ Vh[:k, :]  # rank-k best approximation
 
 # eigen
-w, V = np.linalg.eigh(A_sym)              # A V = V diag(w), V orthonormal
+w, V = np.linalg.eigh(A_sym)  # A V = V diag(w), V orthonormal
 
 # measure
-norm2 = np.linalg.norm(x)                 # L2 / Frobenius
-cond = np.linalg.cond(A)                  # s_max / s_min
+norm2 = np.linalg.norm(x)  # L2 / Frobenius
+cond = np.linalg.cond(A)  # s_max / s_min
 ```
 
 ## Next Steps

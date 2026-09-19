@@ -65,12 +65,12 @@ print("Price: $%.2f" % price)  # Price: $19.99
 
 ```python
 # Width and alignment
-print("%10s" % "hi")       #         hi (right-aligned, width 10)
-print("%-10s" % "hi")      # hi         (left-aligned, width 10)
-print("%010d" % 42)        # 0000000042 (zero-padded)
+print("%10s" % "hi")  #         hi (right-aligned, width 10)
+print("%-10s" % "hi")  # hi         (left-aligned, width 10)
+print("%010d" % 42)  # 0000000042 (zero-padded)
 
 # Precision
-print("%.3f" % 3.14159)    # 3.142
+print("%.3f" % 3.14159)  # 3.142
 print("%.10s" % "Hello World")  # Hello Worl (truncated)
 
 # Named placeholders
@@ -121,6 +121,7 @@ class Person:
         self.name = name
         self.age = age
 
+
 p = Person("Alice", 30)
 print("{0.name} is {0.age}".format(p))  # Alice is 30
 
@@ -133,21 +134,21 @@ print("{name} is {age}".format(**data))  # Alice is 30
 
 ```python
 # Width
-print("{:10}".format("hi"))      #         hi
-print("{:<10}".format("hi"))     # hi
-print("{:>10}".format("hi"))     #         hi
-print("{:^10}".format("hi"))     #     hi
+print("{:10}".format("hi"))  #         hi
+print("{:<10}".format("hi"))  # hi
+print("{:>10}".format("hi"))  #         hi
+print("{:^10}".format("hi"))  #     hi
 
 # Fill character
-print("{:*=10}".format("hi"))    # ********hi
-print("{:.<10}".format("hi"))    # hi........
+print("{:*=10}".format("hi"))  # ********hi
+print("{:.<10}".format("hi"))  # hi........
 
 # Number formatting
 print("{:.2f}".format(3.14159))  # 3.14
-print("{:,}".format(1000000))    # 1,000,000
-print("{:.2%}".format(0.15))     # 15.00%
-print("{:b}".format(10))         # 1010 (binary)
-print("{:x}".format(255))        # ff (hex)
+print("{:,}".format(1000000))  # 1,000,000
+print("{:.2%}".format(0.15))  # 15.00%
+print("{:b}".format(10))  # 1010 (binary)
+print("{:x}".format(255))  # ff (hex)
 ```
 
 ---
@@ -199,9 +200,10 @@ print(f"New line:{nl}")
 # = specifier shows expression and value
 name = "Alice"
 age = 30
-print(f"{name=}")        # name='Alice'
-print(f"{age=}")         # age=30
-print(f"{age * 2=}")     # age * 2=60
+print(f"{name=}")  # name='Alice'
+print(f"{age=}")  # age=30
+print(f"{age * 2=}")  # age * 2=60
+
 
 # Great for debugging
 def calculate(x, y):
@@ -217,13 +219,13 @@ def calculate(x, y):
 # !r - repr()
 # !a - ascii()
 
-print(f"{name!s}")   # Alice
-print(f"{name!r}")   # 'Alice'
+print(f"{name!s}")  # Alice
+print(f"{name!r}")  # 'Alice'
 print(f"{'hello'!r}")  # 'hello'
 
 # Useful for debugging strings with special characters
 text = "Hello\nWorld"
-print(f"{text!r}")   # 'Hello\nWorld'
+print(f"{text!r}")  # 'Hello\nWorld'
 ```
 
 ---
@@ -244,55 +246,55 @@ print(f"{text!r}")   # 'Hello\nWorld'
 # ^ center-align
 # = pad after sign
 
-print(f"{'left':<10}|")     # left      |
-print(f"{'right':>10}|")    #      right|
-print(f"{'center':^10}|")   #   center  |
-print(f"{'pad':*^10}|")     # ***pad****|
+print(f"{'left':<10}|")  # left      |
+print(f"{'right':>10}|")  #      right|
+print(f"{'center':^10}|")  #   center  |
+print(f"{'pad':*^10}|")  # ***pad****|
 
 # With numbers
-print(f"{42:>10}")          #         42
-print(f"{42:<10}")          # 42
-print(f"{42:^10}")          #    42
+print(f"{42:>10}")  #         42
+print(f"{42:<10}")  # 42
+print(f"{42:^10}")  #    42
 ```
 
 ### Number Formatting
 
 ```python
 # Integer
-print(f"{1234567:,}")       # 1,234,567
-print(f"{1234567:_}")       # 1_234_567
+print(f"{1234567:,}")  # 1,234,567
+print(f"{1234567:_}")  # 1_234_567
 
 # Float precision
-print(f"{3.14159:.2f}")     # 3.14
-print(f"{3.14159:.4f}")     # 3.1416
+print(f"{3.14159:.2f}")  # 3.14
+print(f"{3.14159:.4f}")  # 3.1416
 
 # Scientific notation
-print(f"{123456:.2e}")      # 1.23e+05
+print(f"{123456:.2e}")  # 1.23e+05
 
 # Percentage
-print(f"{0.15:.1%}")        # 15.0%
-print(f"{0.15:.2%}")        # 15.00%
+print(f"{0.15:.1%}")  # 15.0%
+print(f"{0.15:.2%}")  # 15.00%
 
 # Binary, Octal, Hex
-print(f"{42:b}")            # 101010
-print(f"{42:o}")            # 52
-print(f"{42:x}")            # 2a
-print(f"{42:#x}")           # 0x2a
-print(f"{42:#b}")           # 0b101010
+print(f"{42:b}")  # 101010
+print(f"{42:o}")  # 52
+print(f"{42:x}")  # 2a
+print(f"{42:#x}")  # 0x2a
+print(f"{42:#b}")  # 0b101010
 ```
 
 ### Sign and Padding
 
 ```python
 # Sign options
-print(f"{42:+d}")           # +42
-print(f"{-42:+d}")          # -42
-print(f"{42: d}")           #  42 (space for positive)
+print(f"{42:+d}")  # +42
+print(f"{-42:+d}")  # -42
+print(f"{42: d}")  #  42 (space for positive)
 
 # Zero-padding
-print(f"{42:05d}")          # 00042
-print(f"{-42:05d}")         # -0042
-print(f"{42:+06d}")         # +00042
+print(f"{42:05d}")  # 00042
+print(f"{-42:05d}")  # -0042
+print(f"{42:+06d}")  # +00042
 ```
 
 ---
@@ -323,10 +325,7 @@ print(t.substitute({"name": "Alice"}))  # Hello, Alice!
 ```python
 # GOOD - user-provided templates (safer)
 user_template = Template("Dear $customer, your order $order_id is ready")
-result = user_template.safe_substitute(
-    customer="Alice",
-    order_id="12345"
-)
+result = user_template.safe_substitute(customer="Alice", order_id="12345")
 
 # NOT recommended - f-strings are more powerful for code
 # But templates are safer when formatting user-supplied patterns
@@ -368,7 +367,7 @@ name = "Alice"
 # print(f"Hello " + name + "!")
 
 # GOOD - use different quotes
-print(f'Hello {name}!')
+print(f"Hello {name}!")
 print(f"Hello {name}!")
 ```
 
@@ -422,28 +421,25 @@ def generate_receipt(items, tax_rate=0.08):
     print("=" * 40)
     print(f"{'ITEMS':^40}")
     print("=" * 40)
-    
+
     subtotal = 0
     for item, price, qty in items:
         total = price * qty
         subtotal += total
         print(f"{item:<25} {qty:>2} x ${price:>6.2f} = ${total:>8.2f}")
-    
+
     print("-" * 40)
     tax = subtotal * tax_rate
     grand_total = subtotal + tax
-    
+
     print(f"{'Subtotal:':<30} ${subtotal:>8.2f}")
     print(f"{'Tax (8%):':<30} ${tax:>8.2f}")
     print(f"{'TOTAL:':<30} ${grand_total:>8.2f}")
     print("=" * 40)
 
+
 # Test
-items = [
-    ("Widget", 9.99, 2),
-    ("Gadget", 24.99, 1),
-    ("Thingamajig", 4.99, 3)
-]
+items = [("Widget", 9.99, 2), ("Gadget", 24.99, 1), ("Thingamajig", 4.99, 3)]
 generate_receipt(items)
 ```
 
@@ -453,28 +449,26 @@ generate_receipt(items)
 def format_table(headers, rows, col_widths=None):
     """Format data as a nice table."""
     if col_widths is None:
-        col_widths = [max(len(str(h)), max(len(str(r[i])) for r in rows)) 
-                      for i, h in enumerate(headers)]
-    
+        col_widths = [
+            max(len(str(h)), max(len(str(r[i])) for r in rows)) for i, h in enumerate(headers)
+        ]
+
     # Header
     header_line = " | ".join(f"{h:<{w}}" for h, w in zip(headers, col_widths))
     separator = "-+-".join("-" * w for w in col_widths)
-    
+
     print(header_line)
     print(separator)
-    
+
     # Rows
     for row in rows:
         row_line = " | ".join(f"{str(v):<{w}}" for v, w in zip(row, col_widths))
         print(row_line)
 
+
 # Test
 headers = ["Name", "Age", "City"]
-rows = [
-    ["Alice", 30, "New York"],
-    ["Bob", 25, "Boston"],
-    ["Charlie", 35, "Chicago"]
-]
+rows = [["Alice", 30, "New York"], ["Bob", 25, "Boston"], ["Charlie", 35, "Chicago"]]
 format_table(headers, rows)
 ```
 
@@ -492,15 +486,16 @@ def format_number(value, style="default"):
         "hex": f"{value:#x}",
         "padded": f"{value:010d}",
     }
-    
+
     return formats.get(style, f"{value}")
 
+
 # Test
-print(format_number(1234567))        # 1,234,567
+print(format_number(1234567))  # 1,234,567
 print(format_number(1234.56, "currency"))  # $1,234.56
-print(format_number(0.15, "percent"))       # 15.0%
-print(format_number(1234567, "scientific")) # 1.23e+06
-print(format_number(255, "hex"))            # 0xff
+print(format_number(0.15, "percent"))  # 15.0%
+print(format_number(1234567, "scientific"))  # 1.23e+06
+print(format_number(255, "hex"))  # 0xff
 ```
 
 ---

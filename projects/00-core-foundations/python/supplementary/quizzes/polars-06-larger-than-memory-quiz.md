@@ -17,6 +17,7 @@ Answers with full explanations and distractor analysis at the end.
 **E2 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [2, None, 1]})
 print(df.sort("a")["a"].to_list())
 ```
@@ -44,6 +45,7 @@ materializing data columns?
 **E5 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [2, None, 1]})
 print(df.select(pl.col("a").null_count()).item())
 ```
@@ -68,6 +70,7 @@ is best read with:
 **M1 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [2, None, 1]})
 print(df.sort("a", nulls_last=True)["a"].to_list())
 ```
@@ -94,7 +97,8 @@ print(df.sort("a", nulls_last=True)["a"].to_list())
 **M4 (code-output).** What prints?
 ```python
 import polars as pl
-lf = pl.scan_csv("events.csv")   # 100k rows, columns id, metric
+
+lf = pl.scan_csv("events.csv")  # 100k rows, columns id, metric
 print(lf.select(pl.len()).collect(engine="streaming").item())
 ```
 
@@ -107,6 +111,7 @@ print(lf.select(pl.len()).collect(engine="streaming").item())
 ```python
 import os
 import polars as pl
+
 lf = pl.scan_parquet("left/")
 rf = pl.scan_parquet("right/")
 lf.join(rf, on="id").sink_parquet("joined.parquet", engine="streaming")
@@ -128,6 +133,7 @@ print(os.path.exists("joined.parquet"))
 **M7 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"tier": [None] * 3 + ["free", "pro"]})
 print(df.group_by("tier").len().sort("tier").rows())
 ```
@@ -175,6 +181,7 @@ streaming needs approximately:
 **H3 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"user_id": [0, 1, 2, 3], "tier": ["free", "pro", "pro", "free"]})
 print(df.filter(pl.col("user_id") < 4).group_by("tier").len().sort("tier").rows())
 ```

@@ -70,17 +70,14 @@ from sklearn.datasets import make_classification
 # Generate data
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=500, n_features=10, n_informative=5,
-    n_redundant=2, random_state=42
+    n_samples=500, n_features=10, n_informative=5, n_redundant=2, random_state=42
 )
 
 print(f"Samples: {X.shape[0]}")
 print(f"Features: {X.shape[1]}")
 
 # Train/test split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Train Random Forest
 rf = RandomForestClassifier(n_estimators=100, random_state=42)
@@ -105,8 +102,7 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 
 np.random.seed(42)
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Single Decision Tree
@@ -121,7 +117,7 @@ acc_rf = accuracy_score(y_test, rf.predict(X_test))
 
 print(f"Single Decision Tree: {acc_dt:.4f}")
 print(f"Random Forest: {acc_rf:.4f}")
-print(f"Improvement: {(acc_rf - acc_dt)*100:.2f}%")
+print(f"Improvement: {(acc_rf - acc_dt) * 100:.2f}%")
 ```
 
 ### Example 3: Feature Importance
@@ -133,8 +129,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 
 np.random.seed(42)
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 feature_names = [f"Feature {i}" for i in range(X.shape[1])]
 
@@ -143,10 +138,9 @@ rf.fit(X, y)
 
 # Feature importance
 importances = rf.feature_importances_
-feature_importance = pd.DataFrame({
-    'feature': feature_names,
-    'importance': importances
-}).sort_values('importance', ascending=False)
+feature_importance = pd.DataFrame(
+    {"feature": feature_names, "importance": importances}
+).sort_values("importance", ascending=False)
 
 print("Feature Importances:")
 for _, row in feature_importance.iterrows():
@@ -154,13 +148,14 @@ for _, row in feature_importance.iterrows():
 
 # Visualize
 import matplotlib.pyplot as plt
+
 plt.figure(figsize=(8, 4))
-plt.barh(feature_importance['feature'], feature_importance['importance'])
-plt.xlabel('Importance')
-plt.title('Feature Importance (Random Forest)')
+plt.barh(feature_importance["feature"], feature_importance["importance"])
+plt.xlabel("Importance")
+plt.title("Feature Importance (Random Forest)")
 plt.gca().invert_yaxis()
 plt.tight_layout()
-plt.savefig('feature_importance.png', dpi=100)
+plt.savefig("feature_importance.png", dpi=100)
 plt.show()
 ```
 
@@ -173,21 +168,21 @@ import numpy as np
 
 np.random.seed(42)
 from sklearn.datasets import make_classification
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 # Test different n_estimators
 print("Effect of n_estimators:")
 for n_trees in [10, 50, 100, 200, 500]:
     rf = RandomForestClassifier(n_estimators=n_trees, random_state=42)
-    scores = cross_val_score(rf, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(rf, X, y, cv=5, scoring="accuracy")
     print(f"  {n_trees:3d} trees: {scores.mean():.4f} +/- {scores.std():.4f}")
 
 # Test different max_depth
 print("\nEffect of max_depth:")
 for depth in [3, 5, 10, 20, None]:
     rf = RandomForestClassifier(n_estimators=100, max_depth=depth, random_state=42)
-    scores = cross_val_score(rf, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(rf, X, y, cv=5, scoring="accuracy")
     print(f"  depth={str(depth):5s}: {scores.mean():.4f} +/- {scores.std():.4f}")
 ```
 
@@ -199,8 +194,7 @@ from sklearn.datasets import make_classification
 import numpy as np
 
 np.random.seed(42)
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 # OOB score uses unused samples for validation
 rf_oob = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=42)
@@ -337,24 +331,24 @@ Compare Random Forest with other ensemble methods.
 3. Train Gradient Boosting
 4. Compare accuracy and training time
 """
+
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.datasets import make_classification
 from sklearn.model_selection import cross_val_score
 import time
 
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 models = {
-    'Decision Tree': DecisionTreeClassifier(random_state=42),
-    'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
-    'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42)
+    "Decision Tree": DecisionTreeClassifier(random_state=42),
+    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
+    "Gradient Boosting": GradientBoostingClassifier(n_estimators=100, random_state=42),
 }
 
 for name, model in models.items():
     start = time.time()
-    scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
     time_taken = time.time() - start
     print(f"{name:20s}: {scores.mean():.4f} +/- {scores.std():.4f} ({time_taken:.2f}s)")
 ```
@@ -369,14 +363,14 @@ Use Random Forest feature importance for feature selection.
 3. Select top 5 features
 4. Compare performance
 """
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.datasets import make_classification
 import numpy as np
 
 np.random.seed(42)
-X, y = make_classification(n_samples=500, n_features=20, 
-                           n_informative=10, random_state=42)
+X, y = make_classification(n_samples=500, n_features=20, n_informative=10, random_state=42)
 
 # Your code here
 rf = RandomForestClassifier(n_estimators=100, random_state=42)
@@ -388,8 +382,8 @@ print(f"Top 5 features: {top_5}")
 print(f"Importances: {importances[top_5]}")
 
 # Compare performance
-scores_all = cross_val_score(rf, X, y, cv=5, scoring='accuracy')
-scores_top5 = cross_val_score(rf, X[:, top_5], y, cv=5, scoring='accuracy')
+scores_all = cross_val_score(rf, X, y, cv=5, scoring="accuracy")
+scores_top5 = cross_val_score(rf, X[:, top_5], y, cv=5, scoring="accuracy")
 
 print(f"\nAll features: {scores_all.mean():.4f}")
 print(f"Top 5 features: {scores_top5.mean():.4f}")
@@ -405,23 +399,22 @@ Tune Random Forest hyperparameters.
 3. Tune min_samples_split
 4. Find best combination
 """
+
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.datasets import make_classification
 
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 # Your code here
 param_grid = {
-    'n_estimators': [50, 100, 200],
-    'max_depth': [5, 10, 20, None],
-    'min_samples_split': [2, 5, 10]
+    "n_estimators": [50, 100, 200],
+    "max_depth": [5, 10, 20, None],
+    "min_samples_split": [2, 5, 10],
 }
 
 grid_search = GridSearchCV(
-    RandomForestClassifier(random_state=42),
-    param_grid, cv=5, scoring='accuracy', n_jobs=-1
+    RandomForestClassifier(random_state=42), param_grid, cv=5, scoring="accuracy", n_jobs=-1
 )
 grid_search.fit(X, y)
 

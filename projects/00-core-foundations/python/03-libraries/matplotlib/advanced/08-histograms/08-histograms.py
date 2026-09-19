@@ -3,14 +3,17 @@ Matplotlib Histograms - W3Schools Exercises
 =============================================
 Histogram creation and distribution visualization.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -78,6 +81,7 @@ def exercise_04():
     data = np.random.gamma(2, 2, 500)
 
     from scipy.stats import gaussian_kde
+
     kde = gaussian_kde(data)
     x_kde = np.linspace(0, data.max(), 200)
 

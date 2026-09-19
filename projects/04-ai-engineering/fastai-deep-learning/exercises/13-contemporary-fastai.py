@@ -30,9 +30,9 @@ from typing import Any, Callable
 # 1. Solveit-Inspired Context Manager
 # ============================================================
 class MessageState(Enum):
-    ACTIVE = auto()     # visible to AI
-    HIDDEN = auto()     # invisible to AI
-    PINNED = auto()     # always visible, cannot be evicted
+    ACTIVE = auto()  # visible to AI
+    HIDDEN = auto()  # invisible to AI
+    PINNED = auto()  # always visible, cannot be evicted
 
 
 @dataclass
@@ -53,7 +53,9 @@ class ManagedContext:
         self._messages: list[ContextMessage] = []
         self.max_tokens = max_tokens
 
-    def add(self, role: str, content: str, state: MessageState = MessageState.ACTIVE) -> None:
+    def add(
+        self, role: str, content: str, state: MessageState = MessageState.ACTIVE
+    ) -> None:
         self._messages.append(ContextMessage(role=role, content=content, state=state))
 
     def hide(self, index: int) -> None:
@@ -87,7 +89,9 @@ class ManagedContext:
         active = sum(1 for m in self._messages if m.state == MessageState.ACTIVE)
         hidden = sum(1 for m in self._messages if m.state == MessageState.HIDDEN)
         pinned = sum(1 for m in self._messages if m.state == MessageState.PINNED)
-        return f"Context: {total} msgs ({active} active, {hidden} hidden, {pinned} pinned)"
+        return (
+            f"Context: {total} msgs ({active} active, {hidden} hidden, {pinned} pinned)"
+        )
 
 
 # ============================================================
@@ -185,6 +189,7 @@ class RouteApp:
             for method in methods:
                 self._routes[(method.upper(), path)] = func
             return func
+
         return decorator
 
     def dispatch(self, method: str, path: str, **kwargs) -> str:
@@ -248,10 +253,12 @@ def print_productivity_table(metrics: list[ProductivityMetrics]) -> None:
     print("-" * len(header))
     for s in metrics:
         gap_str = f"{s.gap():+.1f}"
-        print(f"{s.mode:<35s} {s.perceived_productivity:>6.1f}/10"
-              f" {s.actual_output_quality:>6.1f}/10 {gap_str:>6s}"
-              f" {s.code_maintainability:>5.1f}/10"
-              f" {s.understanding_retention:>8.1f}/10")
+        print(
+            f"{s.mode:<35s} {s.perceived_productivity:>6.1f}/10"
+            f" {s.actual_output_quality:>6.1f}/10 {gap_str:>6s}"
+            f" {s.code_maintainability:>5.1f}/10"
+            f" {s.understanding_retention:>8.1f}/10"
+        )
 
 
 # ============================================================
@@ -280,9 +287,11 @@ def main() -> None:
     print("2. Reversible Pipeline (fasttransform-style)")
     print("=" * 60)
 
-    pipe = Pipeline([
-        Normalize(min_val=0, max_val=255),
-    ])
+    pipe = Pipeline(
+        [
+            Normalize(min_val=0, max_val=255),
+        ]
+    )
 
     test_values = [0, 128, 255, 64.0]
     for v in test_values:
@@ -308,8 +317,9 @@ def main() -> None:
 
     @app.route("/")
     def home():
-        return "<h1>Welcome</h1><p>FastHTML-style routing works!</p>" + \
-               app.htmx_button("Click me", "/click")
+        return "<h1>Welcome</h1><p>FastHTML-style routing works!</p>" + app.htmx_button(
+            "Click me", "/click"
+        )
 
     @app.route("/click")
     def click():
@@ -330,9 +340,13 @@ def main() -> None:
 
     # Highlight the key finding
     agentic = [m for m in metrics if m.mode == "agentic (full automation)"][0]
-    print(f"Key insight: '{agentic.mode}' has perception={agentic.perceived_productivity:.0f}/10")
-    print(f"  but actual quality={agentic.actual_output_quality:.0f}/10, "
-          f"maintainability={agentic.code_maintainability:.0f}/10")
+    print(
+        f"Key insight: '{agentic.mode}' has perception={agentic.perceived_productivity:.0f}/10"
+    )
+    print(
+        f"  but actual quality={agentic.actual_output_quality:.0f}/10, "
+        f"maintainability={agentic.code_maintainability:.0f}/10"
+    )
     print(f"  Gap: {agentic.gap():+.1f} — the productivity paradox.")
     print()
 

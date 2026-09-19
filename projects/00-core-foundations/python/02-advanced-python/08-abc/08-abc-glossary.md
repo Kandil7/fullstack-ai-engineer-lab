@@ -37,14 +37,17 @@
 ```python
 from abc import ABC, abstractmethod
 
+
 class Animal(ABC):
     @abstractmethod
     def speak(self) -> str:
         pass
 
+
 class Dog(Animal):
     def speak(self) -> str:
         return "Woof!"
+
 
 # Cannot instantiate ABC directly
 # animal = Animal()  # TypeError
@@ -65,26 +68,29 @@ print(dog.speak())  # "Woof!"
 ```python
 from abc import ABC, abstractmethod
 
+
 class Shape(ABC):
     @abstractmethod
     def area(self) -> float:
         """Calculate area. Must be implemented."""
         pass
-    
+
     @abstractmethod
     def perimeter(self) -> float:
         """Calculate perimeter. Must be implemented."""
         pass
 
+
 class Circle(Shape):
     def __init__(self, radius):
         self.radius = radius
-    
+
     def area(self) -> float:
-        return 3.14159 * self.radius ** 2
-    
+        return 3.14159 * self.radius**2
+
     def perimeter(self) -> float:
         return 2 * 3.14159 * self.radius
+
 
 # Missing implementation causes error
 # class BadShape(Shape):
@@ -104,28 +110,31 @@ class Circle(Shape):
 ```python
 from abc import ABC, abstractmethod
 
+
 class Database(ABC):
     @abstractmethod
     def connect(self) -> None:
         """Abstract method - no implementation."""
         pass
-    
+
     @abstractmethod
     def query(self, sql: str) -> list:
         """Abstract method - must be implemented."""
         pass
 
+
 class PostgresDB(Database):
     def connect(self) -> None:
         print("Connected to PostgreSQL")
-    
+
     def query(self, sql: str) -> list:
         return [{"id": 1}]
+
 
 class MySQLDB(Database):
     def connect(self) -> None:
         print("Connected to MySQL")
-    
+
     def query(self, sql: str) -> list:
         return [{"id": 2}]
 ```
@@ -142,27 +151,30 @@ class MySQLDB(Database):
 ```python
 from abc import ABC, abstractmethod
 
+
 class Vehicle(ABC):
     @property
     @abstractmethod
     def fuel_type(self) -> str:
         """Must be implemented as a property."""
         pass
-    
+
     @property
     @abstractmethod
     def max_speed(self) -> float:
         """Must be implemented as a property."""
         pass
 
+
 class ElectricCar(Vehicle):
     @property
     def fuel_type(self) -> str:
         return "Electric"
-    
+
     @property
     def max_speed(self) -> float:
         return 200.0
+
 
 car = ElectricCar()
 print(car.fuel_type)  # "Electric"
@@ -181,29 +193,34 @@ print(car.max_speed)  # 200.0
 ```python
 from abc import ABC, abstractmethod
 
+
 class Serializer(ABC):
     @classmethod
     @abstractmethod
     def serialize(cls, data: dict) -> str:
         """Must be implemented as class method."""
         pass
-    
+
     @classmethod
     @abstractmethod
     def deserialize(cls, data: str) -> dict:
         """Must be implemented as class method."""
         pass
 
+
 class JSONSerializer(Serializer):
     @classmethod
     def serialize(cls, data: dict) -> str:
         import json
+
         return json.dumps(data)
-    
+
     @classmethod
     def deserialize(cls, data: str) -> dict:
         import json
+
         return json.loads(data)
+
 
 # Usage
 result = JSONSerializer.serialize({"key": "value"})
@@ -222,6 +239,7 @@ print(result)  # '{"key": "value"}'
 ```python
 from abc import ABC, abstractmethod
 
+
 class Validator(ABC):
     @staticmethod
     @abstractmethod
@@ -229,15 +247,18 @@ class Validator(ABC):
         """Must be implemented as static method."""
         pass
 
+
 class EmailValidator(Validator):
     @staticmethod
     def validate(value) -> bool:
         return "@" in value
 
+
 class NumberValidator(Validator):
     @staticmethod
     def validate(value) -> bool:
         return isinstance(value, (int, float))
+
 
 print(EmailValidator.validate("test@example.com"))  # True
 print(NumberValidator.validate(42))  # True
@@ -255,24 +276,27 @@ print(NumberValidator.validate(42))  # True
 ```python
 from abc import ABC, abstractmethod
 
+
 class DataProcessor(ABC):
     @abstractmethod
     def process(self, data: list) -> list:
         """Must be implemented."""
         pass
-    
+
     def validate(self, data: list) -> bool:
         """Concrete method with default implementation."""
         return len(data) > 0
-    
+
     def log(self, message: str) -> None:
         """Concrete method - logging."""
         print(f"[{self.__class__.__name__}] {message}")
+
 
 class UserProcessor(DataProcessor):
     def process(self, data: list) -> list:
         self.log(f"Processing {len(data)} users")
         return [{"name": d["name"].upper()} for d in data]
+
 
 processor = UserProcessor()
 print(processor.validate([{"name": "alice"}]))  # True
@@ -291,18 +315,22 @@ print(processor.validate([]))  # False
 ```python
 from abc import ABC, abstractmethod
 
+
 class Animal(ABC):
     @abstractmethod
     def speak(self) -> str:
         pass
 
+
 class Dog(Animal):  # Concrete class
     def speak(self) -> str:
         return "Woof!"
 
+
 class Cat(Animal):  # Concrete class
     def speak(self) -> str:
         return "Meow!"
+
 
 # Can instantiate concrete classes
 dog = Dog()
@@ -323,22 +351,27 @@ print(cat.speak())  # "Meow!"
 ```python
 from abc import ABC, abstractmethod
 
+
 # Formal duck typing with ABC
 class Drawable(ABC):
     @abstractmethod
     def draw(self) -> str:
         pass
 
+
 # Any class with draw() can be registered
 class Circle:
     def draw(self) -> str:
         return "Drawing circle"
 
+
 # Register as virtual subclass
 Drawable.register(Circle)
 
+
 def render(shape: Drawable) -> None:
     print(shape.draw())
+
 
 # Works with any registered type
 render(Circle())  # "Drawing circle"
@@ -356,42 +389,44 @@ render(Circle())  # "Drawing circle"
 ```python
 from abc import ABC, abstractmethod
 
+
 class Repository(ABC):
     """Interface for data access."""
-    
+
     @abstractmethod
     def get(self, id: str) -> dict:
         """Get item by ID."""
         pass
-    
+
     @abstractmethod
     def save(self, item: dict) -> None:
         """Save an item."""
         pass
-    
+
     @abstractmethod
     def delete(self, id: str) -> None:
         """Delete an item by ID."""
         pass
-    
+
     @abstractmethod
     def list_all(self) -> list:
         """List all items."""
         pass
 
+
 class UserRepo(Repository):
     def __init__(self):
         self.users = {}
-    
+
     def get(self, id: str) -> dict:
         return self.users.get(id)
-    
+
     def save(self, item: dict) -> None:
         self.users[item["id"]] = item
-    
+
     def delete(self, id: str) -> None:
         self.users.pop(id, None)
-    
+
     def list_all(self) -> list:
         return list(self.users.values())
 ```
@@ -408,18 +443,22 @@ class UserRepo(Repository):
 ```python
 from abc import ABC, abstractmethod
 
+
 class Animal(ABC):
     @abstractmethod
     def speak(self) -> str:
         pass
 
+
 class Dog(Animal):  # Nominal: Dog IS-A Animal
     def speak(self) -> str:
         return "Woof!"
 
+
 # Nominal subtyping through inheritance
 def animal_sound(animal: Animal) -> str:
     return animal.speak()
+
 
 dog = Dog()
 print(animal_sound(dog))  # Works - Dog is subtype of Animal
@@ -438,37 +477,41 @@ print(animal_sound(dog))  # Works - Dog is subtype of Animal
 from abc import ABC, abstractmethod
 from typing import Dict, Type
 
+
 class Plugin(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
         pass
-    
+
     @abstractmethod
     def execute(self, context: dict) -> dict:
         pass
 
+
 class PluginManager:
     def __init__(self):
         self._plugins: Dict[str, Plugin] = {}
-    
+
     def register(self, plugin: Plugin) -> None:
         self._plugins[plugin.name] = plugin
-    
+
     def execute(self, name: str, context: dict) -> dict:
         plugin = self._plugins.get(name)
         if plugin is None:
             raise ValueError(f"Plugin {name} not found")
         return plugin.execute(context)
 
+
 # Implement plugins
 class ValidationPlugin(Plugin):
     @property
     def name(self) -> str:
         return "validation"
-    
+
     def execute(self, context: dict) -> dict:
         return {"valid": True}
+
 
 # Usage
 manager = PluginManager()
@@ -489,28 +532,33 @@ print(result)  # {"valid": True}
 ```python
 from abc import ABC, abstractmethod
 
+
 class Shape(ABC):
     @abstractmethod
     def area(self) -> float:
         pass
 
+
 class Circle(Shape):
     def __init__(self, radius):
         self.radius = radius
-    
+
     def area(self) -> float:
-        return 3.14159 * self.radius ** 2
+        return 3.14159 * self.radius**2
+
 
 class Square(Shape):
     def __init__(self, side):
         self.side = side
-    
+
     def area(self) -> float:
-        return self.side ** 2
+        return self.side**2
+
 
 # Polymorphic function
 def total_area(shapes: list[Shape]) -> float:
     return sum(shape.area() for shape in shapes)
+
 
 # Works with any Shape implementation
 shapes = [Circle(5), Square(4), Circle(3)]
@@ -529,19 +577,23 @@ print(total_area(shapes))  # Same interface, different implementations
 ```python
 from abc import ABC, abstractmethod
 
+
 class Serializable(ABC):
     @abstractmethod
     def to_dict(self) -> dict:
         pass
 
+
 class User:
     """Third-party class - can't modify to inherit from Serializable."""
+
     def __init__(self, name, age):
         self.name = name
         self.age = age
-    
+
     def to_dict(self) -> dict:
         return {"name": self.name, "age": self.age}
+
 
 # Register without inheritance
 Serializable.register(User)
@@ -551,9 +603,11 @@ user = User("Alice", 30)
 print(isinstance(user, Serializable))  # True
 print(issubclass(User, Serializable))  # True
 
+
 # Can use in type hints
 def process(item: Serializable) -> dict:
     return item.to_dict()
+
 
 print(process(user))  # {'name': 'Alice', 'age': 30}
 ```
@@ -570,21 +624,26 @@ print(process(user))  # {'name': 'Alice', 'age': 30}
 ```python
 from typing import Protocol, runtime_checkable
 
+
 @runtime_checkable
 class Drawable(Protocol):
     def draw(self) -> str: ...
+
 
 class Circle:
     def draw(self) -> str:
         return "Circle"
 
+
 class Square:
     def draw(self) -> str:
         return "Square"
 
+
 # Structural - no inheritance needed
 def render(shape: Drawable) -> None:
     print(shape.draw())
+
 
 render(Circle())  # Works - has draw()
 render(Square())  # Works - has draw()
@@ -605,6 +664,7 @@ print(isinstance(Circle(), Drawable))  # True
 ```python
 from abc import ABC, abstractmethod
 
+
 class Drawable(ABC):
     @classmethod
     def __subclasshook__(cls, C):
@@ -614,9 +674,11 @@ class Drawable(ABC):
                 return True
         return NotImplemented
 
+
 class Circle:
     def draw(self) -> str:
         return "Circle"
+
 
 # Structural check without register()
 print(issubclass(Circle, Drawable))  # True
@@ -634,35 +696,38 @@ print(issubclass(Circle, Drawable))  # True
 ```python
 from abc import ABC, abstractmethod
 
+
 class DataPipeline(ABC):
     def run(self, data):
         """Template method - defines the algorithm."""
         validated = self.validate(data)
         transformed = self.transform(validated)
         return self.store(transformed)
-    
+
     @abstractmethod
     def validate(self, data):
         pass
-    
+
     @abstractmethod
     def transform(self, data):
         pass
-    
+
     @abstractmethod
     def store(self, data):
         pass
 
+
 class UserPipeline(DataPipeline):
     def validate(self, data):
         return [d for d in data if "email" in d]
-    
+
     def transform(self, data):
         return [{**d, "email": d["email"].lower()} for d in data]
-    
+
     def store(self, data):
         print(f"Storing {len(data)} users")
         return data
+
 
 pipeline = UserPipeline()
 result = pipeline.run([{"email": "TEST@X.COM"}, {"name": "NoEmail"}])
@@ -681,18 +746,22 @@ result = pipeline.run([{"email": "TEST@X.COM"}, {"name": "NoEmail"}])
 ```python
 from abc import ABC, abstractmethod
 
+
 class Flyer(ABC):
     @abstractmethod
     def fly(self) -> str:
         pass
 
+
 class Bird:
     def fly(self) -> str:
         return "Flying with wings"
 
+
 class Airplane:
     def fly(self) -> str:
         return "Flying with engines"
+
 
 # Register without inheritance
 Flyer.register(Bird)
@@ -702,11 +771,13 @@ Flyer.register(Airplane)
 print(isinstance(Bird(), Flyer))  # True
 print(isinstance(Airplane(), Flyer))  # True
 
+
 # Type hints work
 def launch(flyer: Flyer) -> None:
     print(flyer.fly())
 
-launch(Bird())   # Works
+
+launch(Bird())  # Works
 launch(Airplane())  # Works
 ```
 

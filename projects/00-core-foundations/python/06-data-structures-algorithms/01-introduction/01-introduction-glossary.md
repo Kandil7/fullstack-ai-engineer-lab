@@ -14,10 +14,10 @@
 ```python
 # Stack ADT — abstract specification
 class StackADT:
-    def push(self, item): ...   # Add to top
-    def pop(self): ...          # Remove from top
-    def peek(self): ...         # View top without removing
-    def is_empty(self): ...     # Check if empty
+    def push(self, item): ...  # Add to top
+    def pop(self): ...  # Remove from top
+    def peek(self): ...  # View top without removing
+    def is_empty(self): ...  # Check if empty
 ```
 
 ### Algorithm
@@ -53,8 +53,8 @@ for i in range(1000):
 
 ```python
 arr = [1, 2, 3, 4, 5]
-print(arr[0])   # O(1) access — first element
-print(arr[3])   # O(1) access — fourth element
+print(arr[0])  # O(1) access — first element
+print(arr[3])  # O(1) access — fourth element
 ```
 
 ---
@@ -68,7 +68,7 @@ print(arr[3])   # O(1) access — fourth element
 
 ```python
 def factorial(n):
-    if n <= 1:          # Base case — stops recursion
+    if n <= 1:  # Base case — stops recursion
         return 1
     return n * factorial(n - 1)  # Recursive case
 ```
@@ -123,9 +123,9 @@ def get_first(lst):
 ```python
 # Divide and Conquer: find max in unsorted list
 def find_max(lst):
-    if len(lst) == 1:          # Base case
+    if len(lst) == 1:  # Base case
         return lst[0]
-    mid = len(lst) // 2        # Divide
+    mid = len(lst) // 2  # Divide
     left_max = find_max(lst[:mid])
     right_max = find_max(lst[mid:])
     return max(left_max, right_max)  # Combine
@@ -258,9 +258,9 @@ def quadratic_example(n):
 
 ```python
 def fibonacci(n):
-    if n <= 1:           # Base case
+    if n <= 1:  # Base case
         return n
-    return fibonacci(n-1) + fibonacci(n-2)  # Recursive case
+    return fibonacci(n - 1) + fibonacci(n - 2)  # Recursive case
 ```
 
 ---

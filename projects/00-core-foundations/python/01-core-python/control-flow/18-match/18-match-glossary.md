@@ -72,7 +72,7 @@ match value:
     case int():
         print(f"Got integer: {value}")  # 'value' captures the int
     case str(text):
-        print(f"Got string: {text}")    # 'text' captures the string
+        print(f"Got string: {text}")  # 'text' captures the string
 ```
 
 **Related**: as pattern, binding, variable capture
@@ -88,6 +88,7 @@ class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
 
 match point:
     case Point(x=0, y=0):
@@ -223,9 +224,9 @@ def describe(value):
 **Example**:
 ```python
 match point:
-    case Point(x=0):       # Matches any Point where x=0
+    case Point(x=0):  # Matches any Point where x=0
         print("On Y-axis")
-    case Point():           # Matches any Point
+    case Point():  # Matches any Point
         print(f"Any point")
 ```
 
@@ -281,6 +282,7 @@ class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
 
 match point:
     case Point(0, 0):
@@ -397,10 +399,11 @@ def parse_command(command):
         case _:
             return ("unknown", command)
 
-print(parse_command("quit"))              # ('exit',)
-print(parse_command("help python"))       # ('help', 'python')
-print(parse_command("move north 5"))      # ('move', 'north', 5)
-print(parse_command("set color = red"))   # ('set', 'color', 'red')
+
+print(parse_command("quit"))  # ('exit',)
+print(parse_command("help python"))  # ('help', 'python')
+print(parse_command("move north 5"))  # ('move', 'north', 5)
+print(parse_command("set color = red"))  # ('set', 'color', 'red')
 ```
 
 ### Example 2: JSON Schema Validator
@@ -418,7 +421,8 @@ def validate_schema(data, schema):
         case _:
             return False
 
-print(validate_schema(42, "integer"))                     # True
+
+print(validate_schema(42, "integer"))  # True
 print(validate_schema({"a": 1}, {"type": "object", "required": ["a"]}))  # True
 ```
 

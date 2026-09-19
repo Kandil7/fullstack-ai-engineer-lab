@@ -26,9 +26,9 @@ y = x * 0.5 + rng.normal(0, 0.5, n)
 
 plt.figure(figsize=(8, 6))
 plt.scatter(x, y, alpha=0.7, s=50)
-plt.xlabel('X Variable')
-plt.ylabel('Y Variable')
-plt.title('Basic Scatter Plot')
+plt.xlabel("X Variable")
+plt.ylabel("Y Variable")
+plt.title("Basic Scatter Plot")
 plt.grid(True, alpha=0.3)
 plt.show()
 ```
@@ -45,20 +45,23 @@ plt.show()
 # 4. Size → petal length (continuous)
 # 5. Transparency → density
 
-colors = ['red', 'green', 'blue']
+colors = ["red", "green", "blue"]
 sizes = np.random.uniform(20, 200, n)
 
-for i, species in enumerate(['Setosa', 'Versicolor', 'Virginica']):
+for i, species in enumerate(["Setosa", "Versicolor", "Virginica"]):
     mask = y_true == i  # Using Iris-like data
-    plt.scatter(x[mask], y[mask],
-                c=colors[i],
-                s=sizes[mask],
-                alpha=0.7,
-                label=species,
-                edgecolors='black',
-                linewidth=0.5)
+    plt.scatter(
+        x[mask],
+        y[mask],
+        c=colors[i],
+        s=sizes[mask],
+        alpha=0.7,
+        label=species,
+        edgecolors="black",
+        linewidth=0.5,
+    )
 
-plt.colorbar(label='Petal Length (cm)')
+plt.colorbar(label="Petal Length (cm)")
 plt.legend()
 plt.show()
 ```
@@ -73,10 +76,9 @@ y = rng.uniform(0, 10, 200)
 z = x * y  # Color value
 
 plt.figure(figsize=(10, 7))
-scatter = plt.scatter(x, y, c=z, s=50, cmap='viridis',
-                      alpha=0.7, edgecolors='black', linewidth=0.5)
+scatter = plt.scatter(x, y, c=z, s=50, cmap="viridis", alpha=0.7, edgecolors="black", linewidth=0.5)
 
-plt.colorbar(scatter, label='Product (X × Y)', shrink=0.8)
+plt.colorbar(scatter, label="Product (X × Y)", shrink=0.8)
 
 # Built-in colormaps: 'viridis', 'plasma', 'inferno', 'magma',
 # 'coolwarm', 'RdBu', 'jet', 'hsv', 'twilight'

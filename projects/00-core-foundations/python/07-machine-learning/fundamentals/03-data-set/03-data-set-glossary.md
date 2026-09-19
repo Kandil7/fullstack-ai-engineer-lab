@@ -38,11 +38,9 @@
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    'name': ['Alice', 'Bob', 'Charlie'],
-    'age': [25, 30, 35],
-    'salary': [50000, 60000, 70000]
-})
+df = pd.DataFrame(
+    {"name": ["Alice", "Bob", "Charlie"], "age": [25, 30, 35], "salary": [50000, 60000, 70000]}
+)
 
 print(df)
 #       name  age  salary
@@ -63,11 +61,13 @@ print(df)
 **Example:**
 ```python
 # In house price prediction, these are features:
-X = np.array([
-    [1500, 3, 10],  # [square_feet, bedrooms, age]
-    [2000, 4, 5],
-    [1200, 2, 15]
-])
+X = np.array(
+    [
+        [1500, 3, 10],  # [square_feet, bedrooms, age]
+        [2000, 4, 5],
+        [1200, 2, 15],
+    ]
+)
 # Features: square_feet, bedrooms, age
 ```
 
@@ -78,11 +78,13 @@ X = np.array([
 
 **Example:**
 ```python
-X = np.array([
-    [1500, 3, 10],  # Sample 1
-    [2000, 4, 5],   # Sample 2
-    [1200, 2, 15]   # Sample 3
-])
+X = np.array(
+    [
+        [1500, 3, 10],  # Sample 1
+        [2000, 4, 5],  # Sample 2
+        [1200, 2, 15],  # Sample 3
+    ]
+)
 print(f"Shape: {X.shape}")  # (3, 3) — 3 samples, 3 features
 ```
 
@@ -98,13 +100,14 @@ print(f"Shape: {X.shape}")  # (3, 3) — 3 samples, 3 features
 **Example:**
 ```python
 import pandas as pd
-df = pd.DataFrame({'A': [1, 2, 3]}, index=['x', 'y', 'z'])
+
+df = pd.DataFrame({"A": [1, 2, 3]}, index=["x", "y", "z"])
 print(df)
 #    A
 # x  1
 # y  2
 # z  3
-print(df.loc['x'])  # Access by label
+print(df.loc["x"])  # Access by label
 ```
 
 **Related Terms:** DataFrame, Series, .loc, .iloc
@@ -144,7 +147,7 @@ print(f"X shape: {X.shape}")  # (3, 2)
 import pandas as pd
 
 # Create DataFrame
-df = pd.read_csv('data.csv')
+df = pd.read_csv("data.csv")
 
 # Explore
 print(df.head())
@@ -153,7 +156,7 @@ print(df.info())
 
 # Manipulate
 df_clean = df.dropna()
-df['new_col'] = df['A'] + df['B']
+df["new_col"] = df["A"] + df["B"]
 ```
 
 **Related Terms:** DataFrame, Series, read_csv, dropna
@@ -164,10 +167,8 @@ df['new_col'] = df['A'] + df['B']
 **Example:**
 ```python
 import pandas as pd
-df = pd.DataFrame({
-    'age': [25, 30, 35, 40, 45],
-    'salary': [50000, 60000, 70000, 80000, 90000]
-})
+
+df = pd.DataFrame({"age": [25, 30, 35, 40, 45], "salary": [50000, 60000, 70000, 80000, 90000]})
 print(df.describe())
 #              age        salary
 # count   5.000000      5.000000
@@ -184,16 +185,16 @@ print(df.describe())
 
 **Example:**
 ```python
-df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'C': [7, 8, 9]})
+df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6], "C": [7, 8, 9]})
 
 # Drop column
-df_dropped = df.drop('C', axis=1)
+df_dropped = df.drop("C", axis=1)
 
 # Drop row
 df_dropped = df.drop(0, axis=0)
 
 # Drop multiple columns
-df_dropped = df.drop(['A', 'B'], axis=1)
+df_dropped = df.drop(["A", "B"], axis=1)
 ```
 
 **Related Terms:** .dropna(), .drop_duplicates(), Axis
@@ -204,10 +205,8 @@ df_dropped = df.drop(['A', 'B'], axis=1)
 **Example:**
 ```python
 import numpy as np
-df = pd.DataFrame({
-    'A': [1, np.nan, 3],
-    'B': [4, 5, np.nan]
-})
+
+df = pd.DataFrame({"A": [1, np.nan, 3], "B": [4, 5, np.nan]})
 print(df)
 #      A    B
 # 0  1.0  4.0
@@ -232,11 +231,13 @@ print(df_clean)
 **Example:**
 ```python
 # Each row is a sample
-X = np.array([
-    [1500, 3, 10],  # Sample 1 (house 1)
-    [2000, 4, 5],   # Sample 2 (house 2)
-    [1200,  2, 15]  # Sample 3 (house 3)
-])
+X = np.array(
+    [
+        [1500, 3, 10],  # Sample 1 (house 1)
+        [2000, 4, 5],  # Sample 2 (house 2)
+        [1200, 2, 15],  # Sample 3 (house 3)
+    ]
+)
 print(f"Number of samples: {len(X)}")  # 3
 ```
 
@@ -248,12 +249,13 @@ print(f"Number of samples: {len(X)}")  # 3
 **Example:**
 ```python
 import pandas as pd
-s = pd.Series([10, 20, 30], index=['a', 'b', 'c'])
+
+s = pd.Series([10, 20, 30], index=["a", "b", "c"])
 print(s)
 # a    10
 # b    20
 # c    30
-print(s['b'])  # 20
+print(s["b"])  # 20
 ```
 
 **Related Terms:** DataFrame, Index, Column
@@ -264,11 +266,13 @@ print(s['b'])  # 20
 **Example:**
 ```python
 import numpy as np
+
 X = np.array([[1, 2, 3], [4, 5, 6]])
 print(f"Shape: {X.shape}")  # (2, 3) — 2 rows, 3 columns
 
 import pandas as pd
-df = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
+
+df = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
 print(f"Shape: {df.shape}")  # (2, 2)
 ```
 
@@ -332,11 +336,12 @@ print(f"Values: {y}")
 from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y,
-    test_size=0.2  # 20% for testing, 80% for training
+    X,
+    y,
+    test_size=0.2,  # 20% for testing, 80% for training
 )
 print(f"Train size: {len(X_train)}")  # 80% of total
-print(f"Test size: {len(X_test)}")    # 20% of total
+print(f"Test size: {len(X_test)}")  # 20% of total
 ```
 
 **Related Terms:** train_test_split, Training Set, Test Set
@@ -347,6 +352,7 @@ print(f"Test size: {len(X_test)}")    # 20% of total
 **Example:**
 ```python
 from sklearn.model_selection import train_test_split
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
 model.fit(X_train, y_train)  # Train on training set
@@ -364,16 +370,14 @@ model.fit(X_train, y_train)  # Train on training set
 **Example:**
 ```python
 import pandas as pd
-df = pd.DataFrame({
-    'square_feet': [1500, 2000],
-    'price': [300000, 400000]
-})
 
-X = df[['square_feet']].values  # Convert to NumPy
-y = df['price'].values
+df = pd.DataFrame({"square_feet": [1500, 2000], "price": [300000, 400000]})
+
+X = df[["square_feet"]].values  # Convert to NumPy
+y = df["price"].values
 
 print(type(X))  # <class 'numpy.ndarray'>
-print(X.shape)   # (2, 1)
+print(X.shape)  # (2, 1)
 ```
 
 **Related Terms:** DataFrame, NumPy, Feature Matrix
@@ -414,10 +418,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_iris, load_wine, load_digits
 
 # Create DataFrame from dict
-df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
+df = pd.DataFrame({"col1": [1, 2], "col2": [3, 4]})
 
 # Load CSV
-df = pd.read_csv('data.csv')
+df = pd.read_csv("data.csv")
 
 # Split data
 X_train, X_test, y_train, y_test = train_test_split(
@@ -425,6 +429,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # Convert DataFrame to arrays
-X = df[['feature1', 'feature2']].values
-y = df['target'].values
+X = df[["feature1", "feature2"]].values
+y = df["target"].values
 ```

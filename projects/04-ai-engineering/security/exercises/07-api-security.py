@@ -47,6 +47,7 @@ import math
 # SECTION 1: Rate Limiting
 # =============================================================
 
+
 class SlidingWindowRateLimiter:
     """
     Sliding window rate limiter for API protection.
@@ -67,11 +68,13 @@ class SlidingWindowRateLimiter:
         self.rph = requests_per_hour
         self.burst_limit = burst_limit
         self.burst_window = burst_window
-        self._windows: Dict[str, Dict] = defaultdict(lambda: {
-            "minute": deque(),
-            "hour": deque(),
-            "burst": deque(),
-        })
+        self._windows: Dict[str, Dict] = defaultdict(
+            lambda: {
+                "minute": deque(),
+                "hour": deque(),
+                "burst": deque(),
+            }
+        )
 
     def is_allowed(self, client_id: str, cost: int = 1) -> Dict:
         """
@@ -99,13 +102,19 @@ class SlidingWindowRateLimiter:
 
         # Check limits
         if burst_count + cost > self.burst_limit:
-            retry_after = self.burst_window - (now - window["burst"][0]) if window["burst"] else 0
+            retry_after = (
+                self.burst_window - (now - window["burst"][0]) if window["burst"] else 0
+            )
             return {
                 "allowed": False,
                 "remaining": 0,
                 "retry_after": max(0.1, retry_after),
                 "limits": {"rpm": self.rpm, "rph": self.rph, "burst": self.burst_limit},
-                "current": {"minute": minute_count, "hour": hour_count, "burst": burst_count},
+                "current": {
+                    "minute": minute_count,
+                    "hour": hour_count,
+                    "burst": burst_count,
+                },
                 "reason": "burst_limit",
             }
 
@@ -116,7 +125,11 @@ class SlidingWindowRateLimiter:
                 "remaining": 0,
                 "retry_after": max(1, retry_after),
                 "limits": {"rpm": self.rpm, "rph": self.rph, "burst": self.burst_limit},
-                "current": {"minute": minute_count, "hour": hour_count, "burst": burst_count},
+                "current": {
+                    "minute": minute_count,
+                    "hour": hour_count,
+                    "burst": burst_count,
+                },
                 "reason": "minute_limit",
             }
 
@@ -127,7 +140,11 @@ class SlidingWindowRateLimiter:
                 "remaining": 0,
                 "retry_after": max(1, retry_after),
                 "limits": {"rpm": self.rpm, "rph": self.rph, "burst": self.burst_limit},
-                "current": {"minute": minute_count, "hour": hour_count, "burst": burst_count},
+                "current": {
+                    "minute": minute_count,
+                    "hour": hour_count,
+                    "burst": burst_count,
+                },
                 "reason": "hour_limit",
             }
 
@@ -167,8 +184,8 @@ class TokenBucketRateLimiter:
 
     def __init__(
         self,
-        capacity: int = 100,      # Max tokens
-        refill_rate: float = 10,   # Tokens per second
+        capacity: int = 100,  # Max tokens
+        refill_rate: float = 10,  # Tokens per second
     ):
         self.capacity = capacity
         self.refill_rate = refill_rate
@@ -237,10 +254,7 @@ class AdaptiveRateLimiter:
 
         # Calculate dynamic limits based on score
         multiplier = min(2.0, max(0.1, score))
-        limits = {
-            k: int(v * multiplier)
-            for k, v in self._base_limits.items()
-        }
+        limits = {k: int(v * multiplier) for k, v in self._base_limits.items()}
 
         return {
             "client_id": client_id,
@@ -266,6 +280,7 @@ class AdaptiveRateLimiter:
 # =============================================================
 # SECTION 2: CORS Configuration
 # =============================================================
+
 
 class CORSPolicy:
     """
@@ -343,8 +358,11 @@ class CORSPolicy:
             parsed = urlparse(origin)
             for allowed in self._allowed_origins:
                 allowed_parsed = urlparse(allowed)
-                if (parsed.hostname and allowed_parsed.hostname and
-                        parsed.hostname.endswith("." + allowed_parsed.hostname)):
+                if (
+                    parsed.hostname
+                    and allowed_parsed.hostname
+                    and parsed.hostname.endswith("." + allowed_parsed.hostname)
+                ):
                     return self._build_cors_response(origin)
 
         # Check patterns
@@ -379,6 +397,7 @@ class CORSPolicy:
 # =============================================================
 # SECTION 3: HTTPS Enforcement
 # =============================================================
+
 
 class HTTPSEnforcer:
     """
@@ -436,7 +455,9 @@ class HTTPSEnforcer:
         # Check if request is from a trusted proxy
         if client_ip in self._trusted_proxies:
             # Behind proxy -- check X-Forwarded-Proto
-            forwarded_proto = request.get("headers", {}).get("X-Forwarded-Proto", "https")
+            forwarded_proto = request.get("headers", {}).get(
+                "X-Forwarded-Proto", "https"
+            )
             if forwarded_proto == "https":
                 return {
                     "redirect_needed": False,
@@ -463,6 +484,7 @@ class HTTPSEnforcer:
 # SECTION 4: Request Validation
 # =============================================================
 
+
 class RequestValidator:
     """
     Comprehensive request validation for API security.
@@ -480,7 +502,9 @@ class RequestValidator:
         self._max_url_length = 2048
         self._blocked_patterns = [
             # SQL injection patterns
-            re.compile(r"(?i)(union\s+select|insert\s+into|drop\s+table|delete\s+from)"),
+            re.compile(
+                r"(?i)(union\s+select|insert\s+into|drop\s+table|delete\s+from)"
+            ),
             re.compile(r"(?i)(--\s|;\s*drop|;\s*delete|;\s*update)"),
             # XSS patterns
             re.compile(r"<script[^>]*>", re.IGNORECASE),
@@ -507,7 +531,15 @@ class RequestValidator:
         sanitized = request.copy()
 
         # Validate method
-        if request.get("method") not in ("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"):
+        if request.get("method") not in (
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "OPTIONS",
+            "HEAD",
+        ):
             errors.append("Invalid HTTP method")
 
         # Validate URL length
@@ -549,7 +581,10 @@ class RequestValidator:
         method = request.get("method", "")
         content_type = request.get("headers", {}).get("content-type", "")
         if method in ("POST", "PUT", "PATCH"):
-            if "application/json" not in content_type and "multipart/form-data" not in content_type:
+            if (
+                "application/json" not in content_type
+                and "multipart/form-data" not in content_type
+            ):
                 errors.append(f"Invalid content type for {method}: {content_type}")
 
         return {
@@ -612,23 +647,35 @@ class RequestValidator:
             # String constraints
             if isinstance(value, str):
                 if "max_length" in rules and len(value) > rules["max_length"]:
-                    errors.append(f"Field '{field_name}' exceeds max length: {len(value)} > {rules['max_length']}")
+                    errors.append(
+                        f"Field '{field_name}' exceeds max length: {len(value)} > {rules['max_length']}"
+                    )
                 if "pattern" in rules and not re.match(rules["pattern"], value):
-                    errors.append(f"Field '{field_name}' doesn't match pattern: {rules['pattern']}")
+                    errors.append(
+                        f"Field '{field_name}' doesn't match pattern: {rules['pattern']}"
+                    )
                 if "enum" in rules and value not in rules["enum"]:
-                    errors.append(f"Field '{field_name}' must be one of: {rules['enum']}")
+                    errors.append(
+                        f"Field '{field_name}' must be one of: {rules['enum']}"
+                    )
 
             # Number constraints
             if isinstance(value, (int, float)):
                 if "min" in rules and value < rules["min"]:
-                    errors.append(f"Field '{field_name}' is below minimum: {value} < {rules['min']}")
+                    errors.append(
+                        f"Field '{field_name}' is below minimum: {value} < {rules['min']}"
+                    )
                 if "max" in rules and value > rules["max"]:
-                    errors.append(f"Field '{field_name}' exceeds maximum: {value} > {rules['max']}")
+                    errors.append(
+                        f"Field '{field_name}' exceeds maximum: {value} > {rules['max']}"
+                    )
 
             # Array constraints
             if isinstance(value, list):
                 if "max_items" in rules and len(value) > rules["max_items"]:
-                    errors.append(f"Field '{field_name}' exceeds max items: {len(value)} > {rules['max_items']}")
+                    errors.append(
+                        f"Field '{field_name}' exceeds max items: {len(value)} > {rules['max_items']}"
+                    )
                 if "item_type" in rules:
                     for i, item in enumerate(value):
                         if rules["item_type"] == "string" and not isinstance(item, str):
@@ -640,6 +687,7 @@ class RequestValidator:
 # =============================================================
 # SECTION 5: Response Sanitization
 # =============================================================
+
 
 class ResponseSanitizer:
     """
@@ -653,14 +701,29 @@ class ResponseSanitizer:
     """
 
     SENSITIVE_FIELDS = {
-        "password", "password_hash", "secret", "api_key", "api_secret",
-        "access_token", "refresh_token", "private_key", "credit_card",
-        "ssn", "social_security", "bank_account", "routing_number",
+        "password",
+        "password_hash",
+        "secret",
+        "api_key",
+        "api_secret",
+        "access_token",
+        "refresh_token",
+        "private_key",
+        "credit_card",
+        "ssn",
+        "social_security",
+        "bank_account",
+        "routing_number",
     }
 
     PII_FIELDS = {
-        "email", "phone", "address", "ssn", "credit_card",
-        "date_of_birth", "full_name",
+        "email",
+        "phone",
+        "address",
+        "ssn",
+        "credit_card",
+        "date_of_birth",
+        "full_name",
     }
 
     INTERNAL_ERROR_MESSAGES = {
@@ -750,7 +813,9 @@ class ResponseSanitizer:
         error_msg = str(error).lower()
 
         # Check for internal error patterns
-        is_internal = any(pattern in error_msg for pattern in self.INTERNAL_ERROR_MESSAGES)
+        is_internal = any(
+            pattern in error_msg for pattern in self.INTERNAL_ERROR_MESSAGES
+        )
 
         if is_internal or not include_details:
             return {
@@ -772,6 +837,7 @@ class ResponseSanitizer:
 # =============================================================
 # SECTION 6: Webhook Verification
 # =============================================================
+
 
 class WebhookVerifier:
     """
@@ -885,6 +951,7 @@ class WebhookVerifier:
 # SECTION 7: Security Headers Middleware
 # =============================================================
 
+
 class SecurityHeaders:
     """
     Security headers for API responses.
@@ -932,6 +999,7 @@ class SecurityHeaders:
 # SECTION 8: Request Signing
 # =============================================================
 
+
 class RequestSigner:
     """
     Sign API requests for mutual TLS alternative.
@@ -954,7 +1022,9 @@ class RequestSigner:
             timestamp = int(time.time())
 
         # Create string to sign
-        string_to_sign = f"{method}\n{path}\n{timestamp}\n{body.decode('utf-8', errors='replace')}"
+        string_to_sign = (
+            f"{method}\n{path}\n{timestamp}\n{body.decode('utf-8', errors='replace')}"
+        )
         signature = hmac.new(
             self.api_secret,
             string_to_sign.encode(),
@@ -987,7 +1057,9 @@ class RequestSigner:
             return {"valid": False, "error": "Request timestamp expired"}
 
         # Compute expected signature
-        string_to_sign = f"{method}\n{path}\n{timestamp}\n{body.decode('utf-8', errors='replace')}"
+        string_to_sign = (
+            f"{method}\n{path}\n{timestamp}\n{body.decode('utf-8', errors='replace')}"
+        )
         expected = hmac.new(
             self.api_secret,
             string_to_sign.encode(),
@@ -1003,6 +1075,7 @@ class RequestSigner:
 # =============================================================
 # DEMONSTRATIONS
 # =============================================================
+
 
 def demo_rate_limiting():
     """Demonstrate rate limiting."""
@@ -1022,7 +1095,9 @@ def demo_rate_limiting():
     for i in range(7):
         result = limiter.is_allowed("client_1")
         status = "[OK]" if result["allowed"] else "[FAIL]"
-        print(f"  Request {i+1}: {status} remaining_minute={result['remaining'].get('minute', 'N/A')}")
+        print(
+            f"  Request {i + 1}: {status} remaining_minute={result['remaining'].get('minute', 'N/A')}"
+        )
 
     # Token bucket
     print("\nToken bucket limiter (capacity=5, refill=2/s):")
@@ -1031,7 +1106,7 @@ def demo_rate_limiting():
         result = bucket.is_allowed("client_2")
         status = "[OK]" if result["allowed"] else "[FAIL]"
         remaining = result["remaining"] if result["allowed"] else 0
-        print(f"  Request {i+1}: {status} tokens_remaining={remaining}")
+        print(f"  Request {i + 1}: {status} tokens_remaining={remaining}")
 
     print("\n[OK] Rate limiting demonstrated")
 
@@ -1050,7 +1125,9 @@ def demo_cors():
 
     # Test allowed origin
     result = cors.check_origin("https://app.ai-platform.com")
-    print(f"Origin https://app.ai-platform.com: {'[OK]' if result['allowed'] else '[FAIL]'}")
+    print(
+        f"Origin https://app.ai-platform.com: {'[OK]' if result['allowed'] else '[FAIL]'}"
+    )
 
     # Test disallowed origin
     result = cors.check_origin("https://evil-site.com")
@@ -1075,45 +1152,62 @@ def demo_request_validation():
     validator = RequestValidator()
 
     # Test normal request
-    result = validator.validate_request({
-        "method": "POST",
-        "path": "/api/v1/models",
-        "headers": {"Content-Type": "application/json"},
-        "body": '{"name": "my-model"}',
-    })
+    result = validator.validate_request(
+        {
+            "method": "POST",
+            "path": "/api/v1/models",
+            "headers": {"Content-Type": "application/json"},
+            "body": '{"name": "my-model"}',
+        }
+    )
     print(f"Normal request: {'[OK] Valid' if result['valid'] else '[FAIL] Invalid'}")
     if result["errors"]:
         print(f"  Errors: {result['errors']}")
 
     # Test SQL injection
-    result = validator.validate_request({
-        "method": "GET",
-        "path": "/api/v1/models?id=1' OR '1'='1",
-        "headers": {},
-    })
-    print(f"SQL injection attempt: {'[OK] Valid' if result['valid'] else '[FAIL] Blocked'}")
+    result = validator.validate_request(
+        {
+            "method": "GET",
+            "path": "/api/v1/models?id=1' OR '1'='1",
+            "headers": {},
+        }
+    )
+    print(
+        f"SQL injection attempt: {'[OK] Valid' if result['valid'] else '[FAIL] Blocked'}"
+    )
 
     # Test XSS
-    result = validator.validate_request({
-        "method": "POST",
-        "path": "/api/v1/chat",
-        "headers": {"Content-Type": "application/json"},
-        "body": '<script>alert("xss")</script>',
-    })
+    result = validator.validate_request(
+        {
+            "method": "POST",
+            "path": "/api/v1/chat",
+            "headers": {"Content-Type": "application/json"},
+            "body": '<script>alert("xss")</script>',
+        }
+    )
     print(f"XSS attempt: {'[OK] Valid' if result['valid'] else '[FAIL] Blocked'}")
 
     # Test path traversal
-    result = validator.validate_request({
-        "method": "GET",
-        "path": "/api/v1/files?path=../../etc/passwd",
-        "headers": {},
-    })
-    print(f"Path traversal attempt: {'[OK] Valid' if result['valid'] else '[FAIL] Blocked'}")
+    result = validator.validate_request(
+        {
+            "method": "GET",
+            "path": "/api/v1/files?path=../../etc/passwd",
+            "headers": {},
+        }
+    )
+    print(
+        f"Path traversal attempt: {'[OK] Valid' if result['valid'] else '[FAIL] Blocked'}"
+    )
 
     # JSON schema validation
     print("\nJSON Body Validation:")
     schema = {
-        "model_name": {"type": "string", "required": True, "max_length": 100, "pattern": r"^[a-zA-Z0-9_-]+$"},
+        "model_name": {
+            "type": "string",
+            "required": True,
+            "max_length": 100,
+            "pattern": r"^[a-zA-Z0-9_-]+$",
+        },
         "temperature": {"type": "number", "required": False, "min": 0.0, "max": 2.0},
         "max_tokens": {"type": "integer", "required": False, "min": 1, "max": 4096},
     }
@@ -1191,11 +1285,15 @@ def demo_webhook_verification():
     # Verify tampered payload
     tampered_payload = payload + b"tampered"
     result = verifier.verify_signature(tampered_payload, signature)
-    print(f"Tampered payload: {'[OK]' if result['valid'] else '[FAIL]'} {result.get('error', '')}")
+    print(
+        f"Tampered payload: {'[OK]' if result['valid'] else '[FAIL]'} {result.get('error', '')}"
+    )
 
     # Verify replayed webhook
     result = verifier.verify_signature(payload, signature)
-    print(f"Replayed webhook: {'[OK]' if result['valid'] else '[FAIL]'} {result.get('error', '')}")
+    print(
+        f"Replayed webhook: {'[OK]' if result['valid'] else '[FAIL]'} {result.get('error', '')}"
+    )
 
     # Request signing
     print("\nRequest Signing:")
@@ -1313,4 +1411,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n[FAIL] Error: {e}")
         import traceback
+
         traceback.print_exc()

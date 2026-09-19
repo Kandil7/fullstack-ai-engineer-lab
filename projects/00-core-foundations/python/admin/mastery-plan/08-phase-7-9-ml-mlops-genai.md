@@ -180,6 +180,7 @@ def _verify() -> None:
     # reconstruct-ability: overlap must not lose content
     assert "".join(c[:250] for c in chunks).startswith("a" * 250)
 
+
 # Tier 2 — API calls: mock by default, live only when a key is present
 def _verify_llm() -> None:
     if not os.environ.get("ANTHROPIC_API_KEY"):

@@ -39,12 +39,14 @@ Alphabetical reference of all key terms from the Request Body lecture.
 ```python
 from pydantic import BaseModel, Field
 
+
 class UserCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     email: str = Field(..., description="User's email")
     age: int = Field(..., ge=0, le=150)
     bio: str | None = Field(default=None)
     is_active: bool = Field(default=True)
+
 
 # Automatic validation:
 user = UserCreate(name="Alice", email="alice@test.com", age=30)  # OK
@@ -77,6 +79,7 @@ def batch_create(users: list[UserCreate]):
         user_dict["id"] = len(created) + 1
         created.append(user_dict)
     return {"created_count": len(created), "users": created}
+
 
 # Request body (JSON array):
 # [
@@ -125,6 +128,7 @@ class Item(BaseModel):
     in_stock: bool = True
     tags: list[str] = []
 
+
 item = Item(name="Widget", price=9.99)
 # in_stock and tags use defaults
 
@@ -149,6 +153,7 @@ class Item(BaseModel):
     price: float
     tax: float | None = None
 
+
 item = Item(name="Widget", price=9.99)
 print(item.model_dump(exclude_none=True))
 # {'name': 'Widget', 'price': 9.99}
@@ -170,6 +175,7 @@ class UserUpdate(BaseModel):
     email: str | None = None
     age: int | None = None
 
+
 # Client sends only: {"name": "New Name"}
 user = UserUpdate(name="New Name")
 print(user.model_dump(exclude_unset=True))
@@ -188,6 +194,7 @@ print(user.model_dump(exclude_unset=True))
 **Example:**
 ```python
 from pydantic import BaseModel, Field
+
 
 class Product(BaseModel):
     name: str = Field(
@@ -245,6 +252,7 @@ def full_update_user(user_id: int, user: UserCreate):
     users_db[user_id] = user_dict
     return users_db[user_id]
 
+
 # Client must send: {"name": "...", "email": "...", "age": ..., "bio": "...", "is_active": ...}
 ```
 
@@ -261,6 +269,7 @@ def full_update_user(user_id: int, user: UserCreate):
 @app.post("/users/")
 def create_user(user: UserCreate):
     return user.model_dump()
+
 
 # Client sends:
 # POST /users/
@@ -287,6 +296,7 @@ class User(BaseModel):
     name: str
     email: str
     password: str
+
 
 user = User(name="Alice", email="alice@test.com", password="secret")
 
@@ -326,10 +336,12 @@ class Address(BaseModel):
     state: str
     zip_code: str
 
+
 class Order(BaseModel):
     customer_name: str
     items: list[OrderItem]
     shipping_address: Address  # Nested model
+
 
 # JSON:
 # {
@@ -359,6 +371,7 @@ class UserUpdate(BaseModel):
     email: str | None = None
     age: int | None = None
 
+
 @app.patch("/users/{user_id}")
 def partial_update(user_id: int, user: UserUpdate):
     if user_id not in users_db:
@@ -366,6 +379,7 @@ def partial_update(user_id: int, user: UserUpdate):
     update_data = user.model_dump(exclude_unset=True)
     users_db[user_id].update(update_data)
     return users_db[user_id]
+
 
 # Client sends only: {"email": "new@test.com"}
 # Only email is updated; name and age remain unchanged
@@ -386,6 +400,7 @@ def update_user(user_id: int, user: UserUpdate):
     update_data = user.model_dump(exclude_unset=True)
     users_db[user_id].update(update_data)
     return users_db[user_id]
+
 
 # curl -X PATCH http://localhost:8000/users/1 \
 #   -H "Content-Type: application/json" \
@@ -409,6 +424,7 @@ def full_update(user_id: int, user: UserCreate):
     users_db[user_id] = user_dict
     return users_db[user_id]
 
+
 # curl -X PUT http://localhost:8000/users/1 \
 #   -H "Content-Type: application/json" \
 #   -d '{"name": "Alice", "email": "alice@new.com", "age": 31, "bio": "Hi!"}'
@@ -426,10 +442,12 @@ def full_update(user_id: int, user: UserCreate):
 ```python
 from pydantic import BaseModel, Field, EmailStr
 
+
 class User(BaseModel):
     name: str = Field(..., min_length=1)
     email: EmailStr  # Requires pydantic[email]
     age: int = Field(..., ge=0, le=150)
+
 
 # Validates:
 # - name is a non-empty string
@@ -451,10 +469,12 @@ class ItemCreate(BaseModel):
     name: str
     price: float
 
+
 @app.post("/items/")
 def create_item(item: ItemCreate):
     # 'item' is the parsed and validated request body
     return {"id": 1, **item.model_dump()}
+
 
 # Client sends:
 # POST /items/
@@ -477,10 +497,12 @@ class UserIn(BaseModel):
     email: str
     password: str  # Should NOT be in response
 
+
 class UserOut(BaseModel):
     id: int
     name: str
     email: str  # No password!
+
 
 @app.post("/users/", response_model=UserOut)
 def create_user(user: UserIn):
@@ -503,8 +525,9 @@ def create_user(user: UserIn):
 **Example:**
 ```python
 class User(BaseModel):
-    name: str                    # Must be string
-    age: int = Field(ge=0)       # Must be int >= 0
+    name: str  # Must be string
+    age: int = Field(ge=0)  # Must be int >= 0
+
 
 # Valid: {"name": "Alice", "age": 30}
 # Invalid: {"name": 123, "age": -5} → 422

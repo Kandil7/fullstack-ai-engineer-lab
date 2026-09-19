@@ -35,6 +35,7 @@ cannot know that `except:` is inside a string literal; the AST can.
 ```python
 import ast
 
+
 def mutable_defaults(source: str) -> list[tuple[int, str]]:
     tree = ast.parse(source)
     hits = []
@@ -44,6 +45,7 @@ def mutable_defaults(source: str) -> list[tuple[int, str]]:
                 if isinstance(default, (ast.List, ast.Dict, ast.Set)):
                     hits.append((node.lineno, node.name))
     return hits
+
 
 print(mutable_defaults("def f(a=[]):\n    return a\n"))
 ```
@@ -61,6 +63,7 @@ object is created once at function definition, so all calls share it.
 def buggy(store=[]):
     store.append(1)
     return store
+
 
 print(buggy(), buggy())
 ```
@@ -92,10 +95,15 @@ format` implements the same style at higher speed.
 **Example**:
 ```python
 # Before black:
-def f(  a,b,c   ):return a+b+c
+def f(a, b, c):
+    return a + b + c
+
+
 # After black:
 def f(a, b, c):
     return a + b + c
+
+
 print("one style, zero configuration")
 ```
 ```text
@@ -113,6 +121,7 @@ def gate(source: str) -> bool:
     """True if no selected rule fires. Exit code drives CI."""
     return not lint_source(source).violations  # simplified
 
+
 print(gate("def f(a=[]):\n    return a\n"))
 ```
 ```text
@@ -125,12 +134,14 @@ False
 the cap (default 10). Fires per function; the message names the function.
 **Example**:
 ```python
-src = ("def f(x):\n"
-       "    if x:\n"
-       "        for i in range(3):\n"
-       "            if i:\n"
-       "                return i\n"
-       "    return 0\n")
+src = (
+    "def f(x):\n"
+    "    if x:\n"
+    "        for i in range(3):\n"
+    "            if i:\n"
+    "                return i\n"
+    "    return 0\n"
+)
 # complexity = 1 + if + for + if = 4
 print("C901 message: 'f: complexity 4 > 10' would NOT fire; 12 would")
 ```
@@ -154,7 +165,9 @@ def count_decisions(node):
             n += len(child.values) - 1
     return n
 
+
 import ast
+
 tree = ast.parse("def f(a):\n    if a and b:\n        return 1\n")
 print(1 + count_decisions(tree.body[0]))
 ```
@@ -171,9 +184,12 @@ Docstrings are the contract readers and `help()` rely on.
 def f():  # D100 fires here
     pass
 
+
 def g():
     """Add one."""  # D100 satisfied
     pass
+
+
 print("D100: missing docstring reported at line 1")
 ```
 ```text
@@ -248,6 +264,8 @@ def mean(values: list[float]) -> float:
     if not values:
         return None  # mypy: Incompatible return value type
     return sum(values) / len(values)
+
+
 print("mypy catches the annotation/runtime mismatch")
 ```
 ```text
@@ -263,6 +281,8 @@ project-wide.
 ```python
 def f(x=[]):  # noqa: B006 - shared list is the API contract
     return x
+
+
 print("suppressed: B006 no longer fires on line 1")
 ```
 ```text
@@ -337,8 +357,10 @@ lint cannot see because they only manifest on some inputs.
 ```python
 from typing import Optional
 
+
 def f(x: int) -> Optional[int]:
     return None if x < 0 else x
+
 
 print("static typing: contracts checked before runtime")
 ```
@@ -352,7 +374,7 @@ static typing: contracts checked before runtime
 visible as noise in every diff.
 **Example**:
 ```python
-line = "x = 1  "   # two trailing spaces
+line = "x = 1  "  # two trailing spaces
 print(line.rstrip() == "x = 1" and line != line.rstrip())
 ```
 ```text

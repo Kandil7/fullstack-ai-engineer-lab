@@ -186,6 +186,7 @@ print(f"Total seconds: {diff.total_seconds()}")
 # Example 8: Real-world date operations
 print("\n--- Practical Examples ---")
 
+
 # Age calculator
 def calculate_age(birth_date):
     today = date.today()
@@ -194,8 +195,10 @@ def calculate_age(birth_date):
         age -= 1
     return age
 
+
 birthday = date(1990, 6, 15)
 print(f"Age: {calculate_age(birthday)} years")
+
 
 # Days until Christmas
 def days_until_christmas():
@@ -205,15 +208,18 @@ def days_until_christmas():
         christmas = date(today.year + 1, 12, 25)
     return (christmas - today).days
 
+
 print(f"Days until Christmas: {days_until_christmas()}")
 
 # Week number
 today = date.today()
 print(f"Week number: {today.isocalendar()[1]}")
 
+
 # Is leap year
 def is_leap_year(year):
     return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+
 
 print(f"2024 is leap year: {is_leap_year(2024)}")
 print(f"2023 is leap year: {is_leap_year(2023)}")

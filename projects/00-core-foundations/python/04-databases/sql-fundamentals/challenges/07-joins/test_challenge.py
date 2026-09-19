@@ -11,12 +11,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
 starter_spec = importlib.util.spec_from_file_location(
-    "starter", Path(__file__).parent / "starter.py")
+    "starter", Path(__file__).parent / "starter.py"
+)
 starter_module = importlib.util.module_from_spec(starter_spec)
 starter_spec.loader.exec_module(starter_module)
 
 solution_spec = importlib.util.spec_from_file_location(
-    "solution", Path(__file__).parent / "solution.py")
+    "solution", Path(__file__).parent / "solution.py"
+)
 solution_module = importlib.util.module_from_spec(solution_spec)
 solution_spec.loader.exec_module(solution_module)
 
@@ -29,8 +31,8 @@ def post_conn() -> sqlite3.Connection:
     conn.execute("CREATE TABLE posts (id INTEGER PRIMARY KEY, user_id INTEGER, title TEXT)")
     conn.executemany("INSERT INTO users (name) VALUES (?)", [("ana",), ("bob",)])
     conn.executemany(
-        "INSERT INTO posts (user_id, title) VALUES (?, ?)",
-        [(1, "alpha"), (1, "beta")])
+        "INSERT INTO posts (user_id, title) VALUES (?, ?)", [(1, "alpha"), (1, "beta")]
+    )
     return conn
 
 
@@ -81,11 +83,11 @@ class TestLeftJoinWithNulls:
 class TestSelfJoinReport:
     def _emp(self):
         conn = sqlite3.connect(":memory:")
-        conn.execute(
-            "CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, mgr_id INTEGER)")
+        conn.execute("CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, mgr_id INTEGER)")
         conn.executemany(
             "INSERT INTO employees (id, name, mgr_id) VALUES (?, ?, ?)",
-            [(1, "ana", None), (2, "bob", 1), (3, "cam", 1), (4, "dave", 2)])
+            [(1, "ana", None), (2, "bob", 1), (3, "cam", 1), (4, "dave", 2)],
+        )
         return conn
 
     def test_report_rows(self):
@@ -103,8 +105,7 @@ class TestSelfJoinReport:
 
     def test_single_root(self):
         conn = sqlite3.connect(":memory:")
-        conn.execute(
-            "CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, mgr_id INTEGER)")
+        conn.execute("CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, mgr_id INTEGER)")
         conn.execute("INSERT INTO employees (id, name, mgr_id) VALUES (1, 'solo', NULL)")
         result = solution_module.self_join_report(conn)
         assert result["rows"] == [("solo", "ROOT", 0)]

@@ -155,7 +155,9 @@ print()
 
 # Example 10: Sort by expression
 print("=== ORDER BY Expression ===")
-cursor.execute("SELECT name, score, score * 1.1 as bonus_score FROM students ORDER BY bonus_score DESC")
+cursor.execute(
+    "SELECT name, score, score * 1.1 as bonus_score FROM students ORDER BY bonus_score DESC"
+)
 for row in cursor.fetchall():
     print(f"  {row[0]}: Score={row[1]}, Bonus={row[2]}")
 print()
@@ -174,13 +176,16 @@ cursor.execute("""
     )
 """)
 
-cursor.executemany("INSERT INTO items VALUES (?, ?, ?)", [
-    (1, "Item A", 3),
-    (2, "Item B", None),
-    (3, "Item C", 1),
-    (4, "Item D", None),
-    (5, "Item E", 2),
-])
+cursor.executemany(
+    "INSERT INTO items VALUES (?, ?, ?)",
+    [
+        (1, "Item A", 3),
+        (2, "Item B", None),
+        (3, "Item C", 1),
+        (4, "Item D", None),
+        (5, "Item E", 2),
+    ],
+)
 conn.commit()
 
 cursor.execute("SELECT name, priority FROM items ORDER BY priority ASC")

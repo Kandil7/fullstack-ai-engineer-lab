@@ -69,11 +69,10 @@ p_positive_given_disease = 0.99  # 99% sensitivity
 p_positive_given_no_disease = 0.05  # 5% false positive rate
 
 # P(positive) = P(positive|disease) × P(disease) + P(positive|no disease) × P(no disease)
-p_positive = (p_positive_given_disease * p_disease + 
-              p_positive_given_no_disease * (1 - p_disease))
+p_positive = p_positive_given_disease * p_disease + p_positive_given_no_disease * (1 - p_disease)
 
 # P(disease|positive) = P(positive|disease) × P(disease) / P(positive)
-p_disease_given_positive = (p_positive_given_disease * p_disease / p_positive)
+p_disease_given_positive = p_positive_given_disease * p_disease / p_positive
 
 print(f"P(disease) = {p_disease}")
 print(f"P(positive|disease) = {p_positive_given_disease}")
@@ -95,8 +94,7 @@ from sklearn.datasets import make_classification
 # Generate data
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=300, n_features=4, n_informative=3,
-    n_redundant=1, n_classes=2, random_state=42
+    n_samples=300, n_features=4, n_informative=3, n_redundant=1, n_classes=2, random_state=42
 )
 
 print(f"Samples: {X.shape[0]}")
@@ -104,9 +102,7 @@ print(f"Features: {X.shape[1]}")
 print(f"Classes: {np.unique(y)}")
 
 # Train/test split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Train GaussianNB
 model = GaussianNB()
@@ -131,9 +127,11 @@ y_prob = model.predict_proba(X_test)
 
 print("First 5 predictions:")
 for i in range(5):
-    print(f"  Sample {i+1}: Predicted={y_pred[i]}, "
-          f"P(class 0)={y_prob[i, 0]:.3f}, "
-          f"P(class 1)={y_prob[i, 1]:.3f}")
+    print(
+        f"  Sample {i + 1}: Predicted={y_pred[i]}, "
+        f"P(class 0)={y_prob[i, 0]:.3f}, "
+        f"P(class 1)={y_prob[i, 1]:.3f}"
+    )
 
 # Probability interpretation
 print("\nProbability interpretation:")
@@ -158,7 +156,7 @@ documents = [
     "discount pharmacy online",
     "team standup meeting",
     "claim your prize now",
-    "report due next week"
+    "report due next week",
 ]
 
 labels = [1, 1, 0, 0, 1, 0, 1, 0, 1, 0]  # 1=spam, 0=not spam
@@ -224,7 +222,8 @@ y = (x1 + x3 > 0).astype(int)
 # Naive Bayes still works despite correlation
 model = GaussianNB()
 from sklearn.model_selection import cross_val_score
-scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+
+scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
 print(f"Accuracy with correlated features: {scores.mean():.4f}")
 print("Naive Bayes still works despite violated independence assumption!")
 ```
@@ -241,20 +240,19 @@ from sklearn.model_selection import cross_val_score
 import numpy as np
 
 np.random.seed(42)
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 models = {
-    'Naive Bayes': GaussianNB(),
-    'Logistic Regression': LogisticRegression(random_state=42),
-    'SVM': SVC(random_state=42),
-    'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42)
+    "Naive Bayes": GaussianNB(),
+    "Logistic Regression": LogisticRegression(random_state=42),
+    "SVM": SVC(random_state=42),
+    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
 }
 
 print("Model Comparison (5-fold CV accuracy):")
 print("-" * 40)
 for name, model in models.items():
-    scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
     print(f"{name:25s}: {scores.mean():.4f} +/- {scores.std():.4f}")
 ```
 
@@ -282,7 +280,8 @@ for i in range(3):
 
 # SOLUTION: Transform data or use different algorithm
 from sklearn.preprocessing import PowerTransformer
-scaler = PowerTransformer(method='yeo-johnson')
+
+scaler = PowerTransformer(method="yeo-johnson")
 X_transformed = scaler.fit_transform(X)
 ```
 
@@ -328,6 +327,7 @@ print(f"Accuracy with correlated features: {scores.mean():.4f}")
 
 # SOLUTION: Remove one of correlated features or use PCA
 from sklearn.decomposition import PCA
+
 pca = PCA(n_components=1)
 X_pca = pca.fit_transform(X)
 scores_pca = cross_val_score(model, X_pca, y, cv=5)
@@ -345,12 +345,14 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 
+
 def check_normality(X, feature_names):
     """Check if features are normally distributed."""
     for i, name in enumerate(feature_names):
         stat, p = stats.shapiro(X[:, i])
         status = "Normal" if p > 0.05 else "Not normal"
         print(f"{name}: p={p:.4f} ({status})")
+
 
 # Use GaussianNB only for normal features
 # Use MultinomialNB for count data
@@ -362,14 +364,17 @@ def check_normality(X, feature_names):
 ```python
 # Text with word counts → MultinomialNB
 from sklearn.naive_bayes import MultinomialNB
+
 model = MultinomialNB()
 
 # Text with word presence → BernoulliNB
 from sklearn.naive_bayes import BernoulliNB
+
 model = BernoulliNB()
 
 # Continuous features → GaussianNB
 from sklearn.naive_bayes import GaussianNB
+
 model = GaussianNB()
 ```
 
@@ -384,7 +389,7 @@ import numpy as np
 alphas = [0.001, 0.01, 0.1, 0.5, 1.0, 2.0, 5.0]
 for alpha in alphas:
     model = MultinomialNB(alpha=alpha)
-    scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
     print(f"alpha={alpha:6.3f}: {scores.mean():.4f}")
 ```
 
@@ -396,7 +401,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import cross_val_score
 
 model = GaussianNB()
-scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
 print(f"Baseline accuracy: {scores.mean():.4f}")
 ```
 
@@ -414,6 +419,7 @@ Build a spam classifier with Naive Bayes.
 3. Train MultinomialNB
 4. Evaluate performance
 """
+
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
@@ -429,7 +435,7 @@ spam_emails = [
     "claim your free gift",
     "urgent money transfer",
     "free trial offer",
-    "make money fast"
+    "make money fast",
 ]
 
 ham_emails = [
@@ -440,7 +446,7 @@ ham_emails = [
     "report due next week",
     "check out this article",
     "thanks for your help",
-    "see you at conference"
+    "see you at conference",
 ]
 
 emails = spam_emails + ham_emails
@@ -450,15 +456,13 @@ labels = [1] * len(spam_emails) + [0] * len(ham_emails)
 vectorizer = CountVectorizer()
 X = vectorizer.fit_transform(emails)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, labels, test_size=0.25, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.25, random_state=42)
 
 model = MultinomialNB()
 model.fit(X_train, y_train)
 
 y_pred = model.predict(X_test)
-print(classification_report(y_test, y_pred, target_names=['Ham', 'Spam']))
+print(classification_report(y_test, y_pred, target_names=["Ham", "Spam"]))
 
 # Test on new email
 new_email = ["free money now"]
@@ -476,32 +480,32 @@ Compare different Naive Bayes variants on the same dataset.
 2. Test GaussianNB, MultinomialNB, BernoulliNB
 3. Compare accuracy
 """
+
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
 from sklearn.datasets import make_classification
 from sklearn.model_selection import cross_val_score
 import numpy as np
 
 np.random.seed(42)
-X, y = make_classification(n_samples=200, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=200, n_features=10, n_informative=5, random_state=42)
 
 # Your code here
 X_positive = X - X.min(axis=0) + 1  # Make values positive for MultinomialNB
 X_binary = (X > 0).astype(int)
 
 models = {
-    'GaussianNB': GaussianNB(),
-    'MultinomialNB': MultinomialNB(),
-    'BernoulliNB': BernoulliNB()
+    "GaussianNB": GaussianNB(),
+    "MultinomialNB": MultinomialNB(),
+    "BernoulliNB": BernoulliNB(),
 }
 
 for name, model in models.items():
-    if name == 'MultinomialNB':
-        scores = cross_val_score(model, X_positive, y, cv=5, scoring='accuracy')
-    elif name == 'BernoulliNB':
-        scores = cross_val_score(model, X_binary, y, cv=5, scoring='accuracy')
+    if name == "MultinomialNB":
+        scores = cross_val_score(model, X_positive, y, cv=5, scoring="accuracy")
+    elif name == "BernoulliNB":
+        scores = cross_val_score(model, X_binary, y, cv=5, scoring="accuracy")
     else:
-        scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+        scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
     print(f"{name:20s}: {scores.mean():.4f} +/- {scores.std():.4f}")
 ```
 
@@ -515,6 +519,7 @@ Build a complete text classification pipeline.
 3. Train Naive Bayes
 4. Evaluate with cross-validation
 """
+
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
@@ -529,18 +534,15 @@ documents = [
     "artificial intelligence research",
     "software engineering practices",
     "web development framework",
-    "database optimization techniques"
+    "database optimization techniques",
 ]
 
 labels = [1, 1, 0, 1, 1, 0, 0, 0]  # 1=ML, 0=Software
 
 # Your code here
-pipeline = Pipeline([
-    ('tfidf', TfidfVectorizer()),
-    ('nb', MultinomialNB())
-])
+pipeline = Pipeline([("tfidf", TfidfVectorizer()), ("nb", MultinomialNB())])
 
-scores = cross_val_score(pipeline, documents, labels, cv=3, scoring='accuracy')
+scores = cross_val_score(pipeline, documents, labels, cv=3, scoring="accuracy")
 print(f"Cross-validation accuracy: {scores.mean():.4f}")
 
 # Fit and predict

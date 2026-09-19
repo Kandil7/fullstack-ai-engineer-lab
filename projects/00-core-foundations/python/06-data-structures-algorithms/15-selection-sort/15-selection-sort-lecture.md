@@ -205,19 +205,20 @@ def selection_sort_counting(arr):
     comparisons = 0
     swaps = 0
     n = len(arr)
-    
+
     for i in range(n - 1):
         min_idx = i
         for j in range(i + 1, n):
             comparisons += 1
             if arr[j] < arr[min_idx]:
                 min_idx = j
-        
+
         if min_idx != i:
             arr[i], arr[min_idx] = arr[min_idx], arr[i]
             swaps += 1
-    
+
     return comparisons, swaps
+
 
 # For array of 1000 elements:
 # Selection sort: 499,500 comparisons, at most 999 swaps
@@ -293,8 +294,8 @@ for i in range(n - 1):
 ```python
 # Instability demonstration
 def demonstrate_instability():
-    data = [(3, 'apple'), (1, 'banana'), (3, 'cherry'), (2, 'date')]
-    
+    data = [(3, "apple"), (1, "banana"), (3, "cherry"), (2, "date")]
+
     # Sort by first element using selection sort
     n = len(data)
     for i in range(n - 1):
@@ -303,10 +304,11 @@ def demonstrate_instability():
             if data[j][0] < data[min_idx][0]:
                 min_idx = j
         data[i], data[min_idx] = data[min_idx], data[i]
-    
+
     print(data)
     # May output: [(1, 'banana'), (2, 'date'), (3, 'cherry'), (3, 'apple')]
     # Note: 'cherry' came before 'apple' — order changed!
+
 
 demonstrate_instability()
 ```

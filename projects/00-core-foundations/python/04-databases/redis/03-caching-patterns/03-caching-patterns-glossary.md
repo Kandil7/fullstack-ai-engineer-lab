@@ -47,7 +47,7 @@ from source on miss, store with TTL.
 def get_profile(user_id):
     cached = r.get(f"profile:{user_id}")
     if cached is not None:
-        return cached              # hit
+        return cached  # hit
     value = expensive_load(user_id)  # miss
     r.set(f"profile:{user_id}", value, ex=300)
     return value
@@ -112,6 +112,7 @@ tells you whether the cache earns its memory.
 def avg_read_cost(h, db_cost, cache_cost):
     return h * cache_cost + (1 - h) * db_cost
 
+
 print(avg_read_cost(0.9, 10.0, 0.1))  # -> 1.09 ms
 ```
 ```text
@@ -127,8 +128,9 @@ re-attempt the same miss in lockstep.
 ```python
 import random
 
+
 def retry_delay(attempt):
-    base = 2 ** attempt            # exponential backoff
+    base = 2**attempt  # exponential backoff
     return base + random.uniform(0, 1)  # + jitter de-synchronizes
 ```
 ```text
@@ -247,7 +249,7 @@ r.hincrby("metrics", name, 1)  # acknowledged instantly
 cache, so reads never see stale data.
 **Example**:
 ```python
-db_write(user_id, value)              # source of truth first
+db_write(user_id, value)  # source of truth first
 r.set(f"profile:{user_id}", value, ex=300)  # then the cache
 ```
 ```text

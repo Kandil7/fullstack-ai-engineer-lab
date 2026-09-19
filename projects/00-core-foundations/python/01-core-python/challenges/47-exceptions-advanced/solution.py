@@ -61,7 +61,7 @@ def call_with_retry(
                 break
             import time
 
-            time.sleep(min(base_delay * 2 ** attempt, 1.0))
+            time.sleep(min(base_delay * 2**attempt, 1.0))
     assert last_error is not None
     raise RetryableError(f"gave up after {max_attempts} attempts") from last_error
 

@@ -182,8 +182,9 @@ D) Error
 **What is the output of this code?**
 ```python
 import re
+
 text = "Hello 123 World 456"
-numbers = re.findall(r'\d+', text)
+numbers = re.findall(r"\d+", text)
 print(numbers)
 ```
 
@@ -293,6 +294,7 @@ D) Error
 **What is the output of this code?**
 ```python
 import re
+
 text = "Hello World"
 pattern = r"World"
 match = re.search(pattern, text)

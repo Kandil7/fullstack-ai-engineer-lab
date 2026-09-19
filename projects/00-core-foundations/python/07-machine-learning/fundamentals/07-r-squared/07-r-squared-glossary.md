@@ -212,7 +212,7 @@ y_actual = np.array([1, 2, 3, 4, 5])
 y_predicted = np.array([1.1, 1.9, 3.2, 3.8, 5.1])
 
 residuals = y_actual - y_predicted
-print(f"Residuals: {residuals}")      # [-0.1, 0.1, -0.2, 0.2, -0.1]
+print(f"Residuals: {residuals}")  # [-0.1, 0.1, -0.2, 0.2, -0.1]
 print(f"Mean residual: {residuals.mean():.4f}")  # ≈ 0
 ```
 
@@ -283,7 +283,7 @@ train_r2 = model.score(X_train, y_train)
 test_r2 = model.score(X_test, y_test)
 
 print(f"Training R²: {train_r2:.4f}")  # Often higher
-print(f"Testing R²:  {test_r2:.4f}")   # More realistic
+print(f"Testing R²:  {test_r2:.4f}")  # More realistic
 if train_r2 - test_r2 > 0.1:
     print("Warning: Possible overfitting!")
 ```
@@ -311,7 +311,7 @@ variance = np.var(y)
 std = np.std(y)
 
 print(f"Variance: {variance:.4f}")  # 2.0
-print(f"Std Dev: {std:.4f}")        # 1.4142
+print(f"Std Dev: {std:.4f}")  # 1.4142
 ```
 
 **Related Terms:** Standard Deviation, TSS, R-squared

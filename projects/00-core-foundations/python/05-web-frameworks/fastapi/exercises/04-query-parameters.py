@@ -64,7 +64,7 @@ def list_products(
     if sort_by not in VALID_SORT_OPTIONS:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid sort_by '{sort_by}'. Valid options: {VALID_SORT_OPTIONS}"
+            detail=f"Invalid sort_by '{sort_by}'. Valid options: {VALID_SORT_OPTIONS}",
         )
     return {"sort_by": sort_by, "valid": True, "products": []}
 

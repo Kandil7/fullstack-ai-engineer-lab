@@ -11,12 +11,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
 starter_spec = importlib.util.spec_from_file_location(
-    "starter", Path(__file__).parent / "starter.py")
+    "starter", Path(__file__).parent / "starter.py"
+)
 starter_module = importlib.util.module_from_spec(starter_spec)
 starter_spec.loader.exec_module(starter_module)
 
 solution_spec = importlib.util.spec_from_file_location(
-    "solution", Path(__file__).parent / "solution.py")
+    "solution", Path(__file__).parent / "solution.py"
+)
 solution_module = importlib.util.module_from_spec(solution_spec)
 solution_spec.loader.exec_module(solution_module)
 
@@ -25,12 +27,11 @@ import pytest
 
 def fresh_conn() -> sqlite3.Connection:
     conn = sqlite3.connect(":memory:")
-    conn.execute(
-        "CREATE TABLE models (id INTEGER PRIMARY KEY, name TEXT, epoch INT, metric REAL)")
+    conn.execute("CREATE TABLE models (id INTEGER PRIMARY KEY, name TEXT, epoch INT, metric REAL)")
     conn.executemany(
         "INSERT INTO models (id, name, epoch, metric) VALUES (?, ?, ?, ?)",
-        [(1, "bert", 1, 0.9), (2, "gpt", 2, 0.8), (3, "llm", 3, 0.7),
-         (4, "t5", 4, None)])
+        [(1, "bert", 1, 0.9), (2, "gpt", 2, 0.8), (3, "llm", 3, 0.7), (4, "t5", 4, None)],
+    )
     return conn
 
 
@@ -72,8 +73,13 @@ class TestPatternMatch:
         conn = fresh_conn()
         conn.executemany(
             "INSERT INTO models (id, name, epoch, metric) VALUES (?, ?, ?, ?)",
-            [(5, "bert_v2", 5, 0.5), (6, "gpt_3", 6, 0.5),
-             (7, "plain", 7, 0.5), (8, "a_b_c", 8, 0.5)])
+            [
+                (5, "bert_v2", 5, 0.5),
+                (6, "gpt_3", 6, 0.5),
+                (7, "plain", 7, 0.5),
+                (8, "a_b_c", 8, 0.5),
+            ],
+        )
         result = solution_module.pattern_match(conn, "%")
         assert result["single_underscore"] == 3  # bert_v2, gpt_3, a_b_c
 
@@ -104,10 +110,13 @@ class TestNullAwareReport:
 
     def test_all_null(self):
         conn = sqlite3.connect(":memory:")
-        conn.execute("CREATE TABLE models (id INTEGER PRIMARY KEY, name TEXT, epoch INT, metric REAL)")
+        conn.execute(
+            "CREATE TABLE models (id INTEGER PRIMARY KEY, name TEXT, epoch INT, metric REAL)"
+        )
         conn.executemany(
             "INSERT INTO models (id, name, epoch, metric) VALUES (?, ?, ?, NULL)",
-            [(1, "a", 1), (2, "b", 2)])
+            [(1, "a", 1), (2, "b", 2)],
+        )
         result = solution_module.null_aware_report(conn)
         assert result["buckets"] == {"ok": 0, "missing": 2}
 

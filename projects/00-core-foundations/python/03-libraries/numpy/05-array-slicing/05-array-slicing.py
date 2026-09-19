@@ -16,20 +16,20 @@ arr = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
 print("Array:", arr)
 
 # Slice from index 1 to 5 (stop is exclusive)
-print("\narr[1:5]:", arr[1:5])      # [20 30 40 50]
+print("\narr[1:5]:", arr[1:5])  # [20 30 40 50]
 # Output: arr[1:5]: [20 30 40 50]
 
 # Slice from beginning
-print("arr[:4]:", arr[:4])          # [10 20 30 40]
+print("arr[:4]:", arr[:4])  # [10 20 30 40]
 
 # Slice from end
-print("arr[6:]:", arr[6:])          # [70 80 90 100]
+print("arr[6:]:", arr[6:])  # [70 80 90 100]
 
 # Every other element
-print("arr[::2]:", arr[::2])        # [10 30 50 70 90]
+print("arr[::2]:", arr[::2])  # [10 30 50 70 90]
 
 # Reversed array
-print("arr[::-1]:", arr[::-1])      # [100 90 80 70 60 50 40 30 20 10]
+print("arr[::-1]:", arr[::-1])  # [100 90 80 70 60 50 40 30 20 10]
 
 # Negative step
 print("arr[8:2:-2]:", arr[8:2:-2])  # [90 70 50]
@@ -45,10 +45,7 @@ print("arr[8:2:-2]:", arr[8:2:-2])  # [90 70 50]
 # Slicing rows and columns independently.
 # ============================================================
 
-arr2d = np.array([[1, 2, 3, 4, 5],
-                   [6, 7, 8, 9, 10],
-                   [11, 12, 13, 14, 15],
-                   [16, 17, 18, 19, 20]])
+arr2d = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19, 20]])
 print("\n2D Array:\n", arr2d)
 
 # Slice first two rows
@@ -71,7 +68,7 @@ print("Columns 1-3:\n", arr2d[:, 1:4])
 #   [17 18 19]]
 
 # First row, all columns
-print("First row:", arr2d[0, :])      # [1 2 3 4 5]
+print("First row:", arr2d[0, :])  # [1 2 3 4 5]
 
 # All rows, specific column
 print("Second column:", arr2d[:, 1])  # [ 2  7 12 17]

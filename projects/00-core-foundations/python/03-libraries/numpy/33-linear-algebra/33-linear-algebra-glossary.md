@@ -36,7 +36,7 @@ import numpy as np
 
 X = np.random.default_rng(0).normal(size=(5, 8, 4))
 W = np.random.default_rng(1).normal(size=(4, 3))
-print((X @ W).shape)          # (5, 8, 3)
+print((X @ W).shape)  # (5, 8, 3)
 ```
 
 **Complexity**: O(m·k·n), BLAS-accelerated.
@@ -54,8 +54,8 @@ divided by smallest. Error amplification bound:
 import numpy as np
 
 i, j = np.indices((6, 6))
-H = 1.0 / (i + j + 1.0)               # Hilbert 6
-print(f"{np.linalg.cond(H):.2e}")     # ~1.5e7
+H = 1.0 / (i + j + 1.0)  # Hilbert 6
+print(f"{np.linalg.cond(H):.2e}")  # ~1.5e7
 ```
 
 **Complexity**: O(n³) — dominated by the SVD.
@@ -73,7 +73,7 @@ of `a` and the second-to-last of `b` — no batch broadcasting.
 import numpy as np
 
 a = np.array([1.0, 2.0, 3.0])
-print(np.dot(a, a))           # 14.0 -- inner product
+print(np.dot(a, a))  # 14.0 -- inner product
 ```
 
 **Complexity**: same as `matmul` for 2-D.
@@ -94,7 +94,7 @@ rng = np.random.default_rng(42)
 S = rng.normal(size=(5, 5))
 S = S + S.T
 w, V = np.linalg.eigh(S)
-print(np.isrealobj(w))                          # True
+print(np.isrealobj(w))  # True
 print(np.allclose(S @ V, V @ np.diag(w), atol=1e-10))  # True
 ```
 
@@ -112,7 +112,7 @@ vector v. For symmetric matrices all eigenvalues are real.
 import numpy as np
 
 D = np.diag([1.0, 2.0, 3.0])
-print(np.linalg.eigvalsh(D))    # [1. 2. 3.]
+print(np.linalg.eigvalsh(D))  # [1. 2. 3.]
 ```
 
 **Complexity**: —.
@@ -130,8 +130,8 @@ import numpy as np
 
 S = np.diag([2.0, 5.0])
 w, V = np.linalg.eigh(S)
-print(V)                        # identity: standard basis
-print(np.allclose(S @ V, V @ np.diag(w)))   # True
+print(V)  # identity: standard basis
+print(np.allclose(S @ V, V @ np.diag(w)))  # True
 ```
 
 **Complexity**: —.
@@ -149,8 +149,8 @@ whole matrix; equals sqrt(sum of squared singular values).
 import numpy as np
 
 M = np.array([[1.0, 2.0], [3.0, 4.0]])
-print(np.linalg.norm(M))                # sqrt(30)
-print(np.allclose(np.linalg.norm(M), np.sqrt(np.sum(M ** 2))))  # True
+print(np.linalg.norm(M))  # sqrt(30)
+print(np.allclose(np.linalg.norm(M), np.sqrt(np.sum(M**2))))  # True
 ```
 
 **Complexity**: O(m·n).
@@ -192,7 +192,7 @@ t = np.linspace(0.0, 1.0, 20)
 A = np.column_stack([np.ones_like(t), t])
 y = 3.0 + 2.0 * t + rng.normal(scale=0.05, size=t.size)
 coef, *_ = np.linalg.lstsq(A, y, rcond=None)
-print(np.round(coef, 4))       # ~[3.0, 2.0]
+print(np.round(coef, 4))  # ~[3.0, 2.0]
 ```
 
 **Complexity**: O(m·n²) for m ≥ n.
@@ -213,8 +213,7 @@ A = np.random.default_rng(2).normal(size=(6, 5))
 U, s, Vh = np.linalg.svd(A)
 k = 2
 approx = (U[:, :k] * s[:k]) @ Vh[:k, :]
-print(np.allclose(np.linalg.norm(A - approx),
-                  np.sqrt(np.sum(s[k:] ** 2)), rtol=1e-6))   # True
+print(np.allclose(np.linalg.norm(A - approx), np.sqrt(np.sum(s[k:] ** 2)), rtol=1e-6))  # True
 ```
 
 **Complexity**: SVD O(m·n²) + k·(m+n) storage for the factors.
@@ -252,8 +251,8 @@ matrix flattened.
 import numpy as np
 
 x = np.array([3.0, -4.0])
-print(np.linalg.norm(x))          # 5.0
-print(np.linalg.norm(x, 1))       # 7.0
+print(np.linalg.norm(x))  # 5.0
+print(np.linalg.norm(x, 1))  # 7.0
 print(np.linalg.norm(x, np.inf))  # 4.0
 ```
 
@@ -273,8 +272,8 @@ import numpy as np
 
 A = np.random.default_rng(3).normal(size=(6, 4))
 Q, R = np.linalg.qr(A)
-print(np.allclose(Q.T @ Q, np.eye(4), atol=1e-12))    # True
-print(np.allclose(Q @ R, A, atol=1e-12))              # True
+print(np.allclose(Q.T @ Q, np.eye(4), atol=1e-12))  # True
+print(np.allclose(Q @ R, A, atol=1e-12))  # True
 ```
 
 **Complexity**: O(m·n²).
@@ -292,10 +291,10 @@ the FutureWarning.
 ```python
 import numpy as np
 
-A = np.arange(12.0).reshape(6, 2)   # rank 2
+A = np.arange(12.0).reshape(6, 2)  # rank 2
 b = np.ones(6)
 x, res, rank, s = np.linalg.lstsq(A, b, rcond=None)
-print(rank)                          # 2
+print(rank)  # 2
 ```
 
 **Complexity**: —.
@@ -314,7 +313,7 @@ import numpy as np
 
 A = np.random.default_rng(4).normal(size=(5, 3))
 s = np.linalg.svd(A, compute_uv=False)
-print(np.all(np.diff(s) <= 0))       # True -- descending
+print(np.all(np.diff(s) <= 0))  # True -- descending
 ```
 
 **Complexity**: SVD O(m·n²).
@@ -354,8 +353,8 @@ import numpy as np
 
 A = np.random.default_rng(6).normal(size=(6, 5))
 U, s, Vh = np.linalg.svd(A)
-recon = (U[:, :s.size] * s) @ Vh     # slice U to (6,5)
-print(np.allclose(recon, A, atol=1e-12))   # True
+recon = (U[:, : s.size] * s) @ Vh  # slice U to (6,5)
+print(np.allclose(recon, A, atol=1e-12))  # True
 ```
 
 **Complexity**: O(m·n²).
@@ -375,9 +374,9 @@ import numpy as np
 A = np.random.default_rng(7).normal(size=(200, 50))
 U, s, Vh = np.linalg.svd(A)
 k = 10
-params_full = A.size                 # 10000
+params_full = A.size  # 10000
 params_rankk = 200 * k + k + k * 50  # 2510
-print(params_rankk < params_full)    # True
+print(params_rankk < params_full)  # True
 ```
 
 **Complexity**: SVD dominates; storage k·(m+n).

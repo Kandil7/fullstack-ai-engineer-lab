@@ -35,9 +35,8 @@ converted.
 ```python
 from scipy import sparse as sp
 import numpy as np
-coo = sp.coo_matrix((np.array([1.0, 2.0]),
-                     (np.array([0, 1]), np.array([0, 1]))),
-                    shape=(2, 2))
+
+coo = sp.coo_matrix((np.array([1.0, 2.0]), (np.array([0, 1]), np.array([0, 1]))), shape=(2, 2))
 ```
 
 **Complexity**: O(nnz) to build; O(nnz) per conversion.
@@ -52,7 +51,7 @@ row indices, values. Column slicing is cheap; row slicing is not.
 **Example**:
 ```python
 csc = coo.tocsc()
-col = csc.getcol(3)      # cheap
+col = csc.getcol(3)  # cheap
 ```
 
 **Complexity**: O(nnz) storage; O(1)-ish column access.
@@ -68,8 +67,8 @@ want CSR. Row slicing and matmul are cheap.
 **Example**:
 ```python
 csr = coo.tocsr()
-row = csr.getrow(0)      # cheap
-X = TfidfVectorizer().fit_transform(docs)   # csr_matrix
+row = csr.getrow(0)  # cheap
+X = TfidfVectorizer().fit_transform(docs)  # csr_matrix
 ```
 
 **Complexity**: O(nnz) storage; O(1)-ish row access.
@@ -83,7 +82,7 @@ sparse matrix. Its byte count is part of the storage cost.
 
 **Example**:
 ```python
-print(csr.data[:5])      # first stored values
+print(csr.data[:5])  # first stored values
 ```
 
 **Complexity**: O(nnz).
@@ -112,7 +111,7 @@ matrix. In-place — returns `None` (a common bug).
 
 **Example**:
 ```python
-csr.eliminate_zeros()          # NOT csr = csr.eliminate_zeros()
+csr.eliminate_zeros()  # NOT csr = csr.eliminate_zeros()
 print(csr.nnz)
 ```
 
@@ -169,7 +168,7 @@ means — the grid is reconstructed from pointers, not stored.
 
 **Example**:
 ```python
-print(csr.indptr[:3])    # where each row starts
+print(csr.indptr[:3])  # where each row starts
 ```
 
 **Complexity**: O(rows + 1).
@@ -184,7 +183,7 @@ duplicates and explicit zeros, until converted/cleaned.
 
 **Example**:
 ```python
-print(A.nnz)             # stored entries
+print(A.nnz)  # stored entries
 ```
 
 **Complexity**: O(1).
@@ -198,7 +197,7 @@ print(A.nnz)             # stored entries
 
 **Example**:
 ```python
-Xn = sp.diags(1.0 / l2) @ X     # rows of Xn have unit L2
+Xn = sp.diags(1.0 / l2) @ X  # rows of Xn have unit L2
 ```
 
 **Complexity**: O(n).
@@ -227,8 +226,9 @@ pass a callable `lambda k: rng.uniform(lo, hi, size=k)`.
 
 **Example**:
 ```python
-A = sp.random(100, 80, density=0.01, format="csr",
-              random_state=42, data_rvs=lambda k: rng.uniform(size=k))
+A = sp.random(
+    100, 80, density=0.01, format="csr", random_state=42, data_rvs=lambda k: rng.uniform(size=k)
+)
 ```
 
 **Complexity**: O(nnz).
@@ -244,8 +244,9 @@ dense matrix.
 **Example**:
 ```python
 from scipy.sparse.linalg import spsolve
+
 x = spsolve(A, b)
-residual = np.max(np.abs(A @ x - b))      # ~1e-10
+residual = np.max(np.abs(A @ x - b))  # ~1e-10
 ```
 
 **Complexity**: superlinear in nnz, far below the dense O(n³).
@@ -274,7 +275,7 @@ convert once, then stay in the format your access pattern needs.
 
 **Example**:
 ```python
-csc = csr.tocsc()      # one-time conversion
+csc = csr.tocsc()  # one-time conversion
 ```
 
 **Complexity**: O(nnz) copy.
@@ -290,7 +291,8 @@ its output feeds estimators directly.
 **Example**:
 ```python
 from sklearn.feature_extraction.text import TfidfVectorizer
-X = TfidfVectorizer().fit_transform(docs)   # csr_matrix
+
+X = TfidfVectorizer().fit_transform(docs)  # csr_matrix
 clf = LogisticRegression().fit(X, y)
 ```
 

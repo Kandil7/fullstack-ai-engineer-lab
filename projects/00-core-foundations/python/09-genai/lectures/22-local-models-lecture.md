@@ -68,6 +68,7 @@ token/sec far beyond naive serving:
 
 # your client (L2) — unchanged, just point at the local endpoint:
 from openai import OpenAI
+
 local = OpenAI(base_url="http://localhost:8000/v1", api_key="none")
 resp = local.chat.completions.create(
     model="meta-llama/Llama-3.1-8B-Instruct",
@@ -101,6 +102,7 @@ def vram_estimate(model_params_b: float, bits: int, overhead: float = 1.2) -> fl
     """Rough VRAM: params × bits/8 × overhead."""
     return round(model_params_b * (bits / 8) * overhead, 1)
 
+
 print("8B at 16 bits:", vram_estimate(8, 16), "GB")
 print("8B at 4 bits:", vram_estimate(8, 4), "GB")
 ```
@@ -119,14 +121,23 @@ quality delta must be measured on *your* task, not assumed from a leaderboard.
 Before buying GPUs, do the unit math (Phase 8 L15 discipline):
 
 ```python
-def fleet_plan(req_per_day: int, tokens_per_req: int, tokens_per_sec: float,
-               gpus: int, utilization: float = 0.6) -> dict:
+def fleet_plan(
+    req_per_day: int,
+    tokens_per_req: int,
+    tokens_per_sec: float,
+    gpus: int,
+    utilization: float = 0.6,
+) -> dict:
     """Daily capacity vs demand; right-size the local fleet."""
     day_seconds = 86400
     capacity_tokens = tokens_per_sec * day_seconds * gpus * utilization
     demand_tokens = req_per_day * tokens_per_req
-    return {"capacity_tokens": capacity_tokens, "demand_tokens": demand_tokens,
-            "utilization_needed": round(demand_tokens / capacity_tokens, 2)}
+    return {
+        "capacity_tokens": capacity_tokens,
+        "demand_tokens": demand_tokens,
+        "utilization_needed": round(demand_tokens / capacity_tokens, 2),
+    }
+
 
 print(fleet_plan(500_000, 400, 90, 4))
 ```
@@ -155,13 +166,21 @@ The decision is a table, not an ideology:
 | Customization | limited | full (L21 fine-tunes) |
 
 ```python
-def hosted_vs_local(hosted_cost_per_m: float, local_capex: float,
-                    local_opex_month: float, calls_per_month: float,
-                    tokens_per_call: float) -> dict:
+def hosted_vs_local(
+    hosted_cost_per_m: float,
+    local_capex: float,
+    local_opex_month: float,
+    calls_per_month: float,
+    tokens_per_call: float,
+) -> dict:
     hosted = calls_per_month * tokens_per_call / 1e6 * hosted_cost_per_m
     local = local_capex / 12 + local_opex_month
-    return {"hosted_monthly": round(hosted, 2), "local_monthly": round(local, 2),
-            "breakeven_months": round(local_capex / max(hosted - local_opex_month, 1e-9), 1)}
+    return {
+        "hosted_monthly": round(hosted, 2),
+        "local_monthly": round(local, 2),
+        "breakeven_months": round(local_capex / max(hosted - local_opex_month, 1e-9), 1),
+    }
+
 
 print(hosted_vs_local(5.0, 30_000, 3_000, 20_000_000, 600))
 ```

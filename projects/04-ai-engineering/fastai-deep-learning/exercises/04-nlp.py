@@ -125,9 +125,7 @@ def fine_tune(tok_ds, tokz, model_nm: str):
     # EXERCISE: load AutoModelForSequenceClassification with num_labels=1
     # (regression), then build TrainingArguments with a SMALL learning_rate
     # (~8e-5), FEW epochs (~4), evaluation_strategy="epoch", report_to="none".
-    model = AutoModelForSequenceClassification.from_pretrained(
-        model_nm, num_labels=1
-    )
+    model = AutoModelForSequenceClassification.from_pretrained(model_nm, num_labels=1)
     args = TrainingArguments(
         output_dir="patent-out",
         learning_rate=8e-5,

@@ -69,26 +69,26 @@ class SimpleAgent:
 from dataclasses import dataclass
 from typing import Callable
 
+
 @dataclass
 class Tool:
     name: str
     description: str
     function: Callable
-    
+
     def execute(self, **kwargs):
         return self.function(**kwargs)
+
 
 # Example tools
 search_tool = Tool(
     name="search",
     description="Search the web for information",
-    function=lambda query: f"Results for {query}"
+    function=lambda query: f"Results for {query}",
 )
 
 file_tool = Tool(
-    name="read_file",
-    description="Read a file",
-    function=lambda path: open(path).read()
+    name="read_file", description="Read a file", function=lambda path: open(path).read()
 )
 ```
 
@@ -146,9 +146,9 @@ for step in range(max_steps):
 class AgentMemory:
     def __init__(self):
         self.short_term = []  # Current conversation
-        self.long_term = []   # Important facts
-        self.episodic = []    # Past experiences
-    
+        self.long_term = []  # Important facts
+        self.episodic = []  # Past experiences
+
     def add(self, content, memory_type="short_term"):
         if memory_type == "short_term":
             self.short_term.append(content)
@@ -156,7 +156,7 @@ class AgentMemory:
             self.long_term.append(content)
         elif memory_type == "episodic":
             self.episodic.append(content)
-    
+
     def get_context(self):
         return "\n".join(self.short_term[-10:])
 ```
@@ -218,12 +218,9 @@ class Action:
     tool_input: str = ""
     response: str = ""
 
+
 # Agent decides on action
-action = Action(
-    type="tool_use",
-    tool_name="search",
-    tool_input="latest AI news"
-)
+action = Action(type="tool_use", tool_name="search", tool_input="latest AI news")
 
 # Execute action
 if action.type == "tool_use":
@@ -521,7 +518,7 @@ Final Answer: [your response]
 available_tools = {
     "search": search_tool,
     "calculator": calc_tool,
-    "file_reader": file_tool
+    "file_reader": file_tool,
 }
 
 # Agent selects tool
@@ -559,11 +556,9 @@ functions = [
         "description": "Search the web",
         "parameters": {
             "type": "object",
-            "properties": {
-                "query": {"type": "string"}
-            },
-            "required": ["query"]
-        }
+            "properties": {"query": {"type": "string"}},
+            "required": ["query"],
+        },
     }
 ]
 
@@ -572,7 +567,7 @@ response = client.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "Find info about AI"}],
     functions=functions,
-    function_call="auto"
+    function_call="auto",
 )
 
 # Parse function call

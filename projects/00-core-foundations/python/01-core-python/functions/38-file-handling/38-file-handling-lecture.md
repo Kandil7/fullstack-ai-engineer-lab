@@ -147,7 +147,7 @@ with open("data.csv", "r") as file:
 with open("data.csv", "r") as file:
     reader = csv.DictReader(file)
     for row in reader:
-        print(row['name'], row['age'])
+        print(row["name"], row["age"])
 ```
 
 ### Writing CSV
@@ -155,13 +155,9 @@ with open("data.csv", "r") as file:
 ```python
 import csv
 
-data = [
-    ['name', 'age', 'city'],
-    ['Alice', 30, 'New York'],
-    ['Bob', 25, 'Boston']
-]
+data = [["name", "age", "city"], ["Alice", 30, "New York"], ["Bob", 25, "Boston"]]
 
-with open("output.csv", "w", newline='') as file:
+with open("output.csv", "w", newline="") as file:
     writer = csv.writer(file)
     writer.writerows(data)
 ```
@@ -177,7 +173,7 @@ import json
 
 with open("data.json", "r") as file:
     data = json.load(file)  # Parse JSON to dict
-    print(data['name'])
+    print(data["name"])
 ```
 
 ### Writing JSON
@@ -185,11 +181,7 @@ with open("data.json", "r") as file:
 ```python
 import json
 
-data = {
-    "name": "Alice",
-    "age": 30,
-    "hobbies": ["reading", "coding"]
-}
+data = {"name": "Alice", "age": 30, "hobbies": ["reading", "coding"]}
 
 with open("output.json", "w") as file:
     json.dump(data, file, indent=4)  # Write with formatting
@@ -211,6 +203,7 @@ if os.path.exists("file.txt"):
 
 # pathlib (modern approach)
 from pathlib import Path
+
 path = Path("file.txt")
 if path.exists():
     print("File exists")
@@ -230,6 +223,7 @@ mtime = os.path.getmtime("file.txt")
 
 # Using pathlib
 from pathlib import Path
+
 path = Path("file.txt")
 print(f"Size: {path.stat().st_size}")
 print(f"Exists: {path.exists()}")
@@ -299,11 +293,11 @@ from pathlib import Path
 
 path = Path("/home/user/documents/file.txt")
 
-print(path.name)      # file.txt
-print(path.stem)      # file
-print(path.suffix)    # .txt
-print(path.parent)    # /home/user/documents
-print(path.is_file()) # True
+print(path.name)  # file.txt
+print(path.stem)  # file
+print(path.suffix)  # .txt
+print(path.parent)  # /home/user/documents
+print(path.is_file())  # True
 print(path.is_dir())  # False
 ```
 
@@ -319,7 +313,7 @@ for item in path.iterdir():
 
 # Glob pattern
 txt_files = path.glob("*.txt")  # All .txt files
-py_files = path.rglob("*.py")   # Recursive search
+py_files = path.rglob("*.py")  # Recursive search
 ```
 
 ---
@@ -358,7 +352,7 @@ with open("output.txt", "w") as file:
     file.write("line\n")
 
 # GOOD - use newline parameter
-with open("output.txt", "w", newline='') as file:
+with open("output.txt", "w", newline="") as file:
     file.write("line\n")
 ```
 
@@ -384,12 +378,13 @@ with open("output.txt", "w", newline='') as file:
 from collections import Counter
 from pathlib import Path
 
+
 def analyze_log(log_file):
     """Analyze a log file and return statistics."""
     error_count = 0
     warning_count = 0
     level_counter = Counter()
-    
+
     with open(log_file, "r") as file:
         for line in file:
             if "ERROR" in line:
@@ -398,12 +393,13 @@ def analyze_log(log_file):
             elif "WARNING" in line:
                 warning_count += 1
                 level_counter["WARNING"] += 1
-    
+
     return {
         "total_errors": error_count,
         "total_warnings": warning_count,
-        "levels": dict(level_counter)
+        "levels": dict(level_counter),
     }
+
 
 # Test
 # stats = analyze_log("app.log")
@@ -416,17 +412,19 @@ def analyze_log(log_file):
 from pathlib import Path
 import shutil
 
+
 def organize_files(source_dir, dest_dir):
     """Organize files by extension."""
     source = Path(source_dir)
     dest = Path(dest_dir)
-    
+
     for file in source.iterdir():
         if file.is_file():
             ext = file.suffix[1:] or "no_extension"
             target_dir = dest / ext
             target_dir.mkdir(exist_ok=True)
             shutil.move(str(file), str(target_dir / file.name))
+
 
 # organize_files("./downloads", "./organized")
 ```

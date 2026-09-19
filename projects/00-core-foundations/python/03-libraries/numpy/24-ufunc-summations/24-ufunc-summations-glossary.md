@@ -81,10 +81,12 @@ print(np.cumsum(arr, initial=100))
 ```python
 import numpy as np
 
+
 def moving_average(arr, window):
     cumsum = np.cumsum(arr)
     cumsum = np.insert(cumsum, 0, 0)
     return (cumsum[window:] - cumsum[:-window]) / window
+
 
 data = np.array([10, 12, 11, 13, 14, 12, 15])
 ma3 = moving_average(data, 3)
@@ -104,7 +106,7 @@ print("3-day MA:", ma3.round(2))
 import numpy as np
 
 arr = np.array([1, 2, np.nan, 4, 5])
-print("sum:", np.sum(arr))        # nan
+print("sum:", np.sum(arr))  # nan
 print("nansum:", np.nansum(arr))  # 12.0
 ```
 
@@ -120,10 +122,12 @@ print("nansum:", np.nansum(arr))  # 12.0
 ```python
 import numpy as np
 
+
 def rolling_mean(arr, window):
     cumsum = np.cumsum(arr)
     cumsum = np.insert(cumsum, 0, 0)
     return (cumsum[window:] - cumsum[:-window]) / window
+
 
 data = np.array([1, 2, 3, 4, 5, 6, 7])
 print("Rolling mean (window=3):", rolling_mean(data, 3))

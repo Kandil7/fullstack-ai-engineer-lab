@@ -3,14 +3,17 @@ Matplotlib Scatter Plot - W3Schools Exercises
 ===============================================
 Scatter plot customization and techniques.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -43,8 +46,9 @@ def exercise_02():
     colors = x + y
 
     plt.figure(figsize=(8, 6))
-    sc = plt.scatter(x, y, s=sizes, c=colors, cmap="viridis", alpha=0.7,
-                     edgecolors="black", linewidth=0.5)
+    sc = plt.scatter(
+        x, y, s=sizes, c=colors, cmap="viridis", alpha=0.7, edgecolors="black", linewidth=0.5
+    )
     plt.colorbar(sc, label="x + y value")
     plt.title("Exercise 2: Size & Color Mapping")
     plt.xlabel("X")
@@ -65,8 +69,15 @@ def exercise_03():
     plt.figure(figsize=(8, 6))
     for i, (cat, vals, col) in enumerate(zip(categories, data, colors)):
         jitter = np.random.uniform(-0.1, 0.1, len(vals))
-        plt.scatter(np.full(len(vals), i) + jitter, vals, color=col,
-                    alpha=0.6, edgecolors="black", linewidth=0.5, label=cat)
+        plt.scatter(
+            np.full(len(vals), i) + jitter,
+            vals,
+            color=col,
+            alpha=0.6,
+            edgecolors="black",
+            linewidth=0.5,
+            label=cat,
+        )
 
     plt.xticks(range(len(categories)), categories)
     plt.ylabel("Response")
@@ -89,10 +100,18 @@ def exercise_04():
 
     plt.figure(figsize=(10, 7))
     for i, c in enumerate(countries):
-        plt.scatter(gdp[i], life_expectancy[i], s=population[i] / 5,
-                    color=colors[i], alpha=0.7, edgecolors="black", linewidth=1)
-        plt.annotate(c, (gdp[i], life_expectancy[i]), fontsize=9,
-                     textcoords="offset points", xytext=(10, 5))
+        plt.scatter(
+            gdp[i],
+            life_expectancy[i],
+            s=population[i] / 5,
+            color=colors[i],
+            alpha=0.7,
+            edgecolors="black",
+            linewidth=1,
+        )
+        plt.annotate(
+            c, (gdp[i], life_expectancy[i]), fontsize=9, textcoords="offset points", xytext=(10, 5)
+        )
 
     plt.title("Exercise 4: Bubble Chart (GDP vs Life Expectancy)")
     plt.xlabel("GDP (Trillion $)")
@@ -117,8 +136,13 @@ def exercise_05():
 
     plt.figure(figsize=(8, 6))
     plt.scatter(x, y, alpha=0.6, edgecolors="black", linewidth=0.5)
-    plt.plot(x_line, poly(x_line), color="red", linewidth=2,
-             label=f"y = {coeffs[0]:.2f}x + {coeffs[1]:.2f}")
+    plt.plot(
+        x_line,
+        poly(x_line),
+        color="red",
+        linewidth=2,
+        label=f"y = {coeffs[0]:.2f}x + {coeffs[1]:.2f}",
+    )
     plt.legend(fontsize=12)
     plt.title("Exercise 5: Scatter with Regression Line")
     plt.xlabel("X")

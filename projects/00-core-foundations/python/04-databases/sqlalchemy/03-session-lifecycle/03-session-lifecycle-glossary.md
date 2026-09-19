@@ -46,7 +46,7 @@ persists.
 **Example**:
 ```python
 session.add(User(name="ada"))
-session.commit()      # INSERT + COMMIT
+session.commit()  # INSERT + COMMIT
 print(session.get(User, 1).name)
 # Output:
 # ada
@@ -58,8 +58,11 @@ print(session.get(User, 1).name)
 survives (it is identity, not state); expired attributes raise on access.
 **Example**:
 ```python
-u = User(name="ada"); session.add(u); session.commit(); session.close()
-print(u.id)          # PK survives
+u = User(name="ada")
+session.add(u)
+session.commit()
+session.close()
+print(u.id)  # PK survives
 # Output:
 # 1
 ```
@@ -71,7 +74,7 @@ instance. The classic "serialized the ORM object after the request" bug.
 **Example**:
 ```python
 try:
-    _ = u.role        # expired + detached
+    _ = u.role  # expired + detached
 except DetachedInstanceError as exc:
     print(type(exc).__name__)
 # Output:
@@ -99,8 +102,10 @@ Session(bind=engine, expire_on_commit=False)
 OPEN — rollback can still undo it. Needed when you want PKs before commit.
 **Example**:
 ```python
-user = User(name="ada"); session.add(user); session.flush()
-print(user.id)        # PK assigned, transaction still open
+user = User(name="ada")
+session.add(user)
+session.flush()
+print(user.id)  # PK assigned, transaction still open
 # Output:
 # 1
 ```
@@ -131,7 +136,8 @@ transaction boundary fails safe. After a failed commit, rollback (or close)
 before reusing the session.
 **Example**:
 ```python
-session.add(User(name="ghost")); session.rollback()
+session.add(User(name="ghost"))
+session.rollback()
 print(len(session.scalars(select(User).where(User.name == "ghost")).all()))
 # Output:
 # 0

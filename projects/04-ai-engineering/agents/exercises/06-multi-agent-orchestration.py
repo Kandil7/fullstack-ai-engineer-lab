@@ -43,8 +43,10 @@ import heapq
 # Core Data Structures
 # ============================================================
 
+
 class AgentStatus(Enum):
     """Status of an agent in the system."""
+
     IDLE = "idle"
     BUSY = "busy"
     FAILED = "failed"
@@ -53,6 +55,7 @@ class AgentStatus(Enum):
 
 class TaskStatus(Enum):
     """Status of a task."""
+
     PENDING = "pending"
     RUNNING = "running"
     COMPLETED = "completed"
@@ -62,6 +65,7 @@ class TaskStatus(Enum):
 
 class TaskPriority(Enum):
     """Priority levels for task scheduling."""
+
     LOW = 1
     MEDIUM = 2
     HIGH = 3
@@ -71,6 +75,7 @@ class TaskPriority(Enum):
 @dataclass
 class Task:
     """Represents a unit of work for agents."""
+
     task_id: str
     name: str
     description: str
@@ -92,6 +97,7 @@ class Task:
 @dataclass
 class Agent:
     """Represents an agent capable of executing tasks."""
+
     agent_id: str
     name: str
     capabilities: List[str]
@@ -108,13 +114,16 @@ class Agent:
 
     def is_available(self) -> bool:
         """Check if agent can accept new tasks."""
-        return (self.status == AgentStatus.IDLE and
-                len(self.current_tasks) < self.max_concurrent)
+        return (
+            self.status == AgentStatus.IDLE
+            and len(self.current_tasks) < self.max_concurrent
+        )
 
 
 @dataclass
 class WorkflowResult:
     """Result of a complete workflow execution."""
+
     workflow_id: str
     status: str
     task_results: Dict[str, Any]
@@ -128,10 +137,11 @@ class WorkflowResult:
 # Example 1: Orchestrator-Worker Pattern
 # ============================================================
 
+
 class OrchestratorWorkerSystem:
     """
     Orchestrator-Worker pattern implementation.
-    
+
     The orchestrator coordinates multiple worker agents, delegating
     tasks based on capabilities and managing the overall workflow.
     """
@@ -142,7 +152,7 @@ class OrchestratorWorkerSystem:
             agent_id="orchestrator",
             name="Orchestrator",
             capabilities=["general"],
-            max_concurrent=10
+            max_concurrent=10,
         )
         self.task_queue: List[Task] = []
         self.completed_tasks: Dict[str, Task] = {}
@@ -157,7 +167,8 @@ class OrchestratorWorkerSystem:
     def _find_best_agent(self, task: Task) -> Optional[Agent]:
         """Find the best available agent for a task."""
         candidates = [
-            agent for agent in self.agents.values()
+            agent
+            for agent in self.agents.values()
             if agent.can_handle(task) and agent.is_available()
         ]
         if not candidates:
@@ -195,7 +206,7 @@ class OrchestratorWorkerSystem:
             "task_id": task.task_id,
             "agent_id": agent.agent_id,
             "output": f"Result for {task.name}",
-            "latency_ms": execution_time * 1000
+            "latency_ms": execution_time * 1000,
         }
 
         return result
@@ -220,9 +231,9 @@ class OrchestratorWorkerSystem:
                 agent.current_tasks.remove(task.task_id)
                 agent.completed_tasks += 1
                 agent.avg_latency_ms = (
-                    (agent.avg_latency_ms * (agent.completed_tasks - 1) +
-                     result["latency_ms"]) / agent.completed_tasks
-                )
+                    agent.avg_latency_ms * (agent.completed_tasks - 1)
+                    + result["latency_ms"]
+                ) / agent.completed_tasks
                 if not agent.current_tasks:
                     agent.status = AgentStatus.IDLE
 
@@ -239,9 +250,9 @@ class OrchestratorWorkerSystem:
         """Execute a complete workflow with multiple tasks."""
         workflow_id = str(uuid.uuid4())[:8]
         start_time = time.time()
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Orchestrator-Worker Workflow: {workflow_id}")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         # Process tasks based on dependencies
         completed_ids: Set[str] = set()
@@ -251,10 +262,11 @@ class OrchestratorWorkerSystem:
         while len(completed_ids) < len(tasks):
             # Find tasks whose dependencies are met
             ready = [
-                t for t in tasks
-                if t.task_id not in completed_ids and
-                t.status == TaskStatus.PENDING and
-                all(dep in completed_ids for dep in t.dependencies)
+                t
+                for t in tasks
+                if t.task_id not in completed_ids
+                and t.status == TaskStatus.PENDING
+                and all(dep in completed_ids for dep in t.dependencies)
             ]
 
             if not ready:
@@ -262,8 +274,7 @@ class OrchestratorWorkerSystem:
 
             # Process ready tasks concurrently
             batch_results = await asyncio.gather(
-                *[self.process_task(task) for task in ready],
-                return_exceptions=True
+                *[self.process_task(task) for task in ready], return_exceptions=True
             )
 
             for task, result in zip(ready, batch_results):
@@ -280,13 +291,14 @@ class OrchestratorWorkerSystem:
             status="completed" if not errors else "partial",
             task_results=results,
             execution_time_ms=execution_time,
-            errors=errors
+            errors=errors,
         )
 
 
 # ============================================================
 # Example 2: Sequential vs Parallel Execution
 # ============================================================
+
 
 class ExecutionStrategy:
     """
@@ -295,17 +307,16 @@ class ExecutionStrategy:
 
     @staticmethod
     async def sequential_execution(
-        tasks: List[Task],
-        execute_fn: Callable
+        tasks: List[Task], execute_fn: Callable
     ) -> List[Any]:
         """
         Execute tasks one after another.
-        
+
         Pros:
         - Simple to implement
         - Predictable execution order
         - Easy debugging
-        
+
         Cons:
         - Slow for independent tasks
         - One failure blocks all subsequent tasks
@@ -317,41 +328,35 @@ class ExecutionStrategy:
         return results
 
     @staticmethod
-    async def parallel_execution(
-        tasks: List[Task],
-        execute_fn: Callable
-    ) -> List[Any]:
+    async def parallel_execution(tasks: List[Task], execute_fn: Callable) -> List[Any]:
         """
         Execute all tasks concurrently.
-        
+
         Pros:
         - Maximum throughput for independent tasks
         - Better resource utilization
-        
+
         Cons:
         - More complex error handling
         - Potential resource contention
         - Order of results not guaranteed
         """
         results = await asyncio.gather(
-            *[execute_fn(task) for task in tasks],
-            return_exceptions=True
+            *[execute_fn(task) for task in tasks], return_exceptions=True
         )
         return results
 
     @staticmethod
     async def bounded_parallel_execution(
-        tasks: List[Task],
-        execute_fn: Callable,
-        max_concurrent: int = 3
+        tasks: List[Task], execute_fn: Callable, max_concurrent: int = 3
     ) -> List[Any]:
         """
         Execute tasks concurrently with a concurrency limit.
-        
+
         Pros:
         - Controls resource usage
         - Balances speed and stability
-        
+
         Cons:
         - May be slower than unlimited parallel
         - Requires careful tuning
@@ -364,20 +369,17 @@ class ExecutionStrategy:
                 return await execute_fn(task)
 
         results = await asyncio.gather(
-            *[bounded_execute(task) for task in tasks],
-            return_exceptions=True
+            *[bounded_execute(task) for task in tasks], return_exceptions=True
         )
         return results
 
     @staticmethod
     async def adaptive_execution(
-        tasks: List[Task],
-        execute_fn: Callable,
-        initial_concurrent: int = 2
+        tasks: List[Task], execute_fn: Callable, initial_concurrent: int = 2
     ) -> List[Any]:
         """
         Adaptive execution that adjusts concurrency based on success rate.
-        
+
         Features:
         - Starts conservative
         - Increases concurrency on success
@@ -388,7 +390,7 @@ class ExecutionStrategy:
         batch_size = 3
 
         for i in range(0, len(tasks), batch_size):
-            batch = tasks[i:i + batch_size]
+            batch = tasks[i : i + batch_size]
             batch_concurrent = min(current_concurrent, len(batch))
 
             semaphore = asyncio.Semaphore(batch_concurrent)
@@ -398,8 +400,7 @@ class ExecutionStrategy:
                     return await execute_fn(task)
 
             batch_results = await asyncio.gather(
-                *[bounded(task) for task in batch],
-                return_exceptions=True
+                *[bounded(task) for task in batch], return_exceptions=True
             )
 
             # Count successes and failures
@@ -421,10 +422,11 @@ class ExecutionStrategy:
 # Example 3: DAG-Based Workflow Engine
 # ============================================================
 
+
 class DAGWorkflowEngine:
     """
     Directed Acyclic Graph workflow engine for complex agent orchestration.
-    
+
     Supports:
     - Dependency tracking
     - Topological execution ordering
@@ -444,13 +446,13 @@ class DAGWorkflowEngine:
         node_id: str,
         name: str,
         executor: Callable,
-        metadata: Optional[Dict] = None
+        metadata: Optional[Dict] = None,
     ) -> None:
         """Add a node to the DAG."""
         self.nodes[node_id] = {
             "name": name,
             "executor": executor,
-            "metadata": metadata or {}
+            "metadata": metadata or {},
         }
         if node_id not in self.in_degree:
             self.in_degree[node_id] = 0
@@ -541,6 +543,7 @@ class DAGWorkflowEngine:
 # Example 4: Intelligent Task Delegation
 # ============================================================
 
+
 class TaskDelegator:
     """
     Intelligent task delegation system that routes tasks to
@@ -572,7 +575,7 @@ class TaskDelegator:
     def calculate_agent_score(self, agent: Agent, task: Task) -> float:
         """
         Calculate a score for assigning a task to an agent.
-        
+
         Factors:
         - Capability match (0-1)
         - Current load (0-1)
@@ -600,7 +603,8 @@ class TaskDelegator:
     def delegate(self, task: Task) -> Optional[Agent]:
         """Delegate a task to the best scoring agent."""
         candidates = [
-            agent for agent in self.agents.values()
+            agent
+            for agent in self.agents.values()
             if task.name in agent.capabilities or "general" in agent.capabilities
         ]
 
@@ -609,32 +613,35 @@ class TaskDelegator:
 
         # Score each candidate
         scored = [
-            (agent, self.calculate_agent_score(agent, task))
-            for agent in candidates
+            (agent, self.calculate_agent_score(agent, task)) for agent in candidates
         ]
         scored.sort(key=lambda x: x[1], reverse=True)
 
         # Return best agent
         best_agent, best_score = scored[0]
-        print(f"  Delegating '{task.name}' to {best_agent.name} "
-              f"(score: {best_score:.2f})")
+        print(
+            f"  Delegating '{task.name}' to {best_agent.name} (score: {best_score:.2f})"
+        )
         return best_agent
 
     def record_outcome(self, task: Task, agent_id: str, success: bool) -> None:
         """Record task outcome for learning."""
-        self.task_history.append({
-            "task_id": task.task_id,
-            "task_name": task.name,
-            "agent_id": agent_id,
-            "success": success,
-            "timestamp": datetime.now().isoformat()
-        })
+        self.task_history.append(
+            {
+                "task_id": task.task_id,
+                "task_name": task.name,
+                "agent_id": agent_id,
+                "success": success,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
         self.update_scores(agent_id, task.name, success)
 
 
 # ============================================================
 # Example 5: Result Aggregation Patterns
 # ============================================================
+
 
 class ResultAggregator:
     """
@@ -645,24 +652,24 @@ class ResultAggregator:
     def merge_results(results: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Merge results from multiple agents into a single dict.
-        
+
         Use when: Combining complementary information from different agents.
         """
         merged = {}
         for result in results:
             if result and "output" in result:
-                merged.update(result["output"] if isinstance(result["output"], dict)
-                            else {"output": result["output"]})
+                merged.update(
+                    result["output"]
+                    if isinstance(result["output"], dict)
+                    else {"output": result["output"]}
+                )
         return merged
 
     @staticmethod
-    def reduce_results(
-        results: List[Any],
-        reducer: Callable[[Any, Any], Any]
-    ) -> Any:
+    def reduce_results(results: List[Any], reducer: Callable[[Any, Any], Any]) -> Any:
         """
         Reduce multiple results to a single value.
-        
+
         Use when: Aggregating numerical results or finding a single answer.
         """
         if not results:
@@ -674,16 +681,14 @@ class ResultAggregator:
         return acc
 
     @staticmethod
-    def consensus_results(
-        results: List[str],
-        threshold: float = 0.5
-    ) -> Optional[str]:
+    def consensus_results(results: List[str], threshold: float = 0.5) -> Optional[str]:
         """
         Find consensus among agent results using majority voting.
-        
+
         Use when: Multiple agents provide the same type of answer.
         """
         from collections import Counter
+
         counts = Counter(results)
         total = len(results)
 
@@ -694,12 +699,11 @@ class ResultAggregator:
 
     @staticmethod
     def best_of_results(
-        results: List[Dict[str, Any]],
-        scoring_fn: Callable[[Dict], float]
+        results: List[Dict[str, Any]], scoring_fn: Callable[[Dict], float]
     ) -> Optional[Dict]:
         """
         Select the best result based on a scoring function.
-        
+
         Use when: Multiple agents provide competing answers.
         """
         if not results:
@@ -711,12 +715,11 @@ class ResultAggregator:
 
     @staticmethod
     def weighted_aggregate(
-        results: List[Dict[str, Any]],
-        weights: List[float]
+        results: List[Dict[str, Any]], weights: List[float]
     ) -> Dict[str, Any]:
         """
         Aggregate results using weighted averages.
-        
+
         Use when: Some agents are more reliable than others.
         """
         if not results or not weights:
@@ -737,6 +740,7 @@ class ResultAggregator:
 # Example 6: Complete Multi-Agent System
 # ============================================================
 
+
 class MultiAgentOrchestrator:
     """
     Complete multi-agent orchestrator combining all patterns.
@@ -755,31 +759,31 @@ class MultiAgentOrchestrator:
                 agent_id="researcher",
                 name="Research Agent",
                 capabilities=["research", "analysis"],
-                max_concurrent=3
+                max_concurrent=3,
             ),
             Agent(
                 agent_id="coder",
                 name="Coding Agent",
                 capabilities=["coding", "debugging"],
-                max_concurrent=2
+                max_concurrent=2,
             ),
             Agent(
                 agent_id="reviewer",
                 name="Review Agent",
                 capabilities=["review", "testing"],
-                max_concurrent=2
+                max_concurrent=2,
             ),
             Agent(
                 agent_id="writer",
                 name="Writing Agent",
                 capabilities=["writing", "documentation"],
-                max_concurrent=2
+                max_concurrent=2,
             ),
             Agent(
                 agent_id="generalist",
                 name="General Agent",
                 capabilities=["general"],
-                max_concurrent=5
+                max_concurrent=5,
             ),
         ]
 
@@ -789,9 +793,9 @@ class MultiAgentOrchestrator:
 
     async def execute_research_task(self) -> Dict[str, Any]:
         """Execute a research workflow using DAG."""
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("Research Workflow (DAG-based)")
-        print("="*60)
+        print("=" * 60)
 
         # Define DAG nodes
         async def gather_info(inputs: Dict) -> Dict:
@@ -828,24 +832,45 @@ class MultiAgentOrchestrator:
 
     async def run_example(self) -> None:
         """Run the complete multi-agent orchestration example."""
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("MULTI-AGENT ORCHESTRATION EXAMPLE")
-        print("="*60)
+        print("=" * 60)
 
         await self.create_specialized_agents()
 
         # Create tasks with dependencies
         tasks = [
-            Task("t1", "research", "Gather market data",
-                 TaskPriority.HIGH, dependencies=[]),
-            Task("t2", "analysis", "Analyze trends",
-                 TaskPriority.HIGH, dependencies=["t1"]),
-            Task("t3", "coding", "Build prototype",
-                 TaskPriority.MEDIUM, dependencies=["t2"]),
-            Task("t4", "review", "Code review",
-                 TaskPriority.MEDIUM, dependencies=["t3"]),
-            Task("t5", "documentation", "Write docs",
-                 TaskPriority.LOW, dependencies=["t3"]),
+            Task(
+                "t1",
+                "research",
+                "Gather market data",
+                TaskPriority.HIGH,
+                dependencies=[],
+            ),
+            Task(
+                "t2",
+                "analysis",
+                "Analyze trends",
+                TaskPriority.HIGH,
+                dependencies=["t1"],
+            ),
+            Task(
+                "t3",
+                "coding",
+                "Build prototype",
+                TaskPriority.MEDIUM,
+                dependencies=["t2"],
+            ),
+            Task(
+                "t4", "review", "Code review", TaskPriority.MEDIUM, dependencies=["t3"]
+            ),
+            Task(
+                "t5",
+                "documentation",
+                "Write docs",
+                TaskPriority.LOW,
+                dependencies=["t3"],
+            ),
         ]
 
         # Run orchestration workflow
@@ -861,20 +886,21 @@ class MultiAgentOrchestrator:
 # Main Entry Point
 # ============================================================
 
+
 async def main():
     """Run all examples."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXERCISE 06: MULTI-AGENT ORCHESTRATION")
-    print("="*60)
+    print("=" * 60)
 
     # Example 1-6: Complete multi-agent system
     system = MultiAgentOrchestrator()
     await system.run_example()
 
     # Example 2: Execution strategies demonstration
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXECUTION STRATEGIES COMPARISON")
-    print("="*60)
+    print("=" * 60)
 
     async def simple_execute(task: Task) -> str:
         await asyncio.sleep(0.05)
@@ -888,25 +914,25 @@ async def main():
     start = time.time()
     await strategy.sequential_execution(tasks, simple_execute)
     seq_time = time.time() - start
-    print(f"  Sequential: {seq_time*1000:.1f}ms")
+    print(f"  Sequential: {seq_time * 1000:.1f}ms")
 
     # Parallel
     start = time.time()
     await strategy.parallel_execution(tasks, simple_execute)
     par_time = time.time() - start
-    print(f"  Parallel: {par_time*1000:.1f}ms")
+    print(f"  Parallel: {par_time * 1000:.1f}ms")
 
     # Bounded parallel
     start = time.time()
     await strategy.bounded_parallel_execution(tasks, simple_execute, max_concurrent=3)
     bp_time = time.time() - start
-    print(f"  Bounded Parallel (3): {bp_time*1000:.1f}ms")
+    print(f"  Bounded Parallel (3): {bp_time * 1000:.1f}ms")
 
-    print(f"\nSpeedup (parallel): {seq_time/par_time:.1f}x")
+    print(f"\nSpeedup (parallel): {seq_time / par_time:.1f}x")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXERCISE COMPLETE")
-    print("="*60)
+    print("=" * 60)
 
 
 if __name__ == "__main__":

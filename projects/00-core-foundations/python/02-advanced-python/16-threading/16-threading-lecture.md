@@ -32,10 +32,12 @@ Threads are lightweight processes that share memory space.
 import threading
 import time
 
+
 def worker(name, delay):
     print(f"[{name}] Starting")
     time.sleep(delay)
     print(f"[{name}] Finished")
+
 
 # Create threads
 t1 = threading.Thread(target=worker, args=("Thread-1", 0.3))
@@ -57,18 +59,18 @@ print("Both threads completed")
 import threading
 import time
 
+
 def download_file(url, timeout=30):
     print(f"Downloading {url}...")
     time.sleep(0.5)  # Simulate download
     return f"Data from {url}"
 
+
 # Create threads with different arguments
 threads = []
 for i in range(3):
     t = threading.Thread(
-        target=download_file,
-        args=(f"http://example.com/file{i}.txt",),
-        kwargs={"timeout": 10}
+        target=download_file, args=(f"http://example.com/file{i}.txt",), kwargs={"timeout": 10}
     )
     threads.append(t)
     t.start()
@@ -90,8 +92,10 @@ Threads don't return values directly, but you can capture them using containers 
 ```python
 import threading
 
+
 def compute_square(n, result_container):
-    result_container[n] = n ** 2
+    result_container[n] = n**2
+
 
 results = {}
 threads = []
@@ -113,29 +117,32 @@ print(f"Results: {results}")
 ```python
 import threading
 
+
 class ThreadResult:
     def __init__(self):
         self._result = None
         self._exception = None
-    
+
     @property
     def result(self):
         if self._exception:
             raise self._exception
         return self._result
-    
+
     def set_result(self, result):
         self._result = result
-    
+
     def set_exception(self, exception):
         self._exception = exception
+
 
 def compute(n, result):
     try:
         time.sleep(0.1)
-        result.set_result(n ** 2)
+        result.set_result(n**2)
     except Exception as e:
         result.set_exception(e)
+
 
 results = []
 threads = []
@@ -164,24 +171,28 @@ Locks ensure thread-safe access to shared resources.
 ```python
 import threading
 
+
 class Counter:
     def __init__(self):
         self._count = 0
         self._lock = threading.Lock()
-    
+
     def increment(self):
         with self._lock:
             self._count += 1
-    
+
     @property
     def count(self):
         return self._count
 
+
 counter = Counter()
+
 
 def increment_many(n):
     for _ in range(n):
         counter.increment()
+
 
 threads = []
 for _ in range(10):
@@ -202,22 +213,23 @@ print(f"Expected: 10000, Actual: {counter.count}")
 ```python
 import threading
 
+
 class BankAccount:
     def __init__(self, balance=0):
         self._balance = balance
         self._lock = threading.RLock()  # Reentrant lock
-    
+
     def deposit(self, amount):
         with self._lock:
             self._balance += amount
-    
+
     def withdraw(self, amount):
         with self._lock:
             if self._balance >= amount:
                 self._balance -= amount
                 return True
             return False
-    
+
     def transfer(self, other, amount):
         with self._lock:
             if self._balance >= amount:
@@ -225,10 +237,11 @@ class BankAccount:
                 other.deposit(amount)  # Can acquire lock again
                 return True
             return False
-    
+
     @property
     def balance(self):
         return self._balance
+
 
 # RLock allows the same thread to acquire the lock multiple times
 account1 = BankAccount(1000)
@@ -250,11 +263,13 @@ import time
 
 semaphore = threading.Semaphore(2)  # Max 2 concurrent
 
+
 def limited_task(name):
     with semaphore:
         print(f"{name} started")
         time.sleep(0.1)
         print(f"{name} finished")
+
 
 threads = []
 for i in range(5):
@@ -295,6 +310,7 @@ import threading
 import time
 from queue import Queue
 
+
 def producer(queue, count):
     for i in range(count):
         item = f"item-{i}"
@@ -302,6 +318,7 @@ def producer(queue, count):
         print(f"Produced: {item}")
         time.sleep(0.01)
     queue.put(None)  # Sentinel to stop consumer
+
 
 def consumer(queue):
     while True:
@@ -311,6 +328,7 @@ def consumer(queue):
         print(f"Consumed: {item}")
         time.sleep(0.02)
         queue.task_done()
+
 
 queue = Queue(maxsize=5)
 
@@ -339,15 +357,18 @@ import time
 
 event = threading.Event()
 
+
 def waiter():
     print("Waiter: Waiting for event...")
     event.wait()
     print("Waiter: Event received!")
 
+
 def setter():
     time.sleep(0.2)
     print("Setter: Setting event")
     event.set()
+
 
 t1 = threading.Thread(target=waiter)
 t2 = threading.Thread(target=setter)
@@ -368,6 +389,7 @@ import time
 condition = threading.Condition()
 items = []
 
+
 def producer():
     with condition:
         for i in range(5):
@@ -376,6 +398,7 @@ def producer():
             condition.notify()
         condition.notify_all()
 
+
 def consumer(name):
     with condition:
         while not items:
@@ -383,6 +406,7 @@ def consumer(name):
             condition.wait()
         item = items.pop(0)
         print(f"{name}: Consumed {item}")
+
 
 # Start consumers first
 consumers = []
@@ -412,9 +436,11 @@ Simplified thread management using ThreadPoolExecutor.
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
+
 def fetch_url(url):
     time.sleep(0.1)  # Simulate network request
     return f"Data from {url}"
+
 
 urls = [f"http://example.com/page{i}" for i in range(5)]
 
@@ -444,10 +470,12 @@ Daemon threads stop when the main program exits.
 import threading
 import time
 
+
 def background_task():
     while True:
         print("Background running...")
         time.sleep(0.1)
+
 
 # Daemon process stops when main process exits
 daemon = threading.Thread(target=background_task, daemon=True)
@@ -466,10 +494,12 @@ print("Main process exiting (daemon will stop)")
 # WITHOUT LOCK - Race condition
 counter = 0
 
+
 def increment():
     global counter
     for _ in range(1000):
         counter += 1  # Not atomic!
+
 
 threads = [threading.Thread(target=increment) for _ in range(10)]
 for t in threads:
@@ -481,6 +511,7 @@ print(f"Expected: 10000, Actual: {counter}")  # Unpredictable!
 
 # WITH LOCK - Thread safe
 lock = threading.Lock()
+
 
 def safe_increment():
     global counter
@@ -511,6 +542,7 @@ def consumer(queue):
     while True:
         item = queue.get()
         process(item)
+
 
 # CORRECT - use sentinel
 def consumer(queue):
@@ -577,6 +609,8 @@ Implement a thread-safe bounded queue with:
 - Maximum size limit
 - Proper synchronization
 """
+
+
 class BoundedQueue:
     # Your code here
     pass

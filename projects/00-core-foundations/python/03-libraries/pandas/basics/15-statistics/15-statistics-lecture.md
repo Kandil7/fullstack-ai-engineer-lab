@@ -34,11 +34,13 @@ Pandas provides built-in statistical methods that work directly on DataFrames.
 import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    'department': ['Sales', 'Sales', 'Engineering', 'Engineering', 'HR', 'HR'],
-    'salary': [55000, 62000, 95000, 105000, 58000, 61000],
-    'bonus': [5000, 6000, 12000, 15000, 4000, 4500]
-})
+df = pd.DataFrame(
+    {
+        "department": ["Sales", "Sales", "Engineering", "Engineering", "HR", "HR"],
+        "salary": [55000, 62000, 95000, 105000, 58000, 61000],
+        "bonus": [5000, 6000, 12000, 15000, 4000, 4500],
+    }
+)
 
 # Column mean
 print(f"Average salary: ${df['salary'].mean():,.2f}")
@@ -57,7 +59,7 @@ print(f"Median salary: ${df['salary'].median():,.2f}")
 
 # Why median matters — with an outlier
 df_with_outlier = df.copy()
-df_with_outlier.loc[5, 'salary'] = 500000
+df_with_outlier.loc[5, "salary"] = 500000
 print(f"Mean with outlier:   ${df_with_outlier['salary'].mean():,.2f}")
 print(f"Median with outlier: ${df_with_outlier['salary'].median():,.2f}")
 # Mean with outlier:   $130,333.33
@@ -98,12 +100,12 @@ print(f"Variance: {df['salary'].var():,.2f}")
 
 ```python
 # Range
-salary_range = df['salary'].max() - df['salary'].min()
+salary_range = df["salary"].max() - df["salary"].min()
 print(f"Salary range: ${salary_range:,.2f}")
 
 # Interquartile Range (IQR)
-Q1 = df['salary'].quantile(0.25)
-Q3 = df['salary'].quantile(0.75)
+Q1 = df["salary"].quantile(0.25)
+Q3 = df["salary"].quantile(0.75)
 IQR = Q3 - Q1
 print(f"IQR: ${IQR:,.2f}")
 print(f"25th percentile: ${Q1:,.2f}")
@@ -114,7 +116,7 @@ print(f"75th percentile: ${Q3:,.2f}")
 
 ```python
 # Normalized measure of spread (std / mean)
-cv = df['salary'].std() / df['salary'].mean()
+cv = df["salary"].std() / df["salary"].mean()
 print(f"Coefficient of variation: {cv:.2%}")
 ```
 
@@ -124,7 +126,7 @@ print(f"Coefficient of variation: {cv:.2%}")
 
 ```python
 # Comprehensive summary
-print(df[['salary', 'bonus']].describe())
+print(df[["salary", "bonus"]].describe())
 
 # Output:
 #              salary         bonus
@@ -138,7 +140,7 @@ print(df[['salary', 'bonus']].describe())
 # max   105000.000000  15000.000000
 
 # With percentiles
-print(df['salary'].describe(percentiles=[.1, .25, .5, .75, .9, .95, .99]))
+print(df["salary"].describe(percentiles=[0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99]))
 ```
 
 ---
@@ -152,7 +154,7 @@ print(f"95th percentile:  ${df['salary'].quantile(0.95):,.2f}")
 print(f"99th percentile:  ${df['salary'].quantile(0.99):,.2f}")
 
 # Multiple quantiles at once
-quantiles = df['salary'].quantile([0.1, 0.25, 0.5, 0.75, 0.9])
+quantiles = df["salary"].quantile([0.1, 0.25, 0.5, 0.75, 0.9])
 print(quantiles)
 ```
 
@@ -178,9 +180,9 @@ print(f"Kurtosis: {df['salary'].kurtosis():.2f}")
 
 ```python
 # Statistics per department
-dept_stats = df.groupby('department')['salary'].agg([
-    'count', 'mean', 'median', 'std', 'min', 'max'
-])
+dept_stats = df.groupby("department")["salary"].agg(
+    ["count", "mean", "median", "std", "min", "max"]
+)
 print(dept_stats)
 
 # Output:
@@ -195,22 +197,25 @@ print(dept_stats)
 
 ```python
 # Different aggregations per column
-result = df.groupby('department').agg({
-    'salary': ['mean', 'std', 'min', 'max'],
-    'bonus': ['mean', 'sum', 'count']
-})
+result = df.groupby("department").agg(
+    {"salary": ["mean", "std", "min", "max"], "bonus": ["mean", "sum", "count"]}
+)
 print(result)
 ```
 
 ### 7.3 Named Aggregations (Pandas 0.25+)
 
 ```python
-result = df.groupby('department').agg(
-    avg_salary=('salary', 'mean'),
-    salary_range=('salary', lambda x: x.max() - x.min()),
-    total_bonus=('bonus', 'sum'),
-    headcount=('salary', 'count')
-).reset_index()
+result = (
+    df.groupby("department")
+    .agg(
+        avg_salary=("salary", "mean"),
+        salary_range=("salary", lambda x: x.max() - x.min()),
+        total_bonus=("bonus", "sum"),
+        headcount=("salary", "count"),
+    )
+    .reset_index()
+)
 print(result)
 ```
 
@@ -218,11 +223,11 @@ print(result)
 
 ```python
 # Which department has highest salary variance?
-print(df.groupby('department')['salary'].var())
+print(df.groupby("department")["salary"].var())
 
 # Which department has highest bonus-to-salary ratio?
-df['bonus_ratio'] = df['bonus'] / df['salary']
-print(df.groupby('department')['bonus_ratio'].mean())
+df["bonus_ratio"] = df["bonus"] / df["salary"]
+print(df.groupby("department")["bonus_ratio"].mean())
 ```
 
 ---
@@ -231,14 +236,14 @@ print(df.groupby('department')['bonus_ratio'].mean())
 
 ```python
 # Correlation matrix
-corr_matrix = df[['salary', 'bonus']].corr()
+corr_matrix = df[["salary", "bonus"]].corr()
 print(corr_matrix)
 
 # Correlation of one column with all others
-print(df.corr(numeric_only=True)['salary'])
+print(df.corr(numeric_only=True)["salary"])
 
 # Spearman correlation (rank-based)
-print(df[['salary', 'bonus']].corr(method='spearman'))
+print(df[["salary", "bonus"]].corr(method="spearman"))
 ```
 
 ---
@@ -247,20 +252,22 @@ print(df[['salary', 'bonus']].corr(method='spearman'))
 
 ```python
 # Cumulative statistics
-df_timeseries = pd.DataFrame({
-    'date': pd.date_range('2024-01-01', periods=10),
-    'sales': [100, 120, 115, 130, 125, 140, 135, 150, 145, 160]
-})
+df_timeseries = pd.DataFrame(
+    {
+        "date": pd.date_range("2024-01-01", periods=10),
+        "sales": [100, 120, 115, 130, 125, 140, 135, 150, 145, 160],
+    }
+)
 
 # Expanding mean (cumulative average)
-df_timeseries['expanding_mean'] = df_timeseries['sales'].expanding().mean()
+df_timeseries["expanding_mean"] = df_timeseries["sales"].expanding().mean()
 
 # Expanding std
-df_timeseries['expanding_std'] = df_timeseries['sales'].expanding().std()
+df_timeseries["expanding_std"] = df_timeseries["sales"].expanding().std()
 
 # Rolling statistics
-df_timeseries['rolling_3d_mean'] = df_timeseries['sales'].rolling(3).mean()
-df_timeseries['rolling_5d_max'] = df_timeseries['sales'].rolling(5).max()
+df_timeseries["rolling_3d_mean"] = df_timeseries["sales"].rolling(3).mean()
+df_timeseries["rolling_5d_max"] = df_timeseries["sales"].rolling(5).max()
 ```
 
 ---

@@ -43,26 +43,15 @@ Reference: https://www.w3schools.com/python/python_mongodb_get_started.asp
 # ============================================================
 
 # Example 2: A simple MongoDB document
-user_document = {
-    "_id": 1,
-    "name": "Alice",
-    "age": 25,
-    "email": "alice@mail.com",
-    "is_active": True
-}
+user_document = {"_id": 1, "name": "Alice", "age": 25, "email": "alice@mail.com", "is_active": True}
 print("Simple document:", user_document)
 
 # Example 3: Nested document
 nested_document = {
     "_id": 2,
     "name": "Bob",
-    "address": {
-        "street": "123 Main St",
-        "city": "Springfield",
-        "state": "IL",
-        "zip": "62704"
-    },
-    "hobbies": ["reading", "coding", "hiking"]
+    "address": {"street": "123 Main St", "city": "Springfield", "state": "IL", "zip": "62704"},
+    "hobbies": ["reading", "coding", "hiking"],
 }
 print("Nested document:", nested_document)
 
@@ -77,7 +66,7 @@ print("Nested document:", nested_document)
 users_collection = [
     {"_id": 1, "name": "Alice", "age": 25},
     {"_id": 2, "name": "Bob", "age": 30},
-    {"_id": 3, "name": "Charlie", "age": 35}
+    {"_id": 3, "name": "Charlie", "age": 35},
 ]
 print("\nUsers collection:")
 for user in users_collection:
@@ -142,7 +131,7 @@ database = {
     "products": [
         {"_id": 1, "name": "Laptop", "price": 999.99},
         {"_id": 2, "name": "Mouse", "price": 29.99},
-    ]
+    ],
 }
 
 print("\nDatabase collections:", list(database.keys()))
@@ -166,6 +155,7 @@ print("""
 7. MongoDB stores data as BSON (Binary JSON)
 8. Schema is flexible - documents can vary in structure
 """)
+
 
 # ============================================================
 # Self-Verification  (MANDATORY)

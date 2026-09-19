@@ -55,14 +55,16 @@ That is fine for simulations and shuffles — and **fatal for tokens**:
 ```python
 import random, string
 
+
 def insecure_token(length=16):
     alphabet = string.ascii_letters + string.digits
     return "".join(random.choice(alphabet) for _ in range(length))
 
+
 random.seed(42)
 print(insecure_token(8))
 random.seed(42)
-print(insecure_token(8))     # same seed -> same token
+print(insecure_token(8))  # same seed -> same token
 ```
 
 ```text
@@ -77,9 +79,11 @@ if the attacker knows the seed and past outputs:
 ```python
 import secrets
 
+
 def secure_token(length=32):
     alphabet = string.ascii_letters + string.digits
     return "".join(secrets.choice(alphabet) for _ in range(length))
+
 
 print(secure_token(8))
 ```
@@ -102,16 +106,17 @@ argon2, scrypt. The stdlib pattern:
 ```python
 import hashlib, hmac, secrets
 
+
 def hash_password(password, salt=None, iterations=100_000):
-    salt = salt or secrets.token_bytes(16)          # unique per password
-    digest = hashlib.pbkdf2_hmac(
-        "sha256", password.encode("utf-8"), salt, iterations)
+    salt = salt or secrets.token_bytes(16)  # unique per password
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
     return digest, salt
 
+
 def verify_password(password, digest, salt, iterations=100_000):
-    candidate = hashlib.pbkdf2_hmac(
-        "sha256", password.encode("utf-8"), salt, iterations)
+    candidate = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
     return hmac.compare_digest(candidate, digest)
+
 
 digest, salt = hash_password("correct horse battery staple")
 print(len(digest), len(salt))
@@ -141,8 +146,10 @@ relative to the input length:
 ```python
 import hmac
 
+
 def safe_equals(a, b):
     return hmac.compare_digest(a.encode(), b.encode())
+
 
 print(safe_equals("abc", "abc"))
 print(safe_equals("abc", "abd"))
@@ -163,14 +170,14 @@ Interpolating input into SQL turns the input into *structure*:
 
 ```python
 def unsafe_query(conn, user_id):
-    return conn.execute(
-        f"SELECT name FROM users WHERE id = '{user_id}'").fetchall()
+    return conn.execute(f"SELECT name FROM users WHERE id = '{user_id}'").fetchall()
+
 
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE users (id TEXT, name TEXT)")
 conn.execute("INSERT INTO users VALUES ('1','alice'), ('2','bob')")
 
-print(unsafe_query(conn, "1' OR '1'='1"))   # every row!
+print(unsafe_query(conn, "1' OR '1'='1"))  # every row!
 ```
 
 ```text
@@ -184,11 +191,11 @@ the input stays data, never structure:
 
 ```python
 def safe_query(conn, user_id):
-    return conn.execute(
-        "SELECT name FROM users WHERE id = ?", (user_id,)).fetchall()
+    return conn.execute("SELECT name FROM users WHERE id = ?", (user_id,)).fetchall()
+
 
 print(safe_query(conn, "1"))
-print(safe_query(conn, "1' OR '1'='1"))    # literal value, no match
+print(safe_query(conn, "1' OR '1'='1"))  # literal value, no match
 ```
 
 ```text
@@ -209,12 +216,16 @@ parameterize; `.raw()`/`.execute()` strings do not.
 ```python
 import subprocess
 
+
 def safe_run(user_input):
     # argument list: the shell never sees the input
     return subprocess.run(
-        [sys.executable, "-c", "import sys; print(sys.argv[1])",
-         user_input],
-        capture_output=True, text=True, check=True).stdout
+        [sys.executable, "-c", "import sys; print(sys.argv[1])", user_input],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+
 
 print(safe_run("hello; whoami").strip())
 ```
@@ -236,11 +247,13 @@ stays inside the root:
 ```python
 from pathlib import Path
 
+
 def safe_read(root, filename):
     candidate = (root / filename).resolve()
     if not candidate.is_relative_to(root.resolve()):
         raise ValueError("path escapes the root")
     return candidate.read_text()
+
 
 root = Path("data")
 root.mkdir(exist_ok=True)
@@ -270,12 +283,14 @@ print(safe_read(root, "secret.txt"))
 ```python
 import os, pickle
 
+
 class Evil:
     def __reduce__(self):
         return (os.system, ("echo PWNED from pickle",))
 
+
 payload = pickle.dumps(Evil())
-pickle.loads(payload)          # runs os.system!
+pickle.loads(payload)  # runs os.system!
 ```
 
 ```text
@@ -298,7 +313,7 @@ arbitrary Python objects — the same RCE as pickle:
 import yaml
 
 malicious = "!!python/object/apply:os.system ['echo yaml-pwned']"
-yaml.unsafe_load(malicious)    # executes!
+yaml.unsafe_load(malicious)  # executes!
 ```
 
 ```text
@@ -331,11 +346,12 @@ near-miss inputs. A 30-character string of `a`s followed by `b` can take
 minutes:
 
 ```python
-evil = r"^(a+)+$"      # DON'T use this on attacker input
-safe = r"^a+$"         # linear
+evil = r"^(a+)+$"  # DON'T use this on attacker input
+safe = r"^a+$"  # linear
 
 import re
-print(re.search(safe, "a" * 30 + "b") is not None)   # quick, False
+
+print(re.search(safe, "a" * 30 + "b") is not None)  # quick, False
 ```
 
 ```text
@@ -355,6 +371,7 @@ request dumps. Redact or never include:
 ```python
 def redact(value):
     return f"***{value[-4:]}" if len(value) > 4 else "***"
+
 
 api_key = "sk-1234567890abcdef"
 print(f"log line: calling provider with key {redact(api_key)}")

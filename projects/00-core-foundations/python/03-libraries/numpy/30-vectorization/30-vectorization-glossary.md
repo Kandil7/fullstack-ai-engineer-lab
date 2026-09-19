@@ -35,8 +35,8 @@ import numpy as np
 
 A = np.random.default_rng(0).normal(size=(2000, 2000))
 B = np.random.default_rng(1).normal(size=(2000, 2000))
-C = A @ B          # BLAS dgemm: ~8e9 flops in compiled code
-print(C.shape)     # (2000, 2000)
+C = A @ B  # BLAS dgemm: ~8e9 flops in compiled code
+print(C.shape)  # (2000, 2000)
 ```
 
 **Complexity**: O(n·m·k) work at ~10-100 GFLOP/s.
@@ -54,9 +54,9 @@ import numpy as np
 
 vals = np.array([-3.0, 1.0, -2.0, 4.0])
 mask = vals < 0
-print(mask)            # [ True False  True False]
+print(mask)  # [ True False  True False]
 vals[mask] = 0.0
-print(vals)            # [0. 1. 0. 4.]
+print(vals)  # [0. 1. 0. 4.]
 ```
 
 **Complexity**: O(n) per mask operation.
@@ -76,7 +76,7 @@ import numpy as np
 
 batch = np.ones((8, 5))
 bias = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
-print((batch + bias).shape)     # (8, 5)
+print((batch + bias).shape)  # (8, 5)
 ```
 
 **Complexity**: O(result size).
@@ -96,8 +96,8 @@ import numpy as np
 
 A = np.random.default_rng(2).normal(size=(4, 5))
 B = np.random.default_rng(3).normal(size=(5, 6))
-print(np.allclose(np.einsum("ij,jk->ik", A, B), A @ B))   # True
-print(np.einsum("ii->", np.ones((5, 5))))                 # 5.0
+print(np.allclose(np.einsum("ij,jk->ik", A, B), A @ B))  # True
+print(np.einsum("ii->", np.ones((5, 5))))  # 5.0
 ```
 
 **Complexity**: same as the equivalent BLAS op, slightly slower at
@@ -116,7 +116,7 @@ per-element Python.
 import numpy as np
 
 arr = np.fromiter((i * i for i in range(5)), dtype=np.int64)
-print(arr)                     # [ 0  1  4  9 16]
+print(arr)  # [ 0  1  4  9 16]
 ```
 
 **Complexity**: O(n) interpreter steps.
@@ -134,7 +134,7 @@ slower than compiled ufuncs. Vectorization removes it.
 import numpy as np
 
 x = np.random.default_rng(0).normal(size=1_000_000)
-vec = np.maximum(x, 0.0)        # one C pass
+vec = np.maximum(x, 0.0)  # one C pass
 # the loop equivalent touches 1e6 elements through the interpreter
 ```
 
@@ -153,9 +153,8 @@ compiled element.
 import numpy as np
 
 vals = np.random.default_rng(1).normal(size=100_000)
-print(int((vals > 0).sum()))                  # count positives
-print(np.allclose(vals[vals > 0].sum(),
-                  np.where(vals > 0, vals, 0.0).sum()))  # True
+print(int((vals > 0).sum()))  # count positives
+print(np.allclose(vals[vals > 0].sum(), np.where(vals > 0, vals, 0.0).sum()))  # True
 ```
 
 **Complexity**: O(n).
@@ -172,7 +171,7 @@ Prefer it over nested `np.where` for this exact job.
 import numpy as np
 
 x = np.array([-5.0, 0.5, 3.0, 9.0])
-print(np.clip(x, 0.0, 1.0))     # [0.  0.5 1.  1. ]
+print(np.clip(x, 0.0, 1.0))  # [0.  0.5 1.  1. ]
 ```
 
 **Complexity**: O(n).
@@ -189,7 +188,7 @@ implements ReLU (`np.maximum(x, 0)`).
 import numpy as np
 
 x = np.array([-2.0, -0.5, 0.0, 1.5])
-print(np.maximum(x, 0.0))       # [0.  0.  0.  1.5]
+print(np.maximum(x, 0.0))  # [0.  0.  0.  1.5]
 ```
 
 **Complexity**: O(n).
@@ -206,12 +205,14 @@ passes through the interpreter. Convenience, not performance.
 ```python
 import numpy as np
 
+
 def f(x):
     return x * 2 if x > 0 else -x
 
+
 f_vec = np.vectorize(f)
 x = np.array([-1.0, 2.0, 3.0])
-print(f_vec(x))                 # [ 1.  4.  6.]
+print(f_vec(x))  # [ 1.  4.  6.]
 ```
 
 **Complexity**: O(n) interpreter calls — same class as the loop.
@@ -248,7 +249,7 @@ import numpy as np
 
 rows = [np.array([1.0, 2.0]), np.array([3.0, 4.0, 5.0, 6.0])]
 stats = np.array([(r.mean(), r.std()) for r in rows])
-print(stats.shape)              # (2, 2)
+print(stats.shape)  # (2, 2)
 ```
 
 **Complexity**: O(#rows) interpreter steps + O(total elements) work.
@@ -265,12 +266,14 @@ loop.
 ```python
 import numpy as np
 
+
 def f(x):
     return x * 2 if x > 0 else -x
 
+
 # vectorized rewrite, no scalar function at all:
 x = np.array([-1.0, 2.0])
-print(np.where(x > 0, x * 2, -x))   # [1. 4.]
+print(np.where(x > 0, x * 2, -x))  # [1. 4.]
 ```
 
 **Complexity**: —.
@@ -291,8 +294,8 @@ import numpy as np
 a = np.ones(1_000_000)
 b = np.ones(1_000_000)
 y = np.empty_like(a)
-np.multiply(a, b, out=y)   # same result, no intermediate
-print(y.sum())             # 1000000.0
+np.multiply(a, b, out=y)  # same result, no intermediate
+print(y.sum())  # 1000000.0
 ```
 
 **Complexity**: O(n) per temporary.
@@ -310,7 +313,7 @@ array operands implemented as a compiled loop (`np.add`, `np.exp`,
 import numpy as np
 
 x = np.array([1.0, 4.0, 9.0])
-print(np.sqrt(x))           # [1. 2. 3.]
+print(np.sqrt(x))  # [1. 2. 3.]
 ```
 
 **Complexity**: O(n), compiled.
@@ -331,7 +334,7 @@ import numpy as np
 x = np.random.default_rng(0).normal(size=100_000)
 y_loop = [max(v, 0.0) for v in x]
 y_vec = np.maximum(x, 0.0)
-print(np.allclose(y_loop, y_vec))     # True
+print(np.allclose(y_loop, y_vec))  # True
 ```
 
 **Complexity**: O(n) compiled vs O(n) interpreter steps.

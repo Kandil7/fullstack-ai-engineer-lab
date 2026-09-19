@@ -42,12 +42,15 @@ import json
 # Default decoder
 data = json.loads('{"name": "Alice", "age": 30}')
 
+
 # Custom decoder
 def custom_decode(dct):
     if "date" in dct:
         from datetime import datetime
+
         dct["date"] = datetime.fromisoformat(dct["date"])
     return dct
+
 
 data = json.loads(json_str, object_hook=custom_decode)
 ```
@@ -123,11 +126,13 @@ print(json_string)
 import json
 from datetime import datetime
 
+
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
         return super().default(obj)
+
 
 data = {"timestamp": datetime.now()}
 json_str = json.dumps(data, cls=DateTimeEncoder)
@@ -270,10 +275,12 @@ import json
 # {"name": "Bob", "age": 25}
 # {"name": "Charlie", "age": 35}
 
+
 def read_jsonl(filename):
     with open(filename, "r") as f:
         for line in f:
             yield json.loads(line.strip())
+
 
 for record in read_jsonl("data.jsonl"):
     print(record)
@@ -406,7 +413,7 @@ pretty = json.dumps(data, indent=2)
 print(pretty)
 
 # Minified (compact)
-compact = json.dumps(data, separators=(',', ':'))
+compact = json.dumps(data, separators=(",", ":"))
 print(compact)  # {"name":"Alice","hobbies":["reading","coding"]}
 ```
 
@@ -466,15 +473,13 @@ print(pretty)
 # JSON Schema example
 schema = {
     "type": "object",
-    "properties": {
-        "name": {"type": "string"},
-        "age": {"type": "integer", "minimum": 0}
-    },
-    "required": ["name"]
+    "properties": {"name": {"type": "string"}, "age": {"type": "integer", "minimum": 0}},
+    "required": ["name"],
 }
 
 # Validation with jsonschema library
 from jsonschema import validate
+
 validate(instance={"name": "Alice"}, schema=schema)
 ```
 
@@ -508,6 +513,7 @@ with open("data.json", "w") as f:
 ```python
 import json
 
+
 def handle_api_response(response_text):
     """Parse and validate API response."""
     try:
@@ -518,6 +524,7 @@ def handle_api_response(response_text):
     except json.JSONDecodeError as e:
         return {"error": f"Invalid JSON: {e}"}
 
+
 response = '{"status": "ok", "data": [1, 2, 3]}'
 result = handle_api_response(response)
 print(result)  # {'status': 'ok', 'data': [1, 2, 3]}
@@ -527,14 +534,15 @@ print(result)  # {'status': 'ok', 'data': [1, 2, 3]}
 ```python
 import json
 
+
 def transform_json(data, key_map):
     """Rename keys in JSON data."""
     if isinstance(data, dict):
-        return {key_map.get(k, k): transform_json(v, key_map) 
-                for k, v in data.items()}
+        return {key_map.get(k, k): transform_json(v, key_map) for k, v in data.items()}
     elif isinstance(data, list):
         return [transform_json(item, key_map) for item in data]
     return data
+
 
 data = {"firstName": "Alice", "lastName": "Smith", "age": 30}
 mapping = {"firstName": "first_name", "lastName": "last_name"}

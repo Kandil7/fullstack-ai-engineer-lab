@@ -143,9 +143,7 @@ def test_day_buckets_zoneinfo_constructed_once():
 
     try:
         zoneinfo.ZoneInfo = CountingZoneInfo
-        spec = importlib.util.spec_from_file_location(
-            "mod50_fresh", _DIR / f"{_TARGET}.py"
-        )
+        spec = importlib.util.spec_from_file_location("mod50_fresh", _DIR / f"{_TARGET}.py")
         fresh = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(fresh)
 
@@ -153,9 +151,7 @@ def test_day_buckets_zoneinfo_constructed_once():
         ts = [datetime(2026, 8, 6, 12, 0, tzinfo=timezone.utc)] * n
         out = list(fresh.day_buckets(ts, "Asia/Tokyo"))
         assert len(out) == n
-        assert count["n"] == 1, (
-            f"ZoneInfo constructed {count['n']} times, expected exactly 1"
-        )
+        assert count["n"] == 1, f"ZoneInfo constructed {count['n']} times, expected exactly 1"
     finally:
         zoneinfo.ZoneInfo = orig
 
@@ -310,6 +306,5 @@ def test_schedule_memory_streaming():
     _, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     assert peak < ceiling, (
-        f"peak {peak / 1024 / 1024:.1f} MiB >= 15 MiB ceiling — "
-        "did you materialize the stream?"
+        f"peak {peak / 1024 / 1024:.1f} MiB >= 15 MiB ceiling — did you materialize the stream?"
     )

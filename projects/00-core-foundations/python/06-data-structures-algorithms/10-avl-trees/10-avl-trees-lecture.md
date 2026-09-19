@@ -114,118 +114,116 @@ class AVLNode:
         self.right = None
         self.height = 1  # Height of node (leaf = 1)
 
+
 class AVLTree:
     def __init__(self):
         self.root = None
-    
+
     def get_height(self, node):
         """Get height of node. O(1)."""
         if not node:
             return 0
         return node.height
-    
+
     def get_balance(self, node):
         """Get balance factor. O(1)."""
         if not node:
             return 0
         return self.get_height(node.left) - self.get_height(node.right)
-    
+
     def update_height(self, node):
         """Update height after modification. O(1)."""
-        node.height = 1 + max(
-            self.get_height(node.left),
-            self.get_height(node.right)
-        )
-    
+        node.height = 1 + max(self.get_height(node.left), self.get_height(node.right))
+
     # ============= ROTATIONS =============
-    
+
     def right_rotate(self, z):
         """Right rotation around z. O(1)."""
         y = z.left
         T3 = y.right
-        
+
         # Perform rotation
         y.right = z
         z.left = T3
-        
+
         # Update heights
         self.update_height(z)
         self.update_height(y)
-        
+
         return y  # New root of this subtree
-    
+
     def left_rotate(self, z):
         """Left rotation around z. O(1)."""
         y = z.right
         T2 = y.left
-        
+
         # Perform rotation
         y.left = z
         z.right = T2
-        
+
         # Update heights
         self.update_height(z)
         self.update_height(y)
-        
+
         return y  # New root of this subtree
-    
+
     # ============= INSERT =============
-    
+
     def insert(self, val):
         """Insert value and rebalance. O(log n)."""
         self.root = self._insert(self.root, val)
-    
+
     def _insert(self, node, val):
         # Step 1: Standard BST insert
         if not node:
             return AVLNode(val)
-        
+
         if val < node.val:
             node.left = self._insert(node.left, val)
         elif val > node.val:
             node.right = self._insert(node.right, val)
         else:
             return node  # Duplicate, no insert
-        
+
         # Step 2: Update height
         self.update_height(node)
-        
+
         # Step 3: Get balance factor
         balance = self.get_balance(node)
-        
+
         # Step 4: Rebalance if needed
-        
+
         # Left-Left case
         if balance > 1 and val < node.left.val:
             return self.right_rotate(node)
-        
+
         # Right-Right case
         if balance < -1 and val > node.right.val:
             return self.left_rotate(node)
-        
+
         # Left-Right case
         if balance > 1 and val > node.left.val:
             node.left = self.left_rotate(node.left)
             return self.right_rotate(node)
-        
+
         # Right-Left case
         if balance < -1 and val < node.right.val:
             node.right = self.right_rotate(node.right)
             return self.left_rotate(node)
-        
+
         return node
-    
+
     # ============= DELETE =============
-    
+
     def delete(self, val):
         """Delete value and rebalance. O(log n)."""
         self.root = self._delete(self.root, val)
-    
+
     def _delete(self, node, val):
         # Step 1: Standard BST delete
         if not node:
             return node
-        
+
         if val < node.val:
             node.left = self._delete(node.left, val)
         elif val > node.val:
@@ -236,55 +234,55 @@ class AVLTree:
                 return node.right
             elif not node.right:
                 return node.left
-            
+
             # Two children: get inorder successor
             successor = self._get_min(node.right)
             node.val = successor.val
             node.right = self._delete(node.right, successor.val)
-        
+
         if not node:
             return node
-        
+
         # Step 2: Update height
         self.update_height(node)
-        
+
         # Step 3: Get balance factor
         balance = self.get_balance(node)
-        
+
         # Step 4: Rebalance (4 cases)
-        
+
         # Left-Left
         if balance > 1 and self.get_balance(node.left) >= 0:
             return self.right_rotate(node)
-        
+
         # Left-Right
         if balance > 1 and self.get_balance(node.left) < 0:
             node.left = self.left_rotate(node.left)
             return self.right_rotate(node)
-        
+
         # Right-Right
         if balance < -1 and self.get_balance(node.right) <= 0:
             return self.left_rotate(node)
-        
+
         # Right-Left
         if balance < -1 and self.get_balance(node.right) > 0:
             node.right = self.right_rotate(node.right)
             return self.left_rotate(node)
-        
+
         return node
-    
+
     def _get_min(self, node):
         """Find minimum node in subtree."""
         while node.left:
             node = node.left
         return node
-    
+
     # ============= UTILITIES =============
-    
+
     def search(self, val):
         """Search for value. O(log n)."""
         return self._search(self.root, val)
-    
+
     def _search(self, node, val):
         if not node:
             return False
@@ -294,23 +292,23 @@ class AVLTree:
             return self._search(node.left, val)
         else:
             return self._search(node.right, val)
-    
+
     def inorder(self):
         """Return sorted list of values."""
         result = []
         self._inorder(self.root, result)
         return result
-    
+
     def _inorder(self, node, result):
         if node:
             self._inorder(node.left, result)
             result.append(node.val)
             self._inorder(node.right, result)
-    
+
     def is_balanced(self):
         """Check if tree is AVL-balanced."""
         return self._is_balanced(self.root)
-    
+
     def _is_balanced(self, node):
         if not node:
             return True
@@ -363,21 +361,28 @@ Example:
 def print_tree(node, level=0, prefix="Root: "):
     """Pretty print AVL tree."""
     if node is not None:
-        print(" " * (level * 4) + prefix + str(node.val) + 
-              f" (h={node.height}, bf={get_balance(node)})")
+        print(
+            " " * (level * 4)
+            + prefix
+            + str(node.val)
+            + f" (h={node.height}, bf={get_balance(node)})"
+        )
         if node.left is not None or node.right is not None:
             print_tree(node.left, level + 1, "L--- ")
             print_tree(node.right, level + 1, "R--- ")
+
 
 def get_balance(node):
     if not node:
         return 0
     return get_height(node.left) - get_height(node.right)
 
+
 def get_height(node):
     if not node:
         return 0
     return node.height
+
 
 # Build AVL tree
 avl = AVLTree()
@@ -395,6 +400,7 @@ Find kth smallest element in AVL tree.
 Uses enhanced nodes with subtree size.
 """
 
+
 class AVLNodeWithSize:
     def __init__(self, val):
         self.val = val
@@ -403,10 +409,11 @@ class AVLNodeWithSize:
         self.height = 1
         self.size = 1  # Number of nodes in subtree
 
+
 def kth_smallest(root, k):
     """Find kth smallest using subtree sizes. O(log n)."""
     left_size = root.left.size if root.left else 0
-    
+
     if k <= left_size:
         return kth_smallest(root.left, k)
     elif k == left_size + 1:
@@ -424,18 +431,17 @@ Uses BST property for pruning.
 Time: O(log n + k) where k = number of elements in range
 """
 
+
 def range_count(node, low, high):
     if not node:
         return 0
-    
+
     if node.val < low:
         return range_count(node.right, low, high)
     if node.val > high:
         return range_count(node.left, low, high)
-    
-    return (1 + 
-            range_count(node.left, low, high) + 
-            range_count(node.right, low, high))
+
+    return 1 + range_count(node.left, low, high) + range_count(node.right, low, high)
 ```
 
 ---
@@ -460,6 +466,7 @@ def right_rotate(z):
     z.left = y.right
     y.right = z
     return y  # Heights are wrong!
+
 
 # RIGHT: Update heights after rotation
 def right_rotate(z):

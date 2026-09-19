@@ -5,12 +5,14 @@ pipeline() is built from pure map transforms; cacheable_pipeline()
 keys on (data-fingerprint, steps-fingerprint) so identical work is
 done exactly once.
 """
+
 from __future__ import annotations
 
 from typing import Callable
 
 
 # --- Bronze -----------------------------------------------------------------
+
 
 def square_evens(numbers: list[int]) -> list[int]:
     """Return squares of even inputs via map+filter; never mutate input.
@@ -23,10 +25,13 @@ def square_evens(numbers: list[int]) -> list[int]:
 
 # --- Silver -----------------------------------------------------------------
 
+
 def compose(g: Callable, f: Callable) -> Callable:
     """Return a function computing g(f(x)). O(1) per call wrapper."""
+
     def composed(x):
         return g(f(x))
+
     return composed
 
 

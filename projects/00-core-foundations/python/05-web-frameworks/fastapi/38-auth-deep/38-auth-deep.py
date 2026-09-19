@@ -38,6 +38,7 @@ import bcrypt
 # the library's own compare (which is timing-safe: constant-ish work
 # regardless of match).
 
+
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt(rounds=12)).decode()
 
@@ -68,8 +69,10 @@ print()
 
 SECRET = "dev-secret-change-me"
 
+
 def b64url(data: bytes) -> str:
     import base64
+
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
 
 
@@ -110,6 +113,7 @@ print()
 # defeating "stateless". Production answer: short-lived access tokens
 # (5-15 min) + a revocation check (denylist) for the rare kill switch.
 
+
 class TokenStore:
     """In-memory stand-in for a denylist (Redis in production)."""
 
@@ -137,6 +141,7 @@ print()
 # exchanges it for a fresh pair — and ROTATES (old one is invalidated)
 # so a stolen refresh token dies at first reuse.
 
+
 def issue_pair(user_id: str) -> tuple[str, str, str]:
     """Return (access, refresh, refresh_jti)."""
     access = sign_jwt({"sub": user_id, "type": "access"}, SECRET, exp_seconds=300)
@@ -145,7 +150,9 @@ def issue_pair(user_id: str) -> tuple[str, str, str]:
     return access, refresh, jti
 
 
-def rotate(refresh: str, store: TokenStore, active_refreshes: dict[str, str]) -> tuple[str, str, str]:
+def rotate(
+    refresh: str, store: TokenStore, active_refreshes: dict[str, str]
+) -> tuple[str, str, str]:
     """Exchange a refresh token for a new pair; the old jti is dead."""
     claims = verify_jwt(refresh, SECRET)
     if claims.get("type") != "refresh":
@@ -153,7 +160,7 @@ def rotate(refresh: str, store: TokenStore, active_refreshes: dict[str, str]) ->
     jti = claims.get("jti")
     if store.is_revoked(jti):
         raise ValueError("refresh token already used — possible theft, revoke family")
-    store.revoke(jti)                       # rotation: old token is now dead
+    store.revoke(jti)  # rotation: old token is now dead
     access, new_refresh, new_jti = issue_pair(claims["sub"])
     active_refreshes[new_jti] = claims["sub"]
     return access, new_refresh, new_jti
@@ -165,7 +172,7 @@ access, refresh, jti = issue_pair("user-1")
 access2, refresh2, jti2 = rotate(refresh, store, active)
 print(f"rotated: new access issued, old refresh revoked={store.is_revoked(jti)}")
 try:
-    rotate(refresh, store, active)          # reuse of the dead token
+    rotate(refresh, store, active)  # reuse of the dead token
 except ValueError as e:
     print(f"reuse detected: {e}")
 print()
@@ -186,6 +193,7 @@ print()
 #   attacker cannot forge, but a USER with a role claim can be trusted
 #   only if the token came from YOUR issuer. Validate issuer + audience.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -198,8 +206,9 @@ def _verify() -> None:
     assert h1 != h2, "bcrypt must salt: same password, different hash"
     assert verify_password("secret-1", h1), "correct password must verify"
     assert not verify_password("secret-2", h1), "wrong password must fail"
-    assert timing_safe_eq("abc", "abc") and not timing_safe_eq("abc", "abd"), \
+    assert timing_safe_eq("abc", "abc") and not timing_safe_eq("abc", "abd"), (
         "timing-safe compare must be correct"
+    )
 
     # 2. JWT: valid verifies; tampered payload fails signature check
     tok = sign_jwt({"sub": "u1", "role": "user"}, SECRET)
@@ -254,4 +263,4 @@ if __name__ == "__main__":
         print("1. bcrypt: slow, salted, timing-safe verify")
         print("2. JWT = header.payload.signature; payload is readable, not forgeable")
         print("3. Short access + rotating refresh + denylist = revocation reality")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

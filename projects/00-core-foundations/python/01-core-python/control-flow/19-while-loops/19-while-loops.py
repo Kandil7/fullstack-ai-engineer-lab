@@ -175,11 +175,11 @@ while guess_index < max_attempts:
         guess = guesses[guess_index]
     else:
         guess = "timeout"
-    
+
     if guess == correct_password:
         print(f"Access granted after {guess_index + 1} attempts!")
         break
-    
+
     remaining = max_attempts - guess_index - 1
     if remaining > 0:
         print(f"Wrong password. {remaining} attempts remaining.")
@@ -201,7 +201,7 @@ guess_index = 0
 while guess_index < len(guesses):
     guess = guesses[guess_index]
     guess_index += 1
-    
+
     if guess < target:
         print(f"  Guess {guess}: Too low!")
     elif guess > target:

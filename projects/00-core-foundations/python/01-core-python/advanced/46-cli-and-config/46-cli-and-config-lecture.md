@@ -42,6 +42,7 @@ By the end of this lecture, you will be able to:
 
 ```python
 import sys
+
 print(sys.argv)
 ```
 
@@ -134,7 +135,7 @@ api_key = os.environ.get("OPENAI_API_KEY")
 if not api_key:
     raise SystemExit("OPENAI_API_KEY is not set")
 
-port = int(os.environ.get("PORT", "8080"))     # default, typed
+port = int(os.environ.get("PORT", "8080"))  # default, typed
 debug = os.environ.get("DEBUG", "").lower() in {"1", "true", "yes"}
 ```
 
@@ -167,12 +168,14 @@ Scripts communicate success/failure through exit codes; diagnostics go to
 ```python
 import sys
 
+
 def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if not Path(args.data).exists():
         print(f"error: {args.data} does not exist", file=sys.stderr)
         return 2
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())
@@ -192,6 +195,7 @@ A tiny parser (no dependency needed for a fixed format):
 ```python
 def load_dotenv(path: str = ".env") -> None:
     from pathlib import Path
+
     p = Path(path)
     if not p.exists():
         return
@@ -211,12 +215,12 @@ secret manager, exposed as real environment variables.
 ```python
 REQUIRED_ENV = ("OPENAI_API_KEY", "DATABASE_URL")
 
+
 def check_environment() -> None:
     missing = [k for k in REQUIRED_ENV if not os.environ.get(k)]
     if missing:
-        raise SystemExit(
-            "missing required config: " + ", ".join(missing)
-        )
+        raise SystemExit("missing required config: " + ", ".join(missing))
+
 
 def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)

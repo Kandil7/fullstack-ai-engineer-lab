@@ -23,9 +23,17 @@ import sys
 
 import numpy as np
 
-from vector_utils import (brute_force_knn, cosine_sim, dot_sim, embed_text,
-                          embed_texts, l2_dist, make_corpus, recall_at_k,
-                          seed_all)
+from vector_utils import (
+    brute_force_knn,
+    cosine_sim,
+    dot_sim,
+    embed_text,
+    embed_texts,
+    l2_dist,
+    make_corpus,
+    recall_at_k,
+    seed_all,
+)
 
 seed_all(42)
 
@@ -57,7 +65,7 @@ print(f"sim(q, unrelated corpus)  = {cosine_sim(q, c2):.3f}")
 
 a = np.array([1.0, 0.0])
 b = np.array([0.0, 1.0])
-c = np.array([2.0, 0.0])          # same direction as a, twice the size
+c = np.array([2.0, 0.0])  # same direction as a, twice the size
 print(f"\ncosine(a, c) = {cosine_sim(a, c):.2f}  (angle ignores scale)")
 print(f"dot(a, c)    = {dot_sim(a, c):.2f}  (dot sees scale)")
 print(f"l2(a, c)     = {l2_dist(a, c):.2f}  (distance sees scale)")
@@ -76,7 +84,7 @@ print(f"l2(a, c)     = {l2_dist(a, c):.2f}  (distance sees scale)")
 # that follows.
 
 vectors, meta = make_corpus(n=120, dim=16, n_clusters=6, seed=42)
-queries = vectors[:3]                    # query with corpus members
+queries = vectors[:3]  # query with corpus members
 neighbors = brute_force_knn(queries, vectors, k=5)
 print(f"\nbrute-force kNN: query 0 -> {neighbors[0].tolist()}")
 print(f"self-match is rank 0 (distance 0)")
@@ -105,12 +113,13 @@ print(f"recall@10 of exact search = {recall_at_k(truth, truth, k=10):.2f}")
 # O(n*d) does not scale. An approximate index trades a few points of
 # recall for orders of magnitude in speed:
 
+
 def flops_brute_force(n: int, d: int) -> float:
     return n * d  # multiply-adds per query
 
 
-print(f"\nbrute force @ 10k vectors: {flops_brute_force(10_000, 1536)/1e6:.0f} MFLOP/query")
-print(f"brute force @ 10M vectors: {flops_brute_force(10_000_000, 1536)/1e9:.1f} GFLOP/query")
+print(f"\nbrute force @ 10k vectors: {flops_brute_force(10_000, 1536) / 1e6:.0f} MFLOP/query")
+print(f"brute force @ 10M vectors: {flops_brute_force(10_000_000, 1536) / 1e9:.1f} GFLOP/query")
 
 # Output:
 # brute force @ 10k vectors: 15 MFLOP/query
@@ -134,6 +143,7 @@ print(f"brute force @ 10M vectors: {flops_brute_force(10_000_000, 1536)/1e9:.1f}
 # MISTAKE: measuring recall@k against brute force on a corpus that is
 #   NOT the production distribution — measure on production-shaped data.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
@@ -141,8 +151,9 @@ def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # embeddings are normalized and deterministic
     assert abs(np.linalg.norm(q) - 1.0) < 1e-9, "embeddings must be unit vectors"
-    assert np.allclose(embed_text("hello"), embed_text("hello")), \
+    assert np.allclose(embed_text("hello"), embed_text("hello")), (
         "same text must produce the same vector (deterministic)"
+    )
 
     # cosine is scale-invariant, dot is not
     assert abs(cosine_sim(a, c) - 1.0) < 1e-9, "cosine must ignore magnitude"
@@ -150,20 +161,21 @@ def _verify() -> None:
     assert abs(l2_dist(a, c) - 1.0) < 1e-9, "L2 distance of (1,0)->(2,0) is 1"
 
     # related text scores higher than unrelated text
-    assert cosine_sim(q, c1) > cosine_sim(q, c2), \
-        "semantically related text must embed closer"
+    assert cosine_sim(q, c1) > cosine_sim(q, c2), "semantically related text must embed closer"
 
     # brute force: self-match is the nearest neighbor
     nn = brute_force_knn(queries[:1], vectors, k=1)[0][0]
     assert nn == 0, "a corpus vector must retrieve itself first"
 
     # recall of exact search is 1.0
-    assert recall_at_k(truth, truth, k=10) == 1.0, \
+    assert recall_at_k(truth, truth, k=10) == 1.0, (
         "brute force must achieve perfect recall against itself"
+    )
 
     # complexity math: 10M x 1536 is in the GFLOP range
-    assert flops_brute_force(10_000_000, 1536) > 1e9, \
+    assert flops_brute_force(10_000_000, 1536) > 1e9, (
         "10M vectors must be computationally prohibitive for exact search"
+    )
 
     # embedding matrix shape
     mat = embed_texts(["a", "b", "c"], dim=16)

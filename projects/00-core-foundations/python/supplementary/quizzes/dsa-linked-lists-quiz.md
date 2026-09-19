@@ -107,6 +107,7 @@ class Node:
         self.data = data
         self.next = None
 
+
 a = Node(1)
 b = Node(2)
 c = Node(3)

@@ -31,8 +31,7 @@ print("Leaves make the final prediction")
 print("\nExample 2: Generate Classification Data")
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=200, n_features=4, n_informative=3,
-    n_redundant=1, n_classes=2, random_state=42
+    n_samples=200, n_features=4, n_informative=3, n_redundant=1, n_classes=2, random_state=42
 )
 
 print(f"Features: {X.shape[1]}")
@@ -41,9 +40,7 @@ print(f"Classes: {np.unique(y)}")
 
 # Example 3: Train/test split
 print("\nExample 3: Train/Test Split")
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 print(f"Training set: {len(X_train)} samples")
 print(f"Test set: {len(X_test)} samples")
 
@@ -74,12 +71,12 @@ print(f"Tree depth: {clf.get_depth()}")
 # Example 6: Different criteria
 print("\nExample 6: Gini vs Entropy")
 # Gini impurity (default)
-clf_gini = DecisionTreeClassifier(criterion='gini', random_state=42)
+clf_gini = DecisionTreeClassifier(criterion="gini", random_state=42)
 clf_gini.fit(X_train, y_train)
 acc_gini = accuracy_score(y_test, clf_gini.predict(X_test))
 
 # Entropy
-clf_entropy = DecisionTreeClassifier(criterion='entropy', random_state=42)
+clf_entropy = DecisionTreeClassifier(criterion="entropy", random_state=42)
 clf_entropy.fit(X_train, y_train)
 acc_entropy = accuracy_score(y_test, clf_entropy.predict(X_test))
 
@@ -121,8 +118,7 @@ importances = clf.feature_importances_
 feature_names = [f"Feature {i}" for i in range(X.shape[1])]
 
 print("Feature importances:")
-for name, importance in sorted(zip(feature_names, importances), 
-                              key=lambda x: x[1], reverse=True):
+for name, importance in sorted(zip(feature_names, importances), key=lambda x: x[1], reverse=True):
     print(f"  {name}: {importance:.4f}")
 
 # ============================================================
@@ -192,7 +188,7 @@ print(f"Regression tree R^2 (test): {r2_test:.4f}")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Decision trees split data based on feature values")
 print("- Use Gini or Entropy for split criterion")
@@ -200,4 +196,4 @@ print("- Control tree size to prevent overfitting")
 print("- Feature importance shows which features matter most")
 print("- Works for both classification and regression")
 print("- Simple to interpret but prone to overfitting")
-print("="*60)
+print("=" * 60)

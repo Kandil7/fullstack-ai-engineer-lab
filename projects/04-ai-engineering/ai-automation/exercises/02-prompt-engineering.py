@@ -28,8 +28,15 @@ T = TypeVar("T")
 # 1. LLM Abstraction (simple, for prompt testing)
 # ---------------------------------------------------------------------------
 
-def llm_call(prompt: str, *, system: str = "", temperature: float = 0.7,
-             max_tokens: int = 1024, model: str = "gpt-4o-mini") -> str:
+
+def llm_call(
+    prompt: str,
+    *,
+    system: str = "",
+    temperature: float = 0.7,
+    max_tokens: int = 1024,
+    model: str = "gpt-4o-mini",
+) -> str:
     """Simple LLM call using OpenAI API."""
     from openai import OpenAI
 
@@ -48,8 +55,13 @@ def llm_call(prompt: str, *, system: str = "", temperature: float = 0.7,
     return response.choices[0].message.content or ""
 
 
-def llm_call_groq(prompt: str, *, system: str = "", temperature: float = 0.7,
-                   model: str = "llama-3.3-70b-versatile") -> str:
+def llm_call_groq(
+    prompt: str,
+    *,
+    system: str = "",
+    temperature: float = 0.7,
+    model: str = "llama-3.3-70b-versatile",
+) -> str:
     """Simple LLM call using Groq API."""
     from groq import Groq
 
@@ -72,10 +84,11 @@ def llm_call_groq(prompt: str, *, system: str = "", temperature: float = 0.7,
 # 2. Zero-Shot Prompting
 # ---------------------------------------------------------------------------
 
+
 class ZeroShot:
     """
     Zero-shot prompting: ask the model to perform a task without examples.
-    
+
     When to use: Simple tasks where the model already understands the format.
     Key: Be explicit about the output format and constraints.
     """
@@ -83,7 +96,7 @@ class ZeroShot:
     @staticmethod
     def classify(text: str, categories: list[str], model: str = "gpt-4o-mini") -> str:
         """Classify text into one of the given categories."""
-        prompt = f"""Classify the following text into exactly one of these categories: {', '.join(categories)}
+        prompt = f"""Classify the following text into exactly one of these categories: {", ".join(categories)}
 
 Text: "{text}"
 
@@ -107,7 +120,9 @@ JSON:"""
         return json.loads(response)
 
     @staticmethod
-    def summarize(text: str, *, style: str = "concise", model: str = "gpt-4o-mini") -> str:
+    def summarize(
+        text: str, *, style: str = "concise", model: str = "gpt-4o-mini"
+    ) -> str:
         """Summarize text in a specified style."""
         styles = {
             "concise": "Summarize in 1-2 sentences.",
@@ -127,10 +142,11 @@ Summary:"""
 # 3. Few-Shot Prompting
 # ---------------------------------------------------------------------------
 
+
 class FewShot:
     """
     Few-shot prompting: provide examples before the actual query.
-    
+
     When to use: When you need specific output formatting or style
     that's hard to describe in instructions alone.
     """
@@ -200,10 +216,11 @@ Output:"""
 # 4. Chain-of-Thought (CoT) Prompting
 # ---------------------------------------------------------------------------
 
+
 class ChainOfThought:
     """
     Chain-of-thought prompting: ask the model to reason step-by-step.
-    
+
     When to use: Complex reasoning, math, logic puzzles, multi-step problems.
     Key: "Let's think step by step" is the classic CoT trigger.
     """
@@ -267,11 +284,12 @@ Step 6 - Overall assessment:"""
 # 5. Tree-of-Thought (ToT) Prompting
 # ---------------------------------------------------------------------------
 
+
 class TreeOfThought:
     """
     Tree-of-thought: explore multiple reasoning paths, evaluate them,
     and choose the best one.
-    
+
     When to use: When there are multiple valid approaches and you want
     the model to evaluate alternatives before committing.
     """
@@ -295,7 +313,9 @@ Evaluation:"""
         return llm_call(prompt, temperature=0.5, model=model)
 
     @staticmethod
-    def creative_writing(topic: str, *, num_ideas: int = 3, model: str = "gpt-4o-mini") -> str:
+    def creative_writing(
+        topic: str, *, num_ideas: int = 3, model: str = "gpt-4o-mini"
+    ) -> str:
         """Generate multiple creative ideas and pick the best."""
         prompt = f"""Topic: {topic}
 
@@ -316,10 +336,11 @@ Expanded version of the best idea:"""
 # 6. Self-Consistency
 # ---------------------------------------------------------------------------
 
+
 class SelfConsistency:
     """
     Self-consistency: generate multiple answers and take the majority vote.
-    
+
     When to use: When accuracy matters more than speed.
     Key: Higher temperature = more diverse reasoning paths.
     """
@@ -346,6 +367,7 @@ Final answer:"""
 
         # Count votes
         from collections import Counter
+
         vote_counts = Counter(answers)
         most_common, count = vote_counts.most_common(1)[0]
 
@@ -360,6 +382,7 @@ Final answer:"""
 # ---------------------------------------------------------------------------
 # 7. Prompt Templates
 # ---------------------------------------------------------------------------
+
 
 class PromptTemplate:
     """Reusable prompt template with variable substitution."""
@@ -409,6 +432,7 @@ TEMPLATES = {
 # ---------------------------------------------------------------------------
 # 8. Output Parsing
 # ---------------------------------------------------------------------------
+
 
 class OutputParser:
     """Parse structured output from LLM responses."""
@@ -478,7 +502,9 @@ class OutputParser:
                 elif field_type == "bool":
                     validated[field_name] = bool(value)
                 elif field_type == "list":
-                    validated[field_name] = list(value) if not isinstance(value, list) else value
+                    validated[field_name] = (
+                        list(value) if not isinstance(value, list) else value
+                    )
                 else:
                     validated[field_name] = value
 
@@ -489,9 +515,11 @@ class OutputParser:
 # 9. Prompt Testing Framework
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class PromptTest:
     """A single test case for a prompt."""
+
     input_text: str
     expected_behavior: str
     validation_fn: callable | None = None
@@ -501,6 +529,7 @@ class PromptTest:
 @dataclass
 class TestResult:
     """Result of running a prompt test."""
+
     test: PromptTest
     output: str
     passed: bool
@@ -514,8 +543,13 @@ class PromptTester:
     def __init__(self):
         self.results: list[TestResult] = []
 
-    def test(self, prompt_fn: callable, tests: list[PromptTest], *,
-             judge_model: str = "gpt-4o-mini") -> list[TestResult]:
+    def test(
+        self,
+        prompt_fn: callable,
+        tests: list[PromptTest],
+        *,
+        judge_model: str = "gpt-4o-mini",
+    ) -> list[TestResult]:
         """Run all tests against a prompt function."""
         self.results = []
 
@@ -542,8 +576,11 @@ Score 1-10 (10 = perfect match) and explain briefly in JSON:
 {{"score": <number>, "reason": "<brief explanation>"}}"""
 
             try:
-                judge_response = llm_call(judge_prompt, temperature=0, model=judge_model)
+                judge_response = llm_call(
+                    judge_prompt, temperature=0, model=judge_model
+                )
                 import re
+
                 json_match = re.search(r"\{.*\}", judge_response, re.DOTALL)
                 if json_match:
                     judge_result = json.loads(json_match.group())
@@ -553,11 +590,15 @@ Score 1-10 (10 = perfect match) and explain briefly in JSON:
             except Exception:
                 score = 0.5 if passed else 0.0
 
-            result = TestResult(test=test, output=output, passed=passed, score=score, notes=notes)
+            result = TestResult(
+                test=test, output=output, passed=passed, score=score, notes=notes
+            )
             self.results.append(result)
 
             status = "PASS" if passed else "FAIL"
-            print(f"  [{status}] Score: {score:.1f}/1.0 | {test.expected_behavior[:50]}...")
+            print(
+                f"  [{status}] Score: {score:.1f}/1.0 | {test.expected_behavior[:50]}..."
+            )
 
         return self.results
 
@@ -579,6 +620,7 @@ Score 1-10 (10 = perfect match) and explain briefly in JSON:
 # ---------------------------------------------------------------------------
 # 10. Demo Functions
 # ---------------------------------------------------------------------------
+
 
 def demo_zero_shot():
     """Demo: Zero-shot prompting techniques."""
@@ -621,7 +663,9 @@ def demo_chain_of_thought():
     print("DEMO 3: Chain-of-Thought")
     print("=" * 60)
 
-    question = "If I have 3 apples and give away 1, then buy 5 more, how many do I have?"
+    question = (
+        "If I have 3 apples and give away 1, then buy 5 more, how many do I have?"
+    )
     result = ChainOfThought.math_problem(question)
     print(f"Question: {question}")
     print(f"Answer:\n{result}\n")
@@ -660,7 +704,7 @@ def demo_templates():
     prompt = TEMPLATES["summarize"](
         audience="technical",
         style="bullet points",
-        text="Python is a high-level programming language known for its simplicity and readability."
+        text="Python is a high-level programming language known for its simplicity and readability.",
     )
     print(f"Rendered prompt:\n{prompt}\n")
 
@@ -668,7 +712,9 @@ def demo_templates():
     custom = PromptTemplate(
         "Translate the following {source_lang} text to {target_lang}:\n{text}\nTranslation:"
     )
-    prompt = custom(source_lang="English", target_lang="French", text="Hello, how are you?")
+    prompt = custom(
+        source_lang="English", target_lang="French", text="Hello, how are you?"
+    )
     print(f"Custom template:\n{prompt}\n")
 
 

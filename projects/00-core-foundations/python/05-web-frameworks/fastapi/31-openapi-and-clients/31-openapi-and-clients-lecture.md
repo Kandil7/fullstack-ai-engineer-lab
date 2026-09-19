@@ -104,9 +104,9 @@ from fastapi.security import HTTPBearer
 
 bearer = HTTPBearer()
 
+
 @app.post("/products", security=...)
-def create_product(credentials: HTTPAuthorizationCredentials = Security(bearer)):
-    ...
+def create_product(credentials: HTTPAuthorizationCredentials = Security(bearer)): ...
 ```
 
 Output:

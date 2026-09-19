@@ -126,20 +126,25 @@ cumulative_variance = np.cumsum(pca_full.explained_variance_ratio_)
 # Plot
 plt.figure(figsize=(8, 4))
 plt.subplot(1, 2, 1)
-plt.bar(range(1, len(pca_full.explained_variance_ratio_) + 1),
-        pca_full.explained_variance_ratio_, alpha=0.6, label='Individual')
-plt.step(range(1, len(cumulative_variance) + 1),
-         cumulative_variance, where='mid', label='Cumulative')
-plt.xlabel('Principal Component')
-plt.ylabel('Explained Variance Ratio')
-plt.title('Explained Variance by Component')
+plt.bar(
+    range(1, len(pca_full.explained_variance_ratio_) + 1),
+    pca_full.explained_variance_ratio_,
+    alpha=0.6,
+    label="Individual",
+)
+plt.step(
+    range(1, len(cumulative_variance) + 1), cumulative_variance, where="mid", label="Cumulative"
+)
+plt.xlabel("Principal Component")
+plt.ylabel("Explained Variance Ratio")
+plt.title("Explained Variance by Component")
 plt.legend()
 plt.grid(True, alpha=0.3)
 
 # Print cumulative variance
 print("Cumulative variance by component:")
 for i, var in enumerate(cumulative_variance):
-    print(f"  {i+1} components: {var:.2%}")
+    print(f"  {i + 1} components: {var:.2%}")
 
 # Choose components to explain 95% of variance
 n_components_95 = np.argmax(cumulative_variance >= 0.95) + 1
@@ -175,18 +180,24 @@ X_pca = pca.fit_transform(X_scaled)
 
 # Plot
 plt.figure(figsize=(8, 6))
-colors = ['red', 'green', 'blue']
+colors = ["red", "green", "blue"]
 for i, target_name in enumerate(iris.target_names):
     mask = iris.target == i
-    plt.scatter(X_pca[mask, 0], X_pca[mask, 1],
-                c=colors[i], label=target_name, alpha=0.7, edgecolors='black')
+    plt.scatter(
+        X_pca[mask, 0],
+        X_pca[mask, 1],
+        c=colors[i],
+        label=target_name,
+        alpha=0.7,
+        edgecolors="black",
+    )
 
-plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.1%} variance)')
-plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.1%} variance)')
-plt.title('PCA - Iris Dataset (2D)')
+plt.xlabel(f"PC1 ({pca.explained_variance_ratio_[0]:.1%} variance)")
+plt.ylabel(f"PC2 ({pca.explained_variance_ratio_[1]:.1%} variance)")
+plt.title("PCA - Iris Dataset (2D)")
 plt.legend()
 plt.grid(True, alpha=0.3)
-plt.savefig('pca_visualization.png', dpi=100)
+plt.savefig("pca_visualization.png", dpi=100)
 plt.show()
 ```
 
@@ -306,11 +317,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # Create pipeline
-pipe = Pipeline([
-    ('scaler', StandardScaler()),
-    ('pca', PCA(n_components=2)),
-    ('classifier', SVC(kernel='rbf'))
-])
+pipe = Pipeline(
+    [("scaler", StandardScaler()), ("pca", PCA(n_components=2)), ("classifier", SVC(kernel="rbf"))]
+)
 
 # Train
 pipe.fit(X_train, y_train)
@@ -336,6 +345,7 @@ X_pca = pca.fit_transform(X_unscaled)  # Features with larger ranges dominate
 
 # CORRECT: Scale first
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X_unscaled)
 pca = PCA(n_components=2)
@@ -352,7 +362,7 @@ import pandas as pd
 # Create uncorrelated features
 np.random.seed(42)
 X = np.random.randn(100, 4)
-df = pd.DataFrame(X, columns=['A', 'B', 'C', 'D'])
+df = pd.DataFrame(X, columns=["A", "B", "C", "D"])
 print("Correlation matrix (diagonal only):")
 print(df.corr().round(2))
 # PCA won't reduce dimensions effectively
@@ -380,10 +390,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
 # Use pipeline to ensure scaling
-pipe = Pipeline([
-    ('scaler', StandardScaler()),
-    ('pca', PCA(n_components=2))
-])
+pipe = Pipeline([("scaler", StandardScaler()), ("pca", PCA(n_components=2))])
 
 X_pca = pipe.fit_transform(X)
 ```
@@ -412,8 +419,8 @@ pca = PCA(n_components=2)
 X_2d = pca.fit_transform(X_scaled)
 
 plt.scatter(X_2d[:, 0], X_2d[:, 1], c=labels)
-plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]:.1%})')
-plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]:.1%})')
+plt.xlabel(f"PC1 ({pca.explained_variance_ratio_[0]:.1%})")
+plt.ylabel(f"PC2 ({pca.explained_variance_ratio_[1]:.1%})")
 plt.show()
 ```
 
@@ -444,6 +451,7 @@ Find the number of PCA components needed for 95% variance.
 4. Plot cumulative variance
 5. Determine optimal number
 """
+
 from sklearn.datasets import load_wine
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -460,14 +468,14 @@ pca.fit(X_scaled)
 cumvar = np.cumsum(pca.explained_variance_ratio_)
 
 plt.figure(figsize=(8, 4))
-plt.plot(range(1, len(cumvar) + 1), cumvar, 'bo-')
-plt.axhline(y=0.95, color='r', linestyle='--', label='95% threshold')
-plt.xlabel('Number of Components')
-plt.ylabel('Cumulative Explained Variance')
-plt.title('PCA Explained Variance')
+plt.plot(range(1, len(cumvar) + 1), cumvar, "bo-")
+plt.axhline(y=0.95, color="r", linestyle="--", label="95% threshold")
+plt.xlabel("Number of Components")
+plt.ylabel("Cumulative Explained Variance")
+plt.title("PCA Explained Variance")
 plt.legend()
 plt.grid(True)
-plt.savefig('wine_pca_variance.png', dpi=100)
+plt.savefig("wine_pca_variance.png", dpi=100)
 plt.show()
 
 n_95 = np.argmax(cumvar >= 0.95) + 1
@@ -484,6 +492,7 @@ Compare classification performance with and without PCA.
 3. Train classifier on PCA-reduced data
 4. Compare accuracy and speed
 """
+
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -534,6 +543,7 @@ Use PCA for noise reduction.
 3. Reconstruct
 4. Compare MSE before and after
 """
+
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.datasets import load_iris

@@ -114,6 +114,7 @@ def binary_search(arr, target):
             high = mid - 1
     return -1
 
+
 print(binary_search([2, 4, 6, 8, 10], 6))
 ```
 - **A)** 0
@@ -181,6 +182,7 @@ def find_first(arr, target):
         else:
             high = mid - 1
     return result
+
 
 print(find_first([1, 2, 2, 2, 3, 4], 2))
 ```

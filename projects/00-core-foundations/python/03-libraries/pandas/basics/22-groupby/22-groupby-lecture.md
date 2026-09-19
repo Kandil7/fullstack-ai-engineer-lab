@@ -39,15 +39,26 @@ DataFrame → Split by key → Apply function → Combined result
 import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    'department': ['Sales', 'Sales', 'Engineering', 'Engineering', 'HR', 'HR', 'Sales', 'Engineering'],
-    'employee': ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 'Henry'],
-    'salary': [55000, 62000, 95000, 105000, 58000, 61000, 58000, 98000],
-    'bonus': [5000, 6000, 12000, 15000, 4000, 4500, 5500, 13000]
-})
+df = pd.DataFrame(
+    {
+        "department": [
+            "Sales",
+            "Sales",
+            "Engineering",
+            "Engineering",
+            "HR",
+            "HR",
+            "Sales",
+            "Engineering",
+        ],
+        "employee": ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Henry"],
+        "salary": [55000, 62000, 95000, 105000, 58000, 61000, 58000, 98000],
+        "bonus": [5000, 6000, 12000, 15000, 4000, 4500, 5500, 13000],
+    }
+)
 
 # Simple aggregation
-dept_mean = df.groupby('department')['salary'].mean()
+dept_mean = df.groupby("department")["salary"].mean()
 print(dept_mean)
 # department
 # Engineering    99333.333333
@@ -61,13 +72,13 @@ print(dept_mean)
 
 ```python
 # Single function
-print(df.groupby('department')['salary'].sum())
-print(df.groupby('department')['salary'].mean())
-print(df.groupby('department')['salary'].std())
-print(df.groupby('department')['salary'].count())
+print(df.groupby("department")["salary"].sum())
+print(df.groupby("department")["salary"].mean())
+print(df.groupby("department")["salary"].std())
+print(df.groupby("department")["salary"].count())
 
 # Multiple functions
-print(df.groupby('department')['salary'].agg(['count', 'mean', 'min', 'max']))
+print(df.groupby("department")["salary"].agg(["count", "mean", "min", "max"]))
 #              count          mean    min     max
 # department
 # Engineering      3  99333.333333  95000  105000
@@ -81,13 +92,17 @@ print(df.groupby('department')['salary'].agg(['count', 'mean', 'min', 'max']))
 
 ```python
 # Different aggregations per column
-result = df.groupby('department').agg(
-    headcount=('employee', 'count'),
-    avg_salary=('salary', 'mean'),
-    total_bonus=('bonus', 'sum'),
-    salary_range=('salary', lambda x: x.max() - x.min()),
-    avg_bonus_ratio=('bonus', lambda x: (x / df.loc[x.index, 'salary']).mean())
-).reset_index()
+result = (
+    df.groupby("department")
+    .agg(
+        headcount=("employee", "count"),
+        avg_salary=("salary", "mean"),
+        total_bonus=("bonus", "sum"),
+        salary_range=("salary", lambda x: x.max() - x.min()),
+        avg_bonus_ratio=("bonus", lambda x: (x / df.loc[x.index, "salary"]).mean()),
+    )
+    .reset_index()
+)
 
 print(result)
 #     department  headcount    avg_salary  total_bonus  salary_range  avg_bonus_ratio
@@ -101,14 +116,16 @@ print(result)
 ## 5. Multiple GroupBy Keys
 
 ```python
-df_multi = pd.DataFrame({
-    'region': ['North', 'North', 'South', 'South', 'North', 'South', 'North', 'South'],
-    'department': ['Sales', 'Sales', 'Sales', 'Sales', 'Eng', 'Eng', 'Eng', 'Eng'],
-    'revenue': [10000, 12000, 8000, 9500, 25000, 22000, 28000, 20000]
-})
+df_multi = pd.DataFrame(
+    {
+        "region": ["North", "North", "South", "South", "North", "South", "North", "South"],
+        "department": ["Sales", "Sales", "Sales", "Sales", "Eng", "Eng", "Eng", "Eng"],
+        "revenue": [10000, 12000, 8000, 9500, 25000, 22000, 28000, 20000],
+    }
+)
 
 # Group by multiple columns
-result = df_multi.groupby(['region', 'department'])['revenue'].sum()
+result = df_multi.groupby(["region", "department"])["revenue"].sum()
 print(result)
 # region  department
 # North   Eng           53000
@@ -129,11 +146,11 @@ print(result)
 # Transform applies a function and returns same-sized result
 # Useful for adding group-level statistics back to original data
 
-df['dept_avg_salary'] = df.groupby('department')['salary'].transform('mean')
-df['salary_vs_dept_avg'] = df['salary'] - df['dept_avg_salary']
-df['salary_rank_in_dept'] = df.groupby('department')['salary'].rank(ascending=False)
+df["dept_avg_salary"] = df.groupby("department")["salary"].transform("mean")
+df["salary_vs_dept_avg"] = df["salary"] - df["dept_avg_salary"]
+df["salary_rank_in_dept"] = df.groupby("department")["salary"].rank(ascending=False)
 
-print(df[['employee', 'department', 'salary', 'dept_avg_salary', 'salary_rank_in_dept']])
+print(df[["employee", "department", "salary", "dept_avg_salary", "salary_rank_in_dept"]])
 #   employee   department  salary  dept_avg_salary  salary_rank_in_dept
 # 0    Alice        Sales   55000     58333.333333                  3.0
 # 1      Bob        Sales   62000     58333.333333                  1.0
@@ -152,9 +169,7 @@ print(df[['employee', 'department', 'salary', 'dept_avg_salary', 'salary_rank_in
 ```python
 # Keep only groups that pass a condition
 # Filter departments where average salary > 60000
-high_salary_depts = df.groupby('department').filter(
-    lambda x: x['salary'].mean() > 60000
-)
+high_salary_depts = df.groupby("department").filter(lambda x: x["salary"].mean() > 60000)
 print(high_salary_depts)
 #   department employee  salary  bonus
 # 2  Engineering  Charlie   95000  12000
@@ -169,9 +184,10 @@ print(high_salary_depts)
 ```python
 # Apply custom function to each group
 def top_performer(group):
-    return group.nlargest(1, 'salary')[['employee', 'salary']]
+    return group.nlargest(1, "salary")[["employee", "salary"]]
 
-top_per_dept = df.groupby('department').apply(top_perductor)
+
+top_per_dept = df.groupby("department").apply(top_perductor)
 print(top_per_dept)
 ```
 
@@ -180,7 +196,7 @@ print(top_per_dept)
 ## 9. Iterating Over Groups
 
 ```python
-for name, group in df.groupby('department'):
+for name, group in df.groupby("department"):
     print(f"\n--- {name} ({len(group)} employees) ---")
     print(f"  Avg salary: ${group['salary'].mean():,.0f}")
     print(f"  Top earner: {group.nlargest(1, 'salary')['employee'].values[0]}")

@@ -35,9 +35,9 @@ import numpy as np
 
 a = np.arange(12).reshape(3, 4)
 t = a.T
-print(np.ascontiguousarray(a) is a)    # True -- no copy
+print(np.ascontiguousarray(a) is a)  # True -- no copy
 print(np.ascontiguousarray(t) is not t)  # True -- copy
-print(np.ascontiguousarray(t).strides) # (32, 8)
+print(np.ascontiguousarray(t).strides)  # (32, 8)
 ```
 
 **Complexity**: O(1) when contiguous, O(n) copy otherwise.
@@ -56,8 +56,8 @@ import numpy as np
 
 c = np.zeros((3, 4))
 f = np.asfortranarray(c)
-print(f.strides)                  # (8, 24)
-print(f.flags.f_contiguous)       # True
+print(f.strides)  # (8, 24)
+print(f.flags.f_contiguous)  # True
 ```
 
 **Complexity**: O(1) or O(n) copy, same rule as its mirror.
@@ -76,8 +76,8 @@ import numpy as np
 
 x = np.arange(4, dtype=np.float64)
 y = x.astype(np.float32)
-print(y.base is None)             # True -- new buffer
-print(y.itemsize)                 # 4
+print(y.base is None)  # True -- new buffer
+print(y.itemsize)  # 4
 ```
 
 **Complexity**: O(n) copy.
@@ -95,9 +95,9 @@ test: `arr.base is not None` means a view.
 import numpy as np
 
 a = np.arange(10)
-print(a.base)                     # None
-print(a[2:5].base is a)           # True
-print(a[[0, 1]].base is None)     # True -- fancy indexing copied
+print(a.base)  # None
+print(a[2:5].base is a)  # True
+print(a[[0, 1]].base is None)  # True -- fancy indexing copied
 ```
 
 **Complexity**: O(1).
@@ -114,9 +114,9 @@ points to. Views share it; copies own their own.
 import numpy as np
 
 a = np.arange(6)
-b = a[::2]                        # view into a's buffer
+b = a[::2]  # view into a's buffer
 b[0] = 99
-print(a)                          # [99  1 99  3 99  5]
+print(a)  # [99  1 99  3 99  5]
 ```
 
 **Complexity**: —.
@@ -134,8 +134,8 @@ the inner sizes. The NumPy default.
 import numpy as np
 
 x = np.zeros((4, 6), dtype=np.float64)
-print(x.strides)                  # (48, 8)
-print(x.flags.c_contiguous)       # True
+print(x.strides)  # (48, 8)
+print(x.flags.c_contiguous)  # True
 ```
 
 **Complexity**: —.
@@ -154,7 +154,7 @@ import numpy as np
 
 # 8-byte float64 reads drag in 64-byte lines: 8 elements per line
 x = np.zeros(1000, dtype=np.float64)
-print(x.strides)                  # (8,)
+print(x.strides)  # (8,)
 ```
 
 **Complexity**: —.
@@ -172,8 +172,8 @@ multiplies memory traffic — the physical reason layout matters.
 import numpy as np
 
 big = np.random.default_rng(0).normal(size=(4000, 4000))
-row_sum = big.sum(axis=1)     # sequential per row
-col_sum = big.sum(axis=0)     # strided per column -- measure locally
+row_sum = big.sum(axis=1)  # sequential per row
+col_sum = big.sum(axis=0)  # strided per column -- measure locally
 ```
 
 **Complexity**: sequential ≈ O(n) line fills; strided up to 8×
@@ -194,8 +194,8 @@ import numpy as np
 a = np.arange(4)
 c = a.copy()
 c[0] = 99
-print(a)                          # [0 1 2 3] -- unaffected
-print(c)                          # [99  1  2  3]
+print(a)  # [0 1 2 3] -- unaffected
+print(c)  # [99  1  2  3]
 ```
 
 **Complexity**: O(n).
@@ -213,7 +213,7 @@ Swapped stride pattern versus C; produced by `order='F'` creation,
 import numpy as np
 
 f = np.zeros((3, 4), dtype=np.float32, order="F")
-print(f.strides)                  # (4, 12)
+print(f.strides)  # (4, 12)
 ```
 
 **Complexity**: —.
@@ -269,9 +269,9 @@ buffer; summing `nbytes` across views double-counts.
 import numpy as np
 
 a = np.zeros((1000, 1000), dtype=np.float64)
-b = a[:, 0]                       # view
-print(a.nbytes)                   # 8000000
-print(b.nbytes)                   # 8000 -- shares a's buffer
+b = a[:, 0]  # view
+print(a.nbytes)  # 8000000
+print(b.nbytes)  # 8000 -- shares a's buffer
 ```
 
 **Complexity**: O(1).
@@ -289,8 +289,8 @@ with `base` — never assume.
 import numpy as np
 
 a = np.arange(12).reshape(3, 4)
-print(a.reshape(4, 3).base is a)      # True -- view
-print(a.T.reshape(12).base is a)      # False -- copy
+print(a.reshape(4, 3).base is a)  # True -- view
+print(a.T.reshape(12).base is a)  # False -- copy
 ```
 
 **Complexity**: O(1) view or O(n) copy.
@@ -308,8 +308,8 @@ tests.
 import numpy as np
 
 a = np.arange(12).reshape(3, 4)
-print(np.shares_memory(a, a[1:, :]))   # True
-print(np.shares_memory(a, a.copy()))   # False
+print(np.shares_memory(a, a[1:, :]))  # True
+print(np.shares_memory(a, a.copy()))  # False
 ```
 
 **Complexity**: O(1) bounds check (no element scan by default).
@@ -327,9 +327,9 @@ along axis k. Element `(i0, i1)` of a 2-D array lives at
 import numpy as np
 
 x = np.zeros((4, 6), dtype=np.float64)
-print(x.strides)                  # (48, 8)
+print(x.strides)  # (48, 8)
 y = x.T
-print(y.strides)                  # (8, 48) -- swapped
+print(y.strides)  # (8, 48) -- swapped
 ```
 
 **Complexity**: —.
@@ -348,9 +348,9 @@ import numpy as np
 
 a = np.arange(6)
 v = a[1:5:2]
-print(v)                          # [1 3]
+print(v)  # [1 3]
 v[0] = -1
-print(a)                          # [ 0 -1  2  3  4  5]
+print(a)  # [ 0 -1  2  3  4  5]
 ```
 
 **Complexity**: O(1).

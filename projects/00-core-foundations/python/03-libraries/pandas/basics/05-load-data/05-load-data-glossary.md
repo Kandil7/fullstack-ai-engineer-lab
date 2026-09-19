@@ -48,19 +48,15 @@ df.to_csv("output.csv", index=False)
 The character used to separate values in a text file. Default is comma for CSV.
 
 ```python
-df = pd.read_csv("data.tsv", sep="\t")       # Tab-separated
-df = pd.read_csv("data.csv", sep=";")         # Semicolon-separated
+df = pd.read_csv("data.tsv", sep="\t")  # Tab-separated
+df = pd.read_csv("data.csv", sep=";")  # Semicolon-separated
 ```
 
 **Dtypes**
 Data types to assign to specific columns when reading.
 
 ```python
-df = pd.read_csv("data.csv", dtype={
-    "id": "int32",
-    "category": "category",
-    "amount": "float32"
-})
+df = pd.read_csv("data.csv", dtype={"id": "int32", "category": "category", "amount": "float32"})
 ```
 
 ### E
@@ -165,8 +161,8 @@ pd.read_pickle()    -> Pickle
 The delimiter character for text files.
 
 ```python
-df = pd.read_csv("data.csv", sep=",")     # Comma (default)
-df = pd.read_csv("data.tsv", sep="\t")    # Tab
+df = pd.read_csv("data.csv", sep=",")  # Comma (default)
+df = pd.read_csv("data.tsv", sep="\t")  # Tab
 ```
 
 **Sheet Name**
@@ -205,7 +201,7 @@ df = pd.read_csv(
     parse_dates=["Date"],
     na_values=["N/A", "missing"],
     nrows=1000,
-    encoding="utf-8"
+    encoding="utf-8",
 )
 ```
 

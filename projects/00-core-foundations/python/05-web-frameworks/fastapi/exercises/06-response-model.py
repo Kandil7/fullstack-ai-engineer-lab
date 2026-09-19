@@ -31,6 +31,7 @@ next_item_id = 1
 # =============================================================================
 class UserCreate(BaseModel):
     """Input model - includes password."""
+
     username: str = Field(..., min_length=3, max_length=50)
     email: str
     password: str = Field(..., min_length=8)
@@ -38,6 +39,7 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     """Output model - excludes password."""
+
     id: int
     username: str
     email: str
@@ -61,7 +63,12 @@ class ItemResponse(BaseModel):
 def create_user(user: UserCreate):
     """Create user - password in request, not in response."""
     global next_user_id
-    user_data = {"id": next_user_id, "username": user.username, "email": user.email, "is_active": True}
+    user_data = {
+        "id": next_user_id,
+        "username": user.username,
+        "email": user.email,
+        "is_active": True,
+    }
     users_db[next_user_id] = user_data
     next_user_id += 1
     return UserResponse(**user_data)
@@ -106,12 +113,14 @@ def delete_item(item_id: int):
 # =============================================================================
 class UserPublic(BaseModel):
     """Public user info."""
+
     id: int
     username: str
 
 
 class LoginResponse(BaseModel):
     """Login success response."""
+
     access_token: str
     token_type: str = "bearer"
     user: UserPublic
@@ -132,7 +141,6 @@ def login(email: str, password: str):
     for uid, u in users_db.items():
         if u.get("email") == email:
             return LoginResponse(
-                access_token="fake-jwt-token",
-                user=UserPublic(id=uid, username=u["username"])
+                access_token="fake-jwt-token", user=UserPublic(id=uid, username=u["username"])
             )
     raise HTTPException(status_code=401, detail="Invalid credentials")

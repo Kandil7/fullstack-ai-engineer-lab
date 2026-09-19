@@ -49,11 +49,16 @@ from scipy import sparse as sp
 import numpy as np
 
 coo = sp.coo_matrix(
-    (np.array([1.0, 2.0, 3.0]),          # data
-     (np.array([0, 1, 2]),               # row indices
-      np.array([0, 1, 2]))),             # column indices
-    shape=(3, 3))
-print(coo.nnz, coo.shape)                # 3 (3, 3)
+    (
+        np.array([1.0, 2.0, 3.0]),  # data
+        (
+            np.array([0, 1, 2]),  # row indices
+            np.array([0, 1, 2]),
+        ),
+    ),  # column indices
+    shape=(3, 3),
+)
+print(coo.nnz, coo.shape)  # 3 (3, 3)
 ```
 
 **Critical detail:** COO stores *triplets as given*. An explicit
@@ -99,9 +104,9 @@ change the sparse math.
 The `@` operator respects the operands' types:
 
 ```python
-C = A_csr @ B_csr     # sparse @ sparse -> sparse
-r = A_csr @ v         # sparse @ ndarray -> 1-D ndarray
-D = A_csr @ dense     # sparse @ dense  -> dense ndarray
+C = A_csr @ B_csr  # sparse @ sparse -> sparse
+r = A_csr @ v  # sparse @ ndarray -> 1-D ndarray
+D = A_csr @ dense  # sparse @ dense  -> dense ndarray
 ```
 
 Mixing types densifies the result — often exactly what you do
@@ -115,8 +120,7 @@ be consumed by another sparse operation (chained matmul, solver).
 ```python
 from scipy.sparse.linalg import spsolve
 
-A = sp.diags([-1.0, 2.0, -1.0], [-1, 0, 1], shape=(2000, 2000),
-             format="csr")
+A = sp.diags([-1.0, 2.0, -1.0], [-1, 0, 1], shape=(2000, 2000), format="csr")
 x = spsolve(A, np.ones(2000))
 ```
 
@@ -133,8 +137,8 @@ vocabulary terms. `TfidfVectorizer` returns a `csr_matrix`:
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 
-X = TfidfVectorizer().fit_transform(docs)   # csr_matrix
-clf = LogisticRegression().fit(X, y)        # sklearn accepts sparse
+X = TfidfVectorizer().fit_transform(docs)  # csr_matrix
+clf = LogisticRegression().fit(X, y)  # sklearn accepts sparse
 ```
 
 At 1M documents × 50k terms, dense `float64` would be 400 GB.
@@ -148,7 +152,7 @@ embeddings-style (unit L2) with a diagonal scaling:
 
 ```python
 l2 = np.asarray(X.power(2).sum(axis=1)).ravel() ** 0.5
-Xn = sp.diags(1.0 / l2) @ X          # sparse, nnz preserved
+Xn = sp.diags(1.0 / l2) @ X  # sparse, nnz preserved
 ```
 
 Row L2 norms of `Xn` are now 1 and the matrix is still sparse.
@@ -247,16 +251,17 @@ grid area — the reason 400 GB dense workloads run in GB of RAM.
 from scipy import sparse as sp
 from scipy.sparse.linalg import spsolve
 
-coo  = sp.coo_matrix((data, (rows, cols)), shape=(m, n))
-csr  = coo.tocsr();  csc = coo.tocsc()
+coo = sp.coo_matrix((data, (rows, cols)), shape=(m, n))
+csr = coo.tocsr()
+csc = coo.tocsc()
 A.nnz, A.shape, A.density if hasattr(A, "density") else A.nnz / (m * n)
-A.toarray()                       # ONLY for small matrices
-C = A_csr @ B_csr                 # stays sparse
-v = A_csr @ np.ones(n)            # 1-D ndarray
-x = spsolve(A_csr, b)             # sparse solve
-Xn = sp.diags(1.0 / l2) @ X       # row scaling, stays sparse
-X = TfidfVectorizer().fit_transform(docs)   # csr_matrix
-clf.fit(X, y)                     # sklearn accepts sparse
+A.toarray()  # ONLY for small matrices
+C = A_csr @ B_csr  # stays sparse
+v = A_csr @ np.ones(n)  # 1-D ndarray
+x = spsolve(A_csr, b)  # sparse solve
+Xn = sp.diags(1.0 / l2) @ X  # row scaling, stays sparse
+X = TfidfVectorizer().fit_transform(docs)  # csr_matrix
+clf.fit(X, y)  # sklearn accepts sparse
 ```
 
 ## Next Steps

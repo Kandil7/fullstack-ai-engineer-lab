@@ -5,6 +5,7 @@ W3Schools: https://www.w3schools.com/python/pandas_dataframe_concat.asp
 concat() stacks DataFrames vertically (rows) or horizontally (columns).
 Unlike merge(), it doesn't require common columns.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -12,23 +13,29 @@ import numpy as np
 # Sample data
 # ---------------------------------------------------------------------------
 
-df1 = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Score": [85, 92],
-    "Grade": ["A", "A+"],
-})
+df1 = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob"],
+        "Score": [85, 92],
+        "Grade": ["A", "A+"],
+    }
+)
 
-df2 = pd.DataFrame({
-    "Name": ["Charlie", "Diana"],
-    "Score": [78, 88],
-    "Grade": ["B+", "A-"],
-})
+df2 = pd.DataFrame(
+    {
+        "Name": ["Charlie", "Diana"],
+        "Score": [78, 88],
+        "Grade": ["B+", "A-"],
+    }
+)
 
-df3 = pd.DataFrame({
-    "Name": ["Eve", "Frank"],
-    "Score": [95, 70],
-    "Grade": ["A+", "B"],
-})
+df3 = pd.DataFrame(
+    {
+        "Name": ["Eve", "Frank"],
+        "Score": [95, 70],
+        "Grade": ["A+", "B"],
+    }
+)
 
 print("df1:")
 print(df1)
@@ -63,15 +70,19 @@ print("=" * 60)
 print("Example 2: Horizontal Concatenation (axis=1)")
 print("=" * 60)
 
-df_left = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Score": [85, 92, 78],
-})
+df_left = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie"],
+        "Score": [85, 92, 78],
+    }
+)
 
-df_right = pd.DataFrame({
-    "Grade": ["A", "A+", "B+"],
-    "Passed": [True, True, False],
-})
+df_right = pd.DataFrame(
+    {
+        "Grade": ["A", "A+", "B+"],
+        "Passed": [True, True, False],
+    }
+)
 
 horizontal = pd.concat([df_left, df_right], axis=1)
 print("Stacked horizontally:")
@@ -86,16 +97,20 @@ print("=" * 60)
 print("Example 3: Concat with Different Columns")
 print("=" * 60)
 
-df_a = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Score": [85, 92],
-})
+df_a = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob"],
+        "Score": [85, 92],
+    }
+)
 
-df_b = pd.DataFrame({
-    "Name": ["Charlie", "Diana"],
-    "Grade": ["B+", "A-"],
-    "Bonus": [5, 10],
-})
+df_b = pd.DataFrame(
+    {
+        "Name": ["Charlie", "Diana"],
+        "Grade": ["B+", "A-"],
+        "Bonus": [5, 10],
+    }
+)
 
 outer_concat = pd.concat([df_a, df_b], ignore_index=True)
 print("Outer concat (union of columns):")
@@ -140,11 +155,13 @@ print("=" * 60)
 
 monthly_data = []
 for month in range(1, 4):
-    temp = pd.DataFrame({
-        "Month": [f"2024-{month:02d}"] * 5,
-        "Product": ["A", "B", "C", "D", "E"],
-        "Sales": np.random.randint(100, 500, 5),
-    })
+    temp = pd.DataFrame(
+        {
+            "Month": [f"2024-{month:02d}"] * 5,
+            "Product": ["A", "B", "C", "D", "E"],
+            "Sales": np.random.randint(100, 500, 5),
+        }
+    )
     monthly_data.append(temp)
 
 quarterly = pd.concat(monthly_data, ignore_index=True)

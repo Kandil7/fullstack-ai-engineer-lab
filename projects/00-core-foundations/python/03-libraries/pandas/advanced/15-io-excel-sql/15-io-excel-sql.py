@@ -13,6 +13,7 @@ from sqlalchemy import create_engine, text
 
 try:
     import openpyxl  # noqa: F401
+
     HAS_OPENPYXL = True
 except ImportError:
     HAS_OPENPYXL = False
@@ -20,6 +21,7 @@ except ImportError:
 
 try:
     import xlsxwriter  # noqa: F401
+
     HAS_XLSXWRITER = True
 except ImportError:
     HAS_XLSXWRITER = False
@@ -35,38 +37,41 @@ print("=" * 60)
 print("1. ADVANCED EXCEL OPERATIONS")
 print("=" * 60)
 
-df = pd.DataFrame({
-    'Product': ['Widget A', 'Widget B', 'Gadget X', 'Gadget Y'] * 25,
-    'Region': np.random.choice(['North', 'South', 'East', 'West'], 100),
-    'Sales': np.random.randint(1000, 10000, 100),
-    'Date': pd.date_range('2023-01-01', periods=100, freq='D'),
-    'Rep': np.random.choice(['Alice', 'Bob', 'Charlie'], 100)
-})
+df = pd.DataFrame(
+    {
+        "Product": ["Widget A", "Widget B", "Gadget X", "Gadget Y"] * 25,
+        "Region": np.random.choice(["North", "South", "East", "West"], 100),
+        "Sales": np.random.randint(1000, 10000, 100),
+        "Date": pd.date_range("2023-01-01", periods=100, freq="D"),
+        "Rep": np.random.choice(["Alice", "Bob", "Charlie"], 100),
+    }
+)
 
 if not HAS_OPENPYXL:
     print("[skip] openpyxl not installed — Excel section skipped (pip install openpyxl)")
 else:
     # Write with multiple sheets and formatting
     buffer = io.BytesIO()
-    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
         # Main data
-        df.to_excel(writer, sheet_name='Sales Data', index=False)
+        df.to_excel(writer, sheet_name="Sales Data", index=False)
 
         # Pivot table
-        pivot = pd.pivot_table(df, values='Sales', index='Product', columns='Region',
-                               aggfunc='sum', fill_value=0)
-        pivot.to_excel(writer, sheet_name='Pivot by Region')
+        pivot = pd.pivot_table(
+            df, values="Sales", index="Product", columns="Region", aggfunc="sum", fill_value=0
+        )
+        pivot.to_excel(writer, sheet_name="Pivot by Region")
 
         # Summary stats
-        summary = df.groupby('Product')['Sales'].agg(['sum', 'mean', 'count']).round(2)
-        summary.to_excel(writer, sheet_name='Summary')
+        summary = df.groupby("Product")["Sales"].agg(["sum", "mean", "count"]).round(2)
+        summary.to_excel(writer, sheet_name="Summary")
 
         # Access worksheet for formatting
-        ws = writer.sheets['Sales Data']
+        ws = writer.sheets["Sales Data"]
         # Auto-filter
         ws.auto_filter.ref = ws.dimensions
         # Freeze panes
-        ws.freeze_panes = 'A2'
+        ws.freeze_panes = "A2"
         # Column widths
         for col in ws.columns:
             max_length = max(len(str(cell.value)) for cell in col)
@@ -76,14 +81,17 @@ else:
     print()
 
     # Read with specific options
-    df_read = pd.read_excel(buffer, sheet_name='Sales Data',
-                            parse_dates=['Date'],
-                            dtype={'Product': 'category', 'Region': 'category', 'Rep': 'category'})
+    df_read = pd.read_excel(
+        buffer,
+        sheet_name="Sales Data",
+        parse_dates=["Date"],
+        dtype={"Product": "category", "Region": "category", "Rep": "category"},
+    )
     print(f"Read with dtypes: {df_read.dtypes}")
     print()
 
     # Read multiple sheets
-    all_sheets = pd.read_excel(buffer, sheet_name=['Sales Data', 'Pivot by Region', 'Summary'])
+    all_sheets = pd.read_excel(buffer, sheet_name=["Sales Data", "Pivot by Region", "Summary"])
     for name, sheet_df in all_sheets.items():
         print(f"  {name}: {sheet_df.shape}")
     print()
@@ -100,54 +108,56 @@ if not HAS_XLSXWRITER:
     print("[skip] xlsxwriter not installed — formatting section skipped (pip install xlsxwriter)")
 else:
     buffer2 = io.BytesIO()
-    with pd.ExcelWriter(buffer2, engine='xlsxwriter') as writer:
-        df.to_excel(writer, sheet_name='Report', index=False, startrow=1)
+    with pd.ExcelWriter(buffer2, engine="xlsxwriter") as writer:
+        df.to_excel(writer, sheet_name="Report", index=False, startrow=1)
 
         workbook = writer.book
-        worksheet = writer.sheets['Report']
+        worksheet = writer.sheets["Report"]
 
         # Formats
-        header_format = workbook.add_format({
-            'bold': True,
-            'bg_color': '#4472C4',
-            'font_color': 'white',
-            'border': 1
-        })
+        header_format = workbook.add_format(
+            {"bold": True, "bg_color": "#4472C4", "font_color": "white", "border": 1}
+        )
 
-        money_format = workbook.add_format({'num_format': '$#,##0', 'border': 1})
-        date_format = workbook.add_format({'num_format': 'yyyy-mm-dd', 'border': 1})
-        default_format = workbook.add_format({'border': 1})
+        money_format = workbook.add_format({"num_format": "$#,##0", "border": 1})
+        date_format = workbook.add_format({"num_format": "yyyy-mm-dd", "border": 1})
+        default_format = workbook.add_format({"border": 1})
 
         # Write header
         for col_num, value in enumerate(df.columns.values):
             worksheet.write(0, col_num, value, header_format)
 
         # Set column formats
-        worksheet.set_column('A:A', 15, default_format)  # Product
-        worksheet.set_column('B:B', 12, default_format)  # Region
-        worksheet.set_column('C:C', 12, money_format)    # Sales
-        worksheet.set_column('D:D', 12, date_format)     # Date
-        worksheet.set_column('E:E', 12, default_format)  # Rep
+        worksheet.set_column("A:A", 15, default_format)  # Product
+        worksheet.set_column("B:B", 12, default_format)  # Region
+        worksheet.set_column("C:C", 12, money_format)  # Sales
+        worksheet.set_column("D:D", 12, date_format)  # Date
+        worksheet.set_column("E:E", 12, default_format)  # Rep
 
         # Conditional formatting
-        worksheet.conditional_format('C2:C101', {
-            'type': '3_color_scale',
-            'min_color': '#FF0000',
-            'mid_color': '#FFFF00',
-            'max_color': '#00FF00'
-        })
+        worksheet.conditional_format(
+            "C2:C101",
+            {
+                "type": "3_color_scale",
+                "min_color": "#FF0000",
+                "mid_color": "#FFFF00",
+                "max_color": "#00FF00",
+            },
+        )
 
         # Add chart
-        chart = workbook.add_chart({'type': 'column'})
-        chart.add_series({
-            'name': 'Sales',
-            'categories': '=Report!$A$2:$A$101',
-            'values': '=Report!$C$2:$C$101',
-        })
-        chart.set_title({'name': 'Sales by Product'})
-        chart.set_x_axis({'name': 'Product'})
-        chart.set_y_axis({'name': 'Sales ($)'})
-        worksheet.insert_chart('G2', chart)
+        chart = workbook.add_chart({"type": "column"})
+        chart.add_series(
+            {
+                "name": "Sales",
+                "categories": "=Report!$A$2:$A$101",
+                "values": "=Report!$C$2:$C$101",
+            }
+        )
+        chart.set_title({"name": "Sales by Product"})
+        chart.set_x_axis({"name": "Product"})
+        chart.set_y_axis({"name": "Sales ($)"})
+        worksheet.insert_chart("G2", chart)
 
     print(f"Formatted Excel written: {len(buffer2.getvalue())} bytes")
     print()
@@ -161,10 +171,10 @@ print("3. ADVANCED SQL WITH SQLALCHEMY")
 print("=" * 60)
 
 # Create engine with connection pooling
-engine = create_engine('sqlite:///:memory:', pool_pre_ping=True, echo=False)
+engine = create_engine("sqlite:///:memory:", pool_pre_ping=True, echo=False)
 
 # Write with chunking
-df.to_sql('sales', engine, index=False, if_exists='replace', chunksize=1000, method='multi')
+df.to_sql("sales", engine, index=False, if_exists="replace", chunksize=1000, method="multi")
 
 # Read with SQLAlchemy
 with engine.connect() as conn:
@@ -172,7 +182,7 @@ with engine.connect() as conn:
     result = conn.execute(text("SELECT * FROM sales WHERE Region = :region"), {"region": "North"})
     df_north = pd.DataFrame(result.fetchall(), columns=result.keys())
     print(f"Parameterized query (North): {df_north.shape}")
-    
+
     # Complex query with CTE
     complex_query = """
     WITH monthly_sales AS (
@@ -203,7 +213,7 @@ print("=" * 60)
 
 # Pattern 1: Upsert (Insert or Update)
 print("Pattern 1: Upsert with SQLite")
-conn = sqlite3.connect(':memory:')
+conn = sqlite3.connect(":memory:")
 conn.execute("""
     CREATE TABLE users (
         id INTEGER PRIMARY KEY,
@@ -216,24 +226,26 @@ conn.execute("""
 # Insert initial data
 conn.executemany(
     "INSERT INTO users (id, name, email, last_login) VALUES (?, ?, ?, ?)",
-    [(1, 'Alice', 'alice@test.com', '2023-01-01'),
-     (2, 'Bob', 'bob@test.com', '2023-01-02')]
+    [(1, "Alice", "alice@test.com", "2023-01-01"), (2, "Bob", "bob@test.com", "2023-01-02")],
 )
 
 # Upsert: Insert or Update on conflict
 upsert_data = [
-    (1, 'Alice Updated', 'alice@test.com', '2023-06-01'),  # Update existing
-    (3, 'Charlie', 'charlie@test.com', '2023-06-01')       # Insert new
+    (1, "Alice Updated", "alice@test.com", "2023-06-01"),  # Update existing
+    (3, "Charlie", "charlie@test.com", "2023-06-01"),  # Insert new
 ]
 
 for row in upsert_data:
-    conn.execute("""
+    conn.execute(
+        """
         INSERT INTO users (id, name, email, last_login)
         VALUES (?, ?, ?, ?)
         ON CONFLICT(email) DO UPDATE SET
             name = excluded.name,
             last_login = excluded.last_login
-    """, row)
+    """,
+        row,
+    )
 
 df_users = pd.read_sql("SELECT * FROM users", conn)
 print("After upsert:")
@@ -242,16 +254,15 @@ print()
 
 # Pattern 2: Bulk insert with chunksize
 print("Pattern 2: Bulk insert performance")
-large_data = pd.DataFrame({
-    'id': range(10000),
-    'value': np.random.randn(10000)
-})
+large_data = pd.DataFrame({"id": range(10000), "value": np.random.randn(10000)})
 
 import time
 
 # Method 1: to_sql with chunksize
 start = time.time()
-large_data.to_sql('bulk_test', conn, index=False, if_exists='replace', chunksize=1000, method='multi')
+large_data.to_sql(
+    "bulk_test", conn, index=False, if_exists="replace", chunksize=1000, method="multi"
+)
 print(f"  to_sql chunksize=1000: {time.time() - start:.4f}s")
 
 # Method 2: Raw executemany
@@ -268,11 +279,11 @@ print(f"  executemany: {time.time() - start:.4f}s")
 print("\nPattern 3: Type-safe reads")
 # NOTE: 'sales' was written via the SQLAlchemy engine's in-memory DB, not the
 # sqlite3 'conn' — read it back through the engine
-df_typed = pd.read_sql("SELECT * FROM sales", engine, dtype={
-    'Product': 'category',
-    'Region': 'category',
-    'Rep': 'category'
-})
+df_typed = pd.read_sql(
+    "SELECT * FROM sales",
+    engine,
+    dtype={"Product": "category", "Region": "category", "Rep": "category"},
+)
 print(f"  Typed read dtypes: {df_typed.dtypes.tolist()}")
 print()
 
@@ -341,11 +352,13 @@ test_csv = """id,name,age,salary,join_date
 """
 
 # Read with error handling
-df_qc = pd.read_csv(io.StringIO(test_csv), 
-                     na_values=['abc', 'invalid-date', ''],
-                     dtype={'id': 'Int64', 'age': 'Int64', 'salary': 'Int64'},
-                     parse_dates=['join_date'],
-                     on_bad_lines='warn')
+df_qc = pd.read_csv(
+    io.StringIO(test_csv),
+    na_values=["abc", "invalid-date", ""],
+    dtype={"id": "Int64", "age": "Int64", "salary": "Int64"},
+    parse_dates=["join_date"],
+    on_bad_lines="warn",
+)
 
 print("Data quality read:")
 print(df_qc)
@@ -354,9 +367,9 @@ print(f"\nMissing values:\n{df_qc.isna().sum()}")
 print()
 
 # Validate after read
-assert df_qc['id'].notna().all(), "ID cannot be null"
-assert df_qc['salary'].between(0, 200000).all(), "Salary out of range"
-assert df_qc['age'].between(18, 100).all(), "Age out of range"
+assert df_qc["id"].notna().all(), "ID cannot be null"
+assert df_qc["salary"].between(0, 200000).all(), "Salary out of range"
+assert df_qc["age"].between(18, 100).all(), "Age out of range"
 print("Validation passed!")
 
 print("\n" + "=" * 60)

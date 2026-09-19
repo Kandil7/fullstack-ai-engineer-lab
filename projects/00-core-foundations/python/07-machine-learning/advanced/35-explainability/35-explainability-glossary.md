@@ -30,7 +30,7 @@ attribution methods split credit between them arbitrarily. Check with
 `np.corrcoef` or VIF before trusting feature-level importance.
 **Example**:
 ```python
-np.corrcoef(X[:, 0], X[:, 1])[0, 1]   # 0.98 -> treat with suspicion
+np.corrcoef(X[:, 0], X[:, 1])[0, 1]  # 0.98 -> treat with suspicion
 ```
 **Related**: Permutation importance, Spurious correlation
 
@@ -73,6 +73,7 @@ all other features keep their observed values. Reveals the shape of an effect.
 **Example**:
 ```python
 from sklearn.inspection import partial_dependence
+
 pd_res = partial_dependence(rf, X, [0])
 ```
 **Related**: Global explanation

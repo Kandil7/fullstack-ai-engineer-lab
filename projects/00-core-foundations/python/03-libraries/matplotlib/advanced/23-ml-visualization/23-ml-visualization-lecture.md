@@ -60,7 +60,8 @@ y_true = rng.integers(0, 3, 300)
 y_pred = np.clip(y_true + rng.choice([-1, 0, 0, 0, 1], 300), 0, 2)
 cm = confusion_matrix(y_true, y_pred, labels=[0, 1, 2])
 im = ax.imshow(cm, cmap="viridis")
-ax.set_xticks(range(3), labels); ax.set_yticks(range(3), labels)
+ax.set_xticks(range(3), labels)
+ax.set_yticks(range(3), labels)
 for i in range(3):
     for j in range(3):
         ax.text(j, i, str(cm[i, j]), ha="center", va="center")
@@ -81,7 +82,7 @@ stay visible.
 ```python
 fpr, tpr, _ = roc_curve(y_true, y_score)
 ax1.plot(fpr, tpr, color="tab:blue")
-ax1.plot([0, 1], [0, 1], "k--", alpha=0.4)      # chance line
+ax1.plot([0, 1], [0, 1], "k--", alpha=0.4)  # chance line
 ax1.set_title(f"ROC (AUC={roc_auc:.3f})")
 ```
 

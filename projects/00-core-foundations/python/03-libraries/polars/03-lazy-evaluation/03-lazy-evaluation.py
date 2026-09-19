@@ -36,12 +36,15 @@ _TMP = tempfile.TemporaryDirectory()
 _DATA_DIR = Path(_TMP.name)
 _CSV = _DATA_DIR / "events.csv"
 _PARQUET = _DATA_DIR / "events.parquet"
-_CORPUS_DIR = _DATA_DIR / "corpus"      # parquet-only: directory scan target
+_CORPUS_DIR = _DATA_DIR / "corpus"  # parquet-only: directory scan target
 _CORPUS_DIR.mkdir()
 
 _rows = [
-    {"user": f"u{i % 50:02d}", "split": "train" if i % 4 else "valid",
-     "score": 100.0 * (i % 17) / 17.0}
+    {
+        "user": f"u{i % 50:02d}",
+        "split": "train" if i % 4 else "valid",
+        "score": 100.0 * (i % 17) / 17.0,
+    }
     for i in range(2000)
 ]
 with open(_CSV, "w", encoding="utf-8") as fh:
@@ -52,9 +55,7 @@ pl.DataFrame(_rows).write_parquet(_PARQUET)
 
 # Split the same data into three parquet shards (the corpus layout).
 for shard, offset in enumerate((0, 700, 1400)):
-    pl.DataFrame(_rows[offset : offset + 700]).write_parquet(
-        _CORPUS_DIR / f"shard-{shard}.parquet"
-    )
+    pl.DataFrame(_rows[offset : offset + 700]).write_parquet(_CORPUS_DIR / f"shard-{shard}.parquet")
 
 
 # ============================================================
@@ -63,6 +64,7 @@ for shard, offset in enumerate((0, 700, 1400)):
 # pl.read_csv() reads the whole file into memory NOW. pl.scan_csv()
 # opens the file, reads schema + row estimate, and returns a LazyFrame
 # that holds a plan. The file bytes are not consumed until .collect().
+
 
 def scan_metadata() -> tuple[list[str], int]:
     """Return (columns, estimated rows) from a scan WITHOUT loading data."""
@@ -85,6 +87,7 @@ print(f"scan result: {scan_metadata()}")
 # ============================================================
 # .explain() renders the optimizer's final plan as text. We never print
 # it raw (its Unicode symbols break cp1252 consoles); we inspect it.
+
 
 def optimized_plan(lf: pl.LazyFrame) -> str:
     """Return the optimized plan text for a lazy frame."""
@@ -111,6 +114,7 @@ print(f"filter pushed into scan: {'SELECTION' in plan}")
 # becomes row-group skipping via column statistics. The plan text shows
 # "SELECTION" at the scan level when the predicate was pushed.
 
+
 def has_predicate_pushdown(lf: pl.LazyFrame) -> bool:
     """True if the optimized plan pushes a selection into the scan."""
     return "SELECTION" in lf.explain(optimized=True)
@@ -130,6 +134,7 @@ print(f"predicate pushed into scan: {has_predicate_pushdown(lf_filtered)}")
 # The plan line "PROJECT 2/3 COLUMNS" means the scan reads 2 of the 3
 # columns and never materializes the third. For Parquet this skips whole
 # column chunks on disk.
+
 
 def projected_columns(lf: pl.LazyFrame) -> int:
     """Parse 'PROJECT n/m COLUMNS' from the optimized plan."""
@@ -156,6 +161,7 @@ print(f"columns read: {projected_columns(lf_proj)} of 3")
 # before it — scan, filter, select, joins — is free. This is why you can
 # build an entire ETL as a LazyFrame and execute it once, or stream it.
 
+
 def run_analytics() -> dict[str, float]:
     """Aggregate per-split score stats via one lazy plan."""
     lf = pl.scan_parquet(_PARQUET)
@@ -180,6 +186,7 @@ print(run_analytics())
 # ============================================================
 # scan_parquet(dir) reads ALL parquet files in a directory as one
 # logical table (hive-style partitioning included). One plan, many files.
+
 
 def scan_corpus() -> pl.LazyFrame:
     """Open every parquet file in the corpus dir as one lazy table."""
@@ -230,34 +237,31 @@ def _verify() -> None:
     lf = pl.scan_csv(_CSV)
     assert isinstance(lf, pl.LazyFrame), "scan_csv must return a LazyFrame"
     schema_names, n_rows = scan_metadata()
-    assert schema_names == ["user", "split", "score"], \
-        "scan must read the CSV header as the schema"
+    assert schema_names == ["user", "split", "score"], "scan must read the CSV header as the schema"
     assert n_rows == 2000, "collect() of a scan must count all 2000 rows"
 
-    plan = optimized_plan(
-        lf.filter(pl.col("split") == "valid").select(pl.col("score"))
-    )
+    plan = optimized_plan(lf.filter(pl.col("split") == "valid").select(pl.col("score")))
     assert "SELECT" in plan, "plan must contain a SELECT node"
-    assert "SELECTION" in plan, \
-        "the filter must be pushed into the CSV scan (SELECTION)"
+    assert "SELECTION" in plan, "the filter must be pushed into the CSV scan (SELECTION)"
 
     lf_filtered = pl.scan_parquet(_PARQUET).filter(pl.col("split") == "valid")
-    assert has_predicate_pushdown(lf_filtered), \
+    assert has_predicate_pushdown(lf_filtered), (
         "filter must be pushed into the parquet scan (SELECTION)"
+    )
 
     lf_proj = pl.scan_parquet(_PARQUET).select(pl.col("score"))
-    assert projected_columns(lf_proj) == 1, \
-        "projection pushdown must read only 1 of 3 columns"
+    assert projected_columns(lf_proj) == 1, "projection pushdown must read only 1 of 3 columns"
 
     stats = run_analytics()
-    assert set(stats) == {"train", "valid"}, \
+    assert set(stats) == {"train", "valid"}, (
         "per-split aggregation must cover exactly train and valid"
-    assert abs(stats["valid"] - 46.98823529411765) < 1e-9, \
+    )
+    assert abs(stats["valid"] - 46.98823529411765) < 1e-9, (
         "deterministic synthetic data must give a deterministic mean"
+    )
 
     corpus = scan_corpus()
-    assert corpus.collect().height == 2000, \
-        "directory scan must read all rows across all files"
+    assert corpus.collect().height == 2000, "directory scan must read all rows across all files"
 
     # Determinism: the same plan produces the same result every run
     result_a = lf.select(pl.col("score")).collect()
@@ -276,6 +280,6 @@ if __name__ == "__main__":
             print("1. scan_* opens metadata only; collect() runs the plan")
             print("2. explain() shows the optimizer's work; SELECTION = pushdown")
             print("3. PROJECT n/m COLUMNS proves only needed columns are read")
-            _verify()   # always runs, so plain execution is also a test
+            _verify()  # always runs, so plain execution is also a test
     finally:
-        _TMP.cleanup()   # close handles + delete temp files (Windows-safe)
+        _TMP.cleanup()  # close handles + delete temp files (Windows-safe)

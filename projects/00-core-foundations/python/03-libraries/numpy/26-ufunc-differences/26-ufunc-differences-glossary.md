@@ -107,7 +107,7 @@ print("Velocity:", velocity)  # [10 20 30 40]
 import numpy as np
 
 arr = np.array([1, 4, 9, 16, 25])
-print("1st diff:", np.diff(arr))      # [3 5 7 9]
+print("1st diff:", np.diff(arr))  # [3 5 7 9]
 print("2nd diff:", np.diff(arr, n=2))  # [2 2 2]
 ```
 
@@ -162,7 +162,7 @@ print("First difference:", first_diff)
 import numpy as np
 
 arr = np.array([1, 4, 9, 16, 25])
-print("1st:", np.diff(arr))      # [3 5 7 9]
+print("1st:", np.diff(arr))  # [3 5 7 9]
 print("2nd:", np.diff(arr, n=2))  # [2 2 2]
 print("3rd:", np.diff(arr, n=3))  # [0 0]
 ```

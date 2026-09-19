@@ -43,6 +43,7 @@ lst.append(4)  # [1, 2, 3, 4]
 ```python
 import bisect
 
+
 def binary_search(arr, target):
     idx = bisect.bisect_left(arr, target)
     return idx if idx < len(arr) and arr[idx] == target else -1
@@ -102,7 +103,8 @@ def dutch_flag_sort(arr):
     while mid <= high:
         if arr[mid] == 0:
             arr[low], arr[mid] = arr[mid], arr[low]
-            low += 1; mid += 1
+            low += 1
+            mid += 1
         elif arr[mid] == 1:
             mid += 1
         else:
@@ -131,7 +133,7 @@ def dutch_flag_sort(arr):
 ```python
 arr = ["apple", "banana", "cherry"]
 print(arr[0])  # "apple" — index 0
-print(arr[-1]) # "cherry" — negative index from end
+print(arr[-1])  # "cherry" — negative index from end
 ```
 
 ### In-Place
@@ -145,7 +147,8 @@ def reverse_inplace(arr):
     left, right = 0, len(arr) - 1
     while left < right:
         arr[left], arr[right] = arr[right], arr[left]
-        left += 1; right -= 1
+        left += 1
+        right -= 1
 ```
 
 ### Insert
@@ -190,9 +193,11 @@ def merge_sorted(arr1, arr2):
     i = j = 0
     while i < len(arr1) and j < len(arr2):
         if arr1[i] <= arr2[j]:
-            result.append(arr1[i]); i += 1
+            result.append(arr1[i])
+            i += 1
         else:
-            result.append(arr2[j]); j += 1
+            result.append(arr2[j])
+            j += 1
     result.extend(arr1[i:])
     result.extend(arr2[j:])
     return result

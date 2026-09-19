@@ -12,13 +12,13 @@ Reference: https://www.w3schools.com/python/python_strings.asp
 # ============================================================
 # Example 1: Different ways to create strings
 s1 = "Hello, World!"
-s2 = 'Hello, World!'
+s2 = "Hello, World!"
 s3 = """This is
 a multi-line
 string"""
-s4 = '''Another
+s4 = """Another
 multi-line
-string'''
+string"""
 
 print(s1)
 print(s3)
@@ -29,14 +29,14 @@ print(s3)
 # string
 
 # Escape characters
-print("She said \"hello\"")   # \" = double quote
-print('It\'s a day')          # \' = single quote
-print("Line1\nLine2")         # \n = newline
-print("Col1\tCol2")           # \t = tab
-print("Backslash: \\")        # \\ = backslash
+print('She said "hello"')  # \" = double quote
+print("It's a day")  # \' = single quote
+print("Line1\nLine2")  # \n = newline
+print("Col1\tCol2")  # \t = tab
+print("Backslash: \\")  # \\ = backslash
 
 # Raw strings (ignore escape characters)
-print(r"C:\new\folder")       # Output: C:\new\folder
+print(r"C:\new\folder")  # Output: C:\new\folder
 print(R"Also raw \n string")  # Output: Also raw \n string
 
 # ============================================================
@@ -45,9 +45,9 @@ print(R"Also raw \n string")  # Output: Also raw \n string
 # Example 2: String indexing (0-based)
 text = "Hello, Python!"
 print(f"\nText: {text}")
-print(f"First char: {text[0]}")    # Output: H
-print(f"Second char: {text[1]}")   # Output: e
-print(f"Last char: {text[-1]}")    # Output: !
+print(f"First char: {text[0]}")  # Output: H
+print(f"Second char: {text[1]}")  # Output: e
+print(f"Last char: {text[-1]}")  # Output: !
 print(f"Second to last: {text[-2]}")  # Output: n
 
 # Strings are IMMUTABLE
@@ -59,11 +59,11 @@ print(f"Second to last: {text[-2]}")  # Output: n
 # Example 3: String slicing [start:stop:step]
 text = "Hello, World!"
 print(f"\nFull string: {text}")
-print(f"First 5: {text[0:5]}")     # Output: Hello
+print(f"First 5: {text[0:5]}")  # Output: Hello
 print(f"From index 7: {text[7:]}")  # Output: World!
-print(f"To index 5: {text[:5]}")    # Output: Hello
+print(f"To index 5: {text[:5]}")  # Output: Hello
 print(f"Skip every 2: {text[::2]}")  # Output: Hlo ol!
-print(f"Reverse: {text[::-1]}")     # Output: !dlroW ,olleH
+print(f"Reverse: {text[::-1]}")  # Output: !dlroW ,olleH
 
 # Negative slicing
 print(f"Last 6 chars: {text[-6:]}")  # Output:orld!
@@ -75,12 +75,12 @@ print(f"Last 6 chars: {text[-6:]}")  # Output:orld!
 text = "  Hello, World!  "
 
 print(f"\nOriginal: '{text}'")
-print(f"upper(): '{text.upper()}'")         # HELLO, WORLD!
-print(f"lower(): '{text.lower()}'")         # hello, world!
-print(f"strip(): '{text.strip()}'")         # Hello, World!
-print(f"lstrip(): '{text.lstrip()}'")       # Hello, World!  
-print(f"rstrip(): '{text.rstrip()}'")       #   Hello, World!
-print(f"title(): '{text.strip().title()}'") # Hello, World!
+print(f"upper(): '{text.upper()}'")  # HELLO, WORLD!
+print(f"lower(): '{text.lower()}'")  # hello, world!
+print(f"strip(): '{text.strip()}'")  # Hello, World!
+print(f"lstrip(): '{text.lstrip()}'")  # Hello, World!
+print(f"rstrip(): '{text.rstrip()}'")  #   Hello, World!
+print(f"title(): '{text.strip().title()}'")  # Hello, World!
 print(f"capitalize(): '{text.strip().capitalize()}'")  # Hello, world!
 print(f"swapcase(): '{text.strip().swapcase()}'")  # hELLO, wORLD!
 
@@ -91,11 +91,11 @@ print(f"swapcase(): '{text.strip().swapcase()}'")  # hELLO, wORLD!
 text = "Hello, World! Hello, Python!"
 
 print(f"\nOriginal: {text}")
-print(f"find('Hello'): {text.find('Hello')}")      # 0
-print(f"find('Hello', 5): {text.find('Hello', 5)}") # 14
-print(f"rfind('Hello'): {text.rfind('Hello')}")     # 14
-print(f"index('World'): {text.index('World')}")     # 7
-print(f"count('Hello'): {text.count('Hello')}")     # 2
+print(f"find('Hello'): {text.find('Hello')}")  # 0
+print(f"find('Hello', 5): {text.find('Hello', 5)}")  # 14
+print(f"rfind('Hello'): {text.rfind('Hello')}")  # 14
+print(f"index('World'): {text.index('World')}")  # 7
+print(f"count('Hello'): {text.count('Hello')}")  # 2
 
 # Replace
 new_text = text.replace("Hello", "Hi")
@@ -134,12 +134,12 @@ print(f"join(): {joined}")
 # Example 7: Boolean string methods
 print("\n--- String Testing ---")
 tests = [
-    ("Hello123", "isalnum"),   # Alphanumeric
-    ("Hello", "isalpha"),      # Alphabetical
-    ("12345", "isdigit"),      # Digits
-    ("  ", "isspace"),         # Whitespace
-    ("hello", "islower"),      # All lowercase
-    ("HELLO", "isupper"),      # All uppercase
+    ("Hello123", "isalnum"),  # Alphanumeric
+    ("Hello", "isalpha"),  # Alphabetical
+    ("12345", "isdigit"),  # Digits
+    ("  ", "isspace"),  # Whitespace
+    ("hello", "islower"),  # All lowercase
+    ("HELLO", "isupper"),  # All uppercase
 ]
 
 for s, method in tests:
@@ -212,4 +212,4 @@ print("2. Strings are IMMUTABLE - can't change individual characters")
 print("3. Access characters with text[index] (0-based)")
 print("4. Slice with text[start:stop:step]")
 print("5. Methods: upper, lower, strip, split, replace, find, count")
-print("6. f-strings (f\"...\") are the modern way to format strings")
+print('6. f-strings (f"...") are the modern way to format strings')

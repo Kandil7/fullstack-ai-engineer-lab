@@ -36,9 +36,9 @@ print(f"Empty: {empty}")
 # Example 2: Indexing (0-based)
 fruits = ["apple", "banana", "cherry", "date", "elderberry"]
 print(f"\nFruits: {fruits}")
-print(f"First: {fruits[0]}")      # apple
-print(f"Second: {fruits[1]}")     # banana
-print(f"Last: {fruits[-1]}")      # elderberry
+print(f"First: {fruits[0]}")  # apple
+print(f"Second: {fruits[1]}")  # banana
+print(f"Last: {fruits[-1]}")  # elderberry
 print(f"Third from end: {fruits[-3]}")  # cherry
 
 # ============================================================
@@ -46,11 +46,11 @@ print(f"Third from end: {fruits[-3]}")  # cherry
 # ============================================================
 # Example 3: List slicing [start:stop:step]
 print(f"\nFull list: {fruits}")
-print(f"First 3: {fruits[:3]}")          # ['apple', 'banana', 'cherry']
-print(f"Last 2: {fruits[-2:]}")          # ['date', 'elderberry']
-print(f"Middle: {fruits[1:4]}")          # ['banana', 'cherry', 'date']
-print(f"Every other: {fruits[::2]}")     # ['apple', 'cherry', 'elderberry']
-print(f"Reversed: {fruits[::-1]}")       # ['elderberry', 'date', 'cherry', 'banana', 'apple']
+print(f"First 3: {fruits[:3]}")  # ['apple', 'banana', 'cherry']
+print(f"Last 2: {fruits[-2:]}")  # ['date', 'elderberry']
+print(f"Middle: {fruits[1:4]}")  # ['banana', 'cherry', 'date']
+print(f"Every other: {fruits[::2]}")  # ['apple', 'cherry', 'elderberry']
+print(f"Reversed: {fruits[::-1]}")  # ['elderberry', 'date', 'cherry', 'banana', 'apple']
 
 # ============================================================
 # Modify Items
@@ -157,7 +157,7 @@ while i < len(fruits):
 numbers = [1, 2, 3, 4, 5]
 
 # Basic comprehension
-squares = [x ** 2 for x in numbers]
+squares = [x**2 for x in numbers]
 print(f"\nSquares: {squares}")  # [1, 4, 9, 16, 25]
 
 # With condition
@@ -225,16 +225,17 @@ copy2 = list(original)
 copy3 = original[:]
 
 copy1[0] = 999
-print(f"Original: {original}")   # [1, 2, 3, 4, 5] - unchanged!
-print(f"Copy1: {copy1}")         # [999, 2, 3, 4, 5]
+print(f"Original: {original}")  # [1, 2, 3, 4, 5] - unchanged!
+print(f"Copy1: {copy1}")  # [999, 2, 3, 4, 5]
 
 # Deep copy for nested lists
 import copy
+
 nested = [[1, 2], [3, 4]]
 deep = copy.deepcopy(nested)
 deep[0][0] = 999
 print(f"\nOriginal nested: {nested}")  # [[1, 2], [3, 4]] - unchanged!
-print(f"Deep copy: {deep}")            # [[999, 2], [3, 4]]
+print(f"Deep copy: {deep}")  # [[999, 2], [3, 4]]
 
 # ============================================================
 # Join Lists
@@ -263,8 +264,8 @@ numbers = [3, 1, 4, 1, 5, 9, 2, 6]
 
 print(f"\n--- List Methods ---")
 print(f"list: {numbers}")
-print(f"count(1): {numbers.count(1)}")      # 2
-print(f"index(5): {numbers.index(5)}")      # 4
+print(f"count(1): {numbers.count(1)}")  # 2
+print(f"index(5): {numbers.index(5)}")  # 4
 
 # ============================================================
 # Useful List Functions

@@ -33,7 +33,7 @@ median = ndimage.median_filter(noisy, size=5)
 
 # Edge detection
 edges = ndimage.sobel(noisy)
-edges_magnitude = np.sqrt(edges[0]**2 + edges[1]**2)
+edges_magnitude = np.sqrt(edges[0] ** 2 + edges[1] ** 2)
 
 print(f"Original mean: {image.mean():.3f}")
 print(f"Smoothed mean: {smoothed.mean():.3f}")
@@ -75,11 +75,12 @@ labeled, num_features = ndimage.label(binary)
 print(f"Number of features: {num_features}")
 
 # Find center of mass for each component
-centers = ndimage.center_of_mass(binary, labeled, range(1, num_features+1))
+centers = ndimage.center_of_mass(binary, labeled, range(1, num_features + 1))
 print(f"Centers of mass: {centers}")
 
 # Measure properties
 from scipy.ndimage import find_objects
+
 slices = find_objects(labeled)
 for i, slice_obj in enumerate(slices, 1):
     area = (labeled[slice_obj] == i).sum()

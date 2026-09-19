@@ -58,7 +58,7 @@ schema = pa.DataFrameSchema(
         "tenure": pa.Column(float, nullable=False),
         "churn": pa.Column(int, pa.Check.isin([0, 1])),
     },
-    strict=True,   # reject unknown columns
+    strict=True,  # reject unknown columns
 )
 
 try:
@@ -124,6 +124,7 @@ def check_serving_skew(ref_stats: dict, live_stats: dict, threshold: float = 0.1
             flags.append(f"{feat}: drift {drift:.2%}")
     return flags
 
+
 print(check_serving_skew({"amount": {"mean": 50.0}}, {"amount": {"mean": 300.0}}))
 ```
 
@@ -172,7 +173,7 @@ Different boundaries deserve different policies:
 
 ```python
 def quarantine_bad_rows(df, schema, dead_letter_path: str):
-    valid = schema.validate(df, lazy=True)          # collect ALL failures
+    valid = schema.validate(df, lazy=True)  # collect ALL failures
     bad = df.loc[valid.failure_cases.index]
     bad.to_csv(dead_letter_path, index=False)
     return df.drop(index=bad.index)

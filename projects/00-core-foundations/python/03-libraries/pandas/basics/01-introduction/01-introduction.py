@@ -27,7 +27,7 @@ print(f"Type: {type(s1)}")
 print()
 
 # From a dictionary (keys become index)
-s2 = pd.Series({'a': 1, 'b': 2, 'c': 3})
+s2 = pd.Series({"a": 1, "b": 2, "c": 3})
 print("From dict:")
 print(s2)
 print()
@@ -39,7 +39,7 @@ print(s3)
 print()
 
 # With custom index
-s4 = pd.Series([10, 20, 30], index=['x', 'y', 'z'])
+s4 = pd.Series([10, 20, 30], index=["x", "y", "z"])
 print("With custom index:")
 print(s4)
 print(f"Access by label: s4['y'] = {s4['y']}")
@@ -55,12 +55,14 @@ print("2. CREATING DATAFRAMES")
 print("=" * 60)
 
 # From dict of lists/arrays (columns)
-df1 = pd.DataFrame({
-    'name': ['Alice', 'Bob', 'Charlie', 'Diana'],
-    'age': [25, 30, 35, 28],
-    'city': ['NYC', 'LA', 'Chicago', 'Houston'],
-    'salary': [70000, 80000, 90000, 75000]
-})
+df1 = pd.DataFrame(
+    {
+        "name": ["Alice", "Bob", "Charlie", "Diana"],
+        "age": [25, 30, 35, 28],
+        "city": ["NYC", "LA", "Chicago", "Houston"],
+        "salary": [70000, 80000, 90000, 75000],
+    }
+)
 print("From dict of lists:")
 print(df1)
 print(f"Shape: {df1.shape}")
@@ -69,26 +71,28 @@ print(f"Dtypes:\n{df1.dtypes}")
 print()
 
 # From list of dicts (rows)
-df2 = pd.DataFrame([
-    {'name': 'Alice', 'age': 25, 'city': 'NYC'},
-    {'name': 'Bob', 'age': 30, 'city': 'LA'},
-    {'name': 'Charlie', 'age': 35, 'city': 'Chicago'},
-])
+df2 = pd.DataFrame(
+    [
+        {"name": "Alice", "age": 25, "city": "NYC"},
+        {"name": "Bob", "age": 30, "city": "LA"},
+        {"name": "Charlie", "age": 35, "city": "Chicago"},
+    ]
+)
 print("From list of dicts:")
 print(df2)
 print()
 
 # From 2D numpy array
 arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
-df3 = pd.DataFrame(arr, columns=['A', 'B', 'C'], index=['x', 'y', 'z'])
+df3 = pd.DataFrame(arr, columns=["A", "B", "C"], index=["x", "y", "z"])
 print("From numpy array:")
 print(df3)
 print()
 
 # From Series (each becomes a column)
-s_a = pd.Series([1, 2, 3], name='A')
-s_b = pd.Series([4, 5, 6], name='B')
-df4 = pd.DataFrame({'A': s_a, 'B': s_b})
+s_a = pd.Series([1, 2, 3], name="A")
+s_b = pd.Series([4, 5, 6], name="B")
+df4 = pd.DataFrame({"A": s_a, "B": s_b})
 print("From Series:")
 print(df4)
 print()
@@ -152,7 +156,7 @@ print(df1.describe())
 print()
 
 print("df1.describe(include='all'):")
-print(df1.describe(include='all'))
+print(df1.describe(include="all"))
 print()
 
 # =============================================================================
@@ -170,20 +174,20 @@ print()
 
 # Series has name, DataFrame has columns
 print(f"Series name: {s1.name}")
-s1.name = 'my_series'
+s1.name = "my_series"
 print(f"After naming: {s1.name}")
 print()
 
 # DataFrame columns can be accessed as Series
 print("df1['age'] is a Series:")
-print(type(df1['age']))
-print(df1['age'])
+print(type(df1["age"]))
+print(df1["age"])
 print()
 
 # Multiple columns -> DataFrame
 print("df1[['name', 'age']] is a DataFrame:")
-print(type(df1[['name', 'age']]))
-print(df1[['name', 'age']])
+print(type(df1[["name", "age"]]))
+print(df1[["name", "age"]])
 
 print("\n" + "=" * 60)
 print("END OF INTRODUCTION")

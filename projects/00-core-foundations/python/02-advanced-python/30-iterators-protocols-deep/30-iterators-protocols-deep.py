@@ -32,8 +32,10 @@ from typing import Any, Iterator
 # iterator advances with __next__ and signals exhaustion with
 # StopIteration. Complexity: O(1) per next().
 
+
 class Countdown:
     """Iterable AND iterator: counts down from start to 0."""
+
     def __init__(self, start: int) -> None:
         self.current = start
 
@@ -63,8 +65,10 @@ print(f"countdown: {list(Countdown(3))}")
 # Iteration works on ANY object with __getitem__ raising IndexError —
 # no __iter__ needed. This is how the protocol grew before __iter__.
 
+
 class SliceByIndex:
     """Iterable via __getitem__ alone: the fallback protocol."""
+
     def __init__(self, items: list[int]) -> None:
         self.items = items
 
@@ -87,8 +91,10 @@ print(f"fallback iteration: {list(SliceByIndex([10, 20, 30]))}")
 # __contains__, __iter__, __reversed__ for free from just __len__ +
 # __getitem__. This is the PyTorch Dataset pattern.
 
+
 class EmbeddingDataset(Sequence):
     """A read-only Sequence of (id, vector) pairs — Dataset-like."""
+
     def __init__(self, ids: list[int], vectors: list[tuple[float, ...]]) -> None:
         self._ids = ids
         self._vectors = vectors
@@ -128,8 +134,10 @@ print(f"reversed ids: {[i for i, _ in reversed(ds)]}")
 # __contains__ customizes `in`; __reversed__ customizes reversed();
 # __call__ makes instances callable (used by decorators-as-classes).
 
+
 class Membership:
     """Custom `in` semantics: case-insensitive string containment."""
+
     def __init__(self, values: list[str]) -> None:
         self.values = [v.lower() for v in values]
 
@@ -158,8 +166,10 @@ print(f"m('b') -> {m('b')}")
 # The `with` protocol. __exit__ returning True suppresses the exception
 # (usually you return False and let it propagate).
 
+
 class ManagedVector:
     """Context manager mimicking a vector-store session."""
+
     def __init__(self, name: str) -> None:
         self.name = name
         self.open = False
@@ -192,13 +202,15 @@ print(f"after with: open={store.open}")
 # equally, and the hash of an object in a dict/set must NEVER change.
 # Breaking it corrupts dict behavior: lookups miss, duplicates appear.
 
+
 class MutableKey:
     """DELIBERATELY BROKEN: hash follows a mutable field."""
+
     def __init__(self, value: str) -> None:
         self.value = value
 
     def __hash__(self) -> int:
-        return hash(self.value)          # changes when value changes!
+        return hash(self.value)  # changes when value changes!
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, MutableKey) and self.value == other.value
@@ -215,8 +227,8 @@ class MutableKey:
 key = MutableKey("a")
 table: dict[MutableKey, int] = {key: 1}
 print(f"lookup before mutation: {table.get(key)}")
-key.value = "b"                          # mutate the hash-relevant field
-fresh = MutableKey("b")                  # equal to the mutated key...
+key.value = "b"  # mutate the hash-relevant field
+fresh = MutableKey("b")  # equal to the mutated key...
 print(f"fresh equal key in table: {fresh in table}  (fresh == key: {fresh == key})")
 print(f"len(table): {len(table)}")
 
@@ -232,9 +244,11 @@ print(f"len(table): {len(table)}")
 # Define __eq__ + one rich comparison and total_ordering fills the
 # rest (__le__, __gt__, __ge__) from them.
 
+
 @functools.total_ordering
 class Score:
     """Orderable score with only __eq__ and __lt__ defined."""
+
     def __init__(self, value: float) -> None:
         self.value = value
 
@@ -261,8 +275,10 @@ print(f"a < b: {a < b} | a <= b: {a <= b} | b > a: {b > a} | a >= a: {a >= a}")
 # for EVERY attribute access. Use __getattr__ for lazy defaults;
 # override __getattribute__ only when you must intercept everything.
 
+
 class LazyConfig:
     """__getattr__ computes defaults for missing keys."""
+
     def __init__(self, known: dict[str, int]) -> None:
         self.known = known
 
@@ -273,6 +289,7 @@ class LazyConfig:
 
 class CountingAccess:
     """__getattribute__ sees every access — use sparingly."""
+
     def __init__(self, value: int) -> None:
         self.value = value
         self.accesses = 0
@@ -304,8 +321,10 @@ print(f"value: {ca.value}")
 # Subclass Mapping, implement __getitem__ + __len__ + __iter__, and the
 # ABC supplies get/keys/values/items/__contains__ for free.
 
+
 class CaseInsensitiveMap(Mapping):
     """A read-only mapping with case-insensitive string keys."""
+
     def __init__(self, data: dict[str, int]) -> None:
         self._data = {k.lower(): v for k, v in data.items()}
 
@@ -354,26 +373,22 @@ print(f"get: {cm.get('rate')} | items: {dict(cm.items())}")
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # --- iterator protocol ---
-    assert list(Countdown(3)) == [3, 2, 1, 0], \
-        "__iter__/__next__ must drive for-loop iteration"
-    assert next(iter(Countdown(0))) == 0, \
-        "first next() must return the start value"
+    assert list(Countdown(3)) == [3, 2, 1, 0], "__iter__/__next__ must drive for-loop iteration"
+    assert next(iter(Countdown(0))) == 0, "first next() must return the start value"
 
     # --- __getitem__ fallback ---
-    assert list(SliceByIndex([10, 20, 30])) == [10, 20, 30], \
+    assert list(SliceByIndex([10, 20, 30])) == [10, 20, 30], (
         "__getitem__ with IndexError must support iteration"
+    )
 
     # --- custom Sequence: len/in/slicing/reversed ---
     ds = EmbeddingDataset([0, 1, 2], [(1.0,), (2.0,), (3.0,)])
     assert len(ds) == 3, "__len__ must report the dataset size"
     assert ds[1] == (1, (2.0,)), "__getitem__ must return items by index"
     assert (2, (3.0,)) in ds, "Sequence ABC must supply __contains__"
-    assert ds[1:3] == [(1, (2.0,)), (2, (3.0,))], \
-        "Sequence ABC must supply slicing"
-    assert [i for i, _ in reversed(ds)] == [2, 1, 0], \
-        "Sequence ABC must supply __reversed__"
-    assert isinstance(ds, Sequence), \
-        "the class must register as collections.abc.Sequence"
+    assert ds[1:3] == [(1, (2.0,)), (2, (3.0,))], "Sequence ABC must supply slicing"
+    assert [i for i, _ in reversed(ds)] == [2, 1, 0], "Sequence ABC must supply __reversed__"
+    assert isinstance(ds, Sequence), "the class must register as collections.abc.Sequence"
 
     # --- __contains__ / __call__ ---
     m = Membership(["Alpha", "Beta"])
@@ -392,14 +407,13 @@ def _verify() -> None:
     key.value = "b"
     fresh = MutableKey("b")
     assert fresh == key, "the fresh key must equal the mutated one"
-    assert fresh not in table, \
-        "an EQUAL key must not be found after mutation (contract violation)"
-    assert len(table) == 1, \
-        "the entry still exists — the dict is now corrupted, not empty"
+    assert fresh not in table, "an EQUAL key must not be found after mutation (contract violation)"
+    assert len(table) == 1, "the entry still exists — the dict is now corrupted, not empty"
 
     # --- hash/eq contract respected: equal objects hash equal ---
     class Good:
         """Contract-correct key: hash on an immutable field."""
+
         def __init__(self, value: str) -> None:
             self.value = value
 
@@ -409,28 +423,26 @@ def _verify() -> None:
         def __eq__(self, other: object) -> bool:
             return isinstance(other, Good) and self.value == other.value
 
-    assert hash(Good("x")) == hash(Good("x")), \
-        "equal objects must hash equally"
+    assert hash(Good("x")) == hash(Good("x")), "equal objects must hash equally"
     assert Good("x") in {Good("x")}, "contract-correct keys must be found"
 
     # --- total_ordering ---
     a = Score(1.0)
     b = Score(2.0)
-    assert a < b and a <= b and b > a and a >= a, \
+    assert a < b and a <= b and b > a and a >= a, (
         "total_ordering must derive <=, >, >= from __eq__ and __lt__"
+    )
 
     # --- __getattr__ vs __getattribute__ ---
     cfg = LazyConfig({"batch": 32})
-    assert cfg.batch == 32 and cfg.lr == 0, \
-        "__getattr__ must only fire for missing attributes"
+    assert cfg.batch == 32 and cfg.lr == 0, "__getattr__ must only fire for missing attributes"
     assert ca.value == 7, "__getattribute__ must delegate to the base"
 
     # --- Mapping ABC ---
     cm = CaseInsensitiveMap({"Rate": 10})
     assert isinstance(cm, Mapping), "class must register as a Mapping"
     assert cm["RATE"] == 10, "__getitem__ must be case-insensitive"
-    assert dict(cm.items()) == {"rate": 10}, \
-        "Mapping ABC must supply items()"
+    assert dict(cm.items()) == {"rate": 10}, "Mapping ABC must supply items()"
     assert "rate" in cm, "Mapping ABC must supply __contains__"
 
     print("[OK] 30-iterators-protocols-deep: all checks passed")

@@ -68,11 +68,12 @@ putting encoders inside a `Pipeline`/`ColumnTransformer` makes this automatic.
 
 ```python
 features = [
-    log(order_count + 1),                 # skew fix
-    target_encoded(product_category),     # high-cardinality
-    price / median_price_per_category,    # relative pricing
-    hour_of_day, is_weekend,              # temporal signals
-    tfidf(customer_bio)[:20],             # text signal
+    log(order_count + 1),  # skew fix
+    target_encoded(product_category),  # high-cardinality
+    price / median_price_per_category,  # relative pricing
+    hour_of_day,
+    is_weekend,  # temporal signals
+    tfidf(customer_bio)[:20],  # text signal
 ]
 ```
 

@@ -67,13 +67,13 @@ Boolean data type — True or False.
 
 ```python
 arr = np.array([True, False, True], dtype=np.bool_)
-print(arr.dtype)    # bool
+print(arr.dtype)  # bool
 print(arr.itemsize)  # 1 byte
 
 # From comparison
 arr = np.array([1, 2, 3, 4, 5])
 mask = arr > 3
-print(mask.dtype)   # bool
+print(mask.dtype)  # bool
 ```
 
 **Related:** dtype, boolean indexing
@@ -106,8 +106,8 @@ print(arr_f32.dtype)  # float32
 Complex number type with float32 real and imaginary parts.
 
 ```python
-arr = np.array([1+2j, 3+4j], dtype=np.complex64)
-print(arr.dtype)    # complex64
+arr = np.array([1 + 2j, 3 + 4j], dtype=np.complex64)
+print(arr.dtype)  # complex64
 print(arr.itemsize)  # 8 bytes
 ```
 
@@ -119,8 +119,8 @@ print(arr.itemsize)  # 8 bytes
 Complex number type with float64 real and imaginary parts.
 
 ```python
-arr = np.array([1+2j, 3+4j], dtype=np.complex128)
-print(arr.dtype)    # complex128
+arr = np.array([1 + 2j, 3 + 4j], dtype=np.complex128)
+print(arr.dtype)  # complex128
 print(arr.itemsize)  # 16 bytes
 ```
 
@@ -135,7 +135,7 @@ The data type of array elements. Controls memory allocation and operations.
 
 ```python
 arr = np.array([1, 2, 3], dtype=np.float64)
-print(arr.dtype)    # float64
+print(arr.dtype)  # float64
 print(arr.itemsize)  # 8 bytes
 
 # Common dtypes
@@ -157,7 +157,7 @@ Half-precision floating point (16 bits).
 
 ```python
 arr = np.array([1.123456789], dtype=np.float16)
-print(arr[0])       # 1.123 — precision loss!
+print(arr[0])  # 1.123 — precision loss!
 print(arr.itemsize)  # 2 bytes
 
 # Range
@@ -176,7 +176,7 @@ Single-precision floating point (32 bits).
 
 ```python
 arr = np.array([1.123456789], dtype=np.float32)
-print(arr[0])       # 1.1234568 — good precision
+print(arr[0])  # 1.1234568 — good precision
 print(arr.itemsize)  # 4 bytes
 
 # Range
@@ -194,7 +194,7 @@ Double-precision floating point (64 bits). NumPy's default float type.
 
 ```python
 arr = np.array([1.123456789], dtype=np.float64)
-print(arr[0])       # 1.123456789 — full precision
+print(arr[0])  # 1.123456789 — full precision
 print(arr.itemsize)  # 8 bytes
 
 # Range
@@ -212,10 +212,10 @@ Get information about floating-point types.
 
 ```python
 info = np.finfo(np.float32)
-print(info.dtype)    # float32
-print(info.bits)     # 32
-print(info.max)      # 3.4028235e+38
-print(info.min)      # -3.4028235e+38
+print(info.dtype)  # float32
+print(info.bits)  # 32
+print(info.max)  # 3.4028235e+38
+print(info.min)  # -3.4028235e+38
 print(info.precision)  # 7
 print(info.resolution)  # 1e-05
 ```
@@ -231,10 +231,10 @@ Get information about integer types.
 
 ```python
 info = np.iinfo(np.int32)
-print(info.dtype)    # int32
-print(info.bits)     # 32
-print(info.max)      # 2147483647
-print(info.min)      # -2147483648
+print(info.dtype)  # int32
+print(info.bits)  # 32
+print(info.max)  # 2147483647
+print(info.min)  # -2147483648
 ```
 
 **Related:** finfo, dtype
@@ -246,7 +246,7 @@ Signed 8-bit integer (-128 to 127).
 
 ```python
 arr = np.array([100, 127, -128], dtype=np.int8)
-print(arr.dtype)    # int8
+print(arr.dtype)  # int8
 print(arr.itemsize)  # 1 byte
 
 # Overflow example
@@ -263,7 +263,7 @@ Signed 16-bit integer (-32768 to 32767).
 
 ```python
 arr = np.array([32767, -32768], dtype=np.int16)
-print(arr.dtype)    # int16
+print(arr.dtype)  # int16
 print(arr.itemsize)  # 2 bytes
 ```
 
@@ -276,7 +276,7 @@ Signed 32-bit integer (±2.1 billion).
 
 ```python
 arr = np.array([2147483647, -2147483648], dtype=np.int32)
-print(arr.dtype)    # int32
+print(arr.dtype)  # int32
 print(arr.itemsize)  # 4 bytes
 ```
 
@@ -289,12 +289,12 @@ Signed 64-bit integer (±9.2×10^18). NumPy's default integer type.
 
 ```python
 arr = np.array([1, 2, 3], dtype=np.int64)
-print(arr.dtype)    # int64
+print(arr.dtype)  # int64
 print(arr.itemsize)  # 8 bytes
 
 # Default type
 arr = np.array([1, 2, 3])
-print(arr.dtype)    # int64 (default)
+print(arr.dtype)  # int64 (default)
 ```
 
 **Related:** int32, iinfo
@@ -308,7 +308,7 @@ Stores Python objects (slow, avoid when possible).
 
 ```python
 arr = np.array([1, "hello", [1, 2, 3]], dtype=np.object_)
-print(arr.dtype)    # object
+print(arr.dtype)  # object
 print(arr.itemsize)  # platform-dependent
 
 # Slow operations — no vectorization
@@ -333,7 +333,7 @@ arr = np.array([128], dtype=np.int16)
 print(arr)  # [128] — no overflow
 
 # Check range before creating
-print(np.iinfo(np.int8).max)   # 127
+print(np.iinfo(np.int8).max)  # 127
 print(np.iinfo(np.int16).max)  # 32767
 ```
 
@@ -368,11 +368,11 @@ Unicode string data type.
 
 ```python
 arr = np.array(["hello", "world"], dtype=np.str_)
-print(arr.dtype)    # <U5
+print(arr.dtype)  # <U5
 print(arr.itemsize)  # 20 bytes (5 chars × 4 bytes each)
 
 # Fixed-width strings
-arr = np.array(["hi", "hello"], dtype='U5')
+arr = np.array(["hi", "hello"], dtype="U5")
 print(arr)  # ['hi' 'hello']
 ```
 
@@ -437,7 +437,7 @@ Unsigned 8-bit integer (0 to 255). Common for image data.
 
 ```python
 arr = np.array([0, 128, 255], dtype=np.uint8)
-print(arr.dtype)    # uint8
+print(arr.dtype)  # uint8
 print(arr.itemsize)  # 1 byte
 
 # Image data example

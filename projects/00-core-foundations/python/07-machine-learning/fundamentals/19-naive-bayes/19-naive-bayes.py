@@ -46,11 +46,10 @@ p_positive_given_disease = 0.99
 p_positive_given_no_disease = 0.05
 
 # P(positive) = P(positive|disease) x P(disease) + P(positive|no disease) x P(no disease)
-p_positive = (p_positive_given_disease * p_disease + 
-              p_positive_given_no_disease * (1 - p_disease))
+p_positive = p_positive_given_disease * p_disease + p_positive_given_no_disease * (1 - p_disease)
 
 # P(disease|positive) = P(positive|disease) x P(disease) / P(positive)
-p_disease_given_positive = (p_positive_given_disease * p_disease / p_positive)
+p_disease_given_positive = p_positive_given_disease * p_disease / p_positive
 
 print(f"P(disease) = {p_disease}")
 print(f"P(positive|disease) = {p_positive_given_disease}")
@@ -65,8 +64,7 @@ print(f"P(disease|positive) = {p_disease_given_positive:.4f}")
 print("\nExample 4: Classification Data")
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=300, n_features=4, n_informative=3,
-    n_redundant=1, n_classes=2, random_state=42
+    n_samples=300, n_features=4, n_informative=3, n_redundant=1, n_classes=2, random_state=42
 )
 
 print(f"Samples: {X.shape[0]}")
@@ -75,9 +73,7 @@ print(f"Classes: {np.unique(y)}")
 
 # Example 5: Train/test split
 print("\nExample 5: Train/Test Split")
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 print(f"Training set: {len(X_train)} samples")
 print(f"Test set: {len(X_test)} samples")
 
@@ -108,9 +104,11 @@ y_prob = model.predict_proba(X_test)
 
 print("First 5 predictions:")
 for i in range(5):
-    print(f"  Sample {i+1}: Predicted={y_pred[i]}, "
-          f"P(class 0)={y_prob[i, 0]:.3f}, "
-          f"P(class 1)={y_prob[i, 1]:.3f}")
+    print(
+        f"  Sample {i + 1}: Predicted={y_pred[i]}, "
+        f"P(class 0)={y_prob[i, 0]:.3f}, "
+        f"P(class 1)={y_prob[i, 1]:.3f}"
+    )
 
 # ============================================================
 # Model Evaluation
@@ -199,7 +197,7 @@ print("  - Can be outperformed by more complex models")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Naive Bayes uses Bayes' theorem with independence assumption")
 print("- GaussianNB for continuous features")
@@ -207,4 +205,4 @@ print("- MultinomialNB for discrete counts")
 print("- Fast and works well with small data")
 print("- Good baseline for text classification")
 print("- Simple but effective algorithm")
-print("="*60)
+print("=" * 60)

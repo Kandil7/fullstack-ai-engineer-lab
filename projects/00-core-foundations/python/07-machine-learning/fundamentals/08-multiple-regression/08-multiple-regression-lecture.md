@@ -75,17 +75,14 @@ bedrooms = np.random.randint(1, 6, n_samples)
 age = np.random.randint(0, 50, n_samples)
 
 # Known relationship: Price = 150*sqft + 20000*bed - 1000*age + noise
-price = (150 * square_feet + 
-         20000 * bedrooms - 
-         1000 * age + 
-         np.random.randn(n_samples) * 20000)
+price = 150 * square_feet + 20000 * bedrooms - 1000 * age + np.random.randn(n_samples) * 20000
 
 # Stack features into matrix
 X = np.column_stack([square_feet, bedrooms, age])
 y = price
 
 print(f"Feature matrix shape: {X.shape}")  # (200, 3)
-print(f"Target shape: {y.shape}")            # (200,)
+print(f"Target shape: {y.shape}")  # (200,)
 ```
 
 ### Example 2: Fitting the Model
@@ -94,9 +91,7 @@ print(f"Target shape: {y.shape}")            # (200,)
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 model = LinearRegression()
 model.fit(X_train, y_train)
@@ -136,27 +131,28 @@ print(f"R-squared: {r2:.4f}")
 ### Example 5: Feature Importance
 
 ```python
-feature_names = ['Square Feet', 'Bedrooms', 'Age']
+feature_names = ["Square Feet", "Bedrooms", "Age"]
 importance = np.abs(model.coef_) / np.abs(model.coef_).sum()
 
-for name, imp in sorted(zip(feature_names, importance), 
-                       key=lambda x: x[1], reverse=True):
-    print(f"  {name}: {imp:.3f} ({imp*100:.1f}%)")
+for name, imp in sorted(zip(feature_names, importance), key=lambda x: x[1], reverse=True):
+    print(f"  {name}: {imp:.3f} ({imp * 100:.1f}%)")
 ```
 
 ### Example 6: Predicting New Houses
 
 ```python
-new_houses = np.array([
-    [1500, 3, 10],   # 1500 sqft, 3 bedrooms, 10 years old
-    [2500, 4, 5],    # 2500 sqft, 4 bedrooms, 5 years old
-    [1200, 2, 20]    # 1200 sqft, 2 bedrooms, 20 years old
-])
+new_houses = np.array(
+    [
+        [1500, 3, 10],  # 1500 sqft, 3 bedrooms, 10 years old
+        [2500, 4, 5],  # 2500 sqft, 4 bedrooms, 5 years old
+        [1200, 2, 20],  # 1200 sqft, 2 bedrooms, 20 years old
+    ]
+)
 
 predictions = model.predict(new_houses)
 
 for i, (house, pred) in enumerate(zip(new_houses, predictions)):
-    print(f"House {i+1}: {house[0]} sqft, {house[1]} bedrooms, {house[2]} years")
+    print(f"House {i + 1}: {house[0]} sqft, {house[1]} bedrooms, {house[2]} years")
     print(f"  Predicted price: ${pred:,.0f}")
 ```
 
@@ -165,19 +161,12 @@ for i, (house, pred) in enumerate(zip(new_houses, predictions)):
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    'square_feet': square_feet,
-    'bedrooms': bedrooms,
-    'age': age,
-    'price': price
-})
+df = pd.DataFrame({"square_feet": square_feet, "bedrooms": bedrooms, "age": age, "price": price})
 
-X = df[['square_feet', 'bedrooms', 'age']]
-y = df['price']
+X = df[["square_feet", "bedrooms", "age"]]
+y = df["price"]
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 model = LinearRegression()
 model.fit(X_train, y_train)

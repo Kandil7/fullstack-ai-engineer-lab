@@ -18,6 +18,7 @@ are at the end.
 
 ```python
 import json
+
 print(json.loads(json.dumps({"pair": (1, 2)}))["pair"])
 ```
 
@@ -31,6 +32,7 @@ print(json.loads(json.dumps({"pair": (1, 2)}))["pair"])
 
 ```python
 import json
+
 json.dumps({"tags": {"rag", "eval"}})
 ```
 
@@ -60,6 +62,7 @@ json.dumps({"tags": {"rag", "eval"}})
 
 ```python
 import csv, io
+
 buf = io.StringIO()
 w = csv.DictWriter(buf, fieldnames=["id", "text"])
 w.writeheader()
@@ -79,6 +82,7 @@ print(rows[0]["id"], type(rows[0]["id"]).__name__)
 
 ```python
 import json
+
 print(json.dumps({"x": "مرحبا"}, ensure_ascii=False))
 ```
 
@@ -92,6 +96,7 @@ print(json.dumps({"x": "مرحبا"}, ensure_ascii=False))
 
 ```python
 import json
+
 print(json.dumps({"s": float("nan")}))
 ```
 
@@ -121,6 +126,7 @@ print(json.dumps({"s": float("nan")}))
 
 ```python
 import pickle
+
 print(pickle.DEFAULT_PROTOCOL, pickle.HIGHEST_PROTOCOL)
 ```
 
@@ -142,6 +148,7 @@ print(pickle.DEFAULT_PROTOCOL, pickle.HIGHEST_PROTOCOL)
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE t (x INTEGER)")
 with conn:
@@ -176,6 +183,7 @@ conn.close()
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE t (x INTEGER)")
 with conn:
@@ -204,6 +212,7 @@ conn.close()
 
 ```python
 import shelve
+
 with shelve.open("cache.shlv") as db:
     db["k"] = {"vec": [0.1, 0.2]}
 with shelve.open("cache.shlv") as db:
@@ -222,6 +231,7 @@ with shelve.open("cache.shlv") as db:
 
 ```python
 import struct, base64
+
 print(struct.pack(">f", 3.5).hex(), base64.b64encode(b"hi").decode())
 ```
 

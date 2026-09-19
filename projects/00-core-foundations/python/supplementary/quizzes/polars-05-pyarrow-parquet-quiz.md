@@ -25,6 +25,7 @@ Answers with full explanations and distractor analysis at the end.
 **E3 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3]})
 df.write_parquet("t.parquet")
 print(pl.read_parquet("t.parquet").height)
@@ -52,6 +53,7 @@ print(pl.read_parquet("t.parquet").height)
 **E6 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3]})
 df.write_parquet("t.parquet")
 print(pl.scan_parquet("t.parquet").collect().shape)
@@ -77,6 +79,7 @@ typical numeric+string ML data?
 **M2 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"score": [0.5, 0.25]})
 arr = df["score"].to_numpy(allow_copy=False)
 print(arr.dtype)
@@ -91,6 +94,7 @@ print(arr[0])
 **M3 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"label": ["pos", "neg"]})
 try:
     df["label"].to_numpy(allow_copy=False)
@@ -127,6 +131,7 @@ is:
 ```python
 import os
 import polars as pl
+
 df = pl.DataFrame({"a": [i % 1000 for i in range(100_000)]})
 df.write_parquet("z.parquet", compression="zstd")
 df.write_parquet("u.parquet", compression="uncompressed")
@@ -141,6 +146,7 @@ print(os.path.getsize("z.parquet") < os.path.getsize("u.parquet"))
 **M7 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
 df.write_parquet("t.parquet", compression="zstd")
 back = pl.read_parquet("t.parquet")
@@ -184,6 +190,7 @@ print(back["b"][1])
 **H2 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"label": ["neg"] * 4})
 df.write_parquet("t.parquet", compression="zstd")
 schema = pl.read_parquet("t.parquet").schema

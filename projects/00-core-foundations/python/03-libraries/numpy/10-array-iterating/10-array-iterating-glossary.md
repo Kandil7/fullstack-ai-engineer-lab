@@ -59,8 +59,8 @@ An operation applied independently to each element.
 arr = np.array([1, 2, 3, 4, 5])
 
 # Element-wise operations
-print(arr * 2)    # [2 4 6 8 10]
-print(arr ** 2)   # [1 4 9 16 25]
+print(arr * 2)  # [2 4 6 8 10]
+print(arr**2)  # [1 4 9 16 25]
 print(np.sqrt(arr))  # [1. 1.414 1.732 2. 2.236]
 ```
 
@@ -98,7 +98,7 @@ matrix = np.array([[1, 2, 3], [4, 5, 6]])
 
 # Iterate over all elements
 for element in matrix.flat:
-    print(element, end=' ')
+    print(element, end=" ")
 print()
 # 1 2 3 4 5 6
 
@@ -156,18 +156,18 @@ arr = np.arange(12).reshape(3, 4)
 
 # Basic iteration
 for element in np.nditer(arr):
-    print(element, end=' ')
+    print(element, end=" ")
 print()
 # 0 1 2 3 4 5 6 7 8 9 10 11
 
 # With order control
-for element in np.nditer(arr, order='F'):
-    print(element, end=' ')
+for element in np.nditer(arr, order="F"):
+    print(element, end=" ")
 print()
 # 0 4 8 1 5 9 2 6 10 3 7 11
 
 # With modification
-for element in np.nditer(arr, op_flags=['readwrite']):
+for element in np.nditer(arr, op_flags=["readwrite"]):
     element[...] = element * 2
 ```
 
@@ -184,14 +184,14 @@ Iteration order: 'C' (row-major) or 'F' (column-major).
 arr = np.arange(12).reshape(3, 4)
 
 # C order (default)
-for element in np.nditer(arr, order='C'):
-    print(element, end=' ')
+for element in np.nditer(arr, order="C"):
+    print(element, end=" ")
 print()
 # 0 1 2 3 4 5 6 7 8 9 10 11
 
 # F order
-for element in np.nditer(arr, order='F'):
-    print(element, end=' ')
+for element in np.nditer(arr, order="F"):
+    print(element, end=" ")
 print()
 # 0 4 8 1 5 9 2 6 10 3 7 11
 ```
@@ -211,7 +211,7 @@ for element in np.nditer(arr):
     pass  # element[...] = 0  # Error!
 
 # With readwrite flag
-for element in np.nditer(arr, op_flags=['readwrite']):
+for element in np.nditer(arr, op_flags=["readwrite"]):
     element[...] = element * 2
 
 print(arr)  # [2. 4. 6.]
@@ -229,8 +229,8 @@ Op_flag that allows modifying elements during iteration.
 ```python
 arr = np.arange(5).astype(float)
 
-for element in np.nditer(arr, op_flags=['readwrite']):
-    element[...] = element ** 2
+for element in np.nditer(arr, op_flags=["readwrite"]):
+    element[...] = element**2
 
 print(arr)  # [ 0.  1.  4.  9. 16.]
 ```
@@ -246,8 +246,8 @@ C-style memory layout (rows first, default).
 arr = np.arange(12).reshape(3, 4)
 
 # C order iteration
-for element in np.nditer(arr, order='C'):
-    print(element, end=' ')
+for element in np.nditer(arr, order="C"):
+    print(element, end=" ")
 print()
 # 0 1 2 3 4 5 6 7 8 9 10 11
 ```

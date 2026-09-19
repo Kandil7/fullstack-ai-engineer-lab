@@ -15,8 +15,10 @@ from enum import Enum
 # 1. Singleton Pattern
 # =============================================================================
 
+
 class Singleton:
     """Singleton using metaclass."""
+
     _instances = {}
 
     def __new__(cls, *args, **kwargs):
@@ -38,6 +40,7 @@ class DatabaseConnection(Singleton):
 # =============================================================================
 # 2. Factory Pattern
 # =============================================================================
+
 
 class Animal(ABC):
     """Abstract animal class."""
@@ -100,6 +103,7 @@ class AnimalFactory:
 # 3. Observer Pattern
 # =============================================================================
 
+
 class Observer(ABC):
     """Abstract observer."""
 
@@ -160,6 +164,7 @@ class AlertObserver(Observer):
 # =============================================================================
 # 4. Strategy Pattern
 # =============================================================================
+
 
 class SortStrategy(ABC):
     """Abstract sorting strategy."""
@@ -226,6 +231,7 @@ class Sorter:
 # 5. Adapter Pattern
 # =============================================================================
 
+
 class EuropeanSocket:
     """European socket interface."""
 
@@ -287,6 +293,7 @@ class Laptop:
 # =============================================================================
 # 6. Decorator Pattern (different from Python decorators)
 # =============================================================================
+
 
 class TextProcessor(ABC):
     """Abstract text processor."""

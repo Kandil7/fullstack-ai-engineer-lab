@@ -43,9 +43,10 @@ D) Returns the class name
 class Dog:
     def __init__(self, name):
         self.name = name
-    
+
     def bark(self):
         return f"{self.name} says Woof!"
+
 
 my_dog = Dog("Buddy")
 print(my_dog.bark())
@@ -79,9 +80,11 @@ class Animal:
     def speak(self):
         return "Some sound"
 
+
 class Dog(Animal):
     def speak(self):
         return "Woof!"
+
 
 dog = Dog()
 print(dog.speak())
@@ -127,9 +130,10 @@ class Person:
     def __init__(self, name, age):
         self.__name = name
         self.__age = age
-    
+
     def get_name(self):
         return self.__name
+
 
 p = Person("Alice", 25)
 print(p.__name)
@@ -163,10 +167,12 @@ class Base:
     def __init__(self):
         print("Base init")
 
+
 class Child(Base):
     def __init__(self):
         super().__init__()
         print("Child init")
+
 
 c = Child()
 ```
@@ -197,9 +203,10 @@ D) It's optional in all methods
 ```python
 class Counter:
     count = 0
-    
+
     def __init__(self):
         Counter.count += 1
+
 
 c1 = Counter()
 c2 = Counter()
@@ -235,12 +242,13 @@ class Vector:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-    
+
     def __add__(self, other):
         return Vector(self.x + other.x, self.y + other.y)
-    
+
     def __str__(self):
         return f"({self.x}, {self.y})"
+
 
 v1 = Vector(1, 2)
 v2 = Vector(3, 4)
@@ -277,6 +285,7 @@ class MathOperations:
     def add(a, b):
         return a + b
 
+
 print(MathOperations.add(5, 3))
 ```
 
@@ -308,12 +317,15 @@ class A:
     def show(self):
         return "A"
 
+
 class B(A):
     def show(self):
         return "B"
 
+
 class C(B):
     pass
+
 
 c = C()
 print(c.show())
@@ -345,11 +357,12 @@ D) `__str__` is required, `__repr__` is optional
 ```python
 class Singleton:
     _instance = None
-    
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
+
 
 s1 = Singleton()
 s2 = Singleton()

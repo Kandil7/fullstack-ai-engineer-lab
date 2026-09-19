@@ -111,6 +111,7 @@ calls like `train(model, 10, 1e-4)`.
 def train(model, *, epochs: int, lr: float) -> str:
     return f"{model} {epochs} {lr}"
 
+
 print(train("bert", epochs=3, lr=1e-4))  # bert 3 0.0001
 ```
 
@@ -126,6 +127,7 @@ for deltas, sliding windows of size 2, and transition counts.
 **Example**:
 ```python
 import itertools
+
 print(list(itertools.pairwise([1, 3, 6])))  # [(1, 3), (3, 6)]
 ```
 
@@ -143,7 +145,8 @@ accidentally reorder keyword arguments.
 def mul(a, b, /):
     return a * b
 
-print(mul(2, 3))      # 6
+
+print(mul(2, 3))  # 6
 print(mul(a=2, b=3))  # TypeError: got some positional-only arguments
 ```
 
@@ -160,7 +163,7 @@ string.
 **Example**:
 ```python
 print("s3://bucket/k".removeprefix("s3://"))  # bucket/k
-print("https://x".removeprefix("s3://"))      # https://x (unchanged)
+print("https://x".removeprefix("s3://"))  # https://x (unchanged)
 ```
 
 **Complexity**: O(len(s)).
@@ -175,7 +178,7 @@ way to strip a file extension you know is present.
 **Example**:
 ```python
 print("model_v3.pt".removesuffix(".pt"))  # model_v3
-print("model_v3".removesuffix(".pt"))     # model_v3 (unchanged)
+print("model_v3".removesuffix(".pt"))  # model_v3 (unchanged)
 ```
 
 **Complexity**: O(len(s)).

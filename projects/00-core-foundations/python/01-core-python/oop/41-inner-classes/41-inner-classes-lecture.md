@@ -27,9 +27,10 @@ class Outer:
     class Inner:
         def __init__(self, value):
             self.value = value
-    
+
     def create_inner(self):
         return self.Inner(42)
+
 
 # Usage
 outer = Outer()
@@ -54,19 +55,20 @@ class University:
     def __init__(self, name):
         self.name = name
         self.departments = []
-    
+
     class Department:
         def __init__(self, name, head):
             self.name = name
             self.head = head
-        
+
         def __repr__(self):
             return f"Dept: {self.name} (Head: {self.head})"
-    
+
     def add_department(self, name, head):
         dept = self.Department(name, head)
         self.departments.append(dept)
         return dept
+
 
 # Usage
 uni = University("MIT")
@@ -87,13 +89,14 @@ print(uni.departments)
 class Outer:
     def __init__(self):
         self.outer_attr = "Outer value"
-    
+
     class Inner:
         def __init__(self, outer_instance):
             self.outer = outer_instance  # Store reference
-        
+
         def access_outer(self):
             return self.outer.outer_attr
+
 
 # Usage
 outer = Outer()
@@ -107,24 +110,25 @@ print(inner.access_outer())  # Outer value
 class Outer:
     def __init__(self):
         self.data = [1, 2, 3, 4, 5]
-    
+
     class Iterator:
         def __init__(self, data):
             self.data = data
             self.index = 0
-        
+
         def __iter__(self):
             return self
-        
+
         def __next__(self):
             if self.index >= len(self.data):
                 raise StopIteration
             value = self.data[self.index]
             self.index += 1
             return value
-    
+
     def __iter__(self):
         return self.Iterator(self.data)
+
 
 # Usage
 outer = Outer()
@@ -145,28 +149,28 @@ class QueryBuilder:
         self._conditions = []
         self._order = None
         self._limit = None
-    
+
     class Condition:
         def __init__(self, field, operator, value):
             self.field = field
             self.operator = operator
             self.value = value
-        
+
         def __str__(self):
             return f"{self.field} {self.operator} {self.value}"
-    
+
     def where(self, field, operator, value):
         self._conditions.append(self.Condition(field, operator, value))
         return self
-    
+
     def order_by(self, field, desc=False):
         self._order = f"{field} {'DESC' if desc else 'ASC'}"
         return self
-    
+
     def limit(self, count):
         self._limit = count
         return self
-    
+
     def build(self):
         query = f"SELECT * FROM {self.table}"
         if self._conditions:
@@ -178,13 +182,16 @@ class QueryBuilder:
             query += f" LIMIT {self._limit}"
         return query
 
+
 # Usage
-query = (QueryBuilder("users")
+query = (
+    QueryBuilder("users")
     .where("age", ">", 18)
     .where("status", "=", "active")
     .order_by("name")
     .limit(10)
-    .build())
+    .build()
+)
 
 print(query)
 # SELECT * FROM users WHERE age > 18 AND status = active ORDER BY name ASC LIMIT 10
@@ -196,32 +203,33 @@ print(query)
 class TrafficLight:
     def __init__(self):
         self._state = self.Red()
-    
+
     class State:
         def next(self, light):
             raise NotImplementedError
-        
+
         def __str__(self):
             return self.__class__.__name__
-    
+
     class Red(State):
         def next(self, light):
             light._state = light.Green()
-    
+
     class Green(State):
         def next(self, light):
             light._state = light.Yellow()
-    
+
     class Yellow(State):
         def next(self, light):
             light._state = light.Red()
-    
+
     def next(self):
         self._state.next(self)
-    
+
     @property
     def current(self):
         return str(self._state)
+
 
 # Usage
 light = TrafficLight()
@@ -243,18 +251,20 @@ class Vehicle:
     class Engine:
         def __init__(self, horsepower):
             self.horsepower = horsepower
-        
+
         def start(self):
             return f"Engine started ({self.horsepower} HP)"
-    
+
     def __init__(self, make, horsepower):
         self.make = make
         self.engine = self.Engine(horsepower)
+
 
 class ElectricVehicle(Vehicle):
     class Engine(Vehicle.Engine):  # Override inner class
         def start(self):
             return f"Silent electric motor ({self.horsepower} HP)"
+
 
 # Usage
 car = Vehicle("Toyota", 200)
@@ -277,15 +287,16 @@ class Config:
             self.host = "localhost"
             self.port = 5432
             self.name = "mydb"
-    
+
     class Cache:
         def __init__(self):
             self.enabled = True
             self.ttl = 300
-    
+
     def __init__(self):
         self.database = self.Database()
         self.cache = self.Cache()
+
 
 # Usage
 config = Config()
@@ -300,15 +311,15 @@ class LoggerFactory:
     class FileLogger:
         def __init__(self, filename):
             self.filename = filename
-        
+
         def log(self, message):
-            with open(self.filename, 'a') as f:
+            with open(self.filename, "a") as f:
                 f.write(f"{message}\n")
-    
+
     class ConsoleLogger:
         def log(self, message):
             print(f"LOG: {message}")
-    
+
     @staticmethod
     def create(log_type, **kwargs):
         if log_type == "file":
@@ -316,6 +327,7 @@ class LoggerFactory:
         elif log_type == "console":
             return LoggerFactory.ConsoleLogger()
         raise ValueError(f"Unknown type: {log_type}")
+
 
 # Usage
 file_logger = LoggerFactory.create("file", filename="app.log")
@@ -345,9 +357,11 @@ class A:
             class D:
                 pass
 
+
 # GOOD - flatten when too deep
 class A:
     pass
+
 
 class B:
     pass
@@ -374,12 +388,12 @@ class B:
 class LinkedList:
     def __init__(self):
         self.head = None
-    
+
     class Node:
         def __init__(self, data):
             self.data = data
             self.next = None
-    
+
     def append(self, data):
         if not self.head:
             self.head = self.Node(data)
@@ -388,12 +402,13 @@ class LinkedList:
             while current.next:
                 current = current.next
             current.next = self.Node(data)
-    
+
     def __iter__(self):
         current = self.head
         while current:
             yield current.data
             current = current.next
+
 
 # Usage
 ll = LinkedList()

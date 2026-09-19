@@ -16,6 +16,7 @@ from typing import Any, Optional
 # 1. Class-Based Context Manager
 # =============================================================================
 
+
 class ManagedFile:
     """Context manager for file operations with auto-close."""
 
@@ -73,6 +74,7 @@ class DatabaseConnection:
 # 2. Function-Based Context Manager (contextmanager)
 # =============================================================================
 
+
 @contextmanager
 def managed_temp_dir(prefix: str = "temp_") -> str:
     """Create and clean up a temporary directory."""
@@ -82,6 +84,7 @@ def managed_temp_dir(prefix: str = "temp_") -> str:
         yield temp_dir
     finally:
         import shutil
+
         shutil.rmtree(temp_dir, ignore_errors=True)
         print(f"  Cleaned up temp dir")
 
@@ -90,6 +93,7 @@ def managed_temp_dir(prefix: str = "temp_") -> str:
 def timer(label: str = "Operation"):
     """Time a block of code."""
     import time
+
     start = time.perf_counter()
     print(f"  [{label}] Starting...")
     try:
@@ -114,6 +118,7 @@ def captured_output():
 # =============================================================================
 # 3. Advanced Patterns
 # =============================================================================
+
 
 class SuppressErrors:
     """Context manager to suppress specific exceptions."""
@@ -149,6 +154,7 @@ class NestedResource:
 # 4. Contextlib Utilities
 # =============================================================================
 
+
 def demo_contextlib_utilities():
     """Demonstrate contextlib module features."""
     # suppress - silently ignore exceptions
@@ -165,9 +171,7 @@ def demo_contextlib_utilities():
     with ExitStack() as stack:
         files = []
         for i in range(3):
-            f = stack.enter_context(
-                ManagedFile(tempfile.mktemp(suffix=".txt"), "w")
-            )
+            f = stack.enter_context(ManagedFile(tempfile.mktemp(suffix=".txt"), "w"))
             f.write(f"File {i}\n")
             files.append(f)
         print(f"  Managed {len(files)} files dynamically")
@@ -204,8 +208,10 @@ if __name__ == "__main__":
 
     print("\n--- Timer ---")
     with timer("Fibonacci"):
+
         def fib(n):
-            return n if n < 2 else fib(n-1) + fib(n-2)
+            return n if n < 2 else fib(n - 1) + fib(n - 2)
+
         result = fib(25)
         print(f"  fib(25) = {result}")
 

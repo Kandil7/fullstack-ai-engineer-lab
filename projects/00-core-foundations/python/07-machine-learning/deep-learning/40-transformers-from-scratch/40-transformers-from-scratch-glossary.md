@@ -84,7 +84,7 @@ length S — the dominant cost fact driving context limits, chunking, and
 KV-cache engineering.
 **Example**:
 ```python
-s * s   # token pairs to score for length s
+s * s  # token pairs to score for length s
 ```
 **Related**: Context window, KV cache
 

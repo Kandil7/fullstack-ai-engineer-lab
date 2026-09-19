@@ -60,14 +60,16 @@ from sklearn.preprocessing import StandardScaler
 # Generate linear data
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=200, n_features=2, n_redundant=0,
-    n_informative=2, random_state=42, n_clusters_per_class=1
+    n_samples=200,
+    n_features=2,
+    n_redundant=0,
+    n_informative=2,
+    random_state=42,
+    n_clusters_per_class=1,
 )
 
 # Split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Scale (IMPORTANT for SVM!)
 scaler = StandardScaler()
@@ -75,7 +77,7 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # Linear SVM
-svm_linear = SVC(kernel='linear', random_state=42)
+svm_linear = SVC(kernel="linear", random_state=42)
 svm_linear.fit(X_train_scaled, y_train)
 
 y_pred = svm_linear.predict(X_test_scaled)
@@ -97,8 +99,7 @@ import numpy as np
 
 # Non-linear data
 np.random.seed(42)
-X_circles, y_circles = make_circles(n_samples=200, noise=0.1, 
-                                     factor=0.5, random_state=42)
+X_circles, y_circles = make_circles(n_samples=200, noise=0.1, factor=0.5, random_state=42)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X_circles, y_circles, test_size=0.2, random_state=42
@@ -109,7 +110,7 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # Test different kernels
-kernels = ['linear', 'rbf', 'poly', 'sigmoid']
+kernels = ["linear", "rbf", "poly", "sigmoid"]
 print("Kernel Comparison (non-linear data):")
 print("-" * 35)
 
@@ -128,13 +129,12 @@ from sklearn.datasets import make_classification
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 
-X, y = make_classification(n_samples=200, n_features=2, 
-                           n_redundant=0, random_state=42)
+X, y = make_classification(n_samples=200, n_features=2, n_redundant=0, random_state=42)
 
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-svm = SVC(kernel='rbf', random_state=42)
+svm = SVC(kernel="rbf", random_state=42)
 svm.fit(X_scaled, y)
 
 print(f"Number of support vectors per class: {svm.n_support_}")
@@ -155,8 +155,7 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 
 np.random.seed(42)
-X, y = make_classification(n_samples=200, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=200, n_features=10, n_informative=5, random_state=42)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -168,13 +167,13 @@ X_test_scaled = scaler.transform(X_test)
 results = []
 for C in [0.1, 1, 10, 100]:
     for gamma in [0.1, 1, 10]:
-        svm = SVC(kernel='rbf', C=C, gamma=gamma, random_state=42)
+        svm = SVC(kernel="rbf", C=C, gamma=gamma, random_state=42)
         svm.fit(X_train_scaled, y_train)
         acc = accuracy_score(y_test, svm.predict(X_test_scaled))
-        results.append({'C': C, 'gamma': gamma, 'accuracy': acc})
+        results.append({"C": C, "gamma": gamma, "accuracy": acc})
 
 # Find best
-best = max(results, key=lambda x: x['accuracy'])
+best = max(results, key=lambda x: x["accuracy"])
 print(f"Best parameters: C={best['C']}, gamma={best['gamma']}")
 print(f"Best accuracy: {best['accuracy']:.4f}")
 ```
@@ -198,7 +197,7 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-svr = SVR(kernel='rbf')
+svr = SVR(kernel="rbf")
 svr.fit(X_train_scaled, y_train)
 
 y_pred = svr.predict(X_test_scaled)
@@ -242,6 +241,7 @@ svm_unscaled.fit(X_train, y_train)  # Bad results
 
 # CORRECT: Always scale for SVM
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
@@ -266,13 +266,9 @@ if len(X) > 10000:
 # Default parameters may not be optimal
 from sklearn.model_selection import GridSearchCV
 
-param_grid = {
-    'C': [0.1, 1, 10, 100],
-    'gamma': [0.1, 1, 10],
-    'kernel': ['rbf', 'linear']
-}
+param_grid = {"C": [0.1, 1, 10, 100], "gamma": [0.1, 1, 10], "kernel": ["rbf", "linear"]}
 
-grid = GridSearchCV(SVC(), param_grid, cv=5, scoring='accuracy')
+grid = GridSearchCV(SVC(), param_grid, cv=5, scoring="accuracy")
 grid.fit(X_train_scaled, y_train)
 
 print(f"Best parameters: {grid.best_params_}")
@@ -291,10 +287,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
 # Use pipeline for reproducibility
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('svm', SVC(kernel='rbf', C=1.0, gamma='scale'))
-])
+pipeline = Pipeline(
+    [("scaler", StandardScaler()), ("svm", SVC(kernel="rbf", C=1.0, gamma="scale"))]
+)
 
 pipeline.fit(X_train, y_train)
 score = pipeline.score(X_test, y_test)
@@ -304,7 +299,7 @@ score = pipeline.score(X_test, y_test)
 
 ```python
 # RBF is usually the best choice
-svm = SVC(kernel='rbf', C=1.0, gamma='scale')
+svm = SVC(kernel="rbf", C=1.0, gamma="scale")
 # gamma='scale' uses 1/(n_features * X.var())
 ```
 
@@ -313,7 +308,7 @@ svm = SVC(kernel='rbf', C=1.0, gamma='scale')
 ```python
 from sklearn.model_selection import GridSearchCV
 
-param_grid = {'C': [0.1, 1, 10], 'gamma': [0.1, 1, 10]}
+param_grid = {"C": [0.1, 1, 10], "gamma": [0.1, 1, 10]}
 grid = GridSearchCV(SVC(), param_grid, cv=5)
 grid.fit(X_train_scaled, y_train)
 ```
@@ -323,10 +318,11 @@ grid.fit(X_train_scaled, y_train)
 ```python
 if len(X) < 10000:
     # SVM is a good choice
-    model = SVC(kernel='rbf')
+    model = SVC(kernel="rbf")
 else:
     # Consider faster alternatives
     from sklearn.ensemble import RandomForestClassifier
+
     model = RandomForestClassifier(n_estimators=100)
 ```
 
@@ -344,6 +340,7 @@ Compare linear and non-linear SVM on different datasets.
 3. Test linear and RBF kernels
 4. Compare results
 """
+
 from sklearn.svm import SVC
 from sklearn.datasets import make_moons, make_circles
 from sklearn.model_selection import train_test_split
@@ -353,25 +350,24 @@ import numpy as np
 
 # Your code here
 datasets = {
-    'Linear': make_classification(n_samples=200, n_features=2, 
-                                  n_redundant=0, random_state=42),
-    'Moons': make_moons(n_samples=200, noise=0.1, random_state=42),
-    'Circles': make_circles(n_samples=200, noise=0.1, factor=0.5, random_state=42)
+    "Linear": make_classification(n_samples=200, n_features=2, n_redundant=0, random_state=42),
+    "Moons": make_moons(n_samples=200, noise=0.1, random_state=42),
+    "Circles": make_circles(n_samples=200, noise=0.1, factor=0.5, random_state=42),
 }
 
 for name, (X, y) in datasets.items():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
+
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
-    
-    linear = SVC(kernel='linear').fit(X_train_scaled, y_train)
-    rbf = SVC(kernel='rbf').fit(X_train_scaled, y_train)
-    
+
+    linear = SVC(kernel="linear").fit(X_train_scaled, y_train)
+    rbf = SVC(kernel="rbf").fit(X_train_scaled, y_train)
+
     acc_linear = accuracy_score(y_test, linear.predict(X_test_scaled))
     acc_rbf = accuracy_score(y_test, rbf.predict(X_test_scaled))
-    
+
     print(f"{name:10s}: Linear={acc_linear:.4f}, RBF={acc_rbf:.4f}")
 ```
 
@@ -385,6 +381,7 @@ Analyze how C and gamma affect decision boundary.
 3. Train SVM with different gamma values
 4. Visualize decision boundaries
 """
+
 from sklearn.svm import SVC
 from sklearn.datasets import make_moons
 from sklearn.preprocessing import StandardScaler
@@ -397,7 +394,7 @@ X_scaled = scaler.fit_transform(X)
 # Your code here
 C_values = [0.01, 0.1, 1, 10, 100]
 for C in C_values:
-    svm = SVC(kernel='rbf', C=C, gamma='scale')
+    svm = SVC(kernel="rbf", C=C, gamma="scale")
     svm.fit(X_scaled, y)
     n_sv = sum(svm.n_support_)
     print(f"C={C:6.2f}: Support vectors={n_sv}")
@@ -405,7 +402,7 @@ for C in C_values:
 print()
 gamma_values = [0.01, 0.1, 1, 10, 100]
 for gamma in gamma_values:
-    svm = SVC(kernel='rbf', C=1, gamma=gamma)
+    svm = SVC(kernel="rbf", C=1, gamma=gamma)
     svm.fit(X_scaled, y)
     n_sv = sum(svm.n_support_)
     print(f"gamma={gamma:6.2f}: Support vectors={n_sv}")
@@ -421,6 +418,7 @@ Build a complete SVM pipeline.
 3. Train SVM
 4. Evaluate with cross-validation
 """
+
 from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -431,12 +429,14 @@ from sklearn.datasets import load_breast_cancer
 data = load_breast_cancer()
 X, y = data.data, data.target
 
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('svm', SVC(kernel='rbf', C=1.0, gamma='scale', random_state=42))
-])
+pipeline = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("svm", SVC(kernel="rbf", C=1.0, gamma="scale", random_state=42)),
+    ]
+)
 
-scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
 print(f"Cross-validation accuracy: {scores.mean():.4f} +/- {scores.std():.4f}")
 ```
 

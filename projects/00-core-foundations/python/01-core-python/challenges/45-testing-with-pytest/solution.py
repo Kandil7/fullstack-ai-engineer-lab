@@ -1,4 +1,5 @@
 """Challenge 45 solution — reference implementation with reasoning comments."""
+
 from __future__ import annotations
 
 import inspect

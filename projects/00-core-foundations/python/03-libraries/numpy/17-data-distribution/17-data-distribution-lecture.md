@@ -37,22 +37,22 @@ import numpy as np
 # Continuous uniform between 0 and 1
 uniform = np.random.uniform(0, 1, size=1000)
 print("Uniform distribution:")
-print(f"  Mean: {uniform.mean():.4f}")    # ~0.5
-print(f"  Std: {uniform.std():.4f}")      # ~0.29
-print(f"  Min: {uniform.min():.4f}")      # ~0.00
-print(f"  Max: {uniform.max():.4f}")      # ~1.00
+print(f"  Mean: {uniform.mean():.4f}")  # ~0.5
+print(f"  Std: {uniform.std():.4f}")  # ~0.29
+print(f"  Min: {uniform.min():.4f}")  # ~0.00
+print(f"  Max: {uniform.max():.4f}")  # ~1.00
 
 # Uniform between custom range
 uniform_custom = np.random.uniform(10, 20, size=1000)
 print(f"\nUniform [10, 20):")
 print(f"  Mean: {uniform_custom.mean():.4f}")  # ~15.0
-print(f"  Std: {uniform_custom.std():.4f}")    # ~2.89
+print(f"  Std: {uniform_custom.std():.4f}")  # ~2.89
 
 # Discrete uniform (integers)
 discrete = np.random.randint(1, 7, size=1000)
 print(f"\nDiscrete uniform (dice):")
-print(f"  Mean: {discrete.mean():.4f}")    # ~3.5
-print(f"  Std: {discrete.std():.4f}")      # ~1.71
+print(f"  Mean: {discrete.mean():.4f}")  # ~3.5
+print(f"  Std: {discrete.std():.4f}")  # ~1.71
 ```
 
 **Applications:** Random sampling, shuffling, simulations where all outcomes are equally likely.
@@ -67,17 +67,17 @@ import numpy as np
 # Standard normal (mean=0, std=1)
 normal = np.random.randn(10000)
 print("\nStandard normal:")
-print(f"  Mean: {normal.mean():.4f}")    # ~0.0
-print(f"  Std: {normal.std():.4f}")      # ~1.0
+print(f"  Mean: {normal.mean():.4f}")  # ~0.0
+print(f"  Std: {normal.std():.4f}")  # ~1.0
 
 # Custom normal distribution
 mean, std = 170, 10  # Height in cm
 heights = np.random.normal(mean, std, size=10000)
 print(f"\nHeight distribution (mean={mean}, std={std}):")
-print(f"  Mean: {heights.mean():.4f}")    # ~170.0
-print(f"  Std: {heights.std():.4f}")      # ~10.0
-print(f"  Min: {heights.min():.4f}")      # ~135.0
-print(f"  Max: {heights.max():.4f}")      # ~205.0
+print(f"  Mean: {heights.mean():.4f}")  # ~170.0
+print(f"  Std: {heights.std():.4f}")  # ~10.0
+print(f"  Min: {heights.min():.4f}")  # ~135.0
+print(f"  Max: {heights.max():.4f}")  # ~205.0
 
 # Percentage within 1 std (empirical rule)
 within_1std = np.sum((heights > mean - std) & (heights < mean + std)) / len(heights)
@@ -106,13 +106,13 @@ prob_heads = 0.5
 binomial = np.random.binomial(n_trials, prob_heads, size=n_experiments)
 print("\nBinomial (10 flips, p=0.5):")
 print(f"  Mean heads: {binomial.mean():.2f}")  # ~5.0
-print(f"  Std: {binomial.std():.2f}")          # ~1.58
+print(f"  Std: {binomial.std():.2f}")  # ~1.58
 
 # Count distribution
 unique, counts = np.unique(binomial, return_counts=True)
 print("  Distribution:")
 for u, c in zip(unique, counts):
-    print(f"    {u} heads: {c} times ({c/n_experiments:.1%})")
+    print(f"    {u} heads: {c} times ({c / n_experiments:.1%})")
 
 # Quality control: 5% defect rate, sample of 100
 defects = np.random.binomial(100, 0.05, size=1000)
@@ -140,8 +140,8 @@ import numpy as np
 lambda_val = 4
 customers = np.random.poisson(lambda_val, size=1000)
 print(f"\nPoisson (lambda={lambda_val}):")
-print(f"  Mean: {customers.mean():.2f}")    # ~4.0
-print(f"  Std: {customers.std():.2f}")      # ~2.0
+print(f"  Mean: {customers.mean():.2f}")  # ~4.0
+print(f"  Std: {customers.std():.2f}")  # ~2.0
 
 # Probability of exactly 0 customers
 p_zero = np.sum(customers == 0) / len(customers)
@@ -177,8 +177,8 @@ import numpy as np
 scale = 5
 wait_times = np.random.exponential(scale, size=1000)
 print(f"\nExponential (mean={scale} min):")
-print(f"  Mean wait: {wait_times.mean():.2f} min")   # ~5.0
-print(f"  Std: {wait_times.std():.2f} min")           # ~5.0
+print(f"  Mean wait: {wait_times.mean():.2f} min")  # ~5.0
+print(f"  Std: {wait_times.std():.2f} min")  # ~5.0
 
 # P(wait < 5 min)
 p_short = np.sum(wait_times < scale) / len(wait_times)
@@ -192,7 +192,7 @@ print(f"  P(wait < 1 min): {p_very_short:.2%}")
 arr = np.random.exponential(1.0 / 0.5, size=1000)  # rate=0.5
 print(f"\nExponential (rate=0.5):")
 print(f"  Mean: {arr.mean():.2f}")  # ~2.0
-print(f"  Std: {arr.std():.2f}")    # ~2.0
+print(f"  Std: {arr.std():.2f}")  # ~2.0
 ```
 
 **Parameters:**
@@ -226,18 +226,20 @@ exponential = exponential / exponential.max()  # Normalize to [0,1]
 
 # Compare statistics
 distributions = {
-    'Uniform': uniform,
-    'Normal': normal,
-    'Binomial': binomial,
-    'Poisson': poisson,
-    'Exponential': exponential
+    "Uniform": uniform,
+    "Normal": normal,
+    "Binomial": binomial,
+    "Poisson": poisson,
+    "Exponential": exponential,
 }
 
 print("Distribution Statistics:")
 print(f"{'Name':<12} {'Mean':>8} {'Std':>8} {'Min':>8} {'Max':>8}")
 print("-" * 50)
 for name, data in distributions.items():
-    print(f"{name:<12} {data.mean():>8.4f} {data.std():>8.4f} {data.min():>8.4f} {data.max():>8.4f}")
+    print(
+        f"{name:<12} {data.mean():>8.4f} {data.std():>8.4f} {data.min():>8.4f} {data.max():>8.4f}"
+    )
 ```
 
 ### Example 2: Normal Distribution Analysis
@@ -268,13 +270,13 @@ ranges = [
     ("70-85 (Borderline)", (iq_scores >= 70) & (iq_scores < 85)),
     ("85-115 (Average)", (iq_scores >= 85) & (iq_scores < 115)),
     ("115-130 (Superior)", (iq_scores >= 115) & (iq_scores < 130)),
-    ("Above 130 (Gifted)", iq_scores >= 130)
+    ("Above 130 (Gifted)", iq_scores >= 130),
 ]
 
 print("\nRange Distribution:")
 for name, mask in ranges:
     count = np.sum(mask)
-    print(f"  {name}: {count} ({count/100:.1f}%)")
+    print(f"  {name}: {count} ({count / 100:.1f}%)")
 ```
 
 ### Example 3: Binomial Distribution Simulation
@@ -294,9 +296,9 @@ conversions_a = np.random.binomial(n_visitors, conversion_rate_a)
 conversions_b = np.random.binomial(n_visitors, conversion_rate_b)
 
 print("A/B Test Results:")
-print(f"  Group A: {conversions_a}/{n_visitors} ({conversions_a/n_visitors:.1%})")
-print(f"  Group B: {conversions_b}/{n_visitors} ({conversions_b/n_visitors:.1%})")
-print(f"  Difference: {(conversions_b - conversions_a)/n_visitors:.1%}")
+print(f"  Group A: {conversions_a}/{n_visitors} ({conversions_a / n_visitors:.1%})")
+print(f"  Group B: {conversions_b}/{n_visitors} ({conversions_b / n_visitors:.1%})")
+print(f"  Difference: {(conversions_b - conversions_a) / n_visitors:.1%}")
 
 # Run multiple simulations
 n_sims = 10000
@@ -304,8 +306,8 @@ results_a = np.random.binomial(n_visitors, conversion_rate_a, n_sims)
 results_b = np.random.binomial(n_visitors, conversion_rate_b, n_sims)
 
 print(f"\nSimulation ({n_sims} runs):")
-print(f"  A mean: {results_a.mean():.1f} ({results_a.mean()/n_visitors:.1%})")
-print(f"  B mean: {results_b.mean():.1f} ({results_b.mean()/n_visitors:.1%})")
+print(f"  A mean: {results_a.mean():.1f} ({results_a.mean() / n_visitors:.1%})")
+print(f"  B mean: {results_b.mean():.1f} ({results_b.mean() / n_visitors:.1%})")
 print(f"  B > A probability: {np.mean(results_b > results_a):.1%}")
 ```
 
@@ -326,7 +328,7 @@ hourly_customers = np.random.poisson(lambda_per_hour, size=12)
 print("Hourly Customer Arrivals:")
 print("-" * 40)
 for hour, customers in enumerate(hourly_customers, 1):
-    bar = '█' * customers
+    bar = "█" * customers
     print(f"  Hour {hour:2d}: {customers:3d} {bar}")
 
 print(f"\nDaily Total: {hourly_customers.sum()}")
@@ -382,8 +384,8 @@ print(f"\nAvailability (response < {threshold}ms): {available:.1f}%")
 
 # CORRECT - Understanding each distribution's parameters
 binomial = np.random.binomial(n=10, p=0.5)  # 10 trials, 50% success
-poisson = np.random.poisson(lam=5)           # Average 5 events
-exponential = np.random.exponential(scale=10) # Mean wait = 10
+poisson = np.random.poisson(lam=5)  # Average 5 events
+exponential = np.random.exponential(scale=10)  # Mean wait = 10
 ```
 
 ### Mistake 2: Using Wrong Distribution
@@ -536,11 +538,11 @@ import numpy as np
 # TODO: Simulate 500 coin flips
 np.random.seed(42)
 flips = np.random.binomial(500, 0.5)
-print(f"Heads in 500 flips: {flips} ({flips/500:.1%})")
+print(f"Heads in 500 flips: {flips} ({flips / 500:.1%})")
 
 # TODO: Simulate 1000 patients with 30% recovery rate
 recovered = np.random.binomial(1000, 0.3)
-print(f"Recovered: {recovered} ({recovered/1000:.1%})")
+print(f"Recovered: {recovered} ({recovered / 1000:.1%})")
 ```
 
 ### Exercise 4: Poisson Distribution

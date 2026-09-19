@@ -19,6 +19,8 @@ def predicate_pushed(path: str, column: str, value: str) -> bool:
     raise NotImplementedError
 
 
-def project_and_filter(path: str, keep: list[str], column: str, value: str) -> tuple[pl.DataFrame, int]:
+def project_and_filter(
+    path: str, keep: list[str], column: str, value: str
+) -> tuple[pl.DataFrame, int]:
     """Return (result, columns_read) with columns_read from the plan."""
     raise NotImplementedError

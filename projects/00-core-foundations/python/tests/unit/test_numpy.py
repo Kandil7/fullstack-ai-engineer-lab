@@ -14,6 +14,4 @@ NUMPY_FILES = discover_phase_files("03-libraries/numpy")
 def test_numpy_example_runs(filepath):
     """Every NumPy example must execute without errors."""
     result = run_py_file(filepath, timeout=60)
-    assert result.returncode == 0, (
-        f"{filepath.name} failed:\n{result.stderr[-500:]}"
-    )
+    assert result.returncode == 0, f"{filepath.name} failed:\n{result.stderr[-500:]}"

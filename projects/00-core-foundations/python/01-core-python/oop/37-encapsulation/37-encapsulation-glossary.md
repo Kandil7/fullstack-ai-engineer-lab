@@ -77,6 +77,7 @@ class MyClass:
     def __init__(self):
         self.__private = "hidden"
 
+
 obj = MyClass()
 # obj.__private  # AttributeError
 obj._MyClass__private  # Works (mangled name)
@@ -184,7 +185,7 @@ class Person:
 class Circle:
     @property
     def area(self):
-        return math.pi * self._radius ** 2
+        return math.pi * self._radius**2
 ```
 
 ### Pattern 3: Protected with Copy

@@ -6,7 +6,8 @@ Challenge 22: Styling and Themes — Reference Solution
 from __future__ import annotations
 
 import matplotlib
-matplotlib.use("Agg")   # MUST precede pyplot import: headless tests
+
+matplotlib.use("Agg")  # MUST precede pyplot import: headless tests
 
 import matplotlib.pyplot as plt
 import numpy as np

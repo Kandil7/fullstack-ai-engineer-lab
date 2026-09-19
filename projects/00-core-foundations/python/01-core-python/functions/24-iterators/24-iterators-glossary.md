@@ -48,6 +48,7 @@ print(list(accumulate([1, 2, 3, 4, 5])))
 
 # Running maximum
 from operator import mul
+
 print(list(accumulate([3, 1, 4, 1, 5, 9], max)))
 # [3, 3, 4, 4, 5, 9]
 ```
@@ -124,6 +125,7 @@ def fibonacci():
         yield a
         a, b = b, a + b
 
+
 fib = fibonacci()
 for _ in range(10):
     print(next(fib), end=" ")  # 0 1 1 2 3 5 8 13 21 34
@@ -146,8 +148,9 @@ lst = [x**2 for x in range(1000000)]
 
 # Generator uses much less memory
 import sys
-print(sys.getsizeof(gen))   # ~200 bytes
-print(sys.getsizeof(lst))   # ~8 MB
+
+print(sys.getsizeof(gen))  # ~200 bytes
+print(sys.getsizeof(lst))  # ~8 MB
 ```
 
 **Related**: list comprehension, generator, lazy evaluation
@@ -165,6 +168,7 @@ from itertools import count, cycle, repeat
 counter = count(1)
 # Use with islice to limit
 from itertools import islice
+
 first_5 = list(islice(counter, 5))  # [1, 2, 3, 4, 5]
 
 # cycle — infinite repetition
@@ -212,6 +216,7 @@ for x in [1, 2, 3]:
 for c in "hello":
     print(c)
 
+
 # Check if iterable
 def is_iterable(obj):
     try:
@@ -234,15 +239,16 @@ class Counter:
     def __init__(self, limit):
         self.limit = limit
         self.current = 0
-    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         if self.current >= self.limit:
             raise StopIteration
         self.current += 1
         return self.current
+
 
 for num in Counter(5):
     print(num)  # 1, 2, 3, 4, 5
@@ -261,10 +267,11 @@ for num in Counter(5):
 # 1. __iter__() — returns the iterator object itself
 # 2. __next__() — returns next value or raises StopIteration
 
+
 class MyIterator:
     def __iter__(self):  # Required
         return self
-    
+
     def __next__(self):  # Required
         # Return next value or raise StopIteration
         pass
@@ -301,9 +308,9 @@ for val in lazy:
 **Example**:
 ```python
 my_iter = iter([10, 20, 30])
-print(next(my_iter))      # 10
-print(next(my_iter))      # 20
-print(next(my_iter))      # 30
+print(next(my_iter))  # 10
+print(next(my_iter))  # 20
+print(next(my_iter))  # 30
 # next(my_iter)           # StopIteration
 
 # With default (safe)
@@ -421,6 +428,7 @@ def countdown(n):
         yield n  # Produce value and pause
         n -= 1
 
+
 for num in countdown(5):
     print(num)  # 5, 4, 3, 2, 1
 ```
@@ -455,14 +463,15 @@ for x, y in zip_longest(a, b, fillvalue=0):
 ```python
 class LineReader:
     """Read file lines lazily."""
+
     def __init__(self, filename):
         self.filename = filename
         self.file = None
-    
+
     def __iter__(self):
-        self.file = open(self.filename, 'r')
+        self.file = open(self.filename, "r")
         return self
-    
+
     def __next__(self):
         line = self.file.readline()
         if not line:
@@ -480,8 +489,10 @@ def fibonacci():
         yield a
         a, b = b, a + b
 
+
 # Get first 10
 from itertools import islice
+
 fib = fibonacci()
 first_10 = list(islice(fib, 10))
 print(first_10)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]

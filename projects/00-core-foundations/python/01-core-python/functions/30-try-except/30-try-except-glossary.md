@@ -14,6 +14,7 @@
 class MyClass:
     pass
 
+
 obj = MyClass()
 print(obj.nonexistent)  # AttributeError: 'MyClass' has no attribute 'nonexistent'
 ```
@@ -168,7 +169,8 @@ print(my_dict["c"])  # KeyError: 'c'
 **Definition:** Asserts what follows matches without consuming text (not exception-related, but used in patterns).
 ```python
 import re
-re.findall(r'\d+(?=px)', '10px 20em')  # ['10']
+
+re.findall(r"\d+(?=px)", "10px 20em")  # ['10']
 ```
 **Related:** Regex assertions, lookbehind
 
@@ -309,6 +311,7 @@ int("abc")  # ValueError: invalid literal for int()
 **Definition:** Non-fatal issue signaled to user (not an exception).
 ```python
 import warnings
+
 warnings.warn("Deprecated", DeprecationWarning)
 ```
 **Related:** Deprecation, `warnings` module, non-fatal errors

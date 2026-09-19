@@ -19,6 +19,7 @@ Reference: https://www.w3schools.com/python/python_mongodb_insert.asp
 users = []
 next_id = 1
 
+
 def insert_one(collection, document):
     """Insert one document into a collection"""
     global next_id
@@ -27,6 +28,7 @@ def insert_one(collection, document):
         next_id += 1
     collection.append(document)
     return document["_id"]
+
 
 # MongoDB equivalent:
 # db.users.insert_one({"name": "Alice", "age": 25})
@@ -65,6 +67,7 @@ for user in users:
 # Insert Many Documents
 # ============================================================
 
+
 # Example 5: Insert multiple documents at once
 def insert_many(collection, documents):
     """Insert multiple documents into a collection"""
@@ -78,6 +81,7 @@ def insert_many(collection, documents):
         ids.append(doc["_id"])
     return ids
 
+
 # MongoDB equivalent:
 # db.users.insert_many([
 #     {"name": "David", "age": 28},
@@ -86,11 +90,14 @@ def insert_many(collection, documents):
 # ])
 
 users = []
-new_ids = insert_many(users, [
-    {"name": "David", "age": 28, "city": "Boston"},
-    {"name": "Eve", "age": 32, "city": "New York"},
-    {"name": "Frank", "age": 45, "city": "Chicago"}
-])
+new_ids = insert_many(
+    users,
+    [
+        {"name": "David", "age": 28, "city": "Boston"},
+        {"name": "Eve", "age": 32, "city": "New York"},
+        {"name": "Frank", "age": 45, "city": "Chicago"},
+    ],
+)
 
 print("\nInserted IDs:", new_ids)
 print("Users:", users)
@@ -102,27 +109,23 @@ print("Users:", users)
 # Example 6: Insert documents with nested structures
 products = []
 
-insert_many(products, [
-    {
-        "name": "Laptop",
-        "price": 999.99,
-        "specs": {
-            "ram": "16GB",
-            "storage": "512GB SSD",
-            "cpu": "Intel i7"
+insert_many(
+    products,
+    [
+        {
+            "name": "Laptop",
+            "price": 999.99,
+            "specs": {"ram": "16GB", "storage": "512GB SSD", "cpu": "Intel i7"},
+            "tags": ["electronics", "computers"],
         },
-        "tags": ["electronics", "computers"]
-    },
-    {
-        "name": "Mouse",
-        "price": 29.99,
-        "specs": {
-            "type": "wireless",
-            "dpi": 1600
+        {
+            "name": "Mouse",
+            "price": 29.99,
+            "specs": {"type": "wireless", "dpi": 1600},
+            "tags": ["electronics", "accessories"],
         },
-        "tags": ["electronics", "accessories"]
-    }
-])
+    ],
+)
 
 print("\nProducts with nested docs:")
 for product in products:
@@ -136,18 +139,13 @@ for product in products:
 # Example 7: Documents with array fields
 students = []
 
-insert_many(students, [
-    {
-        "name": "Alice",
-        "courses": ["Math", "Science", "English"],
-        "grades": [95, 88, 92]
-    },
-    {
-        "name": "Bob",
-        "courses": ["Math", "History"],
-        "grades": [78, 85]
-    }
-])
+insert_many(
+    students,
+    [
+        {"name": "Alice", "courses": ["Math", "Science", "English"], "grades": [95, 88, 92]},
+        {"name": "Bob", "courses": ["Math", "History"], "grades": [78, 85]},
+    ],
+)
 
 print("\nStudents with arrays:")
 for student in students:
@@ -164,20 +162,23 @@ from datetime import datetime
 
 orders = []
 
-insert_many(orders, [
-    {
-        "customer": "Alice",
-        "items": ["Laptop", "Mouse"],
-        "total": 1029.98,
-        "created_at": datetime.now().isoformat()
-    },
-    {
-        "customer": "Bob",
-        "items": ["Keyboard"],
-        "total": 79.99,
-        "created_at": datetime.now().isoformat()
-    }
-])
+insert_many(
+    orders,
+    [
+        {
+            "customer": "Alice",
+            "items": ["Laptop", "Mouse"],
+            "total": 1029.98,
+            "created_at": datetime.now().isoformat(),
+        },
+        {
+            "customer": "Bob",
+            "items": ["Keyboard"],
+            "total": 79.99,
+            "created_at": datetime.now().isoformat(),
+        },
+    ],
+)
 
 print("\nOrders with timestamps:")
 for order in orders:
@@ -187,6 +188,7 @@ for order in orders:
 # Insert with Validation
 # ============================================================
 
+
 # Example 9: Validate before insert
 def insert_with_validation(collection, document, required_fields):
     """Insert document only if required fields are present"""
@@ -194,13 +196,14 @@ def insert_with_validation(collection, document, required_fields):
         if field not in document:
             print(f"Validation failed: missing '{field}'")
             return None
-    
+
     if "_id" not in document:
         document["_id"] = next_id
         # increment next_id here in real code
-    
+
     collection.append(document)
     return document.get("_id")
+
 
 # MongoDB equivalent:
 # db.createCollection("users", {
@@ -214,14 +217,16 @@ def insert_with_validation(collection, document, required_fields):
 # })
 
 validated_users = []
-result = insert_with_validation(validated_users, 
-    {"name": "Grace", "email": "grace@mail.com"}, 
-    ["name", "email"])
+result = insert_with_validation(
+    validated_users, {"name": "Grace", "email": "grace@mail.com"}, ["name", "email"]
+)
 print("\nValid insert result:", result)
 
-result = insert_with_validation(validated_users, 
+result = insert_with_validation(
+    validated_users,
     {"name": "Hank"},  # Missing email
-    ["name", "email"])
+    ["name", "email"],
+)
 print("Invalid insert result:", result)
 
 # ============================================================
@@ -231,15 +236,18 @@ print("Invalid insert result:", result)
 # Example 10: Bulk insert comparison
 import time
 
+
 def bulk_insert_simple(collection, count):
     """Insert documents one by one"""
     for i in range(count):
         collection.append({"_id": i, "value": f"item_{i}"})
 
+
 def bulk_insert_batch(collection, count):
     """Insert documents as a batch"""
     docs = [{"_id": i, "value": f"item_{i}"} for i in range(count)]
     collection.extend(docs)
+
 
 # Compare performance
 collection1 = []
@@ -256,7 +264,7 @@ batch_time = time.time() - start
 print(f"\nBulk insert performance (10000 docs):")
 print(f"  One by one: {simple_time:.4f}s")
 print(f"  Batch: {batch_time:.4f}s")
-print(f"  Speedup: {simple_time/batch_time:.2f}x")
+print(f"  Speedup: {simple_time / batch_time:.2f}x")
 
 # ============================================================
 # Summary
@@ -277,6 +285,7 @@ print("""
 9. Use timestamps for audit trails
 10. insert_many() returns a list of inserted _id values
 """)
+
 
 # ============================================================
 # Self-Verification  (MANDATORY)
@@ -306,7 +315,9 @@ def _verify() -> None:
 
     # validation rejects missing required fields
     vc = []
-    assert insert_with_validation(vc, {"name": "G", "email": "g@x.com"}, ["name", "email"]) is not None
+    assert (
+        insert_with_validation(vc, {"name": "G", "email": "g@x.com"}, ["name", "email"]) is not None
+    )
     assert insert_with_validation(vc, {"name": "H"}, ["name", "email"]) is None
     assert len(vc) == 1
 

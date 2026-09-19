@@ -70,7 +70,7 @@ except ZeroDivisionError:
 **Example**:
 ```python
 print(issubclass(KeyboardInterrupt, BaseException))  # True
-print(issubclass(KeyboardInterrupt, Exception))      # False
+print(issubclass(KeyboardInterrupt, Exception))  # False
 ```
 
 **Complexity**: O(1).
@@ -155,8 +155,13 @@ subclasses for each failure mode. Callers catch the base and use
 **Example**:
 ```python
 class ApiError(Exception): ...
+
+
 class RateLimited(ApiError): ...
+
+
 class AuthFailed(ApiError): ...
+
 
 try:
     raise RateLimited()
@@ -177,7 +182,7 @@ progressively more time to recover.
 
 **Example**:
 ```python
-delays = [min(0.05 * 2 ** i, 2.0) for i in range(5)]
+delays = [min(0.05 * 2**i, 2.0) for i in range(5)]
 print(delays)  # [0.05, 0.1, 0.2, 0.4, 0.8]
 ```
 
@@ -193,6 +198,7 @@ propagate to the caller immediately.
 **Example**:
 ```python
 class FatalError(Exception): ...
+
 
 try:
     raise FatalError("400")
@@ -217,6 +223,7 @@ def f() -> str:
     finally:
         return "finally"
 
+
 print(f())  # finally
 ```
 
@@ -232,6 +239,7 @@ rate limit becomes a thundering-herd outage.
 **Example**:
 ```python
 import random
+
 rng = random.Random(42)
 delays = [0.05 * (1 + rng.random()) for _ in range(3)]
 print([round(d, 3) for d in delays])  # [0.062, 0.089, 0.089]
@@ -266,6 +274,7 @@ preserve observability while continuing.
 **Example**:
 ```python
 import logging
+
 logging.basicConfig(level=logging.ERROR)
 
 try:
@@ -321,6 +330,7 @@ bounded, backed off, and jittered.
 **Example**:
 ```python
 class RetryableError(Exception): ...
+
 
 for attempt in range(3):
     try:

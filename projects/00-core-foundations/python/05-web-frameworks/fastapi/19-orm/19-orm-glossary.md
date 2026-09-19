@@ -40,44 +40,49 @@ from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
+
 class Enrollment(Base):
     """Association object with extra fields"""
+
     __tablename__ = "enrollments"
-    
+
     id = Column(Integer, primary_key=True)
     student_id = Column(Integer, ForeignKey("students.id"))
     course_id = Column(Integer, ForeignKey("courses.id"))
     enrolled_at = Column(DateTime, default=datetime.utcnow)
     grade = Column(Float, nullable=True)
-    
+
     # Relationships to both models
     student = relationship("Student", back_populates="enrollments")
     course = relationship("Course", back_populates="enrollments")
 
+
 class Student(Base):
     __tablename__ = "students"
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
-    
+
     # Relationship to association object
     enrollments = relationship("Enrollment", back_populates="student")
 
+
 class Course(Base):
     __tablename__ = "courses"
-    
+
     id = Column(Integer, primary_key=True)
     title = Column(String(200))
-    
+
     # Relationship to association object
     enrollments = relationship("Enrollment", back_populates="course")
+
 
 # Usage
 def enroll_student(db: Session, student_id: int, course_id: int):
     enrollment = Enrollment(
         student_id=student_id,
         course_id=course_id,
-        grade=None  # Initial grade
+        grade=None,  # Initial grade
     )
     db.add(enrollment)
     db.commit()
@@ -98,22 +103,24 @@ def enroll_student(db: Session, student_id: int, course_id: int):
 ```python
 class Parent(Base):
     __tablename__ = "parents"
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
-    
+
     # This creates a双向 relationship
     children = relationship("Child", back_populates="parent")
 
+
 class Child(Base):
     __tablename__ = "children"
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
     parent_id = Column(Integer, ForeignKey("parents.id"))
-    
+
     # This completes the bidirectional relationship
     parent = relationship("Parent", back_populates="children")
+
 
 # Usage
 parent = db.query(Parent).first()
@@ -135,10 +142,10 @@ print(child.parent)  # Access parent from child
 ```python
 class Parent(Base):
     __tablename__ = "parents"
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
-    
+
     # Cascade options:
     # - save-update: Add/update children when parent is saved
     # - delete: Delete children when parent is deleted
@@ -147,17 +154,19 @@ class Parent(Base):
         "Child",
         back_populates="parent",
         cascade="all, delete-orphan",
-        passive_deletes=True  # Let database handle deletes
+        passive_deletes=True,  # Let database handle deletes
     )
+
 
 class Child(Base):
     __tablename__ = "children"
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
     parent_id = Column(Integer, ForeignKey("parents.id", ondelete="CASCADE"))
-    
+
     parent = relationship("Parent", back_populates="children")
+
 
 # Usage
 parent = Parent(name="Parent 1")
@@ -185,36 +194,34 @@ db.commit()
 ```python
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Text, Enum
 
+
 class Product(Base):
     __tablename__ = "products"
-    
+
     # Integer column
     id = Column(Integer, primary_key=True, index=True)
-    
+
     # String column with length
     name = Column(String(200), nullable=False)
-    
+
     # Text for longer content
     description = Column(Text)
-    
+
     # Float for decimal numbers
     price = Column(Float, nullable=False)
-    
+
     # Boolean
     is_active = Column(Boolean, default=True)
-    
+
     # DateTime
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     # Enum
-    status = Column(
-        Enum('draft', 'published', 'archived', name='product_status'),
-        default='draft'
-    )
-    
+    status = Column(Enum("draft", "published", "archived", name="product_status"), default="draft")
+
     # Column with unique constraint
     sku = Column(String(50), unique=True, nullable=False)
-    
+
     # Column with index
     category = Column(String(50), index=True)
 ```
@@ -231,9 +238,12 @@ class Product(Base):
 ```python
 from sqlalchemy.orm import DeclarativeBase
 
+
 class Base(DeclarativeBase):
     """Base class for all models"""
+
     pass
+
 
 # Modern approach with type annotations
 from typing import Annotated
@@ -242,9 +252,10 @@ from sqlalchemy.orm import mapped_column, Mapped
 int_pk = Annotated[int, mapped_column(primary_key=True)]
 str_100 = Annotated[str, mapped_column(String(100))]
 
+
 class User(Base):
     __tablename__ = "users"
-    
+
     id: Mapped[int_pk]
     username: Mapped[str_100]
     email: Mapped[str] = mapped_column(unique=True)
@@ -264,34 +275,22 @@ class User(Base):
 from sqlalchemy.orm import joinedload, selectinload
 
 # Method 1: joinedload - Uses SQL JOIN
-stmt = (
-    select(Course)
-    .options(joinedload(Course.professor))
-    .where(Course.id == course_id)
-)
+stmt = select(Course).options(joinedload(Course.professor)).where(Course.id == course_id)
 
 # Method 2: selectinload - Uses separate IN query
-stmt = (
-    select(Course)
-    .options(selectinload(Course.enrollments))
-    .where(Course.id == course_id)
-)
+stmt = select(Course).options(selectinload(Course.enrollments)).where(Course.id == course_id)
 
 # Method 3: Subquery loading
 from sqlalchemy.orm import subqueryload
-stmt = (
-    select(Course)
-    .options(subqueryload(Course.students))
-    .where(Course.id == course_id)
-)
+
+stmt = select(Course).options(subqueryload(Course.students)).where(Course.id == course_id)
 
 # Multiple eager loads
 stmt = (
     select(Course)
     .options(
         joinedload(Course.professor),
-        selectinload(Course.enrollments)
-            .selectinload(Enrollment.student)
+        selectinload(Course.enrollments).selectinload(Enrollment.student),
     )
     .where(Course.id == course_id)
 )
@@ -313,27 +312,22 @@ courses = result.unique().scalars().all()
 ```python
 from sqlalchemy import ForeignKey
 
+
 class Order(Base):
     __tablename__ = "orders"
-    
+
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    
+
     # Foreign key with options
-    product_id = Column(
-        Integer, 
-        ForeignKey("products.id", ondelete="CASCADE", onupdate="CASCADE")
-    )
-    
+    product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE", onupdate="CASCADE"))
+
     # Composite foreign key
     category_id = Column(Integer)
     item_id = Column(Integer)
-    
+
     __table_args__ = (
-        ForeignKeyConstraint(
-            ['category_id', 'item_id'],
-            ['categories.id', 'items.id']
-        ),
+        ForeignKeyConstraint(["category_id", "item_id"], ["categories.id", "items.id"]),
     )
 ```
 
@@ -349,33 +343,35 @@ class Order(Base):
 ```python
 from sqlalchemy.ext.hybrid import hybrid_property
 
+
 class User(Base):
     __tablename__ = "users"
-    
+
     id = Column(Integer, primary_key=True)
     first_name = Column(String(50))
     last_name = Column(String(50))
     _email = Column("email", String(255))
-    
+
     @hybrid_property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
-    
+
     @full_name.inplace.setter
     def full_name(self, value):
-        first, last = value.split(' ', 1)
+        first, last = value.split(" ", 1)
         self.first_name = first
         self.last_name = last
-    
+
     @hybrid_property
     def email(self):
         return self._email
-    
+
     @email.inplace.setter
     def email(self, value):
-        if '@' not in value:
+        if "@" not in value:
             raise ValueError("Invalid email")
         self._email = value
+
 
 # Usage
 user = db.query(User).first()
@@ -398,29 +394,19 @@ users = db.query(User).filter(User.full_name.ilike("%john%")).all()
 from sqlalchemy.orm import joinedload
 
 # Single relationship
-stmt = (
-    select(Course)
-    .options(joinedload(Course.professor))
-    .where(Course.id == 1)
-)
+stmt = select(Course).options(joinedload(Course.professor)).where(Course.id == 1)
 
 # Multiple relationships
 stmt = (
     select(Order)
-    .options(
-        joinedload(Order.user),
-        joinedload(Order.items)
-            .selectinload(OrderItem.product)
-    )
+    .options(joinedload(Order.user), joinedload(Order.items).selectinload(OrderItem.product))
     .where(Order.id == 1)
 )
 
 # Joinedload with filtering
 stmt = (
     select(Author)
-    .options(
-        joinedload(Author.books).filter(Book.published == True)
-    )
+    .options(joinedload(Author.books).filter(Book.published == True))
     .where(Author.id == 1)
 )
 
@@ -453,6 +439,7 @@ stmt = (
 
 # Disable lazy loading globally
 from sqlalchemy.orm import configure_mappers
+
 configure_mappers()  # Call once
 
 # Or per relationship
@@ -474,28 +461,31 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from typing import Optional
 
+
 class Base(DeclarativeBase):
     pass
 
+
 class User(Base):
     """User model representing the users table"""
+
     __tablename__ = "users"
-    
+
     # Modern approach with type annotations
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(50), unique=True)
     email: Mapped[str] = mapped_column(String(255), unique=True)
     is_active: Mapped[bool] = mapped_column(default=True)
-    
+
     def __repr__(self):
         return f"<User {self.username}>"
-    
+
     def to_dict(self):
         return {
             "id": self.id,
             "username": self.username,
             "email": self.email,
-            "is_active": self.is_active
+            "is_active": self.is_active,
         }
 ```
 
@@ -511,23 +501,21 @@ class User(Base):
 ```python
 class Parent(Base):
     __tablename__ = "parents"
-    
+
     id = Column(Integer, primary_key=True)
-    
+
     # delete-orphan means children are deleted when removed from list
-    children = relationship(
-        "Child",
-        back_populates="parent",
-        cascade="all, delete-orphan"
-    )
+    children = relationship("Child", back_populates="parent", cascade="all, delete-orphan")
+
 
 class Child(Base):
     __tablename__ = "children"
-    
+
     id = Column(Integer, primary_key=True)
     parent_id = Column(Integer, ForeignKey("parents.id"))
-    
+
     parent = relationship("Parent", back_populates="children")
+
 
 # Usage
 parent = Parent()
@@ -553,26 +541,26 @@ db.commit()  # Child is now deleted from database
 ```python
 from sqlalchemy import Column, Integer, String
 
+
 class User(Base):
     __tablename__ = "users"
-    
+
     # Single primary key
     id = Column(Integer, primary_key=True, autoincrement=True)
-    
+
     # String primary key (not recommended for most cases)
     # code = Column(String(10), primary_key=True)
+
 
 # Composite primary key
 class OrderItem(Base):
     __tablename__ = "order_items"
-    
+
     order_id = Column(Integer, primary_key=True)
     product_id = Column(Integer, primary_key=True)
     quantity = Column(Integer)
-    
-    __table_args__ = (
-        PrimaryKeyConstraint('order_id', 'product_id'),
-    )
+
+    __table_args__ = (PrimaryKeyConstraint("order_id", "product_id"),)
 ```
 
 **Related Terms**: Column, Foreign Key, Unique
@@ -587,41 +575,39 @@ class OrderItem(Base):
 ```python
 from sqlalchemy.orm import relationship
 
+
 class Author(Base):
     __tablename__ = "authors"
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
-    
+
     # One-to-many relationship
     books = relationship(
         "Book",
         back_populates="author",  # Bidirectional
         cascade="all, delete-orphan",  # Cascading operations
         lazy="select",  # Loading strategy
-        foreign_keys="[Book.author_id]"  # Explicit foreign key
+        foreign_keys="[Book.author_id]",  # Explicit foreign key
     )
+
 
 class Book(Base):
     __tablename__ = "books"
-    
+
     id = Column(Integer, primary_key=True)
     title = Column(String(200))
     author_id = Column(Integer, ForeignKey("authors.id"))
-    
+
     # Many-to-one relationship
     author = relationship(
         "Author",
         back_populates="books",
-        lazy="joined"  # Eager loading
+        lazy="joined",  # Eager loading
     )
-    
+
     # Many-to-many relationship
-    tags = relationship(
-        "Tag",
-        secondary="book_tags",
-        back_populates="books"
-    )
+    tags = relationship("Tag", secondary="book_tags", back_populates="books")
 ```
 
 **Related Terms**: Foreign Key, Back Populates, Cascade
@@ -637,30 +623,17 @@ class Book(Base):
 from sqlalchemy.orm import selectinload
 
 # Basic selectinload
-stmt = (
-    select(Course)
-    .options(selectinload(Course.enrollments))
-    .where(Course.id == 1)
-)
+stmt = select(Course).options(selectinload(Course.enrollments)).where(Course.id == 1)
 
 # Multiple selectinloads
 stmt = (
-    select(User)
-    .options(
-        selectinload(User.posts),
-        selectinload(User.comments)
-    )
-    .where(User.id == 1)
+    select(User).options(selectinload(User.posts), selectinload(User.comments)).where(User.id == 1)
 )
 
 # Nested selectinload
 stmt = (
     select(Author)
-    .options(
-        selectinload(Author.books)
-            .selectinload(Book.reviews)
-            .selectinload(Review.user)
-    )
+    .options(selectinload(Author.books).selectinload(Book.reviews).selectinload(Review.user))
     .where(Author.id == 1)
 )
 
@@ -686,23 +659,24 @@ student_course = Table(
     MetaData(),
     Column("student_id", Integer, ForeignKey("students.id")),
     Column("course_id", Integer, ForeignKey("courses.id")),
-    Column("enrolled_at", DateTime, default=datetime.utcnow)
+    Column("enrolled_at", DateTime, default=datetime.utcnow),
 )
 
 # Table with constraints
 from sqlalchemy import UniqueConstraint, CheckConstraint
 
+
 class Product(Base):
     __tablename__ = "products"
-    
+
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
     price = Column(Float)
-    
+
     __table_args__ = (
-        UniqueConstraint('name', name='uq_product_name'),
-        CheckConstraint('price > 0', name='ck_positive_price'),
-        Index('ix_products_name', 'name')
+        UniqueConstraint("name", name="uq_product_name"),
+        CheckConstraint("price > 0", name="ck_positive_price"),
+        Index("ix_products_name", "name"),
     )
 ```
 
@@ -719,24 +693,26 @@ class Product(Base):
 from sqlalchemy.orm import validates
 from datetime import datetime
 
+
 class User(Base):
     __tablename__ = "users"
-    
+
     id = Column(Integer, primary_key=True)
     email = Column(String(255))
     age = Column(Integer)
-    
-    @validates('email')
+
+    @validates("email")
     def validate_email(self, key, email):
-        if '@' not in email:
+        if "@" not in email:
             raise ValueError("Invalid email address")
         return email.lower()
-    
-    @validates('age')
+
+    @validates("age")
     def validate_age(self, key, age):
         if age < 0 or age > 150:
             raise ValueError("Invalid age")
         return age
+
 
 # Usage
 user = User(email="TEST@EXAMPLE.COM", age=25)

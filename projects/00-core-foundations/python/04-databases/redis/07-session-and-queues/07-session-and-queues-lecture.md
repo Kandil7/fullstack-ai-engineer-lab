@@ -50,7 +50,7 @@ r = RedisClient(clock=clock)
 r.hset("session:abc123", {"user_id": "42", "role": "admin", "created": "0"})
 r.expire("session:abc123", 1800)
 clock.advance(1500)
-r.expire("session:abc123", 1800)          # user active -> slide the window
+r.expire("session:abc123", 1800)  # user active -> slide the window
 print(f"ttl after activity at 1500s: {r.ttl('session:abc123')}s (slid back to 1800)")
 clock.advance(1801)
 print(f"idle > 30min -> session gone: {r.exists('session:abc123') == 0}")
@@ -80,6 +80,7 @@ class FIFOQueue:
     def dequeue(self):
         raw = self._c.lpop(self._name)
         return eval(raw) if raw is not None else None
+
 
 q = FIFOQueue(r, "queue:embed")
 q.enqueue({"doc": "a.pdf", "chunks": 12})
@@ -111,6 +112,7 @@ class PriorityQueue:
         raw, _ = hits[0]
         self._c.zrem(self._name, raw)
         return eval(raw)
+
 
 pq = PriorityQueue(r, "queue:index")
 pq.enqueue({"job": "reindex-all"}, priority=5)
@@ -163,7 +165,7 @@ class ReliableWorker:
 
     def recover_stale(self):
         if self._c.get("lease:in-progress") is not None:
-            return 0                                  # lease alive
+            return 0  # lease alive
         entries = self._c.lrange("in-progress", 0, -1)
         if not entries:
             return 0

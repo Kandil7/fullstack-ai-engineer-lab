@@ -44,8 +44,8 @@ avoiding the cost of a new connection per command.
 ```python
 from redis_client import get_client
 
-r = get_client()          # stand-in returns a pooled client
-print(r.set("k", "v"))    # reuses an idle connection
+r = get_client()  # stand-in returns a pooled client
+print(r.set("k", "v"))  # reuses an idle connection
 ```
 ```text
 # real redis-py: redis.Redis(connection_pool=pool)
@@ -80,8 +80,8 @@ from redis_client import get_client
 
 r = get_client()
 r.set("name", "sara")
-print(r.get("name"))    # -> sara
-print(r.get("missing")) # -> None
+print(r.get("name"))  # -> sara
+print(r.get("missing"))  # -> None
 ```
 ```text
 # reads are O(1) because the value lives in memory
@@ -97,8 +97,8 @@ string, creating it as 0 first when absent.
 from redis_client import get_client
 
 r = get_client()
-print(r.incr("hits"))   # -> 1
-print(r.incr("hits"))   # -> 2
+print(r.incr("hits"))  # -> 1
+print(r.incr("hits"))  # -> 2
 ```
 ```text
 # atomic: two concurrent INCRs never lose a count
@@ -111,9 +111,9 @@ print(r.incr("hits"))   # -> 2
 schema and no query language — the simplest data model.
 **Example**:
 ```python
-r.set("user:42:name", "sara")   # key:value pairs
+r.set("user:42:name", "sara")  # key:value pairs
 r.set("feature:dark", "on")
-print(r.get("feature:dark"))    # -> on
+print(r.get("feature:dark"))  # -> on
 ```
 ```text
 # no tables, no columns, no joins — just key -> value

@@ -50,6 +50,7 @@ print(f"Python list size: {sys.getsizeof(python_list)} bytes")  # ~8 MB
 
 # NumPy array
 import numpy as np
+
 numpy_array = np.arange(1000000)
 print(f"NumPy array size: {numpy_array.nbytes} bytes")  # ~8 MB
 
@@ -143,7 +144,7 @@ import numpy as np
 
 # From a Python list
 arr = np.array([1, 2, 3, 4, 5])
-print(arr)        # [1 2 3 4 5]
+print(arr)  # [1 2 3 4 5]
 print(type(arr))  # <class 'numpy.ndarray'>
 
 # 2D array (matrix)
@@ -153,11 +154,11 @@ print(matrix)
 #  [4 5 6]]
 
 # Inspecting an array
-print(arr.shape)    # (5,)      — dimensions
-print(arr.dtype)    # int64     — data type
-print(arr.size)     # 5         — total elements
-print(arr.ndim)     # 1         — number of dimensions
-print(arr.itemsize) # 8         — bytes per element
+print(arr.shape)  # (5,)      — dimensions
+print(arr.dtype)  # int64     — data type
+print(arr.size)  # 5         — total elements
+print(arr.ndim)  # 1         — number of dimensions
+print(arr.itemsize)  # 8         — bytes per element
 ```
 
 ---
@@ -169,43 +170,42 @@ The `ndarray` (N-dimensional array) is NumPy's core data structure.
 ### Attributes of an ndarray
 
 ```python
-arr = np.array([[1.0, 2.0, 3.0],
-                [4.0, 5.0, 6.0]])
+arr = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
 
 # Shape: (rows, columns)
-print(arr.shape)      # (2, 3)
+print(arr.shape)  # (2, 3)
 
 # Data type
-print(arr.dtype)      # float64
+print(arr.dtype)  # float64
 
 # Number of dimensions
-print(arr.ndim)       # 2
+print(arr.ndim)  # 2
 
 # Total elements
-print(arr.size)       # 6
+print(arr.size)  # 6
 
 # Bytes per element
-print(arr.itemsize)   # 8
+print(arr.itemsize)  # 8
 
 # Total bytes consumed
-print(arr.nbytes)     # 48
+print(arr.nbytes)  # 48
 
 # strides — bytes to step in each dimension
-print(arr.strides)    # (24, 8)
+print(arr.strides)  # (24, 8)
 ```
 
 ### Homogeneous Data
 
 ```python
 # NumPy arrays store ONE type — this is what makes them fast
-arr_int = np.array([1, 2, 3])       # int64
-arr_float = np.array([1.0, 2.0])    # float64
-arr_mixed = np.array([1, 2.5, 3])   # float64 (upcast!)
-print(arr_mixed.dtype)               # float64
+arr_int = np.array([1, 2, 3])  # int64
+arr_float = np.array([1.0, 2.0])  # float64
+arr_mixed = np.array([1, 2.5, 3])  # float64 (upcast!)
+print(arr_mixed.dtype)  # float64
 
 # You can force a specific type
 arr_str = np.array([1, 2, 3], dtype=str)
-print(arr_str.dtype)                 # <U11
+print(arr_str.dtype)  # <U11
 ```
 
 ---
@@ -224,16 +224,16 @@ np.array([1, 2, 3]) + np.array([4, 5, 6])  # [5, 7, 9]
 ### Mistake 2: Forgetting NumPy is 0-indexed
 ```python
 arr = np.array([10, 20, 30, 40, 50])
-arr[0]   # 10 (first element)
-arr[5]   # IndexError!
+arr[0]  # 10 (first element)
+arr[5]  # IndexError!
 ```
 
 ### Mistake 3: Modifying a view unintentionally
 ```python
 a = np.array([1, 2, 3])
-b = a[:2]       # This is a VIEW, not a copy!
+b = a[:2]  # This is a VIEW, not a copy!
 b[0] = 99
-print(a)        # [99  2  3] — a is modified!
+print(a)  # [99  2  3] — a is modified!
 ```
 
 ---
@@ -274,7 +274,7 @@ arr1 = np.array([1, 2, 3])
 arr2 = np.array([1.0, 2, 3])
 arr3 = np.array([1, 2, "hello"])
 arr4 = np.array([True, False, True])
-arr5 = np.array([1+2j, 3+4j])
+arr5 = np.array([1 + 2j, 3 + 4j])
 ```
 
 ### Exercise 3: Performance Comparison

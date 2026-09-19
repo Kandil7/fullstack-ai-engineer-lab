@@ -30,8 +30,11 @@ print("Output: 0 or 1 (binary) or probabilities")
 
 # Example 2: Sigmoid function
 print("\nExample 2: Sigmoid Function")
+
+
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
+
 
 # Sigmoid maps any value to 0-1
 z_values = np.array([-10, -5, 0, 5, 10])
@@ -53,8 +56,12 @@ print("  - Approaches 1 as z -> +inf")
 print("\nExample 3: Binary Classification Data")
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=300, n_features=2, n_redundant=0,
-    n_informative=2, random_state=42, n_clusters_per_class=1
+    n_samples=300,
+    n_features=2,
+    n_redundant=0,
+    n_informative=2,
+    random_state=42,
+    n_clusters_per_class=1,
 )
 
 print(f"Samples: {X.shape[0]}")
@@ -68,9 +75,7 @@ print(f"Class distribution: {np.bincount(y)}")
 
 # Example 4: Train/test split
 print("\nExample 4: Train/Test Split")
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 print(f"Training set: {len(X_train)} samples")
 print(f"Test set: {len(X_test)} samples")
 
@@ -103,9 +108,11 @@ y_prob = model.predict_proba(X_test_scaled)
 
 print("First 5 predictions:")
 for i in range(5):
-    print(f"  Sample {i+1}: Predicted class={y_pred[i]}, "
-          f"Probability(class 0)={y_prob[i, 0]:.3f}, "
-          f"Probability(class 1)={y_prob[i, 1]:.3f}")
+    print(
+        f"  Sample {i + 1}: Predicted class={y_pred[i]}, "
+        f"Probability(class 0)={y_prob[i, 0]:.3f}, "
+        f"Probability(class 1)={y_prob[i, 1]:.3f}"
+    )
 
 # ============================================================
 # Model Evaluation
@@ -185,7 +192,7 @@ print("  - penalty: 'l1', 'l2', 'elasticnet', or 'none'")
 print("  - solver: Algorithm to use ('lbfgs', 'liblinear', etc.)")
 
 # Example with L1 regularization
-model_l1 = LogisticRegression(penalty='l1', solver='liblinear', C=0.1, random_state=42)
+model_l1 = LogisticRegression(penalty="l1", solver="liblinear", C=0.1, random_state=42)
 model_l1.fit(X_train_scaled, y_train)
 acc_l1 = accuracy_score(y_test, model_l1.predict(X_test_scaled))
 
@@ -194,7 +201,7 @@ print(f"\nL1 regularization (C=0.1) accuracy: {acc_l1:.4f}")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Logistic regression is for classification, not regression")
 print("- Uses sigmoid function to map outputs to probabilities")
@@ -202,4 +209,4 @@ print("- Binary classification: predict 0 or 1")
 print("- Multi-class: extends to multiple classes")
 print("- Evaluate with accuracy, confusion matrix, F1 score")
 print("- Use regularization to prevent overfitting")
-print("="*60)
+print("=" * 60)

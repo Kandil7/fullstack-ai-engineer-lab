@@ -17,8 +17,8 @@ Why DSA matters:
 # =============================================================================
 
 # Data comes in different forms
-name = "Alice"          # String data
-age = 30                # Integer data
+name = "Alice"  # String data
+age = 30  # Integer data
 scores = [95, 87, 92]  # Collection data
 person = {"name": "Bob", "age": 25}  # Structured data
 
@@ -61,6 +61,7 @@ print(f"Set: {unique_nums}")
 
 # An algorithm is a finite sequence of well-defined instructions.
 
+
 # Example: Find the largest number in a list
 def find_largest(numbers):
     """Simple algorithm: scan and compare"""
@@ -71,6 +72,7 @@ def find_largest(numbers):
         if num > largest:
             largest = num
     return largest
+
 
 print("\n=== Algorithm Example ===")
 nums = [34, 78, 12, 99, 45]
@@ -84,10 +86,12 @@ print(f"Largest in {nums}: {find_largest(nums)}")
 # Big O describes how runtime grows with input size.
 # We measure the worst case.
 
+
 # O(1) - Constant time
 def get_first(lst):
     """Always takes 1 step regardless of list size"""
     return lst[0]
+
 
 # O(n) - Linear time
 def linear_search(lst, target):
@@ -96,6 +100,7 @@ def linear_search(lst, target):
         if val == target:
             return i
     return -1
+
 
 # O(n^2) - Quadratic time
 def bubble_sort_step(lst):
@@ -108,6 +113,7 @@ def bubble_sort_step(lst):
             if lst[j] > lst[j + 1]:
                 lst[j], lst[j + 1] = lst[j + 1], lst[j]
     return lst, comparisons
+
 
 # O(log n) - Logarithmic time
 def binary_search_demo(sorted_lst, target):
@@ -124,6 +130,7 @@ def binary_search_demo(sorted_lst, target):
         else:
             high = mid - 1
     return -1, steps
+
 
 print("\n=== Time Complexity Demo ===")
 test_list = list(range(1, 101))
@@ -150,6 +157,7 @@ print(f"O(log n) binary_search(50) in 100 elements: {steps} steps")
 
 # Space complexity measures how much memory an algorithm uses.
 
+
 # O(1) space - no extra data structures
 def sum_list(nums):
     total = 0
@@ -157,13 +165,16 @@ def sum_list(nums):
         total += n
     return total
 
+
 # O(n) space - creates new list
 def double_list(nums):
     return [n * 2 for n in nums]
 
+
 # O(n^2) space - creates matrix
 def identity_matrix(n):
     return [[1 if i == j else 0 for j in range(n)] for i in range(n)]
+
 
 print("\n=== Space Complexity Demo ===")
 test_nums = [1, 2, 3, 4, 5]
@@ -217,12 +228,14 @@ print(f"Bubble sort: {arr}")
 # 7. RECURSION BASICS
 # =============================================================================
 
+
 # A function that calls itself
 def factorial(n):
     """Factorial: n! = n * (n-1)! with base case n=1"""
     if n <= 1:
         return 1
     return n * factorial(n - 1)
+
 
 def fibonacci(n):
     """Fibonacci: F(n) = F(n-1) + F(n-2)"""
@@ -231,6 +244,7 @@ def fibonacci(n):
     if n == 1:
         return 1
     return fibonacci(n - 1) + fibonacci(n - 2)
+
 
 print("\n=== Recursion Basics ===")
 print(f"5! = {factorial(5)}")
@@ -241,6 +255,7 @@ print(f"Fibonacci(10) = {fibonacci(10)}")
 # 8. COMPLEXITY COMPARISON TABLE
 # =============================================================================
 
+
 def complexity_table():
     """Visualize how different complexities scale"""
     print("\n=== Complexity Comparison (N = input size) ===")
@@ -248,8 +263,10 @@ def complexity_table():
     print("-" * 65)
     for n in [1, 10, 100, 1000, 10000]:
         import math
+
         log_n = math.log2(n) if n > 0 else 0
         print(f"{n:<8} {1:<10} {log_n:<12.1f} {n:<10} {n * log_n:<14.1f} {n**2:<10}")
+
 
 complexity_table()
 
@@ -260,6 +277,7 @@ complexity_table()
 
 print("\n=== Practice Exercises ===")
 
+
 # Exercise 1: Count occurrences
 def count_occurrences(lst, target):
     """O(n) time, O(1) space"""
@@ -269,8 +287,10 @@ def count_occurrences(lst, target):
             count += 1
     return count
 
+
 test = [1, 2, 3, 2, 4, 2, 5]
 print(f"Count of 2 in {test}: {count_occurrences(test, 2)}")
+
 
 # Exercise 2: Reverse a list in-place
 def reverse_in_place(lst):
@@ -282,9 +302,11 @@ def reverse_in_place(lst):
         right -= 1
     return lst
 
+
 nums = [1, 2, 3, 4, 5]
 reverse_in_place(nums)
 print(f"Reversed in-place: {nums}")
+
 
 # Exercise 3: Check if palindrome
 def is_palindrome(s):
@@ -297,6 +319,7 @@ def is_palindrome(s):
         left += 1
         right -= 1
     return True
+
 
 print(f"'racecar' is palindrome: {is_palindrome('racecar')}")
 print(f"'hello' is palindrome: {is_palindrome('hello')}")

@@ -52,6 +52,7 @@ framework overhead (Python interpreter for each op).
 ```python
 import time
 
+
 def profile_pipeline(preprocess_fn, predict_fn, sample, n=100):
     stages = {}
     t0 = time.perf_counter()
@@ -64,6 +65,7 @@ def profile_pipeline(preprocess_fn, predict_fn, sample, n=100):
         predict_fn(x)
     stages["predict_ms"] = ((time.perf_counter() - t0) / n) * 1000
     return stages
+
 
 # profile output guides the next step:
 # if predict_ms dominates → model optimization (quantization/ONNX/batching)
@@ -91,9 +93,8 @@ and the latency win is large.
 ```python
 # PyTorch: dynamic quantization (CPU) — 2-4x smaller/faster
 import torch
-model_int8 = torch.quantization.quantize_dynamic(
-    model, {torch.nn.Linear}, dtype=torch.qint8
-)
+
+model_int8 = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
 ```
 
 Output (conceptually):
@@ -121,9 +122,7 @@ sess = ort.InferenceSession(
     sess_options=ort.SessionOptions(),
 )
 sess_options = sess.get_session_options()
-sess_options.graph_optimization_level = (
-    ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-)
+sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
 ```
 
 Output (conceptually):
@@ -145,9 +144,10 @@ def batched_predict(sess, inputs: list, batch_size: int = 32) -> list:
     """Predict in fixed batches; measure the per-batch time."""
     results = []
     for i in range(0, len(inputs), batch_size):
-        batch = inputs[i:i + batch_size]
+        batch = inputs[i : i + batch_size]
         results.extend(sess.run(None, {"X": batch})[0])
     return results
+
 
 # empirical: batch of 32 on GPU ≈ 1.3x the time of batch of 1
 # → 25x more work for 1.3x the time
@@ -174,6 +174,7 @@ model itself:
 ```python
 # Structural pruning example (conceptual)
 import torch.nn.utils.prune as prune
+
 for name, module in model.named_modules():
     if isinstance(module, torch.nn.Linear):
         prune.l1_unstructured(module, name="weight", amount=0.3)

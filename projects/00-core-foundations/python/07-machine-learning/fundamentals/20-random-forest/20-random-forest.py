@@ -32,8 +32,7 @@ print("Final prediction is the majority vote (classification) or average (regres
 print("\nExample 2: Generate Data")
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=500, n_features=10, n_informative=5,
-    n_redundant=2, random_state=42
+    n_samples=500, n_features=10, n_informative=5, n_redundant=2, random_state=42
 )
 
 print(f"Samples: {X.shape[0]}")
@@ -42,9 +41,7 @@ print(f"Classes: {np.unique(y)}")
 
 # Example 3: Train/test split
 print("\nExample 3: Train/Test Split")
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 print(f"Training set: {len(X_train)} samples")
 print(f"Test set: {len(X_test)} samples")
 
@@ -88,7 +85,7 @@ acc_rf = accuracy_score(y_test, rf.predict(X_test))
 
 print(f"Single Decision Tree: {acc_dt:.4f}")
 print(f"Random Forest: {acc_rf:.4f}")
-print(f"Improvement: {(acc_rf - acc_dt)*100:.2f}%")
+print(f"Improvement: {(acc_rf - acc_dt) * 100:.2f}%")
 
 # ============================================================
 # Feature Importance
@@ -100,8 +97,7 @@ importances = rf.feature_importances_
 feature_names = [f"Feature {i}" for i in range(X.shape[1])]
 
 print("Feature importances:")
-for name, importance in sorted(zip(feature_names, importances), 
-                              key=lambda x: x[1], reverse=True):
+for name, importance in sorted(zip(feature_names, importances), key=lambda x: x[1], reverse=True):
     print(f"  {name}: {importance:.4f}")
 
 # ============================================================
@@ -123,7 +119,7 @@ for n_trees in [10, 50, 100, 200]:
     rf = RandomForestClassifier(n_estimators=n_trees, random_state=42)
     rf.fit(X_train, y_train)
     acc = accuracy_score(y_test, rf.predict(X_test))
-    results.append({'n_trees': n_trees, 'accuracy': acc})
+    results.append({"n_trees": n_trees, "accuracy": acc})
     print(f"  {n_trees:3d} trees: Accuracy = {acc:.4f}")
 
 # ============================================================
@@ -181,7 +177,7 @@ print("  - Can overfit with very noisy data")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Random forest combines multiple decision trees")
 print("- Each tree trained on random data/feature subsets")
@@ -189,4 +185,4 @@ print("- More accurate and robust than single trees")
 print("- Provides feature importance")
 print("- Use for classification and regression")
 print("- Tune n_estimators for performance")
-print("="*60)
+print("=" * 60)

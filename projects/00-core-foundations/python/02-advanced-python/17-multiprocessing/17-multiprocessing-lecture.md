@@ -33,10 +33,12 @@ import multiprocessing
 import time
 import os
 
+
 def worker(name):
     print(f"[{name}] PID: {os.getpid()}")
     time.sleep(0.1)
     print(f"[{name}] Done")
+
 
 if __name__ == "__main__":
     processes = []
@@ -44,10 +46,10 @@ if __name__ == "__main__":
         p = multiprocessing.Process(target=worker, args=(f"Process-{i}",))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
-    
+
     print(f"Main process PID: {os.getpid()}")
 ```
 
@@ -56,22 +58,24 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def compute_square(n):
-    return n ** 2
+    return n**2
+
 
 if __name__ == "__main__":
     numbers = [1, 2, 3, 4, 5]
     processes = []
     results = []
-    
+
     for n in numbers:
         p = multiprocessing.Process(target=lambda: results.append(compute_square(n)))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
-    
+
     print(f"Results: {results}")
 ```
 
@@ -86,17 +90,19 @@ Pool provides a convenient interface for parallel execution.
 ```python
 import multiprocessing
 
+
 def square(n):
-    return n ** 2
+    return n**2
+
 
 if __name__ == "__main__":
     with multiprocessing.Pool(processes=4) as pool:
         numbers = [1, 2, 3, 4, 5, 6, 7, 8]
-        
+
         # map - returns results in order
         results = pool.map(square, numbers)
         print(f"Squares: {results}")
-        
+
         # map_async - asynchronous version
         async_result = pool.map_async(square, numbers)
         print(f"Async results: {async_result.get()}")
@@ -107,12 +113,14 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def power(base, exponent):
-    return base ** exponent
+    return base**exponent
+
 
 if __name__ == "__main__":
     args = [(2, 3), (3, 4), (4, 2), (5, 3)]
-    
+
     with multiprocessing.Pool(processes=2) as pool:
         # starmap - unpacks arguments
         results = pool.starmap(power, args)
@@ -124,24 +132,23 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def process_item(item):
     return item * 2
+
 
 def on_success(result):
     print(f"Success: {result}")
 
+
 def on_error(error):
     print(f"Error: {error}")
+
 
 if __name__ == "__main__":
     with multiprocessing.Pool(processes=2) as pool:
         # apply_async with callbacks
-        result = pool.apply_async(
-            process_item,
-            (10,),
-            callback=on_success,
-            error_callback=on_error
-        )
+        result = pool.apply_async(process_item, (10,), callback=on_success, error_callback=on_error)
         result.get()  # Wait for completion
 ```
 
@@ -155,27 +162,29 @@ Multiprocessing excels at CPU-bound tasks.
 import multiprocessing
 import time
 
+
 def fibonacci(n):
     if n < 2:
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
 
+
 if __name__ == "__main__":
     numbers = [30, 32, 34, 35]
-    
+
     # Sequential
     start = time.perf_counter()
     seq_results = [fibonacci(n) for n in numbers]
     seq_time = time.perf_counter() - start
     print(f"Sequential: {seq_time:.2f}s, results: {seq_results}")
-    
+
     # Parallel
     start = time.perf_counter()
     with multiprocessing.Pool(processes=4) as pool:
         par_results = pool.map(fibonacci, numbers)
     par_time = time.perf_counter() - start
     print(f"Parallel: {par_time:.2f}s, results: {par_results}")
-    print(f"Speedup: {seq_time/par_time:.2f}x")
+    print(f"Speedup: {seq_time / par_time:.2f}x")
 ```
 
 ---
@@ -189,23 +198,25 @@ Processes can share state using specialized objects.
 ```python
 import multiprocessing
 
+
 def increment(shared_val, n):
     for _ in range(n):
         with shared_val.get_lock():
             shared_val.value += 1
 
+
 if __name__ == "__main__":
-    counter = multiprocessing.Value('i', 0)  # 'i' = int
-    
+    counter = multiprocessing.Value("i", 0)  # 'i' = int
+
     processes = []
     for _ in range(4):
         p = multiprocessing.Process(target=increment, args=(counter, 1000))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
-    
+
     print(f"Counter: {counter.value}")  # 4000
 ```
 
@@ -214,21 +225,23 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def fill_array(shared_arr, index, value):
     shared_arr[index] = value
 
+
 if __name__ == "__main__":
-    arr = multiprocessing.Array('i', [0, 0, 0, 0, 0])
-    
+    arr = multiprocessing.Array("i", [0, 0, 0, 0, 0])
+
     processes = []
     for i in range(5):
         p = multiprocessing.Process(target=fill_array, args=(arr, i, i * 10))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
-    
+
     print(f"Array: {list(arr)}")  # [0, 10, 20, 30, 40]
 ```
 
@@ -237,25 +250,24 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def update_dict(shared_dict, key, value):
     shared_dict[key] = value
+
 
 if __name__ == "__main__":
     manager = multiprocessing.Manager()
     shared_dict = manager.dict()
-    
+
     processes = []
     for i in range(5):
-        p = multiprocessing.Process(
-            target=update_dict,
-            args=(shared_dict, f"key{i}", i * 10)
-        )
+        p = multiprocessing.Process(target=update_dict, args=(shared_dict, f"key{i}", i * 10))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
-    
+
     print(f"Dict: {dict(shared_dict)}")
 ```
 
@@ -268,10 +280,12 @@ Inter-process communication using Queue.
 ```python
 import multiprocessing
 
+
 def producer(q, count):
     for i in range(count):
         q.put(f"item-{i}")
     q.put(None)  # Sentinel
+
 
 def consumer(q, results):
     while True:
@@ -280,20 +294,21 @@ def consumer(q, results):
             break
         results.append(item.upper())
 
+
 if __name__ == "__main__":
     q = multiprocessing.Queue()
     manager = multiprocessing.Manager()
     results = manager.list()
-    
+
     prod = multiprocessing.Process(target=producer, args=(q, 5))
     cons = multiprocessing.Process(target=consumer, args=(q, results))
-    
+
     prod.start()
     cons.start()
-    
+
     prod.join()
     cons.join()
-    
+
     print(f"Results: {list(results)}")
 ```
 
@@ -308,20 +323,19 @@ import multiprocessing
 
 lock = multiprocessing.Lock()
 
+
 def safe_print(msg, lock_obj):
     with lock_obj:
         print(f"  {msg}")
 
+
 if __name__ == "__main__":
     processes = []
     for i in range(5):
-        p = multiprocessing.Process(
-            target=safe_print,
-            args=(f"Message from process {i}", lock)
-        )
+        p = multiprocessing.Process(target=safe_print, args=(f"Message from process {i}", lock))
         processes.append(p)
         p.start()
-    
+
     for p in processes:
         p.join()
 ```
@@ -336,10 +350,12 @@ Daemon processes stop when the main process exits.
 import multiprocessing
 import time
 
+
 def background_task():
     while True:
         time.sleep(0.1)
         print("Background running...")
+
 
 if __name__ == "__main__":
     daemon = multiprocessing.Process(target=background_task, daemon=True)
@@ -357,15 +373,17 @@ Get return values from processes using Pool.
 ```python
 import multiprocessing
 
+
 def process_data(data):
     return {"input": data, "output": data * 2, "pid": multiprocessing.current_process().pid}
 
+
 if __name__ == "__main__":
     data = [1, 2, 3, 4, 5]
-    
+
     with multiprocessing.Pool(processes=4) as pool:
         results = pool.map(process_data, data)
-    
+
     for r in results:
         print(f"PID {r['pid']}: {r['input']} -> {r['output']}")
 ```
@@ -379,8 +397,10 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def worker():
     print("Working")
+
 
 # WRONG - will cause issues on Windows
 p = multiprocessing.Process(target=worker)
@@ -398,14 +418,17 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 # WRONG - lambda functions can't be pickled
 def bad_example():
     with multiprocessing.Pool() as pool:
         pool.map(lambda x: x * 2, [1, 2, 3])  # PicklingError
 
+
 # CORRECT - use regular functions
 def square(x):
     return x * 2
+
 
 if __name__ == "__main__":
     with multiprocessing.Pool() as pool:
@@ -417,8 +440,10 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def worker():
     print("Working")
+
 
 # WRONG - might exit before process completes
 p = multiprocessing.Process(target=worker)
@@ -440,8 +465,10 @@ p.join()  # Wait for completion
 ```python
 import multiprocessing
 
+
 def process(item):
     return item * 2
+
 
 if __name__ == "__main__":
     with multiprocessing.Pool(processes=4) as pool:
@@ -464,8 +491,10 @@ if __name__ == "__main__":
 ```python
 import multiprocessing
 
+
 def producer(q):
     q.put("data")
+
 
 def consumer(q):
     data = q.get()

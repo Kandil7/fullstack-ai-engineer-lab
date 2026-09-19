@@ -35,8 +35,8 @@ import numpy as np
 arr = np.array([1.2, 2.5, 3.7, 4.1, 5.5, 6.9])
 
 print("Original:", arr)
-print("round():", np.round(arr))       # [1. 2. 4. 4. 6. 7.]
-print("around():", np.around(arr))     # [1. 2. 4. 4. 6. 7.]
+print("round():", np.round(arr))  # [1. 2. 4. 4. 6. 7.]
+print("around():", np.around(arr))  # [1. 2. 4. 4. 6. 7.]
 ```
 
 **Key points:**
@@ -52,8 +52,8 @@ import numpy as np
 arr = np.array([1.2345, 2.3456, 3.4567])
 
 print("\nRound to 2 decimals:", np.round(arr, 2))  # [1.23 2.35 3.46]
-print("Round to 1 decimal:", np.round(arr, 1))    # [1.2 2.3 3.5]
-print("Round to 0 decimals:", np.round(arr, 0))   # [1. 2. 3.]
+print("Round to 1 decimal:", np.round(arr, 1))  # [1.2 2.3 3.5]
+print("Round to 0 decimals:", np.round(arr, 0))  # [1. 2. 3.]
 ```
 
 ### 3. Round to Nearest 10, 100
@@ -77,12 +77,12 @@ import numpy as np
 arr = np.array([1.2, 2.5, 3.7, -1.3, -2.8, 4.0])
 
 print("\nOriginal:", arr)
-print("floor():", np.floor(arr))    # [ 1.  2.  3. -2. -3.  4.]
-print("ceil():", np.ceil(arr))      # [ 2.  3.  4. -1. -2.  4.]
+print("floor():", np.floor(arr))  # [ 1.  2.  3. -2. -3.  4.]
+print("ceil():", np.ceil(arr))  # [ 2.  3.  4. -1. -2.  4.]
 
 # Floor is always <= value, ceil is always >= value
 print("\nFloor check:", np.all(np.floor(arr) <= arr))  # True
-print("Ceil check:", np.all(np.ceil(arr) >= arr))      # True
+print("Ceil check:", np.all(np.ceil(arr) >= arr))  # True
 
 # Practical example: ceiling division
 a = np.array([10, 11, 12, 13])
@@ -99,13 +99,13 @@ import numpy as np
 arr = np.array([1.9, 2.1, -3.7, -4.2, 5.5])
 
 print("\nOriginal:", arr)
-print("trunc():", np.trunc(arr))    # [ 1.  2. -3. -4.  5.]
-print("fix():", np.fix(arr))        # [ 1.  2. -3. -4.  5.]
+print("trunc():", np.trunc(arr))  # [ 1.  2. -3. -4.  5.]
+print("fix():", np.fix(arr))  # [ 1.  2. -3. -4.  5.]
 
 # trunc vs floor for negative numbers
 print("\nFor -3.7:")
-print("  trunc:", np.trunc(-3.7))   # -3.0 (toward zero)
-print("  floor:", np.floor(-3.7))   # -4.0 (toward -inf)
+print("  trunc:", np.trunc(-3.7))  # -3.0 (toward zero)
+print("  floor:", np.floor(-3.7))  # -4.0 (toward -inf)
 
 # Practical: integer part extraction
 arr2 = np.array([3.14, 2.72, 1.41, 0.00])
@@ -120,17 +120,17 @@ import numpy as np
 arr = np.array([1.5, 2.5, 3.5, 4.5, -1.5, -2.5])
 
 print("\nOriginal:", arr)
-print("round():", np.round(arr))      # [2. 2. 4. 4. -2. -2.]
-print("floor():", np.floor(arr))      # [ 1.  2.  3.  4. -2. -3.]
-print("ceil():", np.ceil(arr))        # [2. 3. 4. 5. -1. -2.]
-print("trunc():", np.trunc(arr))      # [ 1.  2.  3.  4. -1. -2.]
+print("round():", np.round(arr))  # [2. 2. 4. 4. -2. -2.]
+print("floor():", np.floor(arr))  # [ 1.  2.  3.  4. -2. -3.]
+print("ceil():", np.ceil(arr))  # [2. 3. 4. 5. -1. -2.]
+print("trunc():", np.trunc(arr))  # [ 1.  2.  3.  4. -1. -2.]
 
 # Banker's rounding (round half to even)
 print("\nBanker's rounding:")
-print("  round(0.5):", np.round(0.5))    # 0.0 (rounds to even)
-print("  round(1.5):", np.round(1.5))    # 2.0 (rounds to even)
-print("  round(2.5):", np.round(2.5))    # 2.0 (rounds to even)
-print("  round(3.5):", np.round(3.5))    # 4.0 (rounds to even)
+print("  round(0.5):", np.round(0.5))  # 0.0 (rounds to even)
+print("  round(1.5):", np.round(1.5))  # 2.0 (rounds to even)
+print("  round(2.5):", np.round(2.5))  # 2.0 (rounds to even)
+print("  round(3.5):", np.round(3.5))  # 4.0 (rounds to even)
 ```
 
 ---

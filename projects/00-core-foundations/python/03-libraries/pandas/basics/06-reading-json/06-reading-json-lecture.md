@@ -61,13 +61,13 @@ print(df)
 import pandas as pd
 import json
 
-json_string = '''
+json_string = """
 [
     {"Name": "Alice", "Age": 28, "City": "New York"},
     {"Name": "Bob", "Age": 35, "City": "London"},
     {"Name": "Charlie", "Age": 42, "City": "Paris"}
 ]
-'''
+"""
 
 df = pd.read_json(json_string)
 print(df)
@@ -106,12 +106,15 @@ Array of objects — each object is a row.
 ```python
 import pandas as pd
 
-df = pd.read_json('''
+df = pd.read_json(
+    """
 [
     {"Name": "Alice", "Age": 28},
     {"Name": "Bob", "Age": 35}
 ]
-''', orient="records")
+""",
+    orient="records",
+)
 ```
 
 ### Orient: "columns"
@@ -126,12 +129,15 @@ Object of objects — outer keys are column names.
 ```
 
 ```python
-df = pd.read_json('''
+df = pd.read_json(
+    """
 {
     "Name": {"0": "Alice", "1": "Bob"},
     "Age": {"0": 28, "1": 35}
 }
-''', orient="columns")
+""",
+    orient="columns",
+)
 ```
 
 ### Orient: "index"
@@ -146,12 +152,15 @@ Object of objects — outer keys are row indices.
 ```
 
 ```python
-df = pd.read_json('''
+df = pd.read_json(
+    """
 {
     "0": {"Name": "Alice", "Age": 28},
     "1": {"Name": "Bob", "Age": 35}
 }
-''', orient="index")
+""",
+    orient="index",
+)
 ```
 
 ### Orient: "values"
@@ -166,12 +175,16 @@ Array of arrays — no headers or indices.
 ```
 
 ```python
-df = pd.read_json('''
+df = pd.read_json(
+    """
 [
     ["Alice", 28],
     ["Bob", 35]
 ]
-''', orient="values", columns=["Name", "Age"])
+""",
+    orient="values",
+    columns=["Name", "Age"],
+)
 ```
 
 ### Orient: "split"
@@ -187,13 +200,16 @@ Separated keys for index, columns, and data.
 ```
 
 ```python
-df = pd.read_json('''
+df = pd.read_json(
+    """
 {
     "index": [0, 1],
     "columns": ["Name", "Age"],
     "data": [["Alice", 28], ["Bob", 35]]
 }
-''', orient="split")
+""",
+    orient="split",
+)
 ```
 
 ---
@@ -241,14 +257,14 @@ data = {
             "id": 1,
             "name": "Alice",
             "contact": {"email": "alice@example.com", "phone": "555-1234"},
-            "scores": [92, 85, 88]
+            "scores": [92, 85, 88],
         },
         {
             "id": 2,
             "name": "Bob",
             "contact": {"email": "bob@example.com", "phone": "555-5678"},
-            "scores": [78, 90, 82]
-        }
+            "scores": [78, 90, 82],
+        },
     ]
 }
 
@@ -271,11 +287,7 @@ print(df)
 # 1   2    Bob  bob@example.com    555-5678    [78, 90, 82]
 
 # Fully flatten (expand lists)
-df = pd.json_normalize(
-    data["results"],
-    sep="_",
-    record_path=None
-)
+df = pd.json_normalize(data["results"], sep="_", record_path=None)
 ```
 
 ### Handling Arrays in JSON
@@ -284,7 +296,7 @@ df = pd.json_normalize(
 import pandas as pd
 
 # JSON with array field
-json_data = '''
+json_data = """
 [
     {
         "id": 1,
@@ -297,7 +309,7 @@ json_data = '''
         "scores": [78, 90, 82]
     }
 ]
-'''
+"""
 
 df = pd.read_json(json_data, orient="records")
 print(df)
@@ -326,10 +338,7 @@ print(df_exploded)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob", "Charlie"], "Age": [28, 35, 42]})
 
 # Save with different orientations
 df.to_json("output_records.json", orient="records", indent=2)
@@ -465,7 +474,7 @@ import pandas as pd
 import json
 
 # Sample nested JSON data
-json_data = '''
+json_data = """
 {
     "employees": [
         {
@@ -490,7 +499,7 @@ json_data = '''
         }
     ]
 }
-'''
+"""
 
 # Parse and flatten
 data = json.loads(json_data)

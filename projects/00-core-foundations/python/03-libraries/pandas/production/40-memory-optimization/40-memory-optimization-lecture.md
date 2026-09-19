@@ -82,10 +82,12 @@ floats = pd.Series(np.random.uniform(0, 1, 100_000))
 ints_small = pd.to_numeric(ints, downcast="integer")
 floats_small = pd.to_numeric(floats, downcast="float")
 
-print(ints.memory_usage(deep=True), "->", ints_small.memory_usage(deep=True),
-      ints_small.dtype)                    # 400132 -> 100132 int8
-print(floats.memory_usage(deep=True), "->", floats_small.memory_usage(deep=True),
-      floats_small.dtype)                  # 800132 -> 400132 float32
+print(
+    ints.memory_usage(deep=True), "->", ints_small.memory_usage(deep=True), ints_small.dtype
+)  # 400132 -> 100132 int8
+print(
+    floats.memory_usage(deep=True), "->", floats_small.memory_usage(deep=True), floats_small.dtype
+)  # 800132 -> 400132 float32
 ```
 
 ```text
@@ -107,7 +109,7 @@ columns — user_ids, timestamps, free text — lose or tie.
 
 ```python
 low_card = pd.Series(np.random.choice(cats, 100_000)).astype("category")
-print(1 - low_card.memory_usage(deep=True) / obj.memory_usage(deep=True))   # ~98%
+print(1 - low_card.memory_usage(deep=True) / obj.memory_usage(deep=True))  # ~98%
 
 high_card = pd.Series([f"user_{i:06d}" for i in range(100_000)])
 high_cat = high_card.astype("category")
@@ -132,6 +134,7 @@ strings, leave booleans alone.
 def audit(frame: pd.DataFrame) -> pd.Series:
     return frame.memory_usage(deep=True)
 
+
 def optimize_dtypes(frame: pd.DataFrame) -> pd.DataFrame:
     out = frame.copy()
     for col in out.columns:
@@ -147,13 +150,16 @@ def optimize_dtypes(frame: pd.DataFrame) -> pd.DataFrame:
                 out[col] = out[col].astype("category")
     return out
 
-waste = pd.DataFrame({
-    "user_id": np.random.randint(1, 50_000, 100_000),
-    "score": np.random.uniform(0, 1, 100_000),
-    "tier": np.random.choice(["free", "pro", "enterprise"], 100_000),
-    "is_active": np.random.choice([True, False], 100_000),
-    "region": np.random.choice(["us", "eu", "ap", "latam", "mea"], 100_000),
-})
+
+waste = pd.DataFrame(
+    {
+        "user_id": np.random.randint(1, 50_000, 100_000),
+        "score": np.random.uniform(0, 1, 100_000),
+        "tier": np.random.choice(["free", "pro", "enterprise"], 100_000),
+        "is_active": np.random.choice([True, False], 100_000),
+        "region": np.random.choice(["us", "eu", "ap", "latam", "mea"], 100_000),
+    }
+)
 fixed = optimize_dtypes(waste)
 print(audit(waste).sum(), "->", audit(fixed).sum())
 # 11946390 -> 1100835
@@ -199,13 +205,12 @@ not the file.
 ```python
 import io
 
-text = pd.DataFrame({"x": np.arange(1000),
-                     "y": np.random.randn(1000)}).to_csv(index=False)
+text = pd.DataFrame({"x": np.arange(1000), "y": np.random.randn(1000)}).to_csv(index=False)
 
 full = pd.read_csv(io.StringIO(text))
-chunked = pd.concat(pd.read_csv(io.StringIO(text), chunksize=250),
-                    ignore_index=True)
-print(full.equals(chunked))                     # True
+chunked = pd.concat(pd.read_csv(io.StringIO(text), chunksize=250), ignore_index=True)
+print(full.equals(chunked))  # True
+
 
 def streamed_mean(csv_text: str, col: str, cs: int) -> float:
     total = count = 0.0
@@ -214,7 +219,8 @@ def streamed_mean(csv_text: str, col: str, cs: int) -> float:
         count += chunk[col].count()
     return total / count
 
-print(full["y"].mean() == streamed_mean(text, "y", 250))   # True
+
+print(full["y"].mean() == streamed_mean(text, "y", 250))  # True
 ```
 
 ```text

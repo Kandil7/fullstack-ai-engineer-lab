@@ -59,7 +59,7 @@ def release(lock_name, token, client):
 that share nothing else cannot run the same critical section twice.
 **Example**:
 ```python
-acquire("job:embed", token, 30, lc)   # one replica wins
+acquire("job:embed", token, 30, lc)  # one replica wins
 # ... rebuild the embedding index ...
 release("job:embed", token, lc)
 ```
@@ -249,7 +249,7 @@ print(release("job:embed", "worker-a", lc))  # -> False, b keeps it
 proving ownership at release time.
 **Example**:
 ```python
-token = uuid4().hex            # unique per acquire
+token = uuid4().hex  # unique per acquire
 acquire("job:embed", token, 30, lc)
 release("job:embed", token, lc)  # only this token releases
 ```

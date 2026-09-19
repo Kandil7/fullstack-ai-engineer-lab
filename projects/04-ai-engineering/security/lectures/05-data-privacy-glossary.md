@@ -34,12 +34,14 @@
 import hashlib
 import random
 
+
 class Anonymizer:
     def __init__(self, salt: str = "static-salt"):
         self.salt = salt
 
-    def anonymize_dataset(self, data: list, quasi_identifiers: list,
-                          k: int = 5) -> list:
+    def anonymize_dataset(
+        self, data: list, quasi_identifiers: list, k: int = 5
+    ) -> list:
         """Apply k-anonymity to dataset."""
         # Group by quasi-identifiers
         groups = {}
@@ -65,6 +67,7 @@ class Anonymizer:
                 # Generalize age to ranges
                 result[qi] = f"{(result[qi] // 10) * 10}-{(result[qi] // 10) * 10 + 9}"
         return result
+
 
 # Usage
 anonymizer = Anonymizer()
@@ -136,18 +139,21 @@ class CCPACompliance:
 from datetime import datetime
 from enum import Enum
 
+
 class ConsentType(Enum):
     DATA_PROCESSING = "data_processing"
     MARKETING = "marketing"
     THIRD_PARTY_SHARING = "third_party_sharing"
     ANALYTICS = "analytics"
 
+
 class ConsentManager:
     def __init__(self):
         self.consents = {}
 
-    def record_consent(self, user_id: str, consent_type: ConsentType,
-                       granted: bool, purpose: str) -> dict:
+    def record_consent(
+        self, user_id: str, consent_type: ConsentType, granted: bool, purpose: str
+    ) -> dict:
         """Record user consent."""
         key = f"{user_id}:{consent_type.value}"
         self.consents[key] = {
@@ -169,6 +175,7 @@ class ConsentManager:
     def withdraw_consent(self, user_id: str, consent_type: ConsentType):
         """Withdraw user consent."""
         self.record_consent(user_id, consent_type, False, "user_withdrawal")
+
 
 # Usage
 manager = ConsentManager()
@@ -245,6 +252,7 @@ class ConsentManagementSystem:
 ```python
 from datetime import datetime, timedelta
 
+
 class DataBreachHandler:
     def __init__(self):
         self.breach_threshold_hours = 72  # GDPR requirement
@@ -310,15 +318,17 @@ class DataController:
     def register_processing_activity(self, activity: dict) -> str:
         """Register a processing activity (Article 30 GDPR)."""
         activity_id = f"PA-{len(self.processing_activities) + 1}"
-        self.processing_activities.append({
-            "id": activity_id,
-            "organization": self.organization,
-            "purpose": activity.get("purpose"),
-            "data_categories": activity.get("data_categories", []),
-            "recipients": activity.get("recipients", []),
-            "retention_period": activity.get("retention_period"),
-            "security_measures": activity.get("security_measures", []),
-        })
+        self.processing_activities.append(
+            {
+                "id": activity_id,
+                "organization": self.organization,
+                "purpose": activity.get("purpose"),
+                "data_categories": activity.get("data_categories", []),
+                "recipients": activity.get("recipients", []),
+                "retention_period": activity.get("retention_period"),
+                "security_measures": activity.get("security_measures", []),
+            }
+        )
         return activity_id
 
     def conduct_dpia(self, processing: dict) -> dict:
@@ -370,8 +380,7 @@ class DataMinimization:
 
         return minimized
 
-    def minimize_api_response(self, user_data: dict,
-                               purpose: str) -> dict:
+    def minimize_api_response(self, user_data: dict, purpose: str) -> dict:
         """Minimize data in API responses based on purpose."""
         # Different purposes require different data
         purpose_configs = {
@@ -398,8 +407,10 @@ class DataMinimization:
 from datetime import datetime, timedelta
 from enum import Enum
 
+
 class RetentionPeriod(Enum):
     """Standard retention periods."""
+
     SESSION_ONLY = 0
     ONE_MONTH = 30
     THREE_MONTHS = 90
@@ -407,6 +418,7 @@ class RetentionPeriod(Enum):
     TWO_YEARS = 730
     FIVE_YEARS = 1825
     TEN_YEARS = 3650
+
 
 class DataRetentionPolicy:
     def __init__(self):
@@ -421,7 +433,9 @@ class DataRetentionPolicy:
 
     def should_delete(self, data_type: str, created_at: datetime) -> bool:
         """Check if data should be deleted."""
-        retention_days = self.retention_rules.get(data_type, RetentionPeriod.ONE_YEAR).value
+        retention_days = self.retention_rules.get(
+            data_type, RetentionPeriod.ONE_YEAR
+        ).value
         age_days = (datetime.utcnow() - created_at).days
         return age_days > retention_days
 
@@ -448,13 +462,13 @@ class DataRetentionPolicy:
 ```python
 import numpy as np
 
+
 class DifferentialPrivacy:
     def __init__(self, epsilon: float = 1.0):
         """Initialize with privacy budget epsilon."""
         self.epsilon = epsilon
 
-    def laplace_mechanism(self, true_value: float,
-                           sensitivity: float) -> float:
+    def laplace_mechanism(self, true_value: float, sensitivity: float) -> float:
         """Add Laplace noise for numeric queries."""
         scale = sensitivity / self.epsilon
         noise = np.random.laplace(0, scale)
@@ -479,6 +493,7 @@ class DifferentialPrivacy:
             return true_value
         return np.random.random() > 0.5
 
+
 # Usage
 dp = DifferentialPrivacy(epsilon=0.5)
 data = [25, 30, 35, 40, 45, 50, 55, 60]
@@ -499,6 +514,7 @@ print(f"Private average: {private_avg:.1f}")
 from cryptography.fernet import Fernet
 import hashlib
 
+
 class DataEncryption:
     def __init__(self):
         self.key = Fernet.generate_key()
@@ -515,6 +531,7 @@ class DataEncryption:
     def hash_for_comparison(self, data: str) -> str:
         """Create hash for comparison (one-way)."""
         return hashlib.sha256(data.encode()).hexdigest()
+
 
 # Usage
 encryption = DataEncryption()
@@ -536,6 +553,7 @@ print(f"Decrypted: {decrypted}")
 **Example**:
 ```python
 import numpy as np
+
 
 class FederatedLearning:
     def __init__(self, global_model: dict):
@@ -566,8 +584,7 @@ class FederatedLearning:
 
         return {"round": self.round, "model": self.global_model}
 
-    def add_differential_privacy(self, gradients: list,
-                                  epsilon: float = 1.0) -> list:
+    def add_differential_privacy(self, gradients: list, epsilon: float = 1.0) -> list:
         """Add DP noise to gradients."""
         dp = DifferentialPrivacy(epsilon)
         return [dp.laplace_mechanism(g, sensitivity=1.0) for g in gradients]
@@ -607,8 +624,7 @@ class GDPRCompliance:
             "legitimate_interests",
         ]
 
-    def handle_data_subject_request(self, request_type: str,
-                                     subject_id: str) -> dict:
+    def handle_data_subject_request(self, request_type: str, subject_id: str) -> dict:
         """Handle GDPR data subject rights."""
         handlers = {
             "access": self._right_of_access,
@@ -653,8 +669,7 @@ class KAnonymity:
     def __init__(self, k: int = 5):
         self.k = k
 
-    def check_k_anonymity(self, data: list,
-                           quasi_identifiers: list) -> dict:
+    def check_k_anonymity(self, data: list, quasi_identifiers: list) -> dict:
         """Check if dataset satisfies k-anonymity."""
         groups = {}
         for record in data:
@@ -664,11 +679,13 @@ class KAnonymity:
         violations = []
         for key, group in groups.items():
             if len(group) < self.k:
-                violations.append({
-                    "quasi_identifiers": dict(zip(quasi_identifiers, key)),
-                    "count": len(group),
-                    "required": self.k,
-                })
+                violations.append(
+                    {
+                        "quasi_identifiers": dict(zip(quasi_identifiers, key)),
+                        "count": len(group),
+                        "required": self.k,
+                    }
+                )
 
         return {
             "satisfies_k_anonymity": len(violations) == 0,
@@ -676,8 +693,7 @@ class KAnonymity:
             "violations": violations,
         }
 
-    def generalize_dataset(self, data: list,
-                            quasi_identifiers: list) -> list:
+    def generalize_dataset(self, data: list, quasi_identifiers: list) -> list:
         """Generalize dataset to achieve k-anonymity."""
         # Group and generalize small groups
         groups = {}
@@ -693,7 +709,9 @@ class KAnonymity:
                     generalized = record.copy()
                     for qi in quasi_identifiers:
                         if qi in generalized and isinstance(generalized[qi], int):
-                            generalized[qi] = f"{(generalized[qi]//10)*10}-{(generalized[qi]//10)*10+9}"
+                            generalized[qi] = (
+                                f"{(generalized[qi] // 10) * 10}-{(generalized[qi] // 10) * 10 + 9}"
+                            )
                     result.append(generalized)
             else:
                 result.extend(group)
@@ -712,6 +730,7 @@ class KAnonymity:
 ```python
 import hashlib
 import secrets
+
 
 class Pseudonymizer:
     def __init__(self):
@@ -738,6 +757,7 @@ class Pseudonymizer:
         if key in self.key_store:
             return self.key_store[key]["original"]
         return None
+
 
 # Usage
 pseudonymizer = Pseudonymizer()
@@ -840,7 +860,11 @@ class PrivacyImpactAssessment:
         return [
             {"risk": "Data breach", "likelihood": "medium", "impact": "high"},
             {"risk": "Unauthorized access", "likelihood": "low", "impact": "high"},
-            {"risk": "Data re-identification", "likelihood": "medium", "impact": "medium"},
+            {
+                "risk": "Data re-identification",
+                "likelihood": "medium",
+                "impact": "medium",
+            },
         ]
 
     def _recommend_mitigations(self, info: dict) -> list:
@@ -848,7 +872,10 @@ class PrivacyImpactAssessment:
         return [
             {"risk": "Data breach", "mitigation": "Encryption and access controls"},
             {"risk": "Unauthorized access", "mitigation": "Role-based access control"},
-            {"risk": "Data re-identification", "mitigation": "Anonymization and aggregation"},
+            {
+                "risk": "Data re-identification",
+                "mitigation": "Anonymization and aggregation",
+            },
         ]
 
     def _check_consultation_needed(self) -> bool:
@@ -877,8 +904,7 @@ class RightToErasure:
             "legal_claims",
         ]
 
-    def handle_erasure_request(self, user_id: str,
-                                request_info: dict) -> dict:
+    def handle_erasure_request(self, user_id: str, request_info: dict) -> dict:
         """Handle a right to erasure request."""
         # Check for exemptions
         exemptions_applied = []

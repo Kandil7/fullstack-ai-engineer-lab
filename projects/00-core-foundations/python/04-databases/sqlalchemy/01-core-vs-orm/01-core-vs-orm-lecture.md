@@ -60,7 +60,7 @@ things. You write one expression; SQLAlchemy writes the dialect.
 ```python
 from sqlalchemy import create_engine, text
 
-engine = create_engine("sqlite://")   # in-memory; dialect = SQLite
+engine = create_engine("sqlite://")  # in-memory; dialect = SQLite
 
 with engine.connect() as conn:
     result = conn.execute(text("SELECT 1 AS one"))
@@ -111,7 +111,7 @@ with engine.connect() as conn:
         widgets.insert(),
         [{"name": "bolt", "qty": 12}, {"name": "nut", "qty": 300}],
     )
-    conn.commit()                     # explicit — never implicit
+    conn.commit()  # explicit — never implicit
 
 with engine.connect() as conn:
     rows = conn.execute(select(widgets.c.name, widgets.c.qty)).all()

@@ -41,15 +41,20 @@ class VectorStore(Protocol):
     def upsert(self, chunk_id: int, vector: list[float]) -> None: ...
     def query(self, vector: list[float], k: int = 3) -> list[int]: ...
 
+
 class QdrantAdapter:
     def __init__(self) -> None:
         self._items: dict[int, list[float]] = {}
+
     def upsert(self, chunk_id: int, vector: list[float]) -> None:
-        self._items[chunk_id] = vector            # qdrant client would go here
+        self._items[chunk_id] = vector  # qdrant client would go here
+
     def query(self, vector: list[float], k: int = 3) -> list[int]:
         return sorted(self._items, key=lambda cid: self._dist(vector, cid))[:k]
+
     def _dist(self, v: list[float], cid: int) -> float:
         return sum((a - b) ** 2 for a, b in zip(v, self._items[cid]))
+
 
 def search_top(store: VectorStore, vector: list[float], k: int) -> list[int]:
     return store.query(vector, k)
@@ -71,16 +76,19 @@ Without DI, a component builds its dependencies itself (`self._llm = OpenAILLM()
 class LLMClient(Protocol):
     def complete(self, prompt: str, temperature: float = 0.0) -> str: ...
 
+
 class FakeLLMClient:
     def complete(self, prompt: str, temperature: float = 0.0) -> str:
         return f"FAKE:{prompt[:5]}:{temperature}"
 
+
 class Summarizer:
-    def __init__(self, llm: LLMClient) -> None:   # injected, not constructed
+    def __init__(self, llm: LLMClient) -> None:  # injected, not constructed
         self._llm = llm
 
     def summarize(self, text: str) -> str:
         return self._llm.complete(f"summarize: {text}")
+
 
 def demo_di() -> str:
     svc = Summarizer(FakeLLMClient())
@@ -104,31 +112,40 @@ class Command(Protocol):
     def execute(self) -> None: ...
     def undo(self) -> None: ...
 
+
 class InsertCommand:
     def __init__(self, buf: list[str], offset: int, text: str) -> None:
         self._buf, self._offset, self._text = buf, offset, text
+
     def execute(self) -> None:
         self._buf.insert(self._offset, self._text)
+
     def undo(self) -> None:
         del self._buf[self._offset]
+
 
 class DeleteCommand:
     def __init__(self, buf: list[str], offset: int, count: int) -> None:
         self._buf, self._offset, self._count = buf, offset, count
+
     def execute(self) -> None:
-        del self._buf[self._offset:self._offset + self._count]
+        del self._buf[self._offset : self._offset + self._count]
+
     def undo(self) -> None:
-        self._buf[self._offset:self._offset] = ["say "]  # restore from captured text
+        self._buf[self._offset : self._offset] = ["say "]  # restore from captured text
+
 
 def demo_command() -> str:
     buf = ["hello"]
     history: list[Command] = []
     cmd = InsertCommand(buf, 1, "world")
-    cmd.execute(); history.append(cmd)      # ["hello", "world"]
+    cmd.execute()
+    history.append(cmd)  # ["hello", "world"]
     cmd2 = DeleteCommand(buf, 0, 1)
-    cmd2.execute(); history.append(cmd2)    # ["world"]
-    cmd2.undo()                              # ["hello", "world"]
-    cmd.undo()                               # ["hello"]
+    cmd2.execute()
+    history.append(cmd2)  # ["world"]
+    cmd2.undo()  # ["hello", "world"]
+    cmd.undo()  # ["hello"]
     return " ".join(buf)
 ```
 
@@ -155,13 +172,16 @@ class Tool:
     def run(self, args: dict) -> str:
         raise NotImplementedError
 
+
 class Calculator(Tool):
     def run(self, args: dict) -> str:
         return str(args.get("a", 0) + args.get("b", 0))
 
+
 class Search(Tool):
     def run(self, args: dict) -> str:
         return f"results-for:{args.get('q', '')}"
+
 
 def demo_registry() -> tuple[list[str], str]:
     return sorted(Tool.registry), Tool.registry["calculator"]().run({"a": 2, "b": 3})
@@ -183,21 +203,28 @@ Strategy keeps an algorithm family behind one interface and swaps members at run
 class Chunker(Protocol):
     def chunk(self, text: str) -> list[str]: ...
 
+
 class FixedChunker:
     def __init__(self, size: int = 3) -> None:
         self._size = size
+
     def chunk(self, text: str) -> list[str]:
-        return [text[i:i + self._size] for i in range(0, len(text), self._size)]
+        return [text[i : i + self._size] for i in range(0, len(text), self._size)]
+
 
 class SentenceChunker:
     def chunk(self, text: str) -> list[str]:
         return text.split(". ")
 
+
 def build_index(text: str, chunker: Chunker) -> list[str]:
     return chunker.chunk(text)
 
+
 def demo_strategy() -> tuple[list[str], list[str]]:
-    return build_index("abcdef", FixedChunker(3)), build_index("one. two. three.", SentenceChunker())
+    return build_index("abcdef", FixedChunker(3)), build_index(
+        "one. two. three.", SentenceChunker()
+    )
 ```
 
 ```

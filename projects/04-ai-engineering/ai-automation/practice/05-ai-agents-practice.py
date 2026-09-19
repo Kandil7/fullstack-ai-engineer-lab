@@ -23,6 +23,7 @@ from typing import Any, Callable
 # EASY PROBLEMS (20 XP)
 # ============================================================
 
+
 # Problem 1: Tool Definition
 # Write a Tool class that:
 # - Has name, description, parameters (JSON schema), and a function
@@ -112,6 +113,7 @@ def problem_05():
 # MEDIUM PROBLEMS (50 XP)
 # ============================================================
 
+
 # Problem 6: Task Decomposer
 # Write a function that takes a high-level goal and breaks it into steps:
 # - Use LLM to decompose: "Research topic X, then write a report"
@@ -124,6 +126,7 @@ class Step:
     description: str
     dependencies: list[str] = field(default_factory=list)
     status: str = "pending"
+
 
 def problem_06():
     pass  # Write your code here
@@ -203,6 +206,7 @@ def problem_10():
 # ============================================================
 # HARD PROBLEMS (100 XP)
 # ============================================================
+
 
 # Problem 11: Context Pruner
 # Write a ContextPruner class that manages what goes into LLM context:

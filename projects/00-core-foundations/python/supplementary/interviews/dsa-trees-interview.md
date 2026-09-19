@@ -61,6 +61,7 @@ def postorder(root):
 ```python
 from collections import deque
 
+
 def level_order(root):
     if not root:
         return []
@@ -118,6 +119,7 @@ def search(root, val):
         return search(root.left, val)
     return search(root.right, val)
 
+
 def insert(root, val):
     if not root:
         return TreeNode(val)
@@ -126,6 +128,7 @@ def insert(root, val):
     elif val > root.val:
         root.right = insert(root.right, val)
     return root
+
 
 def delete(root, val):
     if not root:
@@ -144,6 +147,7 @@ def delete(root, val):
         root.val = successor.val
         root.right = delete(root.right, successor.val)
     return root
+
 
 def find_min(root):
     while root.left:
@@ -169,6 +173,7 @@ def lowest_common_ancestor(root, p, q):
         return root  # p and q are in different subtrees
     return left or right
 
+
 # Test
 #       3
 #      / \
@@ -188,7 +193,9 @@ root.right.left = TreeNode(0)
 root.right.right = TreeNode(8)
 
 assert lowest_common_ancestor(root, root.left, root.right) == root  # LCA of 5 and 1 is 3
-assert lowest_common_ancestor(root, root.left, root.left.right.right) == root.left  # LCA of 5 and 4 is 5
+assert (
+    lowest_common_ancestor(root, root.left, root.left.right.right) == root.left
+)  # LCA of 5 and 4 is 5
 ```
 
 **BST (O(log n) time):**
@@ -246,16 +253,18 @@ class Codec:
 
     def deserialize(self, data):
         """Decodes your encoded data to tree."""
+
         def helper(nodes):
             val = next(nodes)
-            if val == 'null':
+            if val == "null":
                 return None
             node = TreeNode(int(val))
             node.left = helper(nodes)
             node.right = helper(nodes)
             return node
 
-        return helper(iter(data.split(',')))
+        return helper(iter(data.split(",")))
+
 
 # Test
 codec = Codec()
@@ -318,10 +327,11 @@ def build_tree(preorder, inorder):
 
     mid = inorder.index(root_val)
 
-    root.left = build_tree(preorder[1:mid+1], inorder[:mid])
-    root.right = build_tree(preorder[mid+1:], inorder[mid+1:])
+    root.left = build_tree(preorder[1 : mid + 1], inorder[:mid])
+    root.right = build_tree(preorder[mid + 1 :], inorder[mid + 1 :])
 
     return root
+
 
 # Test
 preorder = [3, 9, 20, 15, 7]
@@ -386,6 +396,7 @@ def flatten(root):
             node.right = stack[-1]
         node.left = None
 
+
 # Alternative: Morris traversal O(1) space
 def flatten_morris(root):
     curr = root
@@ -424,6 +435,7 @@ def path_sum(root, target):
     dfs(root, target, [])
     return result
 
+
 # Test
 #       5
 #      / \
@@ -443,7 +455,7 @@ root.right.right = TreeNode(4)
 root.right.right.left = TreeNode(5)
 root.right.right.right = TreeNode(1)
 
-assert path_sum(root, 22) == [[5,4,11,2],[5,8,4,5]]
+assert path_sum(root, 22) == [[5, 4, 11, 2], [5, 8, 4, 5]]
 ```
 
 ---
@@ -466,13 +478,15 @@ def kth_smallest(root, k):
             return curr.val
         curr = curr.right
 
+
 # Alternative: Recursive with counter
 def kth_smallest_recursive(root, k):
     def inorder(node):
         if not node:
             return []
         return inorder(node.left) + [node.val] + inorder(node.right)
-    return inorder(root)[k-1]
+
+    return inorder(root)[k - 1]
 ```
 
 ---
@@ -489,7 +503,7 @@ def is_valid_bst(root):
             return False
         return validate(node.left, low, node.val) and validate(node.right, node.val, high)
 
-    return validate(root, float('-inf'), float('inf'))
+    return validate(root, float("-inf"), float("inf"))
 ```
 
 **Common mistake:** Only checking `node.left.val < node.val` is wrong. Must check against all ancestors.
@@ -557,6 +571,7 @@ def right_side_view(root):
 ```python
 from collections import defaultdict
 
+
 def vertical_order(root):
     if not root:
         return []
@@ -589,6 +604,7 @@ def max_depth(root):
         return 0
     return 1 + max(max_depth(root.left), max_depth(root.right))
 
+
 # Test
 root = TreeNode(3)
 root.left = TreeNode(9)
@@ -609,9 +625,7 @@ def is_symmetric(root):
             return True
         if not t1 or not t2:
             return False
-        return (t1.val == t2.val and
-                is_mirror(t1.left, t2.right) and
-                is_mirror(t1.right, t2.left))
+        return t1.val == t2.val and is_mirror(t1.left, t2.right) and is_mirror(t1.right, t2.left)
 
     return is_mirror(root.left, root.right) if root else True
 ```
@@ -636,6 +650,7 @@ def invert_tree(root):
 ### Challenge 4: Binary Tree Level Order Traversal
 ```python
 from collections import deque
+
 
 def level_order(root):
     if not root:
@@ -667,7 +682,8 @@ def is_valid_bst(root):
         if node.val <= low or node.val >= high:
             return False
         return validate(node.left, low, node.val) and validate(node.right, node.val, high)
-    return validate(root, float('-inf'), float('inf'))
+
+    return validate(root, float("-inf"), float("inf"))
 ```
 **Time: O(n), Space: O(h)**
 
@@ -692,6 +708,7 @@ def lowest_common_ancestor(root, p, q):
 ```python
 def path_sum(root, target):
     result = []
+
     def dfs(node, remaining, path):
         if not node:
             return
@@ -702,6 +719,7 @@ def path_sum(root, target):
             dfs(node.left, remaining - node.val, path)
             dfs(node.right, remaining - node.val, path)
         path.pop()
+
     dfs(root, target, [])
     return result
 ```
@@ -750,13 +768,14 @@ class Codec:
     def deserialize(self, data):
         def helper(nodes):
             val = next(nodes)
-            if val == 'null':
+            if val == "null":
                 return None
             node = TreeNode(int(val))
             node.left = helper(nodes)
             node.right = helper(nodes)
             return node
-        return helper(iter(data.split(',')))
+
+        return helper(iter(data.split(",")))
 ```
 **Time: O(n), Space: O(n)**
 

@@ -25,6 +25,7 @@ Answers with full explanations and distractor analysis at the end.
 ```python
 import numpy as np
 from scipy import stats
+
 rng = np.random.default_rng(0)
 a = rng.normal(size=50)
 print(stats.ttest_ind(a, a).pvalue)
@@ -53,6 +54,7 @@ print(stats.ttest_ind(a, a).pvalue)
 ```python
 import numpy as np
 from scipy import stats
+
 rng = np.random.default_rng(1)
 x = rng.normal(size=300)
 y = 2.0 * x + rng.normal(scale=0.3, size=300)
@@ -80,6 +82,7 @@ print(round(r, 2), p < 0.05)
 ```python
 import numpy as np
 from scipy import stats
+
 rng = np.random.default_rng(2)
 g1 = rng.normal(size=50)
 g2 = rng.normal(size=50)
@@ -103,6 +106,7 @@ print(p < 0.05, F > 0)
 **M4 (code-output).** What prints?
 ```python
 import numpy as np
+
 pvals = np.array([0.01, 0.5, 0.001])
 print(np.minimum(1.0, pvals * 3))
 ```
@@ -123,6 +127,7 @@ print(np.minimum(1.0, pvals * 3))
 ```python
 import numpy as np
 from scipy import stats
+
 rng = np.random.default_rng(3)
 u1 = rng.exponential(scale=1.0, size=100)
 u2 = rng.exponential(scale=1.0, size=100)
@@ -146,6 +151,7 @@ print(p > 0.05)
 ```python
 import numpy as np
 from scipy import stats
+
 table = np.array([[120, 80], [70, 130]])
 chi2, p, dof, expected = stats.chi2_contingency(table)
 print(round(chi2, 1), p < 0.01, dof)
@@ -177,6 +183,7 @@ print(round(chi2, 1), p < 0.01, dof)
 **H2 (code-output).** What prints?
 ```python
 import numpy as np
+
 p = np.array([0.01, 0.04, 0.05])
 order = np.argsort(p)
 adj = p[order] * 3 / np.arange(1, 4)
@@ -207,6 +214,7 @@ print(adj)
 ```python
 import numpy as np
 from scipy import stats
+
 rng = np.random.default_rng(4)
 before = rng.normal(100.0, 20.0, 200)
 after = before + rng.normal(0.3, 2.0, 200)

@@ -133,13 +133,15 @@ def test_silver_is_subquadratic():
         f"used {counter.count} ops for n={n} — needs a hash map or heap, not nested loops"
     )
 
+
 def test_gold_memory_bounded():
     import tracemalloc
+
     tracemalloc.start()
     starter.solve_streaming(generate(10_000_000))
     _, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
-    assert peak < 50 * 1024 * 1024, f"peak {peak/1e6:.1f}MB exceeds 50MB — must stream"
+    assert peak < 50 * 1024 * 1024, f"peak {peak / 1e6:.1f}MB exceeds 50MB — must stream"
 ```
 
 `tracemalloc` and operation counters are reproducible across machines; timing is not.

@@ -49,7 +49,7 @@ imbalance — lower it to catch more positives (recall up, precision down) or
 raise it to reduce alert noise:
 
 ```python
-pred = proba >= 0.2   # business-tuned threshold
+pred = proba >= 0.2  # business-tuned threshold
 ```
 
 ## 5. Honest Evaluation Under Imbalance

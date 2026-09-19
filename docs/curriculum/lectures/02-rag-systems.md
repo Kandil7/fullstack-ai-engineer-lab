@@ -66,33 +66,39 @@ class FixedSizeChunker:
     def __init__(self, chunk_size=512, overlap=50):
         self.chunk_size = chunk_size
         self.overlap = overlap
-    
+
     def chunk(self, text: str, metadata: dict) -> List[Document]:
         chunks = []
         start = 0
         position = 0
-        
+
         while start < len(text):
             end = min(start + self.chunk_size, len(text))
-            
+
             # Break at word boundary
             if end < len(text):
-                last_space = text.rfind(' ', start, end)
+                last_space = text.rfind(" ", start, end)
                 if last_space > start:
                     end = last_space
-            
+
             chunk_text = text[start:end].strip()
             if chunk_text:
-                chunks.append(Document(
-                    content=chunk_text,
-                    metadata={**metadata, "chunk_index": position, "chunker": "fixed"}
-                ))
+                chunks.append(
+                    Document(
+                        content=chunk_text,
+                        metadata={
+                            **metadata,
+                            "chunk_index": position,
+                            "chunker": "fixed",
+                        },
+                    )
+                )
                 position += 1
-            
+
             start = end - self.overlap
             if start >= len(text):
                 break
-        
+
         return chunks
 ```
 
@@ -109,38 +115,43 @@ class RecursiveChunker:
         self.chunk_size = chunk_size
         self.overlap = overlap
         self.separators = separators or ["\n\n", "\n", ". ", " ", ""]
-    
+
     def chunk(self, text: str, metadata: dict) -> List[Document]:
         chunks = self._split_text(text, self.separators)
-        
+
         documents = []
         for i, chunk_text in enumerate(chunks):
             if chunk_text.strip():
-                documents.append(Document(
-                    content=chunk_text.strip(),
-                    metadata={**metadata, "chunk_index": i, "chunker": "recursive"}
-                ))
+                documents.append(
+                    Document(
+                        content=chunk_text.strip(),
+                        metadata={**metadata, "chunk_index": i, "chunker": "recursive"},
+                    )
+                )
         return documents
-    
+
     def _split_text(self, text: str, separators: List[str]) -> List[str]:
         if not separators:
-            return [text[i:i+self.chunk_size] for i in range(0, len(text), self.chunk_size)]
-        
+            return [
+                text[i : i + self.chunk_size]
+                for i in range(0, len(text), self.chunk_size)
+            ]
+
         separator = separators[0]
         splits = text.split(separator)
-        
+
         if len(splits) == 1 or all(len(s) <= self.chunk_size for s in splits):
             if len(separators) > 1:
                 return self._split_text(text, separators[1:])
             return splits
-        
+
         result = []
         for split in splits:
             if len(split) <= self.chunk_size:
                 result.append(split)
             else:
                 result.extend(self._split_text(split, separators[1:]))
-        
+
         return result
 ```
 
@@ -156,22 +167,22 @@ class SemanticChunker:
     def __init__(self, embedding_model, similarity_threshold=0.7):
         self.embedding_model = embedding_model
         self.threshold = similarity_threshold
-    
+
     def chunk(self, text: str, metadata: dict) -> List[Document]:
         # Split into sentences first
         sentences = self._split_sentences(text)
-        
+
         # Embed all sentences
         embeddings = self.embedding_model.embed(sentences)
-        
+
         # Group by semantic similarity
         chunks = []
         current_chunk = [sentences[0]]
         current_embeddings = [embeddings[0]]
-        
+
         for i in range(1, len(sentences)):
             sim = cosine_similarity(embeddings[i], current_embeddings[-1])
-            
+
             if sim >= self.threshold:
                 current_chunk.append(sentences[i])
                 current_embeddings.append(embeddings[i])
@@ -180,12 +191,14 @@ class SemanticChunker:
                 chunks.append(" ".join(current_chunk))
                 current_chunk = [sentences[i]]
                 current_embeddings = [embeddings[i]]
-        
+
         if current_chunk:
             chunks.append(" ".join(current_chunk))
-        
-        return [Document(content=c, metadata={**metadata, "chunker": "semantic"}) 
-                for c in chunks]
+
+        return [
+            Document(content=c, metadata={**metadata, "chunker": "semantic"})
+            for c in chunks
+        ]
 ```
 
 **Pros**: Topic-aware splits, coherent chunks
@@ -198,10 +211,10 @@ class SemanticChunker:
 ```python
 class ASTAwareChunker:
     """Chunk code by syntactic boundaries (functions, classes)."""
-    
+
     def chunk(self, text: str, metadata: dict) -> List[Document]:
         language = metadata.get("language", "").lower()
-        
+
         if language == "python":
             return self._chunk_python(text, metadata)
         elif language in ("javascript", "typescript"):
@@ -209,42 +222,48 @@ class ASTAwareChunker:
         else:
             # Fallback
             return RecursiveChunker().chunk(text, metadata)
-    
+
     def _chunk_python(self, text: str, metadata: dict) -> List[Document]:
         import ast
-        
+
         try:
             tree = ast.parse(text)
         except SyntaxError:
             return RecursiveChunker().chunk(text, metadata)
-        
+
         chunks = []
-        lines = text.split('\n')
-        
+        lines = text.split("\n")
+
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 start = node.lineno - 1
-                end = getattr(node, 'end_lineno', start + 50)
-                
-                chunk_content = '\n'.join(lines[start:end])
-                
+                end = getattr(node, "end_lineno", start + 50)
+
+                chunk_content = "\n".join(lines[start:end])
+
                 if len(chunk_content) > 2000:  # Too large
                     continue
-                
-                chunk_type = "function" if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) else "class"
-                
-                chunks.append(Document(
-                    content=chunk_content,
-                    metadata={
-                        **metadata,
-                        "chunk_type": chunk_type,
-                        "name": node.name,
-                        "start_line": start + 1,
-                        "end_line": end,
-                        "chunker": "ast_aware"
-                    }
-                ))
-        
+
+                chunk_type = (
+                    "function"
+                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                    else "class"
+                )
+
+                chunks.append(
+                    Document(
+                        content=chunk_content,
+                        metadata={
+                            **metadata,
+                            "chunk_type": chunk_type,
+                            "name": node.name,
+                            "start_line": start + 1,
+                            "end_line": end,
+                            "chunker": "ast_aware",
+                        },
+                    )
+                )
+
         return chunks if chunks else RecursiveChunker().chunk(text, metadata)
 ```
 
@@ -261,17 +280,17 @@ client = QdrantClient(host="localhost", port=6333)
 client.create_collection(
     collection_name="code_documents",
     vectors_config=models.VectorParams(
-        size=1536,                    # text-embedding-3-small dimensions
+        size=1536,  # text-embedding-3-small dimensions
         distance=models.Distance.COSINE,
-        on_disk=True,                 # Store vectors on disk for large collections
+        on_disk=True,  # Store vectors on disk for large collections
     ),
     optimizers_config=models.OptimizersConfigDiff(
-        indexing_threshold=20000,     # Switch to HNSW after 20K vectors
+        indexing_threshold=20000,  # Switch to HNSW after 20K vectors
     ),
     hnsw_config=models.HnswConfigDiff(
-        m=16,                         # Connections per node (higher = better recall, more memory)
-        ef_construct=100,             # Build-time search width
-        full_scan_threshold=10000,    # Use exact search below this
+        m=16,  # Connections per node (higher = better recall, more memory)
+        ef_construct=100,  # Build-time search width
+        full_scan_threshold=10000,  # Use exact search below this
     ),
 )
 
@@ -309,7 +328,7 @@ class HybridRetriever:
         self.client = qdrant_client
         self.embedder = embedding_model
         self.k = k  # RRF parameter
-    
+
     async def retrieve(
         self,
         query: str,
@@ -317,16 +336,16 @@ class HybridRetriever:
         limit: int = 20,
         filter: dict = None,
     ) -> List[SearchResult]:
-        
+
         # 1. Semantic search
         semantic_hits = await self._semantic_search(query_vector, limit * 2, filter)
-        
+
         # 2. Keyword search (BM25 via payload filter)
         keyword_hits = await self._keyword_search(query, limit * 2, filter)
-        
+
         # 3. RRF Fusion
         return self._rrf_fusion(semantic_hits, keyword_hits, limit)
-    
+
     async def _semantic_search(self, vector, limit, filter):
         query_filter = self._build_filter(filter) if filter else None
         hits = self.client.search(
@@ -337,7 +356,7 @@ class HybridRetriever:
             with_payload=True,
         )
         return [SearchResult.from_hit(h) for h in hits]
-    
+
     async def _keyword_search(self, query, limit, filter):
         # Use Qdrant's text matching on content field
         # In production, use sparse vectors or external BM25
@@ -347,9 +366,10 @@ class HybridRetriever:
                     key="content",
                     match=models.MatchText(text=query),
                 )
-            ] + ([self._build_filter(filter)] if filter else [])
+            ]
+            + ([self._build_filter(filter)] if filter else [])
         )
-        
+
         hits, _ = self.client.scroll(
             collection_name="code_documents",
             scroll_filter=query_filter,
@@ -357,30 +377,30 @@ class HybridRetriever:
             with_payload=True,
         )
         return [SearchResult.from_hit(h, score=1.0) for h in hits]
-    
+
     def _rrf_fusion(self, semantic, keyword, limit):
         """Reciprocal Rank Fusion: score = 1/(k + rank_semantic) + 1/(k + rank_keyword)"""
         scores = {}
         doc_map = {}
-        
+
         for rank, doc in enumerate(semantic):
             scores[doc.id] = scores.get(doc.id, 0) + 1 / (self.k + rank + 1)
             doc_map[doc.id] = doc
-        
+
         for rank, doc in enumerate(keyword):
             scores[doc.id] = scores.get(doc.id, 0) + 1 / (self.k + rank + 1)
             if doc.id not in doc_map:
                 doc_map[doc.id] = doc
-        
+
         # Sort by combined score
         sorted_ids = sorted(scores.keys(), key=lambda x: scores[x], reverse=True)
-        
+
         results = []
         for doc_id in sorted_ids[:limit]:
             doc = doc_map[doc_id]
             doc.score = scores[doc_id]  # Update with fused score
             results.append(doc)
-        
+
         return results
 ```
 
@@ -416,17 +436,17 @@ class CohereReranker:
             timeout=30.0,
         )
         self.model = model
-    
+
     async def rerank(
         self,
         query: str,
         documents: List[SearchResult],
         top_k: int = 5,
     ) -> List[RerankResult]:
-        
+
         if not documents:
             return []
-        
+
         payload = {
             "model": self.model,
             "query": query,
@@ -434,23 +454,25 @@ class CohereReranker:
             "top_n": top_k,
             "return_documents": False,
         }
-        
+
         response = await self.client.post("/rerank", json=payload)
         response.raise_for_status()
         data = response.json()
-        
+
         results = []
         for item in data["results"]:
             idx = item["index"]
             orig = documents[idx]
-            results.append(RerankResult(
-                id=orig.id,
-                score=item["relevance_score"],
-                content=orig.content,
-                metadata=orig.metadata,
-                original_score=orig.score,
-            ))
-        
+            results.append(
+                RerankResult(
+                    id=orig.id,
+                    score=item["relevance_score"],
+                    content=orig.content,
+                    metadata=orig.metadata,
+                    original_score=orig.score,
+                )
+            )
+
         return results
 ```
 
@@ -459,28 +481,31 @@ class CohereReranker:
 class LocalReranker:
     def __init__(self, model_name: str = "BAAI/bge-reranker-v2-m3"):
         from sentence_transformers import CrossEncoder
+
         self.model = CrossEncoder(model_name, max_length=512)
-    
+
     def rerank(
         self,
         query: str,
         documents: List[SearchResult],
         top_k: int = 5,
     ) -> List[RerankResult]:
-        
+
         pairs = [(query, doc.content) for doc in documents]
         scores = self.model.predict(pairs)
-        
+
         reranked = []
         for doc, score in zip(documents, scores):
-            reranked.append(RerankResult(
-                id=doc.id,
-                score=float(score),
-                content=doc.content,
-                metadata=doc.metadata,
-                original_score=doc.score,
-            ))
-        
+            reranked.append(
+                RerankResult(
+                    id=doc.id,
+                    score=float(score),
+                    content=doc.content,
+                    metadata=doc.metadata,
+                    original_score=doc.score,
+                )
+            )
+
         reranked.sort(key=lambda x: x.score, reverse=True)
         return reranked[:top_k]
 ```
@@ -552,26 +577,28 @@ print(results)
 class RAGEvaluator:
     def __init__(self, rag_pipeline):
         self.pipeline = rag_pipeline
-    
+
     async def evaluate_dataset(
         self,
         dataset_path: str,
         output_path: str = None,
     ) -> Dict[str, float]:
-        
+
         # Load golden set
         with open(dataset_path) as f:
             golden_set = [json.loads(line) for line in f]
-        
+
         results = []
-        
+
         for item in golden_set:
             # Run RAG pipeline
-            rag_result = await self.pipeline.query(RAGRequest(
-                query=item["question"],
-                stream=False,
-            ))
-            
+            rag_result = await self.pipeline.query(
+                RAGRequest(
+                    query=item["question"],
+                    stream=False,
+                )
+            )
+
             # Prepare for RAGAs
             eval_item = {
                 "question": item["question"],
@@ -580,37 +607,37 @@ class RAGEvaluator:
                 "ground_truth": item.get("ground_truth", ""),
             }
             results.append(eval_item)
-        
+
         # Compute metrics
         dataset = Dataset.from_list(results)
-        metrics = evaluate(dataset, metrics=[
-            context_precision, context_recall, 
-            faithfulness, answer_relevancy
-        ])
-        
+        metrics = evaluate(
+            dataset,
+            metrics=[context_precision, context_recall, faithfulness, answer_relevancy],
+        )
+
         # Add custom metrics
         metrics["avg_latency_ms"] = np.mean([r.latency_ms for r in rag_results])
         metrics["avg_cost_usd"] = np.mean([r.usage["total_cost"] for r in rag_results])
         metrics["citation_accuracy"] = self._compute_citation_accuracy(results)
-        
+
         if output_path:
             with open(output_path, "w") as f:
                 json.dump(metrics, f, indent=2)
-        
+
         return metrics
-    
+
     def _compute_citation_accuracy(self, results) -> float:
         """Check if citations [1], [2] match actual sources."""
         correct = 0
         total = 0
-        
+
         for item in results:
             answer = item["answer"]
             contexts = item["contexts"]
-            
+
             # Extract citations [1], [2], etc.
-            citations = re.findall(r'\[(\d+)\]', answer)
-            
+            citations = re.findall(r"\[(\d+)\]", answer)
+
             for cite in citations:
                 total += 1
                 idx = int(cite) - 1
@@ -618,7 +645,7 @@ class RAGEvaluator:
                     # Verify the cited context actually supports the claim
                     # Simplified: just check if context exists
                     correct += 1
-        
+
         return correct / max(total, 1)
 ```
 

@@ -71,9 +71,7 @@ from sklearn.datasets import make_blobs
 
 # Generate clustered data
 np.random.seed(42)
-X, y = make_blobs(
-    n_samples=300, centers=4, cluster_std=0.60, random_state=42
-)
+X, y = make_blobs(n_samples=300, centers=4, cluster_std=0.60, random_state=42)
 
 print(f"Generated {X.shape[0]} points in {X.shape[1]} dimensions")
 print(f"True clusters: {len(np.unique(y))}")
@@ -111,13 +109,13 @@ for k in K_range:
 
 # Plot elbow curve
 plt.figure(figsize=(8, 4))
-plt.plot(K_range, inertias, 'bo-', linewidth=2, markersize=8)
-plt.xlabel('Number of Clusters (K)')
-plt.ylabel('Inertia')
-plt.title('Elbow Method for Optimal K')
+plt.plot(K_range, inertias, "bo-", linewidth=2, markersize=8)
+plt.xlabel("Number of Clusters (K)")
+plt.ylabel("Inertia")
+plt.title("Elbow Method for Optimal K")
 plt.xticks(K_range)
 plt.grid(True, alpha=0.3)
-plt.savefig('elbow_method.png', dpi=100)
+plt.savefig("elbow_method.png", dpi=100)
 plt.show()
 
 print("K | Inertia")
@@ -140,11 +138,11 @@ for k in range(2, 8):
     labels = kmeans.fit_predict(X)
     inertia = kmeans.inertia_
     sil = silhouette_score(X, labels)
-    results.append({'k': k, 'inertia': inertia, 'silhouette': sil})
+    results.append({"k": k, "inertia": inertia, "silhouette": sil})
     print(f"K={k}: Inertia={inertia:.2f}, Silhouette={sil:.4f}")
 
 # Find best K by silhouette
-best_result = max(results, key=lambda x: x['silhouette'])
+best_result = max(results, key=lambda x: x["silhouette"])
 print(f"\nBest K by silhouette: {best_result['k']} (score={best_result['silhouette']:.4f})")
 ```
 
@@ -164,17 +162,21 @@ np.random.seed(42)
 n_customers = 200
 
 # Features: annual_income, spending_score
-annual_income = np.concatenate([
-    np.random.normal(50000, 10000, 50),   # Low income
-    np.random.normal(100000, 15000, 100), # Medium income
-    np.random.normal(150000, 20000, 50)   # High income
-])
+annual_income = np.concatenate(
+    [
+        np.random.normal(50000, 10000, 50),  # Low income
+        np.random.normal(100000, 15000, 100),  # Medium income
+        np.random.normal(150000, 20000, 50),  # High income
+    ]
+)
 
-spending_score = np.concatenate([
-    np.random.normal(30, 10, 50),    # Low spenders
-    np.random.normal(70, 15, 100),   # Medium spenders
-    np.random.normal(50, 20, 50)     # Mixed spenders
-])
+spending_score = np.concatenate(
+    [
+        np.random.normal(30, 10, 50),  # Low spenders
+        np.random.normal(70, 15, 100),  # Medium spenders
+        np.random.normal(50, 20, 50),  # Mixed spenders
+    ]
+)
 
 X_customers = np.column_stack([annual_income, spending_score])
 
@@ -193,7 +195,7 @@ for i in range(3):
     avg_income = annual_income[mask].mean()
     avg_spending = spending_score[mask].mean()
     count = mask.sum()
-    print(f"Segment {i+1}: {count} customers")
+    print(f"Segment {i + 1}: {count} customers")
     print(f"  Avg Income: ${avg_income:,.0f}")
     print(f"  Avg Spending Score: {avg_spending:.0f}\n")
 ```
@@ -269,7 +271,7 @@ for k in range(1, 11):
 kmeans = KMeans(n_clusters=3, n_init=10, random_state=42)
 
 # K-Means++ (default) provides better initialization
-kmeans = KMeans(n_clusters=3, init='k-means++', random_state=42)
+kmeans = KMeans(n_clusters=3, init="k-means++", random_state=42)
 ```
 
 ---
@@ -283,10 +285,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
 # Use pipeline for reproducibility
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('kmeans', KMeans(n_clusters=3, random_state=42))
-])
+pipeline = Pipeline(
+    [("scaler", StandardScaler()), ("kmeans", KMeans(n_clusters=3, random_state=42))]
+)
 
 labels = pipeline.fit_predict(X)
 ```
@@ -301,15 +302,11 @@ results = []
 for k in range(2, 10):
     kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
     labels = kmeans.fit_predict(X)
-    
-    results.append({
-        'k': k,
-        'inertia': kmeans.inertia_,
-        'silhouette': silhouette_score(X, labels)
-    })
+
+    results.append({"k": k, "inertia": kmeans.inertia_, "silhouette": silhouette_score(X, labels)})
 
 # Find K with highest silhouette
-best_k = max(results, key=lambda x: x['silhouette'])['k']
+best_k = max(results, key=lambda x: x["silhouette"])["k"]
 print(f"Optimal K: {best_k}")
 ```
 
@@ -319,13 +316,13 @@ print(f"Optimal K: {best_k}")
 # After clustering, analyze what makes each cluster unique
 import pandas as pd
 
-df = pd.DataFrame(X, columns=['feature1', 'feature2'])
-df['cluster'] = labels
+df = pd.DataFrame(X, columns=["feature1", "feature2"])
+df["cluster"] = labels
 
 # Cluster statistics
-print(df.groupby('cluster').mean())
+print(df.groupby("cluster").mean())
 print("\nCluster sizes:")
-print(df['cluster'].value_counts().sort_index())
+print(df["cluster"].value_counts().sort_index())
 ```
 
 ### 4. Handle Outliers
@@ -359,6 +356,7 @@ Use elbow method and silhouette analysis to find optimal K.
 3. Calculate silhouette scores
 4. Determine best K
 """
+
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.datasets import make_blobs
@@ -382,18 +380,18 @@ for k in K_range:
 # Plot
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
 
-ax1.plot(K_range, inertias, 'bo-', linewidth=2)
-ax1.set_xlabel('K')
-ax1.set_ylabel('Inertia')
-ax1.set_title('Elbow Method')
+ax1.plot(K_range, inertias, "bo-", linewidth=2)
+ax1.set_xlabel("K")
+ax1.set_ylabel("Inertia")
+ax1.set_title("Elbow Method")
 
-ax2.plot(K_range, silhouette_scores, 'ro-', linewidth=2)
-ax2.set_xlabel('K')
-ax2.set_ylabel('Silhouette Score')
-ax2.set_title('Silhouette Analysis')
+ax2.plot(K_range, silhouette_scores, "ro-", linewidth=2)
+ax2.set_xlabel("K")
+ax2.set_ylabel("Silhouette Score")
+ax2.set_title("Silhouette Analysis")
 
 plt.tight_layout()
-plt.savefig('optimal_k_analysis.png', dpi=100)
+plt.savefig("optimal_k_analysis.png", dpi=100)
 plt.show()
 
 best_k = list(K_range)[np.argmax(silhouette_scores)]
@@ -410,6 +408,7 @@ Perform customer segmentation with K-Means.
 3. Interpret segments
 4. Make business recommendations
 """
+
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -419,26 +418,32 @@ np.random.seed(42)
 
 # Generate customer data
 n_customers = 500
-annual_income = np.concatenate([
-    np.random.normal(30000, 8000, 150),
-    np.random.normal(60000, 12000, 200),
-    np.random.normal(100000, 20000, 100),
-    np.random.normal(150000, 25000, 50)
-])
+annual_income = np.concatenate(
+    [
+        np.random.normal(30000, 8000, 150),
+        np.random.normal(60000, 12000, 200),
+        np.random.normal(100000, 20000, 100),
+        np.random.normal(150000, 25000, 50),
+    ]
+)
 
-spending_score = np.concatenate([
-    np.random.normal(20, 8, 150),
-    np.random.normal(50, 15, 200),
-    np.random.normal(80, 10, 100),
-    np.random.normal(60, 20, 50)
-])
+spending_score = np.concatenate(
+    [
+        np.random.normal(20, 8, 150),
+        np.random.normal(50, 15, 200),
+        np.random.normal(80, 10, 100),
+        np.random.normal(60, 20, 50),
+    ]
+)
 
-age = np.concatenate([
-    np.random.normal(55, 10, 150),
-    np.random.normal(35, 8, 200),
-    np.random.normal(28, 5, 100),
-    np.random.normal(45, 12, 50)
-])
+age = np.concatenate(
+    [
+        np.random.normal(55, 10, 150),
+        np.random.normal(35, 8, 200),
+        np.random.normal(28, 5, 100),
+        np.random.normal(45, 12, 50),
+    ]
+)
 
 X = np.column_stack([annual_income, spending_score, age])
 
@@ -461,17 +466,14 @@ kmeans = KMeans(n_clusters=best_k, random_state=42, n_init=10)
 labels = kmeans.fit_predict(X_scaled)
 
 # Analyze segments
-df = pd.DataFrame({
-    'income': annual_income,
-    'spending': spending_score,
-    'age': age,
-    'segment': labels
-})
+df = pd.DataFrame(
+    {"income": annual_income, "spending": spending_score, "age": age, "segment": labels}
+)
 
 print("\nSegment Analysis:")
-print(df.groupby('segment').mean().round(0))
+print(df.groupby("segment").mean().round(0))
 print("\nSegment Sizes:")
-print(df['segment'].value_counts().sort_index())
+print(df["segment"].value_counts().sort_index())
 ```
 
 ### Exercise 3: Compare K-Means with Other Methods
@@ -483,6 +485,7 @@ Compare K-Means with other clustering algorithms.
 2. Apply DBSCAN
 3. Compare results
 """
+
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import silhouette_score
 import numpy as np
@@ -495,6 +498,7 @@ X_moons, y_moons = make_moons(n_samples=200, noise=0.1, random_state=42)
 
 # K-Means
 from sklearn.cluster import KMeans
+
 kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
 labels_kmeans = kmeans.fit_predict(X_moons)
 sil_kmeans = silhouette_score(X_moons, labels_kmeans)

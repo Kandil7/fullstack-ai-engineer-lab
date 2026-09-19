@@ -11,6 +11,7 @@ Run: python projects/04-data-analyzer/main.py
 import numpy as np
 import pandas as pd
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
@@ -118,10 +119,12 @@ def generate_report(analysis: dict, output_path: str):
     lines.append("Numeric Columns Summary:")
     for col, stats in analysis["numeric_summary"].items():
         lines.append(f"  {col}:")
-        lines.append(f"    mean={stats.get('mean', 0):.1f}, "
-                     f"std={stats.get('std', 0):.1f}, "
-                     f"min={stats.get('min', 0):.1f}, "
-                     f"max={stats.get('max', 0):.1f}")
+        lines.append(
+            f"    mean={stats.get('mean', 0):.1f}, "
+            f"std={stats.get('std', 0):.1f}, "
+            f"min={stats.get('min', 0):.1f}, "
+            f"max={stats.get('max', 0):.1f}"
+        )
     lines.append()
 
     # Outliers
@@ -144,7 +147,7 @@ def generate_report(analysis: dict, output_path: str):
 
 def create_visualizations(df: pd.DataFrame):
     """Create multiple visualizations."""
-    
+
     # 1. Income distribution
     fig, ax = plt.subplots(figsize=(10, 6))
     df["annual_income"].dropna().hist(bins=30, ax=ax, color="steelblue", edgecolor="white")
@@ -162,8 +165,12 @@ def create_visualizations(df: pd.DataFrame):
     # 2. Spending score vs annual income (scatter)
     fig, ax = plt.subplots(figsize=(10, 6))
     scatter = ax.scatter(
-        df["annual_income"], df["spending_score"],
-        c=df["purchase_frequency"], cmap="viridis", alpha=0.6, s=30
+        df["annual_income"],
+        df["spending_score"],
+        c=df["purchase_frequency"],
+        cmap="viridis",
+        alpha=0.6,
+        s=30,
     )
     ax.set_title("Spending Score vs Annual Income", fontsize=14)
     ax.set_xlabel("Annual Income ($)")
@@ -200,8 +207,15 @@ def create_visualizations(df: pd.DataFrame):
     ax.set_yticklabels(corr.columns, fontsize=9)
     for i in range(len(corr)):
         for j in range(len(corr)):
-            ax.text(j, i, f"{corr.values[i, j]:.2f}", ha="center", va="center",
-                    fontsize=8, color="white" if abs(corr.values[i, j]) > 0.5 else "black")
+            ax.text(
+                j,
+                i,
+                f"{corr.values[i, j]:.2f}",
+                ha="center",
+                va="center",
+                fontsize=8,
+                color="white" if abs(corr.values[i, j]) > 0.5 else "black",
+            )
     plt.colorbar(im, ax=ax, label="Correlation", shrink=0.8)
     ax.set_title("Correlation Matrix", fontsize=14)
     plt.tight_layout()
@@ -215,8 +229,12 @@ def create_visualizations(df: pd.DataFrame):
     ax.set_title("Customer Membership Duration", fontsize=14)
     ax.set_xlabel("Years")
     ax.set_ylabel("Number of Customers")
-    ax.axvline(df["membership_years"].median(), color="darkred", linestyle="--",
-               label=f"Median: {df['membership_years'].median():.1f}yrs")
+    ax.axvline(
+        df["membership_years"].median(),
+        color="darkred",
+        linestyle="--",
+        label=f"Median: {df['membership_years'].median():.1f}yrs",
+    )
     ax.legend()
     plt.tight_layout()
     fig.savefig(os.path.join(OUTPUT_DIR, "05_membership_duration.png"), dpi=100)

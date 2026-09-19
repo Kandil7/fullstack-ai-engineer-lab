@@ -33,6 +33,7 @@ A collection of elements stored in contiguous memory. NumPy arrays are the found
 
 ```python
 import numpy as np
+
 arr = np.array([1, 2, 3, 4, 5])
 ```
 
@@ -43,6 +44,7 @@ NumPy's ability to perform operations on arrays of different shapes automaticall
 
 ```python
 import pandas as pd
+
 s = pd.Series([1, 2, 3])
 print(s * 2)  # Broadcasting: each element multiplied by 2
 # 0    2
@@ -74,10 +76,8 @@ The primary 2D data structure in Pandas — a table with labeled rows and column
 
 ```python
 import pandas as pd
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Age": [28, 35]
-})
+
+df = pd.DataFrame({"Name": ["Alice", "Bob"], "Age": [28, 35]})
 ```
 
 **Data Types (dtypes)**
@@ -115,6 +115,7 @@ Data that is absent or not recorded. Pandas represents missing values as `NaN` (
 
 ```python
 import numpy as np
+
 s = pd.Series([1, np.nan, 3])
 print(s.isnull())  # Detects missing values
 ```
@@ -126,6 +127,7 @@ Numerical Python — a library for efficient array operations. Pandas is built o
 
 ```python
 import numpy as np
+
 arr = np.array([1, 2, 3])
 ```
 
@@ -207,7 +209,7 @@ import pandas as pd
 data = {
     "Product": ["Laptop", "Phone", "Tablet"],
     "Price": [999, 699, 449],
-    "In Stock": [True, False, True]
+    "In Stock": [True, False, True],
 }
 df = pd.DataFrame(data)
 print(df)

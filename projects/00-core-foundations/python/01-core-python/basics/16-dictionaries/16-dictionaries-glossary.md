@@ -104,9 +104,9 @@ person["email"] = "alice@example.com"
 **Example**:
 ```python
 d = {"a": 1, "b": 2}
-print(d.get("a"))       # 1
-print(d.get("c"))       # None
-print(d.get("c", 0))    # 0
+print(d.get("a"))  # 1
+print(d.get("c"))  # None
+print(d.get("c", 0))  # 0
 ```
 
 **Related**: `__getitem__`, KeyError, `setdefault()`
@@ -153,13 +153,9 @@ print(pairs)  # [('a', 1), ('b', 2), ('c', 3)]
 
 **Example**:
 ```python
-d = {
-    "string_key": "value1",
-    42: "value2",
-    (1, 2): "value3"
-}
+d = {"string_key": "value1", 42: "value2", (1, 2): "value3"}
 print(d["string_key"])  # value1
-print(d[42])            # value2
+print(d[42])  # value2
 ```
 
 **Related**: hashable, value, dictionary, `__hash__`
@@ -224,14 +220,8 @@ merged = {**d1, **d2}
 **Example**:
 ```python
 students = {
-    "alice": {
-        "age": 20,
-        "grades": {"math": 90, "english": 85}
-    },
-    "bob": {
-        "age": 22,
-        "grades": {"math": 78, "english": 92}
-    }
+    "alice": {"age": 20, "grades": {"math": 90, "english": 85}},
+    "bob": {"age": 22, "grades": {"math": 78, "english": 92}},
 }
 print(students["alice"]["grades"]["math"])  # 90
 ```
@@ -267,11 +257,11 @@ print(od)  # OrderedDict([('second', 2), ('third', 3), ('first', 1)])
 ```python
 d = {"a": 1, "b": 2, "c": 3}
 val = d.pop("b")
-print(val)   # 2
-print(d)     # {'a': 1, 'c': 3}
+print(val)  # 2
+print(d)  # {'a': 1, 'c': 3}
 
 val = d.pop("z", "missing")
-print(val)   # "missing"
+print(val)  # "missing"
 ```
 
 **Related**: `popitem()`, `del`, `clear()`
@@ -286,7 +276,7 @@ print(val)   # "missing"
 d = {"a": 1, "b": 2, "c": 3}
 item = d.popitem()
 print(item)  # ('c', 3)
-print(d)     # {'a': 1, 'b': 2}
+print(d)  # {'a': 1, 'b': 2}
 ```
 
 **Related**: `pop()`, `clear()`, `del`
@@ -303,12 +293,12 @@ d = {"a": 1}
 # Key exists — returns value
 val = d.setdefault("a", 10)
 print(val)  # 1
-print(d)    # {'a': 1}
+print(d)  # {'a': 1}
 
 # Key doesn't exist — inserts and returns default
 val = d.setdefault("b", 20)
 print(val)  # 20
-print(d)    # {'a': 1, 'b': 20}
+print(d)  # {'a': 1, 'b': 20}
 ```
 
 **Related**: `get()`, `update()`, initialization patterns
@@ -384,11 +374,7 @@ print(freq.most_common(2))  # [('the', 3), ('cat', 2)]
 ### Example 2: Build a Lookup Table
 ```python
 # Create a fast lookup from ID to name
-users = [
-    {"id": 1, "name": "Alice"},
-    {"id": 2, "name": "Bob"},
-    {"id": 3, "name": "Charlie"}
-]
+users = [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}, {"id": 3, "name": "Charlie"}]
 lookup = {user["id"]: user["name"] for user in users}
 print(lookup)  # {1: 'Alice', 2: 'Bob', 3: 'Charlie'}
 print(lookup[2])  # Bob
@@ -403,7 +389,7 @@ students = [
     ("Bob", "Marketing"),
     ("Charlie", "Engineering"),
     ("Diana", "Marketing"),
-    ("Eve", "Engineering")
+    ("Eve", "Engineering"),
 ]
 
 groups = defaultdict(list)

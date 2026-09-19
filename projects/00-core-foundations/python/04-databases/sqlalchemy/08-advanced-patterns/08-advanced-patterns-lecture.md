@@ -55,6 +55,7 @@ filtering and business logic disagree — so keep both bodies in lockstep.
 ```python
 from sqlalchemy.ext.hybrid import hybrid_property
 
+
 class Experiment(Base):
     __tablename__ = "experiments"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -77,7 +78,8 @@ Instance access uses the Python method; queries use the SQL expression:
 ```python
 with new_session() as session:
     exp = Experiment(name="bert-run-1", model="bert", score=0.92)
-    session.add(exp); session.commit()
+    session.add(exp)
+    session.commit()
     print(f"instance is_leader: {exp.is_leader}")
 # Output:
 # instance is_leader: True
@@ -100,6 +102,7 @@ transparently.
 import array
 from sqlalchemy.types import LargeBinary, TypeDecorator
 
+
 class VectorType(TypeDecorator):
     """Stores an embedding (list[float]) as raw float32 bytes."""
 
@@ -115,6 +118,7 @@ class VectorType(TypeDecorator):
             if value is None:
                 return None
             return array.array("f", value).tobytes()
+
         return to_bytes
 
     def result_processor(self, dialect, coltype):
@@ -122,7 +126,9 @@ class VectorType(TypeDecorator):
             if raw is None:
                 return None
             return list(array.array("f", raw))
+
         return to_list
+
 
 class Embedding(Base):
     __tablename__ = "embeddings"
@@ -144,6 +150,7 @@ stale client write can be detected by comparing versions.
 ```python
 from sqlalchemy import event
 
+
 @event.listens_for(Experiment, "before_update")
 def _bump_version(mapper, connection, target) -> None:
     target.version += 1
@@ -152,13 +159,12 @@ def _bump_version(mapper, connection, target) -> None:
 The guard then reads the row, checks the version, and refuses stale writes:
 
 ```python
-def update_if_version(session, experiment_id: int, expected_version: int,
-                      new_score: float) -> bool:
+def update_if_version(session, experiment_id: int, expected_version: int, new_score: float) -> bool:
     exp = session.get(Experiment, experiment_id)
     if exp is None or exp.version != expected_version:
         return False
     exp.score = new_score
-    session.commit()   # before_update bumps version in the same tx
+    session.commit()  # before_update bumps version in the same tx
     return True
 ```
 
@@ -196,6 +202,7 @@ in Python.
 
 ```python
 from sqlalchemy import func
+
 
 def top_per_model(session: Session, k: int = 1) -> list[tuple[str, str, float]]:
     rank = (

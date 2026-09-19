@@ -104,6 +104,7 @@ D) `Path("model.bin").read_binary()`
 **What is the output of this code?**
 ```python
 from pathlib import Path
+
 p = Path("a/b/c")
 print(p.parts)
 ```

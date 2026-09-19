@@ -34,6 +34,7 @@ The code is otherwise identical to a plain collect.
 **Example**:
 ```python
 import polars as pl
+
 lf = pl.LazyFrame({"k": [1, 2, 3]})
 print(lf.group_by("k").agg(pl.len()).collect(engine="streaming").height)
 ```
@@ -88,6 +89,7 @@ loading the data.
 **Example**:
 ```python
 import polars as pl
+
 lf = pl.LazyFrame({"x": range(1000)})
 print(lf.select(pl.len()).collect(engine="streaming")[0, 0])
 ```
@@ -113,6 +115,7 @@ nulls FIRST by default — a common surprise when reading join results.
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"t": [None, "b", "a"]})
 print(df.sort("t", nulls_last=True)["t"].to_list())
 ```

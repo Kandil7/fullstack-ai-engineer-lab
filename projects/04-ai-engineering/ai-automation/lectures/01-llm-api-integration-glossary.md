@@ -91,13 +91,15 @@ models = {
     "gpt-4-turbo": 128000,
     "gpt-4o": 128000,
     "claude-3-opus": 200000,
-    "claude-3-haiku": 200000
+    "claude-3-haiku": 200000,
 }
+
 
 # Calculate available tokens for output
 def available_output_tokens(model, prompt_tokens):
     context_window = models.get(model, 4096)
     return context_window - prompt_tokens - 100  # 100 for safety margin
+
 
 available = available_output_tokens("gpt-4", 500)
 print(f"Available output tokens: {available}")  # 7592
@@ -125,8 +127,7 @@ client = OpenAI()
 
 # Non-streaming (waits for complete response)
 response = client.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": "Tell me a story"}]
+    model="gpt-4", messages=[{"role": "user", "content": "Tell me a story"}]
 )
 print(response.choices[0].message.content)
 
@@ -134,7 +135,7 @@ print(response.choices[0].message.content)
 stream = client.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "Tell me a story"}],
-    stream=True
+    stream=True,
 )
 
 for chunk in stream:
@@ -161,21 +162,21 @@ for chunk in stream:
 response_factual = client.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "What is 2+2?"}],
-    temperature=0.0
+    temperature=0.0,
 )
 
 # Balanced output (general use)
 response_balanced = client.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "Write a greeting"}],
-    temperature=0.7
+    temperature=0.7,
 )
 
 # Creative output (brainstorming)
 response_creative = client.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "Write a poem"}],
-    temperature=1.2
+    temperature=1.2,
 )
 ```
 
@@ -200,14 +201,14 @@ response_creative = client.chat.completions.create(
 response_short = client.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "Explain Python"}],
-    max_tokens=100  # ~75 words
+    max_tokens=100,  # ~75 words
 )
 
 # Long response
 response_long = client.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "Explain Python"}],
-    max_tokens=2000  # ~1500 words
+    max_tokens=2000,  # ~1500 words
 )
 
 # Check if response was truncated
@@ -233,18 +234,18 @@ if response.choices[0].finish_reason == "length":
 import time
 from openai import RateLimitError
 
+
 def call_with_rate_limit_handling(prompt, max_retries=3):
     for attempt in range(max_retries):
         try:
             response = client.chat.completions.create(
-                model="gpt-4",
-                messages=[{"role": "user", "content": prompt}]
+                model="gpt-4", messages=[{"role": "user", "content": prompt}]
             )
             return response
-            
+
         except RateLimitError as e:
             if attempt < max_retries - 1:
-                wait_time = 2 ** attempt * 1  # Exponential backoff
+                wait_time = 2**attempt * 1  # Exponential backoff
                 print(f"Rate limited. Waiting {wait_time}s...")
                 time.sleep(wait_time)
             else:
@@ -273,18 +274,12 @@ prompt = "Explain quantum computing in simple terms."
 messages = [
     {
         "role": "system",
-        "content": "You are a physics teacher who explains concepts simply."
+        "content": "You are a physics teacher who explains concepts simply.",
     },
-    {
-        "role": "user",
-        "content": "What is quantum entanglement?"
-    }
+    {"role": "user", "content": "What is quantum entanglement?"},
 ]
 
-response = client.chat.completions.create(
-    model="gpt-4",
-    messages=messages
-)
+response = client.chat.completions.create(model="gpt-4", messages=messages)
 ```
 
 **Related Terms:** System Message, User Message, Completion, Chain-of-Thought
@@ -304,8 +299,7 @@ response = client.chat.completions.create(
 **Example:**
 ```python
 response = client.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": "What is AI?"}]
+    model="gpt-4", messages=[{"role": "user", "content": "What is AI?"}]
 )
 
 # Access the completion
@@ -340,8 +334,7 @@ client = OpenAI()
 
 # Generate embedding
 response = client.embeddings.create(
-    model="text-embedding-3-small",
-    input="The cat sat on the mat"
+    model="text-embedding-3-small", input="The cat sat on the mat"
 )
 
 embedding = response.data[0].embedding
@@ -373,18 +366,12 @@ messages = [
         - Always provide code examples
         - Explain your reasoning
         - Follow PEP 8 style
-        - Be concise but thorough"""
+        - Be concise but thorough""",
     },
-    {
-        "role": "user",
-        "content": "How do I read a CSV file?"
-    }
+    {"role": "user", "content": "How do I read a CSV file?"},
 ]
 
-response = client.chat.completions.create(
-    model="gpt-4",
-    messages=messages
-)
+response = client.chat.completions.create(model="gpt-4", messages=messages)
 ```
 
 **Related Terms:** Role, Behavior, Personality, Constraints
@@ -409,21 +396,22 @@ models = {
         "context": 8192,
         "cost_input": 0.03,
         "cost_output": 0.06,
-        "strength": "Reasoning"
+        "strength": "Reasoning",
     },
     "gpt-4o": {
         "context": 128000,
         "cost_input": 0.005,
         "cost_output": 0.015,
-        "strength": "Speed + Quality"
+        "strength": "Speed + Quality",
     },
     "gpt-3.5-turbo": {
         "context": 16385,
         "cost_input": 0.0005,
         "cost_output": 0.0015,
-        "strength": "Cost Efficiency"
-    }
+        "strength": "Cost Efficiency",
+    },
 }
+
 
 # Choose based on needs
 def select_model(task_type, max_budget=0.01):
@@ -454,11 +442,13 @@ def select_model(task_type, max_budget=0.01):
 import time
 import random
 
+
 def exponential_backoff(attempt, base_delay=1, max_delay=60):
     """Calculate wait time with jitter."""
-    delay = min(base_delay * (2 ** attempt), max_delay)
+    delay = min(base_delay * (2**attempt), max_delay)
     jitter = random.uniform(0, delay * 0.1)
     return delay + jitter
+
 
 # Usage
 for attempt in range(5):
@@ -489,7 +479,7 @@ for attempt in range(5):
 response = client.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "Write a long essay"}],
-    max_tokens=100  # Intentionally short
+    max_tokens=100,  # Intentionally short
 )
 
 reason = response.choices[0].finish_reason
@@ -527,21 +517,22 @@ def chunk_text(text, max_tokens=4000, overlap=200):
     chunks = []
     current_chunk = []
     current_count = 0
-    
+
     for word in words:
         current_chunk.append(word)
         current_count += 1
-        
+
         if current_count >= max_tokens:
             chunks.append(" ".join(current_chunk))
             # Keep overlap
             current_chunk = current_chunk[-overlap:]
             current_count = overlap
-    
+
     if current_chunk:
         chunks.append(" ".join(current_chunk))
-    
+
     return chunks
+
 
 # Usage
 long_document = read_file("huge.txt")

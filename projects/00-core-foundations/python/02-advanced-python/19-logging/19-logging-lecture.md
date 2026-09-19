@@ -31,8 +31,7 @@ import logging
 
 # Basic configuration
 logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 logger = logging.getLogger(__name__)
@@ -62,7 +61,7 @@ handler = logging.StreamHandler()
 handler.setLevel(logging.DEBUG)
 
 # Create formatter
-formatter = logging.Formatter('%(levelname)-8s %(message)s')
+formatter = logging.Formatter("%(levelname)-8s %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -102,17 +101,19 @@ logger.setLevel(logging.DEBUG)
 
 # Detailed format
 detailed_formatter = logging.Formatter(
-    fmt='%(asctime)s | %(name)s | %(levelname)-8s | %(funcName)s:%(lineno)d | %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    fmt="%(asctime)s | %(name)s | %(levelname)-8s | %(funcName)s:%(lineno)d | %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 
 handler = logging.StreamHandler()
 handler.setFormatter(detailed_formatter)
 logger.addHandler(handler)
 
+
 def my_function():
     logger.info("Inside my_function")
     logger.debug("Debugging my_function")
+
 
 my_function()
 ```
@@ -146,16 +147,14 @@ logger.setLevel(logging.DEBUG)
 # Console handler (INFO and above)
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
-console_format = logging.Formatter('%(levelname)s: %(message)s')
+console_format = logging.Formatter("%(levelname)s: %(message)s")
 console_handler.setFormatter(console_format)
 
 # File handler (DEBUG and above)
 temp_file = tempfile.mktemp(suffix=".log")
 file_handler = logging.FileHandler(temp_file)
 file_handler.setLevel(logging.DEBUG)
-file_format = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+file_format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 file_handler.setFormatter(file_format)
 
 logger.addHandler(console_handler)
@@ -186,7 +185,7 @@ parent_logger = logging.getLogger("app")
 parent_logger.setLevel(logging.DEBUG)
 
 handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter('%(name)s - %(message)s'))
+handler.setFormatter(logging.Formatter("%(name)s - %(message)s"))
 parent_logger.addHandler(handler)
 
 # Child loggers
@@ -228,46 +227,46 @@ Build a reusable logger for applications.
 import logging
 from typing import Optional
 
+
 class ApplicationLogger:
     """Reusable application logger setup."""
-    
+
     def __init__(self, name: str, log_file: Optional[str] = None):
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.DEBUG)
-        
+
         # Prevent duplicate handlers
         if not self.logger.handlers:
             self._setup_handlers(log_file)
-    
+
     def _setup_handlers(self, log_file: Optional[str]):
         # Console handler
         console = logging.StreamHandler()
         console.setLevel(logging.INFO)
-        console.setFormatter(logging.Formatter(
-            '%(levelname)s: %(message)s'
-        ))
+        console.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
         self.logger.addHandler(console)
-        
+
         # File handler if specified
         if log_file:
             file_handler = logging.FileHandler(log_file)
             file_handler.setLevel(logging.DEBUG)
-            file_handler.setFormatter(logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-            ))
+            file_handler.setFormatter(
+                logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+            )
             self.logger.addHandler(file_handler)
-    
+
     def info(self, msg: str):
         self.logger.info(msg)
-    
+
     def error(self, msg: str, exc_info: bool = False):
         self.logger.error(msg, exc_info=exc_info)
-    
+
     def debug(self, msg: str):
         self.logger.debug(msg)
-    
+
     def warning(self, msg: str):
         self.logger.warning(msg)
+
 
 # Usage
 app_log = ApplicationLogger("myapp", log_file="app.log")
@@ -290,8 +289,9 @@ logger = logging.getLogger("exception_demo")
 logger.setLevel(logging.DEBUG)
 
 handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
 logger.addHandler(handler)
+
 
 def risky_operation():
     try:
@@ -299,6 +299,7 @@ def risky_operation():
     except Exception:
         logger.exception("Error in risky_operation")  # Includes traceback
         raise
+
 
 try:
     risky_operation()
@@ -345,6 +346,7 @@ def setup_logger():
     logger.addHandler(handler)
     return logger
 
+
 # GOOD - check for existing handlers
 def setup_logger():
     logger = logging.getLogger("myapp")
@@ -362,10 +364,10 @@ def setup_logger():
 
 ```python
 logger.debug("Variable value: %s", variable)  # Development
-logger.info("User logged in: %s", username)   # Normal operations
-logger.warning("Disk space low: %s%%", space) # Potential issues
-logger.error("Failed to send email: %s", e)   # Errors
-logger.critical("Database connection lost")    # Critical failures
+logger.info("User logged in: %s", username)  # Normal operations
+logger.warning("Disk space low: %s%%", space)  # Potential issues
+logger.error("Failed to send email: %s", e)  # Errors
+logger.critical("Database connection lost")  # Critical failures
 ```
 
 ### 2. Use Lazy Formatting

@@ -82,6 +82,7 @@ def find_first(nums, target):
             right = mid - 1
     return result
 
+
 def find_last(nums, target):
     left, right = 0, len(nums) - 1
     result = -1
@@ -127,9 +128,10 @@ def search_rotated(nums, target):
 
     return -1
 
+
 # Test
-assert search_rotated([4,5,6,7,0,1,2], 0) == 4
-assert search_rotated([4,5,6,7,0,1,2], 3) == -1
+assert search_rotated([4, 5, 6, 7, 0, 1, 2], 0) == 4
+assert search_rotated([4, 5, 6, 7, 0, 1, 2], 3) == -1
 assert search_rotated([1], 0) == -1
 ```
 **Time: O(log n), Space: O(1)**
@@ -202,10 +204,10 @@ def find_median_sorted_arrays(nums1, nums2):
         i = (left + right) // 2
         j = (m + n + 1) // 2 - i
 
-        max_left_1 = float('-inf') if i == 0 else nums1[i - 1]
-        min_right_1 = float('inf') if i == m else nums1[i]
-        max_left_2 = float('-inf') if j == 0 else nums2[j - 1]
-        min_right_2 = float('inf') if j == n else nums2[j]
+        max_left_1 = float("-inf") if i == 0 else nums1[i - 1]
+        min_right_1 = float("inf") if i == m else nums1[i]
+        max_left_2 = float("-inf") if j == 0 else nums2[j - 1]
+        min_right_2 = float("inf") if j == n else nums2[j]
 
         if max_left_1 <= min_right_2 and max_left_2 <= min_right_1:
             if (m + n) % 2 == 1:
@@ -216,6 +218,7 @@ def find_median_sorted_arrays(nums1, nums2):
             right = i - 1
         else:
             left = i + 1
+
 
 # Test
 assert find_median_sorted_arrays([1, 3], [2]) == 2.0
@@ -240,6 +243,7 @@ def first_bad_version(n):
             left = mid + 1
 
     return left
+
 
 # is_bad_version is provided by the system
 ```
@@ -269,6 +273,7 @@ def sqrt_binary_search(x):
 
     return right  # Return floor of sqrt
 
+
 # Test
 assert sqrt_binary_search(8) == 2
 assert sqrt_binary_search(4) == 2
@@ -294,6 +299,7 @@ def find_peak_element(nums):
             right = mid
 
     return left
+
 
 # Test
 assert find_peak_element([1, 2, 3, 1]) == 2
@@ -339,9 +345,10 @@ def search_range(nums, target):
 
     return [find_first(), find_last()]
 
+
 # Test
-assert search_range([5,7,7,8,8,10], 8) == [3, 4]
-assert search_range([5,7,7,8,8,10], 6) == [-1, -1]
+assert search_range([5, 7, 7, 8, 8, 10], 8) == [3, 4]
+assert search_range([5, 7, 7, 8, 8, 10], 6) == [-1, -1]
 ```
 
 ---
@@ -379,8 +386,9 @@ def split_array(nums, m):
 
     return left
 
+
 # Test
-assert split_array([7,2,5,10,8], 2) == 18
+assert split_array([7, 2, 5, 10, 8], 2) == 18
 ```
 
 **Pattern:** Binary search on the answer, check if it's feasible.
@@ -404,10 +412,11 @@ def find_min(nums):
 
     return nums[left]
 
+
 # Test
-assert find_min([3,4,5,1,2]) == 1
-assert find_min([4,5,6,7,0,1,2]) == 0
-assert find_min([11,13,15,17]) == 11
+assert find_min([3, 4, 5, 1, 2]) == 1
+assert find_min([4, 5, 6, 7, 0, 1, 2]) == 0
+assert find_min([11, 13, 15, 17]) == 11
 ```
 
 **Logic:** If `nums[mid] > nums[right]`, the minimum is in the right half. Otherwise, it's in the left half (including mid).
@@ -430,10 +439,11 @@ def next_greatest_letter(letters, target):
 
     return letters[left % len(letters)]
 
+
 # Test
-assert next_greatest_letter(["c","f","j"], "a") == "c"
-assert next_greatest_letter(["c","f","j"], "c") == "f"
-assert next_greatest_letter(["c","f","j"], "d") == "f"
+assert next_greatest_letter(["c", "f", "j"], "a") == "c"
+assert next_greatest_letter(["c", "f", "j"], "c") == "f"
+assert next_greatest_letter(["c", "f", "j"], "d") == "f"
 ```
 
 ---
@@ -455,6 +465,7 @@ def find_peak_bitonic(nums):
             right = mid
 
     return nums[left]
+
 
 # Test
 assert find_peak_bitonic([1, 3, 8, 12, 4, 2]) == 12
@@ -513,6 +524,7 @@ def intersection(nums1, nums2):
 
     return result
 
+
 # Test
 assert intersection([1, 2, 2, 1], [2, 2]) == [2]
 assert intersection([4, 9, 5], [9, 4, 9, 8, 4]) == [4, 9]
@@ -538,6 +550,7 @@ def binary_search(nums, target):
 
     return -1
 
+
 # Test
 assert binary_search([-1, 0, 3, 5, 9, 12], 9) == 4
 assert binary_search([-1, 0, 3, 5, 9, 12], 2) == -1
@@ -561,6 +574,7 @@ def search_insert(nums, target):
             right = mid - 1
 
     return left
+
 
 # Test
 assert search_insert([1, 3, 5, 6], 5) == 2
@@ -604,9 +618,10 @@ def search_range(nums, target):
 
     return [find_first(), find_last()]
 
+
 # Test
-assert search_range([5,7,7,8,8,10], 8) == [3, 4]
-assert search_range([5,7,7,8,8,10], 6) == [-1, -1]
+assert search_range([5, 7, 7, 8, 8, 10], 8) == [3, 4]
+assert search_range([5, 7, 7, 8, 8, 10], 6) == [-1, -1]
 ```
 **Time: O(log n), Space: O(1)**
 
@@ -636,9 +651,10 @@ def search(nums, target):
 
     return -1
 
+
 # Test
-assert search([4,5,6,7,0,1,2], 0) == 4
-assert search([4,5,6,7,0,1,2], 3) == -1
+assert search([4, 5, 6, 7, 0, 1, 2], 0) == 4
+assert search([4, 5, 6, 7, 0, 1, 2], 3) == -1
 ```
 **Time: O(log n), Space: O(1)**
 
@@ -658,9 +674,10 @@ def find_min(nums):
 
     return nums[left]
 
+
 # Test
-assert find_min([3,4,5,1,2]) == 1
-assert find_min([4,5,6,7,0,1,2]) == 0
+assert find_min([3, 4, 5, 1, 2]) == 1
+assert find_min([4, 5, 6, 7, 0, 1, 2]) == 0
 ```
 **Time: O(log n), Space: O(1)**
 
@@ -679,10 +696,10 @@ def find_median_sorted_arrays(nums1, nums2):
         i = (left + right) // 2
         j = (m + n + 1) // 2 - i
 
-        max_left_1 = float('-inf') if i == 0 else nums1[i - 1]
-        min_right_1 = float('inf') if i == m else nums1[i]
-        max_left_2 = float('-inf') if j == 0 else nums2[j - 1]
-        min_right_2 = float('inf') if j == n else nums2[j]
+        max_left_1 = float("-inf") if i == 0 else nums1[i - 1]
+        min_right_1 = float("inf") if i == m else nums1[i]
+        max_left_2 = float("-inf") if j == 0 else nums2[j - 1]
+        min_right_2 = float("inf") if j == n else nums2[j]
 
         if max_left_1 <= min_right_2 and max_left_2 <= min_right_1:
             if (m + n) % 2 == 1:
@@ -693,6 +710,7 @@ def find_median_sorted_arrays(nums1, nums2):
             right = i - 1
         else:
             left = i + 1
+
 
 # Test
 assert find_median_sorted_arrays([1, 3], [2]) == 2.0
@@ -715,6 +733,7 @@ def peak_index_in_mountain_array(arr):
             right = mid
 
     return left
+
 
 # Test
 assert peak_index_in_mountain_array([0, 1, 0]) == 1
@@ -749,9 +768,10 @@ def ship_within_days(weights, days):
 
     return left
 
+
 # Test
-assert ship_within_days([1,2,3,4,5,6,7,8,9,10], 5) == 15
-assert ship_within_days([3,2,2,4,1,4], 3) == 6
+assert ship_within_days([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 5) == 15
+assert ship_within_days([3, 2, 2, 4, 1, 4], 3) == 6
 ```
 **Time: O(n * log(sum - max)), Space: O(1)**
 
@@ -783,8 +803,9 @@ def split_array(nums, m):
 
     return left
 
+
 # Test
-assert split_array([7,2,5,10,8], 2) == 18
+assert split_array([7, 2, 5, 10, 8], 2) == 18
 ```
 **Time: O(n * log(sum)), Space: O(1)**
 

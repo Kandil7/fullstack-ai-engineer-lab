@@ -72,24 +72,29 @@ from pydantic import BaseModel
 import joblib, os
 
 MODEL_PATH = os.environ.get("MODEL_PATH", "/model/model.pkl")
-model = joblib.load(MODEL_PATH)      # loaded ONCE at import
+model = joblib.load(MODEL_PATH)  # loaded ONCE at import
 
 app = FastAPI(title="churn-api")
+
 
 class PredictRequest(BaseModel):
     tenure: float
     monthly_charges: float
     contract_type_code: int
 
+
 class PredictResponse(BaseModel):
     churn_probability: float
+
 
 @app.post("/predict", response_model=PredictResponse)
 def predict(req: PredictRequest) -> PredictResponse:
     import numpy as np
+
     X = np.array([[req.tenure, req.monthly_charges, req.contract_type_code]])
     proba = float(model.predict_proba(X)[0, 1])
     return PredictResponse(churn_probability=proba)
+
 
 @app.get("/health")
 def health() -> dict[str, str]:
@@ -111,6 +116,7 @@ model exception reach the client as a 500 with a traceback.
 
 ```python
 from fastapi import HTTPException
+
 
 @app.post("/predict")
 def predict(req: PredictRequest) -> PredictResponse:
@@ -143,6 +149,7 @@ Serving math every AI engineer must know:
 ```python
 import time, statistics
 
+
 def measure_latency(predict_fn, samples, n=200) -> dict[str, float]:
     """Measure p50/p95/p99 latency of a predict function."""
     times = []
@@ -151,10 +158,16 @@ def measure_latency(predict_fn, samples, n=200) -> dict[str, float]:
         predict_fn(s)
         times.append((time.perf_counter() - t0) * 1000)
     times.sort()
+
     def pct(p):
         return times[min(len(times) - 1, int(len(times) * p))]
-    return {"p50_ms": round(pct(0.50), 2), "p95_ms": round(pct(0.95), 2),
-            "p99_ms": round(pct(0.99), 2), "throughput_qps": round(n / (sum(times)/1000), 1)}
+
+    return {
+        "p50_ms": round(pct(0.50), 2),
+        "p95_ms": round(pct(0.95), 2),
+        "p99_ms": round(pct(0.99), 2),
+        "throughput_qps": round(n / (sum(times) / 1000), 1),
+    }
 ```
 
 Output (conceptually):
@@ -179,6 +192,7 @@ Three levers to meet latency budgets:
 
 ```python
 from functools import lru_cache
+
 
 @lru_cache(maxsize=1024)
 def predict_cached(*features: float) -> float:

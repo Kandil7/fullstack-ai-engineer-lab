@@ -53,17 +53,20 @@ costs 10–100×.
 ```python
 import numpy as np
 
+
 def relu_loop(values):
     out = np.empty_like(values)
     for i in range(values.size):
         out[i] = values[i] if values[i] > 0 else 0.0
     return out
 
+
 def relu_vec(values):
     return np.maximum(values, 0.0)
 
+
 x = np.random.default_rng(42).normal(size=1_000_000)
-print(np.array_equal(relu_loop(x), relu_vec(x)))   # True
+print(np.array_equal(relu_loop(x), relu_vec(x)))  # True
 ```
 
 ```
@@ -84,15 +87,14 @@ not a branch at all, it is a gather.
 
 ```python
 def clip_where(values, lo, hi):
-    return np.where(values < lo, lo,
-                    np.where(values > hi, hi, values))
+    return np.where(values < lo, lo, np.where(values > hi, hi, values))
+
 
 data = np.random.default_rng(0).normal(size=100_000)
-print(np.array_equal(clip_where(data, -1.0, 1.0),
-                     np.clip(data, -1.0, 1.0)))        # True
+print(np.array_equal(clip_where(data, -1.0, 1.0), np.clip(data, -1.0, 1.0)))  # True
 
 signed = np.where(data > 0, 1.0, np.where(data < 0, -1.0, 0.0))
-print(np.array_equal(signed, np.sign(data)))           # True
+print(np.array_equal(signed, np.sign(data)))  # True
 ```
 
 ```
@@ -114,12 +116,11 @@ replaces the filter-then-update loop.
 ```python
 scores = np.random.default_rng(1).normal(size=1_000_000)
 mask = scores < 0
-scores[mask] = 0.0                # vectorized scatter: one pass
+scores[mask] = 0.0  # vectorized scatter: one pass
 
 vals = np.random.default_rng(2).normal(size=1_000_000)
-print(int((vals > 0).sum()))                    # count positives
-print(np.allclose(vals[vals > 0].sum(),
-                  np.where(vals > 0, vals, 0.0).sum()))  # True
+print(int((vals > 0).sum()))  # count positives
+print(np.allclose(vals[vals > 0].sum(), np.where(vals > 0, vals, 0.0).sum()))  # True
 ```
 
 ```
@@ -143,15 +144,14 @@ batched products — and the subscripts document the math in the code.
 A = np.random.default_rng(3).normal(size=(4, 5))
 B = np.random.default_rng(4).normal(size=(5, 6))
 
-print(np.allclose(np.einsum("ij,jk->ik", A, B), A @ B))   # True
-print(np.einsum("ii->", np.ones((5, 5))))                 # 5.0 trace
-print(np.einsum("i,j->ij", np.ones(3), np.ones(4)).shape) # (3, 4)
-print(np.array_equal(np.einsum("ij->ji", A), A.T))        # True
+print(np.allclose(np.einsum("ij,jk->ik", A, B), A @ B))  # True
+print(np.einsum("ii->", np.ones((5, 5))))  # 5.0 trace
+print(np.einsum("i,j->ij", np.ones(3), np.ones(4)).shape)  # (3, 4)
+print(np.array_equal(np.einsum("ij->ji", A), A.T))  # True
 
 # Batched: "b" is the batch axis on both operands and the output.
 batch = np.random.default_rng(5).normal(size=(8, 4, 5))
-print(np.allclose(np.einsum("bij,jk->bik", batch, B),
-                  batch @ B))                             # True
+print(np.allclose(np.einsum("bij,jk->bik", batch, B), batch @ B))  # True
 ```
 
 ```
@@ -181,9 +181,10 @@ def row_stats_ragged(rows):
     """Per-row mean/std for ragged rows."""
     return np.array([(r.mean(), r.std()) for r in rows])
 
+
 rng = np.random.default_rng(6)
 ragged = [rng.normal(size=n) for n in (3, 7, 2, 5)]
-print(row_stats_ragged(ragged).shape)     # (4, 2)
+print(row_stats_ragged(ragged).shape)  # (4, 2)
 ```
 
 ```
@@ -209,17 +210,22 @@ none of the speed.
 def f(x):
     return x * 2 if x > 0 else -x
 
+
 f_vec = np.vectorize(f)
 x = np.random.default_rng(7).normal(size=200_000)
 
 import time
+
+
 def timed(label, fn):
-    t0 = time.perf_counter(); fn()
+    t0 = time.perf_counter()
+    fn()
     print(f"{label:<14s} {time.perf_counter() - t0:.4f}s")
 
-timed("vectorize",   lambda: f_vec(x))
+
+timed("vectorize", lambda: f_vec(x))
 timed("explicit loop", lambda: np.fromiter((f(v) for v in x), float))
-timed("vectorized",  lambda: np.where(x > 0, x * 2, -x))
+timed("vectorized", lambda: np.where(x > 0, x * 2, -x))
 ```
 
 ```
@@ -250,11 +256,12 @@ def mean_pool(embeddings, mask):
     counts = mask.sum(axis=1, keepdims=True).astype(np.float64)
     return sums / np.maximum(counts, 1.0)
 
+
 rng = np.random.default_rng(8)
 emb = rng.normal(size=(16, 32, 64))
 tok_mask = rng.integers(0, 2, size=(16, 32), dtype=bool)
 pooled = mean_pool(emb, tok_mask)
-print(pooled.shape)                                    # (16, 64)
+print(pooled.shape)  # (16, 64)
 print(np.allclose(pooled[0], emb[0][tok_mask[0]].mean(axis=0)))  # True
 ```
 

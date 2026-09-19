@@ -72,16 +72,17 @@ document is content-hashed (L3), the index carries a **version manifest**
 incremental — only changed docs re-embed (L8):
 
 ```python
-def ingest_into_index(knowledge_base, index, *, embed_model, chunker,
-                      last_index) -> dict:
+def ingest_into_index(knowledge_base, index, *, embed_model, chunker, last_index) -> dict:
     """Incremental, versioned ingestion. Returns the delta report."""
-    changed = [d for d in knowledge_base
-               if content_hash(d) != last_index.get(d.id)]
+    changed = [d for d in knowledge_base if content_hash(d) != last_index.get(d.id)]
     new_chunks = [c for d in changed for c in chunker(d)]
     index.embed_and_store(new_chunks, model=embed_model)
-    manifest = {"embed_model": embed_model, "chunker": chunker.name,
-                "corpus_version": content_hash(knowledge_base)}
-    index.write_manifest(manifest)          # L3: versioned, auditable
+    manifest = {
+        "embed_model": embed_model,
+        "chunker": chunker.name,
+        "corpus_version": content_hash(knowledge_base),
+    }
+    index.write_manifest(manifest)  # L3: versioned, auditable
     return {"reindexed": len(changed), "chunks": len(new_chunks)}
 ```
 
@@ -99,10 +100,10 @@ eval driving every config choice:
 
 ```python
 def retrieve(query: str, index, *, top_recall=50, top_final=5) -> list[Chunk]:
-    semantic_top = index.vector_search(query, k=top_recall)    # L6
-    lexical_top = index.bm25_search(query, k=top_recall)       # L11
-    fused = rrf_fuse(semantic_top, lexical_top)[:top_recall]   # L11
-    return rerank(query, fused, cross_encoder)[:top_final]     # L12
+    semantic_top = index.vector_search(query, k=top_recall)  # L6
+    lexical_top = index.bm25_search(query, k=top_recall)  # L11
+    fused = rrf_fuse(semantic_top, lexical_top)[:top_recall]  # L11
+    return rerank(query, fused, cross_encoder)[:top_final]  # L12
 ```
 
 Output:
@@ -121,11 +122,11 @@ with citations, and a validated structured response:
 
 ```python
 def generate_answer(query: str, chunks: list[Chunk], llm_client) -> Answer:
-    context = format_chunks(chunks)                  # numbered, citable
+    context = format_chunks(chunks)  # numbered, citable
     raw = llm_client.complete(GROUNDED_PROMPT.format(context=context, q=query))
-    answer = Answer.model_validate_json(raw)         # L3: validated structure
-    answer.citations = verify_citations(answer, chunks)   # L9: claims ↔ sources
-    return answer                                    # typed, validated, cited
+    answer = Answer.model_validate_json(raw)  # L3: validated structure
+    answer.citations = verify_citations(answer, chunks)  # L9: claims ↔ sources
+    return answer  # typed, validated, cited
 ```
 
 Output:
@@ -181,9 +182,11 @@ honesty, and guardrail attacks:
 ```python
 def ship_check(candidate_service, suite) -> tuple[bool, dict]:
     report = run_suite(suite, candidate_service, EVALUATORS)  # L20
-    ok = (report.scores["recall@k"] >= BASELINE["recall@k"] - 0.02 and
-          report.scores["groundedness"] >= BASELINE["groundedness"] - 0.02 and
-          report.scores["guardrail_catch"] >= BASELINE["guardrail_catch"] - 0.02)
+    ok = (
+        report.scores["recall@k"] >= BASELINE["recall@k"] - 0.02
+        and report.scores["groundedness"] >= BASELINE["groundedness"] - 0.02
+        and report.scores["guardrail_catch"] >= BASELINE["guardrail_catch"] - 0.02
+    )
     return ok, report.scores
 ```
 

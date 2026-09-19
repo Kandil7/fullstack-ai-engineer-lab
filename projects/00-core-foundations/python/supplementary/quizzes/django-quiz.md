@@ -78,6 +78,7 @@ D) By using decorators
 ```python
 from django.db import models
 
+
 class Article(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
@@ -115,8 +116,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('articles/', views.article_list, name='article_list'),
-    path('articles/<int:pk>/', views.article_detail, name='article_detail'),
+    path("articles/", views.article_list, name="article_list"),
+    path("articles/<int:pk>/", views.article_detail, name="article_detail"),
 ]
 ```
 

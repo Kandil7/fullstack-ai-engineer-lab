@@ -6,6 +6,7 @@ JSON (JavaScript Object Notation) is a lightweight data-interchange format
 that is easy for humans to read and write. Pandas can easily read and
 parse JSON data.
 """
+
 import pandas as pd
 import json
 import io
@@ -85,10 +86,7 @@ nested_data = {
 # Use json_normalize to flatten nested structures
 from pandas import json_normalize
 
-df_nested = json_normalize(
-    nested_data["employees"],
-    sep="_"
-)
+df_nested = json_normalize(nested_data["employees"], sep="_")
 print("Flattened nested JSON:")
 print(df_nested)
 print()
@@ -101,10 +99,12 @@ print("=" * 60)
 print("Example 4: JSON Orientations")
 print("=" * 60)
 
-df_demo = pd.DataFrame({
-    "fruit": ["apple", "banana", "cherry"],
-    "count": [10, 25, 15],
-})
+df_demo = pd.DataFrame(
+    {
+        "fruit": ["apple", "banana", "cherry"],
+        "count": [10, 25, 15],
+    }
+)
 
 # records (list of objects) – most common
 records_json = df_demo.to_json(orient="records", indent=2)

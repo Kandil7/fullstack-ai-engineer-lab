@@ -163,9 +163,10 @@ Model evaluation is critical for assessing ML model performance and making infor
 ### Q16. What is the output of this evaluation?
 ```python
 from sklearn.metrics import classification_report
+
 y_true = [0, 1, 1, 0, 1, 1, 0, 0, 1, 1]
 y_pred = [0, 1, 0, 0, 1, 1, 1, 0, 1, 0]
-print(classification_report(y_true, y_pred, output_dict=True)['weighted avg']['f1-score'])
+print(classification_report(y_true, y_pred, output_dict=True)["weighted avg"]["f1-score"])
 ```
 - **A)** 0.60
 - **B)** 0.65

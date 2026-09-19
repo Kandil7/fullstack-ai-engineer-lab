@@ -56,17 +56,18 @@ enqueue(A) → enqueue(B) → enqueue(C) → dequeue()
 ```python
 class ListQueue:
     """Queue using list — O(n) dequeue due to shifting."""
+
     def __init__(self):
         self.items = []
-    
+
     def enqueue(self, item):
-        self.items.append(item)       # O(1) amortized
-    
+        self.items.append(item)  # O(1) amortized
+
     def dequeue(self):
         if self.is_empty():
             raise IndexError("Dequeue from empty queue")
-        return self.items.pop(0)      # O(n) — shifts all elements!
-    
+        return self.items.pop(0)  # O(n) — shifts all elements!
+
     def is_empty(self):
         return len(self.items) == 0
 ```
@@ -75,27 +76,29 @@ class ListQueue:
 ```python
 from collections import deque
 
+
 class DequeQueue:
     """Queue using deque — O(1) for both enqueue and dequeue."""
+
     def __init__(self):
         self.items = deque()
-    
+
     def enqueue(self, item):
-        self.items.append(item)       # O(1)
-    
+        self.items.append(item)  # O(1)
+
     def dequeue(self):
         if self.is_empty():
             raise IndexError("Dequeue from empty queue")
-        return self.items.popleft()   # O(1)
-    
+        return self.items.popleft()  # O(1)
+
     def peek(self):
         if self.is_empty():
             raise IndexError("Peek at empty queue")
         return self.items[0]
-    
+
     def is_empty(self):
         return len(self.items) == 0
-    
+
     def size(self):
         return len(self.items)
 ```
@@ -107,13 +110,15 @@ class Node:
         self.data = data
         self.next = None
 
+
 class LinkedQueue:
     """Queue using linked list — O(1) enqueue and dequeue."""
+
     def __init__(self):
         self.front = None
         self.rear = None
         self._size = 0
-    
+
     def enqueue(self, item):
         new_node = Node(item)
         if self.is_empty():
@@ -122,7 +127,7 @@ class LinkedQueue:
             self.rear.next = new_node
             self.rear = new_node
         self._size += 1
-    
+
     def dequeue(self):
         if self.is_empty():
             raise IndexError("Dequeue from empty queue")
@@ -132,10 +137,10 @@ class LinkedQueue:
             self.rear = None
         self._size -= 1
         return data
-    
+
     def is_empty(self):
         return self.front is None
-    
+
     def size(self):
         return self._size
 ```
@@ -203,29 +208,32 @@ A priority queue serves elements based on priority, not insertion order.
 ```python
 import heapq
 
+
 class PriorityQueue:
     """Min-heap based priority queue."""
+
     def __init__(self):
         self.heap = []
         self.counter = 0  # For tie-breaking
-    
+
     def enqueue(self, item, priority):
         heapq.heappush(self.heap, (priority, self.counter, item))
         self.counter += 1
-    
+
     def dequeue(self):
         if not self.heap:
             raise IndexError("Dequeue from empty priority queue")
         priority, _, item = heapq.heappop(self.heap)
         return item
-    
+
     def peek(self):
         if not self.heap:
             raise IndexError("Peek at empty priority queue")
         return self.heap[0][2]
-    
+
     def is_empty(self):
         return len(self.heap) == 0
+
 
 # Usage
 pq = PriorityQueue()
@@ -261,35 +269,37 @@ Time: O(V + E), Space: O(V)
 
 from collections import deque
 
+
 def bfs(graph, start):
     """BFS traversal returning visited order."""
     visited = set()
     queue = deque([start])
     visited.add(start)
     order = []
-    
+
     while queue:
-        node = queue.popleft()   # Dequeue from front
+        node = queue.popleft()  # Dequeue from front
         order.append(node)
-        
+
         for neighbor in graph[node]:
             if neighbor not in visited:
                 visited.add(neighbor)
                 queue.append(neighbor)  # Enqueue to back
-    
+
     return order
+
 
 # Example graph (adjacency list)
 graph = {
-    'A': ['B', 'C'],
-    'B': ['A', 'D', 'E'],
-    'C': ['A', 'F'],
-    'D': ['B'],
-    'E': ['B', 'F'],
-    'F': ['C', 'E']
+    "A": ["B", "C"],
+    "B": ["A", "D", "E"],
+    "C": ["A", "F"],
+    "D": ["B"],
+    "E": ["B", "F"],
+    "F": ["C", "E"],
 }
 
-print(bfs(graph, 'A'))  # ['A', 'B', 'C', 'D', 'E', 'F']
+print(bfs(graph, "A"))  # ['A', 'B', 'C', 'D', 'E', 'F']
 ```
 
 ### Example 2: Sliding Window Maximum
@@ -306,26 +316,28 @@ Time: O(n), Space: O(k)
 
 from collections import deque
 
+
 def sliding_window_max(nums, k):
     dq = deque()  # Stores indices, front = max of current window
     result = []
-    
+
     for i in range(len(nums)):
         # Remove elements outside the window
         while dq and dq[0] < i - k + 1:
             dq.popleft()
-        
+
         # Remove smaller elements from back (they're useless)
         while dq and nums[dq[-1]] <= nums[i]:
             dq.pop()
-        
+
         dq.append(i)
-        
+
         # Window is complete
         if i >= k - 1:
             result.append(nums[dq[0]])
-    
+
     return result
+
 
 # Test
 print(sliding_window_max([1, 3, -1, -3, 5, 3, 6, 7], 3))
@@ -342,35 +354,38 @@ Time: O(n), Space: O(n)
 
 from collections import deque
 
+
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
         self.left = left
         self.right = right
 
+
 def level_order(root):
     if not root:
         return []
-    
+
     result = []
     queue = deque([root])
-    
+
     while queue:
         level_size = len(queue)
         current_level = []
-        
+
         for _ in range(level_size):
             node = queue.popleft()
             current_level.append(node.val)
-            
+
             if node.left:
                 queue.append(node.left)
             if node.right:
                 queue.append(node.right)
-        
+
         result.append(current_level)
-    
+
     return result
+
 
 # Build tree:      3
 #                 / \
@@ -397,34 +412,36 @@ When dequeue stack is empty, transfer from enqueue stack.
 Amortized O(1) per operation.
 """
 
+
 class QueueWithStacks:
     def __init__(self):
-        self.stack_in = []    # For enqueue
-        self.stack_out = []   # For dequeue
-    
+        self.stack_in = []  # For enqueue
+        self.stack_out = []  # For dequeue
+
     def enqueue(self, item):
         self.stack_in.append(item)
-    
+
     def dequeue(self):
         self._transfer()
         if not self.stack_out:
             raise IndexError("Dequeue from empty queue")
         return self.stack_out.pop()
-    
+
     def peek(self):
         self._transfer()
         if not self.stack_out:
             raise IndexError("Peek at empty queue")
         return self.stack_out[-1]
-    
+
     def _transfer(self):
         """Move elements from in-stack to out-stack when needed."""
         if not self.stack_out:
             while self.stack_in:
                 self.stack_out.append(self.stack_in.pop())
-    
+
     def is_empty(self):
         return not self.stack_in and not self.stack_out
+
 
 # Usage
 q = QueueWithStacks()
@@ -450,9 +467,10 @@ Time: O(n × k)
 
 from collections import deque
 
+
 def hot_potato(names, k):
     queue = deque(names)
-    
+
     while len(queue) > 1:
         # Rotate k-1 times (move first to end)
         for _ in range(k - 1):
@@ -460,8 +478,9 @@ def hot_potato(names, k):
         # Eliminate the k-th person
         eliminated = queue.popleft()
         print(f"Eliminated: {eliminated}")
-    
+
     return queue[0]
+
 
 # Test
 winner = hot_potato(["Alice", "Bob", "Charlie", "David", "Eve"], 3)
@@ -482,6 +501,7 @@ queue.pop(0)  # O(n) — bad!
 
 # RIGHT: Use deque
 from collections import deque
+
 queue = deque([1, 2, 3])
 queue.popleft()  # O(1) — good!
 ```
@@ -492,14 +512,15 @@ queue.popleft()  # O(1) — good!
 stack = []
 stack.append(1)  # Push
 stack.append(2)  # Push
-stack.pop()      # Returns 2 — this is LIFO!
+stack.pop()  # Returns 2 — this is LIFO!
 
 # RIGHT: Use popleft for FIFO
 from collections import deque
+
 queue = deque()
-queue.append(1)    # Enqueue
-queue.append(2)    # Enqueue
-queue.popleft()    # Returns 1 — this is FIFO!
+queue.append(1)  # Enqueue
+queue.append(2)  # Enqueue
+queue.popleft()  # Returns 1 — this is FIFO!
 ```
 
 ### Mistake 3: Infinite Loop in BFS
@@ -511,6 +532,7 @@ def bfs_infinite(graph, start):
         node = queue.popleft()
         for neighbor in graph[node]:
             queue.append(neighbor)  # Infinite loop! Never marks visited
+
 
 # RIGHT: Always mark when enqueuing
 def bfs_correct(graph, start):
@@ -544,15 +566,17 @@ def bfs_correct(graph, start):
 ```python
 class StackWithQueues:
     """Implement a stack using two queues."""
+
     def __init__(self):
         from collections import deque
+
         self.q1 = deque()
         self.q2 = deque()
-    
+
     def push(self, item):
         # Your solution here
         pass
-    
+
     def pop(self):
         # Your solution here
         pass

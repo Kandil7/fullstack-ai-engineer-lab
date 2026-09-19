@@ -36,14 +36,17 @@ class then stores attributes in descriptors instead of a per-instance
 ```python
 import sys
 
+
 class Record:
     __slots__ = ("id", "vec")
+
     def __init__(self, i, v):
         self.id, self.vec = i, v
 
+
 r = Record(1, [0.1, 0.2])
-print(sys.getsizeof(r))          # ~56 for 2 slots, no dict
-r.extra = 1                      # AttributeError: 'Record' object has no attribute 'extra'
+print(sys.getsizeof(r))  # ~56 for 2 slots, no dict
+r.extra = 1  # AttributeError: 'Record' object has no attribute 'extra'
 ```
 
 **Complexity**: saves ~264 bytes per record (the dict); access is
@@ -59,6 +62,7 @@ where time actually goes, by function.
 **Example**:
 ```python
 import cProfile, pstats
+
 p = cProfile.Profile()
 p.enable()
 # ... real workload ...
@@ -79,12 +83,15 @@ b.next = a`). Refcounting never sees a zero count, so the cycle GC
 ```python
 import gc
 
+
 class Node:
     __slots__ = ("next",)
+
+
 n1, n2 = Node(), Node()
 n1.next, n2.next = n2, n1
 del n1, n2
-print(gc.collect())              # 2 objects collected
+print(gc.collect())  # 2 objects collected
 ```
 
 **Complexity**: cyclic garbage is reclaimed generational-ly — not
@@ -100,11 +107,12 @@ object it references (recursively). `sys.getsizeof` never gives this;
 **Example**:
 ```python
 import tracemalloc
+
 tracemalloc.start()
 big = [0] * 1_000_000
 _, peak = tracemalloc.get_traced_memory()
 tracemalloc.stop()
-print(peak / 1e6, "MB")          # list header + 1M references
+print(peak / 1e6, "MB")  # list header + 1M references
 ```
 
 **Complexity**: O(1) to query peak; allocation tracking adds overhead.
@@ -120,7 +128,9 @@ doubles it (6.14 GB), float16 halves it (1.54 GB).
 ```python
 def embedding_ram_bytes(rows, dim, dtype_bits=32):
     return rows * dim * (dtype_bits // 8)
-print(embedding_ram_bytes(1_000_000, 768, 32) / 1e9)   # 3.07
+
+
+print(embedding_ram_bytes(1_000_000, 768, 32) / 1e9)  # 3.07
 ```
 
 **Complexity**: O(1).
@@ -135,7 +145,8 @@ full collection; `gc.disable()` is almost always wrong.
 **Example**:
 ```python
 import gc
-print(gc.get_objects()[:1])      # (inspect); gc.collect() -> n collected
+
+print(gc.get_objects()[:1])  # (inspect); gc.collect() -> n collected
 ```
 
 **Complexity**: full collections are O(live objects); avoid hot paths.
@@ -154,7 +165,8 @@ def lines(path):
         for line in f:
             yield line.strip()
 
-total = sum(len(l) for l in lines("big.txt"))   # O(1) memory
+
+total = sum(len(l) for l in lines("big.txt"))  # O(1) memory
 ```
 
 **Complexity**: O(1) memory, O(n) total time.
@@ -186,9 +198,9 @@ from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 **Example**:
 ```python
 a, b = 200, 200
-print(a is b)                       # True (cached)
+print(a is b)  # True (cached)
 big_a, big_b = 2**40, int(str(2**40))
-print(big_a is big_b)               # False (distinct objects)
+print(big_a is big_b)  # False (distinct objects)
 ```
 
 **Complexity**: O(1) lookup when interned.
@@ -219,11 +231,11 @@ each iteration: O(n²).
 **Example**:
 ```python
 parts = ["<|im_start|>system\n", prompt, "\n<|im_end|>"]
-message = "".join(parts)            # O(n)
+message = "".join(parts)  # O(n)
 
 s = ""
 for p in parts:
-    s += p                          # O(n^2) as s grows
+    s += p  # O(n^2) as s grows
 ```
 
 **Complexity**: O(n) vs O(n²); measured ~11× at n = 500k.
@@ -238,7 +250,7 @@ bytes object. Release with `del view`/`view.release()`.
 **Example**:
 ```python
 payload = b"HEADER:v2" + b"\x00" * 64 + b"weights..."
-print(memoryview(payload)[:9].tobytes())    # b'HEADER:v2'
+print(memoryview(payload)[:9].tobytes())  # b'HEADER:v2'
 ```
 
 **Complexity**: slicing O(1); `getsizeof(view)` ~184 regardless of
@@ -270,8 +282,9 @@ its references; at zero, it is freed immediately. Fast and deterministic
 **Example**:
 ```python
 import sys
+
 x = [1, 2, 3]
-print(sys.getrefcount(x) - 1)       # 1 (the local binding)
+print(sys.getrefcount(x) - 1)  # 1 (the local binding)
 ```
 
 **Complexity**: O(1) per reference change.
@@ -286,8 +299,9 @@ separate objects not counted.
 **Example**:
 ```python
 import sys
-print(sys.getsizeof([0, 1, 2, 3]))   # 88 - just the list
-print(sys.getsizeof({}))             # 64 - empty dict
+
+print(sys.getsizeof([0, 1, 2, 3]))  # 88 - just the list
+print(sys.getsizeof({}))  # 64 - empty dict
 ```
 
 **Complexity**: O(1).
@@ -301,8 +315,8 @@ for equal values beyond the cache.
 
 **Example**:
 ```python
-print(200 is 200)                    # True (cached)
-print(2**40 is int(str(2**40)))      # False (fresh objects)
+print(200 is 200)  # True (cached)
+print(2**40 is int(str(2**40)))  # False (fresh objects)
 ```
 
 **Complexity**: O(1).
@@ -317,6 +331,7 @@ real shape and scale; report ratios, not absolute wall-clock numbers.
 **Example**:
 ```python
 import timeit
+
 t = timeit.timeit("''.join(['x'] * 1000)", number=10_000)
 print(t)
 ```
@@ -333,6 +348,7 @@ print(t)
 **Example**:
 ```python
 import tracemalloc
+
 tracemalloc.start()
 big = [0] * 1_000_000
 cur, peak = tracemalloc.get_traced_memory()
@@ -352,6 +368,7 @@ in separate processes — right for CPU-bound work (real parallelism).
 **Example**:
 ```python
 from concurrent.futures import ProcessPoolExecutor
+
 with ProcessPoolExecutor() as pool:
     scores = list(pool.map(score_embedding, batches))  # CPU: processes
 ```
@@ -367,7 +384,7 @@ float16 = 1.54 GB, float8 = 0.77 GB.
 
 **Example**:
 ```python
-print(1_000_000 * 768 * 4 / 1e9)    # 3.07
+print(1_000_000 * 768 * 4 / 1e9)  # 3.07
 ```
 
 **Complexity**: O(1).

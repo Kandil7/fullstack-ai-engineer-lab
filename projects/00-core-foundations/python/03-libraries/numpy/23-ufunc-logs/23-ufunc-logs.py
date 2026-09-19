@@ -70,19 +70,19 @@ print("log2 then exp2:", np.exp2(np.log2(arr)))  # [1. 2. 3. 4. 5.]
 arr = np.array([1, 2, 3, 4, 5])
 
 # Power
-print("\npower(x, 2):", np.power(arr, 2))    # [ 1  4  9 16 25]
-print("power(x, 3):", np.power(arr, 3))      # [  1   8  27  64 125]
+print("\npower(x, 2):", np.power(arr, 2))  # [ 1  4  9 16 25]
+print("power(x, 3):", np.power(arr, 3))  # [  1   8  27  64 125]
 print("power(x, 0.5):", np.power(arr, 0.5))  # [1.   1.41 1.73 2.   2.24]
 
 # Square and square root
-print("\nsquare():", np.square(arr))    # [ 1  4  9 16 25]
-print("sqrt():", np.sqrt(arr))          # [1.   1.41 1.73 2.   2.24]
+print("\nsquare():", np.square(arr))  # [ 1  4  9 16 25]
+print("sqrt():", np.sqrt(arr))  # [1.   1.41 1.73 2.   2.24]
 
 # Cube root
-print("cbrt():", np.cbrt(arr))          # [1.    1.26 1.44 1.59 1.71]
+print("cbrt():", np.cbrt(arr))  # [1.    1.26 1.44 1.59 1.71]
 
 # Inverse square root
-print("1/sqrt:", 1 / np.sqrt(arr))      # [1.    0.707 0.577 0.5   0.447]
+print("1/sqrt:", 1 / np.sqrt(arr))  # [1.    0.707 0.577 0.5   0.447]
 # Output:
 # power(x, 2): [ 1  4  9 16 25]
 # sqrt(): [1.    1.414 1.732 2.    2.236]
@@ -107,7 +107,7 @@ print("log(a/b) = log(a) - log(b):", np.allclose(lhs, rhs))
 
 # log(a^n) = n * log(a)
 n = 3
-lhs = np.log(a ** n)
+lhs = np.log(a**n)
 rhs = n * np.log(a)
 print("log(a^n) = n*log(a):", np.allclose(lhs, rhs))
 
@@ -135,7 +135,7 @@ print(f"\nEntropy (uniform): {entropy:.4f} bits")  # 2.0
 
 probs = np.array([0.9, 0.05, 0.03, 0.02])  # Skewed
 entropy = -np.sum(probs * np.log2(probs))
-print(f"Entropy (skewed): {entropy:.4f} bits")    # ~1.0
+print(f"Entropy (skewed): {entropy:.4f} bits")  # ~1.0
 
 # Signal strength: decibels
 power_ratio = np.array([1, 10, 100, 1000])

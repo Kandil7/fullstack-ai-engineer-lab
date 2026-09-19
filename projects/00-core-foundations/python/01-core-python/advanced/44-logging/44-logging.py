@@ -75,8 +75,7 @@ print(f"After disable: {child_logger.propagate}")  # False
 
 # Example 3: Multiple handlers
 formatter = logging.Formatter(
-    "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
+    "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
 )
 
 # Console handler
@@ -87,9 +86,7 @@ console_handler.setFormatter(formatter)
 # File handler with rotation
 with tempfile.TemporaryDirectory() as tmp:
     log_file = os.path.join(tmp, "app.log")
-    file_handler = logging.handlers.RotatingFileHandler(
-        log_file, maxBytes=1024, backupCount=3
-    )
+    file_handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=1024, backupCount=3)
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
 
@@ -117,9 +114,11 @@ with tempfile.TemporaryDirectory() as tmp:
 # 4. Exception Logging: exc_info vs logger.exception
 # ============================================================
 
+
 # Example 4: Logging exceptions
 def risky_operation():
     return 1 / 0
+
 
 try:
     risky_operation()
@@ -140,9 +139,11 @@ except ZeroDivisionError:
 # Example 5: Lazy evaluation — only formats if logged
 import time
 
+
 def expensive_computation():
     time.sleep(0.01)
     return "result"
+
 
 # BAD: f-string always evaluated (eager, even if level is too low)
 logger.info(f"Result: {expensive_computation()}")  # Always computes!
@@ -152,12 +153,16 @@ logger.info(f"Result: {expensive_computation()}")  # Always computes!
 # skipped when the level filters the record out. To defer a genuinely
 # expensive computation, wrap it in a callable whose __str__ does the work:
 
+
 class LazyStr:
     """Defers work until the log formatter actually renders the record."""
+
     def __init__(self, fn):
         self.fn = fn
+
     def __str__(self) -> str:
         return self.fn()
+
 
 # With logging disabled for this logger, LazyStr.__str__ never runs:
 logger.setLevel(logging.WARNING)
@@ -178,9 +183,10 @@ print(f"Lazy formatting time (enabled):  {elapsed:.4f}s")  # ~0.01s
 # 6. Structured JSON Logging
 # ============================================================
 
+
 class JSONFormatter(logging.Formatter):
     """Structured JSON log formatter."""
-    
+
     def format(self, record: logging.LogRecord) -> str:
         log_data = {
             "timestamp": self.formatTime(record),
@@ -194,6 +200,7 @@ class JSONFormatter(logging.Formatter):
         if record.exc_info:
             log_data["exception"] = self.formatException(record.exc_info)
         return json.dumps(log_data)
+
 
 json_handler = logging.StreamHandler()
 json_handler.setFormatter(JSONFormatter())
@@ -259,12 +266,12 @@ app_logger.info("Configured via dictConfig")
 
 # In every module:
 # logger = logging.getLogger(__name__)
-# 
+#
 # This creates loggers like:
 #   myapp.main
 #   myapp.models
 #   myapp.services.rag
-# 
+#
 # Allows granular control: logging.getLogger("myapp.services").setLevel(DEBUG)
 
 # ============================================================
@@ -276,10 +283,12 @@ from contextvars import ContextVar
 
 request_id_var: ContextVar[str] = ContextVar("request_id", default="")
 
+
 class CorrelationFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
         record.request_id = request_id_var.get("no-request-id")
         return True
+
 
 # Usage in middleware:
 # request_id_var.set("req-123")
@@ -307,31 +316,33 @@ class CorrelationFilter(logging.Filter):
 # MISTAKE: Not setting propagate=False on child loggers
 #   Leads to duplicate log messages
 
+
 # ============================================================
 # Self-Verification
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
-    
+
     # Logger hierarchy
     parent = logging.getLogger("test.parent")
     child = logging.getLogger("test.parent.child")
     assert child.parent is parent
-    
+
     # Propagation
     assert child.propagate == True
     child.propagate = False
     assert child.propagate == False
-    
+
     # Levels
     assert logging.DEBUG < logging.INFO < logging.WARNING < logging.ERROR < logging.CRITICAL
-    
+
     # exc_info captures traceback
     try:
-        1/0
+        1 / 0
     except ZeroDivisionError:
         import io
         import logging as lg
+
         stream = io.StringIO()
         handler = lg.StreamHandler(stream)
         test_logger = lg.getLogger("test_verify")
@@ -341,7 +352,7 @@ def _verify() -> None:
         output = stream.getvalue()
         assert "ZeroDivisionError" in output
         assert "1/0" in output
-    
+
     # logger.exception is ERROR + exc_info
     stream = io.StringIO()
     handler = lg.StreamHandler(stream)
@@ -349,12 +360,12 @@ def _verify() -> None:
     test_logger2.addHandler(handler)
     test_logger2.setLevel(lg.DEBUG)
     try:
-        1/0
+        1 / 0
     except ZeroDivisionError:
         test_logger2.exception("failed")
     output = stream.getvalue()
     assert "ZeroDivisionError" in output
-    
+
     # JSON formatter produces valid JSON
     formatter = JSONFormatter()
     record = lg.LogRecord("test", lg.INFO, "", 1, "hello", (), None)
@@ -362,21 +373,25 @@ def _verify() -> None:
     parsed = json.loads(json_str)
     assert parsed["message"] == "hello"
     assert parsed["level"] == "INFO"
-    
+
     # dictConfig works
-    lg.config.dictConfig({
-        "version": 1,
-        "handlers": {"h": {"class": "logging.StreamHandler", "stream": "ext://sys.stdout"}},
-        "root": {"level": "INFO", "handlers": ["h"]},
-    })
-    
+    lg.config.dictConfig(
+        {
+            "version": 1,
+            "handlers": {"h": {"class": "logging.StreamHandler", "stream": "ext://sys.stdout"}},
+            "root": {"level": "INFO", "handlers": ["h"]},
+        }
+    )
+
     # Lazy formatting: deferred work only happens when level permits
     logger = lg.getLogger("lazy_test")
     logger.setLevel(lg.WARNING)
     called = []
+
     def expensive():
         called.append(True)
         return "x"
+
     lazy = LazyStr(expensive)
     logger.info("Result: %s", lazy)
     assert len(called) == 0, "disabled level must not run __str__"
@@ -384,7 +399,7 @@ def _verify() -> None:
     logger.setLevel(lg.INFO)
     logger.info("Result: %s", lazy)
     assert len(called) == 1, "enabled level must render the record"
-    
+
     print("[OK] 44-logging: all checks passed")
 
 

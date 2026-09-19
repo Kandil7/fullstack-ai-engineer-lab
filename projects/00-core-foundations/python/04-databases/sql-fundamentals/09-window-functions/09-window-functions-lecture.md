@@ -42,12 +42,20 @@ By the end of this lecture, you will be able to:
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE evals (id INTEGER PRIMARY KEY, model TEXT, dataset TEXT, score REAL)")
-conn.executemany("INSERT INTO evals (model, dataset, score) VALUES (?, ?, ?)",
-                 [("m1", "d1", 0.91), ("m1", "d2", 0.82),
-                  ("m2", "d1", 0.88), ("m2", "d2", 0.90),
-                  ("m3", "d1", 0.95), ("m3", "d2", 0.78)])
+conn.executemany(
+    "INSERT INTO evals (model, dataset, score) VALUES (?, ?, ?)",
+    [
+        ("m1", "d1", 0.91),
+        ("m1", "d2", 0.82),
+        ("m2", "d1", 0.88),
+        ("m2", "d2", 0.90),
+        ("m3", "d1", 0.95),
+        ("m3", "d2", 0.78),
+    ],
+)
 rows = conn.execute("""
     SELECT model, dataset, score,
            ROW_NUMBER() OVER (PARTITION BY dataset ORDER BY score DESC) AS rn
@@ -131,8 +139,10 @@ A frame bounds which rows the function sees relative to the current row.
 
 ```python
 conn.execute("CREATE TABLE daily (day INTEGER PRIMARY KEY, metric REAL)")
-conn.executemany("INSERT INTO daily (day, metric) VALUES (?, ?)",
-                 [(1, 10.0), (2, 20.0), (3, 30.0), (4, 40.0), (5, 50.0)])
+conn.executemany(
+    "INSERT INTO daily (day, metric) VALUES (?, ?)",
+    [(1, 10.0), (2, 20.0), (3, 30.0), (4, 40.0), (5, 50.0)],
+)
 rows = conn.execute("""
     SELECT day, metric,
            AVG(metric) OVER (ORDER BY day ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) AS ma2

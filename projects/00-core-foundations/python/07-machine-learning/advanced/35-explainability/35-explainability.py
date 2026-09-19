@@ -27,8 +27,9 @@ from sklearn.linear_model import Ridge
 from sklearn.metrics import roc_auc_score
 
 rng = np.random.RandomState(0)
-X, y = make_classification(n_samples=3000, n_features=20, n_informative=6,
-                           n_redundant=6, random_state=0)
+X, y = make_classification(
+    n_samples=3000, n_features=20, n_informative=6, n_redundant=6, random_state=0
+)
 feature_names = [f"f{i}" for i in range(20)]
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0)
 
@@ -54,17 +55,20 @@ print(f"  f0 values      : {np.round(pd_res[values_key][0][:5], 2)}")
 print(f"  avg prediction : {np.round(pd_res['average'][0][:5], 3)}")
 print("  -> as f0 rises, average prediction moves up/down = the effect")
 
+
 # ============================================================
 # 3. Local: LIME-style explanation from first principles
 # ============================================================
-def lime_local_explanation(model, X_instance: np.ndarray, X_background: np.ndarray, n_samples: int = 500, seed: int = 0):
+def lime_local_explanation(
+    model, X_instance: np.ndarray, X_background: np.ndarray, n_samples: int = 500, seed: int = 0
+):
     """Perturb the instance, fit a linear surrogate, return feature weights."""
     r = np.random.RandomState(seed)
     noise = r.normal(0, np.std(X_background, axis=0), size=(n_samples, X_instance.shape[0]))
     X_pert = np.clip(X_instance + noise, X_background.min(0), X_background.max(0))
     # distance-based weights (RBF kernel)
     dist = np.linalg.norm(X_pert - X_instance, axis=1)
-    kernel_w = np.exp(-(dist ** 2) / (2 * (np.median(dist) + 1e-9) ** 2))
+    kernel_w = np.exp(-(dist**2) / (2 * (np.median(dist) + 1e-9) ** 2))
     # local labels: the model's own probability
     y_local = model.predict_proba(X_pert)[:, 1]
     surrogate = Ridge(alpha=1.0).fit(X_pert, y_local, sample_weight=kernel_w)

@@ -27,8 +27,9 @@ equality/inequality constraints**. The right `minimize` method is:
 ```python
 from scipy import optimize
 
-r = optimize.minimize(lambda x: (x[0] - 5.0) ** 2, np.array([0.0]),
-                      method="L-BFGS-B", bounds=[(0.0, 2.0)])
+r = optimize.minimize(
+    lambda x: (x[0] - 5.0) ** 2, np.array([0.0]), method="L-BFGS-B", bounds=[(0.0, 2.0)]
+)
 print(r.x[0], r.fun)
 ```
 
@@ -58,8 +59,8 @@ requires the solver to satisfy:
 from scipy import optimize
 
 r = optimize.differential_evolution(
-    lambda x: x[0] ** 2 + 10.0 * np.sin(x[0]),
-    bounds=[(-10.0, 10.0)], seed=42)
+    lambda x: x[0] ** 2 + 10.0 * np.sin(x[0]), bounds=[(-10.0, 10.0)], seed=42
+)
 print(round(float(r.fun), 2), round(float(r.x[0]), 2))
 ```
 
@@ -76,8 +77,10 @@ print(round(float(r.fun), 2), round(float(r.x[0]), 2))
 ```python
 from scipy import optimize
 
+
 def f(z):
     return (z[0] - 1.0) ** 2 + (z[1] - 2.0) ** 2
+
 
 r = optimize.minimize(f, np.zeros(2), method="BFGS")
 print(np.round(r.x, 1).tolist())
@@ -98,8 +101,10 @@ x = np.linspace(0.0, 10.0, 25)
 y = 2.0 * x + 1.0
 y[-7:] += 40.0
 
+
 def residual(p):
     return p[0] * x + p[1] - y
+
 
 for loss in ("linear", "cauchy"):
     r = optimize.least_squares(residual, np.zeros(2), loss=loss)
@@ -150,10 +155,11 @@ import numpy as np
 from scipy import optimize
 
 r = optimize.minimize(
-    lambda z: z[0] ** 2 + z[1] ** 2, np.array([0.2, 0.2]),
+    lambda z: z[0] ** 2 + z[1] ** 2,
+    np.array([0.2, 0.2]),
     method="SLSQP",
-    constraints={"type": "ineq",
-                 "fun": lambda z: z.sum() - 1.0})
+    constraints={"type": "ineq", "fun": lambda z: z.sum() - 1.0},
+)
 print(np.round(r.x, 2))
 ```
 
@@ -174,8 +180,7 @@ print(np.round(r.x, 2))
 ```python
 from scipy import optimize
 
-r = optimize.least_squares(lambda p: p[0] - 1.0,
-                           x0=np.array([0.0]), loss="linear")
+r = optimize.least_squares(lambda p: p[0] - 1.0, x0=np.array([0.0]), loss="linear")
 print(r.x[0] < 1.1, r.cost < 1e-12)
 ```
 

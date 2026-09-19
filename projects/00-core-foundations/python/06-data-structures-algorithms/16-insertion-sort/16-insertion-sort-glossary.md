@@ -105,6 +105,7 @@ def insertion_sort(arr):
         arr[j + 1] = key
     return arr
 
+
 # Binary Insertion Sort
 def binary_insertion_sort(arr):
     for i in range(1, len(arr)):
@@ -121,6 +122,7 @@ def binary_insertion_sort(arr):
         arr[left] = key
     return arr
 
+
 # Sentinel Version
 def insertion_sort_sentinel(arr):
     # Find and place minimum at position 0
@@ -129,7 +131,7 @@ def insertion_sort_sentinel(arr):
         if arr[i] < arr[min_idx]:
             min_idx = i
     arr[0], arr[min_idx] = arr[min_idx], arr[0]
-    
+
     # Insertion sort without bounds check
     for i in range(1, len(arr)):
         key = arr[i]

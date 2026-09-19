@@ -11,12 +11,14 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 
+
 def _load(name: str):
     spec = importlib.util.spec_from_file_location(name, HERE / f"{name}.py")
     mod = importlib.util.module_from_spec(spec)
     sys.modules[name] = mod
     spec.loader.exec_module(mod)
     return mod
+
 
 solution = _load("solution")
 import pytest
@@ -58,6 +60,7 @@ def test_assert_raises_no_exception():
 
 # --- Gold: mini suite -------------------------------------------------------
 
+
 def _good():
     return 1
 
@@ -72,6 +75,7 @@ def _also_bad():
 
 class _FakeModule:
     """Simulates a module whose test_* functions we want to run."""
+
     def __init__(self):
         self.test_good = _good
         self.test_bad = _bad
@@ -81,8 +85,9 @@ class _FakeModule:
 
 def test_run_suite_discovers_and_reports():
     results = solution.run_suite(_FakeModule())
-    assert set(results) == {"test_good", "test_bad", "test_also_bad"}, \
+    assert set(results) == {"test_good", "test_bad", "test_also_bad"}, (
         "only test_* callables, all of them"
+    )
     assert results["test_good"] is True
     assert results["test_bad"] is False
     assert results["test_also_bad"] is False
@@ -103,6 +108,7 @@ def test_summarize():
 def test_run_suite_on_empty_module():
     class Empty:
         pass
+
     assert solution.run_suite(Empty) == {}
 
 

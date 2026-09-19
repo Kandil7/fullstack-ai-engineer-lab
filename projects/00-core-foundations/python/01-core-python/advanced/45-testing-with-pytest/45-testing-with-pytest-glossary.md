@@ -185,9 +185,7 @@ python -m pytest --cov=. --cov-report=term-missing
 freeze prompt templates and serialization formats.
 **Example**:
 ```python
-assert build_prompt(...) == (
-    "You are a concise assistant.\n\nContext:\n- ..."
-)
+assert build_prompt(...) == ("You are a concise assistant.\n\nContext:\n- ...")
 ```
 **Related**: prompt engineering, regression
 

@@ -54,7 +54,7 @@ Startup gates traffic until the pod is actually warm (e.g. a loaded model).
 ```python
 @app.get("/health/ready")
 def ready():
-    if not all(check_deps()):          # short, cached checks
+    if not all(check_deps()):  # short, cached checks
         return JSONResponse({"failed": [...]}, status_code=503)
     return {"status": "ready"}
 ```

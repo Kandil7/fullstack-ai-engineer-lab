@@ -180,8 +180,8 @@ print(fruits.index("banana", 2))  # 3 (start searching from index 2)
 **Example**:
 ```python
 lst = ["a", "b", "c", "d", "e"]
-print(lst[0])   # a (first)
-print(lst[2])   # c (third)
+print(lst[0])  # a (first)
+print(lst[2])  # c (third)
 print(lst[-1])  # e (last)
 print(lst[-2])  # d (second to last)
 ```
@@ -257,7 +257,7 @@ upper = [word.upper() for word in ["hello", "world"]]
 from array import array
 
 # Create typed array
-arr = array('i', [1, 2, 3, 4, 5])  # 'i' = signed int
+arr = array("i", [1, 2, 3, 4, 5])  # 'i' = signed int
 print(arr)  # array('i', [1, 2, 3, 4, 5])
 
 # arr.append("hello")  # TypeError: integer expected
@@ -273,9 +273,9 @@ print(arr)  # array('i', [1, 2, 3, 4, 5])
 **Example**:
 ```python
 fruits = ["apple", "banana", "cherry"]
-print("apple" in fruits)    # True
-print("mango" in fruits)    # False
-print("mango" not in fruits) # True
+print("apple" in fruits)  # True
+print("mango" in fruits)  # False
+print("mango" not in fruits)  # True
 ```
 
 **Related**: `in`, `not in`, O(n) complexity
@@ -308,9 +308,9 @@ tup = (1, 2, 3)
 **Example**:
 ```python
 lst = [10, 20, 30, 40, 50]
-print(lst[-1])   # 50
-print(lst[-2])   # 40
-print(lst[-5])   # 10
+print(lst[-1])  # 50
+print(lst[-2])  # 40
+print(lst[-5])  # 10
 ```
 
 **Related**: indexing, slicing, zero-based
@@ -323,11 +323,7 @@ print(lst[-5])   # 10
 **Example**:
 ```python
 # 2D matrix
-matrix = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9]
-]
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 print(matrix[0][0])  # 1
 print(matrix[1][2])  # 6
 
@@ -349,11 +345,11 @@ for row in matrix:
 ```python
 fruits = ["apple", "banana", "cherry"]
 last = fruits.pop()
-print(last)    # cherry
+print(last)  # cherry
 print(fruits)  # ['apple', 'banana']
 
 first = fruits.pop(0)
-print(first)   # apple
+print(first)  # apple
 print(fruits)  # ['banana']
 ```
 
@@ -383,7 +379,7 @@ print(numbers)  # [1, 3, 2, 4] — only first 2 removed
 **Example**:
 ```python
 zeros = [0] * 5  # [0, 0, 0, 0, 0]
-ones = [1] * 3   # [1, 1, 1]
+ones = [1] * 3  # [1, 1, 1]
 
 # WARNING: nested list repetition shares references!
 matrix = [[0] * 3] * 3
@@ -408,7 +404,7 @@ print(lst)  # [5, 4, 3, 2, 1]
 # New reversed list (doesn't modify original)
 original = [1, 2, 3, 4, 5]
 reversed_list = original[::-1]
-print(original)    # [1, 2, 3, 4, 5] — unchanged
+print(original)  # [1, 2, 3, 4, 5] — unchanged
 print(reversed_list)  # [5, 4, 3, 2, 1]
 ```
 
@@ -442,11 +438,11 @@ print(original)  # [1, 2, 3] — independent for top-level
 **Example**:
 ```python
 lst = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-print(lst[2:5])    # [2, 3, 4]
-print(lst[:3])     # [0, 1, 2]
-print(lst[7:])     # [7, 8, 9]
-print(lst[::2])    # [0, 2, 4, 6, 8]
-print(lst[::-1])   # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+print(lst[2:5])  # [2, 3, 4]
+print(lst[:3])  # [0, 1, 2]
+print(lst[7:])  # [7, 8, 9]
+print(lst[::2])  # [0, 2, 4, 6, 8]
+print(lst[::-1])  # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 ```
 
 **Related**: indexing, start, stop, step, subsequence
@@ -485,13 +481,13 @@ print(words)  # ['apple', 'banana', 'cherry']
 # Capture first and rest
 first, *rest = [1, 2, 3, 4, 5]
 print(first)  # 1
-print(rest)   # [2, 3, 4, 5]
+print(rest)  # [2, 3, 4, 5]
 
 # Capture first, last, and middle
 first, *middle, last = [1, 2, 3, 4, 5]
-print(first)   # 1
+print(first)  # 1
 print(middle)  # [2, 3, 4]
-print(last)    # 5
+print(last)  # 5
 ```
 
 **Related**: unpacking, `*args`, multiple assignment
@@ -529,6 +525,7 @@ def rotate(lst, n):
     n = n % len(lst)
     return lst[-n:] + lst[:-n]
 
+
 print(rotate([1, 2, 3, 4, 5], 2))  # [4, 5, 1, 2, 3]
 ```
 
@@ -543,6 +540,7 @@ def find_duplicates(lst):
             duplicates.add(item)
         seen.add(item)
     return list(duplicates)
+
 
 print(find_duplicates([1, 2, 3, 2, 4, 3, 5]))  # [2, 3]
 ```

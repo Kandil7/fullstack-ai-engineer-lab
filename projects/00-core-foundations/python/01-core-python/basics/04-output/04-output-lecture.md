@@ -19,7 +19,7 @@ The `print()` function is Python's primary way to output text and data to the co
 
 **Basic syntax:**
 ```python
-print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
+print(*objects, sep=" ", end="\n", file=sys.stdout, flush=False)
 ```
 
 **Parameters:**
@@ -34,7 +34,7 @@ print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)
 **Simple text:**
 ```python
 print("Hello, World!")
-print('This also works')
+print("This also works")
 ```
 
 **Numbers:**
@@ -86,9 +86,9 @@ print(f"Scientific: {1234567:.2e}")  # 1.23e+06
 ```python
 name = "Alice"
 print(f"Left aligned: {name:<10}")  # "Alice     "
-print(f"Right aligned: {name:>10}") # "     Alice"
-print(f"Centered: {name:^10}")      # "  Alice   "
-print(f"Filled: {name:*^10}")       # "**Alice***"
+print(f"Right aligned: {name:>10}")  # "     Alice"
+print(f"Centered: {name:^10}")  # "  Alice   "
+print(f"Filled: {name:*^10}")  # "**Alice***"
 ```
 
 **Integer formatting:**
@@ -97,26 +97,26 @@ number = 1234567
 print(f"With commas: {number:,}")  # 1,234,567
 print(f"With underscores: {number:_}")  # 1_234_567
 print(f"Binary: {42:b}")  # 101010
-print(f"Octal: {42:o}")   # 52
-print(f"Hex: {42:x}")     # 2a
+print(f"Octal: {42:o}")  # 52
+print(f"Hex: {42:x}")  # 2a
 ```
 
 ### 3.5 Special Characters and Escape Sequences
 
 **Common escape sequences:**
 ```python
-print("Line1\nLine2")      # Newline
+print("Line1\nLine2")  # Newline
 print("Column1\tColumn2")  # Tab
-print("Quote: \"Hello\"")  # Double quote
-print("Backslash: \\")     # Backslash
-print("Bell: \a")          # Alert/bell
-print("Backspace: \b")     # Backspace
+print('Quote: "Hello"')  # Double quote
+print("Backslash: \\")  # Backslash
+print("Bell: \a")  # Alert/bell
+print("Backspace: \b")  # Backspace
 ```
 
 **Raw strings (ignore escape sequences):**
 ```python
 print(r"C:\new\folder")  # Prints literal backslashes
-print(r"Line1\nLine2")   # Prints \n literally
+print(r"Line1\nLine2")  # Prints \n literally
 ```
 
 ### 3.6 print() Parameters in Detail
@@ -124,8 +124,8 @@ print(r"Line1\nLine2")   # Prints \n literally
 **Using sep parameter:**
 ```python
 print("2024", "01", "15", sep="-")  # 2024-01-15
-print("a", "b", "c", sep="")        # abc
-print("a", "b", "c", sep=", ")      # a, b, c
+print("a", "b", "c", sep="")  # abc
+print("a", "b", "c", sep=", ")  # a, b, c
 ```
 
 **Using end parameter:**
@@ -195,8 +195,8 @@ print(f"Avogadro: {avogadro:.3e}")  # 6.022e+23
 ```python
 # Escape sequences
 print("Hello\nWorld")  # Newline
-print("Name\tAge")     # Tab
-print("Quote: \"Hi\"") # Quote
+print("Name\tAge")  # Tab
+print('Quote: "Hi"')  # Quote
 
 # Raw strings
 print(r"C:\new\folder")  # Literal backslashes

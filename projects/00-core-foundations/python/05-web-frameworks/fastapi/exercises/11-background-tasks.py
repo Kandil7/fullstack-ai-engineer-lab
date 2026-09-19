@@ -75,9 +75,7 @@ def register_user_background(username: str, email: str):
 @app2.post("/register")
 async def register_user(request: RegisterRequest, background_tasks: BackgroundTasks):
     """Register user - background task handles email, logging."""
-    background_tasks.add_task(
-        register_user_background, request.username, request.email
-    )
+    background_tasks.add_task(register_user_background, request.username, request.email)
     return {"status": "registered", "username": request.username}
 
 

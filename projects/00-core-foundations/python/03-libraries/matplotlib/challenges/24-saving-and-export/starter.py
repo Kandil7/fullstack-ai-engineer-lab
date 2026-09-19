@@ -7,7 +7,8 @@ Fill in the function bodies. Do not modify signatures.
 from __future__ import annotations
 
 import matplotlib
-matplotlib.use("Agg")   # MUST precede pyplot import: headless tests
+
+matplotlib.use("Agg")  # MUST precede pyplot import: headless tests
 
 import matplotlib.pyplot as plt
 

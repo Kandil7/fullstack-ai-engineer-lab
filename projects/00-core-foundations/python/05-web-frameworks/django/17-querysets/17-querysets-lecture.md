@@ -58,14 +58,14 @@ Every app must be registered in INSTALLED_APPS:
 ```python
 # WRONG - app won't be recognized
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    "django.contrib.admin",
     # 'blog' is missing!
 ]
 
 # RIGHT - app is registered
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'blog.apps.BlogConfig',
+    "django.contrib.admin",
+    "blog.apps.BlogConfig",
 ]
 ```
 

@@ -18,6 +18,7 @@ Answers with full explanations and distractor analysis at the end.
 ```python
 import pandas as pd
 import polars as pl
+
 pdf = pd.DataFrame({"i": [1, 2], "s": ["a", "b"]})
 print(pl.from_pandas(pdf).dtypes)
 ```
@@ -38,6 +39,7 @@ print(pl.from_pandas(pdf).dtypes)
 ```python
 import pandas as pd
 import polars as pl
+
 pdf = pd.DataFrame({"f": [1.5, float("nan")]})
 print(pl.from_pandas(pdf)["f"].to_list())
 ```
@@ -58,6 +60,7 @@ print(pl.from_pandas(pdf)["f"].to_list())
 ```python
 import pandas as pd
 import polars as pl
+
 pdf = pd.DataFrame({"i": [1, 2], "s": ["a", "b"]})
 print(pl.from_pandas(pdf)[["i", "s"]].columns)
 ```
@@ -82,11 +85,9 @@ print(pl.from_pandas(pdf)[["i", "s"]].columns)
 ```python
 import pandas as pd
 import polars as pl
+
 pdf = pd.DataFrame({"g": ["x", "y", "x"], "v": [1, 2, 3]})
-out = (pl.from_pandas(pdf)
-       .group_by("g")
-       .agg(pl.col("v").sum().alias("sum_v"))
-       .sort("g"))
+out = pl.from_pandas(pdf).group_by("g").agg(pl.col("v").sum().alias("sum_v")).sort("g")
 print(out.rows())
 ```
 
@@ -115,6 +116,7 @@ the Polars column is:
 ```python
 import pandas as pd
 import polars as pl
+
 pdf = pd.DataFrame({"a": [3, 1, 2]})
 out = pl.from_pandas(pdf).sort("a")
 print(out["a"].to_list())
@@ -137,6 +139,7 @@ print(type(out).__name__)
 ```python
 import pandas as pd
 import polars as pl
+
 pdf = pd.DataFrame({"s": ["a", "b"]})
 back = pl.from_pandas(pdf).to_pandas()
 print(back["s"].dtype)
@@ -181,6 +184,7 @@ workflow?
 ```python
 import pandas as pd
 import polars as pl
+
 pdf = pd.DataFrame({"v": [1.0, 2.0, 3.0]})
 print(pl.from_pandas(pdf).select(pl.col("v").mean()).item())
 ```

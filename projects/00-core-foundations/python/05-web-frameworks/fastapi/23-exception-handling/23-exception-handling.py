@@ -19,6 +19,7 @@ app = FastAPI(title="Exception Handling in FastAPI")
 # ----- Custom Exception Classes -----
 class AppError(Exception):
     """Base application error."""
+
     def __init__(self, message: str, status_code: int = 500, error_code: str = "UNKNOWN"):
         self.message = message
         self.status_code = status_code
@@ -27,6 +28,7 @@ class AppError(Exception):
 
 class NotFoundError(AppError):
     """Resource not found."""
+
     def __init__(self, resource: str, resource_id: int | str):
         super().__init__(
             message=f"{resource} with id '{resource_id}' not found",
@@ -37,12 +39,14 @@ class NotFoundError(AppError):
 
 class ValidationError_(AppError):
     """Business validation error."""
+
     def __init__(self, message: str):
         super().__init__(message=message, status_code=422, error_code="VALIDATION_ERROR")
 
 
 class RateLimitError(AppError):
     """Rate limit exceeded."""
+
     def __init__(self):
         super().__init__(
             message="Rate limit exceeded. Try again later.",
@@ -185,9 +189,7 @@ def demo_errors(error_type: str):
         "not-found": lambda: (_ for _ in ()).throw(NotFoundError("Item", 42)),
         "validation": lambda: (_ for _ in ()).throw(ValidationError_("Invalid input")),
         "rate-limit": lambda: (_ for _ in ()).throw(RateLimitError()),
-        "http": lambda: (_ for _ in ()).throw(
-            HTTPException(status_code=403, detail="Forbidden")
-        ),
+        "http": lambda: (_ for _ in ()).throw(HTTPException(status_code=403, detail="Forbidden")),
         "division": lambda: 1 / 0,
     }
 
@@ -230,6 +232,7 @@ Testing with curl:
     curl http://127.0.0.1:8000/rate-limited/
     curl http://127.0.0.1:8000/nonexistent  # Custom 404 handler
 """
+
 
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
@@ -287,6 +290,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

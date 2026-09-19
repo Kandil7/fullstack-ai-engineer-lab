@@ -175,6 +175,7 @@ D) To configure session duration
 ```python
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup code
@@ -182,6 +183,7 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown code
     await close_database_connection()
+
 
 app = FastAPI(lifespan=lifespan)
 ```
@@ -306,9 +308,11 @@ D) Streaming is not supported
 ```python
 from fastapi.responses import StreamingResponse
 
+
 async def generate():
     for i in range(100):
         yield f"data: {i}\n\n"
+
 
 @app.get("/stream")
 async def stream():

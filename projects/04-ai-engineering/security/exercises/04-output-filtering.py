@@ -38,8 +38,7 @@ from typing import Optional, Callable
 from collections import defaultdict
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 logger = logging.getLogger("output_filtering")
 
@@ -48,8 +47,10 @@ logger = logging.getLogger("output_filtering")
 # Section 1: Core Types
 # =============================================================================
 
+
 class FilterCategory(Enum):
     """Categories of output filtering."""
+
     PII = auto()
     TOXICITY = auto()
     HALLUCINATION = auto()
@@ -61,6 +62,7 @@ class FilterCategory(Enum):
 
 class SeverityLevel(Enum):
     """Severity levels for filter results."""
+
     NONE = 0
     LOW = 1
     MEDIUM = 2
@@ -71,6 +73,7 @@ class SeverityLevel(Enum):
 @dataclass
 class FilterResult:
     """Result of a single output filter check."""
+
     category: FilterCategory
     passed: bool
     severity: SeverityLevel
@@ -83,6 +86,7 @@ class FilterResult:
 @dataclass
 class OutputVerdict:
     """Final verdict combining all filter results."""
+
     content_id: str
     is_safe: bool
     overall_score: float  # 0.0 - 1.0 (1.0 = perfect)
@@ -95,6 +99,7 @@ class OutputVerdict:
 # =============================================================================
 # Section 2: PII Detection & Masking
 # =============================================================================
+
 
 class PIIFilter:
     """
@@ -125,7 +130,7 @@ class PIIFilter:
         },
         "ip_address": {
             "pattern": r"\b(?:\d{1,3}\.){3}\d{1,3}\b",
-            "mask_fn": lambda m: m[:m.rfind(".")] + ".XXX",
+            "mask_fn": lambda m: m[: m.rfind(".")] + ".XXX",
             "severity": SeverityLevel.LOW,
         },
         "date_of_birth": {
@@ -169,15 +174,19 @@ class PIIFilter:
                     else:
                         masked_items.append(match)
 
-                results.append(FilterResult(
-                    category=FilterCategory.PII,
-                    passed=False,
-                    severity=pattern_info["severity"],
-                    confidence=0.9,
-                    details=f"Detected {len(matches)} {pii_type} instance(s)",
-                    flagged_items=masked_items[:5],
-                    recommendations=[f"Mask or redact {pii_type} data before display"],
-                ))
+                results.append(
+                    FilterResult(
+                        category=FilterCategory.PII,
+                        passed=False,
+                        severity=pattern_info["severity"],
+                        confidence=0.9,
+                        details=f"Detected {len(matches)} {pii_type} instance(s)",
+                        flagged_items=masked_items[:5],
+                        recommendations=[
+                            f"Mask or redact {pii_type} data before display"
+                        ],
+                    )
+                )
 
         return results
 
@@ -201,6 +210,7 @@ class PIIFilter:
 # =============================================================================
 # Section 3: Toxicity Detection
 # =============================================================================
+
 
 class ToxicityFilter:
     """
@@ -253,18 +263,21 @@ class ToxicityFilter:
 
             if matches:
                 severity = self.severity_map.get(category, SeverityLevel.MEDIUM)
-                results.append(FilterResult(
-                    category=FilterCategory.TOXICITY,
-                    passed=severity.value < self.severity_threshold.value,
-                    severity=severity,
-                    confidence=min(0.5 + len(matches) * 0.15, 0.95),
-                    details=f"Toxic content detected: {category}",
-                    flagged_items=[str(m)[:50] for m in matches[:5]],
-                    recommendations=[
-                        f"Consider rephrasing to remove {category}" if severity.value < SeverityLevel.HIGH.value
-                        else f"Block content containing {category}"
-                    ],
-                ))
+                results.append(
+                    FilterResult(
+                        category=FilterCategory.TOXICITY,
+                        passed=severity.value < self.severity_threshold.value,
+                        severity=severity,
+                        confidence=min(0.5 + len(matches) * 0.15, 0.95),
+                        details=f"Toxic content detected: {category}",
+                        flagged_items=[str(m)[:50] for m in matches[:5]],
+                        recommendations=[
+                            f"Consider rephrasing to remove {category}"
+                            if severity.value < SeverityLevel.HIGH.value
+                            else f"Block content containing {category}"
+                        ],
+                    )
+                )
 
         return results
 
@@ -273,9 +286,11 @@ class ToxicityFilter:
 # Section 4: Hallucination Detection
 # =============================================================================
 
+
 @dataclass
 class SourceClaim:
     """A factual claim that can be verified against a source."""
+
     claim: str
     source_text: str
     confidence: float = 0.0
@@ -327,7 +342,11 @@ class HallucinationDetector:
 
         score = supported_count / len(claims)
         passed = score >= 0.5
-        severity = SeverityLevel.NONE if score >= 0.8 else (SeverityLevel.LOW if score >= 0.5 else SeverityLevel.MEDIUM)
+        severity = (
+            SeverityLevel.NONE
+            if score >= 0.8
+            else (SeverityLevel.LOW if score >= 0.5 else SeverityLevel.MEDIUM)
+        )
 
         return FilterResult(
             category=FilterCategory.HALLUCINATION,
@@ -336,7 +355,9 @@ class HallucinationDetector:
             confidence=score,
             details=f"Hallucination score: {score:.2f} ({supported_count}/{len(claims)} claims supported)",
             flagged_items=unsupported_claims[:5],
-            recommendations=["Verify claims against source material"] if not passed else [],
+            recommendations=["Verify claims against source material"]
+            if not passed
+            else [],
         )
 
     def _extract_claims(self, text: str) -> list[str]:
@@ -349,7 +370,7 @@ class HallucinationDetector:
             r"(?i)(has|have|had)\s+(over|more\s+than|about|approximately|\d+)",
             r"(?i)(according\s+to|based\s+on|research\s+(shows|indicates|suggests))",
             r"\d{4}",  # Years
-            r"\d+%",   # Percentages
+            r"\d+%",  # Percentages
         ]
         for sentence in sentences:
             sentence = sentence.strip()
@@ -365,6 +386,7 @@ class HallucinationDetector:
 # =============================================================================
 # Section 5: Groundedness Checker
 # =============================================================================
+
 
 class GroundednessChecker:
     """
@@ -440,9 +462,13 @@ class GroundednessChecker:
 
         recommendations = []
         if unsupported:
-            recommendations.append(f"Remove or qualify {len(unsupported)} unsupported assertion(s)")
+            recommendations.append(
+                f"Remove or qualify {len(unsupported)} unsupported assertion(s)"
+            )
         if grounding_ratio < 0.4:
-            recommendations.append("Rewrite response to more closely reference source material")
+            recommendations.append(
+                "Rewrite response to more closely reference source material"
+            )
 
         return FilterResult(
             category=FilterCategory.GROUNDEDNESS,
@@ -471,6 +497,7 @@ class GroundednessChecker:
 # =============================================================================
 # Section 6: Output Quality Scorer
 # =============================================================================
+
 
 class OutputQualityScorer:
     """
@@ -515,8 +542,8 @@ class OutputQualityScorer:
         # Clarity score (sentence structure, readability)
         sentences = re.split(r"[.!?]+", response)
         sentences = [s.strip() for s in sentences if s.strip()]
-        avg_sentence_length = (
-            sum(len(s.split()) for s in sentences) / max(len(sentences), 1)
+        avg_sentence_length = sum(len(s.split()) for s in sentences) / max(
+            len(sentences), 1
         )
         # Ideal sentence length: 15-25 words
         if 10 <= avg_sentence_length <= 30:
@@ -543,7 +570,9 @@ class OutputQualityScorer:
         # Citation quality (if context provided)
         if context:
             context_tokens = set(re.findall(r"\b\w{3,}\b", context.lower()))
-            citation_overlap = len(response_tokens & context_tokens) / max(len(response_tokens), 1)
+            citation_overlap = len(response_tokens & context_tokens) / max(
+                len(response_tokens), 1
+            )
             scores["citation_quality"] = min(citation_overlap * 1.5, 1.0)
 
         # Calculate overall score
@@ -554,9 +583,7 @@ class OutputQualityScorer:
             "coherence": 0.2,
             "citation_quality": 0.1,
         }
-        overall = sum(
-            scores.get(k, 0) * w for k, w in weights.items()
-        )
+        overall = sum(scores.get(k, 0) * w for k, w in weights.items())
         overall = min(overall, 1.0)
 
         # Determine severity
@@ -585,10 +612,10 @@ class OutputQualityScorer:
             passed=passed,
             severity=severity,
             confidence=0.7,
-            details=f"Quality score: {overall:.2f} (relevance={scores.get('relevance',0):.2f}, "
-                    f"completeness={scores.get('completeness',0):.2f}, "
-                    f"clarity={scores.get('clarity',0):.2f}, "
-                    f"coherence={scores.get('coherence',0):.2f})",
+            details=f"Quality score: {overall:.2f} (relevance={scores.get('relevance', 0):.2f}, "
+            f"completeness={scores.get('completeness', 0):.2f}, "
+            f"clarity={scores.get('clarity', 0):.2f}, "
+            f"coherence={scores.get('coherence', 0):.2f})",
             flagged_items=[f"{k}: {v:.2f}" for k, v in scores.items() if v < 0.5],
             recommendations=recommendations,
         )
@@ -597,6 +624,7 @@ class OutputQualityScorer:
 # =============================================================================
 # Section 7: Citation Verifier
 # =============================================================================
+
 
 class CitationVerifier:
     """
@@ -610,7 +638,9 @@ class CitationVerifier:
 
     CITATION_PATTERNS = {
         "bracket_number": re.compile(r"\[(\d+(?:,\s*\d+)*)\]"),
-        "author_year": re.compile(r"\(([A-Z][a-z]+(?:\s+(?:et\s+al\.?|and|&)\s+[A-Z][a-z]+)*),?\s+(\d{4})\)"),
+        "author_year": re.compile(
+            r"\(([A-Z][a-z]+(?:\s+(?:et\s+al\.?|and|&)\s+[A-Z][a-z]+)*),?\s+(\d{4})\)"
+        ),
         "footnote": re.compile(r"\^(\d+)"),
         "url": re.compile(r"https?://[^\s<>\")]+"),
         "doi": re.compile(r"(?:doi:|DOI:)\s*(10\.\d{4,}/[^\s]+)"),
@@ -632,7 +662,9 @@ class CitationVerifier:
                 citations_found.append({"type": cite_type, "ref": cite_str})
 
         # Check for references without citations and vice versa
-        has_references_section = bool(re.search(r"(?i)(references?|bibliography|works?\s+cited)", text))
+        has_references_section = bool(
+            re.search(r"(?i)(references?|bibliography|works?\s+cited)", text)
+        )
         has_citations_in_text = len(citations_found) > 0
 
         if has_references_section and not has_citations_in_text:
@@ -649,7 +681,9 @@ class CitationVerifier:
         # Check citation count vs text length
         word_count = len(text.split())
         if word_count > 200 and len(citations_found) < 2:
-            issues.append(f"Long text ({word_count} words) with few citations ({len(citations_found)})")
+            issues.append(
+                f"Long text ({word_count} words) with few citations ({len(citations_found)})"
+            )
 
         severity = SeverityLevel.NONE if not issues else SeverityLevel.LOW
         if len(issues) > 2:
@@ -669,6 +703,7 @@ class CitationVerifier:
 # =============================================================================
 # Section 8: Output Filtering Pipeline
 # =============================================================================
+
 
 class OutputFilterPipeline:
     """
@@ -755,7 +790,9 @@ class OutputFilterPipeline:
         # Calculate overall verdict
         any_critical = any(r.severity == SeverityLevel.CRITICAL for r in all_results)
         any_high = any(r.severity == SeverityLevel.HIGH for r in all_results)
-        requires_review = any(r.severity.value >= SeverityLevel.MEDIUM.value for r in all_results)
+        requires_review = any(
+            r.severity.value >= SeverityLevel.MEDIUM.value for r in all_results
+        )
 
         is_safe = not any_critical and not any_high
 
@@ -774,15 +811,23 @@ class OutputFilterPipeline:
                     quality_result_score = float(match.group(1))
 
         overall_score = (
-            (sum(quality_scores) / max(len(quality_scores), 1)) * 0.6 +
-            quality_result_score * 0.4
-        ) if quality_scores else quality_result_score
+            (
+                (sum(quality_scores) / max(len(quality_scores), 1)) * 0.6
+                + quality_result_score * 0.4
+            )
+            if quality_scores
+            else quality_result_score
+        )
 
         explanation_parts = []
         if pii_results:
-            explanation_parts.append(f"PII detected and {'masked' if self.pii_filter.mask else 'flagged'}")
+            explanation_parts.append(
+                f"PII detected and {'masked' if self.pii_filter.mask else 'flagged'}"
+            )
         if toxicity_results:
-            explanation_parts.append(f"Toxicity detected in {len(toxicity_results)} category(ies)")
+            explanation_parts.append(
+                f"Toxicity detected in {len(toxicity_results)} category(ies)"
+            )
         if any(r.category == FilterCategory.HALLUCINATION for r in all_results):
             explanation_parts.append("Potential hallucination detected")
         if any(r.category == FilterCategory.GROUNDEDNESS for r in all_results):
@@ -810,6 +855,7 @@ class OutputFilterPipeline:
 # Section 9: Demonstration & Testing
 # =============================================================================
 
+
 def demo_pii_detection():
     """Demonstrate PII detection and masking."""
     print("\n" + "=" * 72)
@@ -827,8 +873,8 @@ def demo_pii_detection():
 
     for i, text in enumerate(test_cases, 1):
         filtered, results = pii_filter.filter_text(text)
-        print(f"\n  [{i}] Original: \"{text[:60]}{'...' if len(text) > 60 else ''}\"")
-        print(f"      Filtered: \"{filtered[:60]}{'...' if len(filtered) > 60 else ''}\"")
+        print(f'\n  [{i}] Original: "{text[:60]}{"..." if len(text) > 60 else ""}"')
+        print(f'      Filtered: "{filtered[:60]}{"..." if len(filtered) > 60 else ""}"')
         if results:
             for r in results:
                 print(f"      [!] {r.details}")
@@ -854,7 +900,7 @@ def demo_toxicity_detection():
 
     for i, text in enumerate(test_cases, 1):
         results = toxicity_filter.check(text)
-        print(f"\n  [{i}] \"{text[:60]}{'...' if len(text) > 60 else ''}\"")
+        print(f'\n  [{i}] "{text[:60]}{"..." if len(text) > 60 else ""}"')
         if results:
             for r in results:
                 print(f"      [!] {r.severity.name}: {r.details}")
@@ -882,15 +928,17 @@ def demo_hallucination_detection():
     test_responses = [
         ("Python was created by Guido van Rossum in 1991.", "Supported claim"),
         ("Python was created by James Gosling in 1995.", "Unsupported claim"),
-        ("Python supports multiple paradigms and was created by Guido van Rossum.",
-         "Mixed: supported + unsupported"),
+        (
+            "Python supports multiple paradigms and was created by Guido van Rossum.",
+            "Mixed: supported + unsupported",
+        ),
     ]
 
     for response, description in test_responses:
         result = detector.check(response, source)
         status = "PASS" if result.passed else "FAIL"
         print(f"\n  [{status}] {description}")
-        print(f"  Response: \"{response}\"")
+        print(f'  Response: "{response}"')
         print(f"  Score: {result.confidence:.2f} | {result.details}")
 
 
@@ -909,12 +957,18 @@ def demo_groundedness_checking():
     )
 
     test_responses = [
-        ("The Eiffel Tower is in Paris, France and was built for the 1889 Worlds Fair.",
-         "Well-grounded response"),
-        ("The Eiffel Tower was built in 1889. The Great Wall of China is very long.",
-         "Partially grounded with irrelevant info"),
-        ("The Eiffel Tower was built by Leonardo da Vinci in 1503 for the French Revolution.",
-         "Poorly grounded with false claims"),
+        (
+            "The Eiffel Tower is in Paris, France and was built for the 1889 Worlds Fair.",
+            "Well-grounded response",
+        ),
+        (
+            "The Eiffel Tower was built in 1889. The Great Wall of China is very long.",
+            "Partially grounded with irrelevant info",
+        ),
+        (
+            "The Eiffel Tower was built by Leonardo da Vinci in 1503 for the French Revolution.",
+            "Poorly grounded with false claims",
+        ),
     ]
 
     for response, description in test_responses:
@@ -937,15 +991,18 @@ def demo_quality_scoring():
 
     query = "What are the benefits of exercise?"
     test_responses = [
-        ("Exercise improves cardiovascular health, strengthens muscles, "
-         "boosts mental health, and helps maintain a healthy weight. "
-         "Regular physical activity reduces the risk of chronic diseases "
-         "such as diabetes and heart disease.",
-         "High-quality response"),
-        ("It is good.",
-         "Low-quality: too brief"),
-        ("The weather is nice today. I like pizza. Exercise exists.",
-         "Low-quality: off-topic"),
+        (
+            "Exercise improves cardiovascular health, strengthens muscles, "
+            "boosts mental health, and helps maintain a healthy weight. "
+            "Regular physical activity reduces the risk of chronic diseases "
+            "such as diabetes and heart disease.",
+            "High-quality response",
+        ),
+        ("It is good.", "Low-quality: too brief"),
+        (
+            "The weather is nice today. I like pizza. Exercise exists.",
+            "Low-quality: off-topic",
+        ),
     ]
 
     for response, description in test_responses:
@@ -976,19 +1033,19 @@ def demo_output_pipeline():
             "Tell me about Acme Corp",
             "Acme Corp was founded in 2010 by John Smith. Contact John at john@acmecorp.com.",
             context,
-            "Response with PII"
+            "Response with PII",
         ),
         (
             "What is Acme Corp?",
             "Acme Corp is a terrible company with awful employees.",
             context,
-            "Toxic response"
+            "Toxic response",
         ),
         (
             "Acme Corp details",
             "Acme Corp was founded in 2010. It has 500 employees and $50 million in revenue.",
             context,
-            "Grounded response"
+            "Grounded response",
         ),
     ]
 
@@ -996,7 +1053,7 @@ def demo_output_pipeline():
         verdict = pipeline.filter(query, response, ctx)
         status = "[OK] SAFE" if verdict.is_safe else "[X] UNSAFE"
         print(f"\n  [{status}] {description}")
-        print(f"  Query: \"{query}\"")
+        print(f'  Query: "{query}"')
         print(f"  Score: {verdict.overall_score:.2f}")
         print(f"  Explanation: {verdict.explanation}")
         if verdict.requires_human_review:
@@ -1006,7 +1063,9 @@ def demo_output_pipeline():
     print(f"\n  Pipeline Statistics:")
     print(f"    Total decisions: {len(pipeline.decision_log)}")
     print(f"    Safe: {sum(1 for v in pipeline.decision_log if v.is_safe)}")
-    print(f"    Requiring review: {sum(1 for v in pipeline.decision_log if v.requires_human_review)}")
+    print(
+        f"    Requiring review: {sum(1 for v in pipeline.decision_log if v.requires_human_review)}"
+    )
 
 
 # =============================================================================

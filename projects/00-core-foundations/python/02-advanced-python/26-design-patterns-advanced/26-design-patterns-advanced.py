@@ -30,7 +30,7 @@ from abc import ABC, abstractmethod
 from typing import Protocol
 
 random.seed(42)
-os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
+os.environ.setdefault("MPLBACKEND", "Agg")  # never open a GUI window
 
 # ============================================================
 # 1. Dependency Injection: Testability First
@@ -39,6 +39,7 @@ os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
 # *injected*. Production passes the real one; tests pass a fake. The
 # service never knows the difference -- and never makes network calls
 # in a test.
+
 
 class LLMClient(Protocol):
     """The contract every LLM client (real or fake) must satisfy."""
@@ -92,6 +93,7 @@ def demo_di() -> FakeLLMClient:
 # ============================================================
 # The service talks to a Repository protocol; swap SQLite for Postgres
 # or for an in-memory fake without touching the service.
+
 
 class UserRecord:
     """A plain data record."""
@@ -156,6 +158,7 @@ def demo_repository() -> UserService:
 # raises, the whole batch rolls back. This is the shape of a DB
 # transaction -- and of a batch job that must be all-or-nothing.
 
+
 class UnitOfWork:
     """Track writes; commit() persists, rollback() discards."""
 
@@ -214,6 +217,7 @@ def demo_unit_of_work() -> None:
 # dispatch on the *type* of the first argument -- a runtime registry of
 # functions. Choose Strategy when the variant carries state or behavior
 # beyond one function; choose singledispatch for stateless one-liners.
+
 
 class SummarizeStrategy(ABC):
     """Strategy: a family of interchangeable summarizers."""
@@ -274,6 +278,7 @@ def demo_strategy_vs_dispatch() -> None:
 # Qdrant and Chroma expose different method names and shapes. An Adapter
 # per vendor makes both satisfy the VectorStore protocol, so the pipeline
 # code is vendor-agnostic. Complexity: O(1) per call, thin wrapper.
+
 
 class VectorStore(Protocol):
     """The interface the application actually uses."""
@@ -339,6 +344,7 @@ def demo_adapter() -> None:
 # Each handler either handles the request or passes it on. This is the
 # shape of middleware stacks: auth -> rate limit -> logging -> the call.
 
+
 class Handler(ABC):
     """A middleware link."""
 
@@ -359,7 +365,7 @@ class AuthHandler(Handler):
     """Rejects requests without a token."""
 
     def handle(self, request: str) -> str:
-        if "token=" not in request:      # "no-token" contains 'token'!
+        if "token=" not in request:  # "no-token" contains 'token'!
             return "DENIED:missing-token"
         return super().handle(request)
 
@@ -410,6 +416,7 @@ def demo_chain() -> None:
 # Operations become objects that know how to do AND undo themselves.
 # The editor keeps a history; Ctrl+Z pops the last command and undoes it.
 
+
 class TextBuffer:
     """A tiny mutable document."""
 
@@ -435,7 +442,7 @@ class InsertCommand(Command):
         self._text = text
 
     def execute(self, buf: TextBuffer) -> None:
-        buf.text = buf.text[: self._pos] + self._text + buf.text[self._pos:]
+        buf.text = buf.text[: self._pos] + self._text + buf.text[self._pos :]
 
     def undo(self, buf: TextBuffer) -> None:
         end = self._pos + len(self._text)
@@ -451,11 +458,11 @@ class DeleteCommand(Command):
         self._removed = ""
 
     def execute(self, buf: TextBuffer) -> None:
-        self._removed = buf.text[self._pos: self._pos + self._length]
-        buf.text = buf.text[: self._pos] + buf.text[self._pos + self._length:]
+        self._removed = buf.text[self._pos : self._pos + self._length]
+        buf.text = buf.text[: self._pos] + buf.text[self._pos + self._length :]
 
     def undo(self, buf: TextBuffer) -> None:
-        buf.text = buf.text[: self._pos] + self._removed + buf.text[self._pos:]
+        buf.text = buf.text[: self._pos] + self._removed + buf.text[self._pos :]
 
 
 class Editor:
@@ -477,8 +484,8 @@ def demo_command() -> TextBuffer:
     """Insert, delete, then undo both operations."""
     buf = TextBuffer("hello world")
     editor = Editor()
-    editor.apply(InsertCommand(0, "say "), buf)   # "say hello world"
-    editor.apply(DeleteCommand(4, 6), buf)        # delete "hello " -> "say world"
+    editor.apply(InsertCommand(0, "say "), buf)  # "say hello world"
+    editor.apply(DeleteCommand(4, 6), buf)  # delete "hello " -> "say world"
     print(f"  after commands: {buf.text!r}")
     editor.undo(buf)
     print(f"  after one undo: {buf.text!r}")
@@ -497,11 +504,11 @@ def demo_command() -> TextBuffer:
 # A Builder separates *how* a complex object is assembled from the object
 # itself. Fluent methods make the assembly read like a sentence.
 
+
 class InferenceConfig:
     """An immutable-ish configuration assembled by its Builder."""
 
-    def __init__(self, model: str, temperature: float, max_tokens: int,
-                 timeout: float) -> None:
+    def __init__(self, model: str, temperature: float, max_tokens: int, timeout: float) -> None:
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
@@ -532,19 +539,19 @@ class InferenceConfigBuilder:
         return self
 
     def build(self) -> InferenceConfig:
-        return InferenceConfig(self._model, self._temperature,
-                               self._max_tokens, self._timeout)
+        return InferenceConfig(self._model, self._temperature, self._max_tokens, self._timeout)
 
 
 def demo_builder() -> InferenceConfig:
     """Assemble a config without a 4-argument constructor call."""
-    cfg = (InferenceConfigBuilder()
-           .with_model("llama-3.1-70b")
-           .with_temperature(0.2)
-           .with_max_tokens(1024)
-           .build())
-    print(f"  built config: model={cfg.model}, temp={cfg.temperature}, "
-          f"max={cfg.max_tokens}")
+    cfg = (
+        InferenceConfigBuilder()
+        .with_model("llama-3.1-70b")
+        .with_temperature(0.2)
+        .with_max_tokens(1024)
+        .build()
+    )
+    print(f"  built config: model={cfg.model}, temp={cfg.temperature}, max={cfg.max_tokens}")
     return cfg
     # Output:
     #   built config: model=llama-3.1-70b, temp=0.2, max=1024
@@ -556,6 +563,7 @@ def demo_builder() -> InferenceConfig:
 # Every subclass is auto-registered at class creation time -- no manual
 # list, no decorator bookkeeping. Agent tool frameworks use exactly this
 # to discover tools. Complexity: O(1) per registration.
+
 
 class Tool(ABC):
     """Base tool: subclasses register themselves by name."""
@@ -628,20 +636,20 @@ def _verify() -> None:
     # 1. DI: a fake client is used; the real one is never touched.
     fake = FakeLLMClient()
     svc = Summarizer(fake)
-    assert svc.summarize("article") == "FAKE:summa", \
+    assert svc.summarize("article") == "FAKE:summa", (
         "DI must route calls through the injected client"
+    )
     assert len(fake.calls) == 1, "injected fake must record the call"
-    assert fake.calls[0] == "summarize: article", \
-        "fake must receive the exact prompt"
+    assert fake.calls[0] == "summarize: article", "fake must receive the exact prompt"
 
     # 2. Repository: interface-backed storage works without a database.
     repo = InMemoryUserRepository()
     repo.save(UserRecord(1, "ada"))
     svc = UserService(repo)
-    assert svc.rename(1, "ada lovelace") == "ada lovelace", \
+    assert svc.rename(1, "ada lovelace") == "ada lovelace", (
         "service must rename through the repository"
-    assert repo.get(1).name == "ada lovelace", \
-        "rename must persist in the repository"
+    )
+    assert repo.get(1).name == "ada lovelace", "rename must persist in the repository"
 
     # 3. Unit of Work: a failing batch rolls back everything.
     repo = InMemoryUserRepository()
@@ -652,28 +660,24 @@ def _verify() -> None:
             raise RuntimeError("boom")
     except RuntimeError:
         pass
-    assert repo.get(2) is None, \
-        "unit of work must roll back writes on failure"
+    assert repo.get(2) is None, "unit of work must roll back writes on failure"
     assert repo.get(1) is not None, "rollback must keep prior committed state"
 
     # 4. Adapter: two incompatible vendor APIs become interchangeable.
     qdrant_out = run_pipeline(QdrantAdapter(QdrantStore()), "cat")
     chroma_out = run_pipeline(ChromaAdapter(ChromaStore()), "cat")
-    assert qdrant_out == chroma_out, \
-        "adapters must make both vendors produce identical results"
-    assert len(qdrant_out) == 2 and len(chroma_out) == 2, \
-        "adapter output must respect top_k"
+    assert qdrant_out == chroma_out, "adapters must make both vendors produce identical results"
+    assert len(qdrant_out) == 2 and len(chroma_out) == 2, "adapter output must respect top_k"
 
     # 5. Chain of Responsibility: each link runs in order, gates work.
     logger = LoggingHandler()
     chain = AuthHandler()
     chain.set_next(RateLimitHandler(2)).set_next(logger)
-    assert chain.handle("no-token") == "DENIED:missing-token", \
+    assert chain.handle("no-token") == "DENIED:missing-token", (
         "auth must reject requests without a token"
-    assert chain.handle("ok token=1") == "processed", \
-        "authorized request must reach the processor"
-    assert logger.seen == ["ok token=1"], \
-        "logging handler must see only requests that passed auth"
+    )
+    assert chain.handle("ok token=1") == "processed", "authorized request must reach the processor"
+    assert logger.seen == ["ok token=1"], "logging handler must see only requests that passed auth"
 
     # 6. Command: undo restores the exact previous state.
     buf = TextBuffer("hello world")
@@ -687,13 +691,16 @@ def _verify() -> None:
     assert buf.text == "hello world", "second undo must restore the original"
 
     # 7. Builder: fluent assembly + validation.
-    cfg = (InferenceConfigBuilder()
-           .with_model("llama-3.1-70b")
-           .with_temperature(0.2)
-           .with_max_tokens(1024)
-           .build())
-    assert cfg.model == "llama-3.1-70b" and cfg.max_tokens == 1024, \
+    cfg = (
+        InferenceConfigBuilder()
+        .with_model("llama-3.1-70b")
+        .with_temperature(0.2)
+        .with_max_tokens(1024)
+        .build()
+    )
+    assert cfg.model == "llama-3.1-70b" and cfg.max_tokens == 1024, (
         "builder must carry every fluent step into the config"
+    )
     try:
         InferenceConfigBuilder().with_temperature(3.0)
         bad_temp = False
@@ -702,19 +709,23 @@ def _verify() -> None:
     assert bad_temp, "builder must reject out-of-range temperatures"
 
     # 8. Strategy and singledispatch both dispatch correctly.
-    assert ExtractStrategy().summarize("A. B.", 5) == "A.", \
+    assert ExtractStrategy().summarize("A. B.", 5) == "A.", (
         "extract strategy must keep the first sentence"
-    assert TruncateStrategy().summarize("hello world", 5) == "hello...", \
+    )
+    assert TruncateStrategy().summarize("hello world", 5) == "hello...", (
         "truncate strategy must cut to max_len"
+    )
     assert score([1, 2]) == "list:2", "singledispatch must route lists"
     assert score({"a": 1}) == "dict:1", "singledispatch must route dicts"
     assert score("hi") == "generic:hi", "singledispatch must use the default"
 
     # 9. Registry: subclasses are discovered, factory constructs by name.
-    assert "search" in Tool._registry and "embed" in Tool._registry, \
+    assert "search" in Tool._registry and "embed" in Tool._registry, (
         "__init_subclass__ must auto-register both tools"
-    assert isinstance(Tool.create("search"), SearchTool), \
+    )
+    assert isinstance(Tool.create("search"), SearchTool), (
         "factory must build the right subclass by name"
+    )
 
     print("\n[OK] 26-design-patterns-advanced: all checks passed")
 

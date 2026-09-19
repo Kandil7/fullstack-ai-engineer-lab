@@ -26,8 +26,8 @@ from dataclasses import dataclass
 # 1. When Fine-Tuning Wins (and When It Doesn't)
 # ============================================================
 
-def ft_decision(task_kind: str, facts_change: bool,
-                style_required: bool) -> str:
+
+def ft_decision(task_kind: str, facts_change: bool, style_required: bool) -> str:
     if facts_change:
         return "RAG: facts change; fine-tuning bakes in stale knowledge"
     if style_required and task_kind in ("format", "style", "domain_language"):
@@ -39,8 +39,8 @@ def ft_decision(task_kind: str, facts_change: bool,
 
 # Example 1: the decision matrix
 cases = [
-    ("format", False, True),   # JSON extraction -> fine-tune
-    ("qa", True, False),       # changing facts -> RAG
+    ("format", False, True),  # JSON extraction -> fine-tune
+    ("qa", True, False),  # changing facts -> RAG
     ("simple_instruction", False, False),  # trivial -> prompt
 ]
 print("Example 1: fine-tune vs RAG vs prompt")
@@ -56,6 +56,7 @@ assert ft_decision("simple_instruction", False, False).startswith("PROMPT")
 # The SFT format: one {"messages": [...]} per line. Quality beats
 # quantity: 1000 clean, deduplicated examples beat 100k scraped ones.
 
+
 @dataclass
 class SFTExample:
     system: str
@@ -63,21 +64,25 @@ class SFTExample:
     assistant: str
 
     def to_jsonl(self) -> str:
-        return json.dumps({
-            "messages": [
-                {"role": "system", "content": self.system},
-                {"role": "user", "content": self.user},
-                {"role": "assistant", "content": self.assistant},
-            ]
-        })
+        return json.dumps(
+            {
+                "messages": [
+                    {"role": "system", "content": self.system},
+                    {"role": "user", "content": self.user},
+                    {"role": "assistant", "content": self.assistant},
+                ]
+            }
+        )
 
 
 # Example 2: build a JSONL dataset
 examples = [
-    SFTExample("You convert text to JSON.", "Order for 3 pens", 
-               '{"items": [{"name": "pen", "qty": 3}]}'),
-    SFTExample("You convert text to JSON.", "One laptop", 
-               '{"items": [{"name": "laptop", "qty": 1}]}'),
+    SFTExample(
+        "You convert text to JSON.", "Order for 3 pens", '{"items": [{"name": "pen", "qty": 3}]}'
+    ),
+    SFTExample(
+        "You convert text to JSON.", "One laptop", '{"items": [{"name": "laptop", "qty": 1}]}'
+    ),
 ]
 lines = [e.to_jsonl() for e in examples]
 print("Example 2: SFT dataset (JSONL)")
@@ -90,6 +95,7 @@ assert parsed["messages"][2]["role"] == "assistant"
 # ============================================================
 # Dedupe, check label balance, and split train/val - the same hygiene
 # as classical ML, because the same failure modes apply.
+
 
 def dedupe(examples: list[dict]) -> list[dict]:
     seen = set()
@@ -121,8 +127,8 @@ assert len(unique) == 2
 # adapters (1-2% of params); QLoRA quantizes the base model and trains
 # adapters on top - fitting on consumer GPUs.
 
-def lora_trainable_params(total_params: int, rank: int,
-                          adapter_layers: int, hidden: int) -> float:
+
+def lora_trainable_params(total_params: int, rank: int, adapter_layers: int, hidden: int) -> float:
     """Trainable parameters for LoRA adapters (2 matrices per layer)."""
     return adapter_layers * 2 * rank * hidden
 
@@ -136,8 +142,7 @@ total = 7_000_000_000  # 7B model
 trainable = lora_trainable_params(total, rank=16, adapter_layers=32, hidden=4096)
 frac = trainable_fraction(total, trainable)
 print("\nExample 4: LoRA")
-print(f"  trainable: {trainable/1e6:.1f}M of {total/1e9:.0f}B params "
-      f"({frac:.2%})")
+print(f"  trainable: {trainable / 1e6:.1f}M of {total / 1e9:.0f}B params ({frac:.2%})")
 assert frac < 0.01, "LoRA trains under 1% of parameters"
 
 # ============================================================
@@ -145,6 +150,7 @@ assert frac < 0.01, "LoRA trains under 1% of parameters"
 # ============================================================
 # SFT: imitate good answers. DPO: learn PREFERENCE (which answer is
 # better) - needs pairs, aligns closer to human judgment.
+
 
 def sft_vs_dpo(data_type: str) -> str:
     if data_type == "pairs_preference":
@@ -166,8 +172,10 @@ assert sft_vs_dpo("pairs_preference").startswith("DPO")
 # After training: evaluate the adapter against the base model on the
 # SAME eval set, and only ship the adapter if it measures better.
 
-def decide_to_ship(base_score: float, ft_score: float,
-                   cost_multiple: float, budget: float) -> tuple[bool, str]:
+
+def decide_to_ship(
+    base_score: float, ft_score: float, cost_multiple: float, budget: float
+) -> tuple[bool, str]:
     if ft_score <= base_score:
         return False, "no quality gain - keep the base model"
     if cost_multiple > budget:

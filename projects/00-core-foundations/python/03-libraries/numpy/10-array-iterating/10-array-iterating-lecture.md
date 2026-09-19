@@ -35,9 +35,7 @@ for element in arr:
 ### 1.2 2D Array Iteration
 
 ```python
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Iterate over rows (axis 0)
 print("Iterating over rows:")
@@ -78,7 +76,7 @@ arr = np.arange(12).reshape(3, 4)
 
 # Iterate over all elements
 for element in np.nditer(arr):
-    print(element, end=' ')
+    print(element, end=" ")
 # 0 1 2 3 4 5 6 7 8 9 10 11
 
 print()
@@ -93,15 +91,15 @@ arr = np.arange(12).reshape(3, 4)
 
 # C order (row-major, default)
 print("C order:")
-for element in np.nditer(arr, order='C'):
-    print(element, end=' ')
+for element in np.nditer(arr, order="C"):
+    print(element, end=" ")
 print()
 # 0 1 2 3 4 5 6 7 8 9 10 11
 
 # F order (column-major)
 print("F order:")
-for element in np.nditer(arr, order='F'):
-    print(element, end=' ')
+for element in np.nditer(arr, order="F"):
+    print(element, end=" ")
 print()
 # 0 4 8 1 5 9 2 6 10 3 7 11
 ```
@@ -116,7 +114,7 @@ for element in np.nditer(arr):
     pass  # element[...] = 0  # ValueError!
 
 # Use op_flags to allow modification
-for element in np.nditer(arr, op_flags=['readwrite']):
+for element in np.nditer(arr, op_flags=["readwrite"]):
     element[...] = element * 2
 
 print(arr)
@@ -132,8 +130,7 @@ print(arr)
 ### 3.1 Basic ndenumerate
 
 ```python
-arr = np.array([[10, 20, 30],
-                [40, 50, 60]])
+arr = np.array([[10, 20, 30], [40, 50, 60]])
 
 # Get index and value
 for index, value in np.ndenumerate(arr):
@@ -170,20 +167,18 @@ for index, value in np.ndenumerate(arr):
 ### 4.1 Basic Flat Iteration
 
 ```python
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Iterate over all elements (flattened)
 for element in matrix.flat:
-    print(element, end=' ')
+    print(element, end=" ")
 print()
 # 1 2 3 4 5 6 7 8 9
 
 # Access by flat index
-print(matrix.flat[0])   # 1
-print(matrix.flat[4])   # 5
-print(matrix.flat[8])   # 9
+print(matrix.flat[0])  # 1
+print(matrix.flat[4])  # 5
+print(matrix.flat[8])  # 9
 ```
 
 ### 4.2 Flat Iteration with 3D
@@ -192,7 +187,7 @@ print(matrix.flat[8])   # 9
 arr = np.arange(8).reshape(2, 2, 2)
 
 for element in arr.flat:
-    print(element, end=' ')
+    print(element, end=" ")
 print()
 # 0 1 2 3 4 5 6 7
 ```
@@ -231,15 +226,15 @@ arr = np.array([1, 2, 3, 4, 5])
 # Complex operations that can't be vectorized
 for i, val in enumerate(arr):
     if val % 2 == 0:
-        arr[i] = val ** 2
+        arr[i] = val**2
     else:
-        arr[i] = val ** 3
+        arr[i] = val**3
 
 print(arr)  # [1 4 27 16 125]
 
 # Or use np.where (better)
 arr = np.array([1, 2, 3, 4, 5])
-arr = np.where(arr % 2 == 0, arr ** 2, arr ** 3)
+arr = np.where(arr % 2 == 0, arr**2, arr**3)
 print(arr)  # [1 4 27 16 125]
 ```
 
@@ -309,7 +304,7 @@ arr = np.array([1, 2, 3], dtype=float)
 #     element[...] = 0  # ValueError: read-only!
 
 # Fix: use op_flags
-for element in np.nditer(arr, op_flags=['readwrite']):
+for element in np.nditer(arr, op_flags=["readwrite"]):
     element[...] = 0
 ```
 
@@ -345,9 +340,7 @@ for i, val in np.ndenumerate(arr):
 ```python
 import numpy as np
 
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # a) Iterate over rows and print each
 # b) Iterate over columns and print each
@@ -363,15 +356,13 @@ for col in matrix.T:
 
 print("\nAll elements:")
 for element in matrix.flat:
-    print(element, end=' ')
+    print(element, end=" ")
 print()
 ```
 
 ### Exercise 2: ndenumerate
 ```python
-arr = np.array([[10, 20, 30],
-                [40, 50, 60],
-                [70, 80, 90]])
+arr = np.array([[10, 20, 30], [40, 50, 60], [70, 80, 90]])
 
 # Find indices of all elements > 50
 indices = []
@@ -396,7 +387,7 @@ for i in range(len(arr)):
 loop_time = time.time() - start
 
 start = time.time()
-result_vec = arr ** 2
+result_vec = arr**2
 vec_time = time.time() - start
 
 print(f"Loop: {loop_time:.4f}s")
@@ -409,7 +400,7 @@ print(f"Speedup: {loop_time / vec_time:.1f}x")
 arr = np.arange(12).reshape(3, 4).astype(float)
 
 # Double all even numbers
-for element in np.nditer(arr, op_flags=['readwrite']):
+for element in np.nditer(arr, op_flags=["readwrite"]):
     if element % 2 == 0:
         element[...] = element * 2
 

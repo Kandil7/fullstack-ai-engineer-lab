@@ -99,6 +99,7 @@ The `rc` trap: `"1.2.0rc1".split(".")` gives `["1", "2", "0rc1"]` — `int("0rc1
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
+
 def matches_requirement(req: str, version: str) -> bool:
     return Version(version) in SpecifierSet(req)
 ```

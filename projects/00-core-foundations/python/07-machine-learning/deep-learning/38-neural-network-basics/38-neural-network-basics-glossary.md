@@ -63,7 +63,7 @@ gradient are always zero. Caused by bad init or a too-high learning rate.
 a cheap ensemble regularizer. Disabled in eval mode.
 **Example**:
 ```python
-nn.Dropout(p=0.5)   # keeps ~50% of units per step in train mode
+nn.Dropout(p=0.5)  # keeps ~50% of units per step in train mode
 ```
 **Related**: Regularization
 

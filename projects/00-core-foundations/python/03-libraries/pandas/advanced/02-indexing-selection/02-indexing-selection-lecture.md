@@ -43,9 +43,9 @@ df = pd.DataFrame(
     index=["r1", "r2", "r3", "r4"],
 )
 
-df["score"]            # Series — column by name
-df[["doc", "score"]]   # DataFrame — list of columns
-df[1:3]                # rows by POSITION (half-open) — label-agnostic
+df["score"]  # Series — column by name
+df[["doc", "score"]]  # DataFrame — list of columns
+df[1:3]  # rows by POSITION (half-open) — label-agnostic
 ```
 
 `df[1:3]` slices positions 1..2 — it does not care about the index labels.
@@ -54,9 +54,9 @@ This positional slice is the source of many `loc`/`iloc` mix-ups.
 ## 2. `.loc` — Label-Based, Inclusive
 
 ```python
-df.loc["r2"]             # row by label
-df.loc[["r2", "r4"]]     # list of labels
-df.loc["r1":"r3"]        # label slice — INCLUSIVE of 'r3'
+df.loc["r2"]  # row by label
+df.loc[["r2", "r4"]]  # list of labels
+df.loc["r1":"r3"]  # label slice — INCLUSIVE of 'r3'
 df.loc["r1":"r3", "score"]  # rows and columns together
 ```
 
@@ -66,10 +66,10 @@ when rows carry meaningful ids (timestamps, doc ids) rather than positions.
 ## 3. `.iloc` — Position-Based, Exclusive
 
 ```python
-df.iloc[0]               # first row by position
-df.iloc[1:3]             # positions 1..2 — EXCLUSIVE of 3
-df.iloc[:, 0]            # all rows, first column
-df.iloc[-1]              # last row
+df.iloc[0]  # first row by position
+df.iloc[1:3]  # positions 1..2 — EXCLUSIVE of 3
+df.iloc[:, 0]  # all rows, first column
+df.iloc[-1]  # last row
 ```
 
 `.iloc` is pure position, half-open, exactly like list slicing. Use it when
@@ -78,7 +78,7 @@ the index is not meaningful (a shuffled frame, a numeric range).
 ## 4. Boolean Masks — The Workhorse
 
 ```python
-high = df[df["score"] > 0.7]          # mask selects rows where True
+high = df[df["score"] > 0.7]  # mask selects rows where True
 top = df[(df["score"] > 0.7) & (df["doc"].str.startswith("a"))]
 either = df[df["score"].isna() | df["score"] > 0.9]
 ```
@@ -91,7 +91,7 @@ parentheses around each comparison because `&` binds tighter than `>`.
 ```python
 df[df["doc"].isin(["a", "c"])]
 df[df["score"].between(0.4, 0.9, inclusive="both")]
-df.query("score > 0.7 and doc != 'b'")      # string-query DSL
+df.query("score > 0.7 and doc != 'b'")  # string-query DSL
 ```
 
 `query` reads almost like SQL and is handy for long filter chains; `.isin` is
@@ -115,13 +115,16 @@ the whole operation on the original.
 ## 7. Production Pattern — Train/Val/Test by Mask
 
 ```python
-def split_mask(n: int, frac_train: float = 0.7, seed: int = 42) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def split_mask(
+    n: int, frac_train: float = 0.7, seed: int = 42
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Deterministic boolean masks for train/val/test (stratify externally)."""
     rng = np.random.default_rng(seed)
     idx = rng.permutation(n)
     k_train = int(n * frac_train)
     k_val = int(n * (frac_train + (1 - frac_train) / 2))
     return idx[:k_train], idx[k_train:k_val], idx[k_val:]
+
 
 train_i, val_i, test_i = split_mask(len(df))
 train = df.iloc[train_i]
@@ -138,9 +141,9 @@ split — no index-label surprises, and the masks are reusable across frames.
 
 ```python
 # WRONG — expects 3 rows, gets 2
-df.iloc[1:3]    # positions 1,2 (half-open)
+df.iloc[1:3]  # positions 1,2 (half-open)
 # CORRECT for 3 rows by label
-df.loc["r1":"r3"]   # includes 'r3'
+df.loc["r1":"r3"]  # includes 'r3'
 ```
 
 ### Mistake 2: `and`/`or` inside masks

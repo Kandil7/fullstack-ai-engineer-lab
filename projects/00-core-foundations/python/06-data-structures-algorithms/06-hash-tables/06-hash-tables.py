@@ -37,6 +37,7 @@ print(f"Values: {list(hash_map.values())}")
 # 2. HASH TABLE IMPLEMENTATION (CHAINING)
 # =============================================================================
 
+
 class HashTable:
     """Hash table with chaining for collision resolution"""
 
@@ -144,6 +145,7 @@ print(f"After delete 'city': {ht.keys()}")
 # 3. HASH TABLE WITH LINEAR PROBING
 # =============================================================================
 
+
 class LinearProbingHashTable:
     """Hash table with open addressing (linear probing)"""
 
@@ -246,6 +248,7 @@ print(lp)
 # 4. WORD FREQUENCY COUNTER
 # =============================================================================
 
+
 def word_frequency(text):
     """Count word frequencies using hash table. O(n) time."""
     freq = {}
@@ -254,6 +257,7 @@ def word_frequency(text):
         word = word.strip(".,!?;:\"'")
         freq[word] = freq.get(word, 0) + 1
     return freq
+
 
 print("\n=== Word Frequency Counter ===")
 text = "the cat sat on the mat the cat ate the rat"
@@ -267,6 +271,7 @@ print(f"Most common: {max(freq, key=freq.get)}")
 # 5. TWO SUM PROBLEM
 # =============================================================================
 
+
 def two_sum_hash(nums, target):
     """Find two numbers that add to target. O(n) time."""
     seen = {}
@@ -276,6 +281,7 @@ def two_sum_hash(nums, target):
             return (seen[complement], i)
         seen[num] = i
     return None
+
 
 print("\n=== Two Sum Problem ===")
 nums = [2, 7, 11, 15, 1, 8]
@@ -290,15 +296,17 @@ if result:
 # 6. GROUP ANAGRAMS
 # =============================================================================
 
+
 def group_anagrams(words):
     """Group anagram strings together. O(n * k log k) time."""
     anagram_map = {}
     for word in words:
-        sorted_word = ''.join(sorted(word))
+        sorted_word = "".join(sorted(word))
         if sorted_word not in anagram_map:
             anagram_map[sorted_word] = []
         anagram_map[sorted_word].append(word)
     return list(anagram_map.values())
+
 
 print("\n=== Group Anagrams ===")
 words = ["eat", "tea", "tan", "ate", "nat", "bat", "tab"]
@@ -312,6 +320,7 @@ print(f"Anagram groups: {groups}")
 # =============================================================================
 
 from collections import OrderedDict
+
 
 class LRUCache:
     """Least Recently Used Cache. O(1) get/put."""
@@ -352,6 +361,7 @@ print(f"After put(4, D): {cache}")
 # =============================================================================
 # 8. HASH SET IMPLEMENTATION
 # =============================================================================
+
 
 class HashSet:
     """Hash set using hash table"""
@@ -415,6 +425,7 @@ print(f"Difference (s1 - s2): {s1.difference(s2)}")
 # 9. FREQUENCY MAP FOR ANAGRAM CHECK
 # =============================================================================
 
+
 def are_anagrams(s1, s2):
     """Check if two strings are anagrams. O(n) time."""
     if len(s1) != len(s2):
@@ -429,6 +440,7 @@ def are_anagrams(s1, s2):
             return False
     return True
 
+
 print("\n=== Anagram Check ===")
 print(f"'listen' and 'silent': {are_anagrams('listen', 'silent')}")
 print(f"'hello' and 'world': {are_anagrams('hello', 'world')}")
@@ -438,6 +450,7 @@ print(f"'a gentleman' and 'elegant man': {are_anagrams('a gentleman', 'elegant m
 # =============================================================================
 # 10. CONSISTENT HASHING (SIMPLE)
 # =============================================================================
+
 
 class ConsistentHash:
     """Simple consistent hashing for distributed systems"""

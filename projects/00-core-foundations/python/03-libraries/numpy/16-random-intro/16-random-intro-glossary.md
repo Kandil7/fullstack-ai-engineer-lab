@@ -91,13 +91,13 @@ import numpy as np
 standard = np.random.randn(10000)
 print(f"Standard normal:")
 print(f"  Mean: {standard.mean():.4f}")  # ~0
-print(f"  Std: {standard.std():.4f}")    # ~1
+print(f"  Std: {standard.std():.4f}")  # ~1
 
 # Custom normal
 custom = np.random.normal(100, 15, size=10000)
 print(f"\nCustom normal (μ=100, σ=15):")
 print(f"  Mean: {custom.mean():.4f}")  # ~100
-print(f"  Std: {custom.std():.4f}")    # ~15
+print(f"  Std: {custom.std():.4f}")  # ~15
 ```
 
 **Related Terms:** randn(), normal(), Standard Deviation, Mean
@@ -307,13 +307,13 @@ import numpy as np
 uniform = np.random.uniform(0, 1, size=1000)
 print(f"Uniform [0,1]:")
 print(f"  Mean: {uniform.mean():.4f}")  # ~0.5
-print(f"  Std: {uniform.std():.4f}")    # ~0.29
+print(f"  Std: {uniform.std():.4f}")  # ~0.29
 
 # Uniform between custom range
 custom = np.random.uniform(10, 20, size=1000)
 print(f"\nUniform [10,20]:")
 print(f"  Mean: {custom.mean():.4f}")  # ~15
-print(f"  Std: {custom.std():.4f}")    # ~2.89
+print(f"  Std: {custom.std():.4f}")  # ~2.89
 ```
 
 **Related Terms:** random(), rand(), Normal Distribution

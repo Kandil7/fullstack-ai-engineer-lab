@@ -36,11 +36,11 @@ print(f"Path with home(): {p2}")
 # Example 2: Path properties
 path = Path("/home/user/data/train.csv")
 print(f"\nPath: {path}")
-print(f"  name:      {path.name}")        # train.csv
-print(f"  stem:      {path.stem}")        # train
-print(f"  suffix:    {path.suffix}")      # .csv
-print(f"  suffixes:  {path.suffixes}")    # ['.csv']
-print(f"  parent:    {path.parent}")      # /home/user/data
+print(f"  name:      {path.name}")  # train.csv
+print(f"  stem:      {path.stem}")  # train
+print(f"  suffix:    {path.suffix}")  # .csv
+print(f"  suffixes:  {path.suffixes}")  # ['.csv']
+print(f"  parent:    {path.parent}")  # /home/user/data
 print(f"  parents:   {list(path.parents)}")
 
 # ============================================================
@@ -104,14 +104,14 @@ with tempfile.TemporaryDirectory() as tmp:
 with tempfile.TemporaryDirectory() as tmp:
     tmp_path = Path(tmp)
     file = tmp_path / "config.json"
-    
+
     # Write
     file.write_text('{"model": "bert", "epochs": 10}')
     print(f"\nWrote: {file.read_text()}")
-    
+
     # Append
-    file.write_text(file.read_text() + '\n', encoding='utf-8')
-    
+    file.write_text(file.read_text() + "\n", encoding="utf-8")
+
     # Binary
     bin_file = tmp_path / "model.bin"
     bin_file.write_bytes(b"\x00\x01\x02\x03")
@@ -127,7 +127,7 @@ with tempfile.TemporaryDirectory() as tmp:
     deep = tmp_path / "experiments" / "run_001" / "checkpoints"
     deep.mkdir(parents=True, exist_ok=True)
     print(f"\nCreated deep path: {deep.exists()}")
-    
+
     # Safe re-creation
     deep.mkdir(parents=True, exist_ok=True)  # No error
 
@@ -137,7 +137,7 @@ with tempfile.TemporaryDirectory() as tmp:
     (tmp_path / "a.txt").write_text("a")
     (tmp_path / "b.txt").write_text("b")
     (tmp_path / "subdir").mkdir()
-    
+
     print(f"\nIterating with iterdir():")
     for item in tmp_path.iterdir():
         print(f"  {item.name} {'(dir)' if item.is_dir() else '(file)'}")
@@ -146,10 +146,12 @@ with tempfile.TemporaryDirectory() as tmp:
 # 6. Path Manipulation for ML Workflows
 # ============================================================
 
+
 # Example 9: Building checkpoint paths
 def checkpoint_path(base: Path, model_name: str, epoch: int, metric: float) -> Path:
     """Generate standardized checkpoint path."""
     return base / model_name / f"epoch_{epoch:04d}_metric_{metric:.4f}.pt"
+
 
 base = Path("/models")
 print(f"\nCheckpoint paths:")
@@ -164,7 +166,7 @@ with tempfile.TemporaryDirectory() as tmp:
     (ckpt_dir / "model_epoch_0001.pt").write_text("1")
     (ckpt_dir / "model_epoch_0010.pt").write_text("10")
     (ckpt_dir / "model_epoch_0050.pt").write_text("50")
-    
+
     latest = max(ckpt_dir.glob("*.pt"), key=lambda p: p.stat().st_mtime)
     print(f"\nLatest checkpoint: {latest.name}")
 
@@ -196,23 +198,24 @@ print(f"Cross-platform: {cross}")
 # CORRECT:
 #   good = Path("file.txt").resolve(strict=True)  # Raises if missing (3.6+)
 
+
 # ============================================================
 # Self-Verification
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     import tempfile
-    
+
     # Path construction
     p = Path("a") / "b" / "c"
     assert str(p) == "a/b/c" or str(p) == "a\\b\\c", "Path construction failed"
-    
+
     # Properties
     assert Path("/home/user/file.txt").name == "file.txt"
     assert Path("/home/user/file.txt").stem == "file"
     assert Path("/home/user/file.txt").suffix == ".txt"
     assert Path("/home/user/file.txt").parent == Path("/home/user")
-    
+
     # Resolution
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
@@ -221,28 +224,29 @@ def _verify() -> None:
         link = tmp_path / "link.txt"
         link.symlink_to(real)
         assert link.resolve() == real.resolve(), "resolve() should follow symlinks"
-        
+
         # glob/rglob
         (tmp_path / "sub").mkdir()
         (tmp_path / "sub" / "test.txt").write_text("x")
         files = [f for f in tmp_path.rglob("*.txt") if f.is_file()]
-        assert any(f.name == "test.txt" for f in files), \
+        assert any(f.name == "test.txt" for f in files), (
             "rglob should find nested files (link.txt is a symlink, not a regular file)"
-        
+        )
+
         # read/write
         f = tmp_path / "data.json"
         f.write_text('{"key": "value"}')
         assert f.read_text() == '{"key": "value"}'
-        
+
         # mkdir parents
         deep = tmp_path / "a" / "b" / "c"
         deep.mkdir(parents=True, exist_ok=True)
         assert deep.is_dir()
-        
+
         # cross-platform path building
         cross = Path("models") / "bert" / "checkpoint.pt"
         assert "models" in str(cross) and "bert" in str(cross) and "checkpoint.pt" in str(cross)
-    
+
     print("[OK] 42-pathlib: all checks passed")
 
 

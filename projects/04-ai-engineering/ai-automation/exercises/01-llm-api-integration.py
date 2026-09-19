@@ -25,6 +25,7 @@ from enum import Enum
 # 1. Configuration & Constants
 # ---------------------------------------------------------------------------
 
+
 class Provider(Enum):
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
@@ -34,6 +35,7 @@ class Provider(Enum):
 @dataclass
 class LLMConfig:
     """Configuration for an LLM provider."""
+
     provider: Provider
     model: str
     api_key: str | None = None
@@ -54,18 +56,21 @@ class LLMConfig:
 @dataclass
 class UsageStats:
     """Track token usage and costs across calls."""
+
     total_input_tokens: int = 0
     total_output_tokens: int = 0
     total_calls: int = 0
     total_cost: float = 0.0
-    _cost_per_1k_tokens: dict = field(default_factory=lambda: {
-        "gpt-4o": {"input": 0.0025, "output": 0.01},
-        "gpt-4o-mini": {"input": 0.00015, "output": 0.0006},
-        "claude-sonnet-4-20250514": {"input": 0.003, "output": 0.015},
-        "claude-haiku-4-20250514": {"input": 0.0008, "output": 0.004},
-        "llama-3.3-70b-versatile": {"input": 0.00059, "output": 0.00079},
-        "mixtral-8x7b-32768": {"input": 0.00024, "output": 0.00024},
-    })
+    _cost_per_1k_tokens: dict = field(
+        default_factory=lambda: {
+            "gpt-4o": {"input": 0.0025, "output": 0.01},
+            "gpt-4o-mini": {"input": 0.00015, "output": 0.0006},
+            "claude-sonnet-4-20250514": {"input": 0.003, "output": 0.015},
+            "claude-haiku-4-20250514": {"input": 0.0008, "output": 0.004},
+            "llama-3.3-70b-versatile": {"input": 0.00059, "output": 0.00079},
+            "mixtral-8x7b-32768": {"input": 0.00024, "output": 0.00024},
+        }
+    )
 
     def record(self, model: str, input_tokens: int, output_tokens: int):
         self.total_input_tokens += input_tokens
@@ -73,7 +78,9 @@ class UsageStats:
         self.total_calls += 1
 
         prices = self._cost_per_1k_tokens.get(model, {"input": 0.001, "output": 0.003})
-        cost = (input_tokens / 1000 * prices["input"]) + (output_tokens / 1000 * prices["output"])
+        cost = (input_tokens / 1000 * prices["input"]) + (
+            output_tokens / 1000 * prices["output"]
+        )
         self.total_cost += cost
 
     def summary(self) -> str:
@@ -93,8 +100,13 @@ usage = UsageStats()
 # 2. OpenAI Integration
 # ---------------------------------------------------------------------------
 
-def openai_chat(prompt: str, *, system: str = "You are a helpful assistant.",
-                config: LLMConfig | None = None) -> str:
+
+def openai_chat(
+    prompt: str,
+    *,
+    system: str = "You are a helpful assistant.",
+    config: LLMConfig | None = None,
+) -> str:
     """Send a chat completion request to OpenAI."""
     from openai import OpenAI
 
@@ -112,12 +124,18 @@ def openai_chat(prompt: str, *, system: str = "You are a helpful assistant.",
     )
 
     msg = response.choices[0].message.content or ""
-    usage.record(config.model, response.usage.prompt_tokens, response.usage.completion_tokens)
+    usage.record(
+        config.model, response.usage.prompt_tokens, response.usage.completion_tokens
+    )
     return msg
 
 
-def openai_stream(prompt: str, *, system: str = "You are a helpful assistant.",
-                  model: str = "gpt-4o-mini") -> Generator[str, None, None]:
+def openai_stream(
+    prompt: str,
+    *,
+    system: str = "You are a helpful assistant.",
+    model: str = "gpt-4o-mini",
+) -> Generator[str, None, None]:
     """Stream OpenAI responses token-by-token."""
     from openai import OpenAI
 
@@ -150,7 +168,10 @@ def openai_function_call(prompt: str, tools: list[dict]) -> dict:
         model="gpt-4o-mini",
         temperature=0,
         messages=[
-            {"role": "system", "content": "You are a helpful assistant with access to tools."},
+            {
+                "role": "system",
+                "content": "You are a helpful assistant with access to tools.",
+            },
             {"role": "user", "content": prompt},
         ],
         tools=tools,
@@ -171,8 +192,13 @@ def openai_function_call(prompt: str, tools: list[dict]) -> dict:
 # 3. Claude (Anthropic) Integration
 # ---------------------------------------------------------------------------
 
-def claude_chat(prompt: str, *, system: str = "You are a helpful assistant.",
-                model: str = "claude-sonnet-4-20250514") -> str:
+
+def claude_chat(
+    prompt: str,
+    *,
+    system: str = "You are a helpful assistant.",
+    model: str = "claude-sonnet-4-20250514",
+) -> str:
     """Send a message to Claude."""
     from anthropic import Anthropic
 
@@ -190,8 +216,12 @@ def claude_chat(prompt: str, *, system: str = "You are a helpful assistant.",
     return text
 
 
-def claude_stream(prompt: str, *, system: str = "You are a helpful assistant.",
-                  model: str = "claude-haiku-4-20250514") -> Generator[str, None, None]:
+def claude_stream(
+    prompt: str,
+    *,
+    system: str = "You are a helpful assistant.",
+    model: str = "claude-haiku-4-20250514",
+) -> Generator[str, None, None]:
     """Stream Claude responses."""
     from anthropic import Anthropic
 
@@ -231,8 +261,13 @@ def claude_tool_use(prompt: str, tools: list[dict]) -> dict:
 # 4. Groq Integration
 # ---------------------------------------------------------------------------
 
-def groq_chat(prompt: str, *, system: str = "You are a helpful assistant.",
-              model: str = "llama-3.3-70b-versatile") -> str:
+
+def groq_chat(
+    prompt: str,
+    *,
+    system: str = "You are a helpful assistant.",
+    model: str = "llama-3.3-70b-versatile",
+) -> str:
     """Send a chat completion request to Groq (fast inference)."""
     from groq import Groq
 
@@ -253,7 +288,9 @@ def groq_chat(prompt: str, *, system: str = "You are a helpful assistant.",
     return msg
 
 
-def groq_stream(prompt: str, *, model: str = "llama-3.3-70b-versatile") -> Generator[str, None, None]:
+def groq_stream(
+    prompt: str, *, model: str = "llama-3.3-70b-versatile"
+) -> Generator[str, None, None]:
     """Stream Groq responses."""
     from groq import Groq
 
@@ -280,14 +317,15 @@ def groq_stream(prompt: str, *, model: str = "llama-3.3-70b-versatile") -> Gener
 # 5. Multi-Provider Abstraction Layer
 # ---------------------------------------------------------------------------
 
+
 class LLMClient:
     """
     Unified interface for multiple LLM providers.
-    
+
     Usage:
         client = LLMClient(Provider.OPENAI, "gpt-4o-mini")
         response = client.chat("What is AI?")
-        
+
         client = LLMClient(Provider.GROQ, "llama-3.3-70b-versatile")
         response = client.chat("What is AI?")
     """
@@ -299,9 +337,15 @@ class LLMClient:
     def chat(self, prompt: str, *, system: str = "You are a helpful assistant.") -> str:
         """Send a chat request via the configured provider."""
         dispatch = {
-            Provider.OPENAI: lambda: openai_chat(prompt, system=system, config=self.config),
-            Provider.ANTHROPIC: lambda: claude_chat(prompt, system=system, model=self.config.model),
-            Provider.GROQ: lambda: groq_chat(prompt, system=system, model=self.config.model),
+            Provider.OPENAI: lambda: openai_chat(
+                prompt, system=system, config=self.config
+            ),
+            Provider.ANTHROPIC: lambda: claude_chat(
+                prompt, system=system, model=self.config.model
+            ),
+            Provider.GROQ: lambda: groq_chat(
+                prompt, system=system, model=self.config.model
+            ),
         }
 
         handler = dispatch.get(self.provider)
@@ -314,7 +358,9 @@ class LLMClient:
         print(f"[{self.provider.value}] Response in {elapsed:.2f}s")
         return result
 
-    def stream(self, prompt: str, *, system: str = "You are a helpful assistant.") -> Generator[str, None, None]:
+    def stream(
+        self, prompt: str, *, system: str = "You are a helpful assistant."
+    ) -> Generator[str, None, None]:
         """Stream a response via the configured provider."""
         if self.provider == Provider.OPENAI:
             yield from openai_stream(prompt, system=system, model=self.config.model)
@@ -339,6 +385,7 @@ class LLMClient:
 # 6. Error Handling & Retry Logic
 # ---------------------------------------------------------------------------
 
+
 class LLMError(Exception):
     """Base exception for LLM integration errors."""
 
@@ -354,7 +401,7 @@ class AuthenticationError(LLMError):
 def retry_with_backoff(func, *, max_retries: int = 3, base_delay: float = 1.0):
     """
     Retry an LLM call with exponential backoff.
-    
+
     Example:
         result = retry_with_backoff(lambda: openai_chat("Hello"))
     """
@@ -366,15 +413,19 @@ def retry_with_backoff(func, *, max_retries: int = 3, base_delay: float = 1.0):
         except Exception as e:
             error_msg = str(e).lower()
             if "rate_limit" in error_msg or "429" in error_msg:
-                delay = base_delay * (2 ** attempt)
-                print(f"Rate limited. Retrying in {delay:.1f}s (attempt {attempt + 1}/{max_retries})")
+                delay = base_delay * (2**attempt)
+                print(
+                    f"Rate limited. Retrying in {delay:.1f}s (attempt {attempt + 1}/{max_retries})"
+                )
                 time.sleep(delay)
                 last_exception = RateLimitError(str(e))
             elif "unauthorized" in error_msg or "401" in error_msg:
                 raise AuthenticationError(f"Invalid API key: {e}") from e
             else:
-                delay = base_delay * (2 ** attempt)
-                print(f"Error: {e}. Retrying in {delay:.1f}s (attempt {attempt + 1}/{max_retries})")
+                delay = base_delay * (2**attempt)
+                print(
+                    f"Error: {e}. Retrying in {delay:.1f}s (attempt {attempt + 1}/{max_retries})"
+                )
                 time.sleep(delay)
                 last_exception = LLMError(str(e))
 
@@ -498,6 +549,7 @@ def demo_error_handling():
 # ---------------------------------------------------------------------------
 # 8. Provider Comparison
 # ---------------------------------------------------------------------------
+
 
 def compare_providers(prompt: str):
     """Compare responses from all available providers."""

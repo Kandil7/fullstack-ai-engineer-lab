@@ -10,6 +10,7 @@ import importlib.util
 import os
 
 import matplotlib
+
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
@@ -39,6 +40,7 @@ def _clean_figures():
 
 # ---------------------------------------------------------------- bronze
 
+
 def test_bronze_rcparams_applied():
     solution.apply_dpi_defaults()
     assert plt.rcParams["figure.dpi"] == 120
@@ -53,6 +55,7 @@ def test_bronze_starter_raises():
 
 
 # ---------------------------------------------------------------- silver
+
 
 def test_silver_exact_set():
     assert solution.uniform_maps() == ["cividis", "inferno", "magma", "plasma", "viridis"]
@@ -69,6 +72,7 @@ def test_silver_starter_raises():
 
 
 # ---------------------------------------------------------------- gold
+
 
 def _noisy_parabola():
     rng = np.random.default_rng(42)

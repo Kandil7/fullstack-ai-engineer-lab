@@ -49,7 +49,7 @@ is always a copy.
 import numpy as np
 
 scores = np.array([0.9, 0.4, 0.7, 0.2, 0.8])
-print(scores[[3, 0, 4]])            # [0.2 0.9 0.8]
+print(scores[[3, 0, 4]])  # [0.2 0.9 0.8]
 X = np.random.default_rng(42).normal(size=(6, 4))
 shuffled = X[np.random.default_rng(0).permutation(X.shape[0])]
 print(np.shares_memory(shuffled, X))  # False -- it's a copy
@@ -68,8 +68,8 @@ A boolean array of the same shape selects the True positions:
 
 ```python
 data = np.random.default_rng(1).normal(size=12)
-pos = data[data > 0.0]              # only positive entries
-print(pos.shape)                    # (6,)
+pos = data[data > 0.0]  # only positive entries
+print(pos.shape)  # (6,)
 ```
 
 Masks also **write**: `data[data < -1.0] = -1.0` clamps in place,
@@ -93,7 +93,7 @@ column i). To get the *grid* of all `rows × cols`, use `np.ix_`:
 M = np.arange(20.0).reshape(4, 5)
 rows = np.array([0, 3])
 cols = np.array([1, 2, 4])
-grid = M[np.ix_(rows, cols)]        # (2, 3) submatrix
+grid = M[np.ix_(rows, cols)]  # (2, 3) submatrix
 ```
 
 `M[np.ix_(rows, cols)]` ≡ `M[rows][:, cols]` — the grid, not the
@@ -117,7 +117,7 @@ explicit out-of-bounds policy:
 
 ```python
 x = np.arange(6)
-print(np.take(x, [7, 8], mode="wrap"))   # [1 2]
+print(np.take(x, [7, 8], mode="wrap"))  # [1 2]
 print(np.take(x, [-3, 9], mode="clip"))  # [0 5]
 ```
 
@@ -137,10 +137,10 @@ is ≤ it — but the left side is **not sorted**. Slice the first
 ```python
 x = np.random.default_rng(2).normal(size=100_000)
 k = 5
-idx = np.argpartition(x, k - 1)[:k]     # k smallest (unsorted)
-top5 = np.sort(x[idx])                  # sort just the k winners
+idx = np.argpartition(x, k - 1)[:k]  # k smallest (unsorted)
+top5 = np.sort(x[idx])  # sort just the k winners
 truth = np.sort(x)[:k]
-print(np.array_equal(top5, truth))      # True
+print(np.array_equal(top5, truth))  # True
 ```
 
 For the k **largest** (retrieval!), partition at `-k`:
@@ -172,8 +172,8 @@ vectorized.
 ```python
 bins = np.array([0.0, 0.25, 0.5, 0.75, 1.0])
 v = np.array([0.05, 0.25, 0.8, 2.0, -1.0])
-print(np.searchsorted(bins, v, side="right"))   # [1 2 4 5 0]
-print(np.digitize(v, bins))                     # same
+print(np.searchsorted(bins, v, side="right"))  # [1 2 4 5 0]
+print(np.digitize(v, bins))  # same
 ```
 
 `np.digitize` is `searchsorted` with `side="right"` on the bin
@@ -193,7 +193,7 @@ belong to" lookups.
 ```python
 labels = np.random.default_rng(3).integers(0, 4, size=1000)
 uniq, counts = np.unique(labels, return_counts=True)
-print(counts.sum() == labels.size)   # True
+print(counts.sum() == labels.size)  # True
 ```
 
 `np.unique` sorts and deduplicates; with `return_counts` you get
@@ -217,12 +217,12 @@ missing-value counts for free.
 base = np.arange(10.0)
 view = base[::2]
 view[:] = -1.0
-print(base[0], base[2])            # -1.0 -1.0 -- wrote through!
+print(base[0], base[2])  # -1.0 -1.0 -- wrote through!
 
 fresh = np.arange(10.0)
 copy_ = fresh[[0, 2, 4]]
 copy_[:] = -1.0
-print(fresh[0], fresh[2])          # 0.0 2.0 -- isolated
+print(fresh[0], fresh[2])  # 0.0 2.0 -- isolated
 ```
 
 Writing through a view is often exactly what you want (in-place
@@ -354,22 +354,22 @@ you the truth before you debug for an hour.
 import numpy as np
 
 # select / reorder / filter
-rows = X[[0, 4, 7]]                    # copy, in order
-kept = X[X[:, 0] > 0.0]                # boolean filter
-grid = M[np.ix_(rows, cols)]           # submatrix grid
-X[X > 1.0] = 1.0                       # in-place clamp
+rows = X[[0, 4, 7]]  # copy, in order
+kept = X[X[:, 0] > 0.0]  # boolean filter
+grid = M[np.ix_(rows, cols)]  # submatrix grid
+X[X > 1.0] = 1.0  # in-place clamp
 
 # gather / scatter with policies
-np.take(x, idx, mode="wrap")           # wrap | clip | raise
-np.put(dst, idx, vals)                 # write at indices
+np.take(x, idx, mode="wrap")  # wrap | clip | raise
+np.put(dst, idx, vals)  # write at indices
 
 # top-k and bucketing
-idx = np.argpartition(scores, -k)[-k:] # k largest, O(n)
-b = np.searchsorted(bins, v, side="right")   # bucket ids
-b = np.digitize(v, bins)               # same as side="right"
+idx = np.argpartition(scores, -k)[-k:]  # k largest, O(n)
+b = np.searchsorted(bins, v, side="right")  # bucket ids
+b = np.digitize(v, bins)  # same as side="right"
 
 # memory semantics
-np.shares_memory(a, b)                 # True => view
+np.shares_memory(a, b)  # True => view
 ```
 
 ## Next Steps

@@ -30,25 +30,29 @@ By the end of this lecture, you will be able to:
 ```python
 from functools import partial
 
+
 def power(base, exponent):
-    return base ** exponent
+    return base**exponent
+
 
 # Create specialized functions
 square = partial(power, exponent=2)
 cube = partial(power, exponent=3)
 
 print(square(5))  # 25
-print(cube(5))    # 125
+print(cube(5))  # 125
+
 
 # Partial with positional arguments
 def greet(greeting, name):
     return f"{greeting}, {name}!"
 
+
 say_hello = partial(greet, "Hello")
 say_hi = partial(greet, "Hi")
 
 print(say_hello("Alice"))  # "Hello, Alice!"
-print(say_hi("Bob"))       # "Hi, Bob!"
+print(say_hi("Bob"))  # "Hi, Bob!"
 ```
 
 ### Partial in Higher-Order Functions
@@ -57,8 +61,10 @@ print(say_hi("Bob"))       # "Hi, Bob!"
 from functools import partial
 from typing import Callable
 
+
 def apply_operation(func: Callable, value: int, operation: Callable) -> int:
     return operation(func(value))
+
 
 # Using partial to specialize
 double = partial(lambda x: x * 2)
@@ -73,8 +79,10 @@ print(result)  # 20 (double(5) = 10, then +10 = 20)
 ```python
 from functools import partial
 
+
 def log_event(event_type, message, timestamp=None):
     print(f"[{event_type}] {message} at {timestamp}")
+
 
 # Specialized loggers
 log_error = partial(log_event, "ERROR")
@@ -95,11 +103,13 @@ log_error("Connection failed", timestamp="2024-01-01 10:00:00")
 import functools
 import time
 
+
 @functools.lru_cache(maxsize=128)
 def fibonacci(n):
     if n < 2:
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
+
 
 # First call - computes and caches
 start = time.perf_counter()
@@ -123,10 +133,12 @@ print(fibonacci.cache_info())
 ```python
 import functools
 
+
 @functools.lru_cache(maxsize=32)
 def expensive_computation(n):
     print(f"Computing {n}...")
-    return sum(i ** 2 for i in range(n))
+    return sum(i**2 for i in range(n))
+
 
 # Clear cache
 expensive_computation.cache_clear()
@@ -135,9 +147,11 @@ expensive_computation.cache_clear()
 info = expensive_computation.cache_info()
 print(f"Cache size: {info.currsize}/{info.maxsize}")
 
+
 # Decorate existing function
 def my_function(x):
     return x * 2
+
 
 cached_version = functools.lru_cache(maxsize=128)(my_function)
 ```
@@ -149,11 +163,13 @@ cached_version = functools.lru_cache(maxsize=128)(my_function)
 ```python
 import functools
 
+
 @functools.cache  # Unbounded cache (like lru_cache(maxsize=None))
 def fibonacci(n):
     if n < 2:
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
+
 
 # Same as lru_cache(maxsize=None)
 result = fibonacci(100)
@@ -170,21 +186,25 @@ print(fibonacci.cache_info())
 ```python
 import functools
 
+
 def my_decorator(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         """Wrapper docstring."""
         return func(*args, **kwargs)
+
     return wrapper
+
 
 @my_decorator
 def greet(name):
     """Greet someone by name."""
     return f"Hello, {name}!"
 
+
 print(greet.__name__)  # "greet" (not "wrapper")
-print(greet.__doc__)   # "Greet someone by name."
-print(greet.__module__) # "__main__"
+print(greet.__doc__)  # "Greet someone by name."
+print(greet.__module__)  # "__main__"
 ```
 
 ### Without `functools.wraps`
@@ -194,15 +214,18 @@ def bad_decorator(func):
     def wrapper(*args, **kwargs):
         """Wrapper docstring."""
         return func(*args, **kwargs)
+
     return wrapper
+
 
 @bad_decorator
 def greet(name):
     """Greet someone by name."""
     return f"Hello, {name}!"
 
+
 print(greet.__name__)  # "wrapper" - lost original name!
-print(greet.__doc__)   # "Wrapper docstring." - lost original docstring!
+print(greet.__doc__)  # "Wrapper docstring." - lost original docstring!
 ```
 
 ---
@@ -251,14 +274,24 @@ print(result)  # {"a": 1, "b": 2, "c": 3}
 from functools import reduce
 from typing import Callable, Any
 
+
 def compose(*functions: Callable) -> Callable:
     """Compose multiple functions into one."""
     return reduce(lambda f, g: lambda *args, **kwargs: f(g(*args, **kwargs)), functions)
 
+
 # Usage
-def add_one(x): return x + 1
-def double(x): return x * 2
-def square(x): return x ** 2
+def add_one(x):
+    return x + 1
+
+
+def double(x):
+    return x * 2
+
+
+def square(x):
+    return x**2
+
 
 composed = compose(square, double, add_one)
 print(composed(3))  # square(double(add_one(3))) = square(double(4)) = square(8) = 64
@@ -271,17 +304,19 @@ print(composed(3))  # square(double(add_one(3))) = square(double(4)) = square(8)
 ```python
 from functools import total_ordering
 
+
 @total_ordering
 class Student:
     def __init__(self, name, grade):
         self.name = name
         self.grade = grade
-    
+
     def __eq__(self, other):
         return self.grade == other.grade
-    
+
     def __lt__(self, other):
         return self.grade < other.grade
+
 
 # Only need __eq__ and __lt__
 # total_ordering adds: __le__, __gt__, __ge__
@@ -289,12 +324,12 @@ class Student:
 alice = Student("Alice", 95)
 bob = Student("Bob", 87)
 
-print(alice > bob)    # True
-print(alice >= bob)   # True
-print(alice <= bob)   # False
-print(alice < bob)    # False
-print(alice == bob)   # False
-print(alice != bob)   # True
+print(alice > bob)  # True
+print(alice >= bob)  # True
+print(alice <= bob)  # False
+print(alice < bob)  # False
+print(alice == bob)  # False
+print(alice != bob)  # True
 ```
 
 ---
@@ -304,25 +339,30 @@ print(alice != bob)   # True
 ```python
 from functools import singledispatch
 
+
 @singledispatch
 def process(value):
     raise NotImplementedError(f"Cannot process {type(value)}")
+
 
 @process.register(int)
 def process_int(value):
     return value * 2
 
+
 @process.register(str)
 def process_str(value):
     return value.upper()
+
 
 @process.register(list)
 def process_list(value):
     return [process(item) for item in value]
 
+
 # Usage
-print(process(5))        # 10
-print(process("hello")) # "HELLO"
+print(process(5))  # 10
+print(process("hello"))  # "HELLO"
 print(process([1, "two", 3]))  # [2, "TWO", 6]
 ```
 
@@ -332,25 +372,30 @@ print(process([1, "two", 3]))  # [2, "TWO", 6]
 from functools import singledispatch
 from typing import Union
 
+
 @singledispatch
 def serialize(value) -> str:
     raise TypeError(f"Cannot serialize {type(value)}")
+
 
 @serialize.register
 def _(value: int) -> str:
     return f"INT:{value}"
 
+
 @serialize.register
 def _(value: str) -> str:
     return f"STR:{value}"
+
 
 @serialize.register
 def _(value: dict) -> str:
     return f"DICT:{value}"
 
-print(serialize(42))      # "INT:42"
-print(serialize("hello")) # "STR:hello"
-print(serialize({"a": 1})) # "DICT:{'a': 1}"
+
+print(serialize(42))  # "INT:42"
+print(serialize("hello"))  # "STR:hello"
+print(serialize({"a": 1}))  # "DICT:{'a': 1}"
 ```
 
 ---
@@ -361,24 +406,26 @@ print(serialize({"a": 1})) # "DICT:{'a': 1}"
 from functools import cached_property
 import math
 
+
 class Circle:
     def __init__(self, radius):
         self.radius = radius
-    
+
     @cached_property
     def area(self):
         """Computed once, then cached."""
         print("Computing area...")
-        return math.pi * self.radius ** 2
-    
+        return math.pi * self.radius**2
+
     @cached_property
     def circumference(self):
         print("Computing circumference...")
         return 2 * math.pi * self.radius
 
+
 c = Circle(5)
-print(c.area)           # "Computing area..." -> 78.54
-print(c.area)           # 78.54 (cached, no computation)
+print(c.area)  # "Computing area..." -> 78.54
+print(c.area)  # 78.54 (cached, no computation)
 print(c.circumference)  # "Computing circumference..." -> 31.42
 print(c.circumference)  # 31.42 (cached)
 
@@ -392,22 +439,24 @@ print(c2.area)  # "Computing area..." -> 314.16
 ```python
 from functools import cached_property
 
+
 class DataProcessor:
     def __init__(self, data):
         self._data = data
         self._dirty = True
-    
+
     @cached_property
     def processed_data(self):
         print("Processing data...")
         self._dirty = False
-        return [x ** 2 for x in self._data]
-    
+        return [x**2 for x in self._data]
+
     def invalidate(self):
         """Manually invalidate cache."""
         if "processed_data" in self.__dict__:
             del self.__dict__["processed_data"]
         self._dirty = True
+
 
 processor = DataProcessor([1, 2, 3])
 print(processor.processed_data)  # [1, 4, 9]
@@ -422,18 +471,21 @@ print(processor.processed_data)  # Re-computes
 ```python
 import functools
 
+
 def my_wrapper(func):
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
-    
+
     # Copy metadata from func to wrapper
     functools.update_wrapper(wrapper, func)
     return wrapper
+
 
 # Equivalent to @functools.wraps
 @my_wrapper
 def greet(name):
     return f"Hello, {name}!"
+
 
 print(greet.__name__)  # "greet"
 ```
@@ -445,15 +497,17 @@ print(greet.__name__)  # "greet"
 ```python
 from functools import partialmethod
 
+
 class Cell:
     def __init__(self):
         self._alive = False
-    
+
     def set_state(self, state):
         self._alive = state
-    
+
     set_alive = partialmethod(set_state, True)
     set_dead = partialmethod(set_state, False)
+
 
 cell = Cell()
 cell.set_alive()
@@ -473,16 +527,20 @@ print(cell._alive)  # False
 import functools
 from typing import Hashable
 
+
 def cached_prediction(model_name: str):
     """Decorator that caches model predictions."""
+
     def decorator(func):
         @functools.lru_cache(maxsize=1000)
         def wrapper(input_hash: Hashable):
             return func(input_hash)
-        
+
         wrapper.cache_info = functools.wraps(func)(wrapper).cache_info
         return wrapper
+
     return decorator
+
 
 @cached_prediction("gpt-4")
 def predict(text_hash: int):
@@ -495,16 +553,18 @@ def predict(text_hash: int):
 ```python
 from functools import partial
 
+
 def train_model(data, model, learning_rate, epochs):
     print(f"Training {model} for {epochs} epochs at lr={learning_rate}")
     return {"model": model, "epochs": epochs}
+
 
 # Specialized trainers
 train_bert = partial(train_model, model="bert", learning_rate=2e-5, epochs=10)
 train_gpt = partial(train_model, model="gpt", learning_rate=1e-5, epochs=5)
 
 train_bert(data)  # Uses bert config
-train_gpt(data)   # Uses gpt config
+train_gpt(data)  # Uses gpt config
 ```
 
 ### Reduce for Pipeline
@@ -512,21 +572,28 @@ train_gpt(data)   # Uses gpt config
 ```python
 from functools import reduce
 
+
 def pipeline(*steps):
     """Create a data processing pipeline."""
+
     def process(data):
         return reduce(lambda d, step: step(d), steps, data)
+
     return process
+
 
 # Define steps
 def validate(data):
     return [d for d in data if d.get("valid")]
 
+
 def transform(data):
     return [{**d, "processed": True} for d in data]
 
+
 def aggregate(data):
     return {"count": len(data), "items": data}
+
 
 # Create pipeline
 process = pipeline(validate, transform, aggregate)
@@ -560,9 +627,10 @@ Create specialized functions using `partial`:
 def log(level, module, message):
     print(f"[{level}] {module}: {message}")
 
+
 # Create specialized loggers
 log_error = ...  # Partial for ERROR level
-log_auth = ...   # Partial for auth module
+log_auth = ...  # Partial for auth module
 ```
 
 ### Exercise 2: LRU Cache with TTL
@@ -590,6 +658,7 @@ Create a type-based serializer:
 @singledispatch
 def serialize(value):
     pass
+
 
 # Support: int, str, list, dict, datetime
 ```

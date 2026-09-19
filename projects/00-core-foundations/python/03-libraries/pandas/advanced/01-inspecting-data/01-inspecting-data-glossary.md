@@ -28,7 +28,7 @@
 structure and sample values.
 **Example**:
 ```python
-df.head(3)   # first three rows
+df.head(3)  # first three rows
 ```
 **Related**: `df.tail()`
 
@@ -42,7 +42,7 @@ the newest are at the end.
 sanity check on any frame.
 **Example**:
 ```python
-df.shape   # (100_000, 12)
+df.shape  # (100_000, 12)
 ```
 **Related**: `df.ndim`
 
@@ -75,7 +75,7 @@ use `include="object"` for categorical summaries (count, unique, top, freq).
 that drives encoding decisions.
 **Example**:
 ```python
-df.nunique()   # label: 2, sentence: 1000, score: 997
+df.nunique()  # label: 2, sentence: 1000, score: 997
 ```
 **Related**: `value_counts()`, cardinality
 
@@ -93,7 +93,7 @@ df["label"].value_counts(normalize=True)
 counts, `.mean()` gives fractions.
 **Example**:
 ```python
-df.isna().mean()   # missing fraction per column
+df.isna().mean()  # missing fraction per column
 ```
 **Related**: missing fraction
 

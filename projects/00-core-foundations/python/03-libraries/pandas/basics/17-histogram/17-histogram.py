@@ -5,9 +5,11 @@ W3Schools: https://www.w3schools.com/python/pandas_plotting_hist.asp
 A histogram is an approximate representation of the distribution of
 numerical data. It groups data into bins and shows frequency.
 """
+
 import pandas as pd
 import numpy as np
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
@@ -22,9 +24,11 @@ print("Example 1: Basic Histogram")
 print("=" * 60)
 
 np.random.seed(42)
-df = pd.DataFrame({
-    "age": np.random.normal(35, 10, 500).astype(int),
-})
+df = pd.DataFrame(
+    {
+        "age": np.random.normal(35, 10, 500).astype(int),
+    }
+)
 
 print("Age statistics:")
 print(df["age"].describe().round(1))
@@ -50,10 +54,12 @@ print("=" * 60)
 print("Example 2: Overlaid Histograms")
 print("=" * 60)
 
-df2 = pd.DataFrame({
-    "score_A": np.random.normal(70, 15, 200),
-    "score_B": np.random.normal(60, 20, 200),
-})
+df2 = pd.DataFrame(
+    {
+        "score_A": np.random.normal(70, 15, 200),
+        "score_B": np.random.normal(60, 20, 200),
+    }
+)
 
 print("Score A stats:", df2["score_A"].describe().round(1).to_dict())
 print("Score B stats:", df2["score_B"].describe().round(1).to_dict())
@@ -81,9 +87,11 @@ print("=" * 60)
 print("Example 3: Custom Bin Ranges")
 print("=" * 60)
 
-df3 = pd.DataFrame({
-    "salary": np.random.lognormal(11, 0.5, 500).round(0),
-})
+df3 = pd.DataFrame(
+    {
+        "salary": np.random.lognormal(11, 0.5, 500).round(0),
+    }
+)
 
 # Define specific bins
 bins = [0, 30000, 50000, 75000, 100000, 150000, 300000]
@@ -125,13 +133,17 @@ print("=" * 60)
 print("Example 4: Histogram by Group")
 print("=" * 60)
 
-df4 = pd.DataFrame({
-    "score": np.concatenate([
-        np.random.normal(75, 10, 100),  # Class A
-        np.random.normal(65, 15, 100),  # Class B
-    ]),
-    "class": ["A"] * 100 + ["B"] * 100,
-})
+df4 = pd.DataFrame(
+    {
+        "score": np.concatenate(
+            [
+                np.random.normal(75, 10, 100),  # Class A
+                np.random.normal(65, 15, 100),  # Class B
+            ]
+        ),
+        "class": ["A"] * 100 + ["B"] * 100,
+    }
+)
 
 fig, ax = plt.subplots(figsize=(8, 5))
 for label, group in df4.groupby("class"):

@@ -35,6 +35,7 @@ from fastapi.security import APIKeyHeader
 
 api_key_header = APIKeyHeader(name="X-API-Key")
 
+
 @app.get("/api/")
 async def api_endpoint(api_key: str = Security(api_key_header)):
     if api_key != "valid-key":
@@ -73,17 +74,21 @@ is_valid = argon2.verify("mypassword", hashed)
 ```python
 from enum import Enum
 
+
 class Role(str, Enum):
     ADMIN = "admin"
     USER = "user"
     GUEST = "guest"
+
 
 def check_permission(required_role: Role):
     def permission_checker(role: Role = Depends(get_user_role)):
         if role != required_role:
             raise HTTPException(status_code=403)
         return role
+
     return permission_checker
+
 
 @app.get("/admin/")
 async def admin_only(role: Role = Depends(check_permission(Role.ADMIN))):
@@ -124,6 +129,7 @@ is_valid = pwd_context.verify("password123", hashed)
 from fastapi.security import HTTPBearer
 
 security = HTTPBearer()
+
 
 @app.get("/protected/")
 async def protected(credentials: HTTPAuthorizationCredentials = Security(security)):
@@ -190,15 +196,16 @@ from fastapi import Request, Response
 
 csrf_tokens = {}
 
+
 @app.middleware("http")
 async def csrf_protection(request: Request, call_next):
     if request.method in ["POST", "PUT", "DELETE"]:
         token = request.headers.get("X-CSRF-Token")
         session_id = request.cookies.get("session_id")
-        
+
         if not token or token != csrf_tokens.get(session_id):
             return Response(status_code=403, content="CSRF token invalid")
-    
+
     return await call_next(request)
 ```
 
@@ -245,6 +252,7 @@ DATABASE_PASSWORD = "admin123"
 
 # ✅ CORRECT
 import os
+
 API_KEY = os.getenv("API_KEY")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 ```
@@ -267,6 +275,7 @@ hash_value = hashlib.sha256(data.encode()).hexdigest()
 
 # For passwords, use specialized algorithms
 from passlib.context import CryptContext
+
 pwd_context = CryptContext(schemes=["bcrypt"])
 hashed = pwd_context.hash("mypassword")
 ```
@@ -289,6 +298,7 @@ async def https_redirect(request: Request, call_next):
         return RedirectResponse(url=url, status_code=301)
     return await call_next(request)
 
+
 # Or configure at server level
 # uvicorn main:app --ssl-keyfile=key.pem --ssl-certfile=cert.pem
 ```
@@ -309,11 +319,13 @@ from datetime import datetime, timedelta
 SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
 
+
 def create_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
 
 def verify_token(token: str):
     try:
@@ -337,6 +349,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 @app.get("/users/me")
 async def read_users_me(token: str = Depends(oauth2_scheme)):
     user = decode_token(token)
@@ -357,7 +370,7 @@ async def read_users_me(token: str = Depends(oauth2_scheme)):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",    # Development
+        "http://localhost:3000",  # Development
         "https://app.example.com",  # Production
     ],
     allow_credentials=True,
@@ -377,11 +390,7 @@ app.add_middleware(
 from passlib.context import CryptContext
 
 # Configure with bcrypt
-pwd_context = CryptContext(
-    schemes=["bcrypt", "argon2"],
-    default="bcrypt",
-    deprecated="auto"
-)
+pwd_context = CryptContext(schemes=["bcrypt", "argon2"], default="bcrypt", deprecated="auto")
 
 # Hash password
 hashed = pwd_context.hash("mypassword")
@@ -406,6 +415,7 @@ db.execute(query)
 
 # ✅ CORRECT - Parameterized query
 from sqlalchemy import text
+
 query = text("SELECT * FROM users WHERE name = :name")
 db.execute(query, {"name": user_input})
 ```
@@ -424,13 +434,16 @@ from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def hash_password(password: str) -> str:
     """Hash password with random salt"""
     return pwd_context.hash(password)
 
+
 def verify_password(plain: str, hashed: str) -> bool:
     """Verify password against hash"""
     return pwd_context.verify(plain, hashed)
+
 
 # Usage
 hashed = hash_password("mypassword")  # Includes random salt
@@ -449,26 +462,28 @@ is_valid = verify_password("mypassword", hashed)  # True
 ```python
 from enum import Enum
 
+
 class Permission(str, Enum):
     READ = "read"
     WRITE = "write"
     DELETE = "delete"
     ADMIN = "admin"
 
+
 user_permissions = [Permission.READ, Permission.WRITE]
+
 
 def require_permission(permission: Permission):
     def checker(perms: list = Depends(get_user_permissions)):
         if permission not in perms:
             raise HTTPException(403, "Insufficient permissions")
         return permission
+
     return checker
 
+
 @app.delete("/items/{id}")
-async def delete_item(
-    id: int,
-    _: Permission = Depends(require_permission(Permission.DELETE))
-):
+async def delete_item(id: int, _: Permission = Depends(require_permission(Permission.DELETE))):
     return {"deleted": id}
 ```
 
@@ -487,20 +502,21 @@ import time
 
 rate_limit_store = defaultdict(list)
 
+
 def rate_limit(request: Request, max_requests: int = 100, window: int = 60):
     client_ip = request.client.host
     current_time = time.time()
-    
+
     # Remove old requests
     rate_limit_store[client_ip] = [
-        t for t in rate_limit_store[client_ip]
-        if current_time - t < window
+        t for t in rate_limit_store[client_ip] if current_time - t < window
     ]
-    
+
     if len(rate_limit_store[client_ip]) >= max_requests:
         raise HTTPException(429, "Rate limit exceeded")
-    
+
     rate_limit_store[client_ip].append(current_time)
+
 
 @app.get("/api/")
 async def api(request: Request):
@@ -521,11 +537,13 @@ async def api(request: Request):
 from enum import Enum
 from functools import wraps
 
+
 class Role(str, Enum):
     ADMIN = "admin"
     MODERATOR = "moderator"
     USER = "user"
     GUEST = "guest"
+
 
 role_permissions = {
     Role.ADMIN: [Permission.READ, Permission.WRITE, Permission.DELETE],
@@ -534,16 +552,20 @@ role_permissions = {
     Role.GUEST: [],
 }
 
+
 def get_user_role(request: Request) -> Role:
     # Get role from token/session
     return Role.USER
+
 
 def require_role(required_role: Role):
     def role_checker(role: Role = Depends(get_user_role)):
         if role != required_role:
             raise HTTPException(403, f"Requires {required_role} role")
         return role
+
     return role_checker
+
 
 @app.get("/admin/")
 async def admin_panel(role: Role = Depends(require_role(Role.ADMIN))):
@@ -589,21 +611,19 @@ hash2 = bcrypt.hashpw(password, bcrypt.gensalt())
 class SecurityHeaders(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
-        
+
         # Prevent MIME type sniffing
         response.headers["X-Content-Type-Options"] = "nosniff"
-        
+
         # Prevent clickjacking
         response.headers["X-Frame-Options"] = "DENY"
-        
+
         # XSS protection
         response.headers["X-XSS-Protection"] = "1; mode=block"
-        
+
         # HSTS
-        response.headers["Strict-Transport-Security"] = (
-            "max-age=31536000; includeSubDomains"
-        )
-        
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
         return response
 ```
 
@@ -624,11 +644,13 @@ async def get_users(name: str):
     # Attacker could input: ' OR '1'='1'; DROP TABLE users;--
     return db.execute(query)
 
+
 # ✅ SAFE - Parameterized query
 @app.get("/users/")
 async def get_users(name: str):
     query = text("SELECT * FROM users WHERE name = :name")
     return db.execute(query, {"name": name})
+
 
 # ✅ SAFE - ORM (SQLAlchemy)
 @app.get("/users/")
@@ -678,18 +700,20 @@ SECRET_KEY = "secret"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE = 30  # minutes
 
+
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+
 @app.post("/token/")
 async def login(credentials: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(credentials.username, credentials.password)
     if not user:
         raise HTTPException(401, "Invalid credentials")
-    
+
     token = create_access_token({"sub": user.username})
     return {"access_token": token, "token_type": "bearer"}
 ```
@@ -706,14 +730,13 @@ async def login(credentials: OAuth2PasswordRequestForm = Depends()):
 ```python
 from markupsafe import escape
 
+
 @app.get("/profile/")
 async def profile(name: str):
     # Escape user input to prevent XSS
     safe_name = escape(name)
-    return {
-        "html": f"<h1>Welcome, {safe_name}</h1>",
-        "message": f"Hello, {safe_name}"
-    }
+    return {"html": f"<h1>Welcome, {safe_name}</h1>", "message": f"Hello, {safe_name}"}
+
 
 # Content Security Policy header
 class CSPMiddleware(BaseHTTPMiddleware):
@@ -762,6 +785,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Security headers
 @app.middleware("http")
 async def security_headers(request, call_next):
@@ -771,11 +795,13 @@ async def security_headers(request, call_next):
     response.headers["Strict-Transport-Security"] = "max-age=31536000"
     return response
 
+
 def create_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
@@ -792,14 +818,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return username
 
+
 @app.post("/token/")
 async def login(username: str, password: str):
     user = fake_user_db.get(username)
     if not user or not pwd_context.verify(password, user["password"]):
         raise HTTPException(401, "Invalid credentials")
-    
+
     token = create_token({"sub": username})
     return {"access_token": token, "token_type": "bearer"}
+
 
 @app.get("/protected/")
 async def protected_route(current_user: str = Depends(get_current_user)):
@@ -812,21 +840,23 @@ async def protected_route(current_user: str = Depends(get_current_user)):
 from pydantic import BaseModel, EmailStr, validator
 import re
 
+
 class SecureUserInput(BaseModel):
     username: str
     email: EmailStr
     bio: str
-    
-    @validator('username')
+
+    @validator("username")
     def validate_username(cls, v):
-        if not re.match(r'^[a-zA-Z0-9_]{3,20}$', v):
-            raise ValueError('Invalid username format')
+        if not re.match(r"^[a-zA-Z0-9_]{3,20}$", v):
+            raise ValueError("Invalid username format")
         return v
-    
-    @validator('bio')
+
+    @validator("bio")
     def sanitize_bio(cls, v):
         # Remove potentially dangerous HTML
-        return re.sub(r'<[^>]+>', '', v)
+        return re.sub(r"<[^>]+>", "", v)
+
 
 @app.post("/users/")
 async def create_user(user: SecureUserInput):
@@ -857,12 +887,14 @@ response.headers["X-Frame-Options"] = "DENY"
 # 5. Rate Limiting
 # Implement per-IP request tracking
 
+
 # 6. Input Validation
-@validator('field')
+@validator("field")
 def validate_field(cls, v):
     if not safe_condition(v):
         raise ValueError("Invalid input")
     return v
+
 
 # 7. Parameterized Queries
 db.execute(text("SELECT * WHERE id = :id"), {"id": user_id})

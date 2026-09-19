@@ -50,14 +50,15 @@ from fastapi import FastAPI, BackgroundTasks
 
 app = FastAPI()
 
+
 @app.post("/users/")
 async def create_user(background_tasks: BackgroundTasks):
     # This runs immediately
     user = create_user_in_db()
-    
+
     # This runs AFTER the response is sent
     background_tasks.add_task(send_welcome_email, user.email)
-    
+
     return {"message": "User created"}
 ```
 
@@ -101,18 +102,20 @@ import time
 
 app = FastAPI()
 
+
 def process_data(data: dict):
     """Simulate slow processing"""
     time.sleep(5)  # Simulate work
     print(f"Processed: {data}")
 
+
 @app.post("/upload/")
 async def upload_data(background_tasks: BackgroundTasks):
     data = {"content": "uploaded file"}
-    
+
     # Add task to run after response
     background_tasks.add_task(process_data, data)
-    
+
     return {"message": "Upload received, processing in background"}
 ```
 
@@ -126,35 +129,28 @@ from email.mime.text import MIMEText
 
 app = FastAPI()
 
+
 def send_email(email: EmailStr, subject: str, body: str):
     """Send email in background"""
     msg = MIMEText(body)
     msg["Subject"] = subject
     msg["From"] = "noreply@example.com"
     msg["To"] = email
-    
+
     # In production, use proper email service
     with smtplib.SMTP("localhost") as server:
         server.send_message(msg)
     print(f"Email sent to {email}")
 
+
 @app.post("/register/")
-async def register_user(
-    email: EmailStr,
-    name: str,
-    background_tasks: BackgroundTasks
-):
+async def register_user(email: EmailStr, name: str, background_tasks: BackgroundTasks):
     # Create user in database
     user = {"email": email, "name": name}
-    
+
     # Send welcome email in background
-    background_tasks.add_task(
-        send_email,
-        email,
-        "Welcome!",
-        f"Hi {name}, welcome to our service!"
-    )
-    
+    background_tasks.add_task(send_email, email, "Welcome!", f"Hi {name}, welcome to our service!")
+
     return {"message": "Registration successful"}
 ```
 
@@ -165,30 +161,34 @@ from fastapi import FastAPI, BackgroundTasks
 
 app = FastAPI()
 
+
 def validate_file(file_path: str):
     """First task: validate the file"""
     print(f"Validating {file_path}")
     # Validation logic here
     return True
 
+
 def process_file(file_path: str):
     """Second task: process the file"""
     print(f"Processing {file_path}")
     # Processing logic here
 
+
 def update_analytics(file_path: str, success: bool):
     """Third task: update analytics"""
     print(f"Analytics updated for {file_path}: {success}")
 
+
 @app.post("/files/")
 async def upload_file(background_tasks: BackgroundTasks):
     file_path = "/uploads/document.pdf"
-    
+
     # Chain tasks - each receives the return value of previous
     background_tasks.add_task(validate_file, file_path)
     background_tasks.add_task(process_file, file_path)
     background_tasks.add_task(update_analytics, file_path, True)
-    
+
     return {"message": "File upload queued"}
 ```
 
@@ -200,12 +200,14 @@ from sqlalchemy.orm import Session
 
 app = FastAPI()
 
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
 
 def notify_admin(db: Session, user_email: str):
     """Background task using database dependency"""
@@ -214,19 +216,16 @@ def notify_admin(db: Session, user_email: str):
     if admin:
         send_notification(admin.email, f"New user: {user_email}")
 
+
 @app.post("/users/")
-async def create_user(
-    email: str,
-    background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db)
-):
+async def create_user(email: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     user = User(email=email)
     db.add(user)
     db.commit()
-    
+
     # Pass db dependency to background task
     background_tasks.add_task(notify_admin, db, email)
-    
+
     return {"message": "User created"}
 ```
 
@@ -241,25 +240,27 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+
 def risky_operation(data: dict):
     """Background task that might fail"""
     try:
         # Simulate operation that might fail
         if data.get("force_error"):
             raise ValueError("Operation failed!")
-        
+
         logger.info("Operation completed successfully")
     except Exception as e:
         logger.error(f"Background task failed: {e}")
         # Store error for later inspection
         # Could also retry or send alert
 
+
 @app.post("/process/")
 async def process_data(background_tasks: BackgroundTasks):
     data = {"content": "some data", "force_error": False}
-    
+
     background_tasks.add_task(risky_operation, data)
-    
+
     return {"message": "Processing queued"}
 ```
 
@@ -270,31 +271,25 @@ from fastapi import FastAPI, BackgroundTasks
 
 app = FastAPI()
 
+
 class EmailService:
     def __init__(self, smtp_server: str):
         self.smtp_server = smtp_server
-    
+
     def send(self, to: str, subject: str, body: str):
         print(f"Sending to {to} via {self.smtp_server}")
         # Actual email sending logic
 
+
 # Create service instance
 email_service = EmailService("smtp.example.com")
 
+
 @app.post("/notify/")
-async def notify_user(
-    email: str,
-    message: str,
-    background_tasks: BackgroundTasks
-):
+async def notify_user(email: str, message: str, background_tasks: BackgroundTasks):
     # Pass bound method to background task
-    background_tasks.add_task(
-        email_service.send,
-        email,
-        "Notification",
-        message
-    )
-    
+    background_tasks.add_task(email_service.send, email, "Notification", message)
+
     return {"message": "Notification queued"}
 ```
 
@@ -306,18 +301,20 @@ import asyncio
 
 app = FastAPI()
 
+
 async def async_process(data: dict):
     """Async background task"""
     await asyncio.sleep(2)  # Simulate async work
     print(f"Async processed: {data}")
 
+
 @app.post("/async/")
 async def trigger_async(background_tasks: BackgroundTasks):
     data = {"key": "value"}
-    
+
     # Background tasks can be async
     background_tasks.add_task(async_process, data)
-    
+
     return {"message": "Async processing queued"}
 ```
 
@@ -336,12 +333,14 @@ async def upload(background_tasks: BackgroundTasks):
     result = check_file_status()  # Could fail
     return {"status": result}
 
+
 # ✅ CORRECT - Use polling or webhooks for status
 @app.post("/upload/")
 async def upload(background_tasks: BackgroundTasks):
     task_id = str(uuid.uuid4())
     background_tasks.add_task(process_file, task_id)
     return {"task_id": task_id, "status": "queued"}
+
 
 @app.get("/status/{task_id}")
 async def get_status(task_id: str):
@@ -356,7 +355,9 @@ def background_task(db: Session):
     # Session is not serializable!
     pass
 
+
 background_tasks.add_task(background_task, db)
+
 
 # ✅ CORRECT - Pass IDs, not objects
 def background_task(user_id: int):
@@ -364,6 +365,7 @@ def background_task(user_id: int):
     with SessionLocal() as db:
         user = db.query(User).get(user_id)
         # Process user
+
 
 background_tasks.add_task(background_task, user.id)
 ```
@@ -374,6 +376,7 @@ background_tasks.add_task(background_task, user.id)
 # ❌ WRONG - Exceptions silently fail
 def background_task():
     raise ValueError("Oops")  # No one sees this error
+
 
 # ✅ CORRECT - Log and handle exceptions
 def background_task():

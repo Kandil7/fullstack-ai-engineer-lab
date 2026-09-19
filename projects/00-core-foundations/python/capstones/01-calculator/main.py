@@ -37,7 +37,7 @@ class Calculator:
         return a / b
 
     def power(self, base: float, exp: float) -> float:
-        return base ** exp
+        return base**exp
 
     def root(self, a: float, n: float = 2) -> float:
         if a < 0 and n % 2 == 0:
@@ -224,7 +224,7 @@ def main():
                         display = f"{result:.10f}".rstrip("0").rstrip(".")
                 else:
                     display = str(result)
-                
+
                 print(f"  = {display}")
                 calc.add_to_history(expr.replace(" ", ""), result)
         except (ValueError, ZeroDivisionError, OverflowError) as e:

@@ -35,19 +35,22 @@
 ```python
 from enum import Enum, auto
 
+
 class Color(Enum):
-    RED = auto()    # 1
+    RED = auto()  # 1
     GREEN = auto()  # 2
-    BLUE = auto()   # 3
+    BLUE = auto()  # 3
+
 
 # Custom auto with __init__
 class Format(Enum):
     def __init__(self, mime_type):
         self.mime_type = mime_type
-    
+
     JSON = auto(), "application/json"
     XML = auto(), "application/xml"
     CSV = auto(), "text/csv"
+
 
 print(Format.JSON.mime_type)  # "application/json"
 ```
@@ -64,15 +67,17 @@ print(Format.JSON.mime_type)  # "application/json"
 ```python
 from enum import Flag, auto
 
+
 class Permission(Flag):
     READ = auto()
     WRITE = auto()
     EXECUTE = auto()
 
+
 perms = Permission.READ | Permission.WRITE
 
 # Check if READ is set
-print(bool(perms & Permission.READ))   # True
+print(bool(perms & Permission.READ))  # True
 print(bool(perms & Permission.EXECUTE))  # False
 
 # Intersection
@@ -91,10 +96,12 @@ both = Permission.READ & Permission.READ  # Permission.READ
 ```python
 from enum import Flag, auto
 
+
 class Permission(Flag):
-    READ = auto()    # 1
-    WRITE = auto()   # 2
-    EXECUTE = auto() # 4
+    READ = auto()  # 1
+    WRITE = auto()  # 2
+    EXECUTE = auto()  # 4
+
 
 # Combine flags
 read_write = Permission.READ | Permission.WRITE
@@ -121,10 +128,12 @@ for perm in read_write:
 ```python
 from enum import Enum
 
+
 class Color(Enum):
     RED = 1
     GREEN = 2
     BLUE = 3
+
 
 print(Color.RED.name)  # "RED"
 print(Color.GREEN.name)  # "GREEN"
@@ -146,12 +155,14 @@ for color in Color:
 ```python
 from enum import Enum, auto
 
+
 class Status(Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
     PENDING = auto()
 
-print(Status.ACTIVE.value)   # "active"
+
+print(Status.ACTIVE.value)  # "active"
 print(Status.PENDING.value)  # 1
 
 # Comparison with values
@@ -170,14 +181,16 @@ print(Status.ACTIVE.value == "active")  # True
 ```python
 from enum import Enum
 
+
 class Color(Enum):
     RED = 1
     GREEN = 2
     BLUE = 3
 
+
 # Access enum class from member
 print(Color.RED.__class__)  # <enum 'Color'>
-print(type(Color.RED))      # <enum 'Color'>
+print(type(Color.RED))  # <enum 'Color'>
 
 # Member iteration
 for member in Color:
@@ -196,17 +209,19 @@ for member in Color:
 ```python
 from enum import IntFlag, auto
 
+
 class FileMode(IntFlag):
-    READ = auto()    # 1
-    WRITE = auto()   # 2
-    EXECUTE = auto() # 4
+    READ = auto()  # 1
+    WRITE = auto()  # 2
+    EXECUTE = auto()  # 4
+
 
 # OR: combine
 rw = FileMode.READ | FileMode.WRITE
 print(oct(rw))  # 0o3
 
 # AND: check
-print(bool(rw & FileMode.READ))    # True
+print(bool(rw & FileMode.READ))  # True
 print(bool(rw & FileMode.EXECUTE))  # False
 
 # XOR: toggle
@@ -230,16 +245,18 @@ print(inverted)  # FileMode.WRITE|EXECUTE
 ```python
 from enum import Enum, auto
 
+
 class Planet(Enum):
     MERCURY = auto()
     VENUS = auto()
     EARTH = auto()
     MARS = auto()
 
+
 # Access member
 earth = Planet.EARTH
-print(earth)        # Planet.EARTH
-print(earth.name)   # "EARTH"
+print(earth)  # Planet.EARTH
+print(earth.name)  # "EARTH"
 print(earth.value)  # 3
 
 # Members are singletons
@@ -258,11 +275,13 @@ print(Planet.EARTH is Planet.EARTH)  # True
 ```python
 from enum import Enum
 
+
 class Season(Enum):
     SPRING = "spring"
     SUMMER = "summer"
     AUTUMN = "autumn"
     WINTER = "winter"
+
 
 # Iterate all members
 for season in Season:
@@ -313,11 +332,13 @@ print(Status.PENDING.value)  # 1
 ```python
 from enum import Flag, auto
 
+
 class Feature(Flag):
     DARK_MODE = auto()
     NOTIFICATIONS = auto()
     SYNC = auto()
     ANALYTICS = auto()
+
 
 # Single flags
 print(Feature.DARK_MODE)  # Feature.DARK_MODE
@@ -352,11 +373,7 @@ Size = Enum("Size", ["SMALL", "MEDIUM", "LARGE"])
 print(Size.MEDIUM)  # Size.MEDIUM
 
 # Create from dict
-Weekday = Enum("Weekday", {
-    "MONDAY": 0,
-    "TUESDAY": 1,
-    "WEDNESDAY": 2
-})
+Weekday = Enum("Weekday", {"MONDAY": 0, "TUESDAY": 1, "WEDNESDAY": 2})
 print(Weekday.MONDAY.value)  # 0
 ```
 
@@ -372,21 +389,25 @@ print(Weekday.MONDAY.value)  # 0
 ```python
 from enum import IntEnum
 
+
 class Priority(IntEnum):
     LOW = 1
     MEDIUM = 2
     HIGH = 3
     CRITICAL = 4
 
+
 # Numeric operations
 print(Priority.HIGH + 10)  # 13
 print(Priority.HIGH > Priority.LOW)  # True
+
 
 # Use as integer
 def process(priority: int) -> str:
     if priority >= Priority.HIGH:
         return "Urgent"
     return "Normal"
+
 
 print(process(Priority.CRITICAL))  # "Urgent"
 print(4)  # 4
@@ -405,15 +426,18 @@ print(4)  # 4
 from enum import Enum
 import json
 
+
 class Status(Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
+
 
 # Custom serializer
 def enum_serializer(obj):
     if isinstance(obj, Enum):
         return obj.value
     raise TypeError(f"Cannot serialize {type(obj)}")
+
 
 # Serialize
 data = {"status": Status.ACTIVE}
@@ -438,11 +462,13 @@ print(status)  # Status.ACTIVE
 ```python
 from enum import Enum
 
+
 class Command(Enum):
     START = "start"
     STOP = "stop"
     PAUSE = "pause"
     RESUME = "resume"
+
 
 def handle_command(cmd: Command):
     match cmd:
@@ -454,6 +480,7 @@ def handle_command(cmd: Command):
             print("Pausing...")
         case Command.RESUME:
             print("Resuming...")
+
 
 handle_command(Command.START)  # "Starting..."
 ```
@@ -470,17 +497,18 @@ handle_command(Command.START)  # "Starting..."
 ```python
 from enum import Enum, auto
 
+
 class OrderState(Enum):
     CREATED = auto()
     PAID = auto()
     SHIPPED = auto()
     DELIVERED = auto()
     CANCELLED = auto()
-    
+
     @property
     def is_terminal(self):
         return self in {OrderState.DELIVERED, OrderState.CANCELLED}
-    
+
     @property
     def next_states(self):
         transitions = {
@@ -492,14 +520,16 @@ class OrderState(Enum):
         }
         return transitions[self]
 
+
 class Order:
     def __init__(self):
         self.state = OrderState.CREATED
-    
+
     def transition(self, new_state):
         if new_state not in self.state.next_states:
             raise ValueError(f"Invalid transition: {self.state} -> {new_state}")
         self.state = new_state
+
 
 order = Order()
 order.transition(OrderState.PAID)
@@ -520,10 +550,12 @@ print(order.state)  # OrderState.SHIPPED
 from enum import Enum
 import json
 
+
 class Color(Enum):
     RED = 1
     GREEN = 2
     BLUE = 3
+
 
 # To string
 color_str = Color.RED.name  # "RED"
@@ -535,12 +567,14 @@ color_val = Color.RED.value  # 1
 color_dict = {c.name: c.value for c in Color}
 print(color_dict)  # {"RED": 1, "GREEN": 2, "BLUE": 3}
 
+
 # JSON with custom encoder
 class EnumEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Enum):
             return obj.value
         return super().default(obj)
+
 
 data = {"color": Color.RED}
 print(json.dumps(data, cls=EnumEncoder))  # {"color": 1}
@@ -588,20 +622,22 @@ print(HttpMethod.GET == "GET")  # True
 ```python
 from enum import Enum
 
+
 class LogLevel(Enum):
     """Logging levels for application output."""
-    
+
     DEBUG = "DEBUG"
     """Detailed debug information for developers."""
-    
+
     INFO = "INFO"
     """General information about system operation."""
-    
+
     WARNING = "WARNING"
     """Potential issues that don't prevent operation."""
-    
+
     ERROR = "ERROR"
     """Serious problems that affect functionality."""
+
 
 # Access docstrings
 print(LogLevel.__doc__)  # "Logging levels..."
@@ -620,13 +656,15 @@ print(LogLevel.DEBUG.__doc__)  # "Detailed debug..."
 ```python
 from enum import Enum, auto
 
+
 class Status(Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
     PENDING = auto()
 
-print(Status.ACTIVE.value)    # "active"
-print(Status.PENDING.value)   # 1
+
+print(Status.ACTIVE.value)  # "active"
+print(Status.PENDING.value)  # 1
 
 # Use in comparisons
 if Status.ACTIVE.value == "active":
@@ -645,10 +683,12 @@ if Status.ACTIVE.value == "active":
 ```python
 from enum import Enum
 
+
 class Color(Enum):
     RED = 1
     GREEN = 2
     BLUE = 3
+
 
 # Membership test
 print(Color.RED in Color)  # True
@@ -657,9 +697,11 @@ print(1 in Color)  # True (checks values)
 # With Flag
 from enum import Flag, auto
 
+
 class Permission(Flag):
     READ = auto()
     WRITE = auto()
+
 
 perms = Permission.READ | Permission.WRITE
 print(Permission.READ in perms)  # True

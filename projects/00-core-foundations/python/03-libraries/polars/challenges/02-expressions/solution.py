@@ -15,9 +15,9 @@ def filter_and_project(df: pl.DataFrame, min_score: float, min_spend: float) -> 
     predicate; Python's `and` would raise on Expr truthiness. select
     projects exactly the two output columns.
     """
-    return df.filter(
-        (pl.col("score") >= min_score) & (pl.col("spend") >= min_spend)
-    ).select("user", "score")
+    return df.filter((pl.col("score") >= min_score) & (pl.col("spend") >= min_spend)).select(
+        "user", "score"
+    )
 
 
 def derive_features(df: pl.DataFrame) -> pl.DataFrame:
@@ -28,10 +28,7 @@ def derive_features(df: pl.DataFrame) -> pl.DataFrame:
     needs descending=True because the default ranks ascending.
     """
     return df.with_columns(
-        pl.when(pl.col("score") >= 0.5)
-        .then(pl.lit("high"))
-        .otherwise(pl.lit("low"))
-        .alias("band"),
+        pl.when(pl.col("score") >= 0.5).then(pl.lit("high")).otherwise(pl.lit("low")).alias("band"),
         pl.col("score").rank(descending=True).alias("score_rank"),
         (pl.col("spend") / 100).alias("spend_norm"),
     )
@@ -47,8 +44,7 @@ def group_ranked_features(df: pl.DataFrame) -> pl.DataFrame:
     return (
         df.with_columns(
             pl.col("spend").rank().over("user").alias("spend_rank_in_user"),
-            (pl.col("spend") / pl.col("spend").sum().over("user"))
-            .alias("share_of_user"),
+            (pl.col("spend") / pl.col("spend").sum().over("user")).alias("share_of_user"),
         )
         .group_by("user")
         .agg(

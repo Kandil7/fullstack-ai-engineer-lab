@@ -35,10 +35,12 @@ np.random.seed(42)
 # the results back into one object.
 
 # Example 1: manual split-apply-combine reproduces groupby exactly
-df = pd.DataFrame({
-    "team": ["a", "b", "a", "c", "b", "a"],
-    "score": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0],
-})
+df = pd.DataFrame(
+    {
+        "team": ["a", "b", "a", "c", "b", "a"],
+        "score": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0],
+    }
+)
 
 # Manual: split by key, apply mean, combine into a Series
 manual = {}
@@ -68,9 +70,9 @@ print("Identical:", manual_result.equals(native))
 stats = df.groupby("team").agg(["mean", "max"])
 print("Multi-func agg columns:", stats.columns.tolist())
 
-by_col = df.groupby("team").agg(avg=("score", "mean"),
-                                peak=("score", "max"),
-                                count=("score", "count"))
+by_col = df.groupby("team").agg(
+    avg=("score", "mean"), peak=("score", "max"), count=("score", "count")
+)
 print("Named agg:")
 print(by_col.round(2).to_dict("index"))
 
@@ -130,8 +132,7 @@ print("Rows kept:", len(big_teams))
 # be expressed otherwise.
 
 # Example 5: apply returning a scalar per group
-first_last = df.groupby("team")["score"].apply(
-    lambda g: g.iloc[0] - g.iloc[-1])
+first_last = df.groupby("team")["score"].apply(lambda g: g.iloc[0] - g.iloc[-1])
 print("First - last per team:", first_last.round(2).tolist())
 
 # Output:
@@ -148,10 +149,12 @@ print("First - last per team:", first_last.round(2).tolist())
 
 # Example 6: same computation, three spellings -- verify equal results
 n = 20_000
-big = pd.DataFrame({
-    "key": np.random.randint(0, 1000, n),
-    "val": np.random.randn(n),
-})
+big = pd.DataFrame(
+    {
+        "key": np.random.randint(0, 1000, n),
+        "val": np.random.randn(n),
+    }
+)
 
 agg_mean = big.groupby("key")["val"].mean()
 apply_mean = big.groupby("key")["val"].apply(lambda g: g.mean())
@@ -159,8 +162,7 @@ apply_mean = big.groupby("key")["val"].apply(lambda g: g.mean())
 # transform returns one value PER ROW: take the first row of each key
 # so every spelling ends up keyed the same way.
 transform_first = (
-    big
-    .assign(m=big.groupby("key")["val"].transform("mean"))
+    big.assign(m=big.groupby("key")["val"].transform("mean"))
     .drop_duplicates("key")[["key", "m"]]
     .set_index("key")["m"]
     .sort_index()
@@ -184,11 +186,13 @@ print("agg == apply:", np.allclose(agg_sorted.values, apply_sorted.values))
 # columns -- the classic "cohort x month" matrix.
 
 # Example 7: two-key grouping and reshaping
-sales = pd.DataFrame({
-    "month": np.repeat(["Jan", "Feb", "Mar"], 4),
-    "city": np.tile(["NY", "SF", "NY", "SF"], 3),
-    "amount": np.random.uniform(10, 100, 12).round(1),
-})
+sales = pd.DataFrame(
+    {
+        "month": np.repeat(["Jan", "Feb", "Mar"], 4),
+        "city": np.tile(["NY", "SF", "NY", "SF"], 3),
+        "amount": np.random.uniform(10, 100, 12).round(1),
+    }
+)
 cohort = sales.groupby(["month", "city"])["amount"].sum()
 print("Multi-key index:", cohort.index.names)
 matrix = cohort.unstack()
@@ -212,11 +216,11 @@ print(matrix.round(1).to_string())
 # features via named agg, then merge back onto the base frame with
 # transform-style alignment -- but explicit, reviewable, and fast.
 
+
 def group_features(frame: pd.DataFrame) -> pd.DataFrame:
     """Per-user summary features, one row per user."""
     return (
-        frame
-        .groupby("user_id")
+        frame.groupby("user_id")
         .agg(
             total_spend=("amount", "sum"),
             avg_spend=("amount", "mean"),
@@ -226,12 +230,15 @@ def group_features(frame: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
     )
 
+
 # Example 8: users with orders, then join features back
-orders = pd.DataFrame({
-    "user_id": np.repeat([1, 2, 3], [3, 2, 1]),
-    "amount": [50.0, 30.0, 20.0, 90.0, 10.0, 15.0],
-    "status": ["paid", "paid", "refunded", "paid", "paid", "paid"],
-})
+orders = pd.DataFrame(
+    {
+        "user_id": np.repeat([1, 2, 3], [3, 2, 1]),
+        "amount": [50.0, 30.0, 20.0, 90.0, 10.0, 15.0],
+        "status": ["paid", "paid", "refunded", "paid", "paid", "paid"],
+    }
+)
 features = group_features(orders)
 print("User features:")
 print(features.round(2).to_string(index=False))
@@ -273,48 +280,46 @@ print(features.round(2).to_string(index=False))
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # Manual split-apply-combine equals the native groupby.
-    assert manual_result.equals(native), \
-        "manual split-apply-combine must match groupby"
+    assert manual_result.equals(native), "manual split-apply-combine must match groupby"
 
     # Named agg produces the expected columns and values.
-    assert by_col.columns.tolist() == ["avg", "peak", "count"], \
+    assert by_col.columns.tolist() == ["avg", "peak", "count"], (
         "named agg must produce the requested column names"
-    assert by_col.loc["a", "avg"] == 33.333333333333336, \
-        "team a mean must be (10+30+60)/3"
+    )
+    assert by_col.loc["a", "avg"] == 33.333333333333336, "team a mean must be (10+30+60)/3"
     assert by_col.loc["a", "count"] == 3, "team a has 3 rows"
     assert by_col.loc["b", "peak"] == 50.0, "team b max must be 50"
 
     # transform preserves the input length and computes group means.
     assert len(df) == 6, "transform must not change row count"
-    assert df["team_mean"].tolist()[0] == 33.333333333333336, \
-        "team_mean must be the group mean"
-    assert np.isclose(df["team_share"].sum(), 3.0), \
+    assert df["team_mean"].tolist()[0] == 33.333333333333336, "team_mean must be the group mean"
+    assert np.isclose(df["team_share"].sum(), 3.0), (
         "each team's shares must sum to 1.0 (three teams -> 3.0)"
+    )
 
     # filter keeps whole groups only.
-    assert sorted(big_teams["team"].unique().tolist()) == ["a", "b"], \
+    assert sorted(big_teams["team"].unique().tolist()) == ["a", "b"], (
         "filter must drop team c entirely"
+    )
 
     # apply produces the per-group first-minus-last.
-    assert first_last.sort_index().tolist() == [-50.0, -30.0, 0.0], \
+    assert first_last.sort_index().tolist() == [-50.0, -30.0, 0.0], (
         "apply must compute first - last per group"
+    )
 
     # agg, transform, and apply agree on the same computation.
-    assert np.allclose(agg_sorted.values, transform_first.values), \
-        "agg and transform must agree"
-    assert np.allclose(agg_sorted.values, apply_sorted.values), \
-        "agg and apply must agree"
+    assert np.allclose(agg_sorted.values, transform_first.values), "agg and transform must agree"
+    assert np.allclose(agg_sorted.values, apply_sorted.values), "agg and apply must agree"
 
     # Multi-key grouping produces a valid cohort matrix.
-    assert cohort.index.names == ["month", "city"], \
-        "two-key groupby must produce a MultiIndex"
+    assert cohort.index.names == ["month", "city"], "two-key groupby must produce a MultiIndex"
     assert matrix.shape == (3, 2), "cohort matrix must be 3 months x 2 cities"
 
     # Production pattern: one row per user, correct totals.
-    assert features["total_spend"].tolist() == [100.0, 100.0, 15.0], \
+    assert features["total_spend"].tolist() == [100.0, 100.0, 15.0], (
         "user totals must be [100, 100, 15]"
-    assert features["order_count"].tolist() == [3, 2, 1], \
-        "order counts must be [3, 2, 1]"
+    )
+    assert features["order_count"].tolist() == [3, 2, 1], "order counts must be [3, 2, 1]"
 
     print("[OK] 42-groupby-internals: all checks passed")
 
@@ -327,4 +332,4 @@ if __name__ == "__main__":
         print("1. agg shrinks, transform preserves, filter drops groups.")
         print("2. apply is the flexible slow path -- last resort.")
         print("3. Named agg makes group features reviewable.")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

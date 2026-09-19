@@ -19,8 +19,7 @@ def signature_matches(func, expected: list[str]) -> bool:
 
 @runtime_checkable
 class Retriever(Protocol):
-    def retrieve(self, query: str, k: int = 5) -> list[str]:
-        ...
+    def retrieve(self, query: str, k: int = 5) -> list[str]: ...
 
 
 class QdrantRetriever:

@@ -40,7 +40,8 @@ credential must come from a CSPRNG.
 
 ```python
 import secrets
-token = secrets.token_urlsafe(32)   # URL-safe random token
+
+token = secrets.token_urlsafe(32)  # URL-safe random token
 ```
 
 **Related Terms:** `secrets`, `random`
@@ -52,6 +53,7 @@ CSPRNG; never seedable, never reproducible.
 
 ```python
 import secrets
+
 print(secrets.token_hex(16))
 ```
 
@@ -70,8 +72,9 @@ tokens.
 
 ```python
 import random
+
 random.seed(42)
-print(random.choice("abcd"))   # same result after every seed(42)
+print(random.choice("abcd"))  # same result after every seed(42)
 ```
 
 ```text
@@ -90,10 +93,10 @@ hashes.
 ```python
 import hashlib, secrets
 
+
 def hash_password(password, salt=None, iterations=100_000):
     salt = salt or secrets.token_bytes(16)
-    return hashlib.pbkdf2_hmac("sha256", password.encode(), salt,
-                               iterations), salt
+    return hashlib.pbkdf2_hmac("sha256", password.encode(), salt, iterations), salt
 ```
 
 **Related Terms:** Salt, KDF
@@ -106,7 +109,7 @@ rainbow tables become useless.
 ```python
 h1, s1 = hash_password("p@ss")
 h2, s2 = hash_password("p@ss")
-print(h1 == h2)   # False — different salts
+print(h1 == h2)  # False — different salts
 ```
 
 ```text
@@ -132,6 +135,7 @@ differ.
 
 ```python
 import hmac
+
 print(hmac.compare_digest(b"abc", b"abc"))
 ```
 
@@ -233,7 +237,8 @@ for untrusted configs.
 
 ```python
 import yaml
-yaml.safe_load("a: 1")     # {'a': 1}
+
+yaml.safe_load("a: 1")  # {'a': 1}
 ```
 
 **Related Terms:** YAML object tag

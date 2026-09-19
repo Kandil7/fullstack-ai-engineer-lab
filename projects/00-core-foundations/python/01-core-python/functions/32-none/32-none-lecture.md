@@ -26,18 +26,18 @@ By the end of this lecture, you will be able to:
 x = None
 y = None
 
-print(x is y)      # True (same object)
-print(type(None))   # <class 'NoneType'>
+print(x is y)  # True (same object)
+print(type(None))  # <class 'NoneType'>
 ```
 
 ### NoneType
 
 ```python
 # None is its own type
-print(type(None))   # <class 'NoneType'>
+print(type(None))  # <class 'NoneType'>
 
 # Only one None exists
-print(None)         # None
+print(None)  # None
 ```
 
 ---
@@ -69,13 +69,14 @@ class BadEquals:
     def __eq__(self, other):
         return True  # Always equal!
 
+
 obj = BadEquals()
 
 # Equality check fails
-print(obj == None)   # True (wrong!)
+print(obj == None)  # True (wrong!)
 
 # Identity check works correctly
-print(obj is None)   # False (correct!)
+print(obj is None)  # False (correct!)
 ```
 
 ---
@@ -90,8 +91,10 @@ def append_to_list(item, lst=[]):
     lst.append(item)
     return lst
 
+
 print(append_to_list(1))  # [1]
 print(append_to_list(2))  # [1, 2] - Bug! Same list!
+
 
 # GOOD - None as default
 def append_to_list(item, lst=None):
@@ -99,6 +102,7 @@ def append_to_list(item, lst=None):
         lst = []
     lst.append(item)
     return lst
+
 
 print(append_to_list(1))  # [1]
 print(append_to_list(2))  # [2] - Correct!
@@ -111,6 +115,7 @@ def find_user(user_id):
     """Return user or None if not found."""
     users = {1: "Alice", 2: "Bob"}
     return users.get(user_id)  # Returns None if not found
+
 
 user = find_user(1)
 if user is not None:
@@ -136,12 +141,12 @@ if not None:
     print("This will execute")
 
 # Truthy/Falsy summary
-print(bool(None))     # False
-print(bool(0))        # False
-print(bool(""))       # False
-print(bool([]))       # False
-print(bool({}))       # False
-print(bool(1))        # True
+print(bool(None))  # False
+print(bool(0))  # False
+print(bool(""))  # False
+print(bool([]))  # False
+print(bool({}))  # False
+print(bool(1))  # True
 print(bool("hello"))  # True
 ```
 
@@ -216,9 +221,9 @@ print(None in my_set)  # True
 value = 0
 
 # These are different!
-print(value is None)    # False
-print(value == None)    # False (but works)
-print(not value)        # True
+print(value is None)  # False
+print(value == None)  # False (but works)
+print(not value)  # True
 
 # Use 'is None' when you specifically mean None
 # Use 'not value' when you want any falsy value
@@ -233,13 +238,15 @@ print(not value)        # True
 ```python
 from typing import Optional
 
+
 def greet(name: Optional[str]) -> str:
     if name is None:
         return "Hello, stranger!"
     return f"Hello, {name}!"
 
+
 print(greet("Alice"))  # Hello, Alice!
-print(greet(None))     # Hello, stranger!
+print(greet(None))  # Hello, stranger!
 ```
 
 ### Optional with Default
@@ -247,8 +254,8 @@ print(greet(None))     # Hello, stranger!
 ```python
 from typing import Optional
 
-def process_data(data: list, 
-                 callback: Optional[callable] = None) -> list:
+
+def process_data(data: list, callback: Optional[callable] = None) -> list:
     if callback is None:
         return data
     return [callback(x) for x in data]
@@ -286,6 +293,7 @@ class Config:
 ```python
 _MISSING = object()  # Unique sentinel
 
+
 def get_value(key, default=_MISSING):
     if default is _MISSING:
         raise KeyError(f"Key {key} not found")
@@ -318,6 +326,7 @@ def func(data=[]):
     data.append(1)
     return data
 
+
 # GOOD - None as default
 def func(data=None):
     if data is None:
@@ -333,6 +342,7 @@ def func(data=None):
 def do_something():
     result = perform_operation()
     # Forgot to return result!
+
 
 # GOOD - explicit return
 def do_something():
@@ -368,11 +378,12 @@ def safe_get_nested(data, *keys):
         current = current.get(key)
     return current
 
+
 # Test
 data = {"a": {"b": {"c": 42}}}
 print(safe_get_nested(data, "a", "b", "c"))  # 42
-print(safe_get_nested(data, "a", "x"))       # None
-print(safe_get_nested(data, "x"))            # None
+print(safe_get_nested(data, "a", "x"))  # None
+print(safe_get_nested(data, "x"))  # None
 ```
 
 ### Exercise 2: None-Safe List Processing
@@ -381,26 +392,23 @@ print(safe_get_nested(data, "x"))            # None
 def filter_and_transform(items, transform=None, filter_fn=None):
     """Filter and transform a list, handling None values."""
     result = items
-    
+
     # Apply filter
     if filter_fn is not None:
         result = [x for x in result if filter_fn(x)]
-    
+
     # Apply transform
     if transform is not None:
         result = [transform(x) for x in result]
-    
+
     return result
+
 
 # Test
 numbers = [1, None, 2, None, 3, 4, None, 5]
 
 # Filter Nones and double
-result = filter_and_transform(
-    numbers,
-    filter_fn=lambda x: x is not None,
-    transform=lambda x: x * 2
-)
+result = filter_and_transform(numbers, filter_fn=lambda x: x is not None, transform=lambda x: x * 2)
 print(result)  # [2, 4, 6, 8, 10]
 ```
 

@@ -60,11 +60,10 @@ def react_agent(task: str, llm_client, registry: dict, max_steps: int = 8) -> st
         resp = llm_client.complete(trace)
         trace.append(resp.message)
         if not resp.tool_calls:
-            return resp.content                      # task complete
+            return resp.content  # task complete
         for call in resp.tool_calls:
-            result = execute_tool(call, registry)    # L13 (validated)
-            trace.append({"role": "tool", "tool_call_id": call.id,
-                          "content": result})
+            result = execute_tool(call, registry)  # L13 (validated)
+            trace.append({"role": "tool", "tool_call_id": call.id, "content": result})
             print(f"[{step}] {call.function.name} -> {result[:60]}")
     return "ERROR: max steps exceeded"
 ```
@@ -88,16 +87,20 @@ multi-step tasks:
 PLAN_PROMPT = """Break this task into 2-5 ordered steps. Output JSON:
 {"steps": [{"step": str, "tool": str, "input": {...}}]}. Task: {task}"""
 
+
 def plan_and_execute(task: str, llm_client, registry: dict) -> str:
     import json
+
     plan = json.loads(llm_client.complete(PLAN_PROMPT.format(task=task)))
     results = []
     for s in plan["steps"]:
-        out = execute_tool({"function": {"name": s["tool"], "arguments":
-                             json.dumps(s["input"])}}, registry)
+        out = execute_tool(
+            {"function": {"name": s["tool"], "arguments": json.dumps(s["input"])}}, registry
+        )
         results.append(f"Step '{s['step']}': {out}")
     return llm_client.complete(
-        f"Task: {task}\nStep results:\n" + "\n".join(results) + "\nFinal answer:")
+        f"Task: {task}\nStep results:\n" + "\n".join(results) + "\nFinal answer:"
+    )
 ```
 
 Output:
@@ -121,10 +124,12 @@ def reflect_generate(task: str, llm_client, rounds: int = 2) -> str:
     for _ in range(rounds):
         critique = llm_client.complete(
             f"Critique this output for correctness and completeness.\n"
-            f"Task: {task}\nOutput: {draft}\nCritique:")
+            f"Task: {task}\nOutput: {draft}\nCritique:"
+        )
         draft = llm_client.complete(
             f"Revise the output addressing this critique.\n"
-            f"Task: {task}\nCritique: {critique}\nRevised output:")
+            f"Task: {task}\nCritique: {critique}\nRevised output:"
+        )
     return draft
 ```
 
@@ -152,14 +157,16 @@ TRANSITIONS = {
     "fulfill": {"done"},
 }
 
+
 def run_state_machine(task: str, llm_client, registry: dict) -> str:
     state = "start"
     ctx = {}
     while state != "done":
         allowed = TRANSITIONS[state]
         resp = llm_client.complete(
-            f"State: {state}. Allowed next: {allowed}. Context: {ctx}. Task: {task}.")
-        state = parse_state(resp)              # L3: constrained enum
+            f"State: {state}. Allowed next: {allowed}. Context: {ctx}. Task: {task}."
+        )
+        state = parse_state(resp)  # L3: constrained enum
         if state not in allowed:
             return f"ERROR: illegal transition to {state}"
         ctx[state] = execute_state(state, registry)
@@ -182,8 +189,7 @@ Every production agent needs the same controls:
 
 ```python
 class AgentBudget:
-    def __init__(self, max_steps: int = 10, max_tokens: int = 20_000,
-                 max_cost: float = 1.0):
+    def __init__(self, max_steps: int = 10, max_tokens: int = 20_000, max_cost: float = 1.0):
         self.steps = 0
         self.tokens = 0
         self.cost = 0.0
@@ -193,9 +199,11 @@ class AgentBudget:
         self.steps += 1
         self.tokens += last_tokens
         self.cost += last_tokens * cost_per_token
-        return (self.steps <= self.limits[0] and
-                self.tokens <= self.limits[1] and
-                self.cost <= self.limits[2])
+        return (
+            self.steps <= self.limits[0]
+            and self.tokens <= self.limits[1]
+            and self.cost <= self.limits[2]
+        )
 ```
 
 Output:
@@ -215,8 +223,10 @@ from scratch is waste; resuming from the persisted trace is cheap.
 ```python
 import json
 
+
 def save_state(agent_id: str, trace: list) -> None:
     json.dump(trace, open(f"outputs/agents/{agent_id}.json", "w"))
+
 
 def load_state(agent_id: str) -> list | None:
     try:
@@ -239,8 +249,10 @@ correctly?) and **efficiency** (steps/tokens per task):
 def evaluate_agent(agent_fn, tasks: list[dict]) -> dict:
     """tasks: [{"input": ..., "expected": ...}]. Score completion + efficiency."""
     done = sum(1 for t in tasks if agent_fn(t["input"]) == t["expected"])
-    return {"completion_rate": round(done / len(tasks), 3),
-            "avg_steps": ... }   # from the agent's step counter
+    return {
+        "completion_rate": round(done / len(tasks), 3),
+        "avg_steps": ...,
+    }  # from the agent's step counter
 ```
 
 Output:

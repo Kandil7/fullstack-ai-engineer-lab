@@ -40,15 +40,19 @@ By the end of this lecture, you will be able to:
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE accounts (id INTEGER PRIMARY KEY, name TEXT, balance INTEGER)")
-conn.executemany("INSERT INTO accounts (id, name, balance) VALUES (?, ?, ?)",
-                 [(1, "ada", 100), (2, "bob", 50)])
+conn.executemany(
+    "INSERT INTO accounts (id, name, balance) VALUES (?, ?, ?)", [(1, "ada", 100), (2, "bob", 50)]
+)
+
 
 def transfer(from_id, to_id, amount):
     conn.execute("UPDATE accounts SET balance = balance - ? WHERE id = ?", (amount, from_id))
     conn.execute("UPDATE accounts SET balance = balance + ? WHERE id = ?", (amount, to_id))
     conn.commit()
+
 
 transfer(1, 2, 30)
 print(conn.execute("SELECT id, balance FROM accounts ORDER BY id").fetchall())
@@ -95,7 +99,7 @@ conn.execute("BEGIN")
 conn.execute("UPDATE accounts SET balance = balance + 10 WHERE id = 1")
 conn.execute("SAVEPOINT after_credit")
 conn.execute("UPDATE accounts SET balance = balance - 5 WHERE id = 1")
-conn.execute("ROLLBACK TO after_credit")   # undo only the -5
+conn.execute("ROLLBACK TO after_credit")  # undo only the -5
 conn.commit()
 ```
 

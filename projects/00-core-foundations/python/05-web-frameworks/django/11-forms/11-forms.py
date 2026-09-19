@@ -30,32 +30,19 @@ from django import forms
 # --- Regular Form ---
 class ContactForm(forms.Form):
     """A simple contact form (not tied to a model)."""
+
     name = forms.CharField(
         max_length=100,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Your name'
-        }),
-        help_text='Enter your full name.',
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Your name"}),
+        help_text="Enter your full name.",
     )
     email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'your@email.com'
-        })
+        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "your@email.com"})
     )
     subject = forms.CharField(max_length=200)
-    message = forms.CharField(
-        widget=forms.Textarea(attrs={
-            'rows': 5,
-            'class': 'form-control'
-        })
-    )
-    subscribe = forms.BooleanField(
-        required=False,
-        initial=True,
-        label='Subscribe to newsletter'
-    )
+    message = forms.CharField(widget=forms.Textarea(attrs={"rows": 5, "class": "form-control"}))
+    subscribe = forms.BooleanField(required=False, initial=True, label="Subscribe to newsletter")
+
 
 # --- ModelForm ---
 class PostForm(forms.ModelForm):
@@ -63,32 +50,24 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post  # Replace with your actual Post model
-        fields = ['title', 'content', 'category', 'status']
+        fields = ["title", "content", "category", "status"]
         widgets = {
-            'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Post title'
-            }),
-            'content': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 10
-            }),
-            'status': forms.Select(attrs={
-                'class': 'form-control'
-            }),
+            "title": forms.TextInput(attrs={"class": "form-control", "placeholder": "Post title"}),
+            "content": forms.Textarea(attrs={"class": "form-control", "rows": 10}),
+            "status": forms.Select(attrs={"class": "form-control"}),
         }
         labels = {
-            'title': 'Post Title',
-            'content': 'Post Content',
+            "title": "Post Title",
+            "content": "Post Content",
         }
         help_texts = {
-            'title': 'Choose a descriptive title.',
+            "title": "Choose a descriptive title.",
         }
 
     # Custom validation
     def clean_title(self):
         """Validate title field."""
-        title = self.cleaned_data.get('title')
+        title = self.cleaned_data.get("title")
         if len(title) < 5:
             raise forms.ValidationError("Title must be at least 5 characters.")
         return title
@@ -96,14 +75,13 @@ class PostForm(forms.ModelForm):
     def clean(self):
         """Validate the entire form."""
         cleaned_data = super().clean()
-        title = cleaned_data.get('title')
-        content = cleaned_data.get('content')
+        title = cleaned_data.get("title")
+        content = cleaned_data.get("content")
 
         if title and content and title.lower() in content.lower():
-            raise forms.ValidationError(
-                "Content should not contain the title."
-            )
+            raise forms.ValidationError("Content should not contain the title.")
         return cleaned_data
+
 
 # ---------------------------------------------------------------------------
 # 3. Form Fields
@@ -183,6 +161,7 @@ class PostForm(forms.ModelForm):
 # ---------------------------------------------------------------------------
 # Django forms have built-in and custom validation.
 
+
 class RegistrationForm(forms.Form):
     username = forms.CharField(min_length=3, max_length=20)
     email = forms.EmailField()
@@ -192,20 +171,20 @@ class RegistrationForm(forms.Form):
 
     # Field-level validation (clean_<fieldname>)
     def clean_username(self):
-        username = self.cleaned_data.get('username')
+        username = self.cleaned_data.get("username")
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError("Username already taken.")
         # You could also check for reserved words, profanity, etc.
         return username
 
     def clean_email(self):
-        email = self.cleaned_data.get('email')
+        email = self.cleaned_data.get("email")
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Email already registered.")
         return email
 
     def clean_age(self):
-        age = self.cleaned_data.get('age')
+        age = self.cleaned_data.get("age")
         if age is not None and age < 18:
             raise forms.ValidationError("Must be 18 or older.")
         return age
@@ -213,13 +192,14 @@ class RegistrationForm(forms.Form):
     # Form-level validation (clean)
     def clean(self):
         cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        password_confirm = cleaned_data.get('password_confirm')
+        password = cleaned_data.get("password")
+        password_confirm = cleaned_data.get("password_confirm")
 
         if password and password_confirm and password != password_confirm:
             raise forms.ValidationError("Passwords do not match.")
 
         return cleaned_data
+
 
 # Validation flow:
 # 1. to_python()     → Convert to Python type
@@ -238,40 +218,40 @@ from django.shortcuts import render, redirect
 def contact_view(request):
     """Handle contact form display and submission."""
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
             # Access cleaned data
-            name = form.cleaned_data['name']
-            email = form.cleaned_data['email']
-            message = form.cleaned_data['message']
+            name = form.cleaned_data["name"]
+            email = form.cleaned_data["email"]
+            message = form.cleaned_data["message"]
 
             # Process the form (send email, save to DB, etc.)
             # send_mail(subject, message, email, ['admin@example.com'])
 
-            return redirect('contact_success')
+            return redirect("contact_success")
     else:
         # GET request - show empty form
         form = ContactForm()
 
-    return render(request, 'contact.html', {'form': form})
+    return render(request, "contact.html", {"form": form})
 
 
 def post_create_view(request):
     """Create a new blog post using ModelForm."""
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = PostForm(request.POST, request.FILES)  # Include FILES for uploads
         if form.is_valid():
             post = form.save(commit=False)  # Don't save to DB yet
-            post.author = request.user       # Set additional fields
-            post.save()                      # Now save
-            form.save_m2m()                  # Save many-to-many relationships
-            return redirect('post_detail', pk=post.pk)
+            post.author = request.user  # Set additional fields
+            post.save()  # Now save
+            form.save_m2m()  # Save many-to-many relationships
+            return redirect("post_detail", pk=post.pk)
     else:
         form = PostForm()
 
-    return render(request, 'blog/post_form.html', {'form': form})
+    return render(request, "blog/post_form.html", {"form": form})
 
 
 def post_edit_view(request, pk):
@@ -285,6 +265,7 @@ def post_edit_view(request, pk):
 
     # return render(request, 'blog/post_form.html', {'form': form})
     pass
+
 
 # ---------------------------------------------------------------------------
 # 7. Rendering Forms in Templates
@@ -330,21 +311,18 @@ def post_edit_view(request, pk):
 # ---------------------------------------------------------------------------
 # Add Bootstrap classes to form fields for styling:
 
+
 class BootstrapPostForm(forms.ModelForm):
     class Meta:
         model = Post  # Your Post model
-        fields = ['title', 'content']
+        fields = ["title", "content"]
         widgets = {
-            'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter title'
-            }),
-            'content': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 5,
-                'placeholder': 'Write your content...'
-            }),
+            "title": forms.TextInput(attrs={"class": "form-control", "placeholder": "Enter title"}),
+            "content": forms.Textarea(
+                attrs={"class": "form-control", "rows": 5, "placeholder": "Write your content..."}
+            ),
         }
+
 
 # Or use django-crispy-forms for automatic styling:
 # pip install django-crispy-forms crispy-bootstrap5

@@ -37,7 +37,7 @@ print(type(json_string))  # <class 'str'>
 
 # JSON string → Python dict
 parsed = json.loads(json_string)
-print(parsed)       # {'name': 'Alice', 'age': 30, 'city': 'New York'}
+print(parsed)  # {'name': 'Alice', 'age': 30, 'city': 'New York'}
 print(type(parsed))  # <class 'dict'>
 ```
 
@@ -47,17 +47,17 @@ print(type(parsed))  # <class 'dict'>
 import json
 
 # Data type conversions
-print(json.dumps(42))          # "42"
-print(json.dumps(3.14))        # "3.14"
-print(json.dumps("hello"))     # "\"hello\""
-print(json.dumps(True))        # "true"
-print(json.dumps(None))        # "null"
+print(json.dumps(42))  # "42"
+print(json.dumps(3.14))  # "3.14"
+print(json.dumps("hello"))  # "\"hello\""
+print(json.dumps(True))  # "true"
+print(json.dumps(None))  # "null"
 
 # Collections
-print(json.dumps([1, 2, 3]))          # "[1, 2, 3]"
-print(json.dumps({"a": 1, "b": 2}))   # "{\"a\": 1, \"b\": 2}"
-print(json.dumps((1, 2, 3)))          # "[1, 2, 3]" — tuples → arrays
-print(json.dumps({1, 2, 3}))          # TypeError — sets not supported
+print(json.dumps([1, 2, 3]))  # "[1, 2, 3]"
+print(json.dumps({"a": 1, "b": 2}))  # "{\"a\": 1, \"b\": 2}"
+print(json.dumps((1, 2, 3)))  # "[1, 2, 3]" — tuples → arrays
+print(json.dumps({1, 2, 3}))  # TypeError — sets not supported
 ```
 
 ### 3. JSON to Python (Decoding)
@@ -88,12 +88,8 @@ import json
 data = {
     "name": "Alice",
     "age": 30,
-    "address": {
-        "street": "123 Main St",
-        "city": "New York",
-        "state": "NY"
-    },
-    "hobbies": ["reading", "coding", "hiking"]
+    "address": {"street": "123 Main St", "city": "New York", "state": "NY"},
+    "hobbies": ["reading", "coding", "hiking"],
 }
 
 # Compact (default)
@@ -133,6 +129,7 @@ print(loaded_data)  # {'users': [{'name': 'Alice'}, {'name': 'Bob'}]}
 import json
 from datetime import datetime, date
 
+
 # Custom encoder for non-serializable types
 class CustomEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -142,20 +139,20 @@ class CustomEncoder(json.JSONEncoder):
             return list(obj)
         return super().default(obj)
 
+
 # Usage
-data = {
-    "date": datetime.now(),
-    "tags": {"python", "json", "data"}
-}
+data = {"date": datetime.now(), "tags": {"python", "json", "data"}}
 
 json_str = json.dumps(data, cls=CustomEncoder, indent=2)
 print(json_str)
+
 
 # Custom decoder
 def custom_hook(dct):
     if "date" in dct:
         dct["date"] = datetime.fromisoformat(dct["date"])
     return dct
+
 
 parsed = json.loads(json_str, object_hook=custom_hook)
 ```
@@ -169,21 +166,10 @@ import json
 data = {
     "company": "TechCorp",
     "employees": [
-        {
-            "name": "Alice",
-            "department": "Engineering",
-            "skills": ["Python", "JavaScript", "SQL"]
-        },
-        {
-            "name": "Bob",
-            "department": "Marketing",
-            "skills": ["SEO", "Analytics"]
-        }
+        {"name": "Alice", "department": "Engineering", "skills": ["Python", "JavaScript", "SQL"]},
+        {"name": "Bob", "department": "Marketing", "skills": ["SEO", "Analytics"]},
     ],
-    "metadata": {
-        "founded": 2010,
-        "public": True
-    }
+    "metadata": {"founded": 2010, "public": True},
 }
 
 # Pretty print
@@ -225,20 +211,22 @@ except json.JSONDecodeError as e:
 ```python
 import json
 
+
 def parse_api_response(response_text):
     """Parse and validate API response."""
     try:
         data = json.loads(response_text)
-        
+
         # Validate required fields
         required = ["status", "data"]
         for field in required:
             if field not in data:
                 return {"error": f"Missing field: {field}"}
-        
+
         return data
     except json.JSONDecodeError as e:
         return {"error": f"Invalid JSON: {e}"}
+
 
 # Test
 response = '{"status": "success", "data": {"users": 42}}'
@@ -252,27 +240,29 @@ print(result)
 import json
 import os
 
+
 class ConfigManager:
     def __init__(self, filename):
         self.filename = filename
         self.config = self.load()
-    
+
     def load(self):
         if os.path.exists(self.filename):
             with open(self.filename, "r") as f:
                 return json.load(f)
         return {}
-    
+
     def save(self):
         with open(self.filename, "w") as f:
             json.dump(self.config, f, indent=2)
-    
+
     def get(self, key, default=None):
         return self.config.get(key, default)
-    
+
     def set(self, key, value):
         self.config[key] = value
         self.save()
+
 
 # Usage
 config = ConfigManager("app_config.json")
@@ -286,6 +276,7 @@ print(config.get("theme"))  # dark
 ```python
 import json
 
+
 def flatten_json(nested_json, prefix=""):
     """Flatten nested JSON into dot-notation keys."""
     flat = {}
@@ -297,14 +288,9 @@ def flatten_json(nested_json, prefix=""):
             flat[new_key] = value
     return flat
 
+
 # Test
-nested = {
-    "name": "Alice",
-    "address": {
-        "street": "123 Main St",
-        "city": "NYC"
-    }
-}
+nested = {"name": "Alice", "address": {"street": "123 Main St", "city": "NYC"}}
 flat = flatten_json(nested)
 print(flat)  # {'name': 'Alice', 'address.street': '123 Main St', 'address.city': 'NYC'}
 ```
@@ -321,12 +307,14 @@ from datetime import datetime
 # WRONG
 # json.dumps(datetime.now())  # TypeError
 
+
 # CORRECT — use custom encoder
 class DateEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat()
         return super().default(obj)
+
 
 json.dumps({"date": datetime.now()}, cls=DateEncoder)
 ```

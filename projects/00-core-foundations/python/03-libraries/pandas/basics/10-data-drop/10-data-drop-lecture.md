@@ -20,12 +20,14 @@ By the end of this lecture, you will be able to:
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42],
-    "City": ["New York", "London", "Paris"],
-    "Salary": [75000, 82000, 95000]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie"],
+        "Age": [28, 35, 42],
+        "City": ["New York", "London", "Paris"],
+        "Salary": [75000, 82000, 95000],
+    }
+)
 
 # Drop single column
 df_dropped = df.drop(columns=["City"])
@@ -64,10 +66,10 @@ df_dropped = df.drop(["City", "Salary"], axis=1)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31]
-}, index=["emp1", "emp2", "emp3", "emp4"])
+df = pd.DataFrame(
+    {"Name": ["Alice", "Bob", "Charlie", "Diana"], "Age": [28, 35, 42, 31]},
+    index=["emp1", "emp2", "emp3", "emp4"],
+)
 
 # Drop by label
 df_dropped = df.drop(index=["emp2"])
@@ -111,12 +113,14 @@ df_dropped = df.drop(df.index[[0, 2]])
 import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, np.nan, 42, 31],
-    "Salary": [75000, 82000, np.nan, 68000],
-    "City": ["New York", None, "Paris", "Tokyo"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, np.nan, 42, 31],
+        "Salary": [75000, 82000, np.nan, 68000],
+        "City": ["New York", None, "Paris", "Tokyo"],
+    }
+)
 
 # Drop rows with any NaN
 print(df.dropna())
@@ -182,11 +186,13 @@ print(df.dropna(axis=1))
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Alice", "Charlie", "Bob"],
-    "Age": [28, 35, 28, 42, 35],
-    "City": ["New York", "London", "New York", "Paris", "London"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Alice", "Charlie", "Bob"],
+        "Age": [28, 35, 28, 42, 35],
+        "City": ["New York", "London", "New York", "Paris", "London"],
+    }
+)
 
 # Drop exact duplicates
 print(df.drop_duplicates())
@@ -235,11 +241,13 @@ print(df.drop_duplicates(keep=False))
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31],
-    "Active": [True, False, True, False]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, 35, 42, 31],
+        "Active": [True, False, True, False],
+    }
+)
 
 # Drop inactive users
 df_active = df[df["Active"] == True]
@@ -267,10 +275,7 @@ df_filtered = df[(df["Age"] >= 30) & (df["Active"] == True)]
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob", "Charlie"], "Age": [28, 35, 42]})
 
 # Method 1: Assignment (recommended)
 df_new = df.drop(columns=["Age"])
@@ -299,14 +304,16 @@ import numpy as np
 
 # Sample dataset with issues
 np.random.seed(42)
-df = pd.DataFrame({
-    "ID": range(1, 101),
-    "Name": [f"User_{i}" for i in range(1, 101)],
-    "Age": np.random.choice([25, 30, 35, np.nan, 40], 100),
-    "Email": np.random.choice(["a@test.com", "b@test.com", None, "d@test.com"], 100),
-    "Score": np.random.randint(0, 100, 100),
-    "Category": np.random.choice(["A", "B", "C"], 100)
-})
+df = pd.DataFrame(
+    {
+        "ID": range(1, 101),
+        "Name": [f"User_{i}" for i in range(1, 101)],
+        "Age": np.random.choice([25, 30, 35, np.nan, 40], 100),
+        "Email": np.random.choice(["a@test.com", "b@test.com", None, "d@test.com"], 100),
+        "Score": np.random.randint(0, 100, 100),
+        "Category": np.random.choice(["A", "B", "C"], 100),
+    }
+)
 
 print("Original shape:", df.shape)
 print("Missing values:\n", df.isnull().sum())

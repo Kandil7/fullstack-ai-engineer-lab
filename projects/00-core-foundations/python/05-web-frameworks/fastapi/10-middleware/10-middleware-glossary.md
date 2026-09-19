@@ -64,6 +64,7 @@ app = FastAPI()
 ```python
 from starlette.middleware.base import BaseHTTPMiddleware
 
+
 class MyMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Process request
@@ -211,6 +212,7 @@ app.add_middleware(MiddlewareC)
 ```python
 from starlette.middleware.base import BaseHTTPMiddleware
 
+
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         print(f"Incoming: {request.method} {request.url}")
@@ -230,10 +232,10 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 **Example:**
 ```python
 # CORRECT ORDER:
-app.add_middleware(CORSMiddleware)      # 1st
-app.add_middleware(TrustedHostMiddleware) # 2nd
-app.add_middleware(LoggingMiddleware)    # 3rd
-app.add_middleware(AuthMiddleware)       # 4th
+app.add_middleware(CORSMiddleware)  # 1st
+app.add_middleware(TrustedHostMiddleware)  # 2nd
+app.add_middleware(LoggingMiddleware)  # 3rd
+app.add_middleware(AuthMiddleware)  # 4th
 ```
 
 **Related Terms:** LIFO, Middleware Stack, CORS
@@ -271,7 +273,7 @@ async def options_handler():
         headers={
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "GET, POST",
-        }
+        },
     )
 ```
 
@@ -311,6 +313,7 @@ class UserMiddleware(BaseHTTPMiddleware):
         request.state.user = get_current_user(request)
         return await call_next(request)
 
+
 @app.get("/profile")
 async def profile(request: Request):
     # Access stored user
@@ -329,6 +332,7 @@ async def profile(request: Request):
 **Example:**
 ```python
 from starlette.responses import JSONResponse
+
 
 class CustomMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -352,10 +356,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Short-circuit if no auth header
         if "Authorization" not in request.headers:
-            return JSONResponse(
-                status_code=401,
-                content={"error": "Missing auth"}
-            )
+            return JSONResponse(status_code=401, content={"error": "Missing auth"})
         return await call_next(request)
 ```
 
@@ -371,10 +372,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
 ```python
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=["example.com", "*.example.com"]
-)
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=["example.com", "*.example.com"])
 ```
 
 **Related Terms:** Host, Security, Host Header
@@ -423,19 +421,22 @@ app.add_middleware(
 # 2. GZip Middleware
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+
 # 3. Custom Logging Middleware (innermost)
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         start_time = time.time()
-        
+
         response = await call_next(request)
-        
+
         duration = time.time() - start_time
         response.headers["X-Response-Time"] = f"{duration:.3f}"
-        
+
         return response
 
+
 app.add_middleware(LoggingMiddleware)
+
 
 @app.get("/")
 async def root():
@@ -451,25 +452,25 @@ import uuid
 
 app = FastAPI()
 
+
 class RequestIDMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
         request.state.request_id = request_id
-        
+
         response = await call_next(request)
         response.headers["X-Request-ID"] = request_id
-        
+
         return response
 
+
 app.add_middleware(RequestIDMiddleware)
+
 
 @app.get("/users")
 async def get_users(request: Request):
     # Access request ID from state
-    return {
-        "request_id": request.state.request_id,
-        "users": ["Alice", "Bob"]
-    }
+    return {"request_id": request.state.request_id, "users": ["Alice", "Bob"]}
 ```
 
 ---
@@ -513,23 +514,23 @@ class MyMiddleware(BaseHTTPMiddleware):
 ### Request Properties
 
 ```python
-request.url           # URL object
-request.url.path      # "/api/users"
-request.url.query     # "page=1"
-request.method        # "GET", "POST", etc.
-request.headers       # Headers dict
+request.url  # URL object
+request.url.path  # "/api/users"
+request.url.query  # "page=1"
+request.method  # "GET", "POST", etc.
+request.headers  # Headers dict
 request.query_params  # Query parameters dict
-request.path_params   # Path parameters dict
-request.client        # Client info (host, port)
-request.state         # Per-request state storage
+request.path_params  # Path parameters dict
+request.client  # Client info (host, port)
+request.state  # Per-request state storage
 ```
 
 ### Response Properties
 
 ```python
 response.status_code  # 200, 404, etc.
-response.headers      # Headers dict
-response.body         # Response body bytes
+response.headers  # Headers dict
+response.body  # Response body bytes
 ```
 
 ---
@@ -540,7 +541,9 @@ response.body         # Response body bytes
 
 ```python
 import logging
+
 logging.basicConfig(level=logging.DEBUG)
+
 
 class DebugMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -555,8 +558,6 @@ class DebugMiddleware(BaseHTTPMiddleware):
 ```python
 @app.get("/debug/middleware")
 async def debug_middleware():
-    middleware_list = [
-        str(m) for m in app.user_middleware
-    ]
+    middleware_list = [str(m) for m in app.user_middleware]
     return {"middleware_order": middleware_list}
 ```

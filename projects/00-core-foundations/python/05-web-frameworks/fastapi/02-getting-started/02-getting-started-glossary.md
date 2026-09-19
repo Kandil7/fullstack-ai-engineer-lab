@@ -37,11 +37,13 @@ Alphabetical reference of all key terms from the Getting Started with FastAPI le
 ```python
 from pydantic import BaseModel
 
+
 class Item(BaseModel):
     name: str
     price: float
     description: str | None = None
     tags: list[str] = []
+
 
 # Usage
 item = Item(name="Laptop", price=999.99)
@@ -96,6 +98,7 @@ print(item.model_dump())
 def read_items(skip: int = 0, limit: int = 10):
     return {"skip": skip, "limit": limit}
 
+
 # Request: GET /items/         → skip=0, limit=10
 # Request: GET /items/?skip=5  → skip=5, limit=10
 ```
@@ -111,6 +114,7 @@ def read_items(skip: int = 0, limit: int = 10):
 **Example:**
 ```python
 from pydantic import BaseModel, Field
+
 
 class Product(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
@@ -142,13 +146,11 @@ class Product(BaseModel):
 ```python
 from fastapi import HTTPException
 
+
 @app.get("/items/{item_id}")
 def read_item(item_id: int):
     if item_id not in items:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Item {item_id} not found"
-        )
+        raise HTTPException(status_code=404, detail=f"Item {item_id} not found")
     return items[item_id]
 ```
 
@@ -177,6 +179,7 @@ items_db: list[dict] = [
 users_db: dict[int, dict] = {}
 next_id = 1
 
+
 @app.post("/users/")
 def create_user(user: User):
     global next_id
@@ -201,6 +204,7 @@ class Item(BaseModel):
     name: str
     price: float
 
+
 @app.post("/items/")
 def create_item(item: Item):
     item_dict = item.model_dump()  # {'name': 'Widget', 'price': 9.99}
@@ -208,11 +212,12 @@ def create_item(item: Item):
     item_dict["created_at"] = "2024-01-01"
     return item_dict
 
+
 # Variants:
-item.model_dump()                    # Full dict
+item.model_dump()  # Full dict
 item.model_dump(exclude_unset=True)  # Only fields that were set
-item.model_dump(exclude_none=True)   # Exclude None values
-item.model_dump(include={"name"})    # Only specified fields
+item.model_dump(exclude_none=True)  # Exclude None values
+item.model_dump(include={"name"})  # Only specified fields
 ```
 
 **Related terms:** BaseModel, Serialization, Dictionary
@@ -230,11 +235,15 @@ class User(BaseModel):
     name: str
     bio: str | None = None  # Optional with default
 
+
 # Python 3.9 and earlier
 from typing import Optional
+
+
 class User(BaseModel):
     name: str
     bio: Optional[str] = None
+
 
 # As a FastAPI query parameter
 @app.get("/users/")
@@ -288,6 +297,7 @@ def read_items(page: int = 1, page_size: int = 10):
 def read_item(item_id: int):
     return {"item_id": item_id}
 
+
 # URL: /items/42 → item_id = 42 (auto-converted to int)
 # URL: /items/abc → 422 Validation Error (not an integer)
 ```
@@ -310,6 +320,7 @@ def read_item(item_id: int):
 @app.get("/search")
 def search(q: str = "", page: int = 1, per_page: int = 10):
     return {"query": q, "page": page, "per_page": per_page}
+
 
 # URL: /search?q=phone&page=2&per_page=5
 # q="phone", page=2, per_page=5
@@ -335,10 +346,12 @@ class UserCreate(BaseModel):
     email: str
     age: int
 
+
 @app.post("/users/", status_code=201)
 def create_user(user: UserCreate):
     # 'user' is the parsed and validated request body
     return {"id": 1, **user.model_dump()}
+
 
 # Client sends:
 # POST /users/
@@ -359,6 +372,7 @@ def create_user(user: UserCreate):
 @app.get("/items/{item_id}")
 def read_item(item_id: int):
     return {"item_id": item_id, "name": "Widget"}
+
 
 # Response headers:
 # Content-Type: application/json
@@ -393,6 +407,7 @@ def read_item(item_id: int):
 def create_item(item: Item):
     return item
 
+
 @app.delete("/items/{item_id}", status_code=204)
 def delete_item(item_id: int):
     items.pop(item_id)
@@ -412,9 +427,11 @@ def delete_item(item_id: int):
 @app.get("/items/{item_id}")
 def read_item(item_id: int): ...  # item_id must be int
 
+
 # Return type hints
 @app.get("/items/")
 def list_items() -> list[dict]: ...  # Returns a list of dicts
+
 
 # Variable type hints
 name: str = "Alice"
@@ -439,9 +456,10 @@ age: int = 30
 **Example:**
 ```python
 class Item(BaseModel):
-    name: str          # Must be a string
-    price: float       # Must be a float
-    quantity: int      # Must be an integer
+    name: str  # Must be a string
+    price: float  # Must be a float
+    quantity: int  # Must be an integer
+
 
 # Valid request:
 # {"name": "Widget", "price": 9.99, "quantity": 5} → 200 OK

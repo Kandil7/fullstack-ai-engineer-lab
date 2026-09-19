@@ -10,12 +10,13 @@
 from dataclasses import dataclass
 import math
 
+
 @dataclass(frozen=True)
 class Point:
     x: float
     y: float
-    def __post_init__(self) -> None:
-        ...
+
+    def __post_init__(self) -> None: ...
 ```
 
 | Input | Expected |
@@ -41,6 +42,7 @@ score descending.
 class Hit:
     score: float
     doc: str
+
 
 def rank_hits(hits: list[tuple[str, float]]) -> list[str]: ...
 ```

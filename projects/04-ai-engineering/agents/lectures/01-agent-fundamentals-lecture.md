@@ -64,7 +64,7 @@ Every agent follows some variation of this cycle:
 def agent_loop(goal, max_iterations=10):
     """
     The fundamental agent loop.
-    
+
     1. Observe the current state
     2. Think about what to do
     3. Take an action
@@ -72,30 +72,28 @@ def agent_loop(goal, max_iterations=10):
     5. Repeat until goal is achieved or limit reached
     """
     context = {"goal": goal, "history": [], "observations": []}
-    
+
     for i in range(max_iterations):
         # Step 1: Perception - observe current state
         observation = perceive(context)
-        
+
         # Step 2: Reasoning - decide what to do
         thought = llm_reason(observation, context["history"])
-        
+
         # Step 3: Action - execute the chosen action
         action = decide_action(thought)
         result = execute(action)
-        
+
         # Step 4: Update context with what happened
-        context["history"].append({
-            "thought": thought,
-            "action": action,
-            "result": result
-        })
+        context["history"].append(
+            {"thought": thought, "action": action, "result": result}
+        )
         context["observations"].append(result)
-        
+
         # Step 5: Check if goal is achieved
         if goal_achieved(result, goal):
             return result
-    
+
     return "Max iterations reached"
 ```
 
@@ -136,35 +134,33 @@ def agent_loop(goal, max_iterations=10):
 Simple ReAct Agent Implementation
 ReAct = Reasoning + Acting
 """
+
 import openai
 from typing import Callable, Dict, List, Optional
+
 
 class SimpleAgent:
     """
     A minimal agent that follows the ReAct pattern:
     Thought → Action → Observation → Thought → ...
     """
-    
+
     def __init__(self, model: str = "gpt-4"):
         self.client = openai.OpenAI()
         self.model = model
         self.tools: Dict[str, Callable] = {}
         self.max_iterations = 10
-    
+
     def register_tool(self, name: str, func: Callable, description: str):
         """Register a tool the agent can use."""
-        self.tools[name] = {
-            "function": func,
-            "description": description
-        }
-    
+        self.tools[name] = {"function": func, "description": description}
+
     def _build_system_prompt(self) -> str:
         """Build system prompt with available tools."""
         tool_descriptions = "\n".join(
-            f"- {name}: {info['description']}"
-            for name, info in self.tools.items()
+            f"- {name}: {info['description']}" for name, info in self.tools.items()
         )
-        
+
         return f"""You are an AI agent that helps users accomplish tasks.
 
 Available tools:
@@ -179,88 +175,93 @@ Final Answer: <your_answer>
 
 Always think step by step.
 """
-    
+
     def _call_llm(self, messages: List[Dict]) -> str:
         """Call the LLM for reasoning."""
         response = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=0.7
+            model=self.model, messages=messages, temperature=0.7
         )
         return response.choices[0].message.content
-    
+
     def _execute_tool(self, action: str, tool_input: str) -> str:
         """Execute a tool and return the result."""
         if action not in self.tools:
-            return f"Error: Unknown tool '{action}'. Available: {list(self.tools.keys())}"
-        
+            return (
+                f"Error: Unknown tool '{action}'. Available: {list(self.tools.keys())}"
+            )
+
         try:
             result = self.tools[action]["function"](tool_input)
             return str(result)
         except Exception as e:
             return f"Error executing {action}: {str(e)}"
-    
+
     def run(self, user_goal: str) -> str:
         """
         Run the agent loop until the goal is achieved.
-        
+
         Args:
             user_goal: What the user wants the agent to do
-            
+
         Returns:
             The final answer or result
         """
         messages = [
             {"role": "system", "content": self._build_system_prompt()},
-            {"role": "user", "content": f"Goal: {user_goal}"}
+            {"role": "user", "content": f"Goal: {user_goal}"},
         ]
-        
+
         for iteration in range(self.max_iterations):
             # Get agent's reasoning
             response = self._call_llm(messages)
             print(f"\n--- Iteration {iteration + 1} ---")
             print(f"Agent: {response}")
-            
+
             # Check if agent has reached a final answer
             if "Final Answer:" in response:
                 final = response.split("Final Answer:")[-1].strip()
                 return final
-            
+
             # Parse and execute action
             if "Action:" in response and "Input:" in response:
                 lines = response.split("\n")
                 action = None
                 tool_input = None
-                
+
                 for line in lines:
                     if line.strip().startswith("Action:"):
                         action = line.strip().split("Action:")[-1].strip()
                     elif line.strip().startswith("Input:"):
                         tool_input = line.strip().split("Input:")[-1].strip()
-                
+
                 if action and tool_input:
                     # Execute tool
                     result = self._execute_tool(action, tool_input)
                     print(f"Tool Result: {result}")
-                    
+
                     # Add to conversation
                     messages.append({"role": "assistant", "content": response})
-                    messages.append({
-                        "role": "user",
-                        "content": f"Observation: {result}\n\nWhat should I do next?"
-                    })
-            
+                    messages.append(
+                        {
+                            "role": "user",
+                            "content": f"Observation: {result}\n\nWhat should I do next?",
+                        }
+                    )
+
             # Safety check
             if "Action:" not in response and "Final Answer:" not in response:
-                messages.append({
-                    "role": "user",
-                    "content": "Please either use a tool (Action: ... Input: ...) or provide a Final Answer."
-                })
-        
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": "Please either use a tool (Action: ... Input: ...) or provide a Final Answer.",
+                    }
+                )
+
         return "Maximum iterations reached without completing the task."
 
 
 # === Usage Example ===
+
 
 # Define tools
 def search_knowledge_base(query: str) -> str:
@@ -270,13 +271,13 @@ def search_knowledge_base(query: str) -> str:
         "agents": "AI agents are autonomous systems that perceive, reason, and act.",
         "llm": "LLMs are large language models trained on text data.",
     }
-    
+
     query_lower = query.lower()
     results = []
     for key, value in knowledge.items():
         if key in query_lower:
             results.append(value)
-    
+
     return "\n".join(results) if results else "No relevant information found."
 
 
@@ -295,7 +296,9 @@ def calculate(expression: str) -> str:
 
 # Create and run agent
 agent = SimpleAgent()
-agent.register_tool("search", search_knowledge_base, "Search the knowledge base for information")
+agent.register_tool(
+    "search", search_knowledge_base, "Search the knowledge base for information"
+)
 agent.register_tool("calculate", calculate, "Calculate a math expression")
 
 # Run it
@@ -310,10 +313,12 @@ print(f"\nFinal Result: {result}")
 Agent with persistent state and context management.
 Demonstrates how agents maintain memory across iterations.
 """
+
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 from enum import Enum
 import json
+
 
 class ActionStatus(Enum):
     PENDING = "pending"
@@ -321,9 +326,11 @@ class ActionStatus(Enum):
     COMPLETED = "completed"
     FAILED = "failed"
 
+
 @dataclass
 class AgentStep:
     """Represents a single step in the agent's execution."""
+
     step_id: int
     thought: str
     action: str
@@ -332,32 +339,34 @@ class AgentStep:
     status: ActionStatus
     timestamp: float = 0.0
 
+
 @dataclass
 class AgentState:
     """
     Maintains the full state of an agent during execution.
-    
+
     This is the 'memory' of the agent - it tracks:
     - What the agent has thought
     - What actions it has taken
     - What results it observed
     - What goals it's working toward
     """
+
     goal: str
     steps: List[AgentStep] = field(default_factory=list)
     current_step: int = 0
     metadata: Dict[str, Any] = field(default_factory=dict)
-    
+
     def add_step(self, step: AgentStep):
         """Record a new step."""
         self.steps.append(step)
         self.current_step += 1
-    
+
     def get_history_summary(self) -> str:
         """Get a human-readable summary of what's happened."""
         if not self.steps:
             return "No steps taken yet."
-        
+
         summary = []
         for step in self.steps:
             summary.append(
@@ -368,7 +377,7 @@ class AgentState:
                 f"  Status: {step.status.value}"
             )
         return "\n\n".join(summary)
-    
+
     def to_dict(self) -> Dict:
         """Serialize state for persistence."""
         return {
@@ -381,20 +390,20 @@ class AgentState:
                     "action": s.action,
                     "action_input": s.action_input,
                     "observation": s.observation,
-                    "status": s.status.value
+                    "status": s.status.value,
                 }
                 for s in self.steps
             ],
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
-    
+
     @classmethod
     def from_dict(cls, data: Dict) -> "AgentState":
         """Deserialize state from persistence."""
         state = cls(goal=data["goal"])
         state.current_step = data["current_step"]
         state.metadata = data.get("metadata", {})
-        
+
         for step_data in data.get("steps", []):
             step = AgentStep(
                 step_id=step_data["step_id"],
@@ -402,27 +411,27 @@ class AgentState:
                 action=step_data["action"],
                 action_input=step_data["action_input"],
                 observation=step_data["observation"],
-                status=ActionStatus(step_data["status"])
+                status=ActionStatus(step_data["status"]),
             )
             state.steps.append(step)
-        
+
         return state
 
 
 class StatefulAgent:
     """
     An agent that maintains state across its execution.
-    
+
     Key features:
     - Persists reasoning history
     - Can resume from saved state
     - Tracks progress toward goal
     """
-    
+
     def __init__(self, tools: Dict[str, Callable], llm_caller):
         self.tools = tools
         self.llm = llm_caller
-    
+
     def think(self, state: AgentState) -> tuple[str, str, str]:
         """
         Agent thinks about what to do next.
@@ -431,32 +440,32 @@ class StatefulAgent:
         prompt = self._build_think_prompt(state)
         response = self.llm(prompt)
         return self._parse_think_response(response)
-    
+
     def act(self, action_name: str, action_input: str) -> str:
         """Execute an action using the appropriate tool."""
         if action_name not in self.tools:
             return f"Unknown action: {action_name}"
-        
+
         try:
             return str(self.tools[action_name](action_input))
         except Exception as e:
             return f"Action failed: {str(e)}"
-    
+
     def run(self, goal: str, state: Optional[AgentState] = None) -> AgentState:
         """
         Main agent loop with state management.
-        
+
         Can resume from an existing state or start fresh.
         """
         if state is None:
             state = AgentState(goal=goal)
-        
+
         max_steps = 10
-        
+
         while state.current_step < max_steps:
             # Think
             thought, action, action_input = self.think(state)
-            
+
             # Create step
             step = AgentStep(
                 step_id=state.current_step + 1,
@@ -464,21 +473,21 @@ class StatefulAgent:
                 action=action,
                 action_input=action_input,
                 observation="",
-                status=ActionStatus.IN_PROGRESS
+                status=ActionStatus.IN_PROGRESS,
             )
-            
+
             # Act
             observation = self.act(action, action_input)
             step.observation = observation
             step.status = ActionStatus.COMPLETED
-            
+
             # Record step
             state.add_step(step)
-            
+
             # Check if done
             if action == "finish":
                 break
-        
+
         return state
 ```
 
@@ -494,6 +503,7 @@ def bad_agent(goal):
         thought = think(goal)
         result = act(thought)
         # No check for completion!
+
 
 # ✅ GOOD: Always have exit conditions
 def good_agent(goal, max_iterations=10, goal_checker=None):
@@ -576,7 +586,7 @@ Create an agent that can:
 tools = {
     "get_weather": get_weather,
     "convert_temp": convert_temperature,
-    "suggest_outfit": suggest_outfit
+    "suggest_outfit": suggest_outfit,
 }
 
 # Your implementation here

@@ -13,8 +13,8 @@ client.create_collection(
     collection_name="documents",
     vectors_config=VectorParams(
         size=1536,  # Embedding dimension
-        distance=Distance.COSINE
-    )
+        distance=Distance.COSINE,
+    ),
 )
 ```
 
@@ -48,10 +48,10 @@ client.upsert(
             payload={
                 "text": "This is a document",
                 "source": "web",
-                "created_at": "2024-01-15"
-            }
+                "created_at": "2024-01-15",
+            },
         )
-    ]
+    ],
 )
 ```
 
@@ -59,21 +59,15 @@ client.upsert(
 ```python
 # Basic search
 results = client.search(
-    collection_name="documents",
-    query_vector=[0.1, 0.2, 0.3, ...],
-    limit=10
+    collection_name="documents", query_vector=[0.1, 0.2, 0.3, ...], limit=10
 )
 
 # Search with filter
 results = client.search(
     collection_name="documents",
     query_vector=[0.1, 0.2, 0.3, ...],
-    query_filter={
-        "must": [
-            {"key": "source", "match": {"value": "web"}}
-        ]
-    },
-    limit=10
+    query_filter={"must": [{"key": "source", "match": {"value": "web"}}]},
+    limit=10,
 )
 
 # Process results
@@ -85,16 +79,11 @@ for result in results:
 ### Retrieving Points
 ```python
 # Get by ID
-point = client.retrieve(
-    collection_name="documents",
-    ids=[1, 2, 3]
-)
+point = client.retrieve(collection_name="documents", ids=[1, 2, 3])
 
 # Scroll through points
 points, next_offset = client.scroll(
-    collection_name="documents",
-    limit=100,
-    with_payload=True
+    collection_name="documents", limit=100, with_payload=True
 )
 ```
 
@@ -102,16 +91,11 @@ points, next_offset = client.scroll(
 ```python
 # Update payload
 client.set_payload(
-    collection_name="documents",
-    payload={"status": "processed"},
-    points=[1, 2, 3]
+    collection_name="documents", payload={"status": "processed"}, points=[1, 2, 3]
 )
 
 # Delete points
-client.delete(
-    collection_name="documents",
-    points_selector=[1, 2, 3]
-)
+client.delete(collection_name="documents", points_selector=[1, 2, 3])
 ```
 
 ---
@@ -121,31 +105,15 @@ client.delete(
 ### Basic Filters
 ```python
 # Match exact value
-filter_condition = {
-    "must": [
-        {"key": "source", "match": {"value": "web"}}
-    ]
-}
+filter_condition = {"must": [{"key": "source", "match": {"value": "web"}}]}
 
 # Match multiple values
 filter_condition = {
-    "must": [
-        {
-            "key": "category",
-            "match": {"any": ["news", "blog", "docs"]}
-        }
-    ]
+    "must": [{"key": "category", "match": {"any": ["news", "blog", "docs"]}}]
 }
 
 # Range filter
-filter_condition = {
-    "must": [
-        {
-            "key": "score",
-            "range": {"gte": 0.5, "lte": 1.0}
-        }
-    ]
-}
+filter_condition = {"must": [{"key": "score", "range": {"gte": 0.5, "lte": 1.0}}]}
 ```
 
 ### Complex Filters
@@ -154,7 +122,7 @@ filter_condition = {
 filter_condition = {
     "must": [
         {"key": "source", "match": {"value": "web"}},
-        {"key": "language", "match": {"value": "en"}}
+        {"key": "language", "match": {"value": "en"}},
     ]
 }
 
@@ -162,16 +130,12 @@ filter_condition = {
 filter_condition = {
     "should": [
         {"key": "category", "match": {"value": "news"}},
-        {"key": "category", "match": {"value": "blog"}}
+        {"key": "category", "match": {"value": "blog"}},
     ]
 }
 
 # Must NOT
-filter_condition = {
-    "must_not": [
-        {"key": "status", "match": {"value": "deleted"}}
-    ]
-}
+filter_condition = {"must_not": [{"key": "status", "match": {"value": "deleted"}}]}
 ```
 
 ---
@@ -183,15 +147,8 @@ filter_condition = {
 results = client.search(
     collection_name="documents",
     query_vector=[0.1, 0.2, 0.3, ...],
-    query_filter={
-        "must": [
-            {
-                "key": "text",
-                "match": {"text": "machine learning"}
-            }
-        ]
-    },
-    limit=10
+    query_filter={"must": [{"key": "text", "match": {"text": "machine learning"}}]},
+    limit=10,
 )
 ```
 
@@ -199,9 +156,7 @@ results = client.search(
 ```python
 # Get more candidates, then rerank
 results = client.search(
-    collection_name="documents",
-    query_vector=[0.1, 0.2, 0.3, ...],
-    limit=20
+    collection_name="documents", query_vector=[0.1, 0.2, 0.3, ...], limit=20
 )
 
 # Custom reranking
@@ -216,9 +171,7 @@ reranked = sorted(results, key=lambda x: x.score, reverse=True)[:10]
 ```python
 # Create payload index
 client.create_payload_index(
-    collection_name="documents",
-    field_name="source",
-    field_schema="keyword"
+    collection_name="documents", field_name="source", field_schema="keyword"
 )
 
 # Index types
@@ -232,10 +185,7 @@ client.create_payload_index(
 ### Managing Indexes
 ```python
 # Delete index
-client.delete_payload_index(
-    collection_name="documents",
-    field_name="source"
-)
+client.delete_payload_index(collection_name="documents", field_name="source")
 ```
 
 ---
@@ -250,10 +200,7 @@ from qdrant_client import QdrantClient
 client = QdrantClient("localhost", port=6333)
 
 # Or with API key (Qdrant Cloud)
-client = QdrantClient(
-    url="https://your-cluster.qdrant.io",
-    api_key="your-api-key"
-)
+client = QdrantClient(url="https://your-cluster.qdrant.io", api_key="your-api-key")
 ```
 
 ### REST API

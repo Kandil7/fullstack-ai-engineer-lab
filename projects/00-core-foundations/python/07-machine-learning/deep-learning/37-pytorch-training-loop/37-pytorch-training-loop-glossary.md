@@ -37,7 +37,7 @@ logits, never pre-sigmoid probabilities. Numerically stable by design.
 **Example**:
 ```python
 criterion = nn.BCEWithLogitsLoss()
-loss = criterion(model(xb), yb)      # not criterion(sigmoid(xb), yb)
+loss = criterion(model(xb), yb)  # not criterion(sigmoid(xb), yb)
 ```
 **Related**: Loss
 
@@ -46,7 +46,10 @@ loss = criterion(model(xb), yb)      # not criterion(sigmoid(xb), yb)
 zero gradients, forward pass, compute loss, backward pass, optimizer step.
 **Example**:
 ```python
-opt.zero_grad(); loss = crit(m(xb), yb); loss.backward(); opt.step()
+opt.zero_grad()
+loss = crit(m(xb), yb)
+loss.backward()
+opt.step()
 ```
 **Related**: Epoch, Step
 
@@ -99,8 +102,12 @@ submodules and parameters automatically.
 **Example**:
 ```python
 class Net(nn.Module):
-    def __init__(self): super().__init__(); self.fc = nn.Linear(10, 1)
-    def forward(self, x): return self.fc(x)
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(10, 1)
+
+    def forward(self, x):
+        return self.fc(x)
 ```
 **Related**: Parameters, forward
 

@@ -30,26 +30,26 @@
 **Coefficient of Variation (CV)**
 Normalized measure of spread: `std / mean`. Useful for comparing variability across datasets with different scales.
 ```python
-cv = df['salary'].std() / df['salary'].mean()
+cv = df["salary"].std() / df["salary"].mean()
 ```
 
 **count()**
 Returns the number of non-null values. Essential for understanding sample size behind statistics.
 ```python
-df['score'].count()  # Excludes NaN
+df["score"].count()  # Excludes NaN
 ```
 
 **corr()**
 Computes pairwise correlation between numeric columns. Default is Pearson. Also supports Spearman and Kendall.
 ```python
-df[['price', 'quantity', 'revenue']].corr()
-df[['x', 'y']].corr(method='spearman')
+df[["price", "quantity", "revenue"]].corr()
+df[["x", "y"]].corr(method="spearman")
 ```
 
 **cov()**
 Computes covariance between columns. Positive covariance means variables move together.
 ```python
-df[['salary', 'bonus']].cov()
+df[["salary", "bonus"]].cov()
 ```
 
 ### D
@@ -58,8 +58,8 @@ df[['salary', 'bonus']].cov()
 Generates count, mean, std, min, 25%, 50%, 75%, max for numeric columns. Add `include='all'` for object columns too.
 ```python
 df.describe()
-df.describe(percentiles=[.05, .25, .5, .75, .95])
-df.describe(include='all')
+df.describe(percentiles=[0.05, 0.25, 0.5, 0.75, 0.95])
+df.describe(include="all")
 ```
 
 ### E
@@ -67,8 +67,8 @@ df.describe(include='all')
 **expanding()**
 Creates an expanding (cumulative) window starting from the beginning. Unlike rolling, it grows with each observation.
 ```python
-df['cumulative_mean'] = df['sales'].expanding().mean()
-df['cumulative_std'] = df['sales'].expanding().std()
+df["cumulative_mean"] = df["sales"].expanding().mean()
+df["cumulative_std"] = df["sales"].expanding().std()
 ```
 
 ### K
@@ -76,7 +76,7 @@ df['cumulative_std'] = df['sales'].expanding().std()
 **Kurtosis**
 Measure of distribution tail heaviness relative to normal distribution. `kurtosis() = 0` is normal-like. Positive = heavy tails (more outliers). Negative = light tails.
 ```python
-df['price'].kurtosis()
+df["price"].kurtosis()
 ```
 
 ### M
@@ -84,26 +84,26 @@ df['price'].kurtosis()
 **mean()**
 Arithmetic average: sum of values divided by count. Sensitive to outliers.
 ```python
-df['salary'].mean()  # sum / count
+df["salary"].mean()  # sum / count
 ```
 
 **median()**
 Middle value when sorted. Robust to outliers. For even counts, returns the average of two middle values.
 ```python
-df['salary'].median()
+df["salary"].median()
 ```
 
 **mode()**
 Most frequently occurring value. Can return multiple values if there are ties.
 ```python
-df['color'].mode()  # Returns Series
-df['color'].mode()[0]  # First mode
+df["color"].mode()  # Returns Series
+df["color"].mode()[0]  # First mode
 ```
 
 **mad()**
 Mean absolute deviation from the mean. Robust alternative to standard deviation.
 ```python
-df['salary'].mad()
+df["salary"].mad()
 ```
 
 ### P
@@ -111,9 +111,9 @@ df['salary'].mad()
 **percentile / quantile**
 Value below which a given percentage of observations fall. `quantile(0.25)` = 25th percentile = Q1.
 ```python
-df['salary'].quantile(0.25)  # 25th percentile
-df['salary'].quantile(0.5)   # Same as median
-df['salary'].quantile(0.75)  # 75th percentile = Q3
+df["salary"].quantile(0.25)  # 25th percentile
+df["salary"].quantile(0.5)  # Same as median
+df["salary"].quantile(0.75)  # 75th percentile = Q3
 ```
 
 ### Q
@@ -121,8 +121,8 @@ df['salary'].quantile(0.75)  # 75th percentile = Q3
 **Q1, Q2, Q3**
 First quartile (25th percentile), second quartile (50th = median), third quartile (75th percentile). IQR = Q3 - Q1.
 ```python
-Q1 = df['salary'].quantile(0.25)
-Q3 = df['salary'].quantile(0.75)
+Q1 = df["salary"].quantile(0.25)
+Q3 = df["salary"].quantile(0.75)
 IQR = Q3 - Q1
 ```
 
@@ -131,14 +131,14 @@ IQR = Q3 - Q1
 **Range**
 Difference between maximum and minimum values. Sensitive to outliers.
 ```python
-salary_range = df['salary'].max() - df['salary'].min()
+salary_range = df["salary"].max() - df["salary"].min()
 ```
 
 **rolling()**
 Provides rolling window calculations. Requires `window` size. Does not include partial windows by default.
 ```python
-df['ma_7'] = df['sales'].rolling(window=7).mean()
-df['rolling_std'] = df['sales'].rolling(window=10).std()
+df["ma_7"] = df["sales"].rolling(window=7).mean()
+df["rolling_std"] = df["sales"].rolling(window=10).std()
 ```
 
 ### S
@@ -146,20 +146,20 @@ df['rolling_std'] = df['sales'].rolling(window=10).std()
 **sem()**
 Standard error of the mean: `std / sqrt(n)`. Measures precision of the mean estimate.
 ```python
-df['salary'].sem()
+df["salary"].sem()
 ```
 
 **Skewness**
 Asymmetry of distribution. Positive = right tail longer. Negative = left tail longer. Zero = symmetric.
 ```python
-df['income'].skew()  # Right-skewed income distributions are common
+df["income"].skew()  # Right-skewed income distributions are common
 ```
 
 **std()**
 Standard deviation. Uses `ddof=1` (sample) by default. Use `ddof=0` for population.
 ```python
-df['salary'].std()      # Sample std (ddof=1)
-df['salary'].std(ddof=0)  # Population std
+df["salary"].std()  # Sample std (ddof=1)
+df["salary"].std(ddof=0)  # Population std
 ```
 
 ### V
@@ -167,8 +167,8 @@ df['salary'].std(ddof=0)  # Population std
 **var()**
 Variance: square of standard deviation. Same `ddof` behavior as `std()`.
 ```python
-df['salary'].var()       # Sample variance
-df['salary'].var(ddof=0) # Population variance
+df["salary"].var()  # Sample variance
+df["salary"].var(ddof=0)  # Population variance
 ```
 
 ---
@@ -181,6 +181,7 @@ df['salary'].var(ddof=0) # Population variance
 import pandas as pd
 import numpy as np
 
+
 def statistical_profile(df):
     """Generate a comprehensive statistical profile for all numeric columns."""
     numeric_cols = df.select_dtypes(include=[np.number]).columns
@@ -189,20 +190,21 @@ def statistical_profile(df):
 
     for col in numeric_cols:
         s = df[col].dropna()
-        stats.loc[col, 'count'] = s.count()
-        stats.loc[col, 'mean'] = s.mean()
-        stats.loc[col, 'median'] = s.median()
-        stats.loc[col, 'std'] = s.std()
-        stats.loc[col, 'min'] = s.min()
-        stats.loc[col, 'Q1'] = s.quantile(0.25)
-        stats.loc[col, 'Q3'] = s.quantile(0.75)
-        stats.loc[col, 'max'] = s.max()
-        stats.loc[col, 'IQR'] = s.quantile(0.75) - s.quantile(0.25)
-        stats.loc[col, 'skewness'] = s.skew()
-        stats.loc[col, 'kurtosis'] = s.kurtosis()
-        stats.loc[col, 'CV'] = s.std() / s.mean() if s.mean() != 0 else np.nan
+        stats.loc[col, "count"] = s.count()
+        stats.loc[col, "mean"] = s.mean()
+        stats.loc[col, "median"] = s.median()
+        stats.loc[col, "std"] = s.std()
+        stats.loc[col, "min"] = s.min()
+        stats.loc[col, "Q1"] = s.quantile(0.25)
+        stats.loc[col, "Q3"] = s.quantile(0.75)
+        stats.loc[col, "max"] = s.max()
+        stats.loc[col, "IQR"] = s.quantile(0.75) - s.quantile(0.25)
+        stats.loc[col, "skewness"] = s.skew()
+        stats.loc[col, "kurtosis"] = s.kurtosis()
+        stats.loc[col, "CV"] = s.std() / s.mean() if s.mean() != 0 else np.nan
 
     return stats.round(3)
+
 
 # Usage
 profile = statistical_profile(df)
@@ -214,18 +216,22 @@ print(profile)
 ```python
 import seaborn as sns
 
-df = sns.load_dataset('titanic')
+df = sns.load_dataset("titanic")
 
 # Compare survival statistics by class
-result = df.groupby('class').agg(
-    survival_rate=('survived', 'mean'),
-    avg_fare=('fare', 'mean'),
-    median_fare=('fare', 'median'),
-    fare_std=('fare', 'std'),
-    count=('survived', 'count'),
-    min_age=('age', 'min'),
-    max_age=('age', 'max')
-).round(3)
+result = (
+    df.groupby("class")
+    .agg(
+        survival_rate=("survived", "mean"),
+        avg_fare=("fare", "mean"),
+        median_fare=("fare", "median"),
+        fare_std=("fare", "std"),
+        count=("survived", "count"),
+        min_age=("age", "min"),
+        max_age=("age", "max"),
+    )
+    .round(3)
+)
 
 print(result)
 ```
@@ -235,18 +241,20 @@ print(result)
 ```python
 # Simulated daily stock data
 np.random.seed(42)
-dates = pd.date_range('2024-01-01', periods=90)
+dates = pd.date_range("2024-01-01", periods=90)
 prices = pd.Series(np.cumsum(np.random.randn(90) * 2) + 100, index=dates)
 
-analysis = pd.DataFrame({
-    'price': prices,
-    'daily_return': prices.pct_change(),
-    'ma_7': prices.rolling(7).mean(),
-    'ma_30': prices.rolling(30).mean(),
-    'volatility_7d': prices.pct_change().rolling(7).std(),
-    'volatility_30d': prices.pct_change().rolling(30).std(),
-    'cumulative_return': (1 + prices.pct_change()).cumprod() - 1
-})
+analysis = pd.DataFrame(
+    {
+        "price": prices,
+        "daily_return": prices.pct_change(),
+        "ma_7": prices.rolling(7).mean(),
+        "ma_30": prices.rolling(30).mean(),
+        "volatility_7d": prices.pct_change().rolling(7).std(),
+        "volatility_30d": prices.pct_change().rolling(30).std(),
+        "cumulative_return": (1 + prices.pct_change()).cumprod() - 1,
+    }
+)
 
 print(analysis.tail(10))
 ```

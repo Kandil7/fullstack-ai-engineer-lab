@@ -30,13 +30,13 @@ app = FastAPI(title="Load Test Target")
 
 @app.get("/ping")
 def ping() -> dict:
-    time.sleep(0.001)     # tiny realistic latency
+    time.sleep(0.001)  # tiny realistic latency
     return {"ok": True}
 
 
 @app.get("/slow")
 def slow() -> dict:
-    time.sleep(0.05)      # a slower endpoint to find in profiling
+    time.sleep(0.05)  # a slower endpoint to find in profiling
     return {"ok": True, "slow": True}
 
 
@@ -50,7 +50,7 @@ def summarize(latencies: list[float]) -> dict:
 
     def pct(p: float) -> float:
         idx = min(len(lat) - 1, int(p * len(lat)))
-        return round(lat[idx] * 1000, 2)     # ms
+        return round(lat[idx] * 1000, 2)  # ms
 
     return {
         "mean_ms": round(statistics.mean(lat) * 1000, 2),
@@ -71,13 +71,14 @@ def run_open_model(n_requests: int, target_ms: float, seed: int = 0) -> list[flo
     latencies = []
     for _ in range(n_requests):
         start = time.perf_counter()
-        time.sleep(target_ms)           # stand-in for the endpoint
+        time.sleep(target_ms)  # stand-in for the endpoint
         latencies.append(time.perf_counter() - start)
     return latencies
 
 
-def run_closed_model(n_requests: int, target_ms: float,
-                     think_ms: float = 20.0, seed: int = 0) -> list[float]:
+def run_closed_model(
+    n_requests: int, target_ms: float, think_ms: float = 20.0, seed: int = 0
+) -> list[float]:
     """Closed model: each 'user' waits between requests (think time).
     Models real user pacing; latency stays flat until concurrency spikes."""
     rng = random.Random(seed)
@@ -101,9 +102,8 @@ def saturation_demo() -> list[dict]:
         target_ms = 10.0
         # serial server: time per request ~= target + queueing
         over = max(0.0, (rps * (target_ms / 1000.0)) - 1.0)
-        latency_ms = target_ms * (1 + over * 8)     # queueing multiplier
-        rows.append({"rps": rps, "latency_ms": round(latency_ms, 1),
-                     "saturated": over > 0})
+        latency_ms = target_ms * (1 + over * 8)  # queueing multiplier
+        rows.append({"rps": rps, "latency_ms": round(latency_ms, 1), "saturated": over > 0})
     return rows
 
 
@@ -119,7 +119,7 @@ print("- Find the bottleneck: profile CPU/DB/network, don't guess")
 print("- Capacity plan: keep p99 under your SLO at peak rps")
 print("=" * 60)
 
-sample = [0.01] * 90 + [0.05] * 9 + [0.5]      # 90 fast, 9 medium, 1 slow
+sample = [0.01] * 90 + [0.05] * 9 + [0.5]  # 90 fast, 9 medium, 1 slow
 print("latency summary:", summarize(sample))
 print("saturation curve:", saturation_demo())
 
@@ -144,8 +144,7 @@ def _verify() -> None:
 
     # Saturation: beyond capacity, latency rises sharply
     curve = saturation_demo()
-    assert curve[-1]["latency_ms"] > curve[0]["latency_ms"] * 5, \
-        "saturation must blow up latency"
+    assert curve[-1]["latency_ms"] > curve[0]["latency_ms"] * 5, "saturation must blow up latency"
 
     print("[OK] 37-load-testing: all checks passed")
 
@@ -153,6 +152,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("37-load-testing:app", host="127.0.0.1", port=8000)
     else:
         _verify()

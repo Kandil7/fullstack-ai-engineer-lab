@@ -128,7 +128,9 @@ cursor.execute("INSERT INTO usernames (username, email) VALUES ('john_doe', 'joh
 conn.commit()
 
 try:
-    cursor.execute("INSERT INTO usernames (username, email) VALUES ('john_doe', 'other@example.com')")
+    cursor.execute(
+        "INSERT INTO usernames (username, email) VALUES ('john_doe', 'other@example.com')"
+    )
 except sqlite3.IntegrityError as e:
     print(f"UNIQUE constraint violation: {e}")
 print()
@@ -180,7 +182,7 @@ cursor.execute("""
 """)
 
 for i in range(5):
-    cursor.execute("INSERT INTO logs (message) VALUES (?)", (f"Log entry {i+1}",))
+    cursor.execute("INSERT INTO logs (message) VALUES (?)", (f"Log entry {i + 1}",))
 conn.commit()
 
 cursor.execute("SELECT * FROM logs")
@@ -218,7 +220,16 @@ print()
 # ============================================================
 
 # Example 12: Drop all created tables
-tables_to_drop = ["customers", "orders", "products", "settings", "usernames", "employees", "logs", "enrollment"]
+tables_to_drop = [
+    "customers",
+    "orders",
+    "products",
+    "settings",
+    "usernames",
+    "employees",
+    "logs",
+    "enrollment",
+]
 for table in tables_to_drop:
     # Table/column identifiers can't be parameterized — only ever interpolate whitelisted literal names, NEVER user input.
     cursor.execute(f"DROP TABLE IF EXISTS {table}")

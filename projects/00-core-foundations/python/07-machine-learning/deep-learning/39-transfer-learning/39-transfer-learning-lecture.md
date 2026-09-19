@@ -49,11 +49,14 @@ class Backbone(nn.Module):
     def __init__(self, in_dim, hidden, feat_dim):
         super().__init__()
         self.features = nn.Sequential(
-            nn.Linear(in_dim, hidden), nn.ReLU(),
-            nn.Linear(hidden, hidden), nn.ReLU(),
+            nn.Linear(in_dim, hidden),
+            nn.ReLU(),
+            nn.Linear(hidden, hidden),
+            nn.ReLU(),
             nn.Linear(hidden, feat_dim),
         )
         self.head = nn.Linear(feat_dim, 1)
+
     def forward(self, x):
         return self.head(self.features(x))
 ```
@@ -71,9 +74,9 @@ cost is billions of examples — which is exactly why you never repeat it.
 
 ```python
 transfer = Backbone(20, 64, 32)
-transfer.load_state_dict(backbone.state_dict())   # start from pretrained weights
+transfer.load_state_dict(backbone.state_dict())  # start from pretrained weights
 
-for p in transfer.features.parameters():          # FREEZE feature extractor
+for p in transfer.features.parameters():  # FREEZE feature extractor
     p.requires_grad = False
 ```
 
@@ -94,7 +97,7 @@ adapt — at a **small learning rate** so pretrained weights are nudged, not
 shattered.
 
 ```python
-for p in transfer.features[-1:].parameters():     # unfreeze last block
+for p in transfer.features[-1:].parameters():  # unfreeze last block
     p.requires_grad = True
 opt = torch.optim.Adam(filter(lambda p: p.requires_grad, transfer.parameters()), lr=1e-4)
 ```
@@ -111,8 +114,8 @@ from-scratch LR.
 ## 4. Transfer vs From-Scratch on Small Data
 
 ```python
-acc_transfer = evaluate(transfer)   # 200-sample target dataset
-acc_scratch  = evaluate(scratch)    # same dataset, random init
+acc_transfer = evaluate(transfer)  # 200-sample target dataset
+acc_scratch = evaluate(scratch)  # same dataset, random init
 ```
 
 Output:
@@ -128,7 +131,7 @@ the whole value proposition — measurable in one comparison.
 
 ```python
 with torch.no_grad():
-    feats = transfer.features(xt)     # embedding vectors, head removed
+    feats = transfer.features(xt)  # embedding vectors, head removed
 ```
 
 Output:

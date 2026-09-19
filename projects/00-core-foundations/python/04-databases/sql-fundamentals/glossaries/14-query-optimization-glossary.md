@@ -33,6 +33,7 @@ value wrapped. `ts >= ?` SEARCHes; `ts / 1000 >= ?` scans.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE e (id INTEGER PRIMARY KEY, ts INTEGER)")
 conn.execute("CREATE INDEX idx_e_ts ON e(ts)")
@@ -57,10 +58,16 @@ not a prod habit.
 primary key; O(log n) per page, stable under concurrent inserts.
 **Example**:
 ```python
-print(conn.execute(
-    "EXPLAIN QUERY PLAN SELECT id FROM e WHERE id > ? ORDER BY id LIMIT ?", (100, 3)).fetchall())
-print(conn.execute(
-    "EXPLAIN QUERY PLAN SELECT id FROM e ORDER BY id LIMIT ? OFFSET ?", (3, 100)).fetchall())
+print(
+    conn.execute(
+        "EXPLAIN QUERY PLAN SELECT id FROM e WHERE id > ? ORDER BY id LIMIT ?", (100, 3)
+    ).fetchall()
+)
+print(
+    conn.execute(
+        "EXPLAIN QUERY PLAN SELECT id FROM e ORDER BY id LIMIT ? OFFSET ?", (3, 100)
+    ).fetchall()
+)
 ```
 ```text
 [(4, 0, 196, 'SEARCH e USING INTEGER PRIMARY KEY (rowid>?)')]

@@ -26,9 +26,15 @@ import sys
 # Dense embeddings catch synonyms; sparse keyword matching catches
 # exact identifiers and rare terms. Combine both scores.
 
-def bm25_score(query_terms: list[str], doc_terms: list[str],
-               df: dict[str, int], n_docs: int,
-               k1: float = 1.5, b: float = 0.75) -> float:
+
+def bm25_score(
+    query_terms: list[str],
+    doc_terms: list[str],
+    df: dict[str, int],
+    n_docs: int,
+    k1: float = 1.5,
+    b: float = 0.75,
+) -> float:
     """A simplified BM25 relevance score."""
     doc_len = len(doc_terms)
     avg_len = sum(doc_len for _ in [0])  # placeholder; use n_docs avg below
@@ -66,6 +72,7 @@ def cosine_similarity(a: list[float], b: list[float]) -> float:
 # Merge two ranked lists without tuning score scales: each doc's fused
 # score is the sum of 1/(k + rank) over all lists it appears in.
 
+
 def rrf_merge(rankings: list[list[str]], k: int = 60) -> list[str]:
     """Fuse multiple ranked lists into one with reciprocal ranks."""
     scores: dict[str, float] = {}
@@ -88,6 +95,7 @@ assert fused[0] == "d3", "d3 is first in both -> wins fusion"
 # ============================================================
 # Add related terms to the query so sparse matching finds more. Simple
 # and effective: synonyms and spelling variants.
+
 
 def expand_query(query: str, thesaurus: dict[str, list[str]]) -> list[str]:
     """Return the original query plus known expansions."""
@@ -112,6 +120,7 @@ assert "automobile" in expanded and "affordable" in expanded
 # answer and search with it. The hypothesis: answers are closer to
 # relevant docs than questions are.
 
+
 def hyde_query(query: str, stub_writer) -> list[str]:
     """Return expanded search terms derived from a hypothetical answer."""
     answer = stub_writer(query)
@@ -132,14 +141,16 @@ assert "configuration" in hyde_terms or "environment" in hyde_terms
 # 5. Multi-Query: Several Angles on One Question
 # ============================================================
 
+
 def multi_query(question: str, variants: list[str]) -> list[str]:
     """The original question plus reformulated variants."""
     return [question] + variants
 
 
 # Example 4: multi-query
-variants = multi_query("How do I reset my password?",
-                       ["password reset steps", "forgot password procedure"])
+variants = multi_query(
+    "How do I reset my password?", ["password reset steps", "forgot password procedure"]
+)
 print("\nExample 4: multi-query")
 print(f"  {len(variants)} queries to run: {variants}")
 
@@ -149,6 +160,7 @@ print(f"  {len(variants)} queries to run: {variants}")
 # Retrieve small precise chunks, then hand the generator the LARGER
 # parent section for context. Precision at retrieval, breadth at
 # generation.
+
 
 def small_to_big(small_chunk_id: str, parent_map: dict[str, str]) -> str:
     """Map a retrieved small chunk back to its parent document."""
@@ -167,14 +179,16 @@ print(f"  retrieved c-12 -> generate with: {expanded}")
 # Never adopt a technique on vibes. Compare baseline vs candidate
 # retrieval with a labeled set and report the lift.
 
+
 def recall_at_k(ranked: list[str], relevant: set[str], k: int) -> float:
     if not relevant:
         return 0.0
     return len(set(ranked[:k]) & relevant) / len(relevant)
 
 
-def compare_techniques(baseline_rank: list[str], candidate_rank: list[str],
-                       relevant: set[str], k: int = 3) -> dict:
+def compare_techniques(
+    baseline_rank: list[str], candidate_rank: list[str], relevant: set[str], k: int = 3
+) -> dict:
     base = recall_at_k(baseline_rank, relevant, k)
     cand = recall_at_k(candidate_rank, relevant, k)
     return {
@@ -186,11 +200,13 @@ def compare_techniques(baseline_rank: list[str], candidate_rank: list[str],
 
 # Example 6: measure a technique
 baseline = ["d1", "d2", "d3"]
-candidate = ["d4", "d1", "d2"]   # d4 is relevant, moved up
+candidate = ["d4", "d1", "d2"]  # d4 is relevant, moved up
 measure = compare_techniques(baseline, candidate, {"d4"}, k=3)
 print("\nExample 6: measured lift")
-print(f"  baseline={measure['baseline_recall']} candidate={measure['candidate_recall']} "
-      f"lift={measure['lift']}")
+print(
+    f"  baseline={measure['baseline_recall']} candidate={measure['candidate_recall']} "
+    f"lift={measure['lift']}"
+)
 assert measure["lift"] > 0, "technique with real lift"
 
 # ============================================================
@@ -199,8 +215,8 @@ assert measure["lift"] > 0, "technique with real lift"
 # The production retrieval stack: hybrid (dense + BM25) fused with RRF,
 # then small-to-big expansion, then generate.
 
-def production_retrieve(query: str, dense: list[str], sparse: list[str],
-                        k: int = 3) -> list[str]:
+
+def production_retrieve(query: str, dense: list[str], sparse: list[str], k: int = 3) -> list[str]:
     return rrf_merge([dense, sparse])[:k]
 
 

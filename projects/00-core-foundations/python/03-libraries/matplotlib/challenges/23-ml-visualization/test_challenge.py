@@ -30,9 +30,7 @@ def _roc_inputs() -> tuple[np.ndarray, np.ndarray]:
     rng = np.random.default_rng(42)
     n = 1000
     y_true = np.concatenate([np.zeros(700), np.ones(300)]).astype(int)
-    y_score = np.concatenate([
-        rng.normal(0.0, 1.0, 700), rng.normal(2.2, 1.0, 300)
-    ])
+    y_score = np.concatenate([rng.normal(0.0, 1.0, 700), rng.normal(2.2, 1.0, 300)])
     return y_true, y_score
 
 
@@ -45,12 +43,12 @@ def _confusion_inputs() -> tuple[np.ndarray, np.ndarray]:
 
 # ---------------------------------------------------------------- bronze
 
+
 def test_bronze_endpoints():
     y_true, y_score = _roc_inputs()
     fpr, tpr = solution.roc_endpoints(y_true, y_score)
     assert fpr[0] == 0.0 and tpr[0] == 0.0, "ROC must start at (0, 0)"
-    assert abs(fpr[-1] - 1.0) < 1e-12 and abs(tpr[-1] - 1.0) < 1e-12, \
-        "ROC must end at (1, 1)"
+    assert abs(fpr[-1] - 1.0) < 1e-12 and abs(tpr[-1] - 1.0) < 1e-12, "ROC must end at (1, 1)"
 
 
 def test_bronze_monotonic():
@@ -74,6 +72,7 @@ def test_bronze_starter_raises():
 
 
 # ---------------------------------------------------------------- silver
+
 
 def test_silver_shape():
     y_true, y_pred = _confusion_inputs()
@@ -102,6 +101,7 @@ def test_silver_starter_raises():
 
 # ---------------------------------------------------------------- gold
 
+
 def test_gold_verdict_true():
     assert solution.learning_curve_improves() is True
 
@@ -114,8 +114,9 @@ def test_gold_checks_train_above_val():
     with open(os.path.join(HERE, "solution.py"), encoding="utf-8") as fh:
         source = fh.read()
     fn = source.split("def learning_curve_improves")[1]
-    assert "train >= valid" in fn or "train >=" in fn, \
+    assert "train >= valid" in fn or "train >=" in fn, (
         "verdict must include the train >= validation condition"
+    )
 
 
 def test_gold_starter_raises():

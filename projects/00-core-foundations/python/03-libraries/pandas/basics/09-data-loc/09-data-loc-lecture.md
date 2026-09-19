@@ -25,16 +25,16 @@ By the end of this lecture, you will be able to:
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31]
-}, index=["emp1", "emp2", "emp3", "emp4"])
+df = pd.DataFrame(
+    {"Name": ["Alice", "Bob", "Charlie", "Diana"], "Age": [28, 35, 42, 31]},
+    index=["emp1", "emp2", "emp3", "emp4"],
+)
 
 # loc — uses labels
-print(df.loc["emp1"])       # Row with label "emp1"
+print(df.loc["emp1"])  # Row with label "emp1"
 
 # iloc — uses integer positions
-print(df.iloc[0])           # First row (position 0)
+print(df.iloc[0])  # First row (position 0)
 ```
 
 ---
@@ -46,11 +46,14 @@ print(df.iloc[0])           # First row (position 0)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31],
-    "City": ["New York", "London", "Paris", "Tokyo"]
-}, index=["emp1", "emp2", "emp3", "emp4"])
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, 35, 42, 31],
+        "City": ["New York", "London", "Paris", "Tokyo"],
+    },
+    index=["emp1", "emp2", "emp3", "emp4"],
+)
 
 print(df.loc["emp2"])
 # Name      Bob
@@ -120,11 +123,13 @@ print(df.loc[["emp1", "emp3"], :])
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31],
-    "City": ["New York", "London", "Paris", "Tokyo"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, 35, 42, 31],
+        "City": ["New York", "London", "Paris", "Tokyo"],
+    }
+)
 
 print(df.iloc[0])
 # Name    Alice
@@ -174,9 +179,9 @@ print(df.iloc[0:2, 0:2])
 ### Negative Indexing
 
 ```python
-print(df.iloc[-1])      # Last row
-print(df.iloc[-2:])     # Last 2 rows
-print(df.iloc[::-1])    # Reverse order
+print(df.iloc[-1])  # Last row
+print(df.iloc[-2:])  # Last 2 rows
+print(df.iloc[::-1])  # Reverse order
 ```
 
 ---
@@ -188,13 +193,10 @@ print(df.iloc[::-1])    # Reverse order
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob", "Charlie", "Diana"], "Age": [28, 35, 42, 31]})
 
 # When index is integers, loc uses labels (integers)
-print(df.loc[0:2])      # Rows 0, 1, 2 (inclusive!)
+print(df.loc[0:2])  # Rows 0, 1, 2 (inclusive!)
 #       Name  Age
 # 0    Alice   28
 # 1      Bob   35
@@ -205,7 +207,7 @@ print(df.loc[0:2])      # Rows 0, 1, 2 (inclusive!)
 
 ```python
 # iloc always uses position
-print(df.iloc[0:2])     # Rows at positions 0, 1 (exclusive end)
+print(df.iloc[0:2])  # Rows at positions 0, 1 (exclusive end)
 #     Name  Age
 # 0  Alice   28
 # 1    Bob   35
@@ -222,10 +224,10 @@ import pandas as pd
 df = pd.DataFrame({"A": [10, 20, 30, 40]}, index=[0, 1, 2, 3])
 
 print("loc[0:2]:")
-print(df.loc[0:2])      # Returns 3 rows (0, 1, 2)
+print(df.loc[0:2])  # Returns 3 rows (0, 1, 2)
 
 print("\niloc[0:2]:")
-print(df.iloc[0:2])     # Returns 2 rows (position 0, 1)
+print(df.iloc[0:2])  # Returns 2 rows (position 0, 1)
 ```
 
 ---
@@ -237,11 +239,13 @@ print(df.iloc[0:2])     # Returns 2 rows (position 0, 1)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31],
-    "Salary": [75000, 82000, 95000, 68000]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, 35, 42, 31],
+        "Salary": [75000, 82000, 95000, 68000],
+    }
+)
 
 # Filter and select columns
 print(df.loc[df["Age"] > 30, ["Name", "Salary"]])
@@ -273,10 +277,9 @@ print(df)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42]
-}, index=["emp1", "emp2", "emp3"])
+df = pd.DataFrame(
+    {"Name": ["Alice", "Bob", "Charlie"], "Age": [28, 35, 42]}, index=["emp1", "emp2", "emp3"]
+)
 
 # Set a single value
 df.loc["emp1", "Age"] = 29

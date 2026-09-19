@@ -24,8 +24,10 @@ Answers with full explanations and distractor analysis at the end.
 **E3 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 fig1, ax1 = plt.subplots()
 fig2, ax2 = plt.subplots()
 plt.sca(ax2)
@@ -41,8 +43,10 @@ plt.close("all")
 **E4 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 fig, ax = plt.subplots()
 plt.close(fig)
 print(len(plt.get_fignums()))
@@ -63,8 +67,10 @@ print(len(plt.get_fignums()))
 **E6 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 fig, (a1, a2) = plt.subplots(2, 1, sharex=True)
 print(a1.get_shared_x_axes().joined(a1, a2))
 print(len(fig.axes))
@@ -91,8 +97,10 @@ returns:
 **M2 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 fig, axd = plt.subplot_mosaic([["a", "b"], ["a", "c"]])
 print(set(axd))
 print(len(fig.axes))
@@ -114,8 +122,10 @@ plt.close(fig)
 **M4 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 fig, (a1, a2) = plt.subplots(2, 1, sharex=True)
 a1.set_xlim(2, 8)
 print(a2.get_xlim())
@@ -147,8 +157,10 @@ how do you plot into the bottom panel?
 **M7 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 fig, ax = plt.subplots(figsize=(6, 4))
 ax.plot([0, 1], [0, 1])
 print(len(ax.lines))
@@ -190,8 +202,10 @@ multi-panel layouts?
 **H2 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 fig = plt.figure()
 gs = fig.add_gridspec(2, 1, height_ratios=(3, 1))
 a = fig.add_subplot(gs[0])

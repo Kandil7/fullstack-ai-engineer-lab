@@ -118,10 +118,10 @@ import numpy as np
 
 arr = np.array([1, 2, 3, 4, 5])
 
-print(arr > 3)      # [False False False  True  True]
-print(arr <= 2)     # [ True  True False False False]
-print(arr == 3)     # [False False  True False False]
-print(arr != 4)     # [ True  True  True False  True]
+print(arr > 3)  # [False False False  True  True]
+print(arr <= 2)  # [ True  True False False False]
+print(arr == 3)  # [False False  True False False]
+print(arr != 4)  # [ True  True  True False  True]
 ```
 
 **Related Terms:** Boolean Mask, Boolean Indexing

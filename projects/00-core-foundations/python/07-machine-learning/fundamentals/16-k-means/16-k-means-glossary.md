@@ -40,8 +40,7 @@ from sklearn.cluster import KMeans
 import numpy as np
 
 # Sample data
-X = np.array([[1, 2], [1.5, 1.8], [5, 8],
-              [8, 8], [1, 0.6], [9, 11]])
+X = np.array([[1, 2], [1.5, 1.8], [5, 8], [8, 8], [1, 0.6], [9, 11]])
 
 # Apply K-Means with K=2
 kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
@@ -68,21 +67,21 @@ import pandas as pd
 
 # Customer data
 np.random.seed(42)
-X = np.column_stack([
-    np.concatenate([np.random.normal(30000, 5000, 50),
-                    np.random.normal(80000, 10000, 50)]),
-    np.concatenate([np.random.normal(20, 5, 50),
-                    np.random.normal(70, 10, 50)])
-])
+X = np.column_stack(
+    [
+        np.concatenate([np.random.normal(30000, 5000, 50), np.random.normal(80000, 10000, 50)]),
+        np.concatenate([np.random.normal(20, 5, 50), np.random.normal(70, 10, 50)]),
+    ]
+)
 
 # Cluster
 kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
 labels = kmeans.fit_predict(X)
 
 # Analyze clusters
-df = pd.DataFrame({'income': X[:, 0], 'spending': X[:, 1], 'cluster': labels})
+df = pd.DataFrame({"income": X[:, 0], "spending": X[:, 1], "cluster": labels})
 print("Cluster means:")
-print(df.groupby('cluster').mean().round(0))
+print(df.groupby("cluster").mean().round(0))
 ```
 
 **Related Terms:** K-Means, Centroid, Segment
@@ -98,8 +97,7 @@ print(df.groupby('cluster').mean().round(0))
 import numpy as np
 from sklearn.cluster import KMeans
 
-X = np.array([[1, 2], [1.5, 1.8], [5, 8],
-              [8, 8], [1, 0.6], [9, 11]])
+X = np.array([[1, 2], [1.5, 1.8], [5, 8], [8, 8], [1, 0.6], [9, 11]])
 
 kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
 kmeans.fit(X)
@@ -177,13 +175,13 @@ for k in K_range:
     inertias.append(kmeans.inertia_)
 
 plt.figure(figsize=(8, 4))
-plt.plot(K_range, inertias, 'bo-', linewidth=2, markersize=8)
-plt.xlabel('Number of Clusters (K)')
-plt.ylabel('Inertia')
-plt.title('Elbow Method')
+plt.plot(K_range, inertias, "bo-", linewidth=2, markersize=8)
+plt.xlabel("Number of Clusters (K)")
+plt.ylabel("Inertia")
+plt.title("Elbow Method")
 plt.xticks(K_range)
 plt.grid(True, alpha=0.3)
-plt.savefig('elbow_method.png', dpi=100)
+plt.savefig("elbow_method.png", dpi=100)
 plt.show()
 
 # The "elbow" is at K=4 (true number of clusters)
@@ -255,14 +253,12 @@ import numpy as np
 X = np.random.randn(100, 2)
 
 # K-Means++ (default)
-kmeans_pp = KMeans(n_clusters=3, init='k-means++', 
-                   n_init=10, random_state=42)
+kmeans_pp = KMeans(n_clusters=3, init="k-means++", n_init=10, random_state=42)
 kmeans_pp.fit(X)
 print(f"K-Means++ Inertia: {kmeans_pp.inertia_:.2f}")
 
 # Random initialization (worse)
-kmeans_random = KMeans(n_clusters=3, init='random',
-                       n_init=10, random_state=42)
+kmeans_random = KMeans(n_clusters=3, init="random", n_init=10, random_state=42)
 kmeans_random.fit(X)
 print(f"Random Init Inertia: {kmeans_random.inertia_:.2f}")
 
@@ -389,11 +385,13 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 
 # Features with different scales
-X = np.array([
-    [100000, 50],   # Income: 100k, Age: 50
-    [200000, 30],   # Income: 200k, Age: 30
-    [150000, 40],   # Income: 150k, Age: 40
-])
+X = np.array(
+    [
+        [100000, 50],  # Income: 100k, Age: 50
+        [200000, 30],  # Income: 200k, Age: 30
+        [150000, 40],  # Income: 150k, Age: 40
+    ]
+)
 
 # Without scaling (income dominates)
 kmeans_unscaled = KMeans(n_clusters=2, random_state=42, n_init=10)
@@ -423,9 +421,7 @@ from sklearn.cluster import KMeans
 import numpy as np
 
 # Data with outlier
-X = np.array([[1, 2], [1.5, 1.8], [2, 2.2],
-              [8, 8], [8.5, 8.2], [9, 8],
-              [50, 50]])  # Outlier!
+X = np.array([[1, 2], [1.5, 1.8], [2, 2.2], [8, 8], [8.5, 8.2], [9, 8], [50, 50]])  # Outlier!
 
 kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
 labels = kmeans.fit_predict(X)
@@ -555,6 +551,7 @@ print(f"Clusters found: {len(np.unique(labels))}")
 ```python
 # Basic K-Means
 from sklearn.cluster import KMeans
+
 kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
 kmeans.fit(X)
 labels = kmeans.labels_
@@ -570,13 +567,15 @@ for k in range(1, 11):
 
 # Silhouette Score
 from sklearn.metrics import silhouette_score
+
 score = silhouette_score(X, labels)
 
 # K-Means++
-kmeans = KMeans(n_clusters=3, init='k-means++', random_state=42)
+kmeans = KMeans(n_clusters=3, init="k-means++", random_state=42)
 
 # Feature Scaling (IMPORTANT!)
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 

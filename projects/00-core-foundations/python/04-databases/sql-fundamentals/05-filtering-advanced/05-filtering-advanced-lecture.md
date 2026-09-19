@@ -49,8 +49,11 @@ people regularly write `BETWEEN 0 AND 100` expecting 100 excluded.
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
-conn.execute("CREATE TABLE items (id INTEGER PRIMARY KEY, name TEXT, category TEXT, price REAL, stock INTEGER)")
+conn.execute(
+    "CREATE TABLE items (id INTEGER PRIMARY KEY, name TEXT, category TEXT, price REAL, stock INTEGER)"
+)
 conn.executemany(
     "INSERT INTO items (name, category, price, stock) VALUES (?, ?, ?, ?)",
     [
@@ -61,10 +64,22 @@ conn.executemany(
         ("cable", "electronics", 3.25, 80),
     ],
 )
-print([r[0] for r in conn.execute(
-    "SELECT name FROM items WHERE category IN (?, ?) ORDER BY id", ("tools", "optics")).fetchall()])
-print([r[0] for r in conn.execute(
-    "SELECT name FROM items WHERE price BETWEEN ? AND ? ORDER BY id", (1.0, 50.0)).fetchall()])
+print(
+    [
+        r[0]
+        for r in conn.execute(
+            "SELECT name FROM items WHERE category IN (?, ?) ORDER BY id", ("tools", "optics")
+        ).fetchall()
+    ]
+)
+print(
+    [
+        r[0]
+        for r in conn.execute(
+            "SELECT name FROM items WHERE price BETWEEN ? AND ? ORDER BY id", (1.0, 50.0)
+        ).fetchall()
+    ]
+)
 ```
 
 ```
@@ -79,8 +94,22 @@ wildcard** (`LIKE '%x'`) cannot use a B-tree index — the engine must
 scan (topics 10, 14). Prefer anchored patterns (`'x%'`) where possible.
 
 ```python
-print([r[0] for r in conn.execute("SELECT name FROM items WHERE name LIKE ? ORDER BY id", ("%et",)).fetchall()])
-print([r[0] for r in conn.execute("SELECT name FROM items WHERE name LIKE ? ORDER BY id", ("w_dg_t",)).fetchall()])
+print(
+    [
+        r[0]
+        for r in conn.execute(
+            "SELECT name FROM items WHERE name LIKE ? ORDER BY id", ("%et",)
+        ).fetchall()
+    ]
+)
+print(
+    [
+        r[0]
+        for r in conn.execute(
+            "SELECT name FROM items WHERE name LIKE ? ORDER BY id", ("w_dg_t",)
+        ).fetchall()
+    ]
+)
 ```
 
 ```
@@ -96,8 +125,18 @@ feature data, `stock IS NULL` ("no inventory data") is different from
 `stock = 0` ("genuinely zero") — collapsing them corrupts statistics.
 
 ```python
-print([r[0] for r in conn.execute("SELECT name FROM items WHERE stock IS NULL ORDER BY id").fetchall()])
-print([r[0] for r in conn.execute("SELECT name FROM items WHERE stock = ? ORDER BY id", (0,)).fetchall()])
+print(
+    [
+        r[0]
+        for r in conn.execute("SELECT name FROM items WHERE stock IS NULL ORDER BY id").fetchall()
+    ]
+)
+print(
+    [
+        r[0]
+        for r in conn.execute("SELECT name FROM items WHERE stock = ? ORDER BY id", (0,)).fetchall()
+    ]
+)
 ```
 
 ```
@@ -112,9 +151,15 @@ still UNKNOWN. Parenthesize OR groups; the classic bug is
 `WHERE a = 1 OR a = 2 AND b = 3` meaning `a = 1 OR (a = 2 AND b = 3)`.
 
 ```python
-print([r[0] for r in conn.execute(
-    "SELECT name FROM items WHERE (category = ? OR category = ?) AND price > ? ORDER BY id",
-    ("tools", "electronics", 3.0)).fetchall()])
+print(
+    [
+        r[0]
+        for r in conn.execute(
+            "SELECT name FROM items WHERE (category = ? OR category = ?) AND price > ? ORDER BY id",
+            ("tools", "electronics", 3.0),
+        ).fetchall()
+    ]
+)
 ```
 
 ```
@@ -131,7 +176,8 @@ through arithmetic: `5 + NULL` is NULL.
 ```python
 trap = conn.execute(
     "SELECT name FROM items WHERE category NOT IN (?, ?) AND category IS NOT NULL ORDER BY id",
-    ("tools", "electronics")).fetchall()
+    ("tools", "electronics"),
+).fetchall()
 print([r[0] for r in trap])
 print(conn.execute("SELECT 5 + NULL").fetchone()[0])
 ```

@@ -18,10 +18,10 @@ arr_i16 = np.array([1, 2, 3], dtype=np.int16)
 arr_i32 = np.array([1, 2, 3], dtype=np.int32)
 arr_i64 = np.array([1, 2, 3], dtype=np.int64)
 
-print("int8:", arr_i8.dtype, "- Bytes:", arr_i8.nbytes)   # int8, 3 bytes
-print("int16:", arr_i16.dtype, "- Bytes:", arr_i16.nbytes) # int16, 6 bytes
-print("int32:", arr_i32.dtype, "- Bytes:", arr_i32.nbytes) # int32, 12 bytes
-print("int64:", arr_i64.dtype, "- Bytes:", arr_i64.nbytes) # int64, 24 bytes
+print("int8:", arr_i8.dtype, "- Bytes:", arr_i8.nbytes)  # int8, 3 bytes
+print("int16:", arr_i16.dtype, "- Bytes:", arr_i16.nbytes)  # int16, 6 bytes
+print("int32:", arr_i32.dtype, "- Bytes:", arr_i32.nbytes)  # int32, 12 bytes
+print("int64:", arr_i64.dtype, "- Bytes:", arr_i64.nbytes)  # int64, 24 bytes
 
 # Float types
 arr_f16 = np.array([1.5, 2.5], dtype=np.float16)
@@ -57,15 +57,15 @@ print("str:", arr_str.dtype)
 
 arr_int = np.array([1, 2, 3])
 arr_float = np.array([1.0, 2.0, 3.0])
-arr_complex = np.array([1+2j, 3+4j])
+arr_complex = np.array([1 + 2j, 3 + 4j])
 arr_bool = np.array([True, False])
 arr_str = np.array(["a", "b", "c"])
 
-print("\nDefault int dtype:", arr_int.dtype)      # int64
-print("Default float dtype:", arr_float.dtype)    # float64
-print("Complex dtype:", arr_complex.dtype)        # complex128
-print("Bool dtype:", arr_bool.dtype)              # bool
-print("String dtype:", arr_str.dtype)             # <U1
+print("\nDefault int dtype:", arr_int.dtype)  # int64
+print("Default float dtype:", arr_float.dtype)  # float64
+print("Complex dtype:", arr_complex.dtype)  # complex128
+print("Bool dtype:", arr_bool.dtype)  # bool
+print("String dtype:", arr_str.dtype)  # <U1
 # Output:
 # Default int dtype: int64
 # Default float dtype: float64

@@ -10,8 +10,10 @@ Answers with full explanations and distractor analysis at the end.
 **E1 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 plt.rcParams["figure.dpi"] = 120
 print(plt.rcParams["figure.dpi"])
 ```
@@ -31,8 +33,10 @@ print(plt.rcParams["figure.dpi"])
 **E3 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 print("ggplot" in plt.style.available)
 print("dark_background" in plt.style.available)
 ```
@@ -52,8 +56,10 @@ print("dark_background" in plt.style.available)
 **E5 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 cmap = plt.get_cmap("viridis")
 print(cmap.name)
 ```
@@ -77,8 +83,10 @@ print(cmap.name)
 **M1 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 plt.rcParams["axes.grid"] = True
 print(plt.rcParams["axes.grid"])
 ```
@@ -108,15 +116,18 @@ print(plt.rcParams["axes.grid"])
 **M4 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+
 fig, ax = plt.subplots()
 x = np.linspace(0, 10, 100)
 y = (x - 4.0) ** 2
 ax.plot(x, y)
-ax.annotate("min", xy=(x[int(np.argmin(y))], y.min()),
-            xytext=(8, 30), arrowprops={"arrowstyle": "->"})
+ax.annotate(
+    "min", xy=(x[int(np.argmin(y))], y.min()), xytext=(8, 30), arrowprops={"arrowstyle": "->"}
+)
 print(len(ax.texts))
 plt.close(fig)
 ```
@@ -143,8 +154,10 @@ plt.close(fig)
 **M7 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 cmaps = {"viridis", "plasma", "inferno", "magma", "cividis"}
 print("jet" in cmaps)
 print("viridis" in cmaps)
@@ -185,8 +198,10 @@ print("viridis" in cmaps)
 **H2 (code-output).** What prints?
 ```python
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 with plt.style.context("ggplot"):
     a = plt.rcParams["axes.grid"]
 with plt.style.context("dark_background"):

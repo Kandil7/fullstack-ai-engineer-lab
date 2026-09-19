@@ -26,6 +26,7 @@ from collections import defaultdict
 # EASY PROBLEMS (20 XP)
 # ============================================================
 
+
 # Problem 1: Message Class
 # Write an AgentMessage class with:
 # - sender: str, receiver: str, content: Any
@@ -67,6 +68,7 @@ class MessageBus:
 class AgentState(Enum):
     pass  # Write your code here
 
+
 def transition(current: AgentState, next_state: AgentState) -> AgentState:
     pass  # Write your code here
 
@@ -94,6 +96,7 @@ def problem_05():
 # ============================================================
 # MEDIUM PROBLEMS (50 XP)
 # ============================================================
+
 
 # Problem 6: Sequential Pipeline
 # Write a SequentialPipeline class that:
@@ -185,6 +188,7 @@ class LoadBalancer:
 # ============================================================
 # HARD PROBLEMS (100 XP)
 # ============================================================
+
 
 # Problem 11: Workflow DAG Executor
 # Write a DAGExecutor class that:

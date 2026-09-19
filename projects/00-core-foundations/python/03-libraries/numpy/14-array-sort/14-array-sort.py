@@ -17,8 +17,8 @@ print("Original:", arr)
 
 # Sort (returns new sorted array)
 sorted_arr = np.sort(arr)
-print("Sorted:", sorted_arr)   # [1 1 2 3 4 5 6 9]
-print("Original:", arr)        # [3 1 4 1 5 9 2 6] (unchanged)
+print("Sorted:", sorted_arr)  # [1 1 2 3 4 5 6 9]
+print("Original:", arr)  # [3 1 4 1 5 9 2 6] (unchanged)
 
 # Sort in place with .sort()
 arr_copy = arr.copy()
@@ -94,19 +94,20 @@ print("\nSorted strings:", np.sort(arr_str))
 arr = np.array([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5])
 
 # Quick sort (default) - O(n log n) average
-print("\nQuicksort:", np.sort(arr, kind='quicksort'))
+print("\nQuicksort:", np.sort(arr, kind="quicksort"))
 
 # Merge sort - O(n log n), stable
-print("Mergesort:", np.sort(arr, kind='mergesort'))
+print("Mergesort:", np.sort(arr, kind="mergesort"))
 
 # Heap sort - O(n log n), not stable
-print("Heapsort:", np.sort(arr, kind='heapsort'))
+print("Heapsort:", np.sort(arr, kind="heapsort"))
 
 # Stable sort preserves order of equal elements
-arr2 = np.array([('Alice', 25), ('Bob', 20), ('Charlie', 25)],
-                dtype=[('name', 'U10'), ('age', int)])
+arr2 = np.array(
+    [("Alice", 25), ("Bob", 20), ("Charlie", 25)], dtype=[("name", "U10"), ("age", int)]
+)
 # Sort by age (stable)
-sorted_by_age = np.sort(arr2, order='age')
+sorted_by_age = np.sort(arr2, order="age")
 print("\nStable sort by age:", sorted_by_age)
 # Output: [('Bob', 20) ('Alice', 25) ('Charlie', 25)]
 
@@ -120,14 +121,14 @@ arr = np.array([30, 10, 50, 20, 40])
 # argsort returns indices that would sort the array
 sort_indices = np.argsort(arr)
 print("\nOriginal:", arr)
-print("argsort:", sort_indices)    # [1 3 0 4 2]
+print("argsort:", sort_indices)  # [1 3 0 4 2]
 print("Sorted by indices:", arr[sort_indices])  # [10 20 30 40 50]
 
 # Use argsort for fancy indexing
 print("Using argsort:", arr[sort_indices])
 
 # lexsort - sort by multiple keys
-names = np.array(['Charlie', 'Alice', 'Bob', 'Alice'])
+names = np.array(["Charlie", "Alice", "Bob", "Alice"])
 ages = np.array([25, 30, 20, 25])
 
 # Sort by age, then by name

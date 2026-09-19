@@ -166,9 +166,7 @@ def range_query(root, low, high):
         return range_query(root.left, low, high)  # Prune right
     if root.val < low:
         return range_query(root.right, low, high)  # Prune left
-    return (range_query(root.left, low, high) + 
-            [root.val] + 
-            range_query(root.right, low, high))
+    return range_query(root.left, low, high) + [root.val] + range_query(root.right, low, high)
 ```
 
 ---
@@ -204,7 +202,7 @@ def sorted_array_to_bst(nums):
     mid = len(nums) // 2
     root = BSTNode(nums[mid])
     root.left = sorted_array_to_bst(nums[:mid])
-    root.right = sorted_array_to_bst(nums[mid+1:])
+    root.right = sorted_array_to_bst(nums[mid + 1 :])
     return root
 ```
 
@@ -248,13 +246,12 @@ def find_target(root, k):
 - **Related:** BST Property, Range Constraints
 
 ```python
-def is_valid_bst(root, low=float('-inf'), high=float('inf')):
+def is_valid_bst(root, low=float("-inf"), high=float("inf")):
     if not root:
         return True
     if root.val <= low or root.val >= high:
         return False
-    return (is_valid_bst(root.left, low, root.val) and
-            is_valid_bst(root.right, root.val, high))
+    return is_valid_bst(root.left, low, root.val) and is_valid_bst(root.right, root.val, high)
 ```
 
 ---

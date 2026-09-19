@@ -52,6 +52,7 @@ class MyClass:
     def __init__(self):
         self.public = "Anyone can see me"
 
+
 obj = MyClass()
 print(obj.public)  # Works fine
 ```
@@ -65,6 +66,7 @@ class MyClass:
     def __init__(self):
         self._protected = "Internal use"
 
+
 obj = MyClass()
 print(obj._protected)  # Works, but shouldn't be accessed
 ```
@@ -77,6 +79,7 @@ Name mangling: harder (not impossible) to access externally.
 class MyClass:
     def __init__(self):
         self.__private = "Really hidden"
+
 
 obj = MyClass()
 # print(obj.__private)  # AttributeError!
@@ -95,31 +98,32 @@ Controlled access using `@property`.
 class Temperature:
     def __init__(self, celsius=0):
         self._celsius = celsius  # Protected attribute
-    
+
     @property
     def celsius(self):
         """Get temperature in Celsius."""
         return self._celsius
-    
+
     @celsius.setter
     def celsius(self, value):
         """Set temperature with validation."""
         if value < -273.15:
             raise ValueError("Temperature below absolute zero!")
         self._celsius = value
-    
+
     @property
     def fahrenheit(self):
         """Get temperature in Fahrenheit (read-only)."""
-        return self._celsius * 9/5 + 32
+        return self._celsius * 9 / 5 + 32
+
 
 # Usage
 temp = Temperature(25)
-print(temp.celsius)       # 25
-print(temp.fahrenheit)    # 77.0
+print(temp.celsius)  # 25
+print(temp.fahrenheit)  # 77.0
 
-temp.celsius = 100        # Setter with validation
-print(temp.fahrenheit)    # 212.0
+temp.celsius = 100  # Setter with validation
+print(temp.fahrenheit)  # 212.0
 
 # temp.fahrenheit = 212  # AttributeError: can't set (read-only)
 ```
@@ -130,32 +134,35 @@ print(temp.fahrenheit)    # 212.0
 class Circle:
     def __init__(self, radius):
         self._radius = radius
-    
+
     @property
     def radius(self):
         return self._radius
-    
+
     @radius.setter
     def radius(self, value):
         if value < 0:
             raise ValueError("Radius cannot be negative")
         self._radius = value
-    
+
     @property
     def area(self):
         """Computed property - calculated on access."""
         import math
-        return math.pi * self._radius ** 2
-    
+
+        return math.pi * self._radius**2
+
     @property
     def circumference(self):
         """Another computed property."""
         import math
+
         return 2 * math.pi * self._radius
 
+
 c = Circle(5)
-print(c.area)          # 78.53981633974483
-print(c.circumference) # 31.41592653589793
+print(c.area)  # 78.53981633974483
+print(c.circumference)  # 31.41592653589793
 ```
 
 ---
@@ -169,26 +176,27 @@ class Person:
     def __init__(self, name, age):
         self._name = name
         self._age = age
-    
+
     # Getter
     def get_name(self):
         return self._name
-    
+
     # Setter
     def set_name(self, value):
         if not value:
             raise ValueError("Name cannot be empty")
         self._name = value
-    
+
     # Getter
     def get_age(self):
         return self._age
-    
+
     # Setter
     def set_age(self, value):
         if not 0 <= value <= 150:
             raise ValueError("Invalid age")
         self._age = value
+
 
 person = Person("Alice", 30)
 print(person.get_name())  # Alice
@@ -202,31 +210,32 @@ class Person:
     def __init__(self, name, age):
         self._name = name
         self._age = age
-    
+
     @property
     def name(self):
         return self._name
-    
+
     @name.setter
     def name(self, value):
         if not value:
             raise ValueError("Name cannot be empty")
         self._name = value
-    
+
     @property
     def age(self):
         return self._age
-    
+
     @age.setter
     def age(self, value):
         if not 0 <= value <= 150:
             raise ValueError("Invalid age")
         self._age = value
 
+
 # Clean syntax
 person = Person("Alice", 30)
-print(person.name)   # Alice
-person.age = 31      # Uses setter with validation
+print(person.name)  # Alice
+person.age = 31  # Uses setter with validation
 ```
 
 ---
@@ -238,18 +247,20 @@ class Circle:
     def __init__(self, radius):
         self._radius = radius
         self._area = None
-    
+
     @property
     def radius(self):
         return self._radius
-    
+
     @property
     def area(self):
         """Read-only computed property."""
         if self._area is None:
             import math
-            self._area = math.pi * self._radius ** 2
+
+            self._area = math.pi * self._radius**2
         return self._area
+
 
 c = Circle(5)
 print(c.area)  # 78.53981633974483
@@ -263,23 +274,25 @@ print(c.area)  # 78.53981633974483
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Student:
     name: str
     _gpa: float = field(init=False, repr=False)
-    
+
     def __post_init__(self):
         self._gpa = 0.0
-    
+
     @property
     def gpa(self):
         return self._gpa
-    
+
     @gpa.setter
     def gpa(self, value):
         if not 0.0 <= value <= 4.0:
             raise ValueError("GPA must be between 0 and 4")
         self._gpa = value
+
 
 student = Student("Alice")
 student.gpa = 3.8
@@ -298,14 +311,15 @@ class Team:
     def __init__(self):
         self.members = []  # Public!
 
+
 # GOOD - controlled access
 class Team:
     def __init__(self):
         self._members = []  # Protected
-    
+
     def add_member(self, member):
         self._members.append(member)
-    
+
     @property
     def members(self):
         return self._members.copy()  # Return copy
@@ -319,15 +333,16 @@ class Person:
     def __init__(self, age):
         self.age = age  # Could be negative!
 
+
 # GOOD - validate in setter
 class Person:
     def __init__(self, age):
         self.age = age  # Uses setter
-    
+
     @property
     def age(self):
         return self._age
-    
+
     @age.setter
     def age(self, value):
         if value < 0:
@@ -359,38 +374,39 @@ class BankAccount:
         self._owner = owner
         self._balance = balance
         self._transactions = []
-    
+
     @property
     def owner(self):
         return self._owner
-    
+
     @property
     def balance(self):
         return self._balance
-    
+
     def deposit(self, amount):
         if amount <= 0:
             raise ValueError("Deposit must be positive")
         self._balance += amount
-        self._transactions.append(('DEPOSIT', amount))
-    
+        self._transactions.append(("DEPOSIT", amount))
+
     def withdraw(self, amount):
         if amount <= 0:
             raise ValueError("Withdrawal must be positive")
         if amount > self._balance:
             raise ValueError("Insufficient funds")
         self._balance -= amount
-        self._transactions.append(('WITHDRAWAL', amount))
-    
+        self._transactions.append(("WITHDRAWAL", amount))
+
     def get_statement(self):
         return self._transactions.copy()
+
 
 # Test
 account = BankAccount("Alice", 1000)
 account.deposit(500)
 account.withdraw(200)
-print(account.balance)         # 1300
-print(account.get_statement()) # [('DEPOSIT', 500), ('WITHDRAWAL', 200)]
+print(account.balance)  # 1300
+print(account.get_statement())  # [('DEPOSIT', 500), ('WITHDRAWAL', 200)]
 ```
 
 ---

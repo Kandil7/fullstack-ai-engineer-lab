@@ -112,6 +112,7 @@ By the end of this lecture, you will be able to:
 Multi-Agent Orchestration System
 Demonstrates sequential, parallel, and hierarchical patterns.
 """
+
 import json
 import time
 from typing import Any, Callable, Dict, List, Optional
@@ -123,6 +124,7 @@ import uuid
 
 class AgentRole(Enum):
     """Different agent specializations."""
+
     RESEARCHER = "researcher"
     WRITER = "writer"
     REVIEWER = "reviewer"
@@ -134,13 +136,14 @@ class AgentRole(Enum):
 @dataclass
 class Message:
     """Message between agents."""
+
     id: str
     sender: str
     receiver: str
     content: Any
     timestamp: float
     message_type: str = "task"  # task, result, feedback
-    
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -148,13 +151,14 @@ class Message:
             "receiver": self.receiver,
             "content": self.content,
             "timestamp": self.timestamp,
-            "type": self.message_type
+            "type": self.message_type,
         }
 
 
 @dataclass
 class AgentConfig:
     """Configuration for an agent."""
+
     name: str
     role: AgentRole
     tools: List[str] = field(default_factory=list)
@@ -164,7 +168,7 @@ class AgentConfig:
 
 class BaseAgent:
     """Base class for all agents."""
-    
+
     def __init__(self, config: AgentConfig, llm_caller: Callable):
         self.config = config
         self.llm = llm_caller
@@ -173,13 +177,12 @@ class BaseAgent:
         self.inbox: List[Message] = []
         self.outbox: List[Message] = []
         self.memory: List[Dict] = []
-    
+
     def receive_message(self, message: Message):
         """Receive a message from another agent."""
         self.inbox.append(message)
-    
-    def send_message(self, receiver: str, content: Any, 
-                    msg_type: str = "task"):
+
+    def send_message(self, receiver: str, content: Any, msg_type: str = "task"):
         """Send a message to another agent."""
         msg = Message(
             id=str(uuid.uuid4()),
@@ -187,15 +190,15 @@ class BaseAgent:
             receiver=receiver,
             content=content,
             timestamp=time.time(),
-            message_type=msg_type
+            message_type=msg_type,
         )
         self.outbox.append(msg)
         return msg
-    
+
     def process_task(self, task: Dict) -> Dict:
         """Process a task - to be overridden by subclasses."""
         raise NotImplementedError
-    
+
     def get_system_prompt(self) -> str:
         """Get role-specific system prompt."""
         return f"You are {self.name}, a {self.role.value} agent."
@@ -203,11 +206,11 @@ class BaseAgent:
 
 class ResearchAgent(BaseAgent):
     """Agent specialized in research and information gathering."""
-    
+
     def process_task(self, task: Dict) -> Dict:
         """Research a topic and return findings."""
         topic = task.get("topic", task.get("description", ""))
-        
+
         prompt = f"""Research the following topic thoroughly:
 Topic: {topic}
 
@@ -225,9 +228,9 @@ Return as JSON:
     "summary": "brief summary"
 }}
 """
-        
+
         response = self.llm(prompt)
-        
+
         try:
             findings = json.loads(response)
         except:
@@ -235,28 +238,24 @@ Return as JSON:
                 "findings": [response],
                 "sources": [],
                 "confidence": 0.5,
-                "summary": response[:200]
+                "summary": response[:200],
             }
-        
+
         # Store in memory
-        self.memory.append({
-            "task": task,
-            "result": findings,
-            "timestamp": time.time()
-        })
-        
+        self.memory.append({"task": task, "result": findings, "timestamp": time.time()})
+
         return findings
 
 
 class WriterAgent(BaseAgent):
     """Agent specialized in content creation."""
-    
+
     def process_task(self, task: Dict) -> Dict:
         """Write content based on provided information."""
         content_type = task.get("type", "article")
         information = task.get("information", "")
         requirements = task.get("requirements", "")
-        
+
         prompt = f"""Write a {content_type} based on the following information:
 
 Information:
@@ -267,29 +266,29 @@ Requirements:
 
 Create well-structured, engaging content.
 """
-        
+
         response = self.llm(prompt)
-        
+
         return {
             "content": response,
             "type": content_type,
             "word_count": len(response.split()),
-            "status": "completed"
+            "status": "completed",
         }
 
 
 class ReviewerAgent(BaseAgent):
     """Agent specialized in reviewing and providing feedback."""
-    
+
     def process_task(self, task: Dict) -> Dict:
         """Review content and provide feedback."""
         content = task.get("content", "")
         criteria = task.get("criteria", ["accuracy", "clarity", "completeness"])
-        
+
         prompt = f"""Review the following content:
 {content}
 
-Review criteria: {', '.join(criteria)}
+Review criteria: {", ".join(criteria)}
 
 Provide:
 1. Overall quality score (0-10)
@@ -309,9 +308,9 @@ Return as JSON:
     "passed": true
 }}
 """
-        
+
         response = self.llm(prompt)
-        
+
         try:
             return json.loads(response)
         except:
@@ -319,32 +318,33 @@ Return as JSON:
                 "score": 5.0,
                 "feedback": {"general": response},
                 "suggestions": [],
-                "passed": False
+                "passed": False,
             }
 
 
 class Orchestrator:
     """
     Manages multiple agents and coordinates their work.
-    
+
     Supports:
     - Sequential execution
     - Parallel execution
     - Hierarchical delegation
     """
-    
+
     def __init__(self, llm_caller: Callable):
         self.llm = llm_caller
         self.agents: Dict[str, BaseAgent] = {}
         self.message_bus: List[Message] = []
         self.execution_log: List[Dict] = []
-    
+
     def register_agent(self, agent: BaseAgent):
         """Register an agent with the orchestrator."""
         self.agents[agent.name] = agent
-    
-    def send_message(self, sender: str, receiver: str, 
-                    content: Any, msg_type: str = "task"):
+
+    def send_message(
+        self, sender: str, receiver: str, content: Any, msg_type: str = "task"
+    ):
         """Route message between agents."""
         msg = Message(
             id=str(uuid.uuid4()),
@@ -352,206 +352,214 @@ class Orchestrator:
             receiver=receiver,
             content=content,
             timestamp=time.time(),
-            message_type=msg_type
+            message_type=msg_type,
         )
         self.message_bus.append(msg)
-        
+
         if receiver in self.agents:
             self.agents[receiver].receive_message(msg)
-        
+
         return msg
-    
+
     def execute_sequential(self, pipeline: List[Dict]) -> List[Dict]:
         """
         Execute agents in sequence.
-        
+
         Each agent's output becomes the next agent's input.
         """
         results = []
         current_input = None
-        
+
         for step in pipeline:
             agent_name = step["agent"]
             task = step.get("task", current_input)
-            
+
             if agent_name not in self.agents:
                 raise ValueError(f"Agent '{agent_name}' not found")
-            
+
             agent = self.agents[agent_name]
-            
+
             # Log execution
-            self.execution_log.append({
-                "agent": agent_name,
-                "task": str(task)[:100],
-                "timestamp": time.time(),
-                "status": "started"
-            })
-            
+            self.execution_log.append(
+                {
+                    "agent": agent_name,
+                    "task": str(task)[:100],
+                    "timestamp": time.time(),
+                    "status": "started",
+                }
+            )
+
             # Execute
             result = agent.process_task(task)
-            
+
             # Update log
             self.execution_log[-1]["status"] = "completed"
             self.execution_log[-1]["result"] = str(result)[:100]
-            
-            results.append({
-                "agent": agent_name,
-                "result": result
-            })
-            
+
+            results.append({"agent": agent_name, "result": result})
+
             current_input = result
-        
+
         return results
-    
-    def execute_parallel(self, tasks: List[Dict], 
-                        max_workers: int = 3) -> List[Dict]:
+
+    def execute_parallel(self, tasks: List[Dict], max_workers: int = 3) -> List[Dict]:
         """
         Execute multiple agents in parallel.
-        
+
         Each agent works independently on its task.
         """
         results = []
-        
+
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = {}
-            
+
             for task in tasks:
                 agent_name = task["agent"]
                 task_data = task.get("task", task)
-                
+
                 if agent_name in self.agents:
                     agent = self.agents[agent_name]
                     future = executor.submit(agent.process_task, task_data)
                     futures[future] = agent_name
-            
+
             for future in as_completed(futures):
                 agent_name = futures[future]
                 try:
                     result = future.result()
-                    results.append({
-                        "agent": agent_name,
-                        "result": result,
-                        "status": "success"
-                    })
+                    results.append(
+                        {"agent": agent_name, "result": result, "status": "success"}
+                    )
                 except Exception as e:
-                    results.append({
-                        "agent": agent_name,
-                        "error": str(e),
-                        "status": "failed"
-                    })
-        
+                    results.append(
+                        {"agent": agent_name, "error": str(e), "status": "failed"}
+                    )
+
         return results
-    
+
     def execute_hierarchical(self, manager_task: Dict) -> Dict:
         """
         Execute with a manager agent delegating to workers.
-        
+
         The manager breaks down the task and assigns subtasks.
         """
         # Get manager agent
         manager_name = manager_task.get("manager", "manager")
         if manager_name not in self.agents:
             raise ValueError(f"Manager agent '{manager_name}' not found")
-        
+
         manager = self.agents[manager_name]
-        
+
         # Manager creates a plan
-        plan = manager.process_task({
-            "type": "plan",
-            "goal": manager_task["goal"],
-            "available_agents": list(self.agents.keys())
-        })
-        
+        plan = manager.process_task(
+            {
+                "type": "plan",
+                "goal": manager_task["goal"],
+                "available_agents": list(self.agents.keys()),
+            }
+        )
+
         # Execute subtasks
         subtask_results = []
         for subtask in plan.get("subtasks", []):
             agent_name = subtask.get("assigned_to", "default")
-            
+
             if agent_name in self.agents:
                 agent = self.agents[agent_name]
                 result = agent.process_task(subtask)
-                subtask_results.append({
-                    "subtask": subtask,
-                    "result": result
-                })
-        
+                subtask_results.append({"subtask": subtask, "result": result})
+
         # Manager aggregates results
-        final_result = manager.process_task({
-            "type": "aggregate",
-            "original_goal": manager_task["goal"],
-            "subtask_results": subtask_results
-        })
-        
+        final_result = manager.process_task(
+            {
+                "type": "aggregate",
+                "original_goal": manager_task["goal"],
+                "subtask_results": subtask_results,
+            }
+        )
+
         return final_result
-    
+
     def get_execution_summary(self) -> Dict:
         """Get summary of all agent executions."""
         return {
             "total_executions": len(self.execution_log),
-            "agents_used": list(set(
-                log["agent"] for log in self.execution_log
-            )),
-            "execution_log": self.execution_log
+            "agents_used": list(set(log["agent"] for log in self.execution_log)),
+            "execution_log": self.execution_log,
         }
 
 
 # === Usage Example ===
 
+
 def mock_llm(prompt: str) -> str:
     """Mock LLM for demonstration."""
     if "Research" in prompt:
-        return json.dumps({
-            "findings": ["AI agents are autonomous systems"],
-            "sources": ["Paper 1", "Paper 2"],
-            "confidence": 0.85,
-            "summary": "AI agents are systems that can perceive, reason, and act."
-        })
+        return json.dumps(
+            {
+                "findings": ["AI agents are autonomous systems"],
+                "sources": ["Paper 1", "Paper 2"],
+                "confidence": 0.85,
+                "summary": "AI agents are systems that can perceive, reason, and act.",
+            }
+        )
     elif "Write" in prompt:
         return "AI agents represent a significant advancement in artificial intelligence..."
     elif "Review" in prompt:
-        return json.dumps({
-            "score": 8.0,
-            "feedback": {"accuracy": "Good", "clarity": "Excellent"},
-            "suggestions": ["Add more examples"],
-            "passed": True
-        })
+        return json.dumps(
+            {
+                "score": 8.0,
+                "feedback": {"accuracy": "Good", "clarity": "Excellent"},
+                "suggestions": ["Add more examples"],
+                "passed": True,
+            }
+        )
     return "Task completed."
+
 
 # Create orchestrator
 orchestrator = Orchestrator(llm_caller=mock_llm)
 
 # Register agents
-orchestrator.register_agent(ResearchAgent(
-    config=AgentConfig(name="researcher", role=AgentRole.RESEARCHER),
-    llm_caller=mock_llm
-))
-orchestrator.register_agent(WriterAgent(
-    config=AgentConfig(name="writer", role=AgentRole.WRITER),
-    llm_caller=mock_llm
-))
-orchestrator.register_agent(ReviewerAgent(
-    config=AgentConfig(name="reviewer", role=AgentRole.REVIEWER),
-    llm_caller=mock_llm
-))
+orchestrator.register_agent(
+    ResearchAgent(
+        config=AgentConfig(name="researcher", role=AgentRole.RESEARCHER),
+        llm_caller=mock_llm,
+    )
+)
+orchestrator.register_agent(
+    WriterAgent(
+        config=AgentConfig(name="writer", role=AgentRole.WRITER), llm_caller=mock_llm
+    )
+)
+orchestrator.register_agent(
+    ReviewerAgent(
+        config=AgentConfig(name="reviewer", role=AgentRole.REVIEWER),
+        llm_caller=mock_llm,
+    )
+)
 
 # Sequential pipeline
 print("=== Sequential Execution ===")
-results = orchestrator.execute_sequential([
-    {"agent": "researcher", "task": {"topic": "AI agents"}},
-    {"agent": "writer", "task": {"type": "article", "information": "AI agents..."}},
-    {"agent": "reviewer", "task": {"content": "AI agents represent..."}}
-])
+results = orchestrator.execute_sequential(
+    [
+        {"agent": "researcher", "task": {"topic": "AI agents"}},
+        {"agent": "writer", "task": {"type": "article", "information": "AI agents..."}},
+        {"agent": "reviewer", "task": {"content": "AI agents represent..."}},
+    ]
+)
 
 for r in results:
     print(f"{r['agent']}: {str(r['result'])[:50]}...")
 
 # Parallel execution
 print("\n=== Parallel Execution ===")
-results = orchestrator.execute_parallel([
-    {"agent": "researcher", "task": {"topic": "Topic A"}},
-    {"agent": "researcher", "task": {"topic": "Topic B"}},
-    {"agent": "researcher", "task": {"topic": "Topic C"}}
-])
+results = orchestrator.execute_parallel(
+    [
+        {"agent": "researcher", "task": {"topic": "Topic A"}},
+        {"agent": "researcher", "task": {"topic": "Topic B"}},
+        {"agent": "researcher", "task": {"topic": "Topic C"}},
+    ]
+)
 
 for r in results:
     print(f"{r['agent']}: {r['status']}")
@@ -570,7 +578,7 @@ agents = [Agent(f"agent_{i}") for i in range(20)]
 agents = {
     "researcher": ResearchAgent(),
     "writer": WriterAgent(),
-    "reviewer": ReviewerAgent()
+    "reviewer": ReviewerAgent(),
 }
 ```
 
@@ -586,7 +594,7 @@ message = {
     "from": "manager",
     "to": "worker",
     "content": {...},
-    "requires_response": True
+    "requires_response": True,
 }
 ```
 

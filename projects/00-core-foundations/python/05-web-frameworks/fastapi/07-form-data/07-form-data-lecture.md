@@ -29,6 +29,7 @@ When a function parameter is a simple type (str, int, bool) without `Body()`, `Q
 ```python
 from fastapi import Form
 
+
 @app.post("/login/")
 def login(username: str = Form(...), password: str = Form(...)):
     # Content-Type: application/x-www-form-urlencoded
@@ -46,8 +47,8 @@ pip install python-multipart
 ```python
 # Required (uses ...)
 @app.post("/login/")
-def login(username: str = Form(...), password: str = Form(...)):
-    ...
+def login(username: str = Form(...), password: str = Form(...)): ...
+
 
 # Optional (has default)
 @app.post("/contact/")
@@ -56,8 +57,7 @@ def contact(
     email: str = Form(...),
     subject: str = Form(default="General Inquiry"),
     message: str = Form(...),
-):
-    ...
+): ...
 ```
 
 ### 3. Form Field Validation
@@ -71,8 +71,7 @@ def register(
     email: str = Form(...),
     password: str = Form(..., min_length=8),
     role: str = Form(default="user"),
-):
-    ...
+): ...
 ```
 
 ### 4. Boolean Form Fields
@@ -83,8 +82,7 @@ def feedback(
     rating: int = Form(..., ge=1, le=5),
     comment: str = Form(default=""),
     recommend: bool = Form(default=True),
-):
-    ...
+): ...
 ```
 
 ### 5. Serving HTML Forms
@@ -93,6 +91,7 @@ Use `HTMLResponse` to serve HTML content:
 
 ```python
 from fastapi.responses import HTMLResponse
+
 
 @app.get("/form", response_class=HTMLResponse)
 def get_form():
@@ -119,11 +118,13 @@ Use Pydantic models for structured responses:
 ```python
 from pydantic import BaseModel
 
+
 class RegistrationResult(BaseModel):
     username: str
     email: str
     role: str
     message: str
+
 
 @app.post("/register/", response_model=RegistrationResult)
 def register(
@@ -166,11 +167,13 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
+
 @app.post("/login/")
 def login(username: str = Form(...), password: str = Form(...)):
     if username == "admin" and password == "secret":
         return {"message": "Login successful", "username": "username"}
     raise HTTPException(status_code=401, detail="Invalid credentials")
+
 
 @app.get("/form", response_class=HTMLResponse)
 def get_form():
@@ -258,25 +261,25 @@ pip install python-multipart
 ```python
 # Wrong: FastAPI treats this as a query parameter
 @app.post("/login/")
-def login(username: str, password: str):
-    ...
+def login(username: str, password: str): ...
+
 
 # Fix: Use Form() explicitly
 @app.post("/login/")
-def login(username: str = Form(...), password: str = Form(...)):
-    ...
+def login(username: str = Form(...), password: str = Form(...)): ...
 ```
 
 ### Mistake 3: Mixing Form() and Body() in same endpoint
 ```python
 # Wrong: Can't mix form data with JSON body
 @app.post("/mixed/")
-def mixed(item: Item, name: str = Form(...)):
-    ...
+def mixed(item: Item, name: str = Form(...)): ...
+
 
 # Fix: Use one or the other
 @app.post("/json/")
 def json_only(item: Item): ...
+
 
 @app.post("/form/")
 def form_only(name: str = Form(...)): ...
@@ -286,13 +289,12 @@ def form_only(name: str = Form(...)): ...
 ```python
 # Wrong: No validation on form fields
 @app.post("/register/")
-def register(username: str = Form(...)):
-    ...
+def register(username: str = Form(...)): ...
+
 
 # Fix: Add validation constraints
 @app.post("/register/")
-def register(username: str = Form(..., min_length=3, max_length=20)):
-    ...
+def register(username: str = Form(..., min_length=3, max_length=20)): ...
 ```
 
 ---
@@ -353,9 +355,11 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
+
 # Required form field
 @app.post("/login/")
 def login(username: str = Form(...), password: str = Form(...)): ...
+
 
 # With validation
 @app.post("/register/")
@@ -364,6 +368,7 @@ def register(
     password: str = Form(..., min_length=8),
     role: str = Form(default="user"),
 ): ...
+
 
 # Serve HTML form
 @app.get("/form", response_class=HTMLResponse)

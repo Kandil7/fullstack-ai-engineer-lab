@@ -36,11 +36,9 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 # Single origin
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"]
-)
+app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"])
 # Response header: Access-Control-Allow-Origin: http://localhost:3000
+
 
 # Multiple origins (dynamic)
 def dynamic_origin(request):
@@ -48,17 +46,13 @@ def dynamic_origin(request):
     origin = request.headers.get("origin")
     return origin if origin in allowed else None
 
+
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_origin_callback=dynamic_origin
+    CORSMiddleware, allow_origins=["http://localhost:3000"], allow_origin_callback=dynamic_origin
 )
 
 # Wildcard (no credentials)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"]
-)
+app.add_middleware(CORSMiddleware, allow_origins=["*"])
 # Response header: Access-Control-Allow-Origin: *
 ```
 
@@ -78,17 +72,11 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 # Allow specific methods
-app.add_middleware(
-    CORSMiddleware,
-    allow_methods=["GET", "POST", "PUT", "DELETE"]
-)
+app.add_middleware(CORSMiddleware, allow_methods=["GET", "POST", "PUT", "DELETE"])
 # Response header: Access-Control-Allow-Methods: GET, POST, PUT, DELETE
 
 # Allow all methods (not recommended for production)
-app.add_middleware(
-    CORSMiddleware,
-    allow_methods=["*"]
-)
+app.add_middleware(CORSMiddleware, allow_methods=["*"])
 
 # Preflight response
 """
@@ -114,10 +102,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 # Allow specific headers
-app.add_middleware(
-    CORSMiddleware,
-    allow_headers=["Authorization", "Content-Type", "Accept"]
-)
+app.add_middleware(CORSMiddleware, allow_headers=["Authorization", "Content-Type", "Accept"])
 # Response header: Access-Control-Allow-Headers: Authorization, Content-Type, Accept
 
 # Common headers to allow
@@ -127,19 +112,13 @@ COMMON_HEADERS = [
     "Accept",
     "Origin",
     "X-Requested-With",
-    "X-CSRF-Token"
+    "X-CSRF-Token",
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_headers=COMMON_HEADERS
-)
+app.add_middleware(CORSMiddleware, allow_headers=COMMON_HEADERS)
 
 # Allow all headers (not recommended)
-app.add_middleware(
-    CORSMiddleware,
-    allow_headers=["*"]
-)
+app.add_middleware(CORSMiddleware, allow_headers=["*"])
 ```
 
 **Related Terms**: CORS, Preflight, Headers
@@ -161,7 +140,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
-    allow_credentials=True  # Required for cookies/auth
+    allow_credentials=True,  # Required for cookies/auth
 )
 # Response header: Access-Control-Allow-Credentials: true
 
@@ -179,15 +158,11 @@ fetch('https://api.example.com/data', {
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Error!
-    allow_credentials=True
+    allow_credentials=True,
 )
 
 # GOOD: Specify exact origins
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_credentials=True
-)
+app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000"], allow_credentials=True)
 ```
 
 **Related Terms**: CORS, Auth, Cookies
@@ -206,29 +181,17 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 # Cache preflight for 10 minutes
-app.add_middleware(
-    CORSMiddleware,
-    max_age=600
-)
+app.add_middleware(CORSMiddleware, max_age=600)
 # Response header: Access-Control-Max-Age: 600
 
 # Cache for 24 hours
-app.add_middleware(
-    CORSMiddleware,
-    max_age=86400
-)
+app.add_middleware(CORSMiddleware, max_age=86400)
 
 # Cache for 1 hour
-app.add_middleware(
-    CORSMiddleware,
-    max_age=3600
-)
+app.add_middleware(CORSMiddleware, max_age=3600)
 
 # No caching (not recommended)
-app.add_middleware(
-    CORSMiddleware,
-    max_age=0
-)
+app.add_middleware(CORSMiddleware, max_age=0)
 ```
 
 **Related Terms**: CORS, Preflight, Cache
@@ -247,24 +210,18 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 # Expose custom headers
-app.add_middleware(
-    CORSMiddleware,
-    expose_headers=["X-Total-Count", "X-Page-Count", "X-Request-ID"]
-)
+app.add_middleware(CORSMiddleware, expose_headers=["X-Total-Count", "X-Page-Count", "X-Request-ID"])
 # Response header: Access-Control-Expose-Headers: X-Total-Count, X-Page-Count, X-Request-ID
 
 # Common exposed headers
 EXPOSED_HEADERS = [
-    "X-Total-Count",      # Total items for pagination
-    "X-Page-Count",       # Total pages
-    "X-Request-ID",       # Request tracking
-    "Content-Disposition" # File download name
+    "X-Total-Count",  # Total items for pagination
+    "X-Page-Count",  # Total pages
+    "X-Request-ID",  # Request tracking
+    "Content-Disposition",  # File download name
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    expose_headers=EXPOSED_HEADERS
-)
+app.add_middleware(CORSMiddleware, expose_headers=EXPOSED_HEADERS)
 
 # Frontend access
 """
@@ -294,7 +251,7 @@ app.add_middleware(
     allow_origins=["http://localhost:3000"],  # Frontend origin
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
-    allow_headers=["Authorization", "Content-Type"]
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 # How CORS works:
@@ -304,9 +261,11 @@ app.add_middleware(
 # 4. Server responds with CORS headers
 # 5. Browser allows/blocks the request
 
+
 @app.get("/api/data")
 async def get_data():
     return {"data": "value"}
+
 
 @app.post("/api/data")
 async def create_data(data: dict):
@@ -331,10 +290,10 @@ async def create_data(data: dict):
 
 # Different origins
 origins = [
-    "http://localhost:3000",      # Development frontend
-    "https://app.example.com",    # Production frontend
-    "https://api.example.com",    # API (different subdomain)
-    "http://localhost:8080"       # Different port
+    "http://localhost:3000",  # Development frontend
+    "https://app.example.com",  # Production frontend
+    "https://api.example.com",  # API (different subdomain)
+    "http://localhost:8080",  # Different port
 ]
 
 # Same origin
@@ -368,7 +327,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
     allow_methods=["GET", "POST", "PUT", "DELETE"],
-    allow_headers=["Authorization", "Content-Type"]
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 # Preflight request (browser sends automatically)
@@ -461,18 +420,21 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
-    allow_credentials=True  # Enable credentials
+    allow_credentials=True,  # Enable credentials
 )
+
 
 # Endpoint using cookies
 @app.get("/api/profile")
 async def get_profile(session_id: str = Cookie(None)):
     return {"session_id": session_id}
 
+
 # Endpoint using auth header
 @app.get("/api/user")
 async def get_user(authorization: str = Header(None)):
     return {"authorization": authorization}
+
 
 # Frontend request with credentials
 """
@@ -525,8 +487,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://app.example.com"],
     allow_methods=["GET", "POST"],
-    allow_headers=["Authorization"]
+    allow_headers=["Authorization"],
 )
+
 
 # Now https://app.example.com can access this API
 @app.get("/api/data")
@@ -549,49 +512,48 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+
 # Dynamic origin validation
 def validate_origin(origin: str) -> bool:
     """Validate origin based on custom logic"""
-    allowed_patterns = [
-        "https://*.example.com",
-        "http://localhost:*"
-    ]
-    
+    allowed_patterns = ["https://*.example.com", "http://localhost:*"]
+
     import re
+
     for pattern in allowed_patterns:
         regex = pattern.replace("*", ".*")
         if re.match(regex, origin):
             return True
-    
+
     return False
+
 
 # Use callback
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  # Fallback
     allow_origin_callback=validate_origin,
-    allow_credentials=True
+    allow_credentials=True,
 )
+
 
 # More complex callback
 def dynamic_cors(request: Request) -> str:
     """Return allowed origin or None"""
     origin = request.headers.get("origin")
-    
+
     # Check against database or config
     if origin in get_allowed_origins():
         return origin
-    
+
     # Check subdomain
     if origin and origin.endswith(".example.com"):
         return origin
-    
+
     return None
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origin_callback=dynamic_cors
-)
+
+app.add_middleware(CORSMiddleware, allow_origin_callback=dynamic_cors)
 ```
 
 **Related Terms**: CORS, Origin, Dynamic
@@ -635,7 +597,7 @@ app.add_middleware(
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 ```
 
@@ -643,14 +605,11 @@ app.add_middleware(
 ```python
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://staging.example.com",
-        "http://localhost:3000"
-    ],
+    allow_origins=["https://staging.example.com", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
-    max_age=300
+    max_age=300,
 )
 ```
 
@@ -658,15 +617,12 @@ app.add_middleware(
 ```python
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://app.example.com",
-        "https://admin.example.com"
-    ],
+    allow_origins=["https://app.example.com", "https://admin.example.com"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
     expose_headers=["X-Total-Count", "X-Request-ID"],
-    max_age=600
+    max_age=600,
 )
 ```
 

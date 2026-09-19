@@ -24,14 +24,14 @@
 - **Related terms**: Boolean, Truthiness, Falsy Values
 ```python
 # bool() conversion
-print(bool(0))      # False
-print(bool(1))      # True
-print(bool(-1))     # True
-print(bool(""))     # False
-print(bool("hi"))   # True
-print(bool([]))     # False
-print(bool([1]))    # True
-print(bool(None))   # False
+print(bool(0))  # False
+print(bool(1))  # True
+print(bool(-1))  # True
+print(bool(""))  # False
+print(bool("hi"))  # True
+print(bool([]))  # False
+print(bool([1]))  # True
+print(bool(None))  # False
 ```
 
 **Built-in Function**
@@ -40,10 +40,10 @@ print(bool(None))   # False
 - **Related terms**: Constructor, Type Conversion, Python Core
 ```python
 # Built-in type conversion functions
-x = int("10")      # String to int
+x = int("10")  # String to int
 y = float("3.14")  # String to float
-z = str(10)        # Int to string
-w = bool(0)        # Int to bool
+z = str(10)  # Int to string
+w = bool(0)  # Int to bool
 ```
 
 ### C
@@ -82,10 +82,10 @@ print(False * 10)  # 0 (False coerced to 0)
 - **Related terms**: Type Casting, Constructor, Manual
 ```python
 # Explicit conversion
-x = int("42")      # Explicit: string to int
-y = float(42)      # Explicit: int to float
-z = str(42)        # Explicit: int to string
-w = bool(42)       # Explicit: int to bool
+x = int("42")  # Explicit: string to int
+y = float(42)  # Explicit: int to float
+z = str(42)  # Explicit: int to string
+w = bool(42)  # Explicit: int to bool
 ```
 
 ### F
@@ -96,10 +96,10 @@ w = bool(42)       # Explicit: int to bool
 - **Related terms**: Float, Decimal, Number
 ```python
 # float() conversion
-print(float(10))      # 10.0
+print(float(10))  # 10.0
 print(float("3.14"))  # 3.14
-print(float(True))    # 1.0
-print(float(False))   # 0.0
+print(float(True))  # 1.0
+print(float(False))  # 0.0
 
 # Invalid conversion
 # float("hello")  # ValueError!
@@ -116,9 +116,11 @@ print(float(False))   # 0.0
 result = 10 + 3.14  # Python converts int to float
 print(type(result))  # <class 'float'>
 
+
 # In function arguments
 def greet(name: str, age: int):
     print(f"Hello {name}, age {age}")
+
 
 # Python handles type conversion automatically
 greet("Alice", 25.0)  # float converted to int? No!
@@ -131,15 +133,15 @@ greet("Alice", 25.0)  # float converted to int? No!
 - **Related terms**: Integer, Truncation, Conversion
 ```python
 # int() conversion
-print(int("42"))      # 42
-print(int(3.99))      # 3 (truncates, doesn't round)
-print(int(True))      # 1
-print(int(False))     # 0
-print(int("3.14"))    # ValueError!
+print(int("42"))  # 42
+print(int(3.99))  # 3 (truncates, doesn't round)
+print(int(True))  # 1
+print(int(False))  # 0
+print(int("3.14"))  # ValueError!
 
 # With base parameter
 print(int("1010", 2))  # 10 (binary to decimal)
-print(int("ff", 16))   # 255 (hex to decimal)
+print(int("ff", 16))  # 255 (hex to decimal)
 ```
 
 ### T
@@ -179,10 +181,10 @@ print("Next year you'll be " + str(next_year_age))
 - **Related terms**: Type Casting, Conversion, Explicit, Implicit
 ```python
 # Type conversion functions
-x = int("42")      # String to int
-y = float(42)      # Int to float
-z = str(42)        # Int to string
-w = bool(0)        # Int to bool
+x = int("42")  # String to int
+y = float(42)  # Int to float
+z = str(42)  # Int to string
+w = bool(0)  # Int to bool
 ```
 
 ### V
@@ -236,8 +238,9 @@ def safe_int(value):
     except (ValueError, TypeError):
         return None
 
+
 result = safe_int("hello")  # Returns None
-result = safe_int("42")     # Returns 42
+result = safe_int("42")  # Returns 42
 ```
 
 ### Common Patterns
@@ -252,6 +255,7 @@ print(f"Age: {age}")  # Better with f-strings
 # Boolean checks
 if bool(user_input):
     process(user_input)
+
 
 # Safe conversion
 def convert_to_float(value):

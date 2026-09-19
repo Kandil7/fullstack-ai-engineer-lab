@@ -41,8 +41,9 @@ def _cohen_d(g1: np.ndarray, g2: np.ndarray) -> float:
     return float((g1.mean() - g2.mean()) / np.sqrt(vp))
 
 
-def ab_report(control: np.ndarray, treatment: np.ndarray,
-              paired: bool = False) -> tuple[float, float, str, str]:
+def ab_report(
+    control: np.ndarray, treatment: np.ndarray, paired: bool = False
+) -> tuple[float, float, str, str]:
     """Return (p, effect_size, test_name, decision)."""
     if paired:
         diffs = treatment - control
@@ -60,8 +61,7 @@ def ab_report(control: np.ndarray, treatment: np.ndarray,
             stat, p = stats.ttest_ind(control, treatment)
             name = "t"
         else:
-            stat, p = stats.mannwhitneyu(control, treatment,
-                                         alternative="two-sided")
+            stat, p = stats.mannwhitneyu(control, treatment, alternative="two-sided")
             name = "u"
         effect = _cohen_d(control, treatment)
     decision = "significant" if p < 0.05 else "not significant"

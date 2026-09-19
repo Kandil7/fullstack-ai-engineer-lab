@@ -44,8 +44,10 @@ import threading
 # Core Data Structures
 # ============================================================
 
+
 class MessageType(Enum):
     """Types of messages in the communication system."""
+
     REQUEST = "request"
     RESPONSE = "response"
     BROADCAST = "broadcast"
@@ -59,6 +61,7 @@ class MessageType(Enum):
 
 class AgentState(Enum):
     """Communication state of an agent."""
+
     DISCONNECTED = "disconnected"
     CONNECTING = "connecting"
     CONNECTED = "connected"
@@ -69,6 +72,7 @@ class AgentState(Enum):
 @dataclass
 class Message:
     """Structured message format for agent communication."""
+
     message_id: str
     sender_id: str
     receiver_id: Optional[str]  # None for broadcasts
@@ -95,7 +99,7 @@ class Message:
             "timestamp": self.timestamp.isoformat(),
             "correlation_id": self.correlation_id,
             "ttl": self.ttl,
-            "priority": self.priority
+            "priority": self.priority,
         }
 
     @classmethod
@@ -110,13 +114,14 @@ class Message:
             timestamp=datetime.fromisoformat(data["timestamp"]),
             correlation_id=data.get("correlation_id"),
             ttl=data.get("ttl", 30),
-            priority=data.get("priority", 0)
+            priority=data.get("priority", 0),
         )
 
 
 @dataclass
 class MessageEnvelope:
     """Wraps a message with delivery metadata."""
+
     message: Message
     attempts: int = 0
     delivered: bool = False
@@ -127,10 +132,11 @@ class MessageEnvelope:
 # Example 1: Message Passing Protocols
 # ============================================================
 
+
 class MessageBus:
     """
     Central message bus for agent communication.
-    
+
     Implements multiple delivery patterns:
     - Point-to-point (unicast)
     - Publish-subscribe (broadcast)
@@ -159,8 +165,10 @@ class MessageBus:
             if message.receiver_id in self.queues:
                 try:
                     self.queues[message.receiver_id].put_nowait(message)
-                    print(f"  Sent: {message.message_type.value} "
-                          f"from {message.sender_id} to {message.receiver_id}")
+                    print(
+                        f"  Sent: {message.message_type.value} "
+                        f"from {message.sender_id} to {message.receiver_id}"
+                    )
                     return True
                 except asyncio.QueueFull:
                     print(f"  Queue full for {message.receiver_id}")
@@ -183,8 +191,9 @@ class MessageBus:
                     except asyncio.QueueFull:
                         pass
 
-            print(f"  Broadcast from {message.sender_id}: "
-                  f"delivered to {delivered} agents")
+            print(
+                f"  Broadcast from {message.sender_id}: delivered to {delivered} agents"
+            )
             return delivered
 
     def subscribe(self, agent_id: str, topic: str) -> None:
@@ -210,13 +219,11 @@ class MessageBus:
             return delivered
 
     async def request_response(
-        self,
-        request: Message,
-        timeout: float = 5.0
+        self, request: Message, timeout: float = 5.0
     ) -> Optional[Message]:
         """
         Synchronous request-response pattern.
-        
+
         Sends a request and waits for a correlated response.
         """
         correlation_id = str(uuid.uuid4())[:8]
@@ -234,8 +241,10 @@ class MessageBus:
         while time.time() - start_time < timeout:
             try:
                 response = await asyncio.wait_for(queue.get(), timeout=0.1)
-                if (response.correlation_id == correlation_id and
-                    response.message_type == MessageType.RESPONSE):
+                if (
+                    response.correlation_id == correlation_id
+                    and response.message_type == MessageType.RESPONSE
+                ):
                     return response
                 else:
                     # Put back unrelated messages
@@ -265,19 +274,12 @@ class MessagePassingAgent:
         self.state = AgentState.CONNECTED
         print(f"  {self.agent_id} connected to bus")
 
-    def register_handler(
-        self,
-        message_type: MessageType,
-        handler: Callable
-    ) -> None:
+    def register_handler(self, message_type: MessageType, handler: Callable) -> None:
         """Register a handler for a message type."""
         self.handlers[message_type] = handler
 
     async def send_message(
-        self,
-        receiver_id: str,
-        message_type: MessageType,
-        payload: Dict[str, Any]
+        self, receiver_id: str, message_type: MessageType, payload: Dict[str, Any]
     ) -> None:
         """Send a message to another agent."""
         message = Message(
@@ -285,7 +287,7 @@ class MessagePassingAgent:
             sender_id=self.agent_id,
             receiver_id=receiver_id,
             message_type=message_type,
-            payload=payload
+            payload=payload,
         )
         await self.bus.send(message)
 
@@ -297,10 +299,7 @@ class MessagePassingAgent:
         self.state = AgentState.PROCESSING
         while self.state != AgentState.DISCONNECTED:
             try:
-                message = await asyncio.wait_for(
-                    self.message_queue.get(),
-                    timeout=1.0
-                )
+                message = await asyncio.wait_for(self.message_queue.get(), timeout=1.0)
 
                 if message.is_expired():
                     continue
@@ -309,8 +308,10 @@ class MessagePassingAgent:
                 if handler:
                     await handler(message)
                 else:
-                    print(f"  {self.agent_id}: No handler for "
-                          f"{message.message_type.value}")
+                    print(
+                        f"  {self.agent_id}: No handler for "
+                        f"{message.message_type.value}"
+                    )
 
             except asyncio.TimeoutError:
                 continue
@@ -327,10 +328,11 @@ class MessagePassingAgent:
 # Example 2: Shared State Management
 # ============================================================
 
+
 class SharedStateManager:
     """
     Thread-safe shared state manager for multi-agent systems.
-    
+
     Implements:
     - Read-write locks for concurrent access
     - State versioning for conflict detection
@@ -367,29 +369,26 @@ class SharedStateManager:
             self._version[key] += 1
 
             # Record history
-            self._history.append({
-                "key": key,
-                "old_value": old_value,
-                "new_value": value,
-                "agent_id": agent_id,
-                "version": self._version[key],
-                "timestamp": datetime.now().isoformat()
-            })
+            self._history.append(
+                {
+                    "key": key,
+                    "old_value": old_value,
+                    "new_value": value,
+                    "agent_id": agent_id,
+                    "version": self._version[key],
+                    "timestamp": datetime.now().isoformat(),
+                }
+            )
 
             # Notify listeners
             for listener in self._listeners.get(key, []):
                 await listener(key, value, agent_id)
 
-            print(f"  {agent_id} wrote to '{key}' "
-                  f"(v{self._version[key]})")
+            print(f"  {agent_id} wrote to '{key}' (v{self._version[key]})")
             return True
 
     async def compare_and_swap(
-        self,
-        key: str,
-        expected: Any,
-        new_value: Any,
-        agent_id: str
+        self, key: str, expected: Any, new_value: Any, agent_id: str
     ) -> bool:
         """Atomic compare-and-swap operation."""
         async with self._write_lock:
@@ -403,10 +402,7 @@ class SharedStateManager:
             return False
 
     async def atomic_update(
-        self,
-        key: str,
-        update_fn: Callable[[Any], Any],
-        agent_id: str
+        self, key: str, update_fn: Callable[[Any], Any], agent_id: str
     ) -> Any:
         """Atomically update a value using a function."""
         async with self._write_lock:
@@ -427,7 +423,7 @@ class SharedStateManager:
             return {
                 "state": dict(self._state),
                 "versions": dict(self._version),
-                "history_length": len(self._history)
+                "history_length": len(self._history),
             }
 
 
@@ -441,6 +437,7 @@ class StatefulAgent:
 
     async def update_shared_counter(self, key: str, increment: int) -> None:
         """Atomically increment a counter in shared state."""
+
         def increment_fn(current: Optional[int]) -> int:
             return (current or 0) + increment
 
@@ -460,10 +457,11 @@ class StatefulAgent:
 # Example 3: Event-Driven Communication
 # ============================================================
 
+
 class EventBus:
     """
     Event-driven communication system using publish-subscribe pattern.
-    
+
     Supports:
     - Topic-based routing
     - Event filtering
@@ -477,12 +475,7 @@ class EventBus:
         self.dead_letters: List[Dict] = []
         self._lock = asyncio.Lock()
 
-    def subscribe(
-        self,
-        topic: str,
-        handler: Callable,
-        agent_id: str
-    ) -> None:
+    def subscribe(self, topic: str, handler: Callable, agent_id: str) -> None:
         """Subscribe to an event topic."""
         self.handlers[topic].append((agent_id, handler))
         print(f"  {agent_id} subscribed to '{topic}'")
@@ -490,15 +483,11 @@ class EventBus:
     def unsubscribe(self, topic: str, agent_id: str) -> None:
         """Unsubscribe from an event topic."""
         self.handlers[topic] = [
-            (aid, h) for aid, h in self.handlers[topic]
-            if aid != agent_id
+            (aid, h) for aid, h in self.handlers[topic] if aid != agent_id
         ]
 
     async def publish(
-        self,
-        topic: str,
-        event_data: Dict[str, Any],
-        source_agent: str
+        self, topic: str, event_data: Dict[str, Any], source_agent: str
     ) -> int:
         """Publish an event to a topic."""
         async with self._lock:
@@ -507,7 +496,7 @@ class EventBus:
                 "topic": topic,
                 "source": source_agent,
                 "data": event_data,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
             self.event_history.append(event)
 
@@ -517,21 +506,18 @@ class EventBus:
                     await handler(event)
                     delivered += 1
                 except Exception as e:
-                    self.dead_letters.append({
-                        "event": event,
-                        "error": str(e),
-                        "agent_id": agent_id
-                    })
+                    self.dead_letters.append(
+                        {"event": event, "error": str(e), "agent_id": agent_id}
+                    )
 
-            print(f"  Event '{topic}' published by {source_agent}: "
-                  f"{delivered} handlers invoked")
+            print(
+                f"  Event '{topic}' published by {source_agent}: "
+                f"{delivered} handlers invoked"
+            )
             return delivered
 
     async def emit_pattern(
-        self,
-        pattern: str,
-        event_data: Dict[str, Any],
-        source_agent: str
+        self, pattern: str, event_data: Dict[str, Any], source_agent: str
     ) -> int:
         """Publish to all topics matching a pattern."""
         delivered = 0
@@ -568,10 +554,11 @@ class EventDrivenAgent:
 # Example 4: Agent Handshake Protocol
 # ============================================================
 
+
 class HandshakeProtocol:
     """
     Implements agent connection handshake protocol.
-    
+
     Phases:
     1. INIT - Sender initiates connection
     2. CAPABILITIES - Exchange capability information
@@ -584,10 +571,7 @@ class HandshakeProtocol:
         self.handshake_log: List[Dict] = []
 
     async def initiate_handshake(
-        self,
-        initiator_id: str,
-        responder_id: str,
-        initiator_caps: List[str]
+        self, initiator_id: str, responder_id: str, initiator_caps: List[str]
     ) -> bool:
         """Initiate a handshake with another agent."""
         print(f"\n  Handshake: {initiator_id} -> {responder_id}")
@@ -597,7 +581,7 @@ class HandshakeProtocol:
             "phase": "INIT",
             "sender": initiator_id,
             "receiver": responder_id,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
         self.handshake_log.append(init_msg)
         print(f"    Phase 1: INIT sent")
@@ -608,7 +592,7 @@ class HandshakeProtocol:
             "sender": initiator_id,
             "receiver": responder_id,
             "capabilities": initiator_caps,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
         self.handshake_log.append(caps_msg)
         print(f"    Phase 2: CAPABILITIES exchanged")
@@ -619,7 +603,7 @@ class HandshakeProtocol:
             "sender": responder_id,
             "receiver": initiator_id,
             "accepted": True,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
         self.handshake_log.append(ack_msg)
         print(f"    Phase 3: ACKNOWLEDGE received")
@@ -628,11 +612,11 @@ class HandshakeProtocol:
         self.connections[initiator_id] = {
             "peer": responder_id,
             "capabilities": initiator_caps,
-            "established_at": datetime.now().isoformat()
+            "established_at": datetime.now().isoformat(),
         }
         self.connections[responder_id] = {
             "peer": initiator_id,
-            "established_at": datetime.now().isoformat()
+            "established_at": datetime.now().isoformat(),
         }
 
         print(f"    Phase 4: ESTABLISHED")
@@ -655,9 +639,7 @@ class HandshakeAgent:
     async def connect_to(self, other_agent: "HandshakeAgent") -> bool:
         """Initiate connection with another agent."""
         success = await self.protocol.initiate_handshake(
-            self.agent_id,
-            other_agent.agent_id,
-            self.capabilities
+            self.agent_id, other_agent.agent_id, self.capabilities
         )
 
         if success:
@@ -671,6 +653,7 @@ class HandshakeAgent:
 # ============================================================
 # Example 5: Broadcast vs Unicast Patterns
 # ============================================================
+
 
 class CommunicationPatterns:
     """
@@ -690,14 +673,11 @@ class CommunicationPatterns:
         self.agents[agent_id] = {
             "metadata": metadata,
             "messages_received": 0,
-            "last_message": None
+            "last_message": None,
         }
 
     async def unicast(
-        self,
-        sender_id: str,
-        receiver_id: str,
-        content: Dict[str, Any]
+        self, sender_id: str, receiver_id: str, content: Dict[str, Any]
     ) -> bool:
         """Send a message to a single agent."""
         if receiver_id not in self.agents:
@@ -707,22 +687,21 @@ class CommunicationPatterns:
         self.agents[receiver_id]["messages_received"] += 1
         self.agents[receiver_id]["last_message"] = content
 
-        self.message_log.append({
-            "pattern": "unicast",
-            "sender": sender_id,
-            "receiver": receiver_id,
-            "content": content,
-            "timestamp": datetime.now().isoformat()
-        })
+        self.message_log.append(
+            {
+                "pattern": "unicast",
+                "sender": sender_id,
+                "receiver": receiver_id,
+                "content": content,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
         print(f"  Unicast: {sender_id} -> {receiver_id}")
         return True
 
     async def multicast(
-        self,
-        sender_id: str,
-        receiver_ids: List[str],
-        content: Dict[str, Any]
+        self, sender_id: str, receiver_ids: List[str], content: Dict[str, Any]
     ) -> int:
         """Send a message to multiple specific agents."""
         delivered = 0
@@ -732,23 +711,21 @@ class CommunicationPatterns:
                 self.agents[receiver_id]["last_message"] = content
                 delivered += 1
 
-        self.message_log.append({
-            "pattern": "multicast",
-            "sender": sender_id,
-            "receivers": receiver_ids,
-            "content": content,
-            "delivered": delivered,
-            "timestamp": datetime.now().isoformat()
-        })
+        self.message_log.append(
+            {
+                "pattern": "multicast",
+                "sender": sender_id,
+                "receivers": receiver_ids,
+                "content": content,
+                "delivered": delivered,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
         print(f"  Multicast: {sender_id} -> {delivered} agents")
         return delivered
 
-    async def broadcast(
-        self,
-        sender_id: str,
-        content: Dict[str, Any]
-    ) -> int:
+    async def broadcast(self, sender_id: str, content: Dict[str, Any]) -> int:
         """Send a message to all agents."""
         delivered = 0
         for agent_id in self.agents:
@@ -757,22 +734,21 @@ class CommunicationPatterns:
                 self.agents[agent_id]["last_message"] = content
                 delivered += 1
 
-        self.message_log.append({
-            "pattern": "broadcast",
-            "sender": sender_id,
-            "content": content,
-            "delivered": delivered,
-            "timestamp": datetime.now().isoformat()
-        })
+        self.message_log.append(
+            {
+                "pattern": "broadcast",
+                "sender": sender_id,
+                "content": content,
+                "delivered": delivered,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
         print(f"  Broadcast: {sender_id} -> {delivered} agents")
         return delivered
 
     async def anycast(
-        self,
-        sender_id: str,
-        content: Dict[str, Any],
-        criteria: Callable[[Dict], bool]
+        self, sender_id: str, content: Dict[str, Any], criteria: Callable[[Dict], bool]
     ) -> Optional[str]:
         """Send a message to one agent matching criteria."""
         for agent_id, agent_data in self.agents.items():
@@ -780,13 +756,15 @@ class CommunicationPatterns:
                 agent_data["messages_received"] += 1
                 agent_data["last_message"] = content
 
-                self.message_log.append({
-                    "pattern": "anycast",
-                    "sender": sender_id,
-                    "receiver": agent_id,
-                    "content": content,
-                    "timestamp": datetime.now().isoformat()
-                })
+                self.message_log.append(
+                    {
+                        "pattern": "anycast",
+                        "sender": sender_id,
+                        "receiver": agent_id,
+                        "content": content,
+                        "timestamp": datetime.now().isoformat(),
+                    }
+                )
 
                 print(f"  Anycast: {sender_id} -> {agent_id}")
                 return agent_id
@@ -798,6 +776,7 @@ class CommunicationPatterns:
 # ============================================================
 # Example 6: Complete Communication System
 # ============================================================
+
 
 class AgentCommunicationSystem:
     """Complete agent communication system combining all patterns."""
@@ -824,12 +803,10 @@ class AgentCommunicationSystem:
 
             # Register message handlers
             agent.register_handler(
-                MessageType.REQUEST,
-                lambda msg: self._handle_request(msg)
+                MessageType.REQUEST, lambda msg: self._handle_request(msg)
             )
             agent.register_handler(
-                MessageType.RESPONSE,
-                lambda msg: self._handle_response(msg)
+                MessageType.RESPONSE, lambda msg: self._handle_response(msg)
             )
 
             self.agents[agent_id] = agent
@@ -845,9 +822,9 @@ class AgentCommunicationSystem:
 
     async def run_communication_demo(self) -> None:
         """Demonstrate all communication patterns."""
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("AGENT COMMUNICATION DEMO")
-        print("="*60)
+        print("=" * 60)
 
         # Set up agents
         await self.setup_agents()
@@ -861,24 +838,19 @@ class AgentCommunicationSystem:
         # 1. Unicast
         print("\n--- Unicast Example ---")
         await self.patterns.unicast(
-            "coordinator",
-            "researcher",
-            {"task": "Analyze market trends"}
+            "coordinator", "researcher", {"task": "Analyze market trends"}
         )
 
         # 2. Multicast
         print("\n--- Multicast Example ---")
         await self.patterns.multicast(
-            "coordinator",
-            ["researcher", "executor"],
-            {"task": "Prepare project plan"}
+            "coordinator", ["researcher", "executor"], {"task": "Prepare project plan"}
         )
 
         # 3. Broadcast
         print("\n--- Broadcast Example ---")
         await self.patterns.broadcast(
-            "coordinator",
-            {"announcement": "System update in 5 minutes"}
+            "coordinator", {"announcement": "System update in 5 minutes"}
         )
 
         # 4. Event-driven
@@ -907,18 +879,19 @@ class AgentCommunicationSystem:
 # Main Entry Point
 # ============================================================
 
+
 async def main():
     """Run all examples."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXERCISE 07: AGENT COMMUNICATION")
-    print("="*60)
+    print("=" * 60)
 
     system = AgentCommunicationSystem()
     await system.run_communication_demo()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXERCISE COMPLETE")
-    print("="*60)
+    print("=" * 60)
 
 
 if __name__ == "__main__":

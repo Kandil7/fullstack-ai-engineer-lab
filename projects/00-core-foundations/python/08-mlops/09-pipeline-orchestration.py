@@ -29,6 +29,7 @@ from typing import Callable, Optional
 # Task C depends on outputs of A and B. A scheduler must run A and B
 # before C, in any order, and skip nothing.
 
+
 @dataclass
 class Task:
     name: str
@@ -95,8 +96,7 @@ assert out["clean"] == 90, "clean ran after ingest"
 import time as _time
 
 
-def run_with_retries(task: Task, results: dict,
-                     backoff_s: float = 0.01) -> object:
+def run_with_retries(task: Task, results: dict, backoff_s: float = 0.01) -> object:
     attempt = 0
     while True:
         try:
@@ -131,13 +131,16 @@ assert result == "ok" and flaky_calls["n"] == 3
 # A task is idempotent if running it twice equals running it once.
 # That is what makes retries and backfills safe.
 
+
 def make_idempotent_counter() -> Callable[[dict], int]:
     state = {"seen": False}
+
     def _run(results: dict) -> int:
         if state["seen"]:
             return 42  # already done - return same result, no side effect
         state["seen"] = True
         return 42
+
     return _run
 
 
@@ -154,6 +157,7 @@ assert first == second
 # ============================================================
 # The production DAG runner: order, retries, and a failure that
 # stops the pipeline loudly instead of silently producing bad data.
+
 
 def orchestrate(tasks: dict[str, Task]) -> dict[str, object]:
     """Run a DAG with per-task retries; fail loudly on real errors."""
@@ -209,6 +213,7 @@ def _verify() -> None:
     # retry exhaustion
     def _always_fail(results: dict) -> object:
         raise ValueError("permanent")
+
     t = Task("f", _always_fail, max_retries=2)
     try:
         run_with_retries(t, {}, backoff_s=0.0)
@@ -219,9 +224,11 @@ def _verify() -> None:
 
     # idempotency
     counter = {"n": 0}
+
     def _inc(results: dict) -> int:
         counter["n"] += 1
         return counter["n"]
+
     twice = [run_with_retries(Task("i", _inc), {}, backoff_s=0.0) for _ in range(2)]
     assert twice == [1, 2], "non-idempotent task differs on re-run"
     print("[OK] 09-pipeline-orchestration: all checks passed")

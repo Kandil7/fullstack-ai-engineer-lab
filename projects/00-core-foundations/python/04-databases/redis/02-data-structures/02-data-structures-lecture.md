@@ -81,10 +81,10 @@ Lists are ordered sequences of strings. `LPUSH`/`RPUSH` push on either end,
 of worker queues: producers `LPUSH` jobs, consumers `RPOP` them.
 
 ```python
-r.lpush("queue:jobs", "job-1", "job-2")   # -> ['job-2', 'job-1']
-print(r.rpop("queue:jobs"))               # FIFO: oldest first
+r.lpush("queue:jobs", "job-1", "job-2")  # -> ['job-2', 'job-1']
+print(r.rpop("queue:jobs"))  # FIFO: oldest first
 print(r.rpop("queue:jobs"))
-print(r.rpop("queue:jobs"))               # empty -> None
+print(r.rpop("queue:jobs"))  # empty -> None
 
 # Output:
 # job-1
@@ -103,7 +103,7 @@ duplicates), `SISMEMBER` asks "is it in there?" in O(1), `SMEMBERS` lists all, a
 seen?") and deduplication (a crawler's seen-URL set) with constant-time answers.
 
 ```python
-r.sadd("tags:ml", "vector", "retrieval", "vector")   # 'vector' added once
+r.sadd("tags:ml", "vector", "retrieval", "vector")  # 'vector' added once
 print(r.smembers("tags:ml"))
 print(r.sismember("tags:ml", "vector"), r.sismember("tags:ml", "sql"))
 
@@ -125,9 +125,9 @@ queues, and any "top-N by score" query.
 
 ```python
 r.zadd("leaderboard", {"alice": 100, "bob": 250, "carol": 150})
-print(r.zrevrange("leaderboard", 0, 1, withscores=True))   # top 2
+print(r.zrevrange("leaderboard", 0, 1, withscores=True))  # top 2
 r.zincrby("leaderboard", 200, "alice")
-print(r.zrank("leaderboard", "alice"))                     # 0 = first now
+print(r.zrank("leaderboard", "alice"))  # 0 = first now
 
 # Output:
 # [('bob', 250.0), ('carol', 150.0)]

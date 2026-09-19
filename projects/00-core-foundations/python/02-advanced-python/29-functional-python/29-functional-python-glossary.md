@@ -36,11 +36,20 @@ algebraic license to refactor pipelines.
 def compose(g, f):
     return lambda x: g(f(x))
 
-def double(x): return x * 2
-def inc(x): return x + 1
-def neg(x): return -x
 
-left = compose(compose(double, inc), neg)   # ((-x) + 1) * 2
+def double(x):
+    return x * 2
+
+
+def inc(x):
+    return x + 1
+
+
+def neg(x):
+    return -x
+
+
+left = compose(compose(double, inc), neg)  # ((-x) + 1) * 2
 right = compose(double, compose(inc, neg))  # -(x) -> inc -> double
 print(left(3), right(3))
 ```
@@ -57,8 +66,10 @@ behind decorators, partials, and factories.
 ```python
 def make_multiplier(factor):
     def multiply(x):
-        return x * factor   # factor captured
+        return x * factor  # factor captured
+
     return multiply
+
 
 triple = make_multiplier(3)
 print(triple(5))
@@ -76,7 +87,9 @@ g(f(x))`. The glue of functional pipelines.
 def compose(g, f):
     def composed(x):
         return g(f(x))
+
     return composed
+
 
 pipeline = compose(str, lambda x: x + 1)
 print(pipeline(4))
@@ -109,7 +122,8 @@ single-argument functions: `f(a, b)` becomes `f(a)(b)`. Python prefers
 def add(a, b):
     return a + b
 
-add5 = lambda b: add(5, b)   # curried form, manually
+
+add5 = lambda b: add(5, b)  # curried form, manually
 print(add5(3))
 ```
 ```text
@@ -138,10 +152,12 @@ them usable as dict keys.
 ```python
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class Chunk:
     doc_id: int
     text: str
+
 
 c = Chunk(1, "hello")
 try:
@@ -161,7 +177,8 @@ replayable.
 **Example**:
 ```python
 def core(samples):
-    return sorted(samples, key=len)   # pure: no I/O
+    return sorted(samples, key=len)  # pure: no I/O
+
 
 print(core(["bb", "a"]))
 ```
@@ -178,7 +195,7 @@ splits into multiple groups.
 ```python
 import itertools
 
-data = [("a", 1), ("b", 2), ("a", 3)]   # NOT sorted by key
+data = [("a", 1), ("b", 2), ("a", 3)]  # NOT sorted by key
 print([k for k, _ in itertools.groupby(data, key=lambda p: p[0])])
 ```
 ```text
@@ -210,11 +227,13 @@ core.
 **Example**:
 ```python
 def shell(path):
-    with open(path, encoding="utf-8") as fh:   # I/O lives here
-        return core(fh.read().splitlines())     # logic is pure
+    with open(path, encoding="utf-8") as fh:  # I/O lives here
+        return core(fh.read().splitlines())  # logic is pure
+
 
 def core(lines):
-    return [line.strip() for line in lines]     # pure
+    return [line.strip() for line in lines]  # pure
+
 
 print(core(["  x  "]))
 ```
@@ -250,12 +269,15 @@ import functools
 
 calls = {"n": 0}
 
+
 @functools.lru_cache(maxsize=None)
 def square(x):
     calls["n"] += 1
     return x * x
 
-square(4); square(4)
+
+square(4)
+square(4)
 print(calls["n"])
 ```
 ```text
@@ -298,8 +320,10 @@ pre-bound as the first argument — configuration through binding.
 ```python
 import functools
 
+
 def scale(x, factor):
     return x * factor
+
 
 halve = functools.partial(scale, factor=0.5)
 print(halve(10))
@@ -315,7 +339,8 @@ output: same arguments always produce the same result.
 **Example**:
 ```python
 def add_one(x):
-    return x + 1     # pure
+    return x + 1  # pure
+
 
 print(add_one(1) == add_one(1))
 ```
@@ -349,8 +374,9 @@ reordering.
 def f(x):
     return x * 2
 
-print(2 + f(3))          # replace f(3) with 6
-print(2 + 6)             # identical program
+
+print(2 + f(3))  # replace f(3) with 6
+print(2 + 6)  # identical program
 ```
 ```text
 8
@@ -366,6 +392,7 @@ is bounded (~1000) and deep recursion raises `RecursionError`.
 ```python
 def rec(n):
     return rec(n - 1) if n else 0
+
 
 try:
     rec(10_000)

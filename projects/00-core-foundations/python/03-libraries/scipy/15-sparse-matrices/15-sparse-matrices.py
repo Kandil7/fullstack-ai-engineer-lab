@@ -18,7 +18,7 @@ from scipy.sparse.linalg import spsolve
 # Example 1: COO -- the human format
 # ---------------------------------------------------------------------------
 rng = np.random.default_rng(42)
-flat = rng.choice(80, size=30, replace=False)   # 30 unique cells
+flat = rng.choice(80, size=30, replace=False)  # 30 unique cells
 rows = flat // 8
 cols = flat % 8
 data = rng.uniform(0.1, 1.0, 30)
@@ -29,24 +29,25 @@ print(f"   shape={coo.shape}  nnz={coo.nnz}  density={coo.nnz / np.prod(coo.shap
 print(f"   toarray() == dense 10x8?  {coo.toarray().shape}")
 
 # stored zeros are stored: they count in nnz until removed
-with_zero = sp.coo_matrix((np.array([1.0, 0.0, 2.0]),
-                           (np.array([0, 1, 2]), np.array([0, 1, 2]))),
-                          shape=(3, 3))
+with_zero = sp.coo_matrix(
+    (np.array([1.0, 0.0, 2.0]), (np.array([0, 1, 2]), np.array([0, 1, 2]))), shape=(3, 3)
+)
 cleaned = with_zero.tocsr()
-cleaned.eliminate_zeros()          # in-place; returns None
-print(f"   explicit zero: nnz before eliminate_zeros()={with_zero.nnz}, "
-      f"after={cleaned.nnz}")
+cleaned.eliminate_zeros()  # in-place; returns None
+print(f"   explicit zero: nnz before eliminate_zeros()={with_zero.nnz}, after={cleaned.nnz}")
 
 # ---------------------------------------------------------------------------
 # Example 2: CSR vs CSC -- pick by access pattern
 # ---------------------------------------------------------------------------
 csr = coo.tocsr()
 csc = coo.tocsc()
-row0 = csr.getrow(0)          # O(1)-ish on CSR
-col0 = csc.getcol(0)          # O(1)-ish on CSC
+row0 = csr.getrow(0)  # O(1)-ish on CSR
+col0 = csc.getcol(0)  # O(1)-ish on CSC
 print("# Example 2: CSR vs CSC")
-print(f"   nnz equal? {csr.nnz == csc.nnz == coo.nnz} "
-      f"(coo counts raw triplets; duplicate cells are summed on conversion)")
+print(
+    f"   nnz equal? {csr.nnz == csc.nnz == coo.nnz} "
+    f"(coo counts raw triplets; duplicate cells are summed on conversion)"
+)
 print(f"   toarray equal? {np.array_equal(csr.toarray(), csc.toarray())}")
 print(f"   getrow(0).nnz={row0.nnz}   getcol(0).nnz={col0.nnz}")
 print("   rule: row slicing on CSR, column slicing on CSC; convert once")
@@ -55,11 +56,16 @@ print("   rule: row slicing on CSR, column slicing on CSC; convert once")
 # Example 3: when sparse wins -- measured memory
 # ---------------------------------------------------------------------------
 n = 4000
-dense = np.zeros((n, n), dtype=np.float64)          # 128 MB dense
-sparse = sp.random(n, n, density=0.005, format="csr",
-                   random_state=42,
-                   data_rvs=lambda k: rng.uniform(0.1, 1.0, size=k))
-sp_bytes = (sparse.data.nbytes + sparse.indices.nbytes + sparse.indptr.nbytes)
+dense = np.zeros((n, n), dtype=np.float64)  # 128 MB dense
+sparse = sp.random(
+    n,
+    n,
+    density=0.005,
+    format="csr",
+    random_state=42,
+    data_rvs=lambda k: rng.uniform(0.1, 1.0, size=k),
+)
+sp_bytes = sparse.data.nbytes + sparse.indices.nbytes + sparse.indptr.nbytes
 ratio = dense.nbytes / sp_bytes
 print("# Example 3: memory comparison (4000x4000, 0.5% filled)")
 print(f"   dense:  {dense.nbytes / 1e6:.1f} MB")
@@ -117,16 +123,15 @@ n_docs, n_terms = X_tfidf.shape
 density = X_tfidf.nnz / (n_docs * n_terms)
 clf = LogisticRegression().fit(X_tfidf, y)
 print("# Example 7: TF-IDF -> sparse -> sklearn")
-print(f"   type={type(X_tfidf).__name__}  shape={X_tfidf.shape}  "
-      f"density={density:.2f}")
+print(f"   type={type(X_tfidf).__name__}  shape={X_tfidf.shape}  density={density:.2f}")
 print(f"   LogisticRegression on sparse matrix score={clf.score(X_tfidf, y):.2f}")
 
 # ---------------------------------------------------------------------------
 # Example 8: row-normalize embeddings-style rows, stay sparse
 # ---------------------------------------------------------------------------
-l2n = np.asarray(X_tfidf.power(2).sum(axis=1)).ravel() ** 0.5   # row L2
+l2n = np.asarray(X_tfidf.power(2).sum(axis=1)).ravel() ** 0.5  # row L2
 scale = sp.diags(1.0 / l2n)
-Xn = scale @ X_tfidf                                # sparse row scaling
+Xn = scale @ X_tfidf  # sparse row scaling
 l2 = np.asarray(Xn.power(2).sum(axis=1)).ravel()
 print("# Example 8: row normalization without densifying")
 print(f"   Xn still {type(Xn).__name__}  nnz preserved? {Xn.nnz == X_tfidf.nnz}")

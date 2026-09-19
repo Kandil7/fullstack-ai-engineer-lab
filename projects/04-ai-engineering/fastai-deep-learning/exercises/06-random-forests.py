@@ -78,15 +78,19 @@ def part_2_overfit_tree(
     print("=" * 60)
 
     deep = DecisionTreeClassifier(random_state=RANDOM_STATE).fit(x_train, y_train)
-    print(f"deep  train={deep.score(x_train, y_train):.3f} "
-          f"valid={deep.score(x_valid, y_valid):.3f}")
+    print(
+        f"deep  train={deep.score(x_train, y_train):.3f} "
+        f"valid={deep.score(x_valid, y_valid):.3f}"
+    )
 
     # EXERCISE: build a constrained tree with max_leaf_nodes=8 and fit it.
     small: DecisionTreeClassifier | None = None
 
     assert small is not None, "TODO: create + fit a max_leaf_nodes=8 tree"
-    print(f"small train={small.score(x_train, y_train):.3f} "
-          f"valid={small.score(x_valid, y_valid):.3f}")
+    print(
+        f"small train={small.score(x_train, y_train):.3f} "
+        f"valid={small.score(x_valid, y_valid):.3f}"
+    )
     print("Expect: deep train ~1.0 but lower valid (overfit); small closes the gap.")
 
 
@@ -112,9 +116,7 @@ def part_3_forest_oob(
     return rf
 
 
-def part_4_n_estimators_curve(
-    x_train: pd.DataFrame, y_train: pd.Series
-) -> None:
+def part_4_n_estimators_curve(x_train: pd.DataFrame, y_train: pd.Series) -> None:
     """Part 4: observe diminishing returns as trees are added."""
     print("\n" + "=" * 60)
     print("PART 4: n_estimators diminishing-returns curve")
@@ -164,8 +166,10 @@ def part_5_feature_importance(
         random_state=RANDOM_STATE,
     ).fit(x_train[keep], y_train)
     print(f"kept columns: {keep}")
-    print(f"full acc: {rf.score(x_valid, y_valid):.3f}  "
-          f"slim acc: {slim.score(x_valid[keep], y_valid):.3f}")
+    print(
+        f"full acc: {rf.score(x_valid, y_valid):.3f}  "
+        f"slim acc: {slim.score(x_valid[keep], y_valid):.3f}"
+    )
     print("Expect: similar accuracy with fewer columns -> simpler model.")
 
 

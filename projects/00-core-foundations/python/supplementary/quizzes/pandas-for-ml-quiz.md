@@ -127,6 +127,7 @@ train — the honest order-preserving split.
 ```python
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
+
 X = pd.DataFrame({"x": [0.0, 2.0]})
 sc = StandardScaler().fit(X)
 print(sc.transform(pd.DataFrame({"x": [0.0, 10.0]}))["x"].tolist())
@@ -201,6 +202,7 @@ concatenates the results — the standard mixed-type feature builder.
 
 ```python
 import pandas as pd
+
 df = pd.DataFrame({"v": [1.0, 2.0, 3.0], "c": ["a", "b", "a"]})
 print(pd.get_dummies(df["c"]).shape)
 ```
@@ -255,6 +257,7 @@ on the pooled frame, so test statistics enter the scaling.
 ```python
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
+
 X = pd.DataFrame({"x": [10.0, 20.0]})
 y = pd.Series([1.0, 2.0])
 train, test = X.iloc[:1], X.iloc[1:]
@@ -334,6 +337,7 @@ just as damaging as row leaks, and harder to spot.
 ```python
 import numpy as np, pandas as pd
 from sklearn.linear_model import Ridge
+
 rng = np.random.RandomState(7)
 x = np.linspace(0, 10, 100)
 y = 2.0 * x + rng.normal(0, 1.0, 100)

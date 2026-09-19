@@ -110,6 +110,7 @@ rows (≈50x).
 
 ```python
 import numpy as np, pandas as pd
+
 s = pd.Series([1.0, np.nan, 3.0, np.nan])
 print(len(s[s != np.nan]))
 ```
@@ -210,6 +211,7 @@ write could propagate — the exercise showed `[99, 2, 3]` vs `[1, 2, 3]`.
 
 ```python
 import pandas as pd
+
 s = pd.Series([10.0, float("nan"), 20.0])
 print(s.pct_change().tolist())
 ```

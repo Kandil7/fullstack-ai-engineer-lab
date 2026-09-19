@@ -63,6 +63,7 @@ print(df.schema)
 # matters because downstream consumers (Parquet files, DuckDB, PyTorch
 # tensors) all inherit these types.
 
+
 def show_schema(frame: pl.DataFrame) -> dict[str, pl.DataType]:
     """Return the {column: dtype} schema of a DataFrame."""
     return dict(frame.schema)
@@ -102,6 +103,7 @@ print(f"mean score: {mean_score:.3f}")
 # the optimizer reorder work: filters before joins, projections before
 # scans. The same expression syntax works in both modes.
 
+
 def eager_pipeline(frame: pl.DataFrame) -> pl.DataFrame:
     """Eager: every call executes immediately."""
     filtered = frame.filter(pl.col("score") > 0.5)
@@ -110,8 +112,10 @@ def eager_pipeline(frame: pl.DataFrame) -> pl.DataFrame:
 
 def lazy_pipeline(frame: pl.DataFrame) -> pl.DataFrame:
     """Lazy: builds a plan; nothing runs until .collect()."""
-    plan = frame.lazy().filter(pl.col("score") > 0.5).with_columns(
-        (pl.col("score") * 100).alias("score_pct")
+    plan = (
+        frame.lazy()
+        .filter(pl.col("score") > 0.5)
+        .with_columns((pl.col("score") * 100).alias("score_pct"))
     )
     return plan.collect()
 
@@ -134,6 +138,7 @@ print(f"same result: {eager.equals(lazy)}")
 # transformations and inspect the plan with .explain() BEFORE running it.
 # This is the core of Polars performance: the optimizer sees the whole
 # pipeline, so it can push filters down to the file scan.
+
 
 def describe_plan(frame: pl.DataFrame) -> str:
     """Return the optimized query plan as text."""
@@ -192,13 +197,11 @@ def _verify() -> None:
     assert eager.height == 2, "filter score > 0.5 keeps two rows"
     assert eager.equals(lazy), "eager and lazy pipelines must agree"
     assert "score_pct" in eager.columns, "with_columns must add the alias"
-    assert abs(eager["score_pct"][0] - 91.0) < 1e-9, \
-        "score_pct must be score * 100"
+    assert abs(eager["score_pct"][0] - 91.0) < 1e-9, "score_pct must be score * 100"
 
     plan = df.lazy().filter(pl.col("score") > 0.5).explain(optimized=True)
     assert "FILTER" in plan, "the plan must contain a FILTER node"
-    assert isinstance(df.lazy(), pl.LazyFrame), \
-        ".lazy() must return a LazyFrame, not data"
+    assert isinstance(df.lazy(), pl.LazyFrame), ".lazy() must return a LazyFrame, not data"
 
     print("[OK] 01-introduction: all checks passed")
 
@@ -211,4 +214,4 @@ if __name__ == "__main__":
         print("1. DataFrames are dict-of-columns; each column is a typed Series")
         print("2. Arrow is columnar: whole-column ops hit one contiguous buffer")
         print("3. Lazy builds a plan; collect() executes it once, optimized")
-        _verify()   # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

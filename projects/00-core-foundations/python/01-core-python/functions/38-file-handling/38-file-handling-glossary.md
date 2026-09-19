@@ -30,6 +30,7 @@ with open("data.txt") as f:
 **Definition:** Plain text format for tabular data.
 ```python
 import csv
+
 with open("data.csv") as f:
     reader = csv.reader(f)
     for row in reader:
@@ -45,6 +46,7 @@ with open("data.csv") as f:
 **Definition:** Folder containing files and subdirectories.
 ```python
 from pathlib import Path
+
 Path("my_dir").mkdir(exist_ok=True)
 ```
 **Related:** Folder, path, `mkdir()`
@@ -68,10 +70,10 @@ with open("data.txt", encoding="utf-8") as f:
 #### File Mode
 **Definition:** Permission/type when opening a file ('r', 'w', 'a', etc.).
 ```python
-open("file.txt", "r")   # Read mode
-open("file.txt", "w")   # Write mode
-open("file.txt", "a")   # Append mode
-open("file.txt", "x")   # Create mode
+open("file.txt", "r")  # Read mode
+open("file.txt", "w")  # Write mode
+open("file.txt", "a")  # Append mode
+open("file.txt", "x")  # Create mode
 ```
 **Related:** Read, write, append, binary
 
@@ -83,6 +85,7 @@ open("file.txt", "x")   # Create mode
 **Definition:** Lightweight data interchange format.
 ```python
 import json
+
 data = {"name": "Alice"}
 with open("data.json", "w") as f:
     json.dump(data, f)
@@ -97,6 +100,7 @@ with open("data.json", "w") as f:
 **Definition:** Location of file/directory in filesystem.
 ```python
 from pathlib import Path
+
 p = Path("/home/user/file.txt")
 ```
 **Related:** Absolute path, relative path, `pathlib`
@@ -105,6 +109,7 @@ p = Path("/home/user/file.txt")
 **Definition:** Modern Python module for path operations.
 ```python
 from pathlib import Path
+
 p = Path("folder/file.txt")
 print(p.exists())
 ```
@@ -118,9 +123,9 @@ print(p.exists())
 **Definition:** Get content from a file.
 ```python
 with open("data.txt") as f:
-    content = f.read()      # Entire file
-    line = f.readline()     # One line
-    lines = f.readlines()   # List of lines
+    content = f.read()  # Entire file
+    line = f.readline()  # One line
+    lines = f.readlines()  # List of lines
 ```
 **Related:** Read modes, file reading
 
@@ -182,6 +187,7 @@ with open("output.txt", "w") as f:
 ### Create
 ```python
 from pathlib import Path
+
 Path("dir").mkdir(exist_ok=True)
 Path("file.txt").touch()
 ```
@@ -195,6 +201,7 @@ Path("dir").rmdir()
 ### Move/Copy
 ```python
 import shutil
+
 shutil.move("src", "dst")
 shutil.copy("src", "dst")
 ```
@@ -202,12 +209,12 @@ shutil.copy("src", "dst")
 ### Info
 ```python
 p = Path("file.txt")
-p.exists()    # True/False
-p.is_file()   # True/False
-p.is_dir()    # True/False
-p.stat()      # File stats
-p.name        # Filename
-p.stem        # Name without extension
-p.suffix      # Extension
-p.parent      # Parent directory
+p.exists()  # True/False
+p.is_file()  # True/False
+p.is_dir()  # True/False
+p.stat()  # File stats
+p.name  # Filename
+p.stem  # Name without extension
+p.suffix  # Extension
+p.parent  # Parent directory
 ```

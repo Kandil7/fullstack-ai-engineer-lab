@@ -31,6 +31,7 @@ from typing import Any
 # The dataset's name is its hash. If the content changes, the name
 # changes - so a name always refers to exactly one dataset.
 
+
 def sha256_file(path: Path, chunk_size: int = 1 << 16) -> str:
     """Streaming SHA-256 - works on large files without loading them."""
     h = hashlib.sha256()
@@ -42,6 +43,7 @@ def sha256_file(path: Path, chunk_size: int = 1 << 16) -> str:
 
 # Example 1: same content, same hash; different content, different hash
 import tempfile
+
 with tempfile.TemporaryDirectory() as tmp:
     p1 = Path(tmp) / "train.csv"
     p2 = Path(tmp) / "train-copy.csv"
@@ -63,6 +65,7 @@ with tempfile.TemporaryDirectory() as tmp:
 # ============================================================
 # A manifest records how a dataset version was produced: raw sources,
 # transforms, and parameters. Lineage lets you walk backwards.
+
 
 @dataclass
 class DatasetManifest:
@@ -107,6 +110,7 @@ assert manifest.rows == 120_000 and manifest.version == "v3"
 # link is what makes "which model is deployed and on what data?"
 # answerable in one query.
 
+
 @dataclass
 class ModelRecord:
     model_id: str
@@ -137,6 +141,7 @@ assert record.data_version == "v3", "model must record its data version"
 # Store datasets under <root>/<dataset_name>/<sha256> so the filesystem
 # itself is content-addressed, then reference the hash everywhere.
 
+
 def store_dataset(root: Path, name: str, content: str) -> Path:
     """Write content to a CAS location, returning the stored path."""
     digest = hashlib.sha256(content.encode()).hexdigest()
@@ -161,6 +166,7 @@ def store_dataset(root: Path, name: str, content: str) -> Path:
 # ============================================================
 def _verify() -> None:
     import tempfile as _tf
+
     with _tf.TemporaryDirectory() as tmp:
         root = Path(tmp)
         p = store_dataset(root, "train", "x,y\n1,2\n")

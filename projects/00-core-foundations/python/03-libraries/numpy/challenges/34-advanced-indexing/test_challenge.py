@@ -31,17 +31,15 @@ starter = _load("starter_34", os.path.join(HERE, "starter.py"))
 
 # ---------------------------------------------------------------- helpers
 
+
 def _assert_no_python_loops(mod):
     for name in ("starter", "solution"):
-        tree = ast.parse(
-            open(os.path.join(HERE, name + ".py"), encoding="utf-8").read()
-        )
+        tree = ast.parse(open(os.path.join(HERE, name + ".py"), encoding="utf-8").read())
         banned = [
             n
             for n in ast.walk(tree)
             if isinstance(
-                n, (ast.For, ast.While, ast.ListComp, ast.DictComp,
-                    ast.SetComp, ast.GeneratorExp)
+                n, (ast.For, ast.While, ast.ListComp, ast.DictComp, ast.SetComp, ast.GeneratorExp)
             )
         ]
         assert not banned, f"{name}.py contains Python loops/comprehensions"
@@ -56,6 +54,7 @@ def _call_peak(fn, *args):
 
 
 # ---------------------------------------------------------------- bronze
+
 
 def test_bronze_basic_top2():
     scores = np.array([5.0, 1.0, 9.0, 2.0, 7.0])
@@ -89,9 +88,9 @@ def test_bronze_k_zero_returns_empty():
 
 def test_bronze_memory_linear():
     rng = np.random.default_rng(1)
-    scores = rng.normal(size=1_000_000)          # 8 MB
+    scores = rng.normal(size=1_000_000)  # 8 MB
     _, peak = _call_peak(solution.top_k_indices, scores, 10)
-    assert peak < 4 * 8 * scores.size            # index buffer(s) only
+    assert peak < 4 * 8 * scores.size  # index buffer(s) only
 
 
 def test_bronze_no_python_loops():
@@ -99,6 +98,7 @@ def test_bronze_no_python_loops():
 
 
 # ---------------------------------------------------------------- silver
+
 
 def test_silver_small_exact_buckets():
     v = np.array([0.0, 0.1, 0.5, 0.9, 1.0])
@@ -153,6 +153,7 @@ def test_silver_no_python_loops():
 
 # ---------------------------------------------------------------- gold
 
+
 def _gold_data(seed=42, n=5000, d=32):
     rng = np.random.default_rng(seed)
     return rng.normal(size=(n, d))
@@ -198,7 +199,7 @@ def test_gold_k_zero_returns_empty():
 
 
 def test_gold_memory_bounded():
-    X = _gold_data(seed=3, n=5000, d=32)         # 1.28 MB float64
+    X = _gold_data(seed=3, n=5000, d=32)  # 1.28 MB float64
     query = np.zeros(X.shape[1])
     _, peak = _call_peak(solution.retrieve_nearest, X, query, 20)
     assert peak < 3 * X.nbytes + 32 * X.shape[0]
@@ -209,6 +210,7 @@ def test_gold_no_python_loops():
 
 
 # ---------------------------------------------------------------- starter
+
 
 def test_starter_raises_not_implemented():
     with pytest.raises(NotImplementedError):

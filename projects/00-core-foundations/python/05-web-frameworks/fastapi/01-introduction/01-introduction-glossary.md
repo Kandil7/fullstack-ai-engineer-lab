@@ -40,6 +40,7 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+
 @app.get("/api/users")  # This is an API endpoint
 def get_users():
     return [{"id": 1, "name": "Alice"}]
@@ -113,6 +114,7 @@ app.add_middleware(
 def read_item(item_id: int):
     return {"item_id": item_id}
 
+
 @app.post("/items")  # POST endpoint
 def create_item():
     return {"status": "created"}
@@ -140,6 +142,7 @@ def create_item():
 from fastapi import FastAPI
 
 app = FastAPI(title="My API", version="1.0.0")
+
 
 @app.get("/")
 def root():
@@ -169,11 +172,14 @@ def root():
 @app.get("/items/{id}")
 def read_item(id: int): ...
 
+
 @app.post("/items")
 def create_item(item: Item): ...
 
+
 @app.put("/items/{id}")
 def update_item(id: int, item: Item): ...
+
 
 @app.delete("/items/{id}")
 def delete_item(id: int): ...
@@ -192,11 +198,8 @@ def delete_item(id: int): ...
 # Python dict → JSON automatically
 @app.get("/data")
 def get_data():
-    return {
-        "name": "Alice",
-        "age": 30,
-        "hobbies": ["reading", "coding"]
-    }
+    return {"name": "Alice", "age": 30, "hobbies": ["reading", "coding"]}
+
 
 # Response body:
 # {"name":"Alice","age":30,"hobbies":["reading","coding"]}
@@ -263,10 +266,12 @@ def get_user(user_id: int):
 ```python
 from pydantic import BaseModel
 
+
 class User(BaseModel):
     name: str
     age: int
     email: str
+
 
 @app.post("/users")
 def create_user(user: User):
@@ -299,6 +304,7 @@ open http://127.0.0.1:8000/redoc
 **Example:**
 ```python
 from fastapi.responses import JSONResponse
+
 
 @app.get("/response")
 def get_response():
@@ -373,6 +379,7 @@ open http://127.0.0.1:8000/docs
 def get_item(item_id: int):  # item_id must be an integer
     return {"item_id": item_id}
 
+
 # Without type hints, no validation occurs
 @app.get("/items/{item_id}")
 def get_item_no_validation(item_id):  # No type = no validation
@@ -422,6 +429,7 @@ uvicorn main:app --reload --log-level info
 def get_user(user_id: int):
     # If user_id is not an integer, FastAPI returns 422
     return {"user_id": user_id}
+
 
 # Request: GET /users/abc → 422 Validation Error
 # Request: GET /users/42 → 200 OK
@@ -488,9 +496,11 @@ import uvicorn
 
 app = FastAPI(title="API", version="1.0.0")
 
+
 @app.get("/")
 def root():
     return {"status": "ok"}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)

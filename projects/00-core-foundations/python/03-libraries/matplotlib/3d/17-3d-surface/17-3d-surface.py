@@ -3,14 +3,17 @@ Matplotlib 3D Surface Plots - W3Schools Exercises
 ====================================================
 Advanced 3D surface rendering and visualization.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -71,8 +74,7 @@ def exercise_03():
 
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(111, projection="3d")
-    surf = ax.plot_surface(X, Y, Z, cmap="RdBu_r", edgecolor="none",
-                           antialiased=True, alpha=0.8)
+    surf = ax.plot_surface(X, Y, Z, cmap="RdBu_r", edgecolor="none", antialiased=True, alpha=0.8)
     fig.colorbar(surf, ax=ax, shrink=0.5, label="Z")
     ax.set_title("Exercise 3: Monkey Saddle (z = x³ - 3xy²)")
     ax.set_xlabel("X")
@@ -113,15 +115,15 @@ def exercise_05():
     x = np.linspace(-2, 2, 150)
     y = np.linspace(-2, 2, 150)
     X, Y = np.meshgrid(x, y)
-    Z = np.exp(-X**2 - Y**2) * np.cos(3 * X) * np.sin(3 * Y)
+    Z = np.exp(-(X**2) - Y**2) * np.cos(3 * X) * np.sin(3 * Y)
 
     fig = plt.figure(figsize=(10, 7))
     ax = fig.add_subplot(111, projection="3d")
-    surf = ax.plot_surface(X, Y, Z, cmap="viridis", edgecolor="none",
-                           antialiased=True, alpha=0.9)
+    surf = ax.plot_surface(X, Y, Z, cmap="viridis", edgecolor="none", antialiased=True, alpha=0.9)
     cbar = fig.colorbar(surf, ax=ax, shrink=0.5, pad=0.1, label="f(x,y)")
-    ax.set_title(r"Exercise 5: Publication-Quality Surface ($e^{-r^2}\cos(3x)\sin(3y)$)",
-                 fontsize=12, pad=15)
+    ax.set_title(
+        r"Exercise 5: Publication-Quality Surface ($e^{-r^2}\cos(3x)\sin(3y)$)", fontsize=12, pad=15
+    )
     ax.set_xlabel("X", fontsize=10)
     ax.set_ylabel("Y", fontsize=10)
     ax.set_zlabel("Z", fontsize=10)

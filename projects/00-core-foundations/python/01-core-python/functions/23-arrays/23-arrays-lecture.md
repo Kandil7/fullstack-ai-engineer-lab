@@ -46,12 +46,12 @@ nums = list(range(5))  # [0, 1, 2, 3, 4]
 fruits = ["apple", "banana", "cherry", "date"]
 
 # Positive indexing (0-based)
-print(fruits[0])    # apple
-print(fruits[2])    # cherry
+print(fruits[0])  # apple
+print(fruits[2])  # cherry
 
 # Negative indexing
-print(fruits[-1])   # date (last)
-print(fruits[-2])   # cherry (second to last)
+print(fruits[-1])  # date (last)
+print(fruits[-2])  # cherry (second to last)
 
 # Out of range raises IndexError
 # print(fruits[10])  # IndexError: list index out of range
@@ -63,20 +63,20 @@ print(fruits[-2])   # cherry (second to last)
 numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 # Basic slice [start:stop]
-print(numbers[2:5])    # [2, 3, 4]
+print(numbers[2:5])  # [2, 3, 4]
 
 # From start
-print(numbers[:5])     # [0, 1, 2, 3, 4]
+print(numbers[:5])  # [0, 1, 2, 3, 4]
 
 # To end
-print(numbers[5:])     # [5, 6, 7, 8, 9]
+print(numbers[5:])  # [5, 6, 7, 8, 9]
 
 # With step
-print(numbers[::2])    # [0, 2, 4, 6, 8]
-print(numbers[1::2])   # [1, 3, 5, 7, 9]
+print(numbers[::2])  # [0, 2, 4, 6, 8]
+print(numbers[1::2])  # [1, 3, 5, 7, 9]
 
 # Reverse
-print(numbers[::-1])   # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+print(numbers[::-1])  # [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 
 # Copy
 copy = numbers[:]
@@ -107,8 +107,8 @@ fruits.extend(["fig", "grape"])
 
 # Remove
 fruits.remove("banana")  # Remove first occurrence
-popped = fruits.pop()    # Remove and return last
-del fruits[0]            # Remove by index
+popped = fruits.pop()  # Remove and return last
+del fruits[0]  # Remove by index
 ```
 
 ### 5. List Methods
@@ -117,7 +117,7 @@ del fruits[0]            # Remove by index
 numbers = [3, 1, 4, 1, 5, 9, 2, 6]
 
 # Sort
-numbers.sort()           # In-place sort
+numbers.sort()  # In-place sort
 numbers.sort(reverse=True)  # Descending
 
 # Sorted (returns new list)
@@ -127,8 +127,8 @@ sorted_nums = sorted(numbers)
 numbers.reverse()
 
 # Find
-index = numbers.index(5)      # Index of first occurrence
-count = numbers.count(1)      # Count occurrences
+index = numbers.index(5)  # Index of first occurrence
+count = numbers.count(1)  # Count occurrences
 
 # Copy
 copy = numbers.copy()
@@ -205,6 +205,7 @@ def remove_duplicates(lst):
             result.append(item)
     return result
 
+
 print(remove_duplicates([1, 2, 2, 3, 1, 4, 3, 5]))  # [1, 2, 3, 4, 5]
 ```
 
@@ -217,6 +218,7 @@ def rotate(lst, n):
         return lst
     n = n % len(lst)
     return lst[-n:] + lst[:-n]
+
 
 print(rotate([1, 2, 3, 4, 5], 2))  # [4, 5, 1, 2, 3]
 print(rotate([1, 2, 3, 4, 5], -1))  # [2, 3, 4, 5, 1]
@@ -235,6 +237,7 @@ def flatten(nested):
             result.append(item)
     return result
 
+
 print(flatten([1, [2, 3], [4, [5, 6]]]))  # [1, 2, 3, 4, 5, 6]
 ```
 
@@ -247,10 +250,8 @@ def transpose(matrix):
     cols = len(matrix[0]) if rows else 0
     return [[matrix[i][j] for i in range(rows)] for j in range(cols)]
 
-matrix = [
-    [1, 2, 3],
-    [4, 5, 6]
-]
+
+matrix = [[1, 2, 3], [4, 5, 6]]
 print(transpose(matrix))  # [[1, 4], [2, 5], [3, 6]]
 ```
 
@@ -266,6 +267,7 @@ def two_sum(nums, target):
             return [seen[complement], i]
         seen[num] = i
     return []
+
 
 print(two_sum([2, 7, 11, 15], 9))  # [0, 1]
 ```
@@ -296,6 +298,7 @@ print(original[0][0])  # 99 — original modified!
 
 # CORRECT — deep copy
 import copy
+
 original = [[1, 2], [3, 4]]
 deep = copy.deepcopy(original)
 deep[0][0] = 99
@@ -340,6 +343,7 @@ def merge_sorted(list1, list2):
     # Your code here
     pass
 
+
 # Expected: [1, 2, 3, 4, 5, 6]
 print(merge_sorted([1, 3, 5], [2, 4, 6]))
 ```
@@ -351,6 +355,7 @@ Write a function that finds all duplicate elements in a list.
 def find_duplicates(lst):
     # Your code here
     pass
+
 
 # Expected: [2, 3]
 print(find_duplicates([1, 2, 3, 2, 4, 3, 5]))
@@ -364,11 +369,8 @@ def rotate_90(matrix):
     # Your code here
     pass
 
-matrix = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9]
-]
+
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 # Expected: [[7, 4, 1], [8, 5, 2], [9, 6, 3]]
 print(rotate_90(matrix))
 ```

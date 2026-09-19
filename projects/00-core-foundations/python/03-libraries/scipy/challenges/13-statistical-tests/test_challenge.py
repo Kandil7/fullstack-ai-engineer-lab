@@ -31,17 +31,15 @@ starter = _load("starter_13", os.path.join(HERE, "starter.py"))
 
 # ---------------------------------------------------------------- helpers
 
+
 def _assert_no_python_loops(mod):
     for name in ("starter", "solution"):
-        tree = ast.parse(
-            open(os.path.join(HERE, name + ".py"), encoding="utf-8").read()
-        )
+        tree = ast.parse(open(os.path.join(HERE, name + ".py"), encoding="utf-8").read())
         banned = [
             n
             for n in ast.walk(tree)
             if isinstance(
-                n, (ast.For, ast.While, ast.ListComp, ast.DictComp,
-                    ast.SetComp, ast.GeneratorExp)
+                n, (ast.For, ast.While, ast.ListComp, ast.DictComp, ast.SetComp, ast.GeneratorExp)
             )
         ]
         assert not banned, f"{name}.py contains Python loops/comprehensions"
@@ -56,6 +54,7 @@ def _skewed(n=200, scale=1.0, seed=7):
 
 
 # ---------------------------------------------------------------- bronze
+
 
 def test_bronze_normal_groups_use_t():
     a, b = _normal(), _normal(seed=1)
@@ -101,15 +100,14 @@ def test_bronze_no_python_loops():
 
 # ---------------------------------------------------------------- silver
 
+
 def test_silver_bonferroni_known():
-    out = solution.multiple_comparisons(np.array([0.01, 0.5, 0.001]),
-                                        "bonferroni")
+    out = solution.multiple_comparisons(np.array([0.01, 0.5, 0.001]), "bonferroni")
     assert np.allclose(out, [0.03, 1.0, 0.003])
 
 
 def test_silver_bh_known():
-    out = solution.multiple_comparisons(np.array([0.01, 0.04, 0.05]),
-                                        "fdr_bh")
+    out = solution.multiple_comparisons(np.array([0.01, 0.04, 0.05]), "fdr_bh")
     assert np.allclose(out, [0.03, 0.05, 0.05])
 
 
@@ -138,6 +136,7 @@ def test_silver_no_python_loops():
 
 
 # ---------------------------------------------------------------- gold
+
 
 def test_gold_unpaired_normal_report():
     a, b = _normal(n=80), _normal(n=80, shift=1.0)
@@ -176,7 +175,7 @@ def test_gold_paired_normal_uses_rel():
 def test_gold_paired_skewed_diffs_use_wilcoxon():
     rng = np.random.default_rng(6)
     before = rng.normal(100.0, 10.0, 100)
-    after = before + rng.exponential(3.0, 100)      # skewed diffs
+    after = before + rng.exponential(3.0, 100)  # skewed diffs
     p, effect, name, decision = solution.ab_report(before, after, paired=True)
     assert name == "wilcoxon"
     assert decision == "significant"
@@ -200,6 +199,7 @@ def test_gold_no_python_loops():
 
 
 # ---------------------------------------------------------------- starter
+
 
 def test_starter_raises_not_implemented():
     a = np.array([1.0, 2.0, 3.0])

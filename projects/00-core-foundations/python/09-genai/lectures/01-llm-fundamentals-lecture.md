@@ -68,12 +68,14 @@ tokens given the context."
 # Conceptual: the LLM as a conditional distribution
 import numpy as np
 
+
 def next_token_probs(logits: list[float]) -> np.ndarray:
     """Softmax over logits — the model's guess at the next token."""
     z = np.exp(np.array(logits) - max(logits))
     return z / z.sum()
 
-probs = next_token_probs([1.2, 4.0, -0.5, 2.1])   # 4 candidate tokens
+
+probs = next_token_probs([1.2, 4.0, -0.5, 2.1])  # 4 candidate tokens
 print("token probabilities:", np.round(probs, 3))
 ```
 
@@ -124,15 +126,22 @@ model can "know" at generation time must fit in the window: the system prompt,
 the user question, any retrieved documents, and the conversation history.
 
 ```python
-def fits_in_context(system_prompt: str, user_input: str, documents: list[str],
-                    window: int, enc) -> tuple[bool, int]:
+def fits_in_context(
+    system_prompt: str, user_input: str, documents: list[str], window: int, enc
+) -> tuple[bool, int]:
     """Does everything fit? Returns fit + total tokens."""
     total = len(enc.encode(system_prompt + user_input + "".join(documents)))
     return total <= window, total
 
+
 enc = tiktoken.get_encoding("cl100k_base")
-ok, used = fits_in_context("You are a helpful assistant.", "What is RAG?",
-                           ["Retrieval augmented generation is..."], 8192, enc)
+ok, used = fits_in_context(
+    "You are a helpful assistant.",
+    "What is RAG?",
+    ["Retrieval augmented generation is..."],
+    8192,
+    enc,
+)
 print("fits:", ok, "| tokens used:", used)
 ```
 
@@ -161,8 +170,7 @@ Generation is *sampling* from the next-token distribution. Three controls:
 | `max_tokens` | hard cap on output length (cost + latency control) |
 
 ```python
-def sample_token(probs: np.ndarray, temperature: float = 1.0,
-                 top_p: float = 1.0, rng=None) -> int:
+def sample_token(probs: np.ndarray, temperature: float = 1.0, top_p: float = 1.0, rng=None) -> int:
     """Sample one token with temperature + nucleus (top-p) truncation."""
     rng = rng or np.random.default_rng(42)
     if temperature == 0:
@@ -180,6 +188,7 @@ def sample_token(probs: np.ndarray, temperature: float = 1.0,
         scaled = scaled * mask
         scaled /= scaled.sum()
     return int(rng.choice(len(scaled), p=scaled))
+
 
 probs = next_token_probs([1.2, 4.0, -0.5, 2.1])
 print("greedy:", sample_token(probs, temperature=0))

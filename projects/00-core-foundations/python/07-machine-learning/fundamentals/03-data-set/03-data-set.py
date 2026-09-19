@@ -35,12 +35,7 @@ print("\nExample 2: Features vs Targets")
 # Simulated house data
 # Features: square_feet, bedrooms, age
 # Target: price
-house_features = np.array([
-    [1500, 3, 10],
-    [2000, 4, 5],
-    [1200, 2, 15],
-    [1800, 3, 8]
-])
+house_features = np.array([[1500, 3, 10], [2000, 4, 5], [1200, 2, 15], [1800, 3, 8]])
 
 house_prices = np.array([300000, 450000, 250000, 400000])
 
@@ -85,9 +80,7 @@ print(f"Test set size: {len(X_test)}")
 
 # Example 6: Proper train_test_split
 print("\nExample 6: Using train_test_split")
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 print(f"Training features shape: {X_train.shape}")
 print(f"Test features shape: {X_test.shape}")
@@ -99,8 +92,7 @@ print("\nExample 7: Stratified Split")
 from sklearn.datasets import make_classification
 
 X, y = make_classification(
-    n_samples=1000, n_features=10, n_informative=5,
-    n_redundant=2, random_state=42
+    n_samples=1000, n_features=10, n_informative=5, n_redundant=2, random_state=42
 )
 
 print(f"Original class distribution: {np.bincount(y)}")
@@ -119,10 +111,10 @@ print(f"Test class distribution: {np.bincount(y_test)}")
 # Example 8: Creating a DataFrame
 print("\nExample 8: Pandas DataFrame")
 data = {
-    'square_feet': [1500, 2000, 1200, 1800, 2200],
-    'bedrooms': [3, 4, 2, 3, 4],
-    'age': [10, 5, 15, 8, 3],
-    'price': [300000, 450000, 250000, 400000, 500000]
+    "square_feet": [1500, 2000, 1200, 1800, 2200],
+    "bedrooms": [3, 4, 2, 3, 4],
+    "age": [10, 5, 15, 8, 3],
+    "price": [300000, 450000, 250000, 400000, 500000],
 }
 
 df = pd.DataFrame(data)
@@ -137,8 +129,8 @@ print(df.head(3))
 
 # Example 10: Selecting features and targets from DataFrame
 print("\nExample 10: Features and Targets from DataFrame")
-X = df[['square_feet', 'bedrooms', 'age']].values
-y = df['price'].values
+X = df[["square_feet", "bedrooms", "age"]].values
+y = df["price"].values
 
 print("Features (X):")
 print(X[:3])
@@ -162,7 +154,7 @@ from sklearn.datasets import load_iris
 
 iris = load_iris()
 iris_df = pd.DataFrame(iris.data, columns=iris.feature_names)
-iris_df['species'] = iris.target
+iris_df["species"] = iris.target
 
 print("Iris dataset:")
 print(iris_df.head())
@@ -183,11 +175,11 @@ print(df.dtypes)
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Datasets consist of features (X) and targets (y)")
 print("- Always split data into training and test sets")
 print("- Use train_test_split for proper splitting")
 print("- Pandas DataFrames are convenient for data manipulation")
 print("- Explore your data before modeling")
-print("="*60)
+print("=" * 60)

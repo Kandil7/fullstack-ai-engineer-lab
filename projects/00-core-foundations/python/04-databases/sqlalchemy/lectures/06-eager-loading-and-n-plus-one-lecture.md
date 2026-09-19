@@ -55,9 +55,18 @@ way to see what your ORM code really sends.
 
 ```python
 from sqlalchemy import create_engine, event, select
-from sqlalchemy.orm import (DeclarativeBase, Mapped, Session, joinedload,
-                            mapped_column, relationship, selectinload, subqueryload)
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    Session,
+    joinedload,
+    mapped_column,
+    relationship,
+    selectinload,
+    subqueryload,
+)
 from sqlalchemy.pool import StaticPool
+
 
 class QueryCounter:
     def __init__(self, engine) -> None:
@@ -73,13 +82,14 @@ class QueryCounter:
     def reset(self) -> None:
         self.queries = []
 
+
 counter = QueryCounter(engine)
 
 with new_session() as session:
     counter.reset()
     projects = session.scalars(select(Project).order_by(Project.id)).all()
     for project in projects:
-        _ = len(project.experiments)   # ONE query per project
+        _ = len(project.experiments)  # ONE query per project
     print(f"lazy: {counter.count()} queries for 4 projects")
 # Output:
 # lazy: 5 queries for 4 projects
@@ -99,7 +109,7 @@ with new_session() as session:
     stmt = select(Project).options(selectinload(Project.experiments)).order_by(Project.id)
     projects = session.scalars(stmt).all()
     counter.reset()
-    total_runs = sum(len(p.experiments) for p in projects)   # no SQL fired
+    total_runs = sum(len(p.experiments) for p in projects)  # no SQL fired
     print(f"selectinload: {counter.count()} queries ({total_runs} runs loaded)")
 # Output:
 # selectinload: 0 queries (12 runs loaded)   [counted AFTER loading]
@@ -119,7 +129,7 @@ does **not** apply it automatically for collection loads.
 ```python
 with new_session() as session:
     stmt = select(Project).options(joinedload(Project.experiments)).order_by(Project.id)
-    projects = session.scalars(stmt).unique().all()   # dedupe parent rows
+    projects = session.scalars(stmt).unique().all()  # dedupe parent rows
     print(f"joinedload: {len(projects)} projects deduped")
 # Output:
 # joinedload: 4 projects deduped

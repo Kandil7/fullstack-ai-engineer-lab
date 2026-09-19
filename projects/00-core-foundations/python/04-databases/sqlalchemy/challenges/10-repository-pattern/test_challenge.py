@@ -29,9 +29,7 @@ def _load(name: str):
     """
     parent = Path(__file__).parent.name.replace("-", "_")
     modname = f"{name}_{parent}"
-    spec = importlib.util.spec_from_file_location(
-        modname, Path(__file__).parent / f"{name}.py"
-    )
+    spec = importlib.util.spec_from_file_location(modname, Path(__file__).parent / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[modname] = module
     spec.loader.exec_module(module)
@@ -172,9 +170,7 @@ class TestBatchUnitOfWork:
 
     def test_clean_batch_commits_all(self, env):
         with Session(bind=env) as s:
-            ids = solution.register_batch_with_transaction(
-                s, [_exp("a"), _exp("b"), _exp("c")]
-            )
+            ids = solution.register_batch_with_transaction(s, [_exp("a"), _exp("b"), _exp("c")])
             assert len(ids) == 3 and all(isinstance(i, int) for i in ids)
         assert self._count(env) == 3
 
@@ -183,9 +179,7 @@ class TestBatchUnitOfWork:
             solution.register_batch_with_transaction(s, [_exp("dup")])
         with Session(bind=env) as s:
             with pytest.raises(ValueError):
-                solution.register_batch_with_transaction(
-                    s, [_exp("fresh"), _exp("dup")]
-                )
+                solution.register_batch_with_transaction(s, [_exp("fresh"), _exp("dup")])
 
     def test_failed_batch_leaves_no_partial_rows(self, env):
         """All-or-nothing: the 'fresh' row must NOT survive with 'dup'."""
@@ -193,9 +187,7 @@ class TestBatchUnitOfWork:
             solution.register_batch_with_transaction(s, [_exp("dup")])
         with Session(bind=env) as s:
             try:
-                solution.register_batch_with_transaction(
-                    s, [_exp("fresh"), _exp("dup")]
-                )
+                solution.register_batch_with_transaction(s, [_exp("fresh"), _exp("dup")])
             except ValueError:
                 pass
         assert self._count(env) == 1, "rollback must remove the whole batch"

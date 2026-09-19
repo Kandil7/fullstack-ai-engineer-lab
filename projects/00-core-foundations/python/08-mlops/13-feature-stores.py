@@ -28,6 +28,7 @@ from typing import Any
 # Offline store: big, batch, for training (historical data).
 # Online store: small, fast, low-latency, for serving (current values).
 
+
 @dataclass
 class FeatureValue:
     entity_id: str
@@ -38,6 +39,7 @@ class FeatureValue:
 
 class OfflineStore:
     """Historical feature log, append-only."""
+
     def __init__(self) -> None:
         self._rows: list[FeatureValue] = []
 
@@ -46,9 +48,11 @@ class OfflineStore:
 
     def as_of(self, entity_id: str, feature: str, at_time: float) -> float | None:
         """The feature value as of a given time (no future leak)."""
-        eligible = [r for r in self._rows
-                    if r.entity_id == entity_id and r.feature == feature
-                    and r.timestamp <= at_time]
+        eligible = [
+            r
+            for r in self._rows
+            if r.entity_id == entity_id and r.feature == feature and r.timestamp <= at_time
+        ]
         if not eligible:
             return None
         return max(eligible, key=lambda r: r.timestamp).value
@@ -70,8 +74,10 @@ assert offline.as_of("u1", "spend_7d", 250.0) == 150.0
 # Skew: training computes a feature one way, serving computes it
 # another way. The model sees different inputs at serving time.
 
+
 def compute_feature_train(row: dict) -> float:
-    return round(row["amount"] * 0.9, 2)   # old definition
+    return round(row["amount"] * 0.9, 2)  # old definition
+
 
 def compute_feature_serving(row: dict) -> float:
     return round(row["amount"] * 0.9 + row.get("discount", 0.0), 2)  # new
@@ -85,6 +91,7 @@ print(f"  train sees: {train_val}")
 print(f"  serving sees: {serve_val}")
 print(f"  skew: {serve_val - train_val:.2f} (silent behavior change)")
 assert train_val != serve_val, "skew demonstrated"
+
 
 # ============================================================
 # 3. A Feature Store Enforces One Definition
@@ -118,8 +125,10 @@ assert train_feat == serve_feat
 # Training rows must join features as-of the row's timestamp - never
 # features computed after the label was set.
 
-def join_point_in_time(events: list[dict], features: OfflineStore,
-                       feature_names: list[str]) -> list[dict]:
+
+def join_point_in_time(
+    events: list[dict], features: OfflineStore, feature_names: list[str]
+) -> list[dict]:
     """Join each event with feature values valid at its timestamp."""
     joined = []
     for ev in events:
@@ -148,6 +157,7 @@ assert joined[1]["spend_7d"] == 150.0, "second event sees updated value"
 # Decide deliberately: a feature store earns its complexity when many
 # models share features or teams share a schema. For one model, keep
 # features next to the model code.
+
 
 def when_feature_store_wins() -> list[str]:
     return [

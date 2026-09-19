@@ -40,6 +40,7 @@ C = TypeVar("C")
 # its result without changing the program. That property is what makes
 # caching and reordering safe.
 
+
 # Example 1: pure vs impure
 def pure_square(x: int) -> int:
     """Return x squared. No state, no I/O."""
@@ -48,14 +49,14 @@ def pure_square(x: int) -> int:
 
 _counter = {"calls": 0}
 
+
 def impure_square(x: int) -> int:
     """Return x squared but count calls — a hidden side effect."""
     _counter["calls"] += 1
     return x * x
 
 
-print(f"pure: {pure_square(4)}; impure: {impure_square(4)}; "
-      f"hidden state: {_counter['calls']}")
+print(f"pure: {pure_square(4)}; impure: {impure_square(4)}; hidden state: {_counter['calls']}")
 
 # Output:
 # pure: 16; impure: 16; hidden state: 1
@@ -68,9 +69,11 @@ print(f"pure: {pure_square(4)}; impure: {impure_square(4)}; "
 # a frozen object cannot be changed after construction, so it is safe
 # to share across threads and safe to use as a dict key.
 
+
 @dataclass(frozen=True)
 class Chunk:
     """An immutable retrieved text chunk with its source id."""
+
     doc_id: int
     text: str
     score: float
@@ -140,6 +143,7 @@ print(f"reduce with operator.add: {total}")
 # partial fixes leading arguments, producing a new pure function.
 # Currying turns f(a, b) into f(a)(b); both are "function factories".
 
+
 # Example 5: partial as a config-free retriever factory
 def fetch_with(page_size: int, offset: int, limit: int) -> int:
     """Simulated page request: return how many rows would be fetched."""
@@ -160,10 +164,13 @@ print(f"partial applied: {page_50(offset=0, limit=200)}")
 # Associativity: compose(f, compose(g, h)) == compose(compose(f, g), h).
 # This is the algebra that makes pipelines reorderable.
 
+
 def compose(g: Callable[[B], C], f: Callable[[A], B]) -> Callable[[A], C]:
     """Return g after f: (compose(g, f))(x) == g(f(x)). O(1) wrapper."""
+
     def composed(x: A) -> C:
         return g(f(x))
+
     return composed
 
 
@@ -178,7 +185,7 @@ def increment(x: int) -> int:
 
 
 # Example 6: composed pipeline applied
-pipeline = compose(double, increment)   # (x + 1) * 2
+pipeline = compose(double, increment)  # (x + 1) * 2
 print(f"compose(double, increment)(3) = {pipeline(3)}")
 
 # Output:
@@ -209,6 +216,7 @@ for key, group in itertools.groupby(pairs, key=operator.itemgetter(0)):
 # Recursion limit is ~1000 by default. Deep recursion raises
 # RecursionError — iterate instead. Complexity: O(n) time but O(n)
 # stack space, which is why deep recursion is a memory bug.
+
 
 def factorial_iter(n: int) -> int:
     """Iterative factorial: O(n) time, O(1) space. Safe for any n."""
@@ -244,9 +252,11 @@ except RecursionError as exc:
 # edges (imperative shell). The core is memoizable and testable; the
 # shell handles files, network, and user interaction.
 
+
 @dataclass(frozen=True)
 class TextSample:
     """Immutable unit of corpus data."""
+
     text: str
     label: str
 
@@ -301,8 +311,7 @@ def _verify() -> None:
     # --- composition associativity ---
     add3 = compose(compose(increment, increment), increment)
     via_left = compose(increment, compose(increment, increment))
-    assert add3(0) == 3 and via_left(0) == 3, \
-        "compose must be associative: f.(g.h) == (f.g).h"
+    assert add3(0) == 3 and via_left(0) == 3, "compose must be associative: f.(g.h) == (f.g).h"
 
     # --- pure functions are memoizable ---
     calls = {"n": 0}
@@ -313,10 +322,10 @@ def _verify() -> None:
         calls["n"] += 1
         return pure_square(x)
 
-    assert memo_pure(7) == 49 and memo_pure(7) == 49, \
+    assert memo_pure(7) == 49 and memo_pure(7) == 49, (
         "pure function must return the same value on repeated calls"
-    assert calls["n"] == 1, \
-        "a pure function memoized must be computed only once"
+    )
+    assert calls["n"] == 1, "a pure function memoized must be computed only once"
 
     # --- pure transforms are reorder-safe ---
     def lowercase(s: str) -> str:
@@ -328,14 +337,16 @@ def _verify() -> None:
         return s.strip()
 
     start = "  Hello  "
-    assert strip_ws(lowercase(start)) == lowercase(strip_ws(start)) == "hello", \
+    assert strip_ws(lowercase(start)) == lowercase(strip_ws(start)) == "hello", (
         "commuting pure transforms must give the same result"
+    )
 
     # --- immutable structures are hashable ---
     key = Chunk(doc_id=1, text="alpha", score=0.5)
     table: dict[Chunk, str] = {key: "v"}
-    assert table[Chunk(doc_id=1, text="alpha", score=0.5)] == "v", \
+    assert table[Chunk(doc_id=1, text="alpha", score=0.5)] == "v", (
         "a frozen dataclass must be usable as a dict key"
+    )
 
     # --- frozen dataclasses refuse mutation ---
     try:
@@ -345,21 +356,20 @@ def _verify() -> None:
         pass
 
     # --- map/filter equals comprehension ---
-    evens_doubled = list(map(lambda x: x * 2, filter(lambda x: x % 2 == 0,
-                                                     [1, 2, 3, 4, 5, 6])))
-    assert evens_doubled == [4, 8, 12], \
-        "map/filter must equal the comprehension form"
+    evens_doubled = list(map(lambda x: x * 2, filter(lambda x: x % 2 == 0, [1, 2, 3, 4, 5, 6])))
+    assert evens_doubled == [4, 8, 12], "map/filter must equal the comprehension form"
 
     # --- operator module as first-class functions ---
-    assert functools.reduce(operator.add, [1, 2, 3, 4]) == 10, \
+    assert functools.reduce(operator.add, [1, 2, 3, 4]) == 10, (
         "operator.add must reduce a list to its sum"
-    assert sorted([("b", 2), ("a", 3)], key=operator.itemgetter(1)) == \
-        [("b", 2), ("a", 3)], "itemgetter must sort by the given field"
+    )
+    assert sorted([("b", 2), ("a", 3)], key=operator.itemgetter(1)) == [("b", 2), ("a", 3)], (
+        "itemgetter must sort by the given field"
+    )
 
     # --- partial application ---
     page_50 = functools.partial(fetch_with, 50)
-    assert page_50(offset=0, limit=200) == 50, \
-        "partial must pre-bind the leading argument"
+    assert page_50(offset=0, limit=200) == 50, "partial must pre-bind the leading argument"
 
     # --- recursion limit is real ---
     try:
@@ -367,13 +377,14 @@ def _verify() -> None:
         raise AssertionError("deep recursion must raise RecursionError")
     except RecursionError:
         pass
-    assert factorial_iter(20) == 2_432_902_008_176_640_000, \
+    assert factorial_iter(20) == 2_432_902_008_176_640_000, (
         "iterative factorial must handle deep inputs"
+    )
 
     # --- functional core / imperative shell ---
-    assert process_corpus([TextSample(text="  Hi There ", label="x")]) == \
-        {"x": ("hi", "there")}, \
+    assert process_corpus([TextSample(text="  Hi There ", label="x")]) == {"x": ("hi", "there")}, (
         "the pure core must normalize and tokenize deterministically"
+    )
 
     print("[OK] 29-functional-python: all checks passed")
 

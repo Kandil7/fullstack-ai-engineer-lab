@@ -16,14 +16,16 @@ uses the **index** as the x-axis and every column as a line:
 import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    "date": pd.date_range("2026-01-01", periods=30),
-    "sales": np.random.randint(80, 200, 30),
-    "target": 150,
-}).set_index("date")
+df = pd.DataFrame(
+    {
+        "date": pd.date_range("2026-01-01", periods=30),
+        "sales": np.random.randint(80, 200, 30),
+        "target": 150,
+    }
+).set_index("date")
 
-df.plot()                       # line chart
-df.plot(kind="bar")             # or: df.plot.bar()
+df.plot()  # line chart
+df.plot(kind="bar")  # or: df.plot.bar()
 df.plot(kind="scatter", x="a", y="b")
 ```
 
@@ -111,7 +113,9 @@ df.groupby("region")["revenue"].sum().sort_values().tail(5).plot.barh(
 df["order_value"].hist(ax=axes[1, 0], bins=30, title="Order value")
 
 # Channel mix
-df.groupby("channel")["revenue"].sum().plot.pie(ax=axes[1, 1], title="Channel mix", autopct="%1.0f%%")
+df.groupby("channel")["revenue"].sum().plot.pie(
+    ax=axes[1, 1], title="Channel mix", autopct="%1.0f%%"
+)
 
 plt.tight_layout()
 fig.savefig("reports/eda.png", dpi=150)

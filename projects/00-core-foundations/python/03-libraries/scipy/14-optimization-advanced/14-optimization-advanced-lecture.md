@@ -57,12 +57,14 @@ the same problem.
 from scipy import optimize
 import numpy as np
 
+
 def rosenbrock(z):
     x, y = z
-    return (1 - x) ** 2 + 100 * (y - x ** 2) ** 2
+    return (1 - x) ** 2 + 100 * (y - x**2) ** 2
+
 
 res = optimize.minimize(rosenbrock, np.array([-1.2, 1.0]), method="BFGS")
-print(res.fun, res.nfev)     # ~1e-11, ~114
+print(res.fun, res.nfev)  # ~1e-11, ~114
 ```
 
 **Rule of thumb:** smooth → BFGS (or L-BFGS-B with bounds); noisy
@@ -77,9 +79,10 @@ Pass `bounds=[(lo, hi), ...]` to `L-BFGS-B`, `SLSQP`, and others.
 Bounds are *hard*: the solver never evaluates outside them.
 
 ```python
-res = optimize.minimize(lambda x: (x[0] - 5.0) ** 2, np.array([0.0]),
-                        method="L-BFGS-B", bounds=[(0.0, 2.0)])
-print(res.x[0], res.fun)     # 2.0, 9.0 -- optimum clamped to the bound
+res = optimize.minimize(
+    lambda x: (x[0] - 5.0) ** 2, np.array([0.0]), method="L-BFGS-B", bounds=[(0.0, 2.0)]
+)
+print(res.x[0], res.fun)  # 2.0, 9.0 -- optimum clamped to the bound
 ```
 
 Use `(None, hi)` or `(lo, None)` for one-sided boxes. Bounds are
@@ -93,9 +96,10 @@ the cheapest way to encode domain knowledge: weights ≥ 0, rates in
 `constraints` accepts a dict or list of dicts:
 
 ```python
-cons = {"type": "eq", "fun": lambda z: np.sum(z) - 3.0}   # sum(z) == 3
-res = optimize.minimize(lambda z: np.sum((z - 1.0) ** 2),
-                        np.zeros(3), method="SLSQP", constraints=cons)
+cons = {"type": "eq", "fun": lambda z: np.sum(z) - 3.0}  # sum(z) == 3
+res = optimize.minimize(
+    lambda z: np.sum((z - 1.0) ** 2), np.zeros(3), method="SLSQP", constraints=cons
+)
 ```
 
 - `"eq"`: `fun(x) == 0` (equality).
@@ -151,9 +155,9 @@ candidates — no gradients, robust to multimodal landscapes.
 def multimodal(x):
     return x[0] ** 2 + 10.0 * np.sin(x[0])
 
-res = optimize.differential_evolution(multimodal, bounds=[(-10.0, 10.0)],
-                                      seed=42)
-print(res.x[0], res.fun)     # -1.3064, -7.9458 -- the global minimum
+
+res = optimize.differential_evolution(multimodal, bounds=[(-10.0, 10.0)], seed=42)
+print(res.x[0], res.fun)  # -1.3064, -7.9458 -- the global minimum
 ```
 
 `f(x) = x² + 10·sin(x)` has several local minima; from x0 = 5,
@@ -197,8 +201,10 @@ Levenberg-Marquardt) with the parameter-vector API:
 def decay(x, A, B, C):
     return A * np.exp(-B * x) + C
 
-popt, pcov = optimize.curve_fit(decay, t, y, p0=[1.0, 1.0, 0.0],
-                                bounds=([0.0, 1e-3, 0.0], [10.0, 3.0, 2.0]))
+
+popt, pcov = optimize.curve_fit(
+    decay, t, y, p0=[1.0, 1.0, 0.0], bounds=([0.0, 1e-3, 0.0], [10.0, 3.0, 2.0])
+)
 ```
 
 - `p0` is the prior — a good guess turns a wild search into
@@ -339,12 +345,13 @@ import numpy as np
 r = optimize.minimize(f, x0, method="BFGS")
 
 # bounded
-r = optimize.minimize(f, x0, method="L-BFGS-B",
-                      bounds=[(0.0, 1.0), (None, 3.0)])
+r = optimize.minimize(f, x0, method="L-BFGS-B", bounds=[(0.0, 1.0), (None, 3.0)])
 
 # constrained
-cons = [{"type": "eq", "fun": lambda z: np.sum(z) - 1.0},
-        {"type": "ineq", "fun": lambda z: z[0] - 0.1}]
+cons = [
+    {"type": "eq", "fun": lambda z: np.sum(z) - 1.0},
+    {"type": "ineq", "fun": lambda z: z[0] - 0.1},
+]
 r = optimize.minimize(f, x0, method="SLSQP", constraints=cons)
 
 # robust least squares
@@ -354,8 +361,7 @@ r = optimize.least_squares(residual, x0, loss="cauchy")
 r = optimize.differential_evolution(f, bounds=[(-10.0, 10.0)], seed=42)
 
 # calibration with priors
-popt, pcov = optimize.curve_fit(model, x, y, p0=[1.0, 1.0],
-                                bounds=([0, 0], [10, 5]))
+popt, pcov = optimize.curve_fit(model, x, y, p0=[1.0, 1.0], bounds=([0, 0], [10, 5]))
 
 # always check
 print(r.success, r.nfev, r.message)

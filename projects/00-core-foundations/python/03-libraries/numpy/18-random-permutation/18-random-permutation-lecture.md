@@ -68,7 +68,7 @@ print("Original:", arr)
 # Get permuted copy (original unchanged)
 permuted = np.random.permutation(arr)
 print("Permuted:", permuted)  # New array
-print("Original:", arr)       # Still [1 2 3 4 5 6 7 8 9 10]
+print("Original:", arr)  # Still [1 2 3 4 5 6 7 8 9 10]
 
 # Permutation of 2D - shuffles rows
 arr2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
@@ -143,7 +143,7 @@ import numpy as np
 
 # Shuffle training data
 X = np.arange(100).reshape(20, 5)  # 20 samples, 5 features
-y = np.arange(20)                   # 20 labels
+y = np.arange(20)  # 20 labels
 
 # Shuffle together
 indices = np.random.permutation(len(y))
@@ -207,10 +207,7 @@ print("\narr2 unchanged:", np.array_equal(arr2, np.array([1, 2, 3, 4, 5])))
 import numpy as np
 
 # Create dataset
-X = np.array([[1, 2, 3],
-              [4, 5, 6],
-              [7, 8, 9],
-              [10, 11, 12]])
+X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
 y = np.array([0, 1, 0, 1])
 
 print("Original X:\n", X)
@@ -414,6 +411,7 @@ import numpy as np
 # In scripts and experiments
 np.random.seed(42)
 
+
 # In functions, accept seed parameter
 def create_train_test_split(X, y, test_size=0.2, seed=None):
     if seed is not None:
@@ -499,10 +497,7 @@ print("Permuted:", permuted)
 import numpy as np
 
 # TODO: Shuffle rows of 2D array
-data = np.array([[1, 2, 3],
-                 [4, 5, 6],
-                 [7, 8, 9],
-                 [10, 11, 12]])
+data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
 
 indices = np.random.permutation(len(data))
 shuffled = data[indices]
@@ -578,7 +573,7 @@ permuted = np.random.permutation(arr)
 indices = np.random.permutation(len(arr))
 
 # Random selection
-selected = np.random.choice(arr, size=n, replace=True/False)
+selected = np.random.choice(arr, size=n, replace=True / False)
 
 # Weighted selection
 selected = np.random.choice(arr, size=n, p=probabilities)

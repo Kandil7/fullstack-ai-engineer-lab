@@ -25,9 +25,12 @@ conn.execute("CREATE TABLE evals (id INTEGER PRIMARY KEY, model TEXT, dataset TE
 conn.executemany(
     "INSERT INTO evals (model, dataset, score) VALUES (?, ?, ?)",
     [
-        ("m1", "d1", 0.91), ("m1", "d2", 0.82),
-        ("m2", "d1", 0.88), ("m2", "d2", 0.90),
-        ("m3", "d1", 0.95), ("m3", "d2", 0.78),
+        ("m1", "d1", 0.91),
+        ("m1", "d2", 0.82),
+        ("m2", "d1", 0.88),
+        ("m2", "d2", 0.90),
+        ("m3", "d1", 0.95),
+        ("m3", "d2", 0.78),
     ],
 )
 
@@ -78,7 +81,9 @@ rows = conn.execute(
     """
 ).fetchall()
 for r in rows:
-    print(f"  {r[0]}: {r[1]:.2f}  prev={r[2] if r[2] is not None else '--':>5}  next={r[3] if r[3] is not None else '--':>5}")
+    print(
+        f"  {r[0]}: {r[1]:.2f}  prev={r[2] if r[2] is not None else '--':>5}  next={r[3] if r[3] is not None else '--':>5}"
+    )
 print("  -> LAG/LEAD build lag features (time-series, deltas)")
 
 # ============================================================
@@ -102,8 +107,10 @@ print("  -> no GROUP BY: every row survives, with its cumulative sum")
 # ============================================================
 print("\n=== 5. Sliding Frame ===")
 conn.execute("CREATE TABLE daily (day INTEGER PRIMARY KEY, metric REAL)")
-conn.executemany("INSERT INTO daily (day, metric) VALUES (?, ?)",
-                 [(1, 10.0), (2, 20.0), (3, 30.0), (4, 40.0), (5, 50.0)])
+conn.executemany(
+    "INSERT INTO daily (day, metric) VALUES (?, ?)",
+    [(1, 10.0), (2, 20.0), (3, 30.0), (4, 40.0), (5, 50.0)],
+)
 rows = conn.execute(
     """
     SELECT day, metric,
@@ -131,6 +138,7 @@ print("  -> frame = rows 1 before through current: a moving average")
 # MISTAKE: ORDER BY inside OVER vs ORDER BY outside — different things
 # CORRECT: OVER's ORDER BY defines the window order; the outer one sorts output
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -139,25 +147,30 @@ def _verify() -> None:
     conn = sqlite3.connect(":memory:")
     try:
         conn.execute("CREATE TABLE s (id INTEGER PRIMARY KEY, g TEXT, v INTEGER)")
-        conn.executemany("INSERT INTO s (id, g, v) VALUES (?, ?, ?)",
-                         [(1, "a", 30), (2, "a", 10), (3, "a", 10), (4, "b", 50)])
+        conn.executemany(
+            "INSERT INTO s (id, g, v) VALUES (?, ?, ?)",
+            [(1, "a", 30), (2, "a", 10), (3, "a", 10), (4, "b", 50)],
+        )
 
         # 1. ROW_NUMBER: unique per partition, no ties
         rows = conn.execute(
             "SELECT ROW_NUMBER() OVER (PARTITION BY g ORDER BY v DESC) FROM s ORDER BY id"
         ).fetchall()
-        assert rows == [(1,), (2,), (3,), (1,)], \
+        assert rows == [(1,), (2,), (3,), (1,)], (
             "ROW_NUMBER must be unique per partition (output ordered by id)"
+        )
 
         # 2. RANK vs DENSE_RANK with ties: RANK skips numbers after a tie
         conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v INTEGER)")
-        conn.executemany("INSERT INTO t (id, v) VALUES (?, ?)",
-                         [(1, 50), (2, 30), (3, 10), (4, 10), (5, 5)])
+        conn.executemany(
+            "INSERT INTO t (id, v) VALUES (?, ?)", [(1, 50), (2, 30), (3, 10), (4, 10), (5, 5)]
+        )
         rows = conn.execute(
             "SELECT DISTINCT RANK() OVER (ORDER BY v DESC), DENSE_RANK() OVER (ORDER BY v DESC) FROM t ORDER BY 1"
         ).fetchall()
-        assert rows == [(1, 1), (2, 2), (3, 3), (5, 4)], \
+        assert rows == [(1, 1), (2, 2), (3, 3), (5, 4)], (
             "tie at v=10: RANK skips 4, DENSE_RANK continues at 4"
+        )
 
         # 3. LAG/LEAD correctness
         rows = conn.execute(
@@ -167,15 +180,12 @@ def _verify() -> None:
         assert rows[1] == (30, 10), "LAG must be the previous row's value"
 
         # 4. Running total keeps rows
-        rows = conn.execute(
-            "SELECT id, SUM(v) OVER (ORDER BY id) FROM s ORDER BY id"
-        ).fetchall()
+        rows = conn.execute("SELECT id, SUM(v) OVER (ORDER BY id) FROM s ORDER BY id").fetchall()
         assert [r[1] for r in rows] == [30, 40, 50, 100], "cumulative sums must accumulate"
 
         # 5. Frame: 2-day MA
         conn.execute("CREATE TABLE d (day INTEGER PRIMARY KEY, m REAL)")
-        conn.executemany("INSERT INTO d (day, m) VALUES (?, ?)",
-                         [(1, 10.0), (2, 20.0), (3, 30.0)])
+        conn.executemany("INSERT INTO d (day, m) VALUES (?, ?)", [(1, 10.0), (2, 20.0), (3, 30.0)])
         rows = conn.execute(
             "SELECT AVG(m) OVER (ORDER BY day ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) FROM d ORDER BY day"
         ).fetchall()

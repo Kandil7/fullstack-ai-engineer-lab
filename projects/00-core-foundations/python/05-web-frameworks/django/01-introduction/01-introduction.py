@@ -67,6 +67,7 @@
 # A quick check script you can actually run:
 if __name__ == "__main__":
     import django
+
     print(f"Django version: {django.__version__}")
     print("Django is installed and ready!")
     print()

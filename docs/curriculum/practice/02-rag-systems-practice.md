@@ -62,6 +62,7 @@ Trace the pipeline on a 3-file corpus without any external service. This only us
 
 ```python
 import sys
+
 sys.path.insert(0, r"projects/04-ai-engineering/devmate/src")
 from devmate.ingest.chunker import DocumentLoader, get_chunker
 from pathlib import Path
@@ -69,7 +70,9 @@ import tempfile
 
 with tempfile.TemporaryDirectory() as d:
     root = Path(d)
-    (root / "a.md").write_text("# Title\n\nSome body text for the doc.\n", encoding="utf-8")
+    (root / "a.md").write_text(
+        "# Title\n\nSome body text for the doc.\n", encoding="utf-8"
+    )
     (root / "b.py").write_text("def helper():\n    return 42\n", encoding="utf-8")
     (root / "blob.bin").write_bytes(b"\x00\x01\x02")
     (root / "notes.xyz").write_text("unsupported\n", encoding="utf-8")
@@ -78,8 +81,13 @@ with tempfile.TemporaryDirectory() as d:
     docs = list(loader.load_directory(root, recursive=False))
     print("count:", len(docs))
     for d in docs:
-        print(d.metadata.get("filename"), "| chunker:", d.metadata.get("chunker"),
-              "| id_len:", len(d.id))
+        print(
+            d.metadata.get("filename"),
+            "| chunker:",
+            d.metadata.get("chunker"),
+            "| id_len:",
+            len(d.id),
+        )
 ```
 
 Expected output (assert each): `count: 3` — `a.md` becomes ≥ 2 chunks (body exceeds 32 chars), `b.py` becomes 1 chunk, `blob.bin` is skipped (UnicodeDecodeError path), `notes.xyz` is skipped (not in `DocumentLoader.SUPPORTED_EXTENSIONS`). Every chunk carries `source`, `filename`, `extension`, `size_bytes`, `chunk_index`, `chunker`; every `id` is 16 hex chars (md5 of `source:position:content[:100]`).
@@ -128,12 +136,22 @@ Reimplement the prompt-construction stage by hand, exactly as `RAGPipeline._buil
 
 ```python
 results = [
-    {"id": "a1", "content": "def parse(): ...",
-     "metadata": {"filename": "parser.py", "chunk_type": "function", "name": "parse"}},
-    {"id": "b2", "content": "OAuth2 flow: authorize at /token",
-     "metadata": {"filename": "auth.md"}},
+    {
+        "id": "a1",
+        "content": "def parse(): ...",
+        "metadata": {
+            "filename": "parser.py",
+            "chunk_type": "function",
+            "name": "parse",
+        },
+    },
+    {
+        "id": "b2",
+        "content": "OAuth2 flow: authorize at /token",
+        "metadata": {"filename": "auth.md"},
+    },
 ]
-context = build_context(results)   # you write this
+context = build_context(results)  # you write this
 prompt = RAG_SYSTEM_PROMPT.format(context=context)  # import from devmate.retrieve.rag
 ```
 
@@ -239,10 +257,11 @@ Part 1 — predictable behavior. Run the real class:
 
 ```python
 import sys
+
 sys.path.insert(0, r"projects/04-ai-engineering/devmate/src")
 from devmate.ingest.chunker import FixedSizeChunker
 
-content = "word " * 60          # 300 chars
+content = "word " * 60  # 300 chars
 docs = FixedSizeChunker(chunk_size=50, overlap=0).chunk(content, {"source": "t.txt"})
 print(len(docs), [len(d.content) for d in docs])
 ```
@@ -310,6 +329,7 @@ Step 1: split on `\n\n` → 3 pieces, all ≤ 64. LangChain semantics would **re
 
 ```python
 from devmate.ingest.chunker import RecursiveChunker
+
 p1 = "Paragraph one with enough words to be its own chunk."
 p2 = "Paragraph two, also long enough to stand alone."
 p3 = "Paragraph three, short."
@@ -416,6 +436,7 @@ Run the real class on this file:
 
 ```python
 import sys
+
 sys.path.insert(0, r"projects/04-ai-engineering/devmate/src")
 from devmate.ingest.chunker import ASTAwareChunker
 
@@ -435,10 +456,18 @@ class Thing:
         return 3
 """
 docs = ASTAwareChunker(chunk_size=4096, overlap=0).chunk(
-    code, {"source": "x.py", "language": "python"})
+    code, {"source": "x.py", "language": "python"}
+)
 for d in docs:
     m = d.metadata
-    print(m.get("name"), m.get("chunk_type"), "lines", m.get("start_line"), "-", m.get("end_line"))
+    print(
+        m.get("name"),
+        m.get("chunk_type"),
+        "lines",
+        m.get("start_line"),
+        "-",
+        m.get("end_line"),
+    )
 ```
 
 Expected (verified): `first function 4–5`, `second function 8–9`, `Thing class 12–14`, and **also** `method function 13–14` (note: `ast.walk` visits nested functions too — methods become their own chunks *and* sit inside the class chunk; decide whether that duplication is desirable). Edge cases to assert: `chunk("def broken(:", …)` → **falls back to recursive** (`chunker == "recursive"` in metadata, no exception — the `except SyntaxError` path in `_chunk_python`); a 3000-line function with `chunk_size=512` is **skipped** by the `len(chunk_content) > chunk_size * 4` guard (2048 chars default) and the file falls back to recursive (verified: 65 recursive chunks, no `chunk_type` metadata); whitespace-only files → `[]`.
@@ -658,8 +687,8 @@ docs = {
     "d4": "Money back requests go through the billing queue.",
     "d5": "OAuth2 token exchange happens at /token.",
 }
-semantic_top3 = ["d4", "d3", "d2"]   # fake but plausible for a meaning-embedder
-keyword_hits  = ["d1", "d5"]          # exact tokens only
+semantic_top3 = ["d4", "d3", "d2"]  # fake but plausible for a meaning-embedder
+keyword_hits = ["d1", "d5"]  # exact tokens only
 ```
 
 For query `"QDR-2024"`: semantic misses d1 entirely (recall = 0/1), keyword finds it (1/1). For query `"money back"`: semantic finds d4 (synonym-aware), keyword finds nothing (0/1). Compute recall@5 for each system per query and the union list; assert: hybrid recall ≥ max(semantic, keyword) on every query in your matrix. Then write 10 real queries for DevMate's own corpus that stress each class: exact tokens (`FixedSizeChunker`, `QdrantVectorStore`, `COHERE_API_KEY`, `semantic_cache_threshold`) and paraphrases ("how do I break text into pieces" vs "chunking", "where is the vector database code" vs "vector_store.py").
@@ -713,8 +742,21 @@ def rrf(semantic, keyword, k=60, limit=5):
         scores[doc] = scores.get(doc, 0) + 1 / (k + rank)
     return sorted(scores, key=scores.get, reverse=True)[:limit]
 
-assert rrf(["A","B","C","D","E"], ["C","A","D","F"], 60, 5) == ["A","C","D","B","F"]
-assert rrf(["A","B","C","D","E"], ["C","A","D","F"], 5, 5) == ["A","C","D","B","F"]
+
+assert rrf(["A", "B", "C", "D", "E"], ["C", "A", "D", "F"], 60, 5) == [
+    "A",
+    "C",
+    "D",
+    "B",
+    "F",
+]
+assert rrf(["A", "B", "C", "D", "E"], ["C", "A", "D", "F"], 5, 5) == [
+    "A",
+    "C",
+    "D",
+    "B",
+    "F",
+]
 ```
 
 k-sensitivity drill (verified): with `k=5`, scores compress — `A = 1/6 + 1/7 = 0.309524`, `C = 1/8 + 1/6 = 0.291667`, `D = 1/9 + 1/8 = 0.236111`, `B = 1/7 = 0.142857`, `F = 1/9 = 0.111111`, `E = 1/10 = 0.1` — order holds but margins change. Explain: small `k` makes top ranks dominate (a rank-10 hit contributes `1/15 ≈ 0.067` vs a rank-1 hit `1/6 ≈ 0.167`); large `k` flattens differences. Note the degenerate case `k → ∞` makes all scores ≈ 0.
@@ -821,7 +863,10 @@ Mapping drill (no network). `CohereReranker.rerank` in `src/devmate/retrieve/ret
 ```python
 docs = ["doc_x", "doc_y", "doc_z"]
 resp = [{"index": 2, "relevance_score": 0.92}, {"index": 0, "relevance_score": 0.71}]
-mapped = [("doc_" + chr(ord('x') + r["index"]), r["index"], r["relevance_score"]) for r in resp]
+mapped = [
+    ("doc_" + chr(ord("x") + r["index"]), r["index"], r["relevance_score"])
+    for r in resp
+]
 print(mapped)  # expect [('doc_z', 2, 0.92), ('doc_x', 0, 0.71)]
 ```
 
@@ -871,18 +916,23 @@ Deterministic stub drill — verify the class contract without downloading a mod
 
 ```python
 import asyncio, sys
+
 sys.path.insert(0, r"projects/04-ai-engineering/devmate/src")
 from devmate.retrieve.retriever import LocalReranker
 from devmate.index.vector_store import SearchResult
 
+
 class FakeModel:
-    def predict(self, pairs):          # returns per-pair scores
+    def predict(self, pairs):  # returns per-pair scores
         return [[0.9 - 0.05 * i] for i in range(len(pairs))]
+
 
 rk = LocalReranker("fake/model")
 rk._model = FakeModel()
-docs = [SearchResult(id=f"d{i}", score=0.5, content=f"content {i}", metadata={"i": i})
-        for i in range(5)]
+docs = [
+    SearchResult(id=f"d{i}", score=0.5, content=f"content {i}", metadata={"i": i})
+    for i in range(5)
+]
 res = asyncio.run(rk.rerank("q", docs, top_k=3))
 print([(r.id, round(r.score, 3)) for r in res])
 ```

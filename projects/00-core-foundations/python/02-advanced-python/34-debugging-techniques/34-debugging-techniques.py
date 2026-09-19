@@ -40,6 +40,7 @@ from typing import Any
 # the exception was raised; the frames above are the callers. Always
 # read from the bottom up.
 
+
 def _inner() -> None:
     """The actual failure site."""
     raise ValueError("chunk index out of range")
@@ -87,6 +88,7 @@ print("innermost frame name present:", "_inner" in tb)
 # print(exc) gives the message only; format_exc gives the full frame
 # stack — what you want in logs.
 
+
 def log_exception(logger: logging.Logger, exc: BaseException) -> str:
     """Format the full traceback for a log line. O(1)."""
     return "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
@@ -111,11 +113,13 @@ except ValueError as exc:
 # A crash tells you WHERE; an assertion tells you WHAT WAS WRONG.
 # The RAG silent-bug method: assert invariants at every stage boundary.
 
+
 def normalize_chunks(chunks: list[str]) -> list[str]:
     """Strip and drop empties; assert the invariant. O(n)."""
     result = [c.strip() for c in chunks if c.strip()]
-    assert all(isinstance(c, str) and c for c in result), \
+    assert all(isinstance(c, str) and c for c in result), (
         "invariant: every chunk is a non-empty string"
+    )
     return result
 
 
@@ -126,9 +130,9 @@ def retrieve(query: str, chunks: list[str], top_k: int) -> list[str]:
 
 
 # Example 3: assertion catches the invariant break BEFORE the retriever
-bad_chunks = ["  good  ", "", None, "ok"]          # type: ignore[list-item]
+bad_chunks = ["  good  ", "", None, "ok"]  # type: ignore[list-item]
 try:
-    normalize_chunks(bad_chunks)                   # type: ignore[arg-type]
+    normalize_chunks(bad_chunks)  # type: ignore[arg-type]
     print("normalized (unexpected)")
 except (AssertionError, AttributeError) as exc:
     print(f"caught by assertion: {type(exc).__name__}: {exc}")
@@ -148,6 +152,7 @@ print(f"retriever top1: {retrieve('q', ['short', 'a much longer chunk'], 1)}")
 # ============================================================
 # 4. Logging as debugging — structured, leveled, queryable
 # ============================================================
+
 
 def make_logger(level: int = logging.DEBUG) -> tuple[logging.Logger, io.StringIO]:
     """A logger that writes to a StringIO for tests. O(1)."""
@@ -193,9 +198,10 @@ print(f"debug hidden at INFO level: {'processed=6' not in stream_info.getvalue()
 # "It works on my machine" usually means an unseeded random source or
 # set/dict iteration order. Freeze everything for a repro.
 
+
 def shuffly_score(items: list[str]) -> list[str]:
     """Deterministic ONLY with a seeded random. O(n)."""
-    rng = random.Random(42)             # fixed seed -> fixed shuffle
+    rng = random.Random(42)  # fixed seed -> fixed shuffle
     result = items[:]
     rng.shuffle(result)
     return result
@@ -203,7 +209,7 @@ def shuffly_score(items: list[str]) -> list[str]:
 
 def hash_order() -> list[str]:
     """Dict/set iteration order depends on PYTHONHASHSEED. O(n)."""
-    return list({"a", "b", "c"})        # order varies per process
+    return list({"a", "b", "c"})  # order varies per process
 
 
 # Example 6: seeded shuffle is reproducible; set order is not
@@ -223,6 +229,7 @@ print(f"set order (process-dependent): {hash_order()}")
 # faulthandler registers handlers that dump Python stack traces on
 # signals (SIGSEGV, SIGABRT) and can be triggered manually. The
 # canonical fix for "it hangs" — find WHERE it hangs.
+
 
 def enable_faulthandler() -> None:
     """Register faulthandler; also flush stderr immediately. O(1)."""
@@ -244,7 +251,7 @@ def _dump_demo() -> str:
     """Run a manual faulthandler dump; the frame appears in the stack."""
     dump_path = "__faulthandler_dump_demo__"
     with open(dump_path, "w", encoding="utf-8") as dump_file:
-        faulthandler.dump_traceback(file=dump_file)   # manual dump
+        faulthandler.dump_traceback(file=dump_file)  # manual dump
     with open(dump_path, encoding="utf-8") as dump_file:
         text = dump_file.read()
     os.remove(dump_path)
@@ -307,11 +314,7 @@ class _CapturingPdb(pdb.Pdb):
 def pdb_inspect() -> str:
     """Run the demo code under a scripted pdb session. O(1)."""
     cap = _CapturingPdb()
-    code = (
-        "x = 10\n"
-        "y = 32\n"
-        "result = x + y\n"
-    )
+    code = "x = 10\ny = 32\nresult = x + y\n"
     # cmdqueue feeds pdb commands deterministically (no stdin):
     # step past x=10, inspect it, step past y=32, inspect it, continue
     cap.cmdqueue = ["n", "p x", "n", "p y", "c"]
@@ -332,6 +335,7 @@ print(pdb_inspect(), end="")
 # ============================================================
 # For a regression across N commits/configs: test the midpoint, keep
 # the failing half, repeat. O(log n) runs instead of O(n).
+
 
 def bisect_bad(configs: list[str], bad_from: int) -> int:
     """Return the first index where a config goes bad. O(log n)."""
@@ -363,13 +367,14 @@ print(f"first bad config: {configs[bisect_bad(configs, 42)]}")
 # 4. Test the hypothesis (prove it)            — small probe
 # 5. Fix + regression test                     — never fix blind
 
+
 def isolate_stage(chunks: list[str]) -> str:
     """Which stage corrupts the data? Check each boundary. O(n)."""
     stage1 = [c.strip() for c in chunks]
     if any(not c for c in stage1):
         return "stage-1: empty after strip"
     stage2 = sorted(stage1, key=len)
-    if len(stage2) != len(set(stage2)):        # probe: no duplicates
+    if len(stage2) != len(set(stage2)):  # probe: no duplicates
         return "stage-2: duplicates introduced"
     return "ok"
 
@@ -416,22 +421,21 @@ def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # --- traceback.format_exc shape ---
     tb = capture_traceback()
-    assert tb.startswith("Traceback (most recent call last):"), \
+    assert tb.startswith("Traceback (most recent call last):"), (
         "format_exc must start with the traceback header"
-    assert "_inner" in tb and "_middle" in tb and "_outer" in tb, \
-        "the full frame chain must appear"
-    assert "ValueError: chunk index out of range" in tb, \
+    )
+    assert "_inner" in tb and "_middle" in tb and "_outer" in tb, "the full frame chain must appear"
+    assert "ValueError: chunk index out of range" in tb, (
         "the innermost frame and message must appear at the end"
+    )
 
     # --- log_exception includes the stack ---
     try:
         _outer()
     except ValueError as exc:
         full = log_exception(logging.getLogger("verify"), exc)
-        assert "_inner" in full, \
-            "format_exception must include all frames"
-        assert "chunk index out of range" in full, \
-            "the message must be in the formatted output"
+        assert "_inner" in full, "format_exception must include all frames"
+        assert "chunk index out of range" in full, "the message must be in the formatted output"
 
     # --- assertion-driven debugging catches the invariant break ---
     try:
@@ -439,12 +443,12 @@ def _verify() -> None:
         raise AssertionError("normalize_chunks accepted None")
     except (AssertionError, AttributeError):
         pass
-    assert normalize_chunks([" a ", " b "]) == ["a", "b"], \
-        "clean chunks normalize correctly"
+    assert normalize_chunks([" a ", " b "]) == ["a", "b"], "clean chunks normalize correctly"
 
     # --- the silent retriever bug is reproducible ---
-    assert retrieve("q", ["short", "a much longer chunk"], 1) == ["short"], \
+    assert retrieve("q", ["short", "a much longer chunk"], 1) == ["short"], (
         "the naive metric ranks by length — reproducible bug"
+    )
 
     # --- logging levels control visibility ---
     logger, stream = make_logger()
@@ -454,8 +458,7 @@ def _verify() -> None:
     assert "processed=6" in output, "DEBUG lines appear at DEBUG level"
     logger2, stream2 = make_logger(level=logging.INFO)
     debug_pipeline(logger2, 3)
-    assert "processed=6" not in stream2.getvalue(), \
-        "DEBUG lines are hidden at INFO level"
+    assert "processed=6" not in stream2.getvalue(), "DEBUG lines are hidden at INFO level"
 
     # --- seeded randomness is reproducible ---
     a = shuffly_score(["a", "b", "c", "d"])
@@ -470,25 +473,29 @@ def _verify() -> None:
     with open(dump_path, encoding="utf-8") as dump_file:
         dump_text = dump_file.read()
     os.remove(dump_path)
-    assert "34-debugging-techniques.py" in dump_text, \
+    assert "34-debugging-techniques.py" in dump_text, (
         "the dump must show the current stack (our file in it)"
+    )
 
     # --- pdb inspection records values ---
     recorded = pdb_inspect()
-    assert "x = 10" in recorded and "y = 32" in recorded, \
+    assert "x = 10" in recorded and "y = 32" in recorded, (
         "pdb 'p' commands must evaluate live state"
+    )
 
     # --- bisection is logarithmic ---
-    assert bisect_bad([f"c{i}" for i in range(100)], 42) == 42, \
+    assert bisect_bad([f"c{i}" for i in range(100)], 42) == 42, (
         "bisect must find the exact first-bad index"
+    )
 
     # --- stage isolation ---
-    assert isolate_stage([" ok ", ""]) == "stage-1: empty after strip", \
+    assert isolate_stage([" ok ", ""]) == "stage-1: empty after strip", (
         "isolation must name the failing stage"
-    assert isolate_stage(["b", "a", "a"]) == "stage-2: duplicates introduced", \
+    )
+    assert isolate_stage(["b", "a", "a"]) == "stage-2: duplicates introduced", (
         "the second probe names its own stage"
-    assert isolate_stage([" ok ", "fine"]) == "ok", \
-        "clean data passes all stage probes"
+    )
+    assert isolate_stage([" ok ", "fine"]) == "ok", "clean data passes all stage probes"
 
     print("[OK] 34-debugging-techniques: all checks passed")
 

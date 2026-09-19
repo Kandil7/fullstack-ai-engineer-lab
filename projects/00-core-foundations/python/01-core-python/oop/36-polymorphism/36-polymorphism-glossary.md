@@ -15,14 +15,17 @@ class Duck:
     def speak(self):
         return "Quack!"
 
+
 class Person:
     def speak(self):
         return "Hello!"
 
+
 def make_speak(thing):
     print(thing.speak())  # Works with both!
 
-make_speak(Duck())    # Quack!
+
+make_speak(Duck())  # Quack!
 make_speak(Person())  # Hello!
 ```
 **Related:** Polymorphism, type checking, protocols
@@ -47,6 +50,7 @@ class Animal:
     def speak(self):
         return "..."
 
+
 class Dog(Animal):
     def speak(self):  # Overrides Animal.speak
         return "Woof!"
@@ -63,8 +67,9 @@ class Dog(Animal):
 def make_sound(animal):
     print(animal.speak())  # Different behavior per animal type
 
-make_sound(Dog())   # Woof!
-make_sound(Cat())   # Meow!
+
+make_sound(Dog())  # Woof!
+make_sound(Cat())  # Meow!
 ```
 **Related:** Inheritance, duck typing, overriding
 
@@ -72,6 +77,7 @@ make_sound(Cat())   # Meow!
 **Definition:** Structural subtyping - defines required methods/attributes.
 ```python
 from typing import Protocol
+
 
 class Drawable(Protocol):
     def draw(self) -> None: ...
@@ -90,8 +96,10 @@ class Circle:
     def draw(self):
         print("Drawing circle")
 
+
 def draw_shape(shape: Drawable):  # Just needs draw()
     shape.draw()
+
 
 draw_shape(Circle())  # Works!
 ```
@@ -152,6 +160,7 @@ class Base:
     def method(self):
         return "Base"
 
+
 class Child(Base):
     def method(self):  # Override
         return "Child"
@@ -166,6 +175,7 @@ def process(thing):
 ### Pattern 3: Abstract Interface
 ```python
 from abc import ABC, abstractmethod
+
 
 class Interface(ABC):
     @abstractmethod
@@ -183,6 +193,7 @@ class MyClass:
 ### Pattern 5: Protocol
 ```python
 from typing import Protocol
+
 
 class MyProtocol(Protocol):
     def required_method(self) -> str: ...

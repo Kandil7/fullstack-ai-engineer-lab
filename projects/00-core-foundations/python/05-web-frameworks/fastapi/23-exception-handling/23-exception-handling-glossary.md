@@ -36,12 +36,14 @@ def divide(a: float, b: float) -> float:
         raise ValueError("Cannot divide by zero")
     return a / b
 
+
 # Raising exceptions
 def get_user(user_id: int) -> dict:
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise LookupError(f"User {user_id} not found")
     return user
+
 
 # Exception hierarchy
 """
@@ -75,18 +77,12 @@ raise HTTPException(status_code=404, detail="Item not found")
 
 # With custom detail
 raise HTTPException(
-    status_code=400,
-    detail={
-        "error": "Invalid input",
-        "fields": ["email", "password"]
-    }
+    status_code=400, detail={"error": "Invalid input", "fields": ["email", "password"]}
 )
 
 # With headers
 raise HTTPException(
-    status_code=401,
-    detail="Not authenticated",
-    headers={"WWW-Authenticate": "Bearer"}
+    status_code=401, detail="Not authenticated", headers={"WWW-Authenticate": "Bearer"}
 )
 
 # Common status codes
@@ -121,29 +117,23 @@ from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
+
 # Handler for specific exception
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
-    return JSONResponse(
-        status_code=400,
-        content={"detail": str(exc)}
-    )
+    return JSONResponse(status_code=400, content={"detail": str(exc)})
+
 
 # Handler for HTTPException
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.detail}
-    )
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
 
 # Handler for all exceptions
 @app.exception_handler(Exception)
 async def general_handler(request: Request, exc: Exception):
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal server error"}
-    )
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
 ```
 
 **Related Terms**: Decorator, Exception, Response
@@ -159,32 +149,34 @@ async def general_handler(request: Request, exc: Exception):
 # Custom exception classes
 class AppException(Exception):
     """Base exception for application"""
+
     def __init__(self, message: str, status_code: int = 500):
         self.message = message
         self.status_code = status_code
         super().__init__(message)
 
+
 class NotFoundException(AppException):
     """Resource not found"""
+
     def __init__(self, resource: str, id: int):
-        super().__init__(
-            f"{resource} with id {id} not found",
-            status_code=404
-        )
+        super().__init__(f"{resource} with id {id} not found", status_code=404)
+
 
 class ValidationException(AppException):
     """Validation error"""
+
     def __init__(self, errors: list):
-        super().__init__(
-            "Validation failed",
-            status_code=422
-        )
+        super().__init__("Validation failed", status_code=422)
         self.errors = errors
+
 
 class ConflictException(AppException):
     """Resource conflict"""
+
     def __init__(self, message: str):
         super().__init__(message, status_code=409)
+
 
 # Usage
 @app.get("/users/{user_id}")
@@ -227,15 +219,16 @@ from fastapi import HTTPException
 # 502 - Bad Gateway
 # 503 - Service Unavailable
 
+
 # Usage
 @app.post("/users/")
 async def create_user(user: UserCreate):
     if not user.email:
         raise HTTPException(status_code=400, detail="Email required")
-    
+
     if user_exists(user.email):
         raise HTTPException(status_code=409, detail="Email exists")
-    
+
     # Create user...
     return {"status": "created"}  # Implicit 200
 ```
@@ -254,20 +247,24 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional
 
+
 # Error response models
 class ErrorDetail(BaseModel):
     field: Optional[str]
     message: str
     type: str
 
+
 class ErrorResponse(BaseModel):
     success: bool = False
     error: ErrorInfo
+
 
 class ErrorInfo(BaseModel):
     code: int
     message: str
     details: Optional[List[ErrorDetail]] = None
+
 
 # Example error responses
 """
@@ -320,48 +317,46 @@ class ErrorInfo(BaseModel):
 from pydantic import BaseModel, EmailStr, validator
 from fastapi import HTTPException
 
+
 class UserCreate(BaseModel):
     email: EmailStr
     username: str
     password: str
-    
-    @validator('username')
+
+    @validator("username")
     def username_alphanumeric(cls, v):
         if not v.isalnum():
-            raise ValueError('Username must be alphanumeric')
+            raise ValueError("Username must be alphanumeric")
         return v
-    
-    @validator('password')
+
+    @validator("password")
     def password_strength(cls, v):
         if len(v) < 8:
-            raise ValueError('Password must be at least 8 characters')
+            raise ValueError("Password must be at least 8 characters")
         return v
+
 
 # FastAPI automatically returns 422 for validation errors
 @app.post("/users/")
 async def create_user(user: UserCreate):
     return user
 
+
 # Custom validation error handling
 @app.exception_handler(RequestValidationError)
 async def validation_handler(request, exc):
     errors = []
     for error in exc.errors():
-        errors.append({
-            "field": ".".join(str(loc) for loc in error["loc"]),
-            "message": error["msg"]
-        })
-    
+        errors.append(
+            {"field": ".".join(str(loc) for loc in error["loc"]), "message": error["msg"]}
+        )
+
     return JSONResponse(
         status_code=422,
         content={
             "success": False,
-            "error": {
-                "code": 422,
-                "message": "Validation error",
-                "details": errors
-            }
-        }
+            "error": {"code": 422, "message": "Validation error", "details": errors},
+        },
     )
 ```
 
@@ -382,36 +377,29 @@ import logging
 app = FastAPI()
 logger = logging.getLogger(__name__)
 
+
 # Global handler for all exceptions
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
-    
+
     return JSONResponse(
         status_code=500,
-        content={
-            "success": False,
-            "error": {
-                "code": 500,
-                "message": "Internal server error"
-            }
-        }
+        content={"success": False, "error": {"code": 500, "message": "Internal server error"}},
     )
+
 
 # Global handler for specific exceptions
 @app.exception_handler(DatabaseError)
 async def database_error_handler(request: Request, exc: DatabaseError):
     logger.error(f"Database error: {exc}")
-    
+
     return JSONResponse(
         status_code=503,
         content={
             "success": False,
-            "error": {
-                "code": 503,
-                "message": "Database temporarily unavailable"
-            }
-        }
+            "error": {"code": 503, "message": "Database temporarily unavailable"},
+        },
     )
 ```
 
@@ -430,10 +418,10 @@ from fastapi import Request
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 # Log exceptions
 @app.get("/items/{item_id}")
@@ -448,6 +436,7 @@ async def get_item(item_id: int):
     except Exception as e:
         logger.error(f"Error getting item {item_id}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal error")
+
 
 # Log with context
 @app.middleware("http")
@@ -474,14 +463,17 @@ def divide(a: float, b: float) -> float:
         raise ValueError("Cannot divide by zero")
     return a / b
 
+
 # Raising HTTPException
 from fastapi import HTTPException
+
 
 def get_user(user_id: int):
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
 
 # Raising custom exceptions
 class InsufficientFunds(Exception):
@@ -490,10 +482,12 @@ class InsufficientFunds(Exception):
         self.amount = amount
         super().__init__(f"Insufficient funds: {balance} < {amount}")
 
+
 def withdraw(balance: float, amount: float):
     if amount > balance:
         raise InsufficientFunds(balance, amount)
     return balance - amount
+
 
 # Re-raising exceptions
 def process_payment():
@@ -565,6 +559,7 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 import traceback
 
+
 class ErrorHandlerMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         try:
@@ -572,13 +567,12 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
             return response
         except Exception as e:
             traceback.print_exc()
-            return JSONResponse(
-                status_code=500,
-                content={"detail": "Internal server error"}
-            )
+            return JSONResponse(status_code=500, content={"detail": "Internal server error"})
+
 
 # Add middleware
 app.add_middleware(ErrorHandlerMiddleware)
+
 
 # Simpler middleware approach
 @app.middleware("http")
@@ -586,10 +580,7 @@ async def error_handling_middleware(request: Request, call_next):
     try:
         return await call_next(request)
     except Exception as e:
-        return JSONResponse(
-            status_code=500,
-            content={"detail": str(e)}
-        )
+        return JSONResponse(status_code=500, content={"detail": str(e)})
 ```
 
 **Related Terms**: Handler, Request, Response
@@ -604,6 +595,7 @@ async def error_handling_middleware(request: Request, call_next):
 ```python
 from sqlalchemy.exc import IntegrityError
 
+
 @app.post("/users/")
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     try:
@@ -614,19 +606,10 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
     except IntegrityError as e:
         db.rollback()
         if "unique" in str(e.orig).lower():
-            raise HTTPException(
-                status_code=409,
-                detail="User already exists"
-            )
+            raise HTTPException(status_code=409, detail="User already exists")
         elif "foreign key" in str(e.orig).lower():
-            raise HTTPException(
-                status_code=400,
-                detail="Referenced resource not found"
-            )
-        raise HTTPException(
-            status_code=400,
-            detail="Database constraint violation"
-        )
+            raise HTTPException(status_code=400, detail="Referenced resource not found")
+        raise HTTPException(status_code=400, detail="Database constraint violation")
 ```
 
 **Related Terms**: Database, Constraint, SQL
@@ -641,6 +624,7 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
 ```python
 from fastapi import HTTPException
 
+
 # 400 Bad Request
 @app.get("/items/")
 async def get_items(page: int = 1):
@@ -648,23 +632,24 @@ async def get_items(page: int = 1):
         raise HTTPException(status_code=400, detail="Page must be positive")
     return []
 
+
 # 401 Unauthorized
 @app.get("/protected/")
-async def protected(user = Depends(get_current_user)):
+async def protected(user=Depends(get_current_user)):
     if user is None:
         raise HTTPException(
-            status_code=401,
-            detail="Not authenticated",
-            headers={"WWW-Authenticate": "Bearer"}
+            status_code=401, detail="Not authenticated", headers={"WWW-Authenticate": "Bearer"}
         )
     return {"data": "secret"}
 
+
 # 403 Forbidden
 @app.delete("/items/{item_id}")
-async def delete_item(item_id: int, user = Depends(get_current_user)):
+async def delete_item(item_id: int, user=Depends(get_current_user)):
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return {"deleted": True}
+
 
 # 404 Not Found
 @app.get("/items/{item_id}")
@@ -674,12 +659,14 @@ async def get_item(item_id: int):
         raise HTTPException(status_code=404, detail="Item not found")
     return item
 
+
 # 409 Conflict
 @app.post("/users/")
 async def create_user(user: UserCreate):
     if user_exists(user.email):
         raise HTTPException(status_code=409, detail="Email already exists")
     return {"created": True}
+
 
 # 422 Unprocessable Entity
 # Automatically raised by FastAPI for validation errors
@@ -700,6 +687,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 # 500 Internal Server Error
 @app.get("/items/{item_id}")
 async def get_item(item_id: int):
@@ -710,6 +698,7 @@ async def get_item(item_id: int):
         logger.error(f"Database error: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+
 # 502 Bad Gateway
 @app.get("/external/")
 async def get_external():
@@ -719,6 +708,7 @@ async def get_external():
     except Exception as e:
         logger.error(f"External API error: {e}")
         raise HTTPException(status_code=502, detail="Bad gateway")
+
 
 # 503 Service Unavailable
 @app.get("/health/")
@@ -741,14 +731,15 @@ class Result:
         self.success = success
         self.data = data
         self.error = error
-    
+
     @classmethod
     def ok(cls, data):
         return cls(success=True, data=data)
-    
+
     @classmethod
     def fail(cls, error):
         return cls(success=False, error=error)
+
 
 # Usage
 @app.get("/items/{item_id}")
@@ -767,16 +758,14 @@ class ErrorCode:
     INVALID_PASSWORD = "USER_003"
     INSUFFICIENT_FUNDS = "PAYMENT_001"
 
+
 @app.get("/users/{user_id}")
 async def get_user(user_id: int):
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         return JSONResponse(
             status_code=404,
-            content={
-                "error_code": ErrorCode.USER_NOT_FOUND,
-                "message": "User not found"
-            }
+            content={"error_code": ErrorCode.USER_NOT_FOUND, "message": "User not found"},
         )
     return user
 ```

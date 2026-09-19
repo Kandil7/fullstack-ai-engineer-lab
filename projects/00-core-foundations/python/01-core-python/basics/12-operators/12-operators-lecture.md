@@ -21,13 +21,13 @@ Perform mathematical calculations:
 a = 10
 b = 3
 
-print(a + b)   # Addition: 13
-print(a - b)   # Subtraction: 7
-print(a * b)   # Multiplication: 30
-print(a / b)   # Division: 3.333...
+print(a + b)  # Addition: 13
+print(a - b)  # Subtraction: 7
+print(a * b)  # Multiplication: 30
+print(a / b)  # Division: 3.333...
 print(a // b)  # Floor Division: 3
-print(a % b)   # Modulus: 1
-print(a ** b)  # Exponent: 1000
+print(a % b)  # Modulus: 1
+print(a**b)  # Exponent: 1000
 ```
 
 ### 3.2 Comparison Operators
@@ -37,12 +37,12 @@ Compare values and return booleans:
 x = 10
 y = 20
 
-print(x == y)   # Equal: False
-print(x != y)   # Not equal: True
-print(x > y)    # Greater than: False
-print(x < y)    # Less than: True
+print(x == y)  # Equal: False
+print(x != y)  # Not equal: True
+print(x > y)  # Greater than: False
+print(x < y)  # Less than: True
 print(x >= 10)  # Greater or equal: True
-print(x <= 5)   # Less or equal: False
+print(x <= 5)  # Less or equal: False
 ```
 
 ### 3.3 Logical Operators
@@ -56,11 +56,11 @@ print(x > 10 and x < 20)  # True
 print(x > 10 and x > 20)  # False
 
 # or - at least one must be True
-print(x > 10 or x > 20)   # True
-print(x > 20 or x > 30)   # False
+print(x > 10 or x > 20)  # True
+print(x > 20 or x > 30)  # False
 
 # not - reverses boolean
-print(not (x > 5))   # False
+print(not (x > 5))  # False
 print(not (x > 15))  # True
 ```
 
@@ -68,14 +68,14 @@ print(not (x > 15))  # True
 Assign and modify values:
 
 ```python
-x = 10       # Basic assignment
-x += 5       # x = x + 5 (15)
-x -= 3       # x = x - 3 (12)
-x *= 2       # x = x * 2 (24)
-x /= 4       # x = x / 4 (6.0)
-x //= 2      # x = x // 2 (3.0)
-x %= 2       # x = x % 2 (1.0)
-x **= 3      # x = x ** 3 (1.0)
+x = 10  # Basic assignment
+x += 5  # x = x + 5 (15)
+x -= 3  # x = x - 3 (12)
+x *= 2  # x = x * 2 (24)
+x /= 4  # x = x / 4 (6.0)
+x //= 2  # x = x // 2 (3.0)
+x %= 2  # x = x % 2 (1.0)
+x **= 3  # x = x ** 3 (1.0)
 ```
 
 ### 3.5 Identity Operators
@@ -86,8 +86,8 @@ a = [1, 2, 3]
 b = [1, 2, 3]
 c = a
 
-print(a is b)      # False (different objects)
-print(a is c)      # True (same object)
+print(a is b)  # False (different objects)
+print(a is c)  # True (same object)
 print(a is not b)  # True
 ```
 
@@ -97,9 +97,9 @@ Check if value is in sequence:
 ```python
 fruits = ["apple", "banana", "cherry"]
 
-print("apple" in fruits)      # True
-print("orange" in fruits)     # False
-print("orange" not in fruits) # True
+print("apple" in fruits)  # True
+print("orange" in fruits)  # False
+print("orange" not in fruits)  # True
 ```
 
 ### 3.7 Operator Precedence
@@ -130,22 +130,23 @@ def calculator():
     num1 = float(input("Enter first number: "))
     num2 = float(input("Enter second number: "))
     op = input("Enter operator (+, -, *, /): ")
-    
-    if op == '+':
+
+    if op == "+":
         result = num1 + num2
-    elif op == '-':
+    elif op == "-":
         result = num1 - num2
-    elif op == '*':
+    elif op == "*":
         result = num1 * num2
-    elif op == '/':
+    elif op == "/":
         if num2 != 0:
             result = num1 / num2
         else:
             return "Error: Division by zero"
     else:
         return "Invalid operator"
-    
+
     return f"{num1} {op} {num2} = {result}"
+
 
 print(calculator())
 ```
@@ -174,19 +175,19 @@ else:
 numbers = [1, 2, 3, 4, 5]
 text = "Hello, World!"
 
-print(3 in numbers)           # True
-print(6 in numbers)           # False
-print("World" in text)        # True
-print("Python" not in text)   # True
+print(3 in numbers)  # True
+print(6 in numbers)  # False
+print("World" in text)  # True
+print("Python" not in text)  # True
 ```
 
 ### Example 4: Operator Precedence
 ```python
 # Understanding precedence
-result1 = 2 + 3 * 4     # 14 (not 20)
-result2 = (2 + 3) * 4   # 20
-result3 = 2 ** 3 ** 2   # 512 (right-associative)
-result4 = (2 ** 3) ** 2 # 64
+result1 = 2 + 3 * 4  # 14 (not 20)
+result2 = (2 + 3) * 4  # 20
+result3 = 2**3**2  # 512 (right-associative)
+result4 = (2**3) ** 2  # 64
 
 print(f"2 + 3 * 4 = {result1}")
 print(f"(2 + 3) * 4 = {result2}")
@@ -222,7 +223,7 @@ else:
 ### Mistake 3: Integer Division vs Float Division
 ```python
 # Unexpected results
-print(10 / 2)   # 5.0 (float)
+print(10 / 2)  # 5.0 (float)
 print(10 // 2)  # 5 (int)
 
 # Use // for integer division

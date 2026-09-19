@@ -25,16 +25,17 @@ def no_leak_rolling(series: pd.Series, window: int) -> pd.Series:
 
 def build_features(series: pd.Series, window: int) -> pd.DataFrame:
     """Feature table: value, lag_1, mean_w (no leak), pct_chg."""
-    return pd.DataFrame({
-        "value": series,
-        "lag_1": series.shift(1),
-        "mean_w": series.rolling(window).mean().shift(1),
-        "pct_chg": series.pct_change(),
-    })
+    return pd.DataFrame(
+        {
+            "value": series,
+            "lag_1": series.shift(1),
+            "mean_w": series.rolling(window).mean().shift(1),
+            "pct_chg": series.pct_change(),
+        }
+    )
 
 
-def features_without_future(series: pd.Series, cutoff: pd.Timestamp,
-                            window: int) -> pd.DataFrame:
+def features_without_future(series: pd.Series, cutoff: pd.Timestamp, window: int) -> pd.DataFrame:
     """Feature table restricted to rows strictly before cutoff."""
     past = series[series.index < cutoff]
     return build_features(past, window)
@@ -43,6 +44,6 @@ def features_without_future(series: pd.Series, cutoff: pd.Timestamp,
 def verify_no_future_leak(full: pd.DataFrame, truncated: pd.DataFrame) -> bool:
     """True if truncated features match full features on overlapping rows."""
     overlap = full.loc[truncated.index, truncated.columns]
-    return bool(np.allclose(overlap.to_numpy(dtype=float),
-                            truncated.to_numpy(dtype=float),
-                            equal_nan=True))
+    return bool(
+        np.allclose(overlap.to_numpy(dtype=float), truncated.to_numpy(dtype=float), equal_nan=True)
+    )

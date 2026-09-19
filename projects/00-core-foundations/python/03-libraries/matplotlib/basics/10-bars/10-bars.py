@@ -3,14 +3,17 @@ Matplotlib Bar Charts - W3Schools Exercises
 =============================================
 Bar chart creation and customization.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -100,8 +103,13 @@ def exercise_05():
     plt.errorbar(methods, means, yerr=stds, fmt="none", ecolor="black", capsize=5, linewidth=2)
 
     for bar, mean in zip(bars, means):
-        plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
-                 f"{mean}%", ha="center", fontweight="bold")
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 1,
+            f"{mean}%",
+            ha="center",
+            fontweight="bold",
+        )
 
     plt.title("Exercise 5: Bar Chart with Error Bars")
     plt.ylabel("Accuracy (%)")

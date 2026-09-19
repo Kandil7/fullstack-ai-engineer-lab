@@ -28,9 +28,7 @@ def _load(name: str):
     """
     parent = Path(__file__).parent.name.replace("-", "_")
     modname = f"{name}_{parent}"
-    spec = importlib.util.spec_from_file_location(
-        modname, Path(__file__).parent / f"{name}.py"
-    )
+    spec = importlib.util.spec_from_file_location(modname, Path(__file__).parent / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[modname] = module
     spec.loader.exec_module(module)
@@ -90,9 +88,7 @@ class TestCreateReviewGraph:
         assert len(session.scalars(select(solution.Tag)).all()) == 1
 
     def test_persists_graph_in_db(self, session):
-        book_id, _ = solution.create_review_graph(
-            session, "Hobbit", ["fantasy", "classic"]
-        )
+        book_id, _ = solution.create_review_graph(session, "Hobbit", ["fantasy", "classic"])
         book = session.get(solution.Book, book_id)
         assert book.title == "Hobbit"
         assert sorted(t.label for t in book.tags) == ["classic", "fantasy"]
@@ -118,12 +114,8 @@ class TestFindBooksByTag:
 
 class TestDeleteAuthorCascade:
     def _seed(self, session) -> None:
-        solution.create_review_graph(
-            session, "Hobbit", ["fantasy"], author_name="Tolkien"
-        )
-        solution.create_review_graph(
-            session, "LOTR", ["fantasy"], author_name="Tolkien"
-        )
+        solution.create_review_graph(session, "Hobbit", ["fantasy"], author_name="Tolkien")
+        solution.create_review_graph(session, "LOTR", ["fantasy"], author_name="Tolkien")
         solution.create_review_graph(session, "Narnia", [], author_name="Lewis")
 
     def test_returns_removed_book_count(self, session):

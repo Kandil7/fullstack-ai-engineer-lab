@@ -65,12 +65,13 @@ print(f"Unique lengths: {unique_lengths}")
 # Example 3: memory-flat stream vs materialized list
 import math
 
+
 def squares_upto(n: int) -> list[int]:
-    return [i * i for i in range(n)]          # materializes n ints
+    return [i * i for i in range(n)]  # materializes n ints
 
 
 def squares_lazy(n: int) -> "generator":
-    return (i * i for i in range(n))          # streams, O(1) memory
+    return (i * i for i in range(n))  # streams, O(1) memory
 
 
 big_list = squares_upto(1_000_000)
@@ -105,6 +106,7 @@ print(f"Off-diagonal pairs: {pairs}")
 # Assign-and-test in expressions. Best where it removes a double call or a
 # pre-loop assignment. If it hurts readability, skip it — it is optional.
 
+
 # Example 5: avoid re-parsing
 def parse_float(s: str) -> float | None:
     try:
@@ -116,6 +118,7 @@ def parse_float(s: str) -> float | None:
 values = ["3.14", "abc", "2.5", "xyz"]
 valid = [v for v in values if (parsed := parse_float(v)) is not None]
 print(f"\nValid floats: {valid}")
+
 
 # Example 6: while-loop sentinel without duplication
 # input_or_empty() is defined at module level below the section for clarity
@@ -159,6 +162,7 @@ print(f"Bucket path: {path.removeprefix('s3://')}")
 # `/` before it: positional-only (can't pass by name). `*` after it:
 # keyword-only (must pass by name). Locking the call signature prevents
 # silently wrong positional argument order in hot library code.
+
 
 # Example 9: both markers
 def train(model, /, *, epochs: int, lr: float) -> str:
@@ -213,13 +217,10 @@ print(f"\nMerged config: {merged}")
 # ============================================================
 # Chain comprehension + generator + strict zip into one readable pipeline.
 
+
 def clean_batch(rows: list[tuple[str, str]]) -> list[tuple[str, str]]:
     """Return (question, answer) pairs, trimmed, deduped, non-empty."""
-    cleaned = {
-        (q.strip(), a.strip())
-        for q, a in rows
-        if q.strip() and a.strip()
-    }
+    cleaned = {(q.strip(), a.strip()) for q, a in rows if q.strip() and a.strip()}
     return sorted(cleaned)
 
 
@@ -253,6 +254,7 @@ print(f"\nCleaned pairs: {clean_batch(rows)}")
 # CORRECT:
 #   good = result = compute(); use result twice
 
+
 # ============================================================
 # Self-Verification
 # ============================================================
@@ -271,12 +273,12 @@ def _verify() -> None:
 
     # Generator is lazy and single-use
     gen = (i for i in range(5))
-    assert next(gen) == 0 and list(gen) == [1, 2, 3, 4], \
-        "generator streams and exhausts"
+    assert next(gen) == 0 and list(gen) == [1, 2, 3, 4], "generator streams and exhausts"
 
     # Flatten order (outermost first)
-    assert [x for batch in [[1, 2], [3]] for x in batch] == [1, 2, 3], \
+    assert [x for batch in [[1, 2], [3]] for x in batch] == [1, 2, 3], (
         "nesting order is left-to-right"
+    )
 
     # Walrus filters without double parse
     assert valid == ["3.14", "2.5"], "walrus must filter invalid floats"

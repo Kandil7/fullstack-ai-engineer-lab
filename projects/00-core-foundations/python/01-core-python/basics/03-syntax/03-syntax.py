@@ -76,11 +76,11 @@ at the beginning of modules, functions, or classes.
 y = 10
 
 # Example 6: Multi-line strings as comments
-'''
+"""
 Another way to write multi-line comments.
 This is technically a string literal, not a true comment,
 but it's commonly used for longer explanations.
-'''
+"""
 
 # ============================================================
 # Python is Case-Sensitive
@@ -90,19 +90,22 @@ myVar = "lowercase"
 MyVar = "Capitalized"
 MYVAR = "ALL CAPS"
 
-print(f"myVar = {myVar}")   # Output: myVar = lowercase
-print(f"MyVar = {MyVar}")   # Output: MyVar = Capitalized
-print(f"MYVAR = {MYVAR}")   # Output: MYVAR = ALL CAPS
+print(f"myVar = {myVar}")  # Output: myVar = lowercase
+print(f"MyVar = {MyVar}")  # Output: MyVar = Capitalized
+print(f"MYVAR = {MYVAR}")  # Output: MYVAR = ALL CAPS
+
 
 # Function names are also case-sensitive
 def my_function():
     return "lowercase function"
 
+
 def My_Function():
     return "Capitalized function"
 
-print(my_function())    # Output: lowercase function
-print(My_Function())    # Output: Capitalized function
+
+print(my_function())  # Output: lowercase function
+print(My_Function())  # Output: Capitalized function
 
 # ============================================================
 # Python Naming Conventions (PEP 8)

@@ -56,7 +56,7 @@ http://localhost:3000
 #    - text/plain
 
 # Example: Simple GET request
-fetch('https://api.example.com/data')
+fetch("https://api.example.com/data")
 ```
 
 #### Preflight Requests
@@ -102,6 +102,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
@@ -119,37 +120,19 @@ import os
 app = FastAPI()
 
 # Get allowed origins from environment
-ALLOWED_ORIGINS: List[str] = os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:3000"
-).split(",")
+ALLOWED_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
 
 # Production CORS configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=[
-        "GET",
-        "POST",
-        "PUT",
-        "DELETE",
-        "PATCH",
-        "OPTIONS"
-    ],
-    allow_headers=[
-        "Authorization",
-        "Content-Type",
-        "Accept",
-        "Origin",
-        "X-Requested-With"
-    ],
-    expose_headers=[
-        "X-Total-Count",
-        "X-Page-Count"
-    ],
-    max_age=600  # Cache preflight for 10 minutes
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
+    expose_headers=["X-Total-Count", "X-Page-Count"],
+    max_age=600,  # Cache preflight for 10 minutes
 )
+
 
 # CORS configuration class
 class CORSSettings:
@@ -159,15 +142,16 @@ class CORSSettings:
         self.allow_methods = ["GET", "POST", "PUT", "DELETE"]
         self.allow_headers = ["Authorization", "Content-Type"]
         self.max_age = 600
-    
+
     def to_dict(self):
         return {
             "allow_origins": self.origins,
             "allow_credentials": self.allow_credentials,
             "allow_methods": self.allow_methods,
             "allow_headers": self.allow_headers,
-            "max_age": self.max_age
+            "max_age": self.max_age,
         }
+
 
 # Use settings
 cors_settings = CORSSettings()
@@ -182,19 +166,22 @@ from pydantic_settings import BaseSettings
 from typing import List
 from functools import lru_cache
 
+
 class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     CORS_ORIGINS: List[str] = ["http://localhost:3000"]
     CORS_ALLOW_CREDENTIALS: bool = True
     CORS_ALLOW_METHODS: List[str] = ["*"]
     CORS_ALLOW_HEADERS: List[str] = ["*"]
-    
+
     class Config:
         env_file = ".env"
+
 
 @lru_cache()
 def get_settings():
     return Settings()
+
 
 # main.py
 from fastapi import FastAPI
@@ -212,7 +199,7 @@ if settings.ENVIRONMENT == "production":
         allow_credentials=settings.CORS_ALLOW_CREDENTIALS,
         allow_methods=["GET", "POST", "PUT", "DELETE"],
         allow_headers=["Authorization", "Content-Type"],
-        max_age=600
+        max_age=600,
     )
 else:
     # Relaxed CORS for development
@@ -221,7 +208,7 @@ else:
         allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
-        allow_headers=["*"]
+        allow_headers=["*"],
     )
 ```
 
@@ -242,50 +229,55 @@ ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "https://app.example.com",
     "https://admin.example.com",
-    "https://*.example.com"  # Wildcard subdomains
+    "https://*.example.com",  # Wildcard subdomains
 ]
+
 
 # Custom origin validator
 def is_origin_allowed(origin: str) -> bool:
     """Check if origin is in allowed list, supporting wildcards"""
     if origin in ALLOWED_ORIGINS:
         return True
-    
+
     # Check wildcard patterns
     for allowed in ALLOWED_ORIGINS:
         if "*" in allowed:
             pattern = allowed.replace("*", ".*")
             if re.match(pattern, origin):
                 return True
-    
+
     return False
+
 
 # CORS middleware with validation
 class CustomCORSMiddleware:
     def __init__(self, app, allowed_origins: List[str]):
         self.app = app
         self.allowed_origins = allowed_origins
-    
+
     async def __call__(self, scope, receive, send):
         if scope["type"] == "http":
             origin = dict(scope.get("headers", [])).get(b"origin", b"").decode()
-            
+
             if origin and is_origin_allowed(origin):
                 # Add CORS headers
                 headers = [
                     [b"access-control-allow-origin", origin.encode()],
-                    [b"access-control-allow-credentials", b"true"]
+                    [b"access-control-allow-credentials", b"true"],
                 ]
                 scope["headers"].extend(headers)
-        
+
         return await self.app(scope, receive, send)
+
 
 # Use custom middleware
 app.add_middleware(CustomCORSMiddleware, allowed_origins=ALLOWED_ORIGINS)
 
+
 # Or use standard middleware with callback
 def custom_origin_validator(origin: str) -> bool:
     return is_origin_allowed(origin)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -293,7 +285,7 @@ app.add_middleware(
     allow_origin_callback=custom_origin_validator,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 ```
 
@@ -315,11 +307,12 @@ app.add_middleware(
     allow_credentials=True,  # Required for auth headers
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
-    expose_headers=["X-Request-ID"]
+    expose_headers=["X-Request-ID"],
 )
 
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 # Auth dependency
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -331,6 +324,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         return {"id": user_id}
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401)
+
 
 # Protected endpoint
 @app.get("/protected")
@@ -365,21 +359,16 @@ app.add_middleware(
     CORSMiddleware,
     # Access-Control-Allow-Origin
     allow_origins=["http://localhost:3000"],
-    
     # Access-Control-Allow-Credentials
     allow_credentials=True,
-    
     # Access-Control-Allow-Methods
     allow_methods=["GET", "POST", "PUT", "DELETE"],
-    
     # Access-Control-Allow-Headers
     allow_headers=["Content-Type", "Authorization"],
-    
     # Access-Control-Expose-Headers
     expose_headers=["X-Total-Count", "X-Page-Count"],
-    
     # Access-Control-Max-Age (seconds)
-    max_age=600
+    max_age=600,
 )
 ```
 
@@ -413,9 +402,11 @@ app.add_middleware(
 async def create_data():
     return {"status": "created"}
 
+
 # GOOD: Let FastAPI handle preflight automatically
 # The CORSMiddleware handles OPTIONS requests automatically
 app.add_middleware(CORSMiddleware, ...)
+
 
 @app.post("/api/data")
 async def create_data():
@@ -431,7 +422,7 @@ app.add_middleware(
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_credentials=True
+    allow_credentials=True,
 )
 
 # GOOD: Restrictive configuration
@@ -441,7 +432,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
     allow_credentials=True,
-    max_age=600
+    max_age=600,
 )
 ```
 

@@ -4,6 +4,7 @@ W3Schools: https://www.w3schools.com/python/pandas_stat.asp
 
 Pandas provides many built-in statistical functions for data analysis.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -14,12 +15,14 @@ import numpy as np
 np.random.seed(42)
 n = 100
 
-df = pd.DataFrame({
-    "age": np.random.randint(18, 65, n),
-    "income": np.random.normal(55000, 15000, n).round(2),
-    "score": np.random.uniform(0, 100, n).round(1),
-    "department": np.random.choice(["Engineering", "Marketing", "Sales", "HR"], n),
-})
+df = pd.DataFrame(
+    {
+        "age": np.random.randint(18, 65, n),
+        "income": np.random.normal(55000, 15000, n).round(2),
+        "score": np.random.uniform(0, 100, n).round(1),
+        "department": np.random.choice(["Engineering", "Marketing", "Sales", "HR"], n),
+    }
+)
 
 print("Sample DataFrame (first 5 rows):")
 print(df.head())
@@ -74,12 +77,16 @@ print(dept_stats)
 print()
 
 # Multiple aggregations
-dept_agg = df.groupby("department").agg(
-    count=("age", "size"),
-    avg_age=("age", "mean"),
-    avg_income=("income", "mean"),
-    max_score=("score", "max"),
-).round(2)
+dept_agg = (
+    df.groupby("department")
+    .agg(
+        count=("age", "size"),
+        avg_age=("age", "mean"),
+        avg_income=("income", "mean"),
+        max_score=("score", "max"),
+    )
+    .round(2)
+)
 print("Multiple aggregations by department:")
 print(dept_agg)
 print()
@@ -113,10 +120,12 @@ print("=" * 60)
 
 # Create a time series
 dates = pd.date_range("2024-01-01", periods=20, freq="D")
-ts = pd.DataFrame({
-    "date": dates,
-    "value": np.cumsum(np.random.randn(20)) + 100,
-})
+ts = pd.DataFrame(
+    {
+        "date": dates,
+        "value": np.cumsum(np.random.randn(20)) + 100,
+    }
+)
 ts = ts.set_index("date")
 
 print("Daily values:")

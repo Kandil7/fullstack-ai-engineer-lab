@@ -20,9 +20,7 @@ Which format is the right one?
 import numpy as np
 from scipy import sparse as sp
 
-coo = sp.coo_matrix((np.array([1.0, 0.0]),
-                     (np.array([0, 1]), np.array([0, 1]))),
-                    shape=(2, 2))
+coo = sp.coo_matrix((np.array([1.0, 0.0]), (np.array([0, 1]), np.array([0, 1]))), shape=(2, 2))
 print(coo.nnz)
 ```
 
@@ -91,9 +89,9 @@ print(type(r).__name__, r.ndim)
 import numpy as np
 from scipy import sparse as sp
 
-A = sp.coo_matrix((np.array([1.0, 0.0, 2.0]),
-                   (np.array([0, 1, 2]), np.array([0, 1, 2]))),
-                  shape=(3, 3)).tocsr()
+A = sp.coo_matrix(
+    (np.array([1.0, 0.0, 2.0]), (np.array([0, 1, 2]), np.array([0, 1, 2]))), shape=(3, 3)
+).tocsr()
 print(A.eliminate_zeros().nnz)
 ```
 
@@ -115,8 +113,14 @@ print(A.eliminate_zeros().nnz)
 import numpy as np
 from scipy import sparse as sp
 
-X = sp.random(50, 40, density=0.1, format="csr", random_state=0,
-              data_rvs=lambda k: np.random.default_rng(1).uniform(0.1, 1.0, size=k))
+X = sp.random(
+    50,
+    40,
+    density=0.1,
+    format="csr",
+    random_state=0,
+    data_rvs=lambda k: np.random.default_rng(1).uniform(0.1, 1.0, size=k),
+)
 l2 = np.asarray(X.power(2).sum(axis=1)).ravel() ** 0.5
 Xn = sp.diags(1.0 / l2) @ X
 print(Xn.nnz == X.nnz)
@@ -140,8 +144,7 @@ print(Xn.nnz == X.nnz)
 from scipy import sparse as sp
 
 rng = np.random.default_rng(0)
-A = sp.random(10, 10, density=0.1, format="csr",
-              random_state=0, data_rvs=rng.uniform)
+A = sp.random(10, 10, density=0.1, format="csr", random_state=0, data_rvs=rng.uniform)
 print(A.nnz)
 ```
 
@@ -165,8 +168,14 @@ matrix is:
 import numpy as np
 from scipy import sparse as sp
 
-A = sp.random(4, 3, density=0.5, format="csr", random_state=0,
-              data_rvs=lambda k: np.random.default_rng(0).uniform(0.0, 1.0, size=k))
+A = sp.random(
+    4,
+    3,
+    density=0.5,
+    format="csr",
+    random_state=0,
+    data_rvs=lambda k: np.random.default_rng(0).uniform(0.0, 1.0, size=k),
+)
 D = np.ones((3, 2))
 print(type(A @ D).__name__)
 ```

@@ -42,8 +42,9 @@ def sum_all(*args):
         total += num
     return total
 
-print(sum_all(1, 2, 3))      # 6
-print(sum_all(1, 2, 3, 4, 5)) # 15
+
+print(sum_all(1, 2, 3))  # 6
+print(sum_all(1, 2, 3, 4, 5))  # 15
 ```
 
 **Related**: `**kwargs`, tuple, variable arguments
@@ -59,6 +60,7 @@ def print_info(**kwargs):
     """Print all keyword arguments."""
     for key, value in kwargs.items():
         print(f"{key}: {value}")
+
 
 print_info(name="Alice", age=30, city="NYC")
 # name: Alice
@@ -80,8 +82,10 @@ def on_click(callback):
     print("Button clicked!")
     callback()
 
+
 def handle_click():
     print("Click handled!")
+
 
 on_click(handle_click)
 ```
@@ -97,11 +101,14 @@ on_click(handle_click)
 ```python
 def counter(start=0):
     count = start
+
     def increment():
         nonlocal count
         count += 1
         return count
+
     return increment
+
 
 c = counter(10)
 print(c())  # 11
@@ -119,17 +126,22 @@ print(c())  # 12
 ```python
 def timer(func):
     import time
+
     def wrapper(*args, **kwargs):
         start = time.time()
         result = func(*args, **kwargs)
-        print(f"{func.__name__}: {time.time()-start:.4f}s")
+        print(f"{func.__name__}: {time.time() - start:.4f}s")
         return result
+
     return wrapper
+
 
 @timer
 def slow():
     import time
+
     time.sleep(1)
+
 
 slow()  # Prints timing
 ```
@@ -146,8 +158,9 @@ slow()  # Prints timing
 def greet(name, greeting="Hello"):
     return f"{greeting}, {name}!"
 
-print(greet("Alice"))           # Hello, Alice!
-print(greet("Alice", "Hi"))    # Hi, Alice!
+
+print(greet("Alice"))  # Hello, Alice!
+print(greet("Alice", "Hi"))  # Hi, Alice!
 ```
 
 **Mutable default warning**: Don't use mutable defaults like `[]` or `{}` — use `None` instead.
@@ -164,15 +177,16 @@ print(greet("Alice", "Hi"))    # Hi, Alice!
 def add(a, b):
     """
     Add two numbers together.
-    
+
     Args:
         a: First number
         b: Second number
-    
+
     Returns:
         Sum of a and b
     """
     return a + b
+
 
 print(add.__doc__)
 ```
@@ -192,6 +206,7 @@ def factorial(n):
         return 1
     return n * factorial(n - 1)
 
+
 print(factorial(5))  # 120
 ```
 
@@ -209,6 +224,7 @@ def fibonacci():
     while True:
         yield a
         a, b = b, a + b
+
 
 fib = fibonacci()
 for _ in range(10):
@@ -228,11 +244,14 @@ for _ in range(10):
 def apply_twice(func, x):
     return func(func(x))
 
+
 print(apply_twice(lambda x: x * 2, 3))  # 12
+
 
 # Returns function
 def multiplier(factor):
     return lambda x: x * factor
+
 
 double = multiplier(2)
 print(double(5))  # 10
@@ -247,16 +266,18 @@ print(double(5))  # 10
 
 **Example**:
 ```python
-x = "global"          # Global
+x = "global"  # Global
+
 
 def outer():
-    x = "enclosing"    # Enclosing
-    
+    x = "enclosing"  # Enclosing
+
     def inner():
-        x = "local"    # Local
-        print(x)       # "local"
-    
+        x = "local"  # Local
+        print(x)  # "local"
+
     inner()
+
 
 outer()
 ```
@@ -271,7 +292,7 @@ outer()
 **Example**:
 ```python
 # Simple lambda
-square = lambda x: x ** 2
+square = lambda x: x**2
 print(square(5))  # 25
 
 # Lambda with multiple args
@@ -297,11 +318,13 @@ squared = list(map(lambda x: x**2, numbers))
 ```python
 from functools import lru_cache
 
+
 @lru_cache(maxsize=None)
 def fibonacci(n):
     if n < 2:
         return n
-    return fibonacci(n-1) + fibonacci(n-2)
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
 
 print(fibonacci(100))  # Instant!
 ```
@@ -319,8 +342,11 @@ print(fibonacci(100))  # Instant!
 def add(a, b):
     return a + b
 
+
 # Impure function (has side effect)
 total = 0
+
+
 def add_to_total(x):
     global total
     total += x  # Modifies external state
@@ -338,11 +364,13 @@ def add_to_total(x):
 # Global scope
 x = 10
 
+
 def func():
     # Local scope
     y = 20
     print(x)  # Can access global
     print(y)  # Can access local
+
 
 func()
 # print(y)  # Error: y is local
@@ -361,9 +389,10 @@ def greet(name: str, times: int = 1) -> str:
     """Greet someone multiple times."""
     return (f"Hello, {name}! " * times).strip()
 
+
 # Type hints don't enforce types at runtime
-print(greet("Alice"))        # Hello, Alice!
-print(greet("Bob", 3))      # Hello, Bob! Hello, Bob! Hello, Bob!
+print(greet("Alice"))  # Hello, Alice!
+print(greet("Bob", 3))  # Hello, Bob! Hello, Bob! Hello, Bob!
 ```
 
 **Related**: annotation, mypy, type checking, documentation
@@ -376,31 +405,37 @@ print(greet("Bob", 3))      # Hello, Bob! Hello, Bob! Hello, Bob!
 ```python
 def create_multiplier(factor):
     """Create a multiplier function."""
+
     def multiplier(x):
         return x * factor
+
     return multiplier
+
 
 double = create_multiplier(2)
 triple = create_multiplier(3)
 
-print(double(5))   # 10
-print(triple(5))   # 15
+print(double(5))  # 10
+print(triple(5))  # 15
 ```
 
 ### Example 2: Compose Functions
 ```python
 def compose(*funcs):
     """Compose multiple functions."""
+
     def composed(x):
         result = x
         for f in reversed(funcs):
             result = f(result)
         return result
+
     return composed
+
 
 add_one = lambda x: x + 1
 double = lambda x: x * 2
-square = lambda x: x ** 2
+square = lambda x: x**2
 
 transform = compose(square, double, add_one)
 print(transform(3))  # square(double(add_one(3))) = 64
@@ -412,18 +447,22 @@ def once(func):
     """Call function only once, cache result."""
     called = False
     result = None
+
     def wrapper(*args, **kwargs):
         nonlocal called, result
         if not called:
             called = True
             result = func(*args, **kwargs)
         return result
+
     return wrapper
+
 
 @once
 def expensive_calculation():
     print("Computing...")
     return 42
+
 
 print(expensive_calculation())  # Computing... 42
 print(expensive_calculation())  # 42 (no computation)

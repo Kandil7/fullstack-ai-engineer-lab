@@ -44,9 +44,11 @@ a process that dies between them leaves a permanent lock.
 ```python
 from redis_client import RedisClient, ManualClock
 
+
 def acquire(lock_name, token, ttl_s, client):
     """SET lock NX PX in one shot; token proves ownership."""
     return client.set(f"lock:{lock_name}", token, nx=True, ex=ttl_s)
+
 
 clock = ManualClock(start=0.0)
 lc = RedisClient(clock=clock)
@@ -65,7 +67,7 @@ the expiry elapses, the key disappears and another worker can acquire. The TTL
 is a promise: *no job may run longer than the lock TTL without renewing*.
 
 ```python
-clock.advance(31)   # lock TTL (30s) elapses
+clock.advance(31)  # lock TTL (30s) elapses
 print(f"after expiry, lock exists? {lc.exists('lock:job:embed')}")
 print(f"worker-b acquires after crash-timeout: {acquire('job:embed', 'worker-b', 30, lc)}")
 

@@ -188,6 +188,7 @@ number.
 ```python
 import numpy as np
 
+
 def per_group_fnr(y_true, y_pred, groups):
     out = {}
     for g in np.unique(groups):
@@ -314,6 +315,7 @@ disaggregated performance and limitations.
 
 ```python
 from dataclasses import dataclass
+
 
 @dataclass(frozen=True)
 class ModelCard:

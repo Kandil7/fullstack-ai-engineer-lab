@@ -104,9 +104,11 @@ app = FastAPI()
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 class UserCreate(BaseModel):
     username: str
     password: str
+
 
 class User(BaseModel):
     id: int
@@ -114,46 +116,51 @@ class User(BaseModel):
     hashed_password: str
     created_at: datetime
 
+
 # In-memory storage (use database in production)
 users_db = {}
+
 
 def hash_password(password: str) -> str:
     """Hash password using bcrypt"""
     return pwd_context.hash(password)
 
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify password against hash"""
     return pwd_context.verify(plain_password, hashed_password)
+
 
 @app.post("/register/", response_model=User)
 async def register(user: UserCreate):
     # Check if user exists
     if user.username in users_db:
         raise HTTPException(status_code=400, detail="Username already registered")
-    
+
     # Hash password before storing
     hashed_password = hash_password(user.password)
-    
+
     # Store user (never store plain text passwords!)
     user_db = User(
         id=len(users_db) + 1,
         username=user.username,
         hashed_password=hashed_password,
-        created_at=datetime.utcnow()
+        created_at=datetime.utcnow(),
     )
     users_db[user.username] = user_db
-    
+
     return user_db
+
 
 @app.post("/login/")
 async def login(username: str, password: str):
     user = users_db.get(username)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     if not verify_password(password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     return {"message": "Login successful"}
 ```
 
@@ -172,29 +179,27 @@ API_KEY_NAME = "X-API-Key"
 
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
+
 async def verify_api_key(api_key: str = Security(api_key_header)):
     """Verify API key from header"""
     if api_key is None:
-        raise HTTPException(
-            status_code=403,
-            detail="API key required"
-        )
+        raise HTTPException(status_code=403, detail="API key required")
     if api_key != API_KEY:
-        raise HTTPException(
-            status_code=403,
-            detail="Invalid API key"
-        )
+        raise HTTPException(status_code=403, detail="Invalid API key")
     return api_key
+
 
 @app.get("/api/data/")
 async def get_data(api_key: str = Security(verify_api_key)):
     return {"data": "secret information", "authenticated": True}
+
 
 # Multiple API keys for different services
 SERVICE_KEYS = {
     "service-a": "key-a-123",
     "service-b": "key-b-456",
 }
+
 
 async def verify_service_key(api_key: str = Security(api_key_header)):
     """Verify service-specific API key"""
@@ -211,10 +216,11 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI()
 
+
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
-        
+
         # Security headers
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
@@ -223,10 +229,12 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Content-Security-Policy"] = "default-src 'self'"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
-        
+
         return response
 
+
 app.add_middleware(SecurityHeadersMiddleware)
+
 
 @app.get("/")
 async def root():
@@ -248,27 +256,25 @@ rate_limit_store = defaultdict(list)
 RATE_LIMIT = 100  # requests
 RATE_WINDOW = 60  # seconds
 
+
 def rate_limit(request: Request):
     """Simple rate limiting decorator"""
     client_ip = request.client.host
     current_time = time.time()
-    
+
     # Clean old requests
     rate_limit_store[client_ip] = [
-        t for t in rate_limit_store[client_ip]
-        if current_time - t < RATE_WINDOW
+        t for t in rate_limit_store[client_ip] if current_time - t < RATE_WINDOW
     ]
-    
+
     # Check rate limit
     if len(rate_limit_store[client_ip]) >= RATE_LIMIT:
-        raise HTTPException(
-            status_code=429,
-            detail="Rate limit exceeded"
-        )
-    
+        raise HTTPException(status_code=429, detail="Rate limit exceeded")
+
     # Add current request
     rate_limit_store[client_ip].append(current_time)
     return True
+
 
 @app.get("/api/data/")
 async def get_data(request: Request):
@@ -285,35 +291,36 @@ import re
 
 app = FastAPI()
 
+
 class UserInput(BaseModel):
     username: str
     email: EmailStr
     age: int
-    
-    @validator('username')
+
+    @validator("username")
     def validate_username(cls, v):
-        if not re.match(r'^[a-zA-Z0-9_]{3,20}$', v):
-            raise ValueError(
-                'Username must be 3-20 characters, alphanumeric and underscore only'
-            )
+        if not re.match(r"^[a-zA-Z0-9_]{3,20}$", v):
+            raise ValueError("Username must be 3-20 characters, alphanumeric and underscore only")
         return v
-    
-    @validator('age')
+
+    @validator("age")
     def validate_age(cls, v):
         if v < 0 or v > 150:
-            raise ValueError('Age must be between 0 and 150')
+            raise ValueError("Age must be between 0 and 150")
         return v
+
 
 @app.post("/users/")
 async def create_user(user: UserInput):
     # Input is validated automatically
     return {"user": user}
 
+
 @app.get("/search/")
 async def search(
     q: str = Query(..., min_length=1, max_length=100),
     page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100)
+    limit: int = Query(10, ge=1, le=100),
 ):
     # Query parameters validated
     return {"query": q, "page": page, "limit": limit}
@@ -341,6 +348,7 @@ app.add_middleware(
     max_age=600,  # Cache preflight for 10 minutes
 )
 
+
 @app.get("/api/data/")
 async def get_data():
     return {"data": "CORS protected"}
@@ -355,17 +363,20 @@ from starlette.responses import RedirectResponse
 
 app = FastAPI()
 
+
 class HTTPSRedirectMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Redirect HTTP to HTTPS
         if request.url.scheme == "http":
             https_url = request.url.replace(scheme="https")
             return RedirectResponse(url=https_url, status_code=301)
-        
+
         return await call_next(request)
+
 
 # Uncomment in production
 # app.add_middleware(HTTPSRedirectMiddleware)
+
 
 @app.get("/")
 async def root():
@@ -386,19 +397,18 @@ DATABASE_URL = "sqlite:///./secure.db"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 
+
 @app.get("/users/")
 async def search_users(name: str = Query(...)):
     db = SessionLocal()
     try:
         # ✅ CORRECT - Parameterized query
-        result = db.execute(
-            text("SELECT * FROM users WHERE name = :name"),
-            {"name": name}
-        )
+        result = db.execute(text("SELECT * FROM users WHERE name = :name"), {"name": name})
         users = result.fetchall()
         return {"users": [dict(u) for u in users]}
     finally:
         db.close()
+
 
 # ❌ WRONG - SQL Injection vulnerability
 # @app.get("/users/bad/")
@@ -419,6 +429,7 @@ async def search_users(name: str = Query(...)):
 def save_user(user: UserCreate):
     db.save({"password": user.password})
 
+
 # ✅ CORRECT - Always hash passwords
 def save_user(user: UserCreate):
     hashed = hash_password(user.password)
@@ -435,9 +446,10 @@ async def get_user(user_id: int):
     if not user:
         raise HTTPException(
             status_code=404,
-            detail=f"User {user_id} not found in database users table"  # ❌
+            detail=f"User {user_id} not found in database users table",  # ❌
         )
     return user
+
 
 # ✅ CORRECT - Generic error messages
 @app.get("/users/{user_id}")
@@ -457,6 +469,7 @@ DATABASE_PASSWORD = "admin123"
 
 # ✅ CORRECT - Use environment variables
 import os
+
 API_KEY = os.getenv("API_KEY")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 ```

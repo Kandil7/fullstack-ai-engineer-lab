@@ -31,19 +31,19 @@ class Evaluation:
     def __init__(self, system):
         self.system = system
         self.results = []
-    
+
     def run(self, test_cases):
         for case in test_cases:
             output = self.system(case.input)
             score = self.measure(output, case.expected)
             self.results.append(score)
-        
+
         return self.summarize()
-    
+
     def summarize(self):
         return {
             "avg_score": sum(self.results) / len(self.results),
-            "pass_rate": sum(1 for r in self.results if r >= 0.7) / len(self.results)
+            "pass_rate": sum(1 for r in self.results if r >= 0.7) / len(self.results),
         }
 ```
 
@@ -65,29 +65,28 @@ class Evaluation:
 ```python
 def calculate_metrics(predictions, labels):
     """Calculate common classification metrics."""
-    
+
     # Accuracy
     correct = sum(1 for p, l in zip(predictions, labels) if p == l)
     accuracy = correct / len(labels)
-    
+
     # Precision (for binary)
     tp = sum(1 for p, l in zip(predictions, labels) if p == 1 and l == 1)
     fp = sum(1 for p, l in zip(predictions, labels) if p == 1 and l == 0)
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0
-    
+
     # Recall
     fn = sum(1 for p, l in zip(predictions, labels) if p == 0 and l == 1)
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-    
+
     # F1
-    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-    
-    return {
-        "accuracy": accuracy,
-        "precision": precision,
-        "recall": recall,
-        "f1": f1
-    }
+    f1 = (
+        2 * (precision * recall) / (precision + recall)
+        if (precision + recall) > 0
+        else 0
+    )
+
+    return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1}
 ```
 
 **Related Terms:** Accuracy, Precision, Recall, F1
@@ -109,33 +108,35 @@ def calculate_metrics(predictions, labels):
 from dataclasses import dataclass
 from typing import Any
 
+
 @dataclass
 class TestCase:
     id: str
     input_data: Any
     expected_output: Any
     tags: list = None
-    
+
+
 # Example test cases
 test_cases = [
     TestCase(
         id="math_1",
         input_data="What is 2 + 2?",
         expected_output="4",
-        tags=["math", "basic"]
+        tags=["math", "basic"],
     ),
     TestCase(
         id="math_2",
         input_data="What is 10 / 0?",
         expected_output="Error: Division by zero",
-        tags=["math", "edge_case"]
+        tags=["math", "edge_case"],
     ),
     TestCase(
         id="geo_1",
         input_data="Capital of France?",
         expected_output="Paris",
-        tags=["geography"]
-    )
+        tags=["geography"],
+    ),
 ]
 ```
 
@@ -160,28 +161,27 @@ class Benchmark:
         self.name = name
         self.test_cases = test_cases
         self.results = {}
-    
+
     def evaluate(self, system_name, system_fn):
         """Evaluate a system on the benchmark."""
         scores = []
-        
+
         for case in self.test_cases:
             output = system_fn(case.input_data)
             score = self._score(output, case.expected_output)
             scores.append(score)
-        
+
         self.results[system_name] = {
             "avg_score": sum(scores) / len(scores),
-            "scores": scores
+            "scores": scores,
         }
-    
+
     def compare(self):
         """Compare all evaluated systems."""
         return sorted(
-            self.results.items(),
-            key=lambda x: x[1]["avg_score"],
-            reverse=True
+            self.results.items(), key=lambda x: x[1]["avg_score"], reverse=True
         )
+
 
 # Usage
 benchmark = Benchmark("qa_benchmark", test_cases)
@@ -208,7 +208,7 @@ print(benchmark.compare())
 ```python
 def llm_judge(actual, expected, criteria="correctness"):
     """Use LLM to judge output quality."""
-    
+
     prompt = f"""Rate the quality of this output.
 
 Actual: {actual}
@@ -221,20 +221,19 @@ Rate 0-1:
 - 1: Fully correct
 
 Score:"""
-    
+
     response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.0
+        model="gpt-4", messages=[{"role": "user", "content": prompt}], temperature=0.0
     )
-    
+
     return float(response.choices[0].message.content.strip())
+
 
 # Usage
 score = llm_judge(
     actual="Paris is the capital of France",
     expected="The capital of France is Paris",
-    criteria="correctness and completeness"
+    criteria="correctness and completeness",
 )
 ```
 
@@ -263,9 +262,10 @@ def precision(predicted_positives, actual_positives):
     """Calculate precision."""
     if not predicted_positives:
         return 0.0
-    
+
     true_positives = len(set(predicted_positives) & set(actual_positives))
     return true_positives / len(predicted_positives)
+
 
 # Example
 predicted = ["spam", "spam", "not_spam", "spam"]
@@ -294,9 +294,10 @@ def recall(predicted_positives, actual_positives):
     """Calculate recall."""
     if not actual_positives:
         return 0.0
-    
+
     true_positives = len(set(predicted_positives) & set(actual_positives))
     return true_positives / len(actual_positives)
+
 
 # Example
 predicted = ["spam", "spam", "not_spam", "spam"]
@@ -327,6 +328,7 @@ def f1_score(precision, recall):
         return 0.0
     return 2 * (precision * recall) / (precision + recall)
 
+
 # Example
 prec = 0.8
 rec = 0.6
@@ -351,23 +353,25 @@ print(f"F1 Score: {f1:.2f}")  # 0.69
 ```python
 import time
 
+
 def measure_latency(system_fn, input_data, n_runs=10):
     """Measure system latency."""
     latencies = []
-    
+
     for _ in range(n_runs):
         start = time.time()
         output = system_fn(input_data)
         latency = (time.time() - start) * 1000  # ms
         latencies.append(latency)
-    
+
     return {
         "avg_ms": sum(latencies) / len(latencies),
         "min_ms": min(latencies),
         "max_ms": max(latencies),
         "p50_ms": sorted(latencies)[len(latencies) // 2],
-        "p95_ms": sorted(latencies)[int(len(latencies) * 0.95)]
+        "p95_ms": sorted(latencies)[int(len(latencies) * 0.95)],
     }
+
 
 # Usage
 metrics = measure_latency(my_system, "test input")
@@ -392,22 +396,24 @@ print(f"Average latency: {metrics['avg_ms']:.0f}ms")
 import time
 from concurrent.futures import ThreadPoolExecutor
 
+
 def measure_throughput(system_fn, inputs, max_workers=10):
     """Measure system throughput."""
-    
+
     start = time.time()
-    
+
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         results = list(executor.map(system_fn, inputs))
-    
+
     elapsed = time.time() - start
     throughput = len(inputs) / elapsed
-    
+
     return {
         "requests_per_second": throughput,
         "total_requests": len(inputs),
-        "total_time_seconds": elapsed
+        "total_time_seconds": elapsed,
     }
+
 
 # Usage
 inputs = [f"query_{i}" for i in range(100)]
@@ -432,7 +438,7 @@ print(f"Throughput: {metrics['requests_per_second']:.1f} req/s")
 ```python
 def evaluate_faithfulness(answer, context):
     """Evaluate if answer is grounded in context."""
-    
+
     prompt = f"""Evaluate if this answer is faithful to the context.
 
 Context: {context}
@@ -444,14 +450,13 @@ Rate 0-1:
 - 1: Fully supported
 
 Score:"""
-    
+
     response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.0
+        model="gpt-4", messages=[{"role": "user", "content": prompt}], temperature=0.0
     )
-    
+
     return float(response.choices[0].message.content.strip())
+
 
 # Usage
 answer = "Python was created by Guido van Rossum in 1991"
@@ -485,13 +490,14 @@ answer = llm.generate(f"Context: {context}\nQuestion: {question}")
 # Potential hallucination: "The Eiffel Tower was built in 1889"
 # (1889 is correct, but not in the context - model used training data)
 
+
 # To detect hallucination:
 def detect_hallucination(answer, context):
     """Check if answer contains information not in context."""
     # Simple check - more sophisticated methods exist
     answer_facts = extract_facts(answer)
     context_facts = extract_facts(context)
-    
+
     unsupported = answer_facts - context_facts
     return len(unsupported) > 0, unsupported
 ```
@@ -516,6 +522,7 @@ def accuracy(predictions, labels):
     """Calculate accuracy."""
     correct = sum(1 for p, l in zip(predictions, labels) if p == l)
     return correct / len(labels)
+
 
 # Example
 predictions = ["cat", "cat", "dog", "cat"]
@@ -574,7 +581,7 @@ print(f"BLEU Score: {score:.2f}")  # ~0.69
 ```python
 from rouge_score import rouge_scorer
 
-scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
+scorer = rouge_scorer.RougeScorer(["rouge1", "rouge2", "rougeL"], use_stemmer=True)
 
 # Reference summary
 reference = "The cat sat on the mat"
@@ -607,12 +614,13 @@ print(f"ROUGE-L: {scores['rougeL'].fmeasure:.2f}")  # ~0.77
 import random
 from scipy import stats
 
+
 def ab_test(system_a, system_b, test_cases, confidence=0.95):
     """Compare two systems using A/B testing."""
-    
+
     results_a = []
     results_b = []
-    
+
     for case in test_cases:
         # Randomly assign to A or B
         if random.random() < 0.5:
@@ -623,16 +631,18 @@ def ab_test(system_a, system_b, test_cases, confidence=0.95):
             output = system_b(case.input_data)
             score = evaluate(output, case.expected_output)
             results_b.append(score)
-    
+
     # Statistical test
     t_stat, p_value = stats.ttest_ind(results_a, results_b)
-    
+
     return {
         "system_a_avg": sum(results_a) / len(results_a),
         "system_b_avg": sum(results_b) / len(results_b),
         "p_value": p_value,
         "significant": p_value < (1 - confidence),
-        "winner": "A" if sum(results_a)/len(results_a) > sum(results_b)/len(results_b) else "B"
+        "winner": "A"
+        if sum(results_a) / len(results_a) > sum(results_b) / len(results_b)
+        else "B",
     }
 ```
 
@@ -655,11 +665,12 @@ def ab_test(system_a, system_b, test_cases, confidence=0.95):
 def confusion_matrix(predictions, labels, classes):
     """Generate confusion matrix."""
     matrix = {c: {c2: 0 for c2 in classes} for c in classes}
-    
+
     for pred, label in zip(predictions, labels):
         matrix[label][pred] += 1
-    
+
     return matrix
+
 
 # Example
 predictions = ["cat", "cat", "dog", "dog", "cat"]
@@ -669,7 +680,9 @@ classes = ["cat", "dog"]
 matrix = confusion_matrix(predictions, labels, classes)
 for true_class in classes:
     for pred_class in classes:
-        print(f"True {true_class}, Predicted {pred_class}: {matrix[true_class][pred_class]}")
+        print(
+            f"True {true_class}, Predicted {pred_class}: {matrix[true_class][pred_class]}"
+        )
 ```
 
 **Related Terms:** Precision, Recall, F1 Score
@@ -690,9 +703,9 @@ for true_class in classes:
 ```python
 def error_analysis(results):
     """Analyze patterns in failures."""
-    
+
     failures = [r for r in results if not r.passed]
-    
+
     # Categorize failures
     categories = {}
     for failure in failures:
@@ -700,16 +713,14 @@ def error_analysis(results):
         if category not in categories:
             categories[category] = []
         categories[category].append(failure)
-    
+
     # Summarize
     summary = {}
     for category, items in categories.items():
-        summary[category] = {
-            "count": len(items),
-            "examples": items[:3]
-        }
-    
+        summary[category] = {"count": len(items), "examples": items[:3]}
+
     return summary
+
 
 def categorize_failure(result):
     """Categorize the type of failure."""

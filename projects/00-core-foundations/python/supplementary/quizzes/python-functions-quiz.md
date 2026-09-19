@@ -31,6 +31,7 @@ D) define
 def greet(name):
     return f"Hello, {name}!"
 
+
 print(greet("Alice"))
 ```
 
@@ -61,6 +62,7 @@ D) Parameters are only used in classes, arguments in functions
 def add(a, b=5):
     return a + b
 
+
 print(add(3))
 ```
 
@@ -79,6 +81,7 @@ D) Error
 def modify_list(lst):
     lst.append(4)
     return lst
+
 
 my_list = [1, 2, 3]
 result = modify_list(my_list)
@@ -109,7 +112,7 @@ D) A function that returns a lambda
 ### Question 7
 **What is the output of this code?**
 ```python
-square = lambda x: x ** 2
+square = lambda x: x**2
 print(square(5))
 ```
 
@@ -142,6 +145,7 @@ def func(x):
     y = x * 2
     return y
 
+
 result = func(5)
 print(y)
 ```
@@ -161,6 +165,7 @@ D) None
 def func(*args):
     return sum(args)
 
+
 print(func(1, 2, 3, 4))
 ```
 
@@ -178,6 +183,7 @@ D) Error
 ```python
 def func(**kwargs):
     return kwargs
+
 
 result = func(a=1, b=2)
 print(result)
@@ -197,9 +203,12 @@ D) None
 ```python
 def outer():
     x = 10
+
     def inner():
         return x
+
     return inner()
+
 
 print(outer())
 ```
@@ -231,8 +240,10 @@ D) A class method
 def apply(func, x):
     return func(x)
 
+
 def double(x):
     return x * 2
+
 
 print(apply(double, 5))
 ```
@@ -253,6 +264,7 @@ def factorial(n):
     if n == 0:
         return 1
     return n * factorial(n - 1)
+
 
 print(factorial(5))
 ```
@@ -284,6 +296,7 @@ D) `return` can only be used once, `print` can be used multiple times
 def func(a, b, c):
     return a + b + c
 
+
 result = func(1, c=3, b=2)
 print(result)
 ```
@@ -302,6 +315,7 @@ D) (1, 2, 3)
 ```python
 def func():
     pass
+
 
 print(func())
 ```
@@ -332,6 +346,7 @@ D) To accept no arguments
 ```python
 def func(x):
     return lambda y: x + y
+
 
 add5 = func(5)
 print(add5(3))

@@ -27,24 +27,27 @@
 ```python
 from abc import ABC, abstractmethod
 
+
 class Shape(ABC):
     @abstractmethod
     def area(self) -> float:
         pass
-    
+
     @abstractmethod
     def perimeter(self) -> float:
         pass
 
+
 class Circle(Shape):
     def __init__(self, radius):
         self.radius = radius
-    
+
     def area(self) -> float:
-        return 3.14159 * self.radius ** 2
-    
+        return 3.14159 * self.radius**2
+
     def perimeter(self) -> float:
         return 2 * 3.14159 * self.radius
+
 
 # shape = Shape()  # TypeError: Can't instantiate abstract class
 circle = Circle(5)
@@ -65,26 +68,30 @@ class EuropeanSocket:
     def voltage(self):
         return 230
 
+
 class AmericanSocket:
     def voltage(self):
         return 120
 
+
 class USAdapter:
     def __init__(self, socket):
         self._socket = socket
-    
+
     def voltage(self):
         return self._socket.voltage()
-    
+
     def earth(self):
         return 0
+
 
 class Laptop:
     def __init__(self, socket):
         self._socket = socket
-    
+
     def charge(self):
         return f"Charging at {self._socket.voltage()}V"
+
 
 # Usage
 european = EuropeanSocket()
@@ -110,18 +117,22 @@ print(laptop2.charge())  # Charging at 120V
 ```python
 from abc import ABC, abstractmethod
 
+
 class Animal(ABC):
     @abstractmethod
     def speak(self) -> str:
         pass
 
+
 class Dog(Animal):  # Concrete class
     def speak(self) -> str:
         return "Woof!"
 
+
 class Cat(Animal):  # Concrete class
     def speak(self) -> str:
         return "Meow!"
+
 
 # animal = Animal()  # Can't instantiate abstract
 dog = Dog()  # Can instantiate concrete
@@ -153,29 +164,35 @@ print(cat.speak())  # Meow!
 ```python
 from abc import ABC, abstractmethod
 
+
 class TextProcessor(ABC):
     @abstractmethod
     def process(self, text: str) -> str:
         pass
 
+
 class PlainText(TextProcessor):
     def process(self, text: str) -> str:
         return text
 
+
 class TextDecorator(TextProcessor):
     def __init__(self, processor: TextProcessor):
         self._processor = processor
-    
+
     def process(self, text: str) -> str:
         return self._processor.process(text)
+
 
 class UpperCase(TextDecorator):
     def process(self, text: str) -> str:
         return self._processor.process(text).upper()
 
+
 class TrimSpaces(TextDecorator):
     def process(self, text: str) -> str:
         return self._processor.process(text).strip()
+
 
 # Usage
 processor = TrimSpaces(UpperCase(PlainText()))
@@ -195,31 +212,36 @@ print(result)  # HELLO WORLD
 ```python
 from abc import ABC, abstractmethod
 
+
 class Animal(ABC):
     @abstractmethod
     def speak(self) -> str:
         pass
 
+
 class Dog(Animal):
     def speak(self) -> str:
         return "Woof!"
 
+
 class Cat(Animal):
     def speak(self) -> str:
         return "Meow!"
+
 
 class AnimalFactory:
     _creators = {
         "dog": Dog,
         "cat": Cat,
     }
-    
+
     @classmethod
     def create(cls, animal_type: str) -> Animal:
         creator = cls._creators.get(animal_type.lower())
         if not creator:
             raise ValueError(f"Unknown animal type: {animal_type}")
         return creator()
+
 
 # Usage
 dog = AnimalFactory.create("dog")
@@ -240,32 +262,37 @@ print(cat.speak())  # Meow!
 ```python
 from abc import ABC, abstractmethod
 
+
 class Observer(ABC):
     @abstractmethod
     def update(self, event: str, data):
         pass
 
+
 class Subject:
     def __init__(self):
         self._observers = []
-    
+
     def attach(self, observer: Observer):
         self._observers.append(observer)
-    
+
     def detach(self, observer: Observer):
         self._observers.remove(observer)
-    
+
     def notify(self, event: str, data):
         for observer in self._observers:
             observer.update(event, data)
+
 
 class EventSystem(Subject):
     def emit(self, event: str, data):
         self.notify(event, data)
 
+
 class LogObserver(Observer):
     def update(self, event: str, data):
         print(f"[LOG] {event}: {data}")
+
 
 # Usage
 system = EventSystem()
@@ -299,15 +326,17 @@ system.emit("user_login", {"user": "Alice"})
 ```python
 class Singleton:
     _instances = {}
-    
+
     def __new__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super().__new__(cls)
         return cls._instances[cls]
 
+
 class DatabaseConnection(Singleton):
     def __init__(self):
         self.connected = True
+
 
 # Usage
 db1 = DatabaseConnection()
@@ -327,10 +356,12 @@ print(db1 is db2)  # True - same instance
 ```python
 from abc import ABC, abstractmethod
 
+
 class SortStrategy(ABC):
     @abstractmethod
     def sort(self, data: list) -> list:
         pass
+
 
 class BubbleSort(SortStrategy):
     def sort(self, data: list) -> list:
@@ -340,6 +371,7 @@ class BubbleSort(SortStrategy):
                 if arr[j] > arr[j + 1]:
                     arr[j], arr[j + 1] = arr[j + 1], arr[j]
         return arr
+
 
 class QuickSort(SortStrategy):
     def sort(self, data: list) -> list:
@@ -351,15 +383,17 @@ class QuickSort(SortStrategy):
         right = [x for x in data if x > pivot]
         return self.sort(left) + middle + self.sort(right)
 
+
 class Sorter:
     def __init__(self, strategy: SortStrategy):
         self._strategy = strategy
-    
+
     def set_strategy(self, strategy: SortStrategy):
         self._strategy = strategy
-    
+
     def sort(self, data: list) -> list:
         return self._strategy.sort(data)
+
 
 # Usage
 data = [64, 34, 25, 12, 22, 11, 90]
@@ -394,25 +428,26 @@ class Subject:
     def __init__(self):
         self._observers = []
         self._state = None
-    
+
     def attach(self, observer):
         self._observers.append(observer)
-    
+
     def detach(self, observer):
         self._observers.remove(observer)
-    
+
     def notify(self):
         for observer in self._observers:
             observer.update(self._state)
-    
+
     @property
     def state(self):
         return self._state
-    
+
     @state.setter
     def state(self, value):
         self._state = value
         self.notify()
+
 
 class Observer:
     def update(self, state):
@@ -468,6 +503,7 @@ Design Patterns
 ```python
 class Singleton:
     _instances = {}
+
     def __new__(cls):
         if cls not in cls._instances:
             cls._instances[cls] = super().__new__(cls)
@@ -478,9 +514,11 @@ class Singleton:
 ```python
 class Factory:
     _creators = {}
+
     @classmethod
     def register(cls, type, creator):
         cls._creators[type] = creator
+
     @classmethod
     def create(cls, type):
         return cls._creators[type]()
@@ -491,8 +529,10 @@ class Factory:
 class Subject:
     def __init__(self):
         self._observers = []
+
     def attach(self, observer):
         self._observers.append(observer)
+
     def notify(self, event, data):
         for obs in self._observers:
             obs.update(event, data)
@@ -503,6 +543,7 @@ class Subject:
 class Context:
     def __init__(self, strategy):
         self._strategy = strategy
+
     def execute(self, data):
         return self._strategy.execute(data)
 ```
@@ -512,6 +553,7 @@ class Context:
 class Adapter:
     def __init__(self, adaptee):
         self._adaptee = adaptee
+
     def target_method(self):
         return self._adaptee.different_method()
 ```

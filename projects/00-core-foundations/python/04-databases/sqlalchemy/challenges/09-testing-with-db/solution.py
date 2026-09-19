@@ -44,9 +44,7 @@ def transactional_session(eng):
     """Yield a session whose writes roll back when the generator ends."""
     connection = eng.connect()
     outer = connection.begin()  # outer transaction: never committed
-    session = Session(
-        bind=connection, join_transaction_mode="create_savepoint"
-    )
+    session = Session(bind=connection, join_transaction_mode="create_savepoint")
     try:
         yield session
     finally:

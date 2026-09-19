@@ -25,21 +25,24 @@ plt.plot(x, np.sin(x), linewidth=2)
 plt.grid(True)
 
 # Customized grid
-plt.grid(True,
-         which='both',        # 'major', 'minor', or 'both'
-         axis='both',         # 'x', 'y', or 'both'
-         color='gray',
-         linestyle='--',
-         linewidth=0.5,
-         alpha=0.7)
+plt.grid(
+    True,
+    which="both",  # 'major', 'minor', or 'both'
+    axis="both",  # 'x', 'y', or 'both'
+    color="gray",
+    linestyle="--",
+    linewidth=0.5,
+    alpha=0.7,
+)
 
 # Minor ticks and grid
 from matplotlib.ticker import MultipleLocator
+
 ax = plt.gca()
 ax.xaxis.set_minor_locator(MultipleLocator(0.5))
 ax.yaxis.set_minor_locator(MultipleLocator(0.1))
-ax.grid(True, which='minor', alpha=0.2)
-ax.grid(True, which='major', alpha=0.5)
+ax.grid(True, which="minor", alpha=0.2)
+ax.grid(True, which="major", alpha=0.5)
 
 plt.show()
 ```
@@ -51,16 +54,16 @@ plt.show()
 ```python
 # Remove top and right spines
 ax = plt.gca()
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
 
 # Move spines
-ax.spines['left'].set_position(('outward', 10))  # Move outward 10pts
-ax.spines['bottom'].set_position(('data', 0))    # Move to y=0
+ax.spines["left"].set_position(("outward", 10))  # Move outward 10pts
+ax.spines["bottom"].set_position(("data", 0))  # Move to y=0
 
 # Customize spine color/width
-ax.spines['left'].set_color('darkblue')
-ax.spines['left'].set_linewidth(2)
+ax.spines["left"].set_color("darkblue")
+ax.spines["left"].set_linewidth(2)
 ```
 
 ---
@@ -76,8 +79,7 @@ plt.tight_layout(pad=2.0, w_pad=1.0, h_pad=1.0)
 fig, axs = plt.subplots(2, 2, figsize=(10, 8), constrained_layout=True)
 
 # subplots_adjust - manual control
-plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1,
-                    wspace=0.3, hspace=0.3)
+plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1, wspace=0.3, hspace=0.3)
 ```
 
 ---

@@ -33,6 +33,7 @@ Reference: https://www.w3schools.com/python/python_user_input.asp
 # Example 3: Converting string input to numbers
 # Uncomment to test:
 
+
 def demo_conversion():
     """Demonstrate input conversion."""
     # Integer input
@@ -42,6 +43,7 @@ def demo_conversion():
     # Float input
     height = float(input("Enter your height in meters: "))
     print(f"Height in cm: {height * 100}")
+
 
 # ============================================================
 # Input Validation
@@ -62,26 +64,30 @@ def get_integer(prompt, min_val=None, max_val=None):
         except ValueError:
             print("Please enter a valid number!")
 
+
 # Example 5: Safe input with default value
 def get_input_with_default(prompt, default=""):
     """Get input with a default value if user presses Enter."""
     value = input(f"{prompt} [{default}]: ").strip()
     return value if value else default
 
+
 # Example 6: Yes/No confirmation
 def confirm(prompt="Continue?"):
     """Ask for yes/no confirmation."""
     while True:
         response = input(f"{prompt} (y/n): ").strip().lower()
-        if response in ('y', 'yes'):
+        if response in ("y", "yes"):
             return True
-        elif response in ('n', 'no'):
+        elif response in ("n", "no"):
             return False
         print("Please enter 'y' or 'n'!")
+
 
 # ============================================================
 # Interactive Examples (Uncomment to Test)
 # ============================================================
+
 
 # Example 7: Simple calculator
 def simple_calculator():
@@ -91,7 +97,7 @@ def simple_calculator():
 
     while True:
         expression = input("\nEnter calculation (e.g., 2 + 3): ")
-        if expression.lower() == 'quit':
+        if expression.lower() == "quit":
             print("Goodbye!")
             break
 
@@ -101,6 +107,7 @@ def simple_calculator():
             print(f"Result: {result}")
         except Exception as e:
             print(f"Error: {e}")
+
 
 # Example 8: Menu system
 def menu_system():
@@ -114,17 +121,18 @@ def menu_system():
 
         choice = input("\nEnter your choice (1-4): ")
 
-        if choice == '1':
+        if choice == "1":
             print("You selected Option 1!")
-        elif choice == '2':
+        elif choice == "2":
             print("You selected Option 2!")
-        elif choice == '3':
+        elif choice == "3":
             print("You selected Option 3!")
-        elif choice == '4':
+        elif choice == "4":
             print("Goodbye!")
             break
         else:
             print("Invalid choice! Please enter 1-4.")
+
 
 # Example 9: Name list builder
 def name_list_builder():
@@ -134,7 +142,7 @@ def name_list_builder():
 
     while True:
         name = input("Enter a name (or 'done' to finish): ").strip()
-        if name.lower() == 'done':
+        if name.lower() == "done":
             break
         if name:
             names.append(name)
@@ -146,6 +154,7 @@ def name_list_builder():
     else:
         print("No names entered.")
 
+
 # ============================================================
 # Simulated Input (For Testing)
 # ============================================================
@@ -156,6 +165,7 @@ print("--- Simulated Input ---")
 simulated_inputs = ["Alice", "30", "5.7", "yes"]
 input_index = 0
 
+
 def simulated_input(prompt=""):
     """Simulate input() for testing."""
     global input_index
@@ -165,6 +175,7 @@ def simulated_input(prompt=""):
         print(f"{prompt}{value}")
         return value
     return ""
+
 
 # Test with simulated input
 name = simulated_input("Enter name: ")
@@ -216,6 +227,7 @@ print("  - 'Email (user@example.com): ' - with example")
 
 import ast
 
+
 def safe_eval(expression):
     """Safely parse a literal value (numbers, lists, dicts, etc.)."""
     try:
@@ -225,6 +237,7 @@ def safe_eval(expression):
     except (ValueError, SyntaxError):
         # Anything that is not a plain literal is refused here.
         return None
+
 
 # Test safe eval with plain literals
 expressions = ["[1, 2, 3]", "{'a': 1}", "(10, 20)"]

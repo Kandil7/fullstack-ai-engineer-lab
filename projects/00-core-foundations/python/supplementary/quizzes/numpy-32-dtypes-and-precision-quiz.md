@@ -10,6 +10,7 @@ Answers with full explanations and distractor analysis at the end.
 **E1 (code-output).** What prints?
 ```python
 import numpy as np
+
 x = np.array([0.1, 0.2, 0.3])
 print(x.dtype)
 print(x.itemsize)
@@ -23,6 +24,7 @@ print(x.itemsize)
 **E2 (code-output).** What prints?
 ```python
 import numpy as np
+
 x = np.array([1.9, -2.7])
 print(x.astype(np.int64, casting="unsafe"))
 ```
@@ -42,6 +44,7 @@ print(x.astype(np.int64, casting="unsafe"))
 **E4 (code-output).** What prints?
 ```python
 import numpy as np
+
 print(np.isclose(0.1 + 0.2, 0.3))
 print(0.1 + 0.2 == 0.3)
 ```
@@ -61,6 +64,7 @@ print(0.1 + 0.2 == 0.3)
 **E6 (code-output).** What prints?
 ```python
 import numpy as np
+
 x = np.array([1.0, np.nan, 3.0])
 print(x.sum())
 print(np.nan != np.nan)
@@ -78,6 +82,7 @@ print(np.nan != np.nan)
 **M1 (code-output).** What prints? (NumPy 2.x)
 ```python
 import numpy as np
+
 i = np.arange(3, dtype=np.int64)
 f = np.arange(3, dtype=np.float32)
 print((i + f).dtype)
@@ -92,6 +97,7 @@ print((i + 1).dtype)
 **M2 (code-output).** What prints?
 ```python
 import numpy as np
+
 x = np.array([1.0, np.nan, np.inf, -np.inf, 2.0])
 bad = ~np.isfinite(x)
 print(bad.sum())
@@ -114,6 +120,7 @@ print(x)
 **M4 (code-output).** What prints?
 ```python
 import numpy as np
+
 with np.errstate(over="ignore"):
     big = np.float64(1e308) * 10.0
 print(np.isinf(big))
@@ -135,6 +142,7 @@ print(np.inf - np.inf)
 **M6 (code-output).** What prints?
 ```python
 import numpy as np
+
 rec = np.zeros(2, dtype=[("score", "f4"), ("id", "i4")])
 rec["score"] = [0.9, 0.4]
 rec["id"] = [7, 3]
@@ -157,6 +165,7 @@ print(rec.nbytes)
 **M8 (code-output).** What prints?
 ```python
 import numpy as np
+
 x = np.array([1.0, np.nan, 3.0, np.nan])
 print(np.nanmean(x))
 print(np.isnan(x).sum())
@@ -181,6 +190,7 @@ print(np.isnan(x).sum())
 **H1 (code-output).** What prints? (NumPy 2.x, NEP 50)
 ```python
 import numpy as np
+
 a = np.arange(3, dtype=np.int64)
 b = np.arange(3, dtype=np.float32)
 try:
@@ -206,6 +216,7 @@ print((a + 0.5).dtype)
 **H3 (code-output).** What prints?
 ```python
 import numpy as np
+
 w = np.array([127.0, 128.0, 1e10], dtype=np.float32)
 h = w.astype(np.float16)
 print(h)

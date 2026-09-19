@@ -53,7 +53,8 @@ acc_leaky = accuracy_score(y_te, LogisticRegression().fit(X_tr, y_tr).predict(X_
 X_tr, X_te, y_tr, y_te = train_test_split(X_all, y_all, test_size=0.3, random_state=0)
 scaler_ok = SS().fit(X_tr)
 acc_ok = accuracy_score(
-    y_te, LogisticRegression().fit(scaler_ok.transform(X_tr), y_tr).predict(scaler_ok.transform(X_te))
+    y_te,
+    LogisticRegression().fit(scaler_ok.transform(X_tr), y_tr).predict(scaler_ok.transform(X_te)),
 )
 print("Example 1: leakage by manual scaling")
 print(f"  accuracy (leaky scaler): {acc_leaky:.3f}  (optimistic)")
@@ -62,6 +63,7 @@ print(f"  accuracy (train-only)  : {acc_ok:.3f}  (honest)")
 # ============================================================
 # 2. A Mixed-Type Dataset (the real world)
 # ============================================================
+
 
 def make_mixed_df(n: int = 500, seed: int = 0) -> tuple[pd.DataFrame, pd.Series]:
     r = np.random.RandomState(seed)
@@ -90,23 +92,39 @@ categorical_cols = ["plan", "region"]
 
 preprocessor = ColumnTransformer(
     transformers=[
-        ("num", Pipeline([("impute", SimpleImputer(strategy="median")),
-                          ("scale", StandardScaler())]), numeric_cols),
-        ("cat", Pipeline([("impute", SimpleImputer(strategy="most_frequent")),
-                          ("onehot", OneHotEncoder(handle_unknown="ignore"))]), categorical_cols),
+        (
+            "num",
+            Pipeline([("impute", SimpleImputer(strategy="median")), ("scale", StandardScaler())]),
+            numeric_cols,
+        ),
+        (
+            "cat",
+            Pipeline(
+                [
+                    ("impute", SimpleImputer(strategy="most_frequent")),
+                    ("onehot", OneHotEncoder(handle_unknown="ignore")),
+                ]
+            ),
+            categorical_cols,
+        ),
     ]
 )
 
-full_pipeline = Pipeline([
-    ("prep", preprocessor),
-    ("clf", RandomForestClassifier(n_estimators=100, random_state=0)),
-])
+full_pipeline = Pipeline(
+    [
+        ("prep", preprocessor),
+        ("clf", RandomForestClassifier(n_estimators=100, random_state=0)),
+    ]
+)
 
 full_pipeline.fit(X_train, y_train)
 acc_pipe = accuracy_score(y_test, full_pipeline.predict(X_test))
 print("\nExample 2: full pipeline")
 print(f"  accuracy: {acc_pipe:.3f}")
-print(f"  X_train shape -> {X_train.shape}, transformed -> {preprocessor.fit_transform(X_train).shape}")
+print(
+    f"  X_train shape -> {X_train.shape}, transformed -> {preprocessor.fit_transform(X_train).shape}"
+)
+
 
 # ============================================================
 # 4. Custom Transformer — fit on train only, guaranteed
@@ -124,39 +142,61 @@ class ClipOutliers(BaseEstimator, TransformerMixin):
         return np.clip(np.asarray(X), self.low_, self.high_)
 
 
-custom = Pipeline([
-    ("impute", SimpleImputer(strategy="median")),
-    ("clip", ClipOutliers()),
-    ("model", LogisticRegression(max_iter=500)),
-])
+custom = Pipeline(
+    [
+        ("impute", SimpleImputer(strategy="median")),
+        ("clip", ClipOutliers()),
+        ("model", LogisticRegression(max_iter=500)),
+    ]
+)
 custom.fit(X_train[["income"]], y_train)
 print("\nExample 3: custom transformer")
-print(f"  learned clip bounds: {float(custom.named_steps['clip'].low_[0]):.0f} .. {float(custom.named_steps['clip'].high_[0]):.0f}")
+print(
+    f"  learned clip bounds: {float(custom.named_steps['clip'].low_[0]):.0f} .. {float(custom.named_steps['clip'].high_[0]):.0f}"
+)
 print(f"  accuracy: {accuracy_score(y_test, custom.predict(X_test[['income']])):.3f}")
+
 
 # ============================================================
 # 5. FeatureUnion — parallel feature extraction
 # ============================================================
 def add_age_squared(X: np.ndarray) -> np.ndarray:
-    return np.hstack([X, (X ** 2)])  # type: ignore[operator]
+    return np.hstack([X, (X**2)])  # type: ignore[operator]
 
 
-feature_union = FeatureUnion([
-    ("raw", FunctionTransformer()),
-    ("poly", FunctionTransformer(add_age_squared, validate=False)),
-])
+feature_union = FeatureUnion(
+    [
+        ("raw", FunctionTransformer()),
+        ("poly", FunctionTransformer(add_age_squared, validate=False)),
+    ]
+)
 
-fu_pipe = Pipeline([
-    ("prep", ColumnTransformer([("num", Pipeline([
-        ("impute", SimpleImputer(strategy="median")),
-        ("scale", StandardScaler()),
-    ]), numeric_cols)])),
-    ("fu", feature_union),
-    ("clf", LogisticRegression(max_iter=500)),
-])
+fu_pipe = Pipeline(
+    [
+        (
+            "prep",
+            ColumnTransformer(
+                [
+                    (
+                        "num",
+                        Pipeline(
+                            [
+                                ("impute", SimpleImputer(strategy="median")),
+                                ("scale", StandardScaler()),
+                            ]
+                        ),
+                        numeric_cols,
+                    )
+                ]
+            ),
+        ),
+        ("fu", feature_union),
+        ("clf", LogisticRegression(max_iter=500)),
+    ]
+)
 fu_pipe.fit(X_train, y_train)
 print("\nExample 4: FeatureUnion")
-_prepped = fu_pipe.named_steps['prep'].transform(X_train.iloc[:5])
+_prepped = fu_pipe.named_steps["prep"].transform(X_train.iloc[:5])
 print(f"  feature count after union: {fu_pipe.named_steps['fu'].transform(_prepped).shape[1]}")
 
 # ============================================================

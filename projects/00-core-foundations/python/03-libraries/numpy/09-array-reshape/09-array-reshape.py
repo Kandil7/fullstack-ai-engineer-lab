@@ -95,7 +95,7 @@ print("Shape:", flat.shape)  # (6,)
 
 # ravel() - returns a view when possible
 ravel = arr.ravel()
-print("Raveled:", ravel)    # [1 2 3 4 5 6]
+print("Raveled:", ravel)  # [1 2 3 4 5 6]
 print("Shape:", ravel.shape)  # (6,)
 
 # Test: flatten is a copy, ravel is a view

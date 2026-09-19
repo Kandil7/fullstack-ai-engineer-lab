@@ -164,10 +164,10 @@
 def quick_sort(arr, low, high):
     """
     Basic Quick Sort implementation.
-    
+
     Time Complexity: O(n log n) average, O(n²) worst case
     Space Complexity: O(log n) average, O(n) worst case
-    
+
     Args:
         arr: List to sort
         low: Starting index
@@ -176,38 +176,40 @@ def quick_sort(arr, low, high):
     if low < high:
         # Partition the array and get pivot position
         pivot_index = partition(arr, low, high)
-        
+
         # Recursively sort elements before and after partition
         quick_sort(arr, low, pivot_index - 1)
         quick_sort(arr, pivot_index + 1, high)
 
+
 def partition(arr, low, high):
     """
     Lomuto partition scheme.
-    
+
     Selects last element as pivot and partitions array
     so elements less than pivot are on the left.
-    
+
     Args:
         arr: Array to partition
         low: Starting index
         high: Ending index
-    
+
     Returns:
         Final position of pivot element
     """
     pivot = arr[high]  # Choose last element as pivot
-    i = low - 1        # Index of smaller element
-    
+    i = low - 1  # Index of smaller element
+
     for j in range(low, high):
         # If current element is smaller than or equal to pivot
         if arr[j] <= pivot:
             i += 1
             arr[i], arr[j] = arr[j], arr[i]
-    
+
     # Place pivot in correct position
     arr[i + 1], arr[high] = arr[high], arr[i + 1]
     return i + 1
+
 
 # Example usage
 arr = [10, 7, 8, 9, 1, 5]
@@ -222,20 +224,20 @@ print("Sorted array:", arr)
 def median_of_three(arr, low, high):
     """
     Select pivot as median of first, middle, and last elements.
-    
+
     This improves pivot selection to avoid worst-case scenarios
     on already sorted or reverse sorted arrays.
-    
+
     Args:
         arr: Array to select pivot from
         low: Starting index
         high: Ending index
-    
+
     Returns:
         Index of median element
     """
     mid = (low + high) // 2
-    
+
     # Sort low, mid, high elements
     if arr[low] > arr[mid]:
         arr[low], arr[mid] = arr[mid], arr[low]
@@ -243,15 +245,16 @@ def median_of_three(arr, low, high):
         arr[low], arr[high] = arr[high], arr[low]
     if arr[mid] > arr[high]:
         arr[mid], arr[high] = arr[high], arr[mid]
-    
+
     # Place median at high-1 position for partitioning
     arr[mid], arr[high - 1] = arr[high - 1], arr[mid]
     return arr[high - 1]
 
+
 def quick_sort_median(arr, low, high):
     """
     Quick Sort with median-of-three pivot selection.
-    
+
     Args:
         arr: Array to sort
         low: Starting index
@@ -265,7 +268,7 @@ def quick_sort_median(arr, low, high):
             pivot = median_of_three(arr, low, high)
             i = low
             j = high - 1
-            
+
             while True:
                 i += 1
                 while arr[i] < pivot:
@@ -273,16 +276,17 @@ def quick_sort_median(arr, low, high):
                 j -= 1
                 while arr[j] > pivot:
                     j -= 1
-                
+
                 if i < j:
                     arr[i], arr[j] = arr[j], arr[i]
                 else:
                     break
-            
+
             arr[i], arr[high - 1] = arr[high - 1], arr[i]
-            
+
             quick_sort_median(arr, low, i - 1)
             quick_sort_median(arr, i + 1, high)
+
 
 def insertion_sort(arr, low, high):
     """Helper insertion sort for small subarrays."""
@@ -293,6 +297,7 @@ def insertion_sort(arr, low, high):
             arr[j + 1] = arr[j]
             j -= 1
         arr[j + 1] = key
+
 
 # Example usage
 arr = [3, 6, 8, 10, 1, 2, 1]
@@ -306,34 +311,36 @@ print("Sorted array:", arr)
 ```python
 import random
 
+
 def random_partition(arr, low, high):
     """
     Partition using a random pivot element.
-    
+
     Randomly selects pivot and swaps it with the last element
     before using standard Lomuto partition.
-    
+
     Args:
         arr: Array to partition
         low: Starting index
         high: Ending index
-    
+
     Returns:
         Final position of pivot
     """
     # Select random pivot and move to end
     random_idx = random.randint(low, high)
     arr[random_idx], arr[high] = arr[high], arr[random_idx]
-    
+
     return partition(arr, low, high)
+
 
 def quick_sort_random(arr, low, high):
     """
     Quick Sort with random pivot selection.
-    
+
     Expected time complexity: O(n log n)
     Eliminates worst-case behavior on sorted inputs.
-    
+
     Args:
         arr: Array to sort
         low: Starting index
@@ -344,18 +351,20 @@ def quick_sort_random(arr, low, high):
         quick_sort_random(arr, low, pi - 1)
         quick_sort_random(arr, pi + 1, high)
 
+
 def partition(arr, low, high):
     """Standard Lomuto partition."""
     pivot = arr[high]
     i = low - 1
-    
+
     for j in range(low, high):
         if arr[j] <= pivot:
             i += 1
             arr[i], arr[j] = arr[j], arr[i]
-    
+
     arr[i + 1], arr[high] = arr[high], arr[i + 1]
     return i + 1
+
 
 # Example usage
 arr = [10, 7, 8, 9, 1, 5, 3, 4, 2, 6]
@@ -370,17 +379,17 @@ print("Sorted array:", arr)
 def three_way_partition(arr, low, high):
     """
     Three-way partition (Dutch National Flag) for handling duplicates.
-    
+
     Partitions array into three regions:
     - Elements less than pivot
     - Elements equal to pivot
     - Elements greater than pivot
-    
+
     Args:
         arr: Array to partition
         low: Starting index
         high: Ending index
-    
+
     Returns:
         Tuple (lt, gt) where:
         - arr[low:lt] < pivot
@@ -389,12 +398,12 @@ def three_way_partition(arr, low, high):
     """
     if low > high:
         return low, high
-    
+
     pivot = arr[low]
-    lt = low      # arr[low:lt] < pivot
-    gt = high     # arr[gt+1:high+1] > pivot
-    i = low       # arr[lt:i] == pivot
-    
+    lt = low  # arr[low:lt] < pivot
+    gt = high  # arr[gt+1:high+1] > pivot
+    i = low  # arr[lt:i] == pivot
+
     while i <= gt:
         if arr[i] < pivot:
             arr[lt], arr[i] = arr[i], arr[lt]
@@ -405,15 +414,16 @@ def three_way_partition(arr, low, high):
             gt -= 1
         else:
             i += 1
-    
+
     return lt, gt
+
 
 def quick_sort_three_way(arr, low, high):
     """
     Quick Sort with three-way partitioning.
-    
+
     Efficient for arrays with many duplicate elements.
-    
+
     Args:
         arr: Array to sort
         low: Starting index
@@ -423,6 +433,7 @@ def quick_sort_three_way(arr, low, high):
         lt, gt = three_way_partition(arr, low, high)
         quick_sort_three_way(arr, low, lt - 1)
         quick_sort_three_way(arr, gt + 1, high)
+
 
 # Example usage
 arr = [4, 9, 4, 4, 1, 9, 4, 4, 9, 4, 4, 1, 4]
@@ -437,10 +448,10 @@ print("Sorted array:", arr)
 def quick_sort_tail_recursive(arr, low, high):
     """
     Quick Sort with tail recursion optimization.
-    
+
     Reduces worst-case space complexity from O(n) to O(log n)
     by recursing only on the smaller partition.
-    
+
     Args:
         arr: Array to sort
         low: Starting index
@@ -448,7 +459,7 @@ def quick_sort_tail_recursive(arr, low, high):
     """
     while low < high:
         pi = partition(arr, low, high)
-        
+
         # Recurse on smaller partition, iterate on larger
         if pi - low < high - pi:
             quick_sort_tail_recursive(arr, low, pi - 1)
@@ -457,18 +468,20 @@ def quick_sort_tail_recursive(arr, low, high):
             quick_sort_tail_recursive(arr, pi + 1, high)
             high = pi - 1
 
+
 def partition(arr, low, high):
     """Standard Lomuto partition."""
     pivot = arr[high]
     i = low - 1
-    
+
     for j in range(low, high):
         if arr[j] <= pivot:
             i += 1
             arr[i], arr[j] = arr[j], arr[i]
-    
+
     arr[i + 1], arr[high] = arr[high], arr[i + 1]
     return i + 1
+
 
 # Example usage
 arr = [3, 3, 5, 2, 1, 4, 2, 3]

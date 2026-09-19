@@ -107,7 +107,7 @@ Each block serves a specific purpose in exception handling.
 def process_file(filename):
     file = None
     try:
-        file = open(filename, 'r')
+        file = open(filename, "r")
         data = file.read()
     except FileNotFoundError:
         print(f"File not found: {filename}")
@@ -128,10 +128,11 @@ def process_file(filename):
             file.close()
             print("File closed")
 
+
 # Modern approach using context manager
 def process_file_modern(filename):
     try:
-        with open(filename, 'r') as file:
+        with open(filename, "r") as file:
             data = file.read()
     except FileNotFoundError:
         print(f"File not found: {filename}")
@@ -156,17 +157,15 @@ class ValidationError(Exception):
         self.field = field
         self.value = value
 
+
 # Using custom exception
 def validate_age(age):
     if not isinstance(age, int):
         raise TypeError("Age must be an integer")
     if age < 0 or age > 150:
-        raise ValidationError(
-            f"Invalid age: {age}",
-            field="age",
-            value=age
-        )
+        raise ValidationError(f"Invalid age: {age}", field="age", value=age)
     return True
+
 
 try:
     validate_age(200)
@@ -175,24 +174,32 @@ except ValidationError as e:
     print(f"Field: {e.field}")
     print(f"Value: {e.value}")
 
+
 # Exception hierarchy for a library
 class AppError(Exception):
     """Base exception for application"""
+
     pass
+
 
 class DatabaseError(AppError):
     """Database-related errors"""
+
     pass
+
 
 class ConnectionError(DatabaseError):
     """Database connection errors"""
+
     def __init__(self, host, port):
         super().__init__(f"Cannot connect to {host}:{port}")
         self.host = host
         self.port = port
 
+
 class QueryError(DatabaseError):
     """Query execution errors"""
+
     def __init__(self, query, original_error):
         super().__init__(f"Query failed: {query}")
         self.query = query
@@ -213,11 +220,11 @@ class FileManager:
         self.filename = filename
         self.mode = mode
         self.file = None
-    
+
     def __enter__(self):
         self.file = open(self.filename, self.mode)
         return self.file
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.file:
             self.file.close()
@@ -226,11 +233,13 @@ class FileManager:
             print(f"Error occurred: {exc_val}")
         return False
 
+
 with FileManager("test.txt", "w") as f:
     f.write("Hello, World!")
 
 # Function-based using contextlib
 from contextlib import contextmanager
+
 
 @contextmanager
 def managed_resource(name):
@@ -243,6 +252,7 @@ def managed_resource(name):
         resource["active"] = False
     finally:
         print(f"Releasing {name}")
+
 
 with managed_resource("database") as res:
     print(f"Using {res['name']}")
@@ -311,28 +321,31 @@ Async functions use try/except, but exceptions propagate differently.
 ```python
 import asyncio
 
+
 async def risky_operation():
     await asyncio.sleep(1)
     raise ValueError("Something went wrong")
+
 
 async def main():
     try:
         await risky_operation()
     except ValueError as e:
         print(f"Caught: {e}")
-    
+
     # Handling multiple awaitables
     tasks = [
         asyncio.create_task(task1()),
         asyncio.create_task(task2()),
     ]
-    
+
     results = await asyncio.gather(*tasks, return_exceptions=True)
     for i, result in enumerate(results):
         if isinstance(result, Exception):
             print(f"Task {i} failed: {result}")
         else:
             print(f"Task {i} succeeded: {result}")
+
 
 # Exception groups (Python 3.11+)
 async def handle_exception_groups():
@@ -360,9 +373,11 @@ try:
 except FileNotFoundError as e:
     raise RuntimeError("Failed to process") from e
 
+
 # Explicit chaining with raise from
 class DatabaseError(Exception):
     pass
+
 
 def connect_db():
     try:
@@ -370,6 +385,7 @@ def connect_db():
         raise ConnectionError("Connection refused")
     except ConnectionError as e:
         raise DatabaseError("Database unavailable") from e
+
 
 # Suppressing chaining
 try:
@@ -399,12 +415,14 @@ def get_value_lbyl(dictionary, key):
         return dictionary[key]
     return None
 
+
 # EAFP - Easier to Ask Forgiveness than Permission
 def get_value_eafp(dictionary, key):
     try:
         return dictionary[key]
     except KeyError:
         return None
+
 
 # Python prefers EAFP
 # - More Pythonic
@@ -442,32 +460,40 @@ Use `pytest.raises` for testing that exceptions are properly raised and handled.
 ```python
 import pytest
 
+
 # Basic exception testing
 def divide(a, b):
     if b == 0:
         raise ValueError("Cannot divide by zero")
     return a / b
 
+
 def test_divide_by_zero():
     with pytest.raises(ValueError) as exc_info:
         divide(10, 0)
     assert str(exc_info.value) == "Cannot divide by zero"
+
 
 # Testing exception type hierarchy
 def test_divide_by_zero_hierarchy():
     with pytest.raises(ArithmeticError):
         divide(10, 0)  # ValueError is subclass of ArithmeticError
 
+
 # Testing no exception
 def test_divide_normal():
     result = divide(10, 2)
     assert result == 5.0
 
+
 # Parametrized exception testing
-@pytest.mark.parametrize("a, b, expected", [
-    (10, 2, 5.0),
-    (10, 0, None),
-])
+@pytest.mark.parametrize(
+    "a, b, expected",
+    [
+        (10, 2, 5.0),
+        (10, 0, None),
+    ],
+)
 def test_divide(a, b, expected):
     if b == 0:
         with pytest.raises(ValueError):
@@ -475,11 +501,13 @@ def test_divide(a, b, expected):
     else:
         assert divide(a, b) == expected
 
+
 # Custom exception context
 class AppError(Exception):
     def __init__(self, message, code):
         super().__init__(message)
         self.code = code
+
 
 def test_custom_exception():
     with pytest.raises(AppError) as exc_info:
@@ -501,7 +529,7 @@ from contextlib import (
     redirect_stdout,
     redirect_stderr,
     ExitStack,
-    closing
+    closing,
 )
 from io import StringIO
 
@@ -520,18 +548,21 @@ with ExitStack() as stack:
     files = [stack.enter_context(open(f)) for f in file_list]
     # All files will be closed when exiting
 
+
 # closing - wrap objects with close() method
 class Database:
     def __init__(self):
         self.connected = True
-    
+
     def close(self):
         self.connected = False
+
 
 with closing(Database()) as db:
     # Use db
     pass
 # db.close() called automatically
+
 
 # contextmanager with exception handling
 @contextmanager
@@ -565,10 +596,12 @@ def generator_with_errors():
     finally:
         print("Generator cleanup")
 
+
 gen = generator_with_errors()
 print(next(gen))  # 1
 print(next(gen))  # 2
 gen.throw(ValueError, "Forced error")
+
 
 # Generator that receives exceptions
 def controlled_generator():
@@ -583,10 +616,12 @@ def controlled_generator():
             print(f"Generator received: {e}")
             yield -1
 
+
 gen = controlled_generator()
-print(next(gen))      # 0
-print(gen.send(5))    # 5
+print(next(gen))  # 0
+print(gen.send(5))  # 5
 print(gen.throw(ValueError, "test"))  # -1 (after handling)
+
 
 # Context manager using generator
 @contextmanager
@@ -615,37 +650,39 @@ class DatabaseConnection:
     def __init__(self, connection_string):
         self.connection_string = connection_string
         self.connection = None
-    
+
     def __enter__(self):
         self.connection = self._connect()
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.connection:
             self.connection.close()
         return False
-    
+
     def _connect(self):
         print(f"Connecting to {self.connection_string}")
         return {"connected": True}
-    
+
     def execute(self, query):
         print(f"Executing: {query}")
+
 
 # Usage - connection guaranteed to close
 with DatabaseConnection("postgres://localhost/mydb") as db:
     db.execute("SELECT * FROM users")
 # Connection closed here, even if exception occurred
 
+
 # Multiple resources
 class Transaction:
     def __init__(self, db):
         self.db = db
-    
+
     def __enter__(self):
         self.db.execute("BEGIN")
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None:
             self.db.execute("COMMIT")
@@ -680,10 +717,12 @@ try:
 except Exception:  # BAD - catches too much
     log_error()
 
+
 # Pitfall 4: Mutable default in exception
 def bad_function(errors=[]):  # BAD - shared state
     errors.append("error")
     return errors
+
 
 # Pitfall 5: Exception in finally block
 def risky_finally():
@@ -692,12 +731,14 @@ def risky_finally():
     finally:
         raise TypeError("Finally")  # Original exception lost!
 
+
 # Pitfall 6: Infinite recursion in except
 def infinite_loop():
     try:
         raise ValueError()
     except ValueError:
         infinite_loop()  # BAD - RecursionError
+
 
 # Good practices
 def good_exception_handling():
@@ -726,9 +767,11 @@ Concurrent code requires special consideration for exception propagation.
 import asyncio
 import concurrent.futures
 
+
 # Threading
 def thread_worker():
     raise ValueError("Thread error")
+
 
 with concurrent.futures.ThreadPoolExecutor() as executor:
     future = executor.submit(thread_worker)
@@ -737,9 +780,11 @@ with concurrent.futures.ThreadPoolExecutor() as executor:
     except ValueError as e:
         print(f"Thread error: {e}")
 
+
 # Multiprocessing
 def process_worker():
     raise ValueError("Process error")
+
 
 with concurrent.futures.ProcessPoolExecutor() as executor:
     future = executor.submit(process_worker)
@@ -748,26 +793,29 @@ with concurrent.futures.ProcessPoolExecutor() as executor:
     except ValueError as e:
         print(f"Process error: {e}")
 
+
 # Async
 async def async_worker():
     raise ValueError("Async error")
+
 
 async def main():
     try:
         await async_worker()
     except ValueError as e:
         print(f"Async error: {e}")
-    
+
     # Exception in tasks
     tasks = [
         asyncio.create_task(task1()),
         asyncio.create_task(task2()),
     ]
     results = await asyncio.gather(*tasks, return_exceptions=True)
-    
+
     for result in results:
         if isinstance(result, Exception):
             print(f"Task failed: {result}")
+
 
 asyncio.run(main())
 ```
@@ -785,13 +833,14 @@ asyncio.run(main())
 import functools
 import time
 
+
 def retry(exceptions=Exception, max_attempts=3, delay=1, backoff=2):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             attempts = 0
             current_delay = delay
-            
+
             while attempts < max_attempts:
                 try:
                     return func(*args, **kwargs)
@@ -803,18 +852,23 @@ def retry(exceptions=Exception, max_attempts=3, delay=1, backoff=2):
                     print(f"Retrying in {current_delay}s...")
                     time.sleep(current_delay)
                     current_delay *= backoff
-            
+
             return None
+
         return wrapper
+
     return decorator
+
 
 # Usage
 @retry(exceptions=(ConnectionError, TimeoutError), max_attempts=3, delay=1)
 def fetch_data(url):
     import random
+
     if random.random() < 0.7:
         raise ConnectionError("Connection failed")
     return "Success"
+
 
 # Test
 try:
@@ -838,21 +892,23 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @contextmanager
 def managed_operation(operation_name):
     logger.info(f"Starting: {operation_name}")
-    start_time = __import__('time').time()
-    
+    start_time = __import__("time").time()
+
     try:
         yield operation_name
     except Exception as e:
-        duration = __import__('time').time() - start_time
+        duration = __import__("time").time() - start_time
         logger.error(f"Failed: {operation_name} after {duration:.2f}s")
         logger.error(f"Exception: {type(e).__name__}: {e}")
         raise
     else:
-        duration = __import__('time').time() - start_time
+        duration = __import__("time").time() - start_time
         logger.info(f"Completed: {operation_name} in {duration:.2f}s")
+
 
 # Usage
 with managed_operation("data processing"):
@@ -881,37 +937,33 @@ class ValidationError(Exception):
         self.errors = errors
         super().__init__(f"Validation failed: {len(errors)} errors")
 
+
 class Validator:
     def __init__(self):
         self.errors = []
-    
+
     def check(self, condition, message):
         if not condition:
             self.errors.append(message)
         return self
-    
+
     def is_valid(self):
         return len(self.errors) == 0
-    
+
     def validate(self):
         if not self.is_valid():
             raise ValidationError(self.errors)
 
+
 def validate_user(data):
     validator = Validator()
-    
-    validator.check(
-        "name" in data and len(data["name"]) > 0,
-        "Name is required"
-    ).check(
-        "email" in data and "@" in data.get("email", ""),
-        "Valid email is required"
-    ).check(
-        "age" in data and 0 <= data.get("age", -1) <= 150,
-        "Age must be between 0 and 150"
-    )
-    
+
+    validator.check("name" in data and len(data["name"]) > 0, "Name is required").check(
+        "email" in data and "@" in data.get("email", ""), "Valid email is required"
+    ).check("age" in data and 0 <= data.get("age", -1) <= 150, "Age must be between 0 and 150")
+
     validator.validate()
+
 
 # Usage
 try:
@@ -932,24 +984,26 @@ except ValidationError as e:
 ```python
 from typing import Any, Callable, List
 
+
 class PipelineError(Exception):
     def __init__(self, step, original_error):
         self.step = step
         self.original_error = original_error
         super().__init__(f"Error in step '{step}': {original_error}")
 
+
 class Pipeline:
     def __init__(self):
         self.steps = []
-    
+
     def add_step(self, name: str, func: Callable):
         self.steps.append((name, func))
         return self
-    
+
     def execute(self, data: Any, stop_on_error: bool = False) -> Any:
         result = data
         errors = []
-        
+
         for name, func in self.steps:
             try:
                 result = func(result)
@@ -957,13 +1011,14 @@ class Pipeline:
                 errors.append((name, e))
                 if stop_on_error:
                     raise PipelineError(name, e)
-        
+
         if errors:
             print(f"Pipeline completed with {len(errors)} errors:")
             for step, error in errors:
                 print(f"  - {step}: {error}")
-        
+
         return result
+
 
 # Usage
 def validate(data):
@@ -971,11 +1026,14 @@ def validate(data):
         raise TypeError("Input must be a list")
     return data
 
+
 def clean(data):
     return [x.strip() if isinstance(x, str) else x for x in data]
 
+
 def transform(data):
     return [x.upper() if isinstance(x, str) else x for x in data]
+
 
 pipeline = Pipeline()
 pipeline.add_step("validate", validate)
@@ -997,10 +1055,12 @@ print(result)  # ['HELLO', 'WORLD']
 import time
 from enum import Enum
 
+
 class CircuitState(Enum):
     CLOSED = "closed"
     OPEN = "open"
     HALF_OPEN = "half_open"
+
 
 class CircuitBreaker:
     def __init__(self, failure_threshold=5, recovery_timeout=60):
@@ -1009,7 +1069,7 @@ class CircuitBreaker:
         self.failure_count = 0
         self.state = CircuitState.CLOSED
         self.last_failure_time = None
-    
+
     def __call__(self, func):
         def wrapper(*args, **kwargs):
             if self.state == CircuitState.OPEN:
@@ -1017,7 +1077,7 @@ class CircuitBreaker:
                     self.state = CircuitState.HALF_OPEN
                 else:
                     raise Exception("Circuit breaker is OPEN")
-            
+
             try:
                 result = func(*args, **kwargs)
                 self._on_success()
@@ -1025,36 +1085,40 @@ class CircuitBreaker:
             except Exception as e:
                 self._on_failure()
                 raise
+
         return wrapper
-    
+
     def _on_success(self):
         self.failure_count = 0
         self.state = CircuitState.CLOSED
-    
+
     def _on_failure(self):
         self.failure_count += 1
         self.last_failure_time = time.time()
         if self.failure_count >= self.failure_threshold:
             self.state = CircuitState.OPEN
-    
+
     def _should_attempt_reset(self):
         return time.time() - self.last_failure_time >= self.recovery_timeout
+
 
 # Usage
 @CircuitBreaker(failure_threshold=3, recovery_timeout=5)
 def call_external_service():
     import random
+
     if random.random() < 0.5:
         raise ConnectionError("Service unavailable")
     return "Success"
+
 
 # Test
 for i in range(10):
     try:
         result = call_external_service()
-        print(f"Attempt {i+1}: {result}")
+        print(f"Attempt {i + 1}: {result}")
     except Exception as e:
-        print(f"Attempt {i+1}: {e}")
+        print(f"Attempt {i + 1}: {e}")
     time.sleep(1)
 ```
 
@@ -1069,38 +1133,31 @@ for i in range(10):
 class ErrorCollector:
     def __init__(self):
         self.errors = []
-    
+
     def __enter__(self):
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:
-            self.errors.append({
-                "type": exc_type.__name__,
-                "message": str(exc_val),
-                "traceback": exc_tb
-            })
+            self.errors.append(
+                {"type": exc_type.__name__, "message": str(exc_val), "traceback": exc_tb}
+            )
         return True  # Suppress exception
-    
+
     def add_error(self, error_type, message):
-        self.errors.append({
-            "type": error_type,
-            "message": message
-        })
-    
+        self.errors.append({"type": error_type, "message": message})
+
     def has_errors(self):
         return len(self.errors) > 0
-    
+
     def clear(self):
         self.errors = []
-    
+
     def raise_if_errors(self):
         if self.has_errors():
-            error_messages = "\n".join(
-                f"  - {e['type']}: {e['message']}"
-                for e in self.errors
-            )
+            error_messages = "\n".join(f"  - {e['type']}: {e['message']}" for e in self.errors)
             raise Exception(f"Collected errors:\n{error_messages}")
+
 
 # Usage
 with ErrorCollector() as collector:
@@ -1108,7 +1165,7 @@ with ErrorCollector() as collector:
         risky_operation_1()
     except Exception as e:
         collector.add_error("Operation1Error", str(e))
-    
+
     try:
         risky_operation_2()
     except Exception as e:
@@ -1130,23 +1187,20 @@ if collector.has_errors():
 import functools
 from typing import Callable, Any, List
 
-def with_recovery(
-    strategies: List[Callable],
-    fallback: Any = None,
-    max_retries: int = 1
-):
+
+def with_recovery(strategies: List[Callable], fallback: Any = None, max_retries: int = 1):
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             last_error = None
-            
+
             for attempt in range(max_retries + 1):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
                     last_error = e
                     print(f"Attempt {attempt + 1} failed: {e}")
-                    
+
                     for strategy in strategies:
                         try:
                             result = strategy(e)
@@ -1154,31 +1208,36 @@ def with_recovery(
                                 return result
                         except Exception as strategy_error:
                             print(f"Recovery strategy failed: {strategy_error}")
-            
+
             if fallback is not None:
                 print("Using fallback value")
                 return fallback
-            
+
             raise last_error
+
         return wrapper
+
     return decorator
+
 
 # Recovery strategies
 def cache_recovery(error):
     print("Attempting cache recovery")
     return {"source": "cache", "data": "cached_value"}
 
+
 def default_recovery(error):
     print("Using default value")
     return {"source": "default", "data": "default_value"}
 
+
 # Usage
 @with_recovery(
-    strategies=[cache_recovery, default_recovery],
-    fallback={"source": "fallback", "data": None}
+    strategies=[cache_recovery, default_recovery], fallback={"source": "fallback", "data": None}
 )
 def fetch_data(url):
     raise ConnectionError("Service unavailable")
+
 
 result = fetch_data("https://api.example.com")
 print(result)
@@ -1198,34 +1257,27 @@ from datetime import datetime
 from typing import Any, Dict
 from contextlib import contextmanager
 
+
 class StructuredLogger:
     def __init__(self, name: str):
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.DEBUG)
-        
+
         handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter('%(message)s'))
+        handler.setFormatter(logging.Formatter("%(message)s"))
         self.logger.addHandler(handler)
-    
-    def log_error(
-        self,
-        error: Exception,
-        context: Dict[str, Any] = None,
-        level: str = "ERROR"
-    ):
+
+    def log_error(self, error: Exception, context: Dict[str, Any] = None, level: str = "ERROR"):
         log_entry = {
             "timestamp": datetime.utcnow().isoformat(),
             "level": level,
             "error_type": type(error).__name__,
             "message": str(error),
-            "context": context or {}
+            "context": context or {},
         }
-        
-        self.logger.log(
-            getattr(logging, level),
-            json.dumps(log_entry, indent=2)
-        )
-    
+
+        self.logger.log(getattr(logging, level), json.dumps(log_entry, indent=2))
+
     @contextmanager
     def error_context(self, **context):
         try:
@@ -1233,6 +1285,7 @@ class StructuredLogger:
         except Exception as e:
             self.log_error(e, context)
             raise
+
 
 # Usage
 logger = StructuredLogger("myapp")
@@ -1242,12 +1295,7 @@ try:
     risky_operation()
 except Exception as e:
     logger.log_error(
-        e,
-        context={
-            "user_id": 123,
-            "operation": "fetch_data",
-            "url": "https://api.example.com"
-        }
+        e, context={"user_id": 123, "operation": "fetch_data", "url": "https://api.example.com"}
     )
 
 # Context manager

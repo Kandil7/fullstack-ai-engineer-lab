@@ -34,6 +34,7 @@ vulnerability for decades.
 **Example** (the vulnerability):
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)")
 conn.execute("INSERT INTO users (name) VALUES (?)", ("admin",))

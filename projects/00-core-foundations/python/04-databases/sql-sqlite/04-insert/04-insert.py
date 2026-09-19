@@ -37,7 +37,7 @@ print()
 # Example 1: Basic INSERT with specific columns
 cursor.execute(
     "INSERT INTO students (name, email, age, grade) VALUES (?, ?, ?, ?)",
-    ("Alice Johnson", "alice@example.com", 20, "A")
+    ("Alice Johnson", "alice@example.com", 20, "A"),
 )
 conn.commit()
 print(f"Inserted Alice. Rows affected: {cursor.rowcount}")
@@ -45,8 +45,7 @@ print()
 
 # Example 2: INSERT without specifying columns (must provide all values)
 cursor.execute(
-    "INSERT INTO students VALUES (?, ?, ?, ?, ?)",
-    (2, "Bob Smith", "bob@example.com", 22, "B")
+    "INSERT INTO students VALUES (?, ?, ?, ?, ?)", (2, "Bob Smith", "bob@example.com", 22, "B")
 )
 conn.commit()
 print(f"Inserted Bob. Rows affected: {cursor.rowcount}")
@@ -55,7 +54,7 @@ print()
 # Example 3: INSERT with NULL values
 cursor.execute(
     "INSERT INTO students (name, email, age, grade) VALUES (?, ?, ?, ?)",
-    ("Charlie Brown", None, 21, "C")
+    ("Charlie Brown", None, 21, "C"),
 )
 conn.commit()
 print(f"Inserted Charlie with NULL email. Rows affected: {cursor.rowcount}")
@@ -82,8 +81,7 @@ grade = "A"
 
 # Tuple parameters (most common)
 cursor.execute(
-    "INSERT INTO students (name, email, age, grade) VALUES (?, ?, ?, ?)",
-    (name, email, age, grade)
+    "INSERT INTO students (name, email, age, grade) VALUES (?, ?, ?, ?)", (name, email, age, grade)
 )
 conn.commit()
 print(f"Inserted Diana using tuple parameters.")
@@ -103,8 +101,7 @@ students_data = [
 ]
 
 cursor.executemany(
-    "INSERT INTO students (name, email, age, grade) VALUES (?, ?, ?, ?)",
-    students_data
+    "INSERT INTO students (name, email, age, grade) VALUES (?, ?, ?, ?)", students_data
 )
 conn.commit()
 print(f"Inserted {len(students_data)} students using executemany.")
@@ -118,7 +115,7 @@ print()
 # Example 7: lastrowid gets the last inserted row's ID
 cursor.execute(
     "INSERT INTO students (name, email, age, grade) VALUES (?, ?, ?, ?)",
-    ("Jack Ryan", "jack@example.com", 24, "A")
+    ("Jack Ryan", "jack@example.com", 24, "A"),
 )
 conn.commit()
 last_id = cursor.lastrowid
@@ -126,11 +123,15 @@ print(f"Last inserted row ID: {last_id}")
 print()
 
 # Example 8: Getting multiple lastrowid values
-cursor.execute("INSERT INTO students (name, email, age, grade) VALUES (?, ?, ?, ?)",
-               ("Kate Bishop", "kate@example.com", 20, "B"))
+cursor.execute(
+    "INSERT INTO students (name, email, age, grade) VALUES (?, ?, ?, ?)",
+    ("Kate Bishop", "kate@example.com", 20, "B"),
+)
 id1 = cursor.lastrowid
-cursor.execute("INSERT INTO students (name, email, age, grade) VALUES (?, ?, ?, ?)",
-               ("Leo Messi", "leo@example.com", 22, "A"))
+cursor.execute(
+    "INSERT INTO students (name, email, age, grade) VALUES (?, ?, ?, ?)",
+    ("Leo Messi", "leo@example.com", 22, "A"),
+)
 id2 = cursor.lastrowid
 conn.commit()
 print(f"Inserted Kate (ID={id1}) and Leo (ID={id2})")

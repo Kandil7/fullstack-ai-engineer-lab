@@ -43,9 +43,11 @@ import re
 # SECTION 1: Training Data Poisoning Detection
 # =============================================================
 
+
 @dataclass
 class DataPoint:
     """A single training data point with metadata."""
+
     features: List[float]
     label: Any
     source: str
@@ -59,7 +61,9 @@ class DataPoint:
 
     def _compute_checksum(self) -> str:
         """Compute integrity checksum."""
-        data = json.dumps({"features": self.features, "label": self.label}, sort_keys=True)
+        data = json.dumps(
+            {"features": self.features, "label": self.label}, sort_keys=True
+        )
         return hashlib.sha256(data.encode()).hexdigest()
 
 
@@ -147,14 +151,16 @@ class DataPoisoningDetector:
                 if z_score > 3.0:  # 3 standard deviations
                     dp.is_suspicious = True
                     suspicious.append(i)
-                    issues.append({
-                        "type": "statistical_outlier",
-                        "severity": "medium",
-                        "sample_index": i,
-                        "feature": feat_idx,
-                        "z_score": round(z_score, 2),
-                        "message": f"Sample {i} feature {feat_idx} is {z_score:.1f} std devs from mean",
-                    })
+                    issues.append(
+                        {
+                            "type": "statistical_outlier",
+                            "severity": "medium",
+                            "sample_index": i,
+                            "feature": feat_idx,
+                            "z_score": round(z_score, 2),
+                            "message": f"Sample {i} feature {feat_idx} is {z_score:.1f} std devs from mean",
+                        }
+                    )
 
         return {"issues": issues, "suspicious_indices": list(set(suspicious))}
 
@@ -176,12 +182,14 @@ class DataPoisoningDetector:
 
             labels = [label for _, label in group]
             if len(set(str(l) for l in labels)) > 1:
-                issues.append({
-                    "type": "label_inconsistency",
-                    "severity": "high",
-                    "message": f"Similar samples have different labels: {labels}",
-                    "sample_indices": [i for i, _ in group],
-                })
+                issues.append(
+                    {
+                        "type": "label_inconsistency",
+                        "severity": "high",
+                        "message": f"Similar samples have different labels: {labels}",
+                        "sample_indices": [i for i, _ in group],
+                    }
+                )
 
         return {"issues": issues}
 
@@ -197,23 +205,27 @@ class DataPoisoningDetector:
 
             # Check for single dominant source
             if proportion > 0.8 and len(source_counts) > 1:
-                issues.append({
-                    "type": "source_dominance",
-                    "severity": "medium",
-                    "source": source,
-                    "proportion": round(proportion, 3),
-                    "message": f"Source '{source}' provides {proportion:.1%} of data",
-                })
+                issues.append(
+                    {
+                        "type": "source_dominance",
+                        "severity": "medium",
+                        "source": source,
+                        "proportion": round(proportion, 3),
+                        "message": f"Source '{source}' provides {proportion:.1%} of data",
+                    }
+                )
 
             # Check for unknown/untrusted sources
             if source.startswith("unknown") or source.startswith("unverified"):
-                issues.append({
-                    "type": "untrusted_source",
-                    "severity": "high",
-                    "source": source,
-                    "count": count,
-                    "message": f"Data from untrusted source: '{source}'",
-                })
+                issues.append(
+                    {
+                        "type": "untrusted_source",
+                        "severity": "high",
+                        "source": source,
+                        "count": count,
+                        "message": f"Data from untrusted source: '{source}'",
+                    }
+                )
 
         return {"issues": issues}
 
@@ -230,7 +242,7 @@ class DataPoisoningDetector:
         # Check for burst additions
         time_diffs = []
         for i in range(1, len(sorted_data)):
-            diff = sorted_data[i].timestamp - sorted_data[i-1].timestamp
+            diff = sorted_data[i].timestamp - sorted_data[i - 1].timestamp
             time_diffs.append(diff)
 
         if time_diffs:
@@ -240,12 +252,14 @@ class DataPoisoningDetector:
             bursts = sum(1 for d in time_diffs if d < burst_threshold)
 
             if bursts > len(time_diffs) * 0.3:
-                issues.append({
-                    "type": "temporal_burst",
-                    "severity": "medium",
-                    "burst_count": bursts,
-                    "message": f"Detected {bursts} rapid data additions (possible injection)",
-                })
+                issues.append(
+                    {
+                        "type": "temporal_burst",
+                        "severity": "medium",
+                        "burst_count": bursts,
+                        "message": f"Detected {bursts} rapid data additions (possible injection)",
+                    }
+                )
 
         return {"issues": issues}
 
@@ -266,19 +280,23 @@ class DataPoisoningDetector:
             # Simple bimodality check: split into halves and compare means
             mid = len(values) // 2
             lower_mean = sum(values[:mid]) / mid if mid > 0 else 0
-            upper_mean = sum(values[mid:]) / (len(values) - mid) if len(values) > mid else 0
+            upper_mean = (
+                sum(values[mid:]) / (len(values) - mid) if len(values) > mid else 0
+            )
 
             mean = sum(values) / len(values)
             if mean != 0:
                 separation = abs(upper_mean - lower_mean) / abs(mean)
                 if separation > 2.0:
-                    issues.append({
-                        "type": "bimodal_distribution",
-                        "severity": "medium",
-                        "feature": feat_idx,
-                        "separation": round(separation, 2),
-                        "message": f"Feature {feat_idx} shows bimodal pattern (possible poisoning)",
-                    })
+                    issues.append(
+                        {
+                            "type": "bimodal_distribution",
+                            "severity": "medium",
+                            "feature": feat_idx,
+                            "separation": round(separation, 2),
+                            "message": f"Feature {feat_idx} shows bimodal pattern (possible poisoning)",
+                        }
+                    )
 
         return {"issues": issues}
 
@@ -290,15 +308,23 @@ class DataPoisoningDetector:
         if "statistical_outlier" in issue_types:
             recommendations.append("Review and potentially remove statistical outliers")
         if "label_inconsistency" in issue_types:
-            recommendations.append("Manually verify labels for similar samples with different labels")
+            recommendations.append(
+                "Manually verify labels for similar samples with different labels"
+            )
         if "source_dominance" in issue_types:
-            recommendations.append("Diversify data sources to reduce single-source dependency")
+            recommendations.append(
+                "Diversify data sources to reduce single-source dependency"
+            )
         if "untrusted_source" in issue_types:
             recommendations.append("Verify data from untrusted sources before training")
         if "temporal_burst" in issue_types:
-            recommendations.append("Investigate rapid data additions for potential injection")
+            recommendations.append(
+                "Investigate rapid data additions for potential injection"
+            )
         if "bimodal_distribution" in issue_types:
-            recommendations.append("Investigate bimodal feature distributions for mixed data")
+            recommendations.append(
+                "Investigate bimodal feature distributions for mixed data"
+            )
 
         return recommendations
 
@@ -306,6 +332,7 @@ class DataPoisoningDetector:
 # =============================================================
 # SECTION 2: Adversarial Attack Detection & Defense
 # =============================================================
+
 
 class AdversarialDetector:
     """
@@ -323,7 +350,9 @@ class AdversarialDetector:
         self._input_history: List[List[float]] = []
         self._prediction_history: List[Any] = []
 
-    def detect_adversarial(self, input_features: List[float], model_fn: Callable) -> Dict:
+    def detect_adversarial(
+        self, input_features: List[float], model_fn: Callable
+    ) -> Dict:
         """
         Check if an input is potentially adversarial.
 
@@ -347,7 +376,9 @@ class AdversarialDetector:
         squeeze_score = self._feature_squeezing_test(input_features, model_fn)
         scores.append(squeeze_score)
         if squeeze_score > 0.6:
-            reasons.append("Model predictions change significantly with feature squeezing")
+            reasons.append(
+                "Model predictions change significantly with feature squeezing"
+            )
 
         # 3. Statistical anomaly detection
         stat_score = self._statistical_test(input_features)
@@ -405,7 +436,7 @@ class AdversarialDetector:
 
             # Squeezed prediction (reduce precision)
             squeezed = [
-                round(f * (2 ** squeeze_bit_depth)) / (2 ** squeeze_bit_depth)
+                round(f * (2**squeeze_bit_depth)) / (2**squeeze_bit_depth)
                 for f in features
             ]
             squeezed_pred = model_fn(squeezed)
@@ -460,7 +491,9 @@ class AdversarialDetector:
                 pert_pred = model_fn(perturbed)
 
                 # If numeric, compute difference
-                if isinstance(orig_pred, (int, float)) and isinstance(pert_pred, (int, float)):
+                if isinstance(orig_pred, (int, float)) and isinstance(
+                    pert_pred, (int, float)
+                ):
                     sensitivity = abs(pert_pred - orig_pred) / perturbation
                     max_sensitivity = max(max_sensitivity, sensitivity)
             except Exception:
@@ -570,7 +603,9 @@ class AdversarialRobustnessTester:
             "clean_accuracy": correct_clean / total if total > 0 else 0,
             "fgsm_accuracy": correct_fgsm / total if total > 0 else 0,
             "pgd_accuracy": correct_pgd / total if total > 0 else 0,
-            "robustness_score": (correct_fgsm + correct_pgd) / (2 * total) if total > 0 else 0,
+            "robustness_score": (correct_fgsm + correct_pgd) / (2 * total)
+            if total > 0
+            else 0,
             "total_samples": total,
             "epsilon": epsilon,
         }
@@ -582,6 +617,7 @@ class AdversarialRobustnessTester:
 # =============================================================
 # SECTION 3: Model Theft Prevention
 # =============================================================
+
 
 class ModelAccessController:
     """
@@ -638,11 +674,13 @@ class ModelAccessController:
 
         # Track usage
         now = time.time()
-        self._query_log[model_id].append({
-            "user_id": user_id,
-            "timestamp": now,
-            "query_type": query_type,
-        })
+        self._query_log[model_id].append(
+            {
+                "user_id": user_id,
+                "timestamp": now,
+                "query_type": query_type,
+            }
+        )
 
         model["total_queries"] += 1
         model["unique_users"].add(user_id)
@@ -650,12 +688,10 @@ class ModelAccessController:
         # Check rate limits
         limits = self._rate_limits.get(model_id, {})
         recent_minute = sum(
-            1 for q in self._query_log[model_id]
-            if now - q["timestamp"] < 60
+            1 for q in self._query_log[model_id] if now - q["timestamp"] < 60
         )
         recent_hour = sum(
-            1 for q in self._query_log[model_id]
-            if now - q["timestamp"] < 3600
+            1 for q in self._query_log[model_id] if now - q["timestamp"] < 3600
         )
 
         if recent_minute > limits.get("per_minute", 50):
@@ -668,12 +704,16 @@ class ModelAccessController:
         if anomaly["is_anomalous"]:
             return {"allowed": False, "reason": "Anomalous query pattern detected"}
 
-        return {"allowed": True, "remaining_minute": limits.get("per_minute", 50) - recent_minute}
+        return {
+            "allowed": True,
+            "remaining_minute": limits.get("per_minute", 50) - recent_minute,
+        }
 
     def _detect_query_anomaly(self, model_id: str, user_id: str) -> Dict:
         """Detect anomalous query patterns that may indicate extraction."""
         recent_queries = [
-            q for q in self._query_log[model_id]
+            q
+            for q in self._query_log[model_id]
             if time.time() - q["timestamp"] < 3600 and q["user_id"] == user_id
         ]
 
@@ -683,12 +723,14 @@ class ModelAccessController:
         # Check for systematic probing
         # (e.g., queries that vary in small increments)
         timestamps = [q["timestamp"] for q in recent_queries]
-        intervals = [timestamps[i+1] - timestamps[i] for i in range(len(timestamps)-1)]
+        intervals = [
+            timestamps[i + 1] - timestamps[i] for i in range(len(timestamps) - 1)
+        ]
 
         if intervals:
             # Check for very regular intervals (bot-like behavior)
             mean_interval = sum(intervals) / len(intervals)
-            variance = sum((i - mean_interval)**2 for i in intervals) / len(intervals)
+            variance = sum((i - mean_interval) ** 2 for i in intervals) / len(intervals)
             cv = math.sqrt(variance) / mean_interval if mean_interval > 0 else 0
 
             if cv < 0.1 and len(intervals) > 20:
@@ -704,6 +746,7 @@ class ModelAccessController:
 # =============================================================
 # SECTION 4: Model Watermarking
 # =============================================================
+
 
 class ModelWatermarker:
     """
@@ -778,7 +821,10 @@ class ModelWatermarker:
         """
         stored = self._watermark_patterns.get(model_id)
         if not stored:
-            return {"watermarked": False, "reason": "No watermark registered for this model"}
+            return {
+                "watermarked": False,
+                "reason": "No watermark registered for this model",
+            }
 
         watermark = stored["watermark"]
 
@@ -831,6 +877,7 @@ class ModelWatermarker:
 # SECTION 5: Backdoor Detection
 # =============================================================
 
+
 class BackdoorDetector:
     """
     Detect backdoor/trojan attacks in neural networks.
@@ -866,17 +913,21 @@ class BackdoorDetector:
                     # Analyze why prediction differs
                     diff_score = self._compute_perturbation_sensitivity(inp, model_fn)
                     if diff_score > 0.5:
-                        anomalies.append({
-                            "sample_index": i,
-                            "expected": label,
-                            "predicted": pred,
-                            "perturbation_sensitivity": diff_score,
-                        })
+                        anomalies.append(
+                            {
+                                "sample_index": i,
+                                "expected": label,
+                                "predicted": pred,
+                                "perturbation_sensitivity": diff_score,
+                            }
+                        )
             except Exception as e:
-                anomalies.append({
-                    "sample_index": i,
-                    "error": str(e),
-                })
+                anomalies.append(
+                    {
+                        "sample_index": i,
+                        "error": str(e),
+                    }
+                )
 
         # Analyze prediction distribution
         pred_counter = Counter(predictions)
@@ -884,12 +935,19 @@ class BackdoorDetector:
 
         distribution_shift = 0
         for label in set(list(pred_counter.keys()) + list(label_counter.keys())):
-            pred_ratio = pred_counter.get(label, 0) / len(predictions) if predictions else 0
-            true_ratio = label_counter.get(label, 0) / len(expected_labels) if expected_labels else 0
+            pred_ratio = (
+                pred_counter.get(label, 0) / len(predictions) if predictions else 0
+            )
+            true_ratio = (
+                label_counter.get(label, 0) / len(expected_labels)
+                if expected_labels
+                else 0
+            )
             distribution_shift += abs(pred_ratio - true_ratio)
 
         return {
-            "backdoor_suspected": distribution_shift > 0.3 or len(anomalies) > len(test_inputs) * 0.1,
+            "backdoor_suspected": distribution_shift > 0.3
+            or len(anomalies) > len(test_inputs) * 0.1,
             "anomalies": anomalies[:10],  # First 10 anomalies
             "anomaly_count": len(anomalies),
             "distribution_shift": round(distribution_shift, 3),
@@ -913,7 +971,9 @@ class BackdoorDetector:
                 perturbed[i] += epsilon
                 perturbed_pred = model_fn(perturbed)
 
-                if isinstance(original, (int, float)) and isinstance(perturbed_pred, (int, float)):
+                if isinstance(original, (int, float)) and isinstance(
+                    perturbed_pred, (int, float)
+                ):
                     change = abs(perturbed_pred - original)
                     max_change = max(max_change, change)
 
@@ -970,7 +1030,7 @@ class BackdoorDetector:
         total = 0
         for point in data:
             dist = math.sqrt(
-                sum((p - c) ** 2 for p, c in zip(point[:len(centroid)], centroid))
+                sum((p - c) ** 2 for p, c in zip(point[: len(centroid)], centroid))
             )
             total += dist
         return total / len(data) if data else 0
@@ -979,6 +1039,7 @@ class BackdoorDetector:
 # =============================================================
 # SECTION 6: Secure Model Serving
 # =============================================================
+
 
 class SecureModelServer:
     """
@@ -992,7 +1053,9 @@ class SecureModelServer:
         self._input_validator = InputValidator()
         self._adversarial_detector = AdversarialDetector()
 
-    def register_model(self, model_id: str, model_fn: Callable, sensitivity: str = "medium"):
+    def register_model(
+        self, model_id: str, model_fn: Callable, sensitivity: str = "medium"
+    ):
         """Register a model for secure serving."""
         self._models[model_id] = {
             "fn": model_fn,
@@ -1036,9 +1099,7 @@ class SecureModelServer:
             }
 
         # 4. Adversarial detection
-        adv_check = self._adversarial_detector.detect_adversarial(
-            features, model["fn"]
-        )
+        adv_check = self._adversarial_detector.detect_adversarial(features, model["fn"])
         if adv_check["is_adversarial"]:
             return {
                 "error": "Potentially adversarial input detected",
@@ -1057,12 +1118,14 @@ class SecureModelServer:
             prediction = self._add_output_noise(prediction)
 
         # 7. Log query
-        self._query_log.append({
-            "model_id": model_id,
-            "user_id": user_id,
-            "timestamp": time.time(),
-            "latency": time.time() - start_time,
-        })
+        self._query_log.append(
+            {
+                "model_id": model_id,
+                "user_id": user_id,
+                "timestamp": time.time(),
+                "latency": time.time() - start_time,
+            }
+        )
 
         model["total_queries"] += 1
 
@@ -1095,7 +1158,9 @@ class TokenBucketRateLimiter:
 
         bucket = self._buckets[client_id]
         elapsed = now - bucket["last_refill"]
-        bucket["tokens"] = min(self.capacity, bucket["tokens"] + elapsed * self.refill_rate)
+        bucket["tokens"] = min(
+            self.capacity, bucket["tokens"] + elapsed * self.refill_rate
+        )
         bucket["last_refill"] = now
 
         if bucket["tokens"] >= 1:
@@ -1132,6 +1197,7 @@ class InputValidator:
 # DEMONSTRATIONS
 # =============================================================
 
+
 def demo_poisoning_detection():
     """Demonstrate data poisoning detection."""
     print("\n" + "=" * 60)
@@ -1142,18 +1208,24 @@ def demo_poisoning_detection():
 
     # Create clean dataset
     clean_data = [
-        DataPoint(features=[random.gauss(0, 1) for _ in range(5)], label=i % 2, source="trusted")
+        DataPoint(
+            features=[random.gauss(0, 1) for _ in range(5)],
+            label=i % 2,
+            source="trusted",
+        )
         for i in range(100)
     ]
 
     # Inject poisoned data
     poisoned_data = clean_data.copy()
     for _ in range(10):
-        poisoned_data.append(DataPoint(
-            features=[100 + random.gauss(0, 0.1) for _ in range(5)],  # Outliers
-            label=0,  # Wrong label
-            source="unknown_attacker",
-        ))
+        poisoned_data.append(
+            DataPoint(
+                features=[100 + random.gauss(0, 0.1) for _ in range(5)],  # Outliers
+                label=0,  # Wrong label
+                source="unknown_attacker",
+            )
+        )
 
     print("Analyzing clean dataset...")
     clean_result = detector.analyze_dataset(clean_data)
@@ -1168,14 +1240,14 @@ def demo_poisoning_detection():
     print(f"  Issues: {len(poisoned_result['issues'])}")
     print(f"  Suspicious samples: {poisoned_result['suspicious_count']}")
 
-    if poisoned_result['issues']:
+    if poisoned_result["issues"]:
         print("\n  Sample issues:")
-        for issue in poisoned_result['issues'][:3]:
+        for issue in poisoned_result["issues"][:3]:
             print(f"    - [{issue['severity']}] {issue['message']}")
 
-    if poisoned_result['recommendations']:
+    if poisoned_result["recommendations"]:
         print("\n  Recommendations:")
-        for rec in poisoned_result['recommendations']:
+        for rec in poisoned_result["recommendations"]:
             print(f"    -> {rec}")
 
     print("\n[OK] Poisoning detection demonstrated")
@@ -1204,20 +1276,27 @@ def demo_adversarial_detection():
     # Test with clean input
     clean_input = [0.1, -0.2, 0.3, 0.0, -0.1]
     result = detector.detect_adversarial(clean_input, simple_model)
-    print(f"Clean input: adversarial={result['is_adversarial']}, confidence={result['confidence']:.3f}")
+    print(
+        f"Clean input: adversarial={result['is_adversarial']}, confidence={result['confidence']:.3f}"
+    )
 
     # Test with adversarial input
     adversarial_input = [100, -200, 150, 50, -100]
     result = detector.detect_adversarial(adversarial_input, simple_model)
-    print(f"Adversarial input: adversarial={result['is_adversarial']}, confidence={result['confidence']:.3f}")
-    if result['reasons']:
-        for reason in result['reasons']:
+    print(
+        f"Adversarial input: adversarial={result['is_adversarial']}, confidence={result['confidence']:.3f}"
+    )
+    if result["reasons"]:
+        for reason in result["reasons"]:
             print(f"  Reason: {reason}")
 
     # Robustness testing
     print("\nRobustness Evaluation:")
     tester = AdversarialRobustnessTester()
-    test_data = [([random.gauss(0, 1) for _ in range(5)], random.randint(0, 1)) for _ in range(50)]
+    test_data = [
+        ([random.gauss(0, 1) for _ in range(5)], random.randint(0, 1))
+        for _ in range(50)
+    ]
 
     robustness = tester.evaluate_robustness(test_data, simple_model, epsilon=0.1)
     print(f"  Clean accuracy: {robustness['clean_accuracy']:.1%}")
@@ -1392,4 +1471,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n[FAIL] Error: {e}")
         import traceback
+
         traceback.print_exc()

@@ -30,12 +30,14 @@ starter = _load("starter_03", os.path.join(HERE, "starter.py"))
 def data_dir(tmp_path):
     """A 4-column csv + matching parquet (1000 rows)."""
     n = 1000
-    df = pl.DataFrame({
-        "id": range(n),
-        "score": [float(i % 97) for i in range(n)],
-        "split": ["valid" if i % 4 == 0 else "train" for i in range(n)],
-        "weight": [0.5] * n,
-    })
+    df = pl.DataFrame(
+        {
+            "id": range(n),
+            "score": [float(i % 97) for i in range(n)],
+            "split": ["valid" if i % 4 == 0 else "train" for i in range(n)],
+            "weight": [0.5] * n,
+        }
+    )
     csv_path = tmp_path / "events.csv"
     df.write_csv(csv_path)
     pq_path = tmp_path / "events.parquet"
@@ -44,6 +46,7 @@ def data_dir(tmp_path):
 
 
 # ---------------------------------------------------------------- bronze
+
 
 def test_bronze_count_matches(data_dir):
     csv_path, _, df = data_dir
@@ -70,6 +73,7 @@ def test_bronze_starter_raises(data_dir):
 
 # ---------------------------------------------------------------- silver
 
+
 def test_silver_pushes_predicate(data_dir):
     _, pq_path, df = data_dir
     assert solution.predicate_pushed(pq_path, "split", "valid") is True
@@ -81,8 +85,7 @@ def test_silver_does_not_collect(data_dir):
         source = fh.read()
     # predicate_pushed must only explain; count the collect calls per fn
     fn_src = source.split("def _projected_columns")[0]
-    assert fn_src.count("collect(") == 1, \
-        "predicate_pushed must use explain, not collect"
+    assert fn_src.count("collect(") == 1, "predicate_pushed must use explain, not collect"
 
 
 def test_silver_starter_raises(data_dir):
@@ -92,6 +95,7 @@ def test_silver_starter_raises(data_dir):
 
 
 # ---------------------------------------------------------------- gold
+
 
 def test_gold_result_correct(data_dir):
     _, pq_path, df = data_dir

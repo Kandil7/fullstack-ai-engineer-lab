@@ -94,7 +94,7 @@ class JobQueue:
                     self._dlq.append(job)
                     results.append({"id": job["id"], "status": "dead"})
                 else:
-                    self._queue.append(job)     # retry
+                    self._queue.append(job)  # retry
                     results.append({"id": job["id"], "status": "retry"})
         return results
 
@@ -167,9 +167,11 @@ def _verify() -> None:
         queue2 = JobQueue()
         # make every attempt fail by raising always: simulate with max_retries=1
         poisoned = queue2.enqueue("flaky", {})
+
         # force failure: monkeypatch _run to always raise
         def always_fail(job):
             raise RuntimeError("permanent")
+
         queue2._run = always_fail  # type: ignore[method-assign]
         results2 = queue2.drain(max_retries=2)
         assert any(r["id"] == poisoned and r["status"] == "dead" for r in results2)
@@ -183,6 +185,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("35-background-jobs:app", host="127.0.0.1", port=8000)
     else:
         _verify()

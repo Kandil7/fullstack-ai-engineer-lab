@@ -59,7 +59,7 @@ Never `logging.info(...)` from a library. Create a logger per module:
 ```python
 import logging
 
-logger = logging.getLogger(__name__)   # "myapp.retriever" in a package
+logger = logging.getLogger(__name__)  # "myapp.retriever" in a package
 
 logger.info("retrieved %d chunks in %.1f ms", 5, 12.3)
 ```
@@ -79,10 +79,8 @@ import logging
 logger = logging.getLogger("app")
 logger.setLevel(logging.DEBUG)
 
-console = logging.StreamHandler()                       # stderr
-console.setFormatter(logging.Formatter(
-    "%(asctime)s %(levelname)s %(name)s: %(message)s"
-))
+console = logging.StreamHandler()  # stderr
+console.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
 logger.addHandler(console)
 
 rotating = logging.handlers.RotatingFileHandler(
@@ -106,9 +104,7 @@ import logging.config
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {
-        "standard": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"}
-    },
+    "formatters": {"standard": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"}},
     "handlers": {
         "console": {"class": "logging.StreamHandler", "formatter": "standard"},
         "file": {
@@ -137,7 +133,7 @@ the current traceback:
 try:
     json.loads(raw)
 except ValueError:
-    logger.exception("malformed response from model")   # includes traceback
+    logger.exception("malformed response from model")  # includes traceback
 ```
 
 Outside an exception block use `logger.error("...", exc_info=True)` to get the
@@ -163,8 +159,7 @@ Text logs are for humans; JSON logs are for machines (and therefore for the
 dashboards built by machines). Add a request/correlation ID as a field:
 
 ```python
-logger.info("retrieve",
-            extra={"request_id": "7ac9", "chunks": 5, "ms": 12.3})
+logger.info("retrieve", extra={"request_id": "7ac9", "chunks": 5, "ms": 12.3})
 ```
 
 With a JSON formatter each line becomes `{"level": "INFO", "message": "retrieve",
@@ -178,8 +173,9 @@ class RequestAdapter(logging.LoggerAdapter):
     def process(self, msg, kwargs):
         return f"[{self.extra['request_id']}] {msg}", kwargs
 
+
 logger = RequestAdapter(logging.getLogger("rag"), {"request_id": "7ac9"})
-logger.info("retrieval started")          # [7ac9] retrieval started
+logger.info("retrieval started")  # [7ac9] retrieval started
 ```
 
 Every log line from a request carries its ID — the join key that reconstructs a
@@ -208,7 +204,7 @@ logger.info("user logged in: %s", user_id)
 ```python
 # WRONG — root logger has a default handler AND you added another
 logger = logging.getLogger()
-logger.addHandler(StreamHandler())   # now everything prints twice
+logger.addHandler(StreamHandler())  # now everything prints twice
 # CORRECT — set logger.propagate = False, or configure only the root
 ```
 

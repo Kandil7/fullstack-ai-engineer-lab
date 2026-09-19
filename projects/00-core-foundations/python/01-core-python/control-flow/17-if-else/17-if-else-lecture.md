@@ -59,7 +59,7 @@ temperature = 75
 if temperature >= 90:
     print("It's hot!")
 elif temperature >= 70:
-    print("It's warm!")       # This executes
+    print("It's warm!")  # This executes
 elif temperature >= 50:
     print("It's cool!")
 elif temperature >= 32:
@@ -78,18 +78,18 @@ x = 10
 y = 20
 
 # Equal to
-print(x == y)    # False
+print(x == y)  # False
 
 # Not equal to
-print(x != y)    # True
+print(x != y)  # True
 
 # Greater than / Less than
-print(x > y)     # False
-print(x < y)     # True
+print(x > y)  # False
+print(x < y)  # True
 
 # Greater/Less than or equal to
-print(x >= 10)   # True
-print(x <= 5)    # False
+print(x >= 10)  # True
+print(x <= 5)  # False
 
 # Chained comparisons (Pythonic!)
 print(5 < x < 15)  # True — equivalent to 5 < x and x < 15
@@ -126,32 +126,32 @@ if (age >= 18 and income >= 30000) or not is_student:
 # Everything in Python has a boolean value
 
 # FALSY values (evaluate to False in conditions)
-bool(0)         # False
-bool(0.0)       # False
-bool("")        # False
-bool([])        # False
-bool({})        # False
-bool(set())     # False
-bool(None)      # False
-bool(False)     # False
+bool(0)  # False
+bool(0.0)  # False
+bool("")  # False
+bool([])  # False
+bool({})  # False
+bool(set())  # False
+bool(None)  # False
+bool(False)  # False
 
 # TRUTHY values (evaluate to True)
-bool(1)         # True
-bool(-1)        # True
-bool("hello")   # True
-bool([1, 2])    # True
+bool(1)  # True
+bool(-1)  # True
+bool("hello")  # True
+bool([1, 2])  # True
 bool({"a": 1})  # True
 bool(object())  # True
 
 # Practical usage
 name = ""
-if name:          # Empty string is falsy
+if name:  # Empty string is falsy
     print("Hello, " + name)
 else:
     print("Name is empty!")
 
 items = []
-if not items:     # Empty list is falsy
+if not items:  # Empty list is falsy
     print("No items in cart")
 ```
 
@@ -265,12 +265,13 @@ def classify_age(age):
     else:
         return "Senior"
 
+
 # Test cases
-print(classify_age(-5))   # Invalid age
-print(classify_age(10))   # Child
-print(classify_age(16))   # Teenager
-print(classify_age(30))   # Adult
-print(classify_age(70))   # Senior
+print(classify_age(-5))  # Invalid age
+print(classify_age(10))  # Child
+print(classify_age(16))  # Teenager
+print(classify_age(30))  # Adult
+print(classify_age(70))  # Senior
 ```
 
 ### Example 2: FizzBuzz
@@ -286,6 +287,7 @@ def fizzbuzz(n):
             print("Buzz")
         else:
             print(i)
+
 
 fizzbuzz(15)
 ```
@@ -308,9 +310,10 @@ def validate_login(username, password):
         return "Password must contain a digit"
     return "Valid!"
 
-print(validate_login("ab", "short"))       # Username must be at least 3 characters
-print(validate_login("alice", "password")) # Password must contain a digit
-print(validate_login("alice", "Pass1234")) # Valid!
+
+print(validate_login("ab", "short"))  # Username must be at least 3 characters
+print(validate_login("alice", "password"))  # Password must contain a digit
+print(validate_login("alice", "Pass1234"))  # Valid!
 ```
 
 ### Example 4: Discount Calculator
@@ -318,29 +321,30 @@ print(validate_login("alice", "Pass1234")) # Valid!
 ```python
 def calculate_discount(total, is_member, day_of_week):
     discount = 0
-    
+
     # Base discount for members
     if is_member:
         discount += 0.10  # 10% member discount
-    
+
     # Day-specific discounts
     if day_of_week == "Tuesday":
         discount += 0.05  # 5% Tuesday special
     elif day_of_week == "Wednesday":
         discount += 0.15  # 15% Wednesday deal
-    
+
     # High-value purchase bonus
     if total >= 100:
         discount += 0.05  # 5% big spender
-    
+
     # Cap discount at 30%
     discount = min(discount, 0.30)
-    
+
     final = total * (1 - discount)
     return final, discount
 
+
 final_price, applied_discount = calculate_discount(150, True, "Wednesday")
-print(f"Original: $150, Discount: {applied_discount*100}%, Final: ${final_price:.2f}")
+print(f"Original: $150, Discount: {applied_discount * 100}%, Final: ${final_price:.2f}")
 ```
 
 ---
@@ -364,8 +368,9 @@ class Empty:
     def __bool__(self):
         return False
 
+
 # Pythonic — explicit checks
-if len(my_list) > 0:    # or simply: if my_list:
+if len(my_list) > 0:  # or simply: if my_list:
     process(my_list)
 ```
 
@@ -440,10 +445,11 @@ def get_grade(score):
     # Your code here
     pass
 
+
 # Expected: "A-", "B+", etc.
-print(get_grade(92))   # A-
-print(get_grade(85))   # B+
-print(get_grade(73))   # C
+print(get_grade(92))  # A-
+print(get_grade(85))  # B+
+print(get_grade(73))  # C
 ```
 
 ### Exercise 2: BMI Calculator
@@ -453,6 +459,7 @@ Write a function that calculates BMI and returns a category: "Underweight", "Nor
 def bmi_category(weight_kg, height_m):
     # Your code here
     pass
+
 
 # Expected: "Normal weight"
 print(bmi_category(70, 1.75))
@@ -465,6 +472,7 @@ Write a function that determines if a year is a leap year.
 def is_leap_year(year):
     # Your code here
     pass
+
 
 # Expected: True
 print(is_leap_year(2024))
@@ -479,6 +487,7 @@ Write a function that takes a traffic light color and returns the action ("Stop"
 def traffic_action(color):
     # Your code here
     pass
+
 
 # Expected: "Stop"
 print(traffic_action("red"))

@@ -42,13 +42,14 @@ PIPELINE = [
     ("promote-100", 8),
 ]
 
+
 def run_pipeline(fail_at: str | None) -> list[tuple[str, bool]]:
     results = []
     for stage, order in PIPELINE:
         ok = stage != fail_at
         results.append((stage, ok))
         if not ok:
-            break                        # a failed stage stops the ship
+            break  # a failed stage stops the ship
     return results
 
 
@@ -70,8 +71,9 @@ MATRIX = [
     {"python": "3.13", "deps": "latest"},
 ]
 
+
 def matrix_success(run_log: list[bool]) -> bool:
-    return all(run_log)                  # every cell must pass
+    return all(run_log)  # every cell must pass
 
 
 print("=== 2. Matrix testing ===")
@@ -87,6 +89,7 @@ print()
 # pip install ~minutes; a cache keyed on the lockfile turns it into
 # seconds when nothing changed. Key correctness matters: too coarse
 # (no key) = stale cache; too fine = never hits.
+
 
 def cache_hit(cache_key: str, lockfile_hash: str, store: dict[str, str]) -> bool:
     """Restore from cache if the key matches the lockfile hash."""
@@ -113,14 +116,14 @@ print()
 # AFTER (contract) — or the new code queries a schema that does not
 # exist yet. The pipeline orders it for you.
 
+
 def migration_order(expand: list[str], contract: list[str]) -> list[str]:
     """Expand (additive) before deploy; contract (destructive) after."""
     return ["EXPAND: " + s for s in expand] + ["deploy"] + ["CONTRACT: " + s for s in contract]
 
 
 print("=== 4. Migrations in the pipeline ===")
-for step in migration_order(["add column model_v2_score"],
-                            ["drop column legacy_score"]):
+for step in migration_order(["add column model_v2_score"], ["drop column legacy_score"]):
     print(f"  {step}")
 print()
 
@@ -131,8 +134,10 @@ print()
 # Canary: route 5% -> 25% -> 100% (slow, measurable, small blast).
 # The rollout is traffic math with health gates at each step.
 
+
 def canary_steps(steps: list[float]) -> list[float]:
     return steps
+
 
 def blue_green_switch(old_ok: bool, new_ok: bool) -> str:
     if not new_ok:
@@ -152,6 +157,7 @@ print()
 # Every deploy has a rollback: revert the code AND the data changes.
 # Schema-destructive migrations complicate rollback — which is why
 # expand/contract (section 4) makes rollback just a code revert.
+
 
 def rollback_strategy(has_destructive_migration: bool) -> str:
     if has_destructive_migration:
@@ -181,6 +187,7 @@ print()
 #
 # MISTAKE: no rollback story — the deploy is a point of no return
 # CORRECT: expand/contract so rollback = code revert
+
 
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
@@ -231,4 +238,4 @@ if __name__ == "__main__":
         print("2. Matrix = the coverage contract across versions")
         print("3. Cache keyed on the lockfile; migrations expand/contract")
         print("4. Canary/blue-green rollout; rollback = code revert")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

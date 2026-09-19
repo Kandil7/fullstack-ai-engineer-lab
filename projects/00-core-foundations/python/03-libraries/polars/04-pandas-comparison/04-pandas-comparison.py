@@ -54,6 +54,7 @@ plf = pl.DataFrame(_records)  # polars DataFrame
 # pandas: boolean mask in square brackets. polars: filter() with an Expr.
 # Both are vectorized; the polars one is also reusable in lazy mode.
 
+
 def pandas_filter(df: pd.DataFrame, campaign: str, min_rev: float) -> pd.DataFrame:
     """pandas: boolean-mask row selection."""
     return df[(df["campaign"] == campaign) & (df["revenue"] >= min_rev)]
@@ -61,9 +62,7 @@ def pandas_filter(df: pd.DataFrame, campaign: str, min_rev: float) -> pd.DataFra
 
 def polars_filter(df: pl.DataFrame, campaign: str, min_rev: float) -> pl.DataFrame:
     """polars: filter() with a compound Expr predicate."""
-    return df.filter(
-        (pl.col("campaign") == campaign) & (pl.col("revenue") >= min_rev)
-    )
+    return df.filter((pl.col("campaign") == campaign) & (pl.col("revenue") >= min_rev))
 
 
 # Example 1: identical rows, same order (polars preserves input order here)
@@ -82,13 +81,14 @@ print(f"pandas rows: {len(p_out)}, polars rows: {pl_out.height}")
 # with expressions. Note: pandas computes the same aggregates; polars
 # expressions read top-to-bottom like a spec.
 
+
 def pandas_groupby(df: pd.DataFrame) -> pd.DataFrame:
     """pandas: per-campaign conversion and revenue stats."""
     return (
         df.groupby("campaign")
-        .agg(conversions=("converted", "sum"),
-             revenue=("revenue", "mean"),
-             events=("user", "count"))
+        .agg(
+            conversions=("converted", "sum"), revenue=("revenue", "mean"), events=("user", "count")
+        )
         .reset_index()
     )
 
@@ -97,9 +97,11 @@ def polars_groupby(df: pl.DataFrame) -> pl.DataFrame:
     """polars: per-campaign conversion and revenue stats."""
     return (
         df.group_by("campaign")
-        .agg(pl.col("converted").sum().alias("conversions"),
-             pl.col("revenue").mean().alias("revenue"),
-             pl.len().alias("events"))
+        .agg(
+            pl.col("converted").sum().alias("conversions"),
+            pl.col("revenue").mean().alias("revenue"),
+            pl.len().alias("events"),
+        )
         .sort("campaign")
     )
 
@@ -121,10 +123,9 @@ print(g_l.select("campaign", "conversions").rows())
 # pandas: df.merge(other, on=...). polars: df.join(other, on=...). Both
 # default to inner joins; both accept how=/how=.
 
-campaign_meta_p = pd.DataFrame(
-    {"campaign": ["a", "b", "c", "d"], "budget": [1000, 800, 1200, 600]}
-)
+campaign_meta_p = pd.DataFrame({"campaign": ["a", "b", "c", "d"], "budget": [1000, 800, 1200, 600]})
 campaign_meta_l = pl.DataFrame(campaign_meta_p)
+
 
 def pandas_join(df: pd.DataFrame) -> pd.DataFrame:
     """pandas: merge on campaign id."""
@@ -151,6 +152,7 @@ print(j_p.shape, j_l.shape)
 # pandas: df["new"] = expr (writes into the frame). polars:
 # with_columns() returns a new frame — nothing mutates the input.
 
+
 def pandas_new_col(df: pd.DataFrame) -> pd.DataFrame:
     """pandas: column assignment in place (returns the same frame)."""
     df = df.copy()
@@ -161,8 +163,7 @@ def pandas_new_col(df: pd.DataFrame) -> pd.DataFrame:
 def polars_new_col(df: pl.DataFrame) -> pl.DataFrame:
     """polars: with_columns returns a NEW frame with the derived column."""
     return df.with_columns(
-        (pl.col("revenue") / pl.col("revenue").sum().over("user"))
-        .alias("revenue_per_user")
+        (pl.col("revenue") / pl.col("revenue").sum().over("user")).alias("revenue_per_user")
     )
 
 
@@ -184,6 +185,7 @@ print(f"polars new col: {n_l['revenue_per_user'][0]:.6f}")
 # but never gate on it. Run the same workload several times; the polars
 # advantage grows with data size and with lazy pipelines that avoid
 # materialization.
+
 
 def measure(label: str, fn, repeat: int = 3) -> None:
     """Run fn repeatedly, print best wall-clock time in ms."""
@@ -223,6 +225,7 @@ measure("polars", lambda: polars_groupby(plf))
 # the pipeline is a fixed set of vectorized steps, and Parquet/Arrow
 # interop matters more than pandas convenience.
 
+
 def pandas_why_still_right() -> str:
     """One-line summary of when NOT to migrate."""
     return (
@@ -260,37 +263,41 @@ def _verify() -> None:
     g_p = pandas_groupby(pdframe).sort_values("campaign")
     g_l = polars_groupby(plf)
     assert g_l.height == 4, "one row per campaign"
-    assert g_l["conversions"].sum() == int(g_p["conversions"].sum()), \
+    assert g_l["conversions"].sum() == int(g_p["conversions"].sum()), (
         "total conversions must agree between engines"
-    assert g_p["conversions"].tolist() == [c for _, c in g_l.select("campaign", "conversions").rows()], \
-        "per-campaign conversion counts must match exactly"
+    )
+    assert g_p["conversions"].tolist() == [
+        c for _, c in g_l.select("campaign", "conversions").rows()
+    ], "per-campaign conversion counts must match exactly"
 
     j_p = pandas_join(pdframe)
     j_l = polars_join(plf)
-    assert j_p.shape == j_l.shape == (N, 5), \
-        "left joins must widen both frames identically"
+    assert j_p.shape == j_l.shape == (N, 5), "left joins must widen both frames identically"
     assert "budget" in j_l.columns, "join must bring the budget column in"
 
     n_p = pandas_new_col(pdframe)
     n_l = polars_new_col(plf)
-    assert abs(n_p["revenue_per_user"].iloc[0] - n_l["revenue_per_user"][0]) < 1e-9, \
+    assert abs(n_p["revenue_per_user"].iloc[0] - n_l["revenue_per_user"][0]) < 1e-9, (
         "derived column must match to float precision"
-    assert "revenue_per_user" in n_l.columns, \
-        "with_columns must add the derived column"
-    assert n_l.columns == plf.columns + ["revenue_per_user"], \
+    )
+    assert "revenue_per_user" in n_l.columns, "with_columns must add the derived column"
+    assert n_l.columns == plf.columns + ["revenue_per_user"], (
         "polars must keep original columns and append the new one"
+    )
 
     # pandas input must be untouched by the polars pipeline (no mutation)
-    assert list(pdframe.columns) == ["user", "campaign", "converted", "revenue"], \
+    assert list(pdframe.columns) == ["user", "campaign", "converted", "revenue"], (
         "polars pipeline must not mutate the pandas frame"
+    )
 
     # Cross-check the groupby numbers exactly (deterministic seed data)
-    assert g_l.select("conversions").to_series().to_list() == \
-        [24739, 24780, 25233, 24974], \
+    assert g_l.select("conversions").to_series().to_list() == [24739, 24780, 25233, 24974], (
         "seeded data must reproduce the exact conversion counts"
+    )
 
-    assert "pandas wins" in pandas_why_still_right(), \
+    assert "pandas wins" in pandas_why_still_right(), (
         "the guidance must state when pandas remains the right choice"
+    )
 
     print("[OK] 04-pandas-comparison: all checks passed")
 
@@ -303,4 +310,4 @@ if __name__ == "__main__":
         print("1. Same idioms, two grammars: filter / group_by.agg / join / new cols")
         print("2. Measurements are printed, never asserted (wall-clock is flaky)")
         print("3. Port for scale and Parquet; keep pandas for tz/apply ecosystems")
-        _verify()   # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

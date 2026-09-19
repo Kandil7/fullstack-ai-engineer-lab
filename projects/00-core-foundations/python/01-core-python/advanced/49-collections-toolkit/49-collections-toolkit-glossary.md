@@ -33,6 +33,7 @@ where `list.insert(0, x)` would shift the whole list.
 **Example**:
 ```python
 from collections import deque
+
 q = deque([1, 2])
 q.appendleft(0)
 print(list(q))  # [0, 1, 2]
@@ -51,9 +52,10 @@ on the *first* equal element.
 **Example**:
 ```python
 import bisect
+
 xs = [1, 3, 5, 7, 7, 9]
-print(bisect.bisect_left(xs, 7))   # 3
-print(bisect.bisect_left(xs, 6))   # 3 (between 5 and 7)
+print(bisect.bisect_left(xs, 7))  # 3
+print(bisect.bisect_left(xs, 6))  # 3 (between 5 and 7)
 ```
 
 **Complexity**: O(log n).
@@ -69,8 +71,9 @@ of the two variants.
 **Example**:
 ```python
 import bisect
+
 xs = [1, 3, 5, 7, 7, 9]
-print(bisect.bisect_right(xs, 7))   # 5 (past the second 7)
+print(bisect.bisect_right(xs, 7))  # 5 (past the second 7)
 print(bisect.bisect_right(xs, 7) - bisect.bisect_left(xs, 7))  # 2 (count of 7s)
 ```
 
@@ -86,6 +89,7 @@ standard model for config precedence: overrides -> env -> defaults.
 **Example**:
 ```python
 from collections import ChainMap
+
 cfg = ChainMap({"lr": 1e-4}, {"lr": 1e-3, "seed": 0})
 print(cfg["lr"], cfg["seed"])  # 0.0001 0
 ```
@@ -102,9 +106,10 @@ elements in one O(n) pass. `most_common(k)` returns the top-k as
 **Example**:
 ```python
 from collections import Counter
+
 freq = Counter(["a", "b", "a", "a"])
-print(dict(freq))              # {'a': 3, 'b': 1}
-print(freq.most_common(1))     # [('a', 3)]
+print(dict(freq))  # {'a': 3, 'b': 1}
+print(freq.most_common(1))  # [('a', 3)]
 ```
 
 **Complexity**: O(n) to build; O(n log k) for `most_common(k)`.
@@ -119,9 +124,10 @@ counting code. Reads via `.get()` do not create keys.
 **Example**:
 ```python
 from collections import defaultdict
+
 groups = defaultdict(list)
 groups["c"].append(1)
-print(dict(groups))   # {'c': [1]}
+print(dict(groups))  # {'c': [1]}
 print(groups.get("x"))  # None - no key created
 ```
 
@@ -137,6 +143,7 @@ buffer that evicts the oldest item on overflow.
 **Example**:
 ```python
 from collections import deque
+
 d = deque(maxlen=2)
 for x in [1, 2, 3]:
     d.append(x)
@@ -155,6 +162,7 @@ satisfies the heap invariant (smallest first) in O(n) — faster than n
 **Example**:
 ```python
 import heapq
+
 xs = [5, 1, 3]
 heapq.heapify(xs)
 print(xs[0])  # 1
@@ -172,6 +180,7 @@ ascending order.
 **Example**:
 ```python
 import heapq
+
 xs = [3, 1, 2]
 heapq.heapify(xs)
 print(heapq.heappop(xs))  # 1
@@ -190,6 +199,7 @@ queue.
 **Example**:
 ```python
 import heapq
+
 pq = []
 heapq.heappush(pq, (2, "rerank"))
 heapq.heappush(pq, (1, "health"))
@@ -208,6 +218,7 @@ insert O(n). Choose it when reads vastly outnumber writes.
 **Example**:
 ```python
 import bisect
+
 xs = [10, 20, 40]
 bisect.insort(xs, 30)
 print(xs)  # [10, 20, 30, 40]
@@ -225,6 +236,7 @@ models a sliding window.
 **Example**:
 ```python
 from collections import deque
+
 w = deque(maxlen=3)
 for t in ["q1", "q2", "q3", "q4"]:
     w.append(t)
@@ -244,6 +256,7 @@ tie-breaking.
 **Example**:
 ```python
 from collections import Counter
+
 freq = Counter("abacaba")
 print(freq.most_common(2))  # [('a', 4), ('b', 2)]
 ```
@@ -260,6 +273,7 @@ k-element heap: O(n log k) — far cheaper than `sorted(...)[:k]` for small k.
 **Example**:
 ```python
 import heapq
+
 scores = {"a": 0.1, "b": 0.9, "c": 0.5}
 print(heapq.nlargest(2, scores.items(), key=lambda kv: kv[1]))
 # [('b', 0.9), ('c', 0.5)]
@@ -277,6 +291,7 @@ documents, largest outliers below a floor).
 **Example**:
 ```python
 import heapq
+
 print(heapq.nsmallest(2, [5, 1, 4, 2]))  # [1, 2]
 ```
 
@@ -293,6 +308,7 @@ a regular dict is smaller and faster.
 **Example**:
 ```python
 from collections import OrderedDict
+
 od = OrderedDict(a=1, b=2)
 od.move_to_end("a")
 print(list(od))  # ['b', 'a']
@@ -311,9 +327,10 @@ semantics with no list shifting.
 **Example**:
 ```python
 from collections import deque
+
 jobs = deque(["a", "b"])
 print(jobs.popleft())  # a
-print(list(jobs))      # ['b']
+print(list(jobs))  # ['b']
 ```
 
 **Complexity**: O(1).
@@ -328,6 +345,7 @@ dequeue. Priority is typically the first element of a tuple.
 **Example**:
 ```python
 import heapq
+
 pq = []
 heapq.heappush(pq, (3, "slow job"))
 heapq.heappush(pq, (1, "urgent"))

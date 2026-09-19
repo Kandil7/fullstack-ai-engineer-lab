@@ -115,8 +115,8 @@ print(person["name"])  # Alice
 person["email"] = "alice@example.com"
 
 # Dictionary methods
-print(person.keys())   # dict_keys(['name', 'age', 'email'])
-print(person.values()) # dict_values(['Alice', 25, 'alice@example.com'])
+print(person.keys())  # dict_keys(['name', 'age', 'email'])
+print(person.values())  # dict_values(['Alice', 25, 'alice@example.com'])
 ```
 
 ### F
@@ -165,13 +165,13 @@ zero = 0
 large = 1_000_000  # Underscores for readability
 
 # Integer operations
-print(10 + 5)   # 15
-print(10 - 5)   # 5
-print(10 * 5)   # 50
-print(10 / 5)   # 2.0 (float division)
+print(10 + 5)  # 15
+print(10 - 5)  # 5
+print(10 * 5)  # 50
+print(10 / 5)  # 2.0 (float division)
 print(10 // 3)  # 3 (integer division)
-print(10 % 3)   # 1 (modulus)
-print(10 ** 2)  # 100 (exponent)
+print(10 % 3)  # 1 (modulus)
+print(10**2)  # 100 (exponent)
 ```
 
 **isinstance()**
@@ -180,7 +180,7 @@ print(10 ** 2)  # 100 (exponent)
 - **Related terms**: type(), Type Checking, Inheritance
 ```python
 x = 10
-print(isinstance(x, int))    # True
+print(isinstance(x, int))  # True
 print(isinstance(x, float))  # False
 
 # Can check multiple types
@@ -205,7 +205,7 @@ numbers.remove(3)  # Remove first occurrence of 3
 numbers.pop()  # Remove and return last element
 
 # List indexing
-print(numbers[0])   # First element
+print(numbers[0])  # First element
 print(numbers[-1])  # Last element
 print(numbers[1:3])  # Slice
 ```
@@ -240,6 +240,7 @@ x = None
 if x is None:
     print("x is None")
 
+
 # Function returning None
 def greet():
     print("Hello")
@@ -254,7 +255,7 @@ def greet():
 - **Related terms**: Sequence, Iterator, Loop
 ```python
 # range creation
-r1 = range(5)      # 0, 1, 2, 3, 4
+r1 = range(5)  # 0, 1, 2, 3, 4
 r2 = range(1, 10)  # 1, 2, 3, 4, 5, 6, 7, 8, 9
 r3 = range(0, 10, 2)  # 0, 2, 4, 6, 8
 
@@ -278,9 +279,9 @@ numbers = {1, 2, 3, 4, 5}
 from_list = set([1, 2, 2, 3, 3])  # Removes duplicates
 
 # Set operations
-numbers.add(6)        # Add element
-numbers.remove(3)     # Remove element
-numbers.discard(10)   # Remove if exists (no error)
+numbers.add(6)  # Add element
+numbers.remove(3)  # Remove element
+numbers.discard(10)  # Remove if exists (no error)
 
 # Set math
 a = {1, 2, 3}
@@ -297,21 +298,21 @@ print(a - b)  # Difference: {1, 2}
 ```python
 # String creation
 name = "Alice"
-greeting = 'Hello, World!'
+greeting = "Hello, World!"
 multi = """This is
 a multi-line string"""
 
 # String operations
-print(len(name))      # 5
-print(name.upper())   # ALICE
-print(name.lower())   # alice
-print(name[0])        # A
-print(name[1:3])      # li
+print(len(name))  # 5
+print(name.upper())  # ALICE
+print(name.lower())  # alice
+print(name[0])  # A
+print(name[1:3])  # li
 
 # String methods
 print(name.replace("A", "B"))  # Blice
-print(name.startswith("A"))    # True
-print(name.endswith("e"))      # True
+print(name.startswith("A"))  # True
+print(name.endswith("e"))  # True
 ```
 
 ### T
@@ -362,8 +363,10 @@ print(type(z))  # <class 'list'>
 ```python
 from typing import Union
 
+
 def process(value: Union[int, str]) -> str:
     return str(value)
+
 
 # Python 3.10+ syntax
 def process(value: int | str) -> str:

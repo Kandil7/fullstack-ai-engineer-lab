@@ -9,11 +9,14 @@ import numpy as np
 
 try:  # sklearn present -> use its metrics; else fall back to numpy
     from sklearn.metrics import confusion_matrix, roc_curve
+
     HAS_SKLEARN = True
 except ImportError:  # pragma: no cover - fallback path
     HAS_SKLEARN = False
 
-    def roc_curve(y_true: np.ndarray, y_score: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def roc_curve(
+        y_true: np.ndarray, y_score: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Minimal ROC: sweep thresholds over sorted scores."""
         order = np.argsort(y_score)[::-1]
         y_s, y_t = y_score[order], y_true[order]

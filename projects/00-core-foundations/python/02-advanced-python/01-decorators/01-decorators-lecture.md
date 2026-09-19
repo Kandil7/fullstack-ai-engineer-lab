@@ -34,6 +34,7 @@ In Python, functions are **first-class objects** — they can be assigned to var
 def greet(name):
     return f"Hello, {name}!"
 
+
 # Assign to a variable
 say_hello = greet
 print(say_hello("Alice"))  # "Hello, Alice!"
@@ -44,9 +45,11 @@ dispatch = {
     "upper": str.upper,
 }
 
+
 # Pass as an argument
 def apply(func, value):
     return func(value)
+
 
 print(apply(greet, "Bob"))  # "Hello, Bob!"
 ```
@@ -65,24 +68,30 @@ def repeat(func, times):
         for _ in range(times):
             results.append(func(*args, **kwargs))
         return results
+
     return wrapper
+
 
 @repeat
 def say_hi():
     return "Hi!"
 
+
 print(say_hi())  # ['Hi!', 'Hi!', 'Hi!']
+
 
 # Higher-order function: returns a function
 def multiplier(factor):
     def multiply(x):
         return x * factor
+
     return multiply
+
 
 double = multiplier(2)
 triple = multiplier(3)
-print(double(5))   # 10
-print(triple(5))   # 15
+print(double(5))  # 10
+print(triple(5))  # 15
 ```
 
 ---
@@ -97,10 +106,13 @@ def my_decorator(func):
         print("Something before the function")
         func()
         print("Something after the function")
+
     return wrapper
+
 
 def say_hello():
     print("Hello!")
+
 
 # Manually decorating
 say_hello = my_decorator(say_hello)
@@ -121,11 +133,14 @@ def my_decorator(func):
         print("Something before the function")
         func()
         print("Something after the function")
+
     return wrapper
+
 
 @my_decorator
 def say_hello():
     print("Hello!")
+
 
 # Equivalent to: say_hello = my_decorator(say_hello)
 say_hello()
@@ -138,26 +153,31 @@ Without `functools.wraps`, the decorated function loses its original metadata:
 ```python
 import functools
 
+
 def my_decorator(func):
     @functools.wraps(func)  # Preserves func's metadata
     def wrapper(*args, **kwargs):
         """Wrapper docstring"""
         return func(*args, **kwargs)
+
     return wrapper
+
 
 @my_decorator
 def greet(name):
     """Greet someone by name."""
     return f"Hello, {name}!"
 
+
 print(greet.__name__)  # "greet" (not "wrapper")
-print(greet.__doc__)   # "Greet someone by name."
+print(greet.__doc__)  # "Greet someone by name."
 ```
 
 ### Handling Arguments
 
 ```python
 import functools
+
 
 def my_decorator(func):
     @functools.wraps(func)
@@ -166,12 +186,15 @@ def my_decorator(func):
         result = func(*args, **kwargs)
         print(f"{func.__name__} returned {result}")
         return result
+
     return wrapper
+
 
 @my_decorator
 def add(a, b):
     """Add two numbers."""
     return a + b
+
 
 add(3, 5)
 # Calling add with (3, 5), {}
@@ -187,8 +210,10 @@ When you need to pass arguments to a decorator itself, you need an extra layer o
 ```python
 import functools
 
+
 def repeat(times):
     """Decorator factory that repeats a function call `times` times."""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -196,13 +221,17 @@ def repeat(times):
             for _ in range(times):
                 result = func(*args, **kwargs)
             return result
+
         return wrapper
+
     return decorator
+
 
 @repeat(times=3)
 def say_hello(name):
     print(f"Hello, {name}!")
     return name
+
 
 result = say_hello("Alice")
 # Output:
@@ -217,14 +246,16 @@ result = say_hello("Alice")
 import functools
 import time
 
+
 def retry(max_attempts=3, delay=1, backoff=2, exceptions=(Exception,)):
     """Retry decorator with exponential backoff."""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             last_exception = None
             current_delay = delay
-            
+
             for attempt in range(1, max_attempts + 1):
                 try:
                     return func(*args, **kwargs)
@@ -234,14 +265,18 @@ def retry(max_attempts=3, delay=1, backoff=2, exceptions=(Exception,)):
                         print(f"Attempt {attempt} failed: {e}. Retrying in {current_delay}s...")
                         time.sleep(current_delay)
                         current_delay *= backoff
-            
+
             raise last_exception
+
         return wrapper
+
     return decorator
+
 
 @retry(max_attempts=3, delay=0.5, exceptions=(ConnectionError, TimeoutError))
 def fetch_data(url):
     import random
+
     if random.random() < 0.7:
         raise ConnectionError("Connection refused")
     return {"status": "ok"}
@@ -257,39 +292,44 @@ Classes can implement decorators using the `__call__` method:
 import functools
 import time
 
+
 class Timer:
     """Class-based decorator that times function execution."""
-    
+
     def __init__(self, func):
         functools.update_wrapper(self, func)
         self.func = func
         self.total_time = 0
         self.call_count = 0
-    
+
     def __call__(self, *args, **kwargs):
         start = time.perf_counter()
         result = self.func(*args, **kwargs)
         elapsed = time.perf_counter() - start
-        
+
         self.total_time += elapsed
         self.call_count += 1
-        
-        print(f"{self.func.__name__} took {elapsed:.4f}s "
-              f"(avg: {self.total_time / self.call_count:.4f}s)")
+
+        print(
+            f"{self.func.__name__} took {elapsed:.4f}s "
+            f"(avg: {self.total_time / self.call_count:.4f}s)"
+        )
         return result
-    
+
     def stats(self):
         """Return timing statistics."""
         return {
             "total_time": self.total_time,
             "call_count": self.call_count,
-            "avg_time": self.total_time / self.call_count if self.call_count else 0
+            "avg_time": self.total_time / self.call_count if self.call_count else 0,
         }
+
 
 @Timer
 def slow_function(n):
     time.sleep(n / 10)
     return n
+
 
 slow_function(1)
 slow_function(2)
@@ -301,33 +341,35 @@ print(slow_function.stats())
 ```python
 import functools
 
+
 class RateLimiter:
     """Rate limiter that limits function calls per time window."""
-    
+
     def __init__(self, max_calls, period):
         self.max_calls = max_calls
         self.period = period
-    
+
     def __call__(self, func):
         import collections
+
         calls = collections.deque()
-        
+
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             now = time.time()
-            
+
             # Remove expired entries
             while calls and calls[0] <= now - self.period:
                 calls.popleft()
-            
+
             if len(calls) >= self.max_calls:
                 raise RuntimeError(
                     f"Rate limit exceeded: {self.max_calls} calls per {self.period}s"
                 )
-            
+
             calls.append(now)
             return func(*args, **kwargs)
-        
+
         wrapper.calls = calls
         return wrapper
 ```
@@ -341,22 +383,24 @@ class RateLimiter:
 ```python
 import functools
 
+
 def add_repr(cls):
     """Decorator that adds a __repr__ method to a class."""
+
     def repr_method(self):
-        attrs = ", ".join(
-            f"{key}={value!r}" for key, value in self.__dict__.items()
-        )
+        attrs = ", ".join(f"{key}={value!r}" for key, value in self.__dict__.items())
         return f"{cls.__name__}({attrs})"
-    
+
     cls.__repr__ = repr_method
     return cls
+
 
 @add_repr
 class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
 
 p = Point(3, 4)
 print(p)  # Point(x=3, y=4)
@@ -367,32 +411,39 @@ print(p)  # Point(x=3, y=4)
 ```python
 import functools
 
+
 def log_method(func):
     """Decorator for instance methods."""
+
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         print(f"Calling {type(self).__name__}.{func.__name__}")
         return func(self, *args, **kwargs)
+
     return wrapper
+
 
 def validate_positive(func):
     """Decorator that validates first argument is positive."""
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         if args and args[0] <= 0:
             raise ValueError(f"Expected positive value, got {args[0]}")
         return func(*args, **kwargs)
+
     return wrapper
+
 
 class BankAccount:
     def __init__(self, balance=0):
         self.balance = balance
-    
+
     @log_method
     def deposit(self, amount):
         self.balance += amount
         return self.balance
-    
+
     @validate_positive
     def withdraw(self, amount):
         self.balance -= amount
@@ -435,6 +486,7 @@ class MyClass:
 ```python
 import functools
 
+
 # Simple cache
 @functools.lru_cache(maxsize=128)
 def fibonacci(n):
@@ -442,38 +494,41 @@ def fibonacci(n):
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
 
+
 # Custom cache with TTL
 def ttl_cache(maxsize=128, ttl=300):
     """Cache with time-to-live expiration."""
     import time
-    
+
     def decorator(func):
         cache = {}
         timestamps = {}
-        
+
         @functools.wraps(func)
         def wrapper(*args):
             now = time.time()
-            
+
             # Check if cached and not expired
             if args in cache and (now - timestamps[args]) < ttl:
                 return cache[args]
-            
+
             result = func(*args)
             cache[args] = result
             timestamps[args] = now
-            
+
             # Evict if over capacity
             if len(cache) > maxsize:
                 oldest = min(timestamps, key=timestamps.get)
                 del cache[oldest]
                 del timestamps[oldest]
-            
+
             return result
-        
+
         wrapper.cache_clear = lambda: (cache.clear(), timestamps.clear())
         return wrapper
+
     return decorator
+
 
 @ttl_cache(ttl=60)
 def get_user(user_id):
@@ -492,45 +547,42 @@ from typing import Any, Callable
 
 logger = logging.getLogger(__name__)
 
-def log_execution(
-    level: str = "INFO",
-    include_args: bool = True,
-    include_result: bool = False
-):
+
+def log_execution(level: str = "INFO", include_args: bool = True, include_result: bool = False):
     """Configurable logging decorator."""
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> Any:
             log_func = getattr(logger, level.lower())
-            
+
             func_name = func.__name__
             if include_args:
                 log_msg = f"Entering {func_name} | args={args}, kwargs={kwargs}"
             else:
                 log_msg = f"Entering {func_name}"
-            
+
             log_func(log_msg)
             start = time.perf_counter()
-            
+
             try:
                 result = func(*args, **kwargs)
                 elapsed = time.perf_counter() - start
-                
+
                 if include_result:
                     log_msg = f"Exiting {func_name} | result={result} | {elapsed:.4f}s"
                 else:
                     log_msg = f"Exiting {func_name} | {elapsed:.4f}s"
-                
+
                 log_func(log_msg)
                 return result
             except Exception as e:
                 elapsed = time.perf_counter() - start
-                logger.error(
-                    f"Error in {func_name}: {e} | {elapsed:.4f}s"
-                )
+                logger.error(f"Error in {func_name}: {e} | {elapsed:.4f}s")
                 raise
-        
+
         return wrapper
+
     return decorator
 ```
 
@@ -539,8 +591,10 @@ def log_execution(
 ```python
 import functools
 
+
 def validate_types(*type_args, **type_kwargs):
     """Validate function argument types."""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -551,7 +605,7 @@ def validate_types(*type_args, **type_kwargs):
                         f"Argument {i} of {func.__name__} must be {expected.__name__}, "
                         f"got {type(arg).__name__}"
                     )
-            
+
             # Validate keyword arguments
             for key, expected in type_kwargs.items():
                 if key in kwargs:
@@ -561,10 +615,13 @@ def validate_types(*type_args, **type_kwargs):
                             f"Argument '{key}' of {func.__name__} must be "
                             f"{expected.__name__}, got {type(arg).__name__}"
                         )
-            
+
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
+
 
 @validate_types(int, str, debug=bool)
 def process_data(user_id, name, debug=False):
@@ -578,29 +635,37 @@ def process_data(user_id, name, debug=False):
 ```python
 import functools
 
+
 def bold(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return f"<b>{func(*args, **kwargs)}</b>"
+
     return wrapper
+
 
 def italic(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return f"<i>{func(*args, **kwargs)}</i>"
+
     return wrapper
+
 
 def underline(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return f"<u>{func(*args, **kwargs)}</u>"
+
     return wrapper
+
 
 @bold
 @italic
 @underline
 def greet(name):
     return f"Hello, {name}!"
+
 
 # Decorators applied bottom-to-top, executed top-to-bottom
 # greet = bold(italic(underline(greet)))
@@ -613,15 +678,20 @@ print(greet("World"))
 ```python
 import functools
 
+
 def conditional_decorator(condition, decorator):
     """Apply decorator only if condition is True."""
+
     def wrapper(func):
         if condition:
             return decorator(func)
         return func
+
     return wrapper
 
+
 DEBUG = True
+
 
 @conditional_decorator(DEBUG, my_decorator)
 def debug_only_function():
@@ -639,13 +709,16 @@ def debug_only_function():
 def bad_decorator(func):
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
+
     return wrapper
+
 
 # GOOD: Preserves metadata
 def good_decorator(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
+
     return wrapper
 ```
 
@@ -655,11 +728,14 @@ def good_decorator(func):
 # BAD: Shared mutable state between calls
 def bad_decorator(func):
     results = []  # Shared across all decorated functions
+
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
         results.append(result)  # Accumulates forever
         return result
+
     return wrapper
+
 
 # GOOD: Fresh state per decorator instance
 def good_decorator(func):
@@ -668,6 +744,7 @@ def good_decorator(func):
         result = func(*args, **kwargs)
         results.append(result)
         return result
+
     return wrapper
 ```
 
@@ -681,7 +758,9 @@ def bad_catch(func):
             return func(*args, **kwargs)
         except:  # Catches EVERYTHING including SystemExit
             return None
+
     return wrapper
+
 
 # GOOD: Specific exception handling with re-raise
 def good_catch(func):
@@ -692,6 +771,7 @@ def good_catch(func):
         except ValueError as e:
             logger.warning(f"ValueError in {func.__name__}: {e}")
             raise  # Re-raise after logging
+
     return wrapper
 ```
 
@@ -704,6 +784,7 @@ def good_catch(func):
 @decorator_c
 def func():
     pass
+
 
 # Equivalent to: func = decorator_a(decorator_b(decorator_c(func)))
 ```
@@ -735,6 +816,7 @@ Write a `@debug` decorator that prints the function name, arguments, and return 
 def add(a, b):
     return a + b
 
+
 # Expected output:
 # Calling add(3, 5)
 # add returned 8
@@ -747,6 +829,7 @@ Create a `@retry(max_attempts=3, delay=1)` decorator that retries failed functio
 @retry(max_attempts=3, delay=1)
 def unstable_function():
     import random
+
     if random.random() < 0.5:
         raise ConnectionError("Network error")
     return "Success"
@@ -761,6 +844,7 @@ class Database:
     def __init__(self):
         print("Connecting to database...")
 
+
 db1 = Database()  # "Connecting to database..."
 db2 = Database()  # No output - returns same instance
 assert db1 is db2
@@ -773,7 +857,7 @@ Create `@timer` and `@log` decorators and compose them:
 @timer
 @log
 def process_data(data):
-    return [x ** 2 for x in data]
+    return [x**2 for x in data]
 ```
 
 ### Exercise 5: Method Decorator
@@ -786,6 +870,7 @@ class User:
         self.name = name
         self.age = age
         self.email = email
+
 
 user = User("Alice", 30, "alice@example.com")  # OK
 user = User("Alice", "thirty", "alice@example.com")  # TypeError

@@ -59,8 +59,7 @@ import openai
 client = openai.OpenAI(api_key="sk-...")
 
 response = client.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": "Hello!"}]
+    model="gpt-4", messages=[{"role": "user", "content": "Hello!"}]
 )
 ```
 
@@ -73,7 +72,7 @@ client = anthropic.Anthropic(api_key="sk-ant-...")
 response = client.messages.create(
     model="claude-sonnet-4-20250514",
     max_tokens=1024,
-    messages=[{"role": "user", "content": "Hello!"}]
+    messages=[{"role": "user", "content": "Hello!"}],
 )
 ```
 
@@ -103,7 +102,7 @@ messages = [
     {"role": "system", "content": "You are a Python expert."},
     {"role": "user", "content": "Explain list comprehensions."},
     {"role": "assistant", "content": "List comprehensions are..."},
-    {"role": "user", "content": "Give me an example."}
+    {"role": "user", "content": "Give me an example."},
 ]
 ```
 
@@ -112,21 +111,14 @@ messages = [
 **Non-Streaming (Synchronous):**
 ```python
 # Waits for complete response
-response = client.chat.completions.create(
-    model="gpt-4",
-    messages=messages
-)
+response = client.chat.completions.create(model="gpt-4", messages=messages)
 print(response.choices[0].message.content)
 ```
 
 **Streaming:**
 ```python
 # Returns tokens as they're generated
-stream = client.chat.completions.create(
-    model="gpt-4",
-    messages=messages,
-    stream=True
-)
+stream = client.chat.completions.create(model="gpt-4", messages=messages, stream=True)
 
 for chunk in stream:
     if chunk.choices[0].delta.content:
@@ -176,11 +168,11 @@ Control output behavior with parameters:
 response = client.chat.completions.create(
     model="gpt-4",
     messages=messages,
-    temperature=0.7,      # 0 = deterministic, 2 = very random
-    max_tokens=1000,       # Limit response length
-    top_p=0.9,             # Nucleus sampling
-    frequency_penalty=0.0, # Reduce repetition
-    presence_penalty=0.0   # Encourage new topics
+    temperature=0.7,  # 0 = deterministic, 2 = very random
+    max_tokens=1000,  # Limit response length
+    top_p=0.9,  # Nucleus sampling
+    frequency_penalty=0.0,  # Reduce repetition
+    presence_penalty=0.0,  # Encourage new topics
 )
 ```
 
@@ -197,29 +189,28 @@ LLM APIs can fail. Implement robust error handling:
 import time
 from openai import RateLimitError, APIError, Timeout
 
+
 def call_llm_with_retry(messages, max_retries=3):
     for attempt in range(max_retries):
         try:
             response = client.chat.completions.create(
-                model="gpt-4",
-                messages=messages,
-                timeout=30.0
+                model="gpt-4", messages=messages, timeout=30.0
             )
             return response
-            
+
         except RateLimitError as e:
-            wait_time = 2 ** attempt * 1  # Exponential backoff
+            wait_time = 2**attempt * 1  # Exponential backoff
             print(f"Rate limited. Waiting {wait_time}s...")
             time.sleep(wait_time)
-            
+
         except Timeout:
             print(f"Timeout on attempt {attempt + 1}")
-            
+
         except APIError as e:
             print(f"API error: {e}")
             if attempt == max_retries - 1:
                 raise
-    
+
     raise Exception("Max retries exceeded")
 ```
 
@@ -233,6 +224,7 @@ def call_llm_with_retry(messages, max_retries=3):
 """
 A reusable LLM client that supports multiple providers.
 """
+
 import os
 from dataclasses import dataclass
 from typing import Optional
@@ -243,6 +235,7 @@ import anthropic
 @dataclass
 class LLMResponse:
     """Standardized response from any LLM provider."""
+
     content: str
     model: str
     input_tokens: int
@@ -252,84 +245,77 @@ class LLMResponse:
 
 class LLMClient:
     """Unified client for multiple LLM providers."""
-    
+
     def __init__(self, provider: str = "openai", model: Optional[str] = None):
         self.provider = provider
         self.model = model or self._default_model()
-        
+
         if provider == "openai":
-            self.client = openai.OpenAI(
-                api_key=os.getenv("OPENAI_API_KEY")
-            )
+            self.client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         elif provider == "anthropic":
-            self.client = anthropic.Anthropic(
-                api_key=os.getenv("ANTHROPIC_API_KEY")
-            )
+            self.client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
         else:
             raise ValueError(f"Unsupported provider: {provider}")
-    
+
     def _default_model(self) -> str:
-        defaults = {
-            "openai": "gpt-4",
-            "anthropic": "claude-sonnet-4-20250514"
-        }
+        defaults = {"openai": "gpt-4", "anthropic": "claude-sonnet-4-20250514"}
         return defaults[self.provider]
-    
+
     def generate(
         self,
         messages: list[dict],
         temperature: float = 0.7,
         max_tokens: int = 1000,
-        system_prompt: Optional[str] = None
+        system_prompt: Optional[str] = None,
     ) -> LLMResponse:
         """Generate a response from the LLM."""
-        
+
         # Prepend system prompt if provided
         if system_prompt:
             messages = [{"role": "system", "content": system_prompt}] + messages
-        
+
         if self.provider == "openai":
             return self._generate_openai(messages, temperature, max_tokens)
         elif self.provider == "anthropic":
             return self._generate_anthropic(messages, temperature, max_tokens)
-    
+
     def _generate_openai(self, messages, temperature, max_tokens):
         response = self.client.chat.completions.create(
             model=self.model,
             messages=messages,
             temperature=temperature,
-            max_tokens=max_tokens
+            max_tokens=max_tokens,
         )
-        
+
         return LLMResponse(
             content=response.choices[0].message.content,
             model=response.model,
             input_tokens=response.usage.prompt_tokens,
             output_tokens=response.usage.completion_tokens,
-            finish_reason=response.choices[0].finish_reason
+            finish_reason=response.choices[0].finish_reason,
         )
-    
+
     def _generate_anthropic(self, messages, temperature, max_tokens):
         # Anthropic requires system prompt as separate parameter
         system = None
         if messages and messages[0]["role"] == "system":
             system = messages[0]["content"]
             messages = messages[1:]
-        
+
         response = self.client.messages.create(
             model=self.model,
             max_tokens=max_tokens,
             temperature=temperature,
             system=system,
-            messages=messages
+            messages=messages,
         )
-        
+
         return LLMResponse(
             content=response.content[0].text,
             model=response.model,
             input_tokens=response.usage.input_tokens,
             output_tokens=response.usage.output_tokens,
-            finish_reason=response.stop_reason
+            finish_reason=response.stop_reason,
         )
 
 
@@ -338,7 +324,7 @@ client = LLMClient(provider="openai")
 response = client.generate(
     messages=[{"role": "user", "content": "Explain recursion in 3 sentences."}],
     temperature=0.5,
-    max_tokens=200
+    max_tokens=200,
 )
 print(response.content)
 print(f"Tokens used: {response.input_tokens + response.output_tokens}")
@@ -350,45 +336,40 @@ print(f"Tokens used: {response.input_tokens + response.output_tokens}")
 """
 Streaming response with token counting and progress display.
 """
+
 import sys
 from openai import OpenAI
 
 client = OpenAI()
 
+
 def stream_with_progress(messages, model="gpt-4"):
     """Stream response with real-time token counting."""
-    
-    stream = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        stream=True
-    )
-    
+
+    stream = client.chat.completions.create(model=model, messages=messages, stream=True)
+
     full_response = ""
     token_count = 0
-    
+
     for chunk in stream:
         if chunk.choices[0].delta.content:
             token = chunk.choices[0].delta.content
             full_response += token
             token_count += 1
-            
+
             # Display with progress
             sys.stdout.write(f"\r[Tokens: {token_count}] {token}")
             sys.stdout.flush()
-    
+
     print()  # New line after streaming
-    
-    return {
-        "content": full_response,
-        "token_count": token_count,
-        "model": model
-    }
+
+    return {"content": full_response, "token_count": token_count, "model": model}
+
 
 # Usage
-result = stream_with_progress([
-    {"role": "user", "content": "Write a short poem about coding."}
-])
+result = stream_with_progress(
+    [{"role": "user", "content": "Write a short poem about coding."}]
+)
 print(f"\n\nTotal tokens: {result['token_count']}")
 ```
 
@@ -398,12 +379,14 @@ print(f"\n\nTotal tokens: {result['token_count']}")
 """
 Process multiple prompts efficiently with rate limit handling.
 """
+
 import time
 from dataclasses import dataclass
 from typing import List
 import openai
 
 client = openai.OpenAI()
+
 
 @dataclass
 class BatchResult:
@@ -418,13 +401,13 @@ def process_batch(
     prompts: List[str],
     model: str = "gpt-4",
     requests_per_minute: int = 20,
-    max_retries: int = 3
+    max_retries: int = 3,
 ) -> List[BatchResult]:
     """Process multiple prompts with rate limiting."""
-    
+
     results = []
     delay_between_requests = 60 / requests_per_minute
-    
+
     for i, prompt in enumerate(prompts):
         result = None
         for attempt in range(max_retries):
@@ -432,48 +415,50 @@ def process_batch(
                 response = client.chat.completions.create(
                     model=model,
                     messages=[{"role": "user", "content": prompt}],
-                    max_tokens=500
+                    max_tokens=500,
                 )
-                
+
                 result = BatchResult(
                     prompt=prompt,
                     response=response.choices[0].message.content,
                     tokens_used=response.usage.total_tokens,
-                    success=True
+                    success=True,
                 )
                 break
-                
+
             except openai.RateLimitError:
-                wait_time = 2 ** attempt * 5
-                print(f"Rate limited at {i+1}/{len(prompts)}. Waiting {wait_time}s...")
+                wait_time = 2**attempt * 5
+                print(
+                    f"Rate limited at {i + 1}/{len(prompts)}. Waiting {wait_time}s..."
+                )
                 time.sleep(wait_time)
-                
+
             except Exception as e:
                 result = BatchResult(
                     prompt=prompt,
                     response="",
                     tokens_used=0,
                     success=False,
-                    error=str(e)
+                    error=str(e),
                 )
                 break
-        
+
         if result is None:
             result = BatchResult(
                 prompt=prompt,
                 response="",
                 tokens_used=0,
                 success=False,
-                error="Max retries exceeded"
+                error="Max retries exceeded",
             )
-        
+
         results.append(result)
-        print(f"[{i+1}/{len(prompts)}] {'✓' if result.success else '✗'}")
-        
+        print(f"[{i + 1}/{len(prompts)}] {'✓' if result.success else '✗'}")
+
         # Rate limiting
         if i < len(prompts) - 1:
             time.sleep(delay_between_requests)
-    
+
     return results
 
 
@@ -483,7 +468,7 @@ prompts = [
     "What is a neural network?",
     "Define deep learning.",
     "What is NLP?",
-    "Explain computer vision."
+    "Explain computer vision.",
 ]
 
 results = process_batch(prompts)
@@ -503,13 +488,13 @@ print(f"Total tokens: {total_tokens}")
 # ❌ BAD: No rate limit handling
 for prompt in prompts:
     response = client.chat.completions.create(...)
-    
+
 # ✅ GOOD: With backoff
 for prompt in prompts:
     try:
         response = client.chat.completions.create(...)
     except RateLimitError:
-        time.sleep(2 ** attempt)
+        time.sleep(2**attempt)
 ```
 
 ### 2. Ignoring Token Limits
@@ -544,6 +529,7 @@ client = openai.OpenAI(api_key="sk-secret123")
 
 # ✅ GOOD: Environment variable
 import os
+
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 ```
 

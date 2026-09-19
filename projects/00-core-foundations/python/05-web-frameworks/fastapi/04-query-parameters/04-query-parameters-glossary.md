@@ -39,11 +39,13 @@ from fastapi import FastAPI, Query
 
 app = FastAPI()
 
+
 @app.get("/products/")
 def list_products(
     product_name: str | None = Query(default=None, alias="name"),
 ):
     return {"product_name": product_name}
+
 
 # URL: /products/?name=phone
 # Function receives: product_name = "phone"
@@ -67,6 +69,7 @@ def get_active_users(active: bool = True):
     filtered = [u for u in USERS if u["active"] == active]
     return {"active": active, "count": len(filtered)}
 
+
 # GET /active-users?active=true  → active = True
 # GET /active-users?active=false → active = False
 # GET /active-users              → active = True (default)
@@ -87,10 +90,12 @@ def get_active_users(active: bool = True):
 def list_items(limit: int = 10):
     return {"limit": limit}
 
+
 # Without default → required
 @app.get("/filter")
 def filter_items(category: str):
     return {"category": category}
+
 
 # None default → optional (can be None)
 @app.get("/search")
@@ -123,6 +128,7 @@ def list_users(
         results = [u for u in results if u["active"]]
     return {"count": len(results), "results": results}
 
+
 # GET /users/?department=Engineering&min_age=25&active_only=true
 ```
 
@@ -141,6 +147,7 @@ def multi_filter(
     departments: list[str] = Query(default=[], description="Filter by departments"),
 ):
     return {"departments": departments}
+
 
 # GET /multi-filter?departments=Engineering&departments=Sales
 # departments = ["Engineering", "Sales"]
@@ -162,7 +169,8 @@ def multi_filter(
 ```python
 @app.get("/items/")
 def list_items(skip: int = 0, limit: int = 10):
-    return items_db[skip:skip + limit]
+    return items_db[skip : skip + limit]
+
 
 # GET /items/?skip=0&limit=10   → items 1-10
 # GET /items/?skip=10&limit=10  → items 11-20
@@ -182,10 +190,11 @@ def list_items(skip: int = 0, limit: int = 10):
 @app.get("/users/")
 def list_users(
     department: str | None = Query(default=None),  # Optional
-    min_age: int = Query(default=0),                # Optional (has default)
-    active: bool = Query(default=True),             # Optional (has default)
+    min_age: int = Query(default=0),  # Optional (has default)
+    active: bool = Query(default=True),  # Optional (has default)
 ):
     return {"department": department, "min_age": min_age}
+
 
 # All of these are valid:
 # GET /users/
@@ -217,6 +226,7 @@ def list_users(
         "results": USERS[start:end],
     }
 
+
 # GET /users/?page=1&page_size=10  → items 1-10
 # GET /users/?page=2&page_size=10  → items 11-20
 ```
@@ -233,7 +243,7 @@ def list_users(
 ```python
 @app.get("/items/")
 def list_items(skip: int = 0, limit: int = 10):
-    return items_db[skip:skip + limit]
+    return items_db[skip : skip + limit]
 ```
 
 **Page-based pattern with metadata:**
@@ -271,6 +281,7 @@ def list_items(
 **Example:**
 ```python
 from fastapi import Query
+
 
 @app.get("/items/")
 def list_items(
@@ -322,6 +333,7 @@ def list_items(
 def search(q: str = "", page: int = 1, per_page: int = 10):
     return {"query": q, "page": page, "per_page": per_page}
 
+
 # URL: /search?q=phone&page=2&per_page=5
 # q="phone", page=2, per_page=5
 ```
@@ -346,6 +358,7 @@ def search(q: str = "", page: int = 1, per_page: int = 10):
 def filter_users(department: str):
     """department is required — no default value"""
     return {"department": department}
+
 
 # GET /filter?department=Engineering → 200 OK
 # GET /filter                        → 422 Validation Error
@@ -376,13 +389,14 @@ def search_users(
 
     total = len(results)
     start = (page - 1) * page_size
-    paginated = results[start:start + page_size]
+    paginated = results[start : start + page_size]
 
     return {
         "query": q,
         "total": total,
         "results": paginated,
     }
+
 
 # GET /users/search?q=alice&department=Engineering&page=1
 ```
@@ -399,7 +413,8 @@ def search_users(
 ```python
 @app.get("/items/")
 def list_items(skip: int = 0, limit: int = 10):
-    return items_db[skip:skip + limit]
+    return items_db[skip : skip + limit]
+
 
 # GET /items/?skip=0   → first 10 items
 # GET /items/?skip=10  → skip first 10, return next 10
@@ -426,6 +441,7 @@ def list_users(
         reverse=(order == "desc"),
     )
     return {"sort_by": sort_by, "order": order, "results": sorted_users}
+
 
 # GET /users/?sort_by=age&order=desc
 ```

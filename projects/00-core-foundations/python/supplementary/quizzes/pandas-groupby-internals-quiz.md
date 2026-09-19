@@ -126,6 +126,7 @@ column directly. The classic dict+rename produces the same result.
 
 ```python
 import pandas as pd
+
 df = pd.DataFrame({"team": ["a", "a", "b"], "x": [1, 2, 3]})
 print(df.groupby("team")["x"].agg(["mean", "max"]))
 ```
@@ -230,6 +231,7 @@ challenge's `month_idx` Series does exactly this mapping before
 
 ```python
 import pandas as pd
+
 df = pd.DataFrame({"team": ["a", "a", "b"], "x": [1.0, float("nan"), 3.0]})
 print(df.groupby("team")["x"].count().tolist())
 ```
@@ -320,6 +322,7 @@ DataFrame indexed by key values.
 
 ```python
 import pandas as pd
+
 df = pd.DataFrame({"k": ["a", "a", "b"], "v": [1, 2, 3]})
 g = df.groupby("k")["v"].agg(total="sum", peak="max")
 print(g.loc["a", "peak"])

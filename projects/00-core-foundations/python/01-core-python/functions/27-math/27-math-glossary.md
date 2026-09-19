@@ -51,10 +51,10 @@ import math
 print(math.comb(10, 3))  # 120
 
 # 5 choose 5
-print(math.comb(5, 5))   # 1
+print(math.comb(5, 5))  # 1
 
 # 5 choose 0
-print(math.comb(5, 0))   # 1
+print(math.comb(5, 0))  # 1
 ```
 
 **Related**: permutations, factorial, binomial coefficient
@@ -91,9 +91,9 @@ print(0.1 + 0.2)  # 0.30000000000000004
 ```python
 import math
 
-print(math.factorial(0))   # 1 (by definition)
-print(math.factorial(1))   # 1
-print(math.factorial(5))   # 120 (5*4*3*2*1)
+print(math.factorial(0))  # 1 (by definition)
+print(math.factorial(1))  # 1
+print(math.factorial(5))  # 120 (5*4*3*2*1)
 print(math.factorial(10))  # 3628800
 ```
 
@@ -129,9 +129,9 @@ print(math.isclose(0.1 + 0.2, 0.3))  # True
 ```python
 import math
 
-print(math.gcd(12, 8))    # 4
-print(math.gcd(12, 8, 6)) # 2
-print(math.gcd(7, 13))    # 1 (coprime)
+print(math.gcd(12, 8))  # 4
+print(math.gcd(12, 8, 6))  # 2
+print(math.gcd(7, 13))  # 1 (coprime)
 ```
 
 **Related**: LCM, coprime, number theory
@@ -146,10 +146,10 @@ print(math.gcd(7, 13))    # 1 (coprime)
 import math
 
 # 3-4-5 triangle
-print(math.hypot(3, 4))     # 5.0
+print(math.hypot(3, 4))  # 5.0
 
 # 5-12-13 triangle
-print(math.hypot(5, 12))    # 13.0
+print(math.hypot(5, 12))  # 13.0
 
 # Works with more dimensions
 print(math.hypot(1, 2, 3))  # 3.7416573867739413
@@ -166,10 +166,11 @@ print(math.hypot(1, 2, 3))  # 3.7416573867739413
 ```python
 import math
 
-print(math.inf > 1000000)    # True
+print(math.inf > 1000000)  # True
 print(-math.inf < -1000000)  # True
 print(math.inf == math.inf)  # True
-print(math.inf + 1)          # inf
+print(math.inf + 1)  # inf
+
 
 # Useful for finding minimum
 def find_minimum(values):
@@ -191,9 +192,9 @@ def find_minimum(values):
 ```python
 import math
 
-print(math.lcm(4, 6))     # 12
+print(math.lcm(4, 6))  # 12
 print(math.lcm(4, 6, 8))  # 24
-print(math.lcm(3, 5))     # 15
+print(math.lcm(3, 5))  # 15
 ```
 
 **Related**: GCD, multiples, number theory
@@ -207,11 +208,11 @@ print(math.lcm(3, 5))     # 15
 ```python
 import math
 
-print(math.log(100))        # 4.605... (natural log, base e)
-print(math.log(100, 10))    # 2.0 (log base 10)
-print(math.log(8, 2))       # 3.0 (log base 2)
-print(math.log2(8))         # 3.0
-print(math.log10(100))      # 2.0
+print(math.log(100))  # 4.605... (natural log, base e)
+print(math.log(100, 10))  # 2.0 (log base 10)
+print(math.log(8, 2))  # 3.0 (log base 2)
+print(math.log2(8))  # 3.0
+print(math.log10(100))  # 2.0
 ```
 
 **Related**: exp(), inverse, exponential
@@ -225,13 +226,13 @@ print(math.log10(100))      # 2.0
 ```python
 import math
 
-print(math.nan)              # nan
+print(math.nan)  # nan
 print(math.nan == math.nan)  # False (NaN != NaN!)
 print(math.isnan(math.nan))  # True (use this to check)
 
 # NaN propagates
-print(math.nan + 1)          # nan
-print(math.nan * 0)          # nan
+print(math.nan + 1)  # nan
+print(math.nan * 0)  # nan
 ```
 
 **Related**: infinity, undefined, comparison
@@ -249,7 +250,7 @@ import math
 print(math.perm(10, 3))  # 720
 
 # 5 permute 5
-print(math.perm(5, 5))   # 120 (same as 5!)
+print(math.perm(5, 5))  # 120 (same as 5!)
 ```
 
 **Related**: combinations, factorial, ordering
@@ -267,7 +268,7 @@ print(math.pi)  # 3.141592653589793
 
 # Circle calculations
 radius = 5
-area = math.pi * radius ** 2
+area = math.pi * radius**2
 circumference = 2 * math.pi * radius
 
 print(f"Area: {area:.2f}")  # 78.54
@@ -285,13 +286,15 @@ print(f"Circumference: {circumference:.2f}")  # 31.42
 ```python
 import math
 
+
 def is_right_triangle(a, b, c):
     sides = sorted([a, b, c])
-    return math.isclose(sides[0]**2 + sides[1]**2, sides[2]**2)
+    return math.isclose(sides[0] ** 2 + sides[1] ** 2, sides[2] ** 2)
 
-print(is_right_triangle(3, 4, 5))   # True
-print(is_right_triangle(5, 12, 13)) # True
-print(is_right_triangle(3, 4, 6))   # False
+
+print(is_right_triangle(3, 4, 5))  # True
+print(is_right_triangle(5, 12, 13))  # True
+print(is_right_triangle(3, 4, 6))  # False
 ```
 
 **Related**: hypotenuse, trigonometry, geometry
@@ -306,11 +309,11 @@ print(is_right_triangle(3, 4, 6))   # False
 import math
 
 # Degrees to radians
-print(math.radians(90))   # π/2 ≈ 1.5708
+print(math.radians(90))  # π/2 ≈ 1.5708
 print(math.radians(180))  # π ≈ 3.1416
 
 # Radians to degrees
-print(math.degrees(math.pi))      # 180.0
+print(math.degrees(math.pi))  # 180.0
 print(math.degrees(math.pi / 2))  # 90.0
 ```
 
@@ -355,12 +358,12 @@ print(lst)
 ```python
 import math
 
-print(math.sqrt(16))   # 4.0
-print(math.sqrt(2))    # 1.4142135623730951
-print(math.sqrt(0))    # 0.0
+print(math.sqrt(16))  # 4.0
+print(math.sqrt(2))  # 1.4142135623730951
+print(math.sqrt(0))  # 0.0
 
 # Or use exponent
-print(16 ** 0.5)       # 4.0
+print(16**0.5)  # 4.0
 ```
 
 **Related**: power, exponent, Pythagorean theorem
@@ -373,9 +376,11 @@ print(16 ** 0.5)       # 4.0
 ```python
 import math
 
+
 def euclidean_distance(p1, p2):
     """Calculate Euclidean distance between two points."""
     return math.sqrt(sum((a - b) ** 2 for a, b in zip(p1, p2)))
+
 
 print(euclidean_distance((0, 0), (3, 4)))  # 5.0
 print(euclidean_distance((1, 1), (4, 5)))  # 5.0
@@ -385,9 +390,11 @@ print(euclidean_distance((1, 1), (4, 5)))  # 5.0
 ```python
 import math
 
+
 def compound_interest(principal, rate, years, n=12):
     """Calculate compound interest."""
-    return principal * (1 + rate/n) ** (n * years)
+    return principal * (1 + rate / n) ** (n * years)
+
 
 final = compound_interest(10000, 0.05, 10)
 print(f"Final: ${final:,.2f}")  # $16,470.09
@@ -397,11 +404,13 @@ print(f"Final: ${final:,.2f}")  # $16,470.09
 ```python
 import math
 
+
 def normal_pdf(x, mu=0, sigma=1):
     """Normal distribution probability density function."""
     coefficient = 1 / (sigma * math.sqrt(2 * math.pi))
     exponent = -0.5 * ((x - mu) / sigma) ** 2
     return coefficient * math.exp(exponent)
+
 
 for x in range(-3, 4):
     print(f"x={x}: {normal_pdf(x):.4f}")

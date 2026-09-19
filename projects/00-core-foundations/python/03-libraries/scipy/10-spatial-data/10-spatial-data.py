@@ -14,11 +14,17 @@ Topics:
 """
 
 import numpy as np
+
 # Ensure output directory exists (Tier 0 fix: Windows + CI)
 import os
-os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
+os.makedirs(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy",
+    exist_ok=True,
+)
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy.spatial import KDTree, Delaunay, ConvexHull, Voronoi, voronoi_plot_2d
@@ -45,7 +51,7 @@ distances, indices = tree.query(query_point, k=5)
 print(f"Query point: {query_point}")
 print(f"5 nearest neighbors:")
 for i, (idx, dist) in enumerate(zip(indices, distances)):
-    print(f"  #{i+1}: point {points[idx]}, distance = {dist:.4f}")
+    print(f"  #{i + 1}: point {points[idx]}, distance = {dist:.4f}")
 
 # Range query: find all points within radius r
 radius = 0.1
@@ -73,8 +79,13 @@ ax.legend()
 ax.grid(True, alpha=0.3)
 ax.set_aspect("equal")
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_kdtree.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_kdtree.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_kdtree.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_kdtree.png"
+)
 
 # ============================================================
 # Example 2: Delaunay Triangulation
@@ -86,7 +97,7 @@ print("=" * 60)
 # Points forming a shape
 np.random.seed(42)
 n = 50
-theta = np.linspace(0, 2*np.pi, n, endpoint=False)
+theta = np.linspace(0, 2 * np.pi, n, endpoint=False)
 r = 0.5 + 0.2 * np.sin(3 * theta)  # Star-like shape
 points_tri = np.column_stack([r * np.cos(theta), r * np.sin(theta)])
 # Add some interior points
@@ -98,12 +109,13 @@ tri = Delaunay(points_tri)
 print(f"Number of points: {len(points_tri)}")
 print(f"Number of triangles: {len(tri.simplices)}")
 
+
 # Compute triangle areas
 def triangle_area(p1, p2, p3):
-    return 0.5 * abs((p2[0]-p1[0])*(p3[1]-p1[1]) - (p3[0]-p1[0])*(p2[1]-p1[1]))
+    return 0.5 * abs((p2[0] - p1[0]) * (p3[1] - p1[1]) - (p3[0] - p1[0]) * (p2[1] - p1[1]))
 
-areas = [triangle_area(points_tri[s[0]], points_tri[s[1]], points_tri[s[2]])
-         for s in tri.simplices]
+
+areas = [triangle_area(points_tri[s[0]], points_tri[s[1]], points_tri[s[2]]) for s in tri.simplices]
 print(f"Triangle areas: min={min(areas):.4f}, max={max(areas):.4f}, mean={np.mean(areas):.4f}")
 
 # Visualize
@@ -114,8 +126,13 @@ ax.set_title(f"Delaunay Triangulation ({len(tri.simplices)} triangles)")
 ax.set_aspect("equal")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_delaunay.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_delaunay.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_delaunay.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_delaunay.png"
+)
 
 # Point-in-triangle test
 test_point = np.array([0.0, 0.0])
@@ -150,16 +167,30 @@ fig, ax = plt.subplots(figsize=(8, 8))
 ax.scatter(points_hull[:, 0], points_hull[:, 1], s=30, alpha=0.5, color="blue")
 # Draw hull
 hull_loop = np.append(hull.vertices, hull.vertices[0])
-ax.plot(points_hull[hull_loop, 0], points_hull[hull_loop, 1], "r-", linewidth=2, label="Convex hull")
-ax.scatter(points_hull[hull.vertices, 0], points_hull[hull.vertices, 1],
-           c="red", s=80, marker="D", zorder=5, label="Hull vertices")
+ax.plot(
+    points_hull[hull_loop, 0], points_hull[hull_loop, 1], "r-", linewidth=2, label="Convex hull"
+)
+ax.scatter(
+    points_hull[hull.vertices, 0],
+    points_hull[hull.vertices, 1],
+    c="red",
+    s=80,
+    marker="D",
+    zorder=5,
+    label="Hull vertices",
+)
 ax.set_title(f"Convex Hull ({len(hull.vertices)} vertices, area={hull.volume:.4f})")
 ax.legend()
 ax.grid(True, alpha=0.3)
 ax.set_aspect("equal")
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_convexhull.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_convexhull.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_convexhull.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_convexhull.png"
+)
 
 # ============================================================
 # Example 4: Voronoi Diagram
@@ -192,8 +223,13 @@ ax.set_xlim(-0.1, 1.1)
 ax.set_ylim(-0.1, 1.1)
 ax.set_aspect("equal")
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_voronoi.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_voronoi.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_voronoi.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_10_voronoi.png"
+)
 
 # ============================================================
 # Example 5: Spatial Distance and Proximity
@@ -222,21 +258,23 @@ from scipy.spatial.distance import pdist as pdist_func
 
 # Random points on a 2D manifold embedded in 5D
 n_manifold = 200
-t = np.random.uniform(0, 2*np.pi, n_manifold)
-manifold_points = np.column_stack([
-    np.cos(t),
-    np.sin(t),
-    0.1 * np.cos(2*t),
-    0.1 * np.sin(2*t),
-    0.05 * np.random.randn(n_manifold),
-])
+t = np.random.uniform(0, 2 * np.pi, n_manifold)
+manifold_points = np.column_stack(
+    [
+        np.cos(t),
+        np.sin(t),
+        0.1 * np.cos(2 * t),
+        0.1 * np.sin(2 * t),
+        0.05 * np.random.randn(n_manifold),
+    ]
+)
 
 # Build tree and compute k-NN distances
 tree_manifold = KDTree(manifold_points)
 k_values = [1, 2, 5, 10, 20, 50]
 print("\nIntrinsic dimensionality estimation:")
 for k in k_values:
-    dists_k, _ = tree_manifold.query(manifold_points, k=k+1)
+    dists_k, _ = tree_manifold.query(manifold_points, k=k + 1)
     avg_log_dist = np.mean(np.log(dists_k[:, -1] + 1e-10))
     if k > 1:
         # crude dimensionality estimate
@@ -244,4 +282,3 @@ for k in k_values:
 
 print("\n[OK] SciPy spatial module covered!")
 print("   Next: 11-image-processing.py for image operations.")
-

@@ -74,7 +74,7 @@ pca_full.fit(X_scaled)
 cumulative_variance = np.cumsum(pca_full.explained_variance_ratio_)
 print("Cumulative variance by component:")
 for i, var in enumerate(cumulative_variance):
-    print(f"  {i+1} components: {var:.2%}")
+    print(f"  {i + 1} components: {var:.2%}")
 
 # ============================================================
 # PCA for Visualization
@@ -94,9 +94,7 @@ print("3. Color points by their class")
 # Example 7: Using PCA for faster training
 print("\nExample 7: PCA for Faster Training")
 # Original data
-X_train, X_test, y_train, y_test = train_test_split(
-    X_scaled, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
 # Train on original data
 model_orig = LogisticRegression(random_state=42, max_iter=200)
@@ -159,11 +157,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 
 # Create pipeline
-pipe = Pipeline([
-    ('scaler', StandardScaler()),
-    ('pca', PCA(n_components=2)),
-    ('classifier', SVC(kernel='rbf'))
-])
+pipe = Pipeline(
+    [("scaler", StandardScaler()), ("pca", PCA(n_components=2)), ("classifier", SVC(kernel="rbf"))]
+)
 
 # Train
 pipe.fit(X_train, y_train)
@@ -195,7 +191,7 @@ print("  - Small dataset with few features")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- PCA reduces dimensions while preserving variance")
 print("- Use explained variance to choose components")
@@ -203,4 +199,4 @@ print("- Good for visualization and speed")
 print("- Can help with noise reduction")
 print("- Always scale data before PCA")
 print("- Trade-off: less interpretability")
-print("="*60)
+print("=" * 60)

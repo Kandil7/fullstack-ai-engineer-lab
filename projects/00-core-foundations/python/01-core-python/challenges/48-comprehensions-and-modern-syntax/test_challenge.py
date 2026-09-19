@@ -19,9 +19,7 @@ import os
 from pathlib import Path
 
 TARGET = "solution" if os.environ.get("CHALLENGE_USE_SOLUTION") == "1" else "starter"
-_spec = importlib.util.spec_from_file_location(
-    TARGET, Path(__file__).parent / f"{TARGET}.py"
-)
+_spec = importlib.util.spec_from_file_location(TARGET, Path(__file__).parent / f"{TARGET}.py")
 mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(mod)
 
@@ -66,7 +64,9 @@ class TestTokenizeAndFilter:
 
     def test_basic(self) -> None:
         assert mod.tokenize_and_filter(["the", "cat", "on", "mat"], 3) == [
-            "THE", "CAT", "MAT",
+            "THE",
+            "CAT",
+            "MAT",
         ]
 
     def test_min_len_2(self) -> None:

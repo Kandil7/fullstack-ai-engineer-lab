@@ -37,6 +37,7 @@ def process_order(order):
     log.info(f"Order processed: {result}")
     return result
 
+
 # With AOP: logging separated via decorator
 @log_execution
 def process_order(order):
@@ -55,20 +56,23 @@ def process_order(order):
 ```python
 import functools
 
+
 class CountCalls:
     def __init__(self, func):
         functools.update_wrapper(self, func)
         self.func = func
         self.count = 0
-    
+
     def __call__(self, *args, **kwargs):
         self.count += 1
         print(f"{self.func.__name__} called {self.count} times")
         return self.func(*args, **kwargs)
 
+
 @CountCalls
 def say_hello():
     print("Hello!")
+
 
 say_hello()  # say_hello called 1 times; Hello!
 say_hello()  # say_hello called 2 times; Hello!
@@ -86,13 +90,14 @@ say_hello()  # say_hello called 2 times; Hello!
 ```python
 def make_counter():
     count = 0
-    
+
     def counter():
         nonlocal count
         count += 1
         return count
-    
+
     return counter
+
 
 counter = make_counter()
 print(counter())  # 1
@@ -112,22 +117,28 @@ print(counter())  # 2
 ```python
 import functools
 
+
 def bold(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return f"<b>{func(*args, **kwargs)}</b>"
+
     return wrapper
+
 
 def italic(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return f"<i>{func(*args, **kwargs)}</i>"
+
     return wrapper
+
 
 @bold
 @italic
 def greet(name):
     return f"Hello, {name}!"
+
 
 # Applied as: bold(italic(greet))
 print(greet("World"))  # <b><i>Hello, World!</i></b>
@@ -162,21 +173,27 @@ def api_endpoint(request):
 ```python
 import functools
 
+
 def timer(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         import time
+
         start = time.perf_counter()
         result = func(*args, **kwargs)
         elapsed = time.perf_counter() - start
         print(f"{func.__name__} took {elapsed:.4f}s")
         return result
+
     return wrapper
+
 
 @timer
 def slow_function():
     import time
+
     time.sleep(1)
+
 
 slow_function()  # slow_function took 1.0012s
 ```
@@ -193,8 +210,10 @@ slow_function()  # slow_function took 1.0012s
 ```python
 import functools
 
+
 def repeat(times):
     """Decorator factory: returns a decorator."""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -202,12 +221,16 @@ def repeat(times):
             for _ in range(times):
                 result = func(*args, **kwargs)
             return result
+
         return wrapper
+
     return decorator
+
 
 @repeat(times=3)
 def greet(name):
     print(f"Hello, {name}!")
+
 
 greet("Alice")
 # Hello, Alice!
@@ -229,10 +252,10 @@ class CachedProperty:
     def __init__(self, func):
         self.func = func
         self.attrname = func.__name__
-    
+
     def __set_name__(self, owner, name):
         self.attrname = name
-    
+
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
@@ -240,11 +263,13 @@ class CachedProperty:
         setattr(instance, self.attrname, value)
         return value
 
+
 class DataProcessor:
     @CachedProperty
     def processed_data(self):
         print("Computing...")
-        return [x ** 2 for x in range(1000)]
+        return [x**2 for x in range(1000)]
+
 
 processor = DataProcessor()
 processor.processed_data  # Computing... [computed value]
@@ -264,15 +289,18 @@ processor.processed_data  # [cached, no "Computing..."]
 def greet(name):
     return f"Hello, {name}!"
 
+
 # Assigned to variable
 my_greet = greet
 
 # Stored in data structure
 functions = {"greet": greet, "upper": str.upper}
 
+
 # Passed as argument
 def apply(func, value):
     return func(value)
+
 
 apply(greet, "World")  # "Hello, World!"
 ```
@@ -289,11 +317,13 @@ apply(greet, "World")  # "Hello, World!"
 ```python
 import functools
 
+
 @functools.lru_cache(maxsize=128)
 def fibonacci(n):
     if n < 2:
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
+
 
 fibonacci(100)  # Instant result due to caching
 print(fibonacci.cache_info())
@@ -312,16 +342,19 @@ print(fibonacci.cache_info())
 ```python
 import functools
 
+
 def my_decorator(func):
     wrapper = lambda *args, **kwargs: func(*args, **kwargs)
     functools.update_wrapper(wrapper, func)
     return wrapper
+
 
 # Equivalent to:
 def my_decorator_v2(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
+
     return wrapper
 ```
 
@@ -337,20 +370,24 @@ def my_decorator_v2(func):
 ```python
 import functools
 
+
 def my_decorator(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         """Wrapper docstring (ignored if wraps is used)."""
         return func(*args, **kwargs)
+
     return wrapper
+
 
 @my_decorator
 def greet(name):
     """Greet someone."""
     return f"Hello, {name}!"
 
+
 print(greet.__name__)  # "greet" (not "wrapper")
-print(greet.__doc__)   # "Greet someone."
+print(greet.__doc__)  # "Greet someone."
 print(greet.__wrapped__)  # Original unwrapped function
 ```
 
@@ -368,11 +405,14 @@ print(greet.__wrapped__)  # Original unwrapped function
 def apply_to_list(func, items):
     return [func(item) for item in items]
 
+
 # Returns a function
 def multiplier(factor):
     def multiply(x):
         return x * factor
+
     return multiply
+
 
 double = multiplier(2)
 apply_to_list(double, [1, 2, 3])  # [2, 4, 6]
@@ -390,10 +430,12 @@ apply_to_list(double, [1, 2, 3])  # [2, 4, 6]
 ```python
 from functools import lru_cache
 
+
 @lru_cache(maxsize=256)
 def expensive_computation(n):
     # Simulate expensive work
-    return sum(i ** 2 for i in range(n))
+    return sum(i**2 for i in range(n))
+
 
 result = expensive_computation(1000)
 # Second call is instant
@@ -412,24 +454,29 @@ result = expensive_computation(1000)
 ```python
 import functools
 
+
 # Manual memoization
 def memoize(func):
     cache = {}
+
     @functools.wraps(func)
     def wrapper(*args):
         if args not in cache:
             cache[args] = func(*args)
         return cache[args]
+
     return wrapper
+
 
 @memoize
 def factorial(n):
     return 1 if n <= 1 else n * factorial(n - 1)
 
+
 # Built-in memoization
 @functools.lru_cache
 def fibonacci(n):
-    return n if n < 2 else fibonacci(n-1) + fibonacci(n-2)
+    return n if n < 2 else fibonacci(n - 1) + fibonacci(n - 2)
 ```
 
 **Related**: `lru_cache`, Caching, Performance Optimization
@@ -444,15 +491,21 @@ def fibonacci(n):
 ```python
 # Monkey patching (fragile)
 original_print = print
+
+
 def patched_print(*args, **kwargs):
     original_print("[PATCHED]", *args, **kwargs)
+
+
 print = patched_print
+
 
 # Decorator approach (safer)
 def log_call(func):
     def wrapper(*args, **kwargs):
         print(f"Calling {func.__name__}")
         return func(*args, **kwargs)
+
     return wrapper
 ```
 
@@ -468,13 +521,14 @@ def log_call(func):
 ```python
 def make_counter():
     count = 0
-    
+
     def counter():
         nonlocal count  # Without this, UnboundLocalError
         count += 1
         return count
-    
+
     return counter
+
 
 counter = make_counter()
 counter()  # 1
@@ -493,6 +547,7 @@ counter()  # 2
 ```python
 import functools
 
+
 def validate_range(min_val=None, max_val=None):
     def decorator(func):
         @functools.wraps(func)
@@ -503,8 +558,11 @@ def validate_range(min_val=None, max_val=None):
             if max_val is not None and result > max_val:
                 raise ValueError(f"Result {result} above maximum {max_val}")
             return result
+
         return wrapper
+
     return decorator
+
 
 @validate_range(min_val=0, max_val=100)
 def calculate_score(answers):
@@ -523,6 +581,7 @@ def calculate_score(answers):
 ```python
 import functools
 
+
 def decorator(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):  # <-- This is the wrapper
@@ -530,6 +589,7 @@ def decorator(func):
         result = func(*args, **kwargs)
         print("After")
         return result
+
     return wrapper
 ```
 
@@ -546,9 +606,10 @@ def decorator(func):
 class Multiplier:
     def __init__(self, factor):
         self.factor = factor
-    
+
     def __call__(self, x):
         return x * self.factor
+
 
 double = Multiplier(2)
 triple = Multiplier(3)
@@ -570,15 +631,19 @@ print(callable(double))  # True
 ```python
 import functools
 
+
 def my_decorator(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
+
     return wrapper
+
 
 @my_decorator
 def greet(name):
     return f"Hello, {name}!"
+
 
 # Access original function
 print(greet.__wrapped__("World"))  # "Hello, World!"

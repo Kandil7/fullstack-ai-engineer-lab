@@ -96,8 +96,9 @@ def l2_dist(a: np.ndarray, b: np.ndarray) -> float:
 # ----------------------------------------------------------------------
 # brute-force kNN
 # ----------------------------------------------------------------------
-def brute_force_knn(queries: np.ndarray, corpus: np.ndarray, k: int = 5,
-                    metric: str = "cosine") -> np.ndarray:
+def brute_force_knn(
+    queries: np.ndarray, corpus: np.ndarray, k: int = 5, metric: str = "cosine"
+) -> np.ndarray:
     """Exact kNN by exhaustive scan: O(n_queries * n_corpus * d).
 
     Returns an (n_queries, k) int array of corpus indices, best first.
@@ -131,8 +132,9 @@ def recall_at_k(predicted: np.ndarray, truth: np.ndarray, k: int = 5) -> float:
 # ----------------------------------------------------------------------
 # synthetic corpus with metadata
 # ----------------------------------------------------------------------
-def make_corpus(n: int = 200, dim: int = 16, n_clusters: int = 6,
-                seed: int = _SEED) -> tuple[np.ndarray, list[dict]]:
+def make_corpus(
+    n: int = 200, dim: int = 16, n_clusters: int = 6, seed: int = _SEED
+) -> tuple[np.ndarray, list[dict]]:
     """Build a clustered synthetic corpus: (vectors, metadata list).
 
     Each metadata dict has: id, cluster (0..n_clusters-1), tenant (a/b),
@@ -163,14 +165,17 @@ def make_corpus(n: int = 200, dim: int = 16, n_clusters: int = 6,
         cluster = i % n_clusters
         v = centroids[cluster] + rng.normal(scale=0.18, size=dim)
         vectors[i] = v / np.linalg.norm(v)
-        meta.append({
-            "id": i,
-            "cluster": cluster,
-            "tenant": "a" if (i // 2) % 2 == 0 else "b",
-            "tags": [t for t in ["ml", "db", "web", "ops"]
-                     if (i % 3 + i // 6 + len(t)) % 3 == 0],
-            "text": f"{topic_texts[cluster]} sample {i:03d}",
-        })
+        meta.append(
+            {
+                "id": i,
+                "cluster": cluster,
+                "tenant": "a" if (i // 2) % 2 == 0 else "b",
+                "tags": [
+                    t for t in ["ml", "db", "web", "ops"] if (i % 3 + i // 6 + len(t)) % 3 == 0
+                ],
+                "text": f"{topic_texts[cluster]} sample {i:03d}",
+            }
+        )
     return vectors, meta
 
 
@@ -183,7 +188,7 @@ def chunk_fixed(text: str, chunk_size: int = 40, overlap: int = 8) -> list[str]:
     start = 0
     step = max(1, chunk_size - overlap)
     while start < len(text):
-        chunks.append(text[start:start + chunk_size])
+        chunks.append(text[start : start + chunk_size])
         start += step
     return chunks
 
@@ -207,8 +212,9 @@ def chunk_by_sentences(text: str, max_chars: int = 200) -> list[str]:
     return chunks
 
 
-def chunk_recursive(text: str, max_chars: int = 100,
-                    separators: list[str] | None = None) -> list[str]:
+def chunk_recursive(
+    text: str, max_chars: int = 100, separators: list[str] | None = None
+) -> list[str]:
     """Recursive character splitting: try the largest separator first,
     then smaller ones, until every piece fits under max_chars."""
     if separators is None:
@@ -220,10 +226,10 @@ def chunk_recursive(text: str, max_chars: int = 100,
         if len(parts) > 1:
             out: list[str] = []
             for p in parts:
-                out.extend(chunk_recursive(p, max_chars, separators[separators.index(sep) + 1:]))
+                out.extend(chunk_recursive(p, max_chars, separators[separators.index(sep) + 1 :]))
             return [c for c in out if c.strip()]
     # no separator helped — hard cut
-    return [text[i:i + max_chars] for i in range(0, len(text), max_chars)]
+    return [text[i : i + max_chars] for i in range(0, len(text), max_chars)]
 
 
 # ----------------------------------------------------------------------
@@ -233,8 +239,7 @@ def tokenize(text: str) -> list[str]:
     return re.findall(r"[a-z0-9]+", text.lower())
 
 
-def bm25_scores(query: str, docs: list[str],
-                k1: float = 1.2, b: float = 0.75) -> np.ndarray:
+def bm25_scores(query: str, docs: list[str], k1: float = 1.2, b: float = 0.75) -> np.ndarray:
     """BM25-ish ranking of docs against a query. Higher = more relevant.
 
     Idle simplicity: idf from document frequency, tf with k1/b saturation.
@@ -272,8 +277,7 @@ def rrf_fusion(rankings: list[list[int]], k: int = 60) -> list[int]:
     for ranking in rankings:
         for rank, doc_id in enumerate(ranking):
             scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k + rank + 1)
-    return [doc_id for doc_id, _ in
-            sorted(scores.items(), key=lambda kv: kv[1], reverse=True)]
+    return [doc_id for doc_id, _ in sorted(scores.items(), key=lambda kv: kv[1], reverse=True)]
 
 
 # ----------------------------------------------------------------------
@@ -290,5 +294,5 @@ def hamming_distance(x: np.ndarray, y: np.ndarray) -> int:
 
 def asymmetric_distance(query_vec: np.ndarray, bq_corpus: np.ndarray) -> np.ndarray:
     """ADC-style approximate distance: query full-precision, corpus binarized."""
-    bits = (bq_corpus.astype(np.int8) * 2 - 1)
+    bits = bq_corpus.astype(np.int8) * 2 - 1
     return np.asarray(-(query_vec @ bits.T) / bq_corpus.shape[1], dtype=np.float64)

@@ -43,20 +43,21 @@ print("Example 2: SciPy Submodule Tour")
 print("=" * 60)
 
 import scipy
+
 print(f"SciPy version: {scipy.__version__}")
 
 submodules = [
     "constants",  # Physical/mathematical constants
-    "optimize",   # Optimization algorithms
+    "optimize",  # Optimization algorithms
     "integrate",  # Integration and ODE solvers
-    "interpolate", # Interpolation tools
-    "linalg",     # Linear algebra (beyond NumPy)
-    "stats",      # Statistical distributions and tests
-    "fft",        # Fourier transforms
-    "signal",     # Signal processing
-    "ndimage",    # N-dimensional image processing
-    "spatial",    # Spatial data structures
-    "io",         # File I/O for various formats
+    "interpolate",  # Interpolation tools
+    "linalg",  # Linear algebra (beyond NumPy)
+    "stats",  # Statistical distributions and tests
+    "fft",  # Fourier transforms
+    "signal",  # Signal processing
+    "ndimage",  # N-dimensional image processing
+    "spatial",  # Spatial data structures
+    "io",  # File I/O for various formats
 ]
 
 for mod in submodules:
@@ -77,9 +78,9 @@ from scipy import special
 
 # Bessel functions
 x = np.linspace(0, 20, 200)
-j0 = special.jv(0, x)   # Bessel function of first kind, order 0
-j1 = special.jv(1, x)   # Bessel function of first kind, order 1
-y0 = special.yv(0, x)   # Bessel function of second kind, order 0
+j0 = special.jv(0, x)  # Bessel function of first kind, order 0
+j1 = special.jv(1, x)  # Bessel function of first kind, order 1
+y0 = special.yv(0, x)  # Bessel function of second kind, order 0
 
 print(f"Bessel J0(1.0) = {special.jv(0, 1.0):.6f}")
 print(f"Bessel J1(1.0) = {special.jv(1, 1.0):.6f}")
@@ -111,7 +112,7 @@ temps_fahr = convert_temperature(temps_celsius, "C", "F")
 
 print("Temperature Conversion:")
 print(f"  {'Celsius':>10s} {'Kelvin':>10s} {'Fahrenheit':>12s}")
-print(f"  {'-'*10} {'-'*10} {'-'*12}")
+print(f"  {'-' * 10} {'-' * 10} {'-' * 12}")
 for c, k, f in zip(temps_celsius, temps_kelvin, temps_fahr):
     print(f"  {c:10.2f} {k:10.2f} {f:12.2f}")
 
@@ -144,6 +145,7 @@ print(f"  Std dev changed: {data.std():.4f} -> {smoothed.std():.4f}")
 
 # Edge detection with Sobel filter
 from scipy.ndimage import sobel
+
 sobel_x = sobel(data, axis=0)
 sobel_y = sobel(data, axis=1)
 edge_magnitude = np.sqrt(sobel_x**2 + sobel_y**2)
@@ -151,4 +153,3 @@ print(f"Edge magnitude range: [{edge_magnitude.min():.4f}, {edge_magnitude.max()
 
 print("\n[OK] SciPy provides powerful scientific tools that extend NumPy!")
 print("     Next: 02-getting-started.py to install and start using SciPy.")
-

@@ -40,7 +40,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 # ============================================================
 # One Base per application. Every model inherits from it; the class
 # attributes become table columns. 1.x style used `declarative_base()`
-# with `Column(...)` everywhere; 2.0 prefers `Mapped[...]` + 
+# with `Column(...)` everywhere; 2.0 prefers `Mapped[...]` +
 # `mapped_column(...)` so the type is checked twice (Python + DB).
 
 
@@ -109,6 +109,7 @@ print(f"notes nullable: {cols['notes']['nullable']}")
 # The ORM will happily try to insert anything you give it; the database
 # says no. This is why constraints live in the schema, not in validation.
 
+
 def _fresh_session() -> Session:
     """Return a session bound to a fresh in-memory DB with the schema."""
     return Session(bind=engine)
@@ -171,9 +172,7 @@ class TrainingStep(Base):
     __table_args__ = (UC("experiment_id", "step", name="uq_step_per_experiment"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    experiment_id: Mapped[int] = mapped_column(
-        ForeignKey("experiments.id"), nullable=False
-    )
+    experiment_id: Mapped[int] = mapped_column(ForeignKey("experiments.id"), nullable=False)
     step: Mapped[int] = mapped_column(Integer, nullable=False)
     loss: Mapped[float] = mapped_column(default=0.0)
 
@@ -215,6 +214,7 @@ with _fresh_session() as session:
 # per (model_name, version), with a versioned payload column and a
 # check that keeps version numbers sane.
 
+
 class ModelVersion(Base):
     __tablename__ = "model_versions"
     __table_args__ = (
@@ -240,9 +240,7 @@ def register_version(model_name: str, version: int, artifact_uri: str) -> ModelV
     DetachedInstanceError on first attribute access.
     """
     with _fresh_session() as session:
-        mv = ModelVersion(
-            model_name=model_name, version=version, artifact_uri=artifact_uri
-        )
+        mv = ModelVersion(model_name=model_name, version=version, artifact_uri=artifact_uri)
         session.add(mv)
         session.commit()
         session.refresh(mv)  # re-load expired attributes while attached
@@ -260,8 +258,7 @@ def _verify() -> None:
 
     # 2. Mapped columns carry the right nullability (Optional -> NULL)
     assert inspect(engine).get_columns("experiments")[3]["name"] == "notes"
-    notes_col = [c for c in inspect(engine).get_columns("experiments")
-                 if c["name"] == "notes"][0]
+    notes_col = [c for c in inspect(engine).get_columns("experiments") if c["name"] == "notes"][0]
     assert notes_col["nullable"] is True, "Optional[...] columns must be nullable"
 
     # 3. UNIQUE constraint fires on duplicate name

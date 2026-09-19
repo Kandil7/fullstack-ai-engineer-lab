@@ -59,7 +59,7 @@ def matches_requirement(req: str, version: str) -> bool:
         clause = clause.strip()
         for op in (">=", "<=", "==", ">", "<"):
             if clause.startswith(op):
-                if not _check_one(op, clause[len(op):].strip(), parsed):
+                if not _check_one(op, clause[len(op) :].strip(), parsed):
                     return False
                 break
         else:

@@ -44,6 +44,7 @@ By the end of this lecture, you will be able to:
 ```python
 import torch.nn as nn
 
+
 class TwoLayerNet(nn.Module):
     def __init__(self, in_dim, hidden, out_dim):
         super().__init__()
@@ -55,6 +56,7 @@ class TwoLayerNet(nn.Module):
 
     def forward(self, x):
         return self.net(x)
+
 
 model = TwoLayerNet(10, 32, 1)
 print(sum(p.numel() for p in model.parameters()))
@@ -74,7 +76,7 @@ manual bookkeeping. `forward()` defines the computation; you never call
 ```python
 from torch.utils.data import TensorDataset, DataLoader
 
-dataset = TensorDataset(X, y)                       # (features, targets) pairs
+dataset = TensorDataset(X, y)  # (features, targets) pairs
 loader = DataLoader(dataset, batch_size=64, shuffle=True)
 ```
 
@@ -92,6 +94,7 @@ time-series use `shuffle=False` and split chronologically.
 ```python
 criterion = nn.BCEWithLogitsLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)
+
 
 def train_one_epoch(m, dataloader, crit, opt):
     m.train()
@@ -144,8 +147,8 @@ before touching real data.
 ## 5. Train vs Eval Mode
 
 ```python
-model.train()      # enables dropout, batch-norm batch statistics
-model.eval()       # disables them; uses running statistics
+model.train()  # enables dropout, batch-norm batch statistics
+model.eval()  # disables them; uses running statistics
 with torch.no_grad():
     logits = model(X[:10])
 ```

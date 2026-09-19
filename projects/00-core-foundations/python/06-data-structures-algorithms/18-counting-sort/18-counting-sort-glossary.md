@@ -185,32 +185,33 @@
 def counting_sort(arr):
     """
     Basic counting sort for non-negative integers.
-    
+
     Time Complexity: O(n + k) where k is the range
     Space Complexity: O(n + k)
-    
+
     Args:
         arr: List of non-negative integers
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return []
-    
+
     max_val = max(arr)
     count = [0] * (max_val + 1)
-    
+
     # Count occurrences
     for num in arr:
         count[num] += 1
-    
+
     # Build sorted array
     sorted_arr = []
     for i in range(len(count)):
         sorted_arr.extend([i] * count[i])
-    
+
     return sorted_arr
+
 
 # Example usage
 arr = [4, 2, 2, 8, 3, 3, 1]
@@ -224,34 +225,35 @@ print("Sorted:", counting_sort(arr))
 def counting_sort_cumulative(arr):
     """
     Counting sort using cumulative counts for direct placement.
-    
+
     Args:
         arr: List of non-negative integers
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return []
-    
+
     max_val = max(arr)
     count = [0] * (max_val + 1)
-    
+
     # Count occurrences
     for num in arr:
         count[num] += 1
-    
+
     # Compute cumulative counts
     for i in range(1, len(count)):
         count[i] += count[i - 1]
-    
+
     # Build output (backward for stability)
     output = [0] * len(arr)
     for i in range(len(arr) - 1, -1, -1):
         output[count[arr[i]] - 1] = arr[i]
         count[arr[i]] -= 1
-    
+
     return output
+
 
 # Example usage
 arr = [3, 1, 4, 1, 5, 9, 2, 6]
@@ -264,30 +266,31 @@ print("Sorted:", counting_sort_cumulative(arr))
 def counting_sort_negative(arr):
     """
     Counting sort that handles negative numbers.
-    
+
     Args:
         arr: List of integers (including negatives)
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return []
-    
+
     min_val = min(arr)
     max_val = max(arr)
     shift = -min_val
     range_size = max_val - min_val + 1
-    
+
     count = [0] * range_size
     for num in arr:
         count[num + shift] += 1
-    
+
     sorted_arr = []
     for i in range(range_size):
         sorted_arr.extend([i - shift] * count[i])
-    
+
     return sorted_arr
+
 
 # Example usage
 arr = [-3, -1, -4, 2, 0, -2, 1]
@@ -300,38 +303,39 @@ print("Sorted:", counting_sort_negative(arr))
 def counting_sort_stable(arr):
     """
     Stable counting sort implementation.
-    
+
     Preserves relative order of equal elements.
-    
+
     Args:
         arr: List of non-negative integers
-    
+
     Returns:
         Sorted list (stable)
     """
     if not arr:
         return []
-    
+
     max_val = max(arr)
     count = [0] * (max_val + 1)
-    
+
     for num in arr:
         count[num] += 1
-    
+
     # Cumulative counts
     for i in range(1, len(count)):
         count[i] += count[i - 1]
-    
+
     # Backward traversal for stability
     output = [0] * len(arr)
     for i in range(len(arr) - 1, -1, -1):
         output[count[arr[i]] - 1] = arr[i]
         count[arr[i]] -= 1
-    
+
     return output
 
+
 # Stability test
-arr = [(2, 'a'), (1, 'b'), (2, 'c'), (1, 'd')]
+arr = [(2, "a"), (1, "b"), (2, "c"), (1, "d")]
 # Sort by first element
 sorted_arr = counting_sort_stable([x[0] for x in arr])
 print("Stable sort preserves order of equal elements")

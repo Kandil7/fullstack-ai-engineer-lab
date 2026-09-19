@@ -42,7 +42,8 @@ print(round(min(times), 5))
 **Example**:
 ```python
 def sum_squares(n: int) -> int:
-    return sum(i * i for i in range(n))     # O(n) loop, O(1) extra space
+    return sum(i * i for i in range(n))  # O(n) loop, O(1) extra space
+
 
 print(sum_squares(5))
 ```
@@ -57,10 +58,12 @@ print(sum_squares(5))
 ```python
 calls = 0
 
+
 def fib(n: int) -> int:
     global calls
     calls += 1
     return n if n < 2 else fib(n - 1) + fib(n - 2)
+
 
 fib(10)
 print(calls, "calls")
@@ -76,8 +79,10 @@ print(calls, "calls")
 ```python
 import cProfile
 
+
 def work() -> int:
     return sum(i * i for i in range(10_000))
+
 
 cProfile.run("work()")
 ```
@@ -92,11 +97,14 @@ cProfile.run("work()")
 ```python
 import cProfile, pstats, io
 
+
 def inner() -> None:
     [x for x in range(10_000)]
 
+
 def outer() -> None:
     inner()
+
 
 pr = cProfile.Profile()
 pr.enable()
@@ -134,11 +142,14 @@ print(joined)
 ```python
 import cProfile, pstats, io
 
+
 def cold() -> None:
     pass
 
+
 def hot(n: int) -> int:
     return sum(i for i in range(n))
+
 
 pr = cProfile.Profile()
 pr.enable()
@@ -161,8 +172,9 @@ True
 def plus_loop(n: int) -> str:
     s = ""
     for _ in range(n):
-        s = s + "c"          # refcount 1: CPython resizes in place
+        s = s + "c"  # refcount 1: CPython resizes in place
     return s
+
 
 print(plus_loop(5))
 ```
@@ -184,6 +196,7 @@ def fib(n: int, memo: dict[int, int] | None = None) -> int:
         return n
     memo[n] = fib(n - 1, memo) + fib(n - 2, memo)
     return memo[n]
+
 
 print(fib(25))
 ```
@@ -234,11 +247,14 @@ import timeit
 
 ns = {"n": 40_000}
 
+
 def naive(n: int) -> int:
     return sum(i for i in range(n)) * 1
 
+
 def fast(n: int) -> int:
     return n * (n - 1) // 2
+
 
 t_naive = min(timeit.repeat("naive(n)", globals=ns, number=5, repeat=3))
 t_fast = min(timeit.repeat("fast(n)", globals=ns, number=5, repeat=3))
@@ -269,8 +285,10 @@ print(round(min(timeit.repeat("sorted(data)", globals=ns, number=100, repeat=3))
 ```python
 import cProfile, pstats, io
 
+
 def leaf() -> None:
     sum(x * x for x in range(50_000))
+
 
 pr = cProfile.Profile()
 pr.enable()

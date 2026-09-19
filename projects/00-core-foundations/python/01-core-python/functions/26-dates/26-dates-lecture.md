@@ -34,9 +34,9 @@ specific_date = date(2026, 12, 25)
 print(specific_date)  # 2026-12-25
 
 # Date attributes
-print(today.year)   # 2026
+print(today.year)  # 2026
 print(today.month)  # 7
-print(today.day)    # 5
+print(today.day)  # 5
 print(today.weekday())  # 6 (Monday=0, Sunday=6)
 ```
 
@@ -53,7 +53,7 @@ specific_time = time(14, 30, 45)
 print(specific_time)  # 14:30:45
 
 # Time attributes
-print(specific_time.hour)    # 14
+print(specific_time.hour)  # 14
 print(specific_time.minute)  # 30
 print(specific_time.second)  # 45
 ```
@@ -77,10 +77,10 @@ dt_from_ts = datetime.fromtimestamp(timestamp)
 print(dt_from_ts)  # 2023-01-01 00:00:00
 
 # Attributes
-print(now.year)     # 2026
-print(now.month)    # 7
-print(now.hour)     # 14
-print(now.minute)   # 30
+print(now.year)  # 2026
+print(now.month)  # 7
+print(now.hour)  # 14
+print(now.minute)  # 30
 ```
 
 ### 4. Formatting Dates (strftime)
@@ -89,12 +89,12 @@ print(now.minute)   # 30
 now = datetime.now()
 
 # Common format codes
-print(now.strftime("%Y-%m-%d"))        # 2026-07-05
-print(now.strftime("%d/%m/%Y"))        # 05/07/2026
-print(now.strftime("%B %d, %Y"))       # July 05, 2026
-print(now.strftime("%A, %B %d, %Y"))   # Sunday, July 05, 2026
-print(now.strftime("%I:%M %p"))        # 02:30 PM
-print(now.strftime("%H:%M:%S"))        # 14:30:45
+print(now.strftime("%Y-%m-%d"))  # 2026-07-05
+print(now.strftime("%d/%m/%Y"))  # 05/07/2026
+print(now.strftime("%B %d, %Y"))  # July 05, 2026
+print(now.strftime("%A, %B %d, %Y"))  # Sunday, July 05, 2026
+print(now.strftime("%I:%M %p"))  # 02:30 PM
+print(now.strftime("%H:%M:%S"))  # 14:30:45
 print(now.strftime("%Y-%m-%d %H:%M"))  # 2026-07-05 14:30
 ```
 
@@ -195,12 +195,14 @@ print(dt_back)
 ```python
 from datetime import date
 
+
 def calculate_age(birthdate):
     today = date.today()
     age = today.year - birthdate.year
     if (today.month, today.day) < (birthdate.month, birthdate.day):
         age -= 1
     return age
+
 
 birthday = date(1990, 5, 15)
 print(f"Age: {calculate_age(birthday)} years")
@@ -211,10 +213,12 @@ print(f"Age: {calculate_age(birthday)} years")
 ```python
 from datetime import date
 
+
 def days_until(target_date):
     today = date.today()
     delta = target_date - today
     return max(delta.days, 0)
+
 
 christmas = date(2026, 12, 25)
 print(f"Days until Christmas: {days_until(christmas)}")
@@ -224,6 +228,7 @@ print(f"Days until Christmas: {days_until(christmas)}")
 
 ```python
 from datetime import date, timedelta
+
 
 def business_days(start, end):
     """Count business days between two dates."""
@@ -235,6 +240,7 @@ def business_days(start, end):
         current += timedelta(days=1)
     return days
 
+
 start = date(2026, 7, 1)
 end = date(2026, 7, 31)
 print(f"Business days in July 2026: {business_days(start, end)}")
@@ -245,12 +251,14 @@ print(f"Business days in July 2026: {business_days(start, end)}")
 ```python
 from datetime import date, timedelta
 
+
 def date_range(start, end, step_days=1):
     """Generate dates in a range."""
     current = start
     while current <= end:
         yield current
         current += timedelta(days=step_days)
+
 
 for d in date_range(date(2026, 7, 1), date(2026, 7, 10), 3):
     print(d)  # 2026-07-01, 2026-07-04, 2026-07-07, 2026-07-10
@@ -265,6 +273,7 @@ for d in date_range(date(2026, 7, 1), date(2026, 7, 10), 3):
 # WRONG
 def add_days(dt, days=timedelta(days=1)):
     return dt + days  # timedelta created once!
+
 
 # CORRECT
 def add_days(dt, days=1):

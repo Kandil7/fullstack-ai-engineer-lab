@@ -84,10 +84,10 @@ def weak_cache_trap() -> tuple[int, int, int]:
     deleting the owner evicts the entry."""
     cache: weakref.WeakValueDictionary[int, Entry] = weakref.WeakValueDictionary()
 
-    cache[1] = Entry("temp")            # temporary: evicted instantly
+    cache[1] = Entry("temp")  # temporary: evicted instantly
     trap_len = len(cache)
 
-    e = Entry("owned")                  # strong owner elsewhere
+    e = Entry("owned")  # strong owner elsewhere
     cache[2] = e
     alive_len = len(cache)
 

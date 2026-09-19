@@ -3,14 +3,17 @@ Matplotlib Line Plot - W3Schools Exercises
 ============================================
 Focused exercises on line plotting techniques.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -40,7 +43,7 @@ def exercise_02():
 
     plt.figure(figsize=(8, 5))
     for base, color in zip(bases, colors):
-        plt.plot(x, base ** x, color=color, linewidth=2, label=f"{base}^x")
+        plt.plot(x, base**x, color=color, linewidth=2, label=f"{base}^x")
     plt.legend()
     plt.title("Exercise 2: Exponential Functions")
     plt.xlabel("x")
@@ -81,9 +84,15 @@ def exercise_04():
     plt.figure(figsize=(10, 8))
     for i, ds in enumerate(styles, 1):
         plt.subplot(2, 2, i)
-        plt.step(x, y, where="pre" if "pre" in ds else
-                 ("mid" if "mid" in ds else "post" if "post" in ds else "pre"),
-                 linewidth=2, color="teal")
+        plt.step(
+            x,
+            y,
+            where="pre"
+            if "pre" in ds
+            else ("mid" if "mid" in ds else "post" if "post" in ds else "pre"),
+            linewidth=2,
+            color="teal",
+        )
         plt.plot(x, y, "o", color="red", markersize=6)
         plt.title(f"drawstyle: {ds}")
         plt.ylim(0, 8)
@@ -105,17 +114,25 @@ def exercise_05():
 
     # Annotate the maximum
     max_idx = np.argmax(y)
-    plt.annotate("Maximum", xy=(x[max_idx], y[max_idx]),
-                 xytext=(x[max_idx] + 0.5, y[max_idx] + 0.3),
-                 arrowprops=dict(arrowstyle="->", color="red"),
-                 fontsize=11, color="red")
+    plt.annotate(
+        "Maximum",
+        xy=(x[max_idx], y[max_idx]),
+        xytext=(x[max_idx] + 0.5, y[max_idx] + 0.3),
+        arrowprops=dict(arrowstyle="->", color="red"),
+        fontsize=11,
+        color="red",
+    )
 
     # Annotate the minimum
     min_idx = np.argmin(y)
-    plt.annotate("Minimum", xy=(x[min_idx], y[min_idx]),
-                 xytext=(x[min_idx] + 0.5, y[min_idx] - 0.3),
-                 arrowprops=dict(arrowstyle="->", color="orange"),
-                 fontsize=11, color="orange")
+    plt.annotate(
+        "Minimum",
+        xy=(x[min_idx], y[min_idx]),
+        xytext=(x[min_idx] + 0.5, y[min_idx] - 0.3),
+        arrowprops=dict(arrowstyle="->", color="orange"),
+        fontsize=11,
+        color="orange",
+    )
 
     plt.title("Exercise 5: Line with Annotations")
     plt.xlabel("x")

@@ -50,7 +50,8 @@ The first layer: reject/filter input that violates policy — harmful requests,
 PII in unsanctioned contexts, injection attempts:
 
 ```python
-BLOCKED = ["harmful content patterns..."]     # domain-specific blocklist
+BLOCKED = ["harmful content patterns..."]  # domain-specific blocklist
+
 
 def check_input(user_input: str, policy) -> tuple[bool, str]:
     """Input gate: (allowed, reason). Blocked input never reaches the model."""
@@ -58,6 +59,7 @@ def check_input(user_input: str, policy) -> tuple[bool, str]:
         if rule.matches(user_input):
             return False, reason
     return True, ""
+
 
 ok, reason = check_input("Give me a refund", support_policy)
 print(ok, reason)
@@ -88,6 +90,7 @@ def check_output(completion: str, policy) -> tuple[bool, str]:
     if policy.unsafe and classify_content(completion) == "unsafe":
         return False, "unsafe content detected"
     return True, ""
+
 
 print(check_output("Your card number is 4111...", policy(pii=True)))
 ```
@@ -140,15 +143,21 @@ low-risk, but writing/acting (refund, transfer, delete, deploy) must be
 gated:
 
 ```python
-ACTION_LEVELS = {"lookup_order": "read", "search_docs": "read",
-                 "issue_refund": "write", "transfer_funds": "write"}
+ACTION_LEVELS = {
+    "lookup_order": "read",
+    "search_docs": "read",
+    "issue_refund": "write",
+    "transfer_funds": "write",
+}
+
 
 def authorize_tool(tool: str, actor: str, approver_fn) -> tuple[bool, str]:
     """Read tools auto-approve; write tools require human approval."""
-    level = ACTION_LEVELS.get(tool, "write")     # unknown = deny
+    level = ACTION_LEVELS.get(tool, "write")  # unknown = deny
     if level == "read":
         return True, "auto-approved (read)"
-    return approver_fn(tool, actor)              # human-in-the-loop (L24)
+    return approver_fn(tool, actor)  # human-in-the-loop (L24)
+
 
 print(authorize_tool("search_docs", "user1", approver_fn))
 print(authorize_tool("issue_refund", "user1", approver_fn))  # → pending approval
@@ -199,16 +208,13 @@ known-bad inputs and outputs; measure catch rate + false-positive rate:
 ```python
 def eval_guardrails(guard_fn, attack_suite: list[tuple[str, bool]]) -> dict:
     """attack_suite = (input, should_block). Score the guardrail."""
-    tp = sum(1 for x, should in attack_suite
-             if guard_fn(x)[0] is False and should)
-    fp = sum(1 for x, should in attack_suite
-             if guard_fn(x)[0] is False and not should)
+    tp = sum(1 for x, should in attack_suite if guard_fn(x)[0] is False and should)
+    fp = sum(1 for x, should in attack_suite if guard_fn(x)[0] is False and not should)
     total = len(attack_suite)
-    return {"catch_rate": round(tp / total, 3),
-            "false_positive_rate": round(fp / total, 3)}
+    return {"catch_rate": round(tp / total, 3), "false_positive_rate": round(fp / total, 3)}
 
-print(eval_guardrails(check_input, [("bomb instructions", True),
-                                    ("normal question", False)]))
+
+print(eval_guardrails(check_input, [("bomb instructions", True), ("normal question", False)]))
 ```
 
 Output:

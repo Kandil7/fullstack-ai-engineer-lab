@@ -42,10 +42,10 @@ header; the ints are separate objects the header points to.
 ```python
 import sys
 
-print(sys.getsizeof([0, 1, 2, 3]))                    # 88  (list header only)
-print(sys.getsizeof({}))                              # 64  (empty dict)
+print(sys.getsizeof([0, 1, 2, 3]))  # 88  (list header only)
+print(sys.getsizeof({}))  # 64  (empty dict)
 print(sys.getsizeof({"a": 1, "b": 2, "c": 3, "d": 4}))  # 184
-print(sys.getsizeof(2**62), sys.getsizeof(1.5))       # 36 24
+print(sys.getsizeof(2**62), sys.getsizeof(1.5))  # 36 24
 
 # Output:
 # 88
@@ -65,7 +65,7 @@ tracemalloc.start()
 big = [0] * 1_000_000
 _cur, peak = tracemalloc.get_traced_memory()
 tracemalloc.stop()
-print(f"deep memory: {peak / 1e6:.1f} MB")   # list header + 1M int refs
+print(f"deep memory: {peak / 1e6:.1f} MB")  # list header + 1M int refs
 ```
 
 Memory accounting rules of thumb: a `float` is 24 bytes, an `int` is 28
@@ -84,19 +84,31 @@ attribute access, and no new attributes.
 ```python
 import sys
 
+
 class ManyDict:
     def __init__(self) -> None:
-        self.a = 1; self.b = 2; self.c = 3; self.d = 4; self.e = 5
+        self.a = 1
+        self.b = 2
+        self.c = 3
+        self.d = 4
+        self.e = 5
+
 
 class ManySlots:
     __slots__ = ("a", "b", "c", "d", "e")
+
     def __init__(self) -> None:
-        self.a = 1; self.b = 2; self.c = 3; self.d = 4; self.e = 5
+        self.a = 1
+        self.b = 2
+        self.c = 3
+        self.d = 4
+        self.e = 5
+
 
 md = ManyDict()
 ms = ManySlots()
 print(sys.getsizeof(md) + sys.getsizeof(md.__dict__))  # 336  (instance + dict)
-print(sys.getsizeof(ms))                               # 72   (slots only)
+print(sys.getsizeof(ms))  # 72   (slots only)
 
 # Output:
 # 336
@@ -128,16 +140,16 @@ value comparison.
 
 ```python
 a, b = 200, 200
-print(a is b)                        # True  (cached small int)
+print(a is b)  # True  (cached small int)
 
 big_a = 2**40
-big_b = int(str(2**40))              # parsed at runtime -> fresh object
-print(big_a == big_b)                # True  (equal values)
-print(big_a is big_b)                # False (distinct objects)
+big_b = int(str(2**40))  # parsed at runtime -> fresh object
+print(big_a == big_b)  # True  (equal values)
+print(big_a is big_b)  # False (distinct objects)
 
 s1 = "model_checkpoint"
-s2 = "model_" + "checkpoint"         # folded constant -> same object
-print(s1 is s2)                      # True  (interned)
+s2 = "model_" + "checkpoint"  # folded constant -> same object
+print(s1 is s2)  # True  (interned)
 
 # Output:
 # True
@@ -161,14 +173,17 @@ everything each iteration. Building a string in a loop is O(n²); a single
 ```python
 import timeit
 
+
 def concat_loop(n: int) -> str:
     s = ""
     for _ in range(n):
         s += "x"
     return s
 
+
 def join_parts(n: int) -> str:
     return "".join(["x"] * n)
+
 
 for n in (50_000, 500_000):
     t_loop = timeit.timeit(lambda: concat_loop(n), number=5)
@@ -204,9 +219,11 @@ difference is O(1) vs O(n) memory — the difference between processing a
 ```python
 import tracemalloc
 
+
 def stream_lines(n: int) -> int:
     """Sum lengths of n synthetic lines — O(1) memory."""
     return sum(len(f"line {i}") for i in range(n))
+
 
 tracemalloc.start()
 total = stream_lines(1_000_000)
@@ -234,7 +251,7 @@ header from a model artifact without loading the payload twice.
 payload = b"HEADER:v2" + b"\x00" * 64 + b"weights..."
 view = memoryview(payload)
 
-header = view[:9].tobytes()        # copy only the 9 bytes you need
+header = view[:9].tobytes()  # copy only the 9 bytes you need
 print(header)
 
 # Output:
@@ -263,17 +280,20 @@ run.
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import time
 
+
 def spin(n: int) -> int:
     total = 0
     for i in range(n):
         total += i
     return total
 
+
 def time_pool(pool_cls, n_workers: int, n: int) -> float:
     t0 = time.perf_counter()
     with pool_cls(max_workers=n_workers) as pool:
         list(pool.map(spin, [n] * n_workers))
     return time.perf_counter() - t0
+
 
 print(f"threads: {time_pool(ThreadPoolExecutor, 4, 300_000):.3f}s")
 print(f"processes: {time_pool(ProcessPoolExecutor, 4, 300_000):.3f}s")
@@ -305,16 +325,18 @@ which refcounting alone cannot detect.
 import gc, sys
 
 x = [1, 2, 3]
-print(sys.getrefcount(x) - 1)        # 1  (the local binding)
+print(sys.getrefcount(x) - 1)  # 1  (the local binding)
+
 
 class Node:
     __slots__ = ("next",)
 
+
 n1, n2 = Node(), Node()
-n1.next = n2                          # cycle: n1 -> n2 -> n1
+n1.next = n2  # cycle: n1 -> n2 -> n1
 n2.next = n1
-del n1, n2                            # refcounts never reach zero
-print(gc.collect())                   # 2  objects collected by the cycle GC
+del n1, n2  # refcounts never reach zero
+print(gc.collect())  # 2  objects collected by the cycle GC
 
 # Output:
 # 1
@@ -369,6 +391,7 @@ The calculation every AI engineer must be able to do on a whiteboard:
 def embedding_ram_bytes(rows: int, dim: int, dtype_bits: int = 32) -> int:
     """Total bytes for a rows x dim matrix, dtype-aware."""
     return rows * dim * (dtype_bits // 8)
+
 
 rows, dim = 1_000_000, 768
 for bits in (64, 32, 16, 8):
@@ -540,21 +563,23 @@ the remaining memory, and again for float16. Verify with
 ```python
 import sys, timeit, tracemalloc
 
-sys.getsizeof(obj)                 # shallow size
+sys.getsizeof(obj)  # shallow size
 # tracemalloc.start() ... get_traced_memory() ... stop()   # deep size
 
-class Record:                      # fixed-shape hot records
+
+class Record:  # fixed-shape hot records
     __slots__ = ("id", "vec")
 
-x == y                             # values
-x is y                             # identity (None, singletons only)
 
-"".join(parts)                     # O(n) - never s += part in a loop
-sum(len(line) for line in f)       # O(1) memory streaming
+x == y  # values
+x is y  # identity (None, singletons only)
+
+"".join(parts)  # O(n) - never s += part in a loop
+sum(len(line) for line in f)  # O(1) memory streaming
 memoryview(payload)[:9].tobytes()  # zero-copy slice
 
 # ThreadPoolExecutor -> I/O; ProcessPoolExecutor -> CPU; asyncio -> waits
-rows * dim * (bits // 8)           # tensor bytes: 1M*768*4 = 3.07 GB
+rows * dim * (bits // 8)  # tensor bytes: 1M*768*4 = 3.07 GB
 ```
 
 ## Next Steps

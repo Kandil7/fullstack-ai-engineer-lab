@@ -26,18 +26,18 @@ By the end of this lecture, you will be able to:
 import numpy as np
 
 # Signed integers (can be negative)
-i8 = np.array([1, 2, 3], dtype=np.int8)     # -128 to 127
-i16 = np.array([1, 2, 3], dtype=np.int16)   # -32768 to 32767
-i32 = np.array([1, 2, 3], dtype=np.int32)   # -2^31 to 2^31-1
-i64 = np.array([1, 2, 3], dtype=np.int64)   # -2^63 to 2^63-1
+i8 = np.array([1, 2, 3], dtype=np.int8)  # -128 to 127
+i16 = np.array([1, 2, 3], dtype=np.int16)  # -32768 to 32767
+i32 = np.array([1, 2, 3], dtype=np.int32)  # -2^31 to 2^31-1
+i64 = np.array([1, 2, 3], dtype=np.int64)  # -2^63 to 2^63-1
 
-print(f"int8:  {i8.dtype}, size: {i8.itemsize}")    # int8, 1 byte
-print(f"int16: {i16.dtype}, size: {i16.itemsize}")   # int16, 2 bytes
-print(f"int32: {i32.dtype}, size: {i32.itemsize}")   # int32, 4 bytes
-print(f"int64: {i64.dtype}, size: {i64.itemsize}")   # int64, 8 bytes
+print(f"int8:  {i8.dtype}, size: {i8.itemsize}")  # int8, 1 byte
+print(f"int16: {i16.dtype}, size: {i16.itemsize}")  # int16, 2 bytes
+print(f"int32: {i32.dtype}, size: {i32.itemsize}")  # int32, 4 bytes
+print(f"int64: {i64.dtype}, size: {i64.itemsize}")  # int64, 8 bytes
 
 # Unsigned integers (0 and positive only)
-u8 = np.array([1, 2, 3], dtype=np.uint8)    # 0 to 255
+u8 = np.array([1, 2, 3], dtype=np.uint8)  # 0 to 255
 u16 = np.array([1, 2, 3], dtype=np.uint16)  # 0 to 65535
 u32 = np.array([1, 2, 3], dtype=np.uint32)  # 0 to 2^32-1
 u64 = np.array([1, 2, 3], dtype=np.uint64)  # 0 to 2^64-1
@@ -47,29 +47,29 @@ u64 = np.array([1, 2, 3], dtype=np.uint64)  # 0 to 2^64-1
 
 ```python
 # Floating-point types
-f16 = np.array([1.5, 2.5], dtype=np.float16)   # Half precision
-f32 = np.array([1.5, 2.5], dtype=np.float32)   # Single precision
-f64 = np.array([1.5, 2.5], dtype=np.float64)   # Double precision (default!)
+f16 = np.array([1.5, 2.5], dtype=np.float16)  # Half precision
+f32 = np.array([1.5, 2.5], dtype=np.float32)  # Single precision
+f64 = np.array([1.5, 2.5], dtype=np.float64)  # Double precision (default!)
 
-print(f"float16: {f16.dtype}, size: {f16.itemsize}")   # 2 bytes
-print(f"float32: {f32.dtype}, size: {f32.itemsize}")   # 4 bytes
-print(f"float64: {f64.dtype}, size: {f64.itemsize}")   # 8 bytes
+print(f"float16: {f16.dtype}, size: {f16.itemsize}")  # 2 bytes
+print(f"float32: {f32.dtype}, size: {f32.itemsize}")  # 4 bytes
+print(f"float64: {f64.dtype}, size: {f64.itemsize}")  # 8 bytes
 
 # Precision comparison
-print(f"float16 max: {np.finfo(np.float16).max}")   # 65504
-print(f"float32 max: {np.finfo(np.float32).max}")   # 3.4028235e+38
-print(f"float64 max: {np.finfo(np.float64).max}")   # 1.7976931348623157e+308
+print(f"float16 max: {np.finfo(np.float16).max}")  # 65504
+print(f"float32 max: {np.finfo(np.float32).max}")  # 3.4028235e+38
+print(f"float64 max: {np.finfo(np.float64).max}")  # 1.7976931348623157e+308
 ```
 
 ### 1.3 Complex Types
 
 ```python
 # Complex numbers
-c64 = np.array([1+2j, 3+4j], dtype=np.complex64)
-c128 = np.array([1+2j, 3+4j], dtype=np.complex128)
+c64 = np.array([1 + 2j, 3 + 4j], dtype=np.complex64)
+c128 = np.array([1 + 2j, 3 + 4j], dtype=np.complex128)
 
-print(f"complex64:  {c64.dtype}, size: {c64.itemsize}")   # 8 bytes
-print(f"complex128: {c128.dtype}, size: {c128.itemsize}") # 16 bytes
+print(f"complex64:  {c64.dtype}, size: {c64.itemsize}")  # 8 bytes
+print(f"complex128: {c128.dtype}, size: {c128.itemsize}")  # 16 bytes
 ```
 
 ### 1.4 Boolean and String Types
@@ -122,18 +122,18 @@ arr = np.array([1, 2, 3], dtype=complex)
 
 ```python
 # NumPy provides many aliases
-arr = np.array([1, 2, 3], dtype=np.int_)      # Platform integer
-arr = np.array([1, 2, 3], dtype=np.float_)    # Platform float
+arr = np.array([1, 2, 3], dtype=np.int_)  # Platform integer
+arr = np.array([1, 2, 3], dtype=np.float_)  # Platform float
 arr = np.array([1, 2, 3], dtype=np.complex_)  # Platform complex
-arr = np.array([1, 2, 3], dtype=np.bool_)     # Boolean
-arr = np.array([1, 2, 3], dtype=np.str_)      # String
-arr = np.array([1, 2, 3], dtype=np.object_)   # Object
+arr = np.array([1, 2, 3], dtype=np.bool_)  # Boolean
+arr = np.array([1, 2, 3], dtype=np.str_)  # String
+arr = np.array([1, 2, 3], dtype=np.object_)  # Object
 
 # Character codes (legacy, but still works)
-arr = np.array([1, 2, 3], dtype='i')   # int
-arr = np.array([1, 2, 3], dtype='f')   # float
-arr = np.array([1, 2, 3], dtype='d')   # double
-arr = np.array([1, 2, 3], dtype='b')   # byte (int8)
+arr = np.array([1, 2, 3], dtype="i")  # int
+arr = np.array([1, 2, 3], dtype="f")  # float
+arr = np.array([1, 2, 3], dtype="d")  # double
+arr = np.array([1, 2, 3], dtype="b")  # byte (int8)
 ```
 
 ---
@@ -148,14 +148,14 @@ arr = np.array([1, 2, 3, 4, 5], dtype=np.int64)
 # Cast to different types
 arr_float = arr.astype(np.float32)
 print(arr_float.dtype)  # float32
-print(arr_float)        # [1. 2. 3. 4. 5.]
+print(arr_float)  # [1. 2. 3. 4. 5.]
 
 arr_int8 = arr.astype(np.int8)
-print(arr_int8.dtype)   # int8
+print(arr_int8.dtype)  # int8
 
 # Using string
 arr_str = arr.astype("float64")
-print(arr_str.dtype)    # float64
+print(arr_str.dtype)  # float64
 ```
 
 ### 3.2 Casting with Copy vs View
@@ -194,6 +194,7 @@ except:
 
 # Use safe casting
 from numpy import result_type
+
 dt = np.result_type(np.int8, np.int32)
 print(dt)  # int32
 ```
@@ -272,11 +273,11 @@ arr_int64 = np.zeros(n, dtype=np.int64)
 arr_float32 = np.zeros(n, dtype=np.float32)
 arr_float64 = np.zeros(n, dtype=np.float64)
 
-print(f"int8:   {arr_int8.nbytes:>10,} bytes ({arr_int8.nbytes/1024/1024:.1f} MB)")
-print(f"int32:  {arr_int32.nbytes:>10,} bytes ({arr_int32.nbytes/1024/1024:.1f} MB)")
-print(f"int64:  {arr_int64.nbytes:>10,} bytes ({arr_int64.nbytes/1024/1024:.1f} MB)")
-print(f"float32: {arr_float32.nbytes:>10,} bytes ({arr_float32.nbytes/1024/1024:.1f} MB)")
-print(f"float64: {arr_float64.nbytes:>10,} bytes ({arr_float64.nbytes/1024/1024:.1f} MB)")
+print(f"int8:   {arr_int8.nbytes:>10,} bytes ({arr_int8.nbytes / 1024 / 1024:.1f} MB)")
+print(f"int32:  {arr_int32.nbytes:>10,} bytes ({arr_int32.nbytes / 1024 / 1024:.1f} MB)")
+print(f"int64:  {arr_int64.nbytes:>10,} bytes ({arr_int64.nbytes / 1024 / 1024:.1f} MB)")
+print(f"float32: {arr_float32.nbytes:>10,} bytes ({arr_float32.nbytes / 1024 / 1024:.1f} MB)")
+print(f"float64: {arr_float64.nbytes:>10,} bytes ({arr_float64.nbytes / 1024 / 1024:.1f} MB)")
 ```
 
 ### 5.2 Precision Limits
@@ -309,17 +310,17 @@ print(f"float64: {arr_f64[0]}")  # 1.123456789
 
 ```python
 # Datetime
-dates = np.array(['2024-01-01', '2024-01-02', '2024-01-03'], dtype='datetime64')
+dates = np.array(["2024-01-01", "2024-01-02", "2024-01-03"], dtype="datetime64")
 print(dates)  # ['2024-01-01' '2024-01-02' '2024-01-03']
 print(dates.dtype)  # datetime64[D]
 
 # Timedelta
-deltas = np.array([1, 2, 3], dtype='timedelta64[D]')
+deltas = np.array([1, 2, 3], dtype="timedelta64[D]")
 print(deltas)  # [1 2 3] days
 print(deltas.dtype)  # timedelta64[D]
 
 # Date arithmetic
-tomorrow = dates[0] + np.timedelta64(1, 'D')
+tomorrow = dates[0] + np.timedelta64(1, "D")
 print(tomorrow)  # 2024-01-02
 ```
 
@@ -327,15 +328,13 @@ print(tomorrow)  # 2024-01-02
 
 ```python
 # Structured array with named fields
-dt = np.dtype([('name', 'U10'), ('age', 'i4'), ('salary', 'f8')])
-employees = np.array([
-    ('Alice', 30, 75000.0),
-    ('Bob', 25, 65000.0),
-    ('Charlie', 35, 85000.0)
-], dtype=dt)
+dt = np.dtype([("name", "U10"), ("age", "i4"), ("salary", "f8")])
+employees = np.array(
+    [("Alice", 30, 75000.0), ("Bob", 25, 65000.0), ("Charlie", 35, 85000.0)], dtype=dt
+)
 
-print(employees['name'])      # ['Alice' 'Bob' 'Charlie']
-print(employees['salary'])    # [75000. 65000. 85000.]
+print(employees["name"])  # ['Alice' 'Bob' 'Charlie']
+print(employees["salary"])  # [75000. 65000. 85000.]
 ```
 
 ---
@@ -415,7 +414,7 @@ arr2 = np.array([1.0, 2.0, 3.0])
 arr3 = np.array([1, 2.0, 3])
 arr4 = np.array([True, False, True])
 arr5 = np.array(["a", "b", "c"])
-arr6 = np.array([1+2j, 3+4j])
+arr6 = np.array([1 + 2j, 3 + 4j])
 
 # Print dtypes and sizes
 for i, arr in enumerate([arr1, arr2, arr3, arr4, arr5, arr6], 1):
@@ -453,12 +452,11 @@ import sys
 # Compare memory for 1M elements
 n = 1000000
 
-dtypes = [np.int8, np.int16, np.int32, np.int64,
-          np.float16, np.float32, np.float64]
+dtypes = [np.int8, np.int16, np.int32, np.int64, np.float16, np.float32, np.float64]
 
 for dt in dtypes:
     arr = np.zeros(n, dtype=dt)
-    print(f"{str(dt):>10}: {arr.nbytes:>12,} bytes ({arr.nbytes/1024/1024:.1f} MB)")
+    print(f"{str(dt):>10}: {arr.nbytes:>12,} bytes ({arr.nbytes / 1024 / 1024:.1f} MB)")
 ```
 
 ### Exercise 4: Type Promotion

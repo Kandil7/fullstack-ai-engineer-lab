@@ -119,8 +119,7 @@ async def download_file(filename: str):
         raise HTTPException(status_code=404, detail=f"File '{filename}' not found")
 
     return FileResponse(
-        filepath,
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+        filepath, headers={"Content-Disposition": f'attachment; filename="{filename}"'}
     )
 
 
@@ -138,8 +137,7 @@ templates = Jinja2Templates(directory="templates")
 async def styled_page(request: Request):
     try:
         return templates.TemplateResponse(
-            "styled.html",
-            {"request": request, "title": "Styled Page"}
+            "styled.html", {"request": request, "title": "Styled Page"}
         )
     except Exception:
         return HTMLResponse("""
@@ -204,7 +202,7 @@ async def favicon():
         <rect width="16" height="16" rx="3" fill="#4A90D9"/>
         <text x="8" y="12" text-anchor="middle" fill="white" font-size="10" font-family="Arial">F</text>
         </svg>""",
-        media_type="image/svg+xml"
+        media_type="image/svg+xml",
     )
 
 

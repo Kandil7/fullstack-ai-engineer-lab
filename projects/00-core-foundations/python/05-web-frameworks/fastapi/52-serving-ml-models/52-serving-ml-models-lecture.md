@@ -45,7 +45,8 @@ By the end of this lecture, you will be able to:
 ## 1. Load once at startup
 
 ```python
-MODEL = joblib.load("model.joblib")   # module level: once, at import
+MODEL = joblib.load("model.joblib")  # module level: once, at import
+
 
 @app.post("/v1/predict")
 def predict(req: PredictRequest):
@@ -65,7 +66,7 @@ initialization. Fire a dummy prediction at startup so the first *real*
 request is already fast:
 
 ```python
-MODEL.predict(np.zeros((1, n_features)))   # warmup at startup
+MODEL.predict(np.zeros((1, n_features)))  # warmup at startup
 ```
 
 Warmup belongs in the startup lifecycle (topic 25/46) — before the
@@ -78,6 +79,7 @@ The contract is explicit, validated, and versioned:
 ```python
 class PredictRequest(BaseModel):
     features: list[float] = Field(min_length=8, max_length=8)
+
 
 @app.post("/v1/predict")
 def predict(req: PredictRequest): ...

@@ -48,8 +48,11 @@ the created key to a cache, a queue, or a downstream join.
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
-conn.execute("CREATE TABLE features (id INTEGER PRIMARY KEY, entity TEXT NOT NULL UNIQUE, value REAL NOT NULL)")
+conn.execute(
+    "CREATE TABLE features (id INTEGER PRIMARY KEY, entity TEXT NOT NULL UNIQUE, value REAL NOT NULL)"
+)
 row = conn.execute(
     "INSERT INTO features (entity, value) VALUES (?, ?) RETURNING id, entity",
     ("user_42", 0.87),
@@ -76,7 +79,7 @@ sql = """
     ON CONFLICT (entity) DO UPDATE SET value = excluded.value
 """
 conn.execute(sql, ("user_42", 0.92))
-conn.execute(sql, ("user_42", 0.92))   # re-run: idempotent
+conn.execute(sql, ("user_42", 0.92))  # re-run: idempotent
 print(conn.execute("SELECT entity, value FROM features WHERE entity = ?", ("user_42",)).fetchall())
 ```
 

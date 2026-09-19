@@ -50,6 +50,7 @@ queries are repeated (popular support questions, common phrases):
 ```python
 from functools import lru_cache
 
+
 class ExactPromptCache:
     def __init__(self, ttl_s: int = 3600):
         self._cache: dict[str, tuple[float, str]] = {}
@@ -64,6 +65,7 @@ class ExactPromptCache:
 
     def set(self, prompt: str, completion: str) -> None:
         self._cache[prompt] = (time.time(), completion)
+
 
 cache = ExactPromptCache()
 cache.set("What is the refund policy?", "Refunds take 3-5 days.")
@@ -91,7 +93,7 @@ class SemanticCache:
     def __init__(self, embed_fn, threshold: float = 0.92):
         self.embed = embed_fn
         self.threshold = threshold
-        self._items: list[tuple[str, list[float], str]] = []   # query, vec, answer
+        self._items: list[tuple[str, list[float], str]] = []  # query, vec, answer
 
     def get(self, query: str) -> str | None:
         qv = self.embed(query)
@@ -102,6 +104,7 @@ class SemanticCache:
 
     def set(self, query: str, answer: str) -> None:
         self._items.append((query, self.embed(query), answer))
+
 
 c = SemanticCache(embed_text)
 c.set("How do I reset my password?", "Go to Settings → Security → Reset.")
@@ -157,6 +160,7 @@ def route_model(query: str, classify_fn) -> str:
     """Return the model for this query: cheap default, premium for hard."""
     return "gpt-4o-mini" if classify_fn(query) == "easy" else "gpt-4o"
 
+
 # 80% easy → 80% of traffic at 1/20th the price
 # measured: eval (L20) must confirm the cheap route doesn't regress quality
 ```
@@ -183,12 +187,16 @@ Before any cache, the cheapest cost control is tokens:
 | Batch where possible | call overhead | L2 |
 
 ```python
-def token_budget_check(prompt_tokens: int, completion_tokens: int,
-                       prompt_cap: int, completion_cap: int) -> tuple[bool, str]:
+def token_budget_check(
+    prompt_tokens: int, completion_tokens: int, prompt_cap: int, completion_cap: int
+) -> tuple[bool, str]:
     """Gate: no call exceeds its token budget (L17 metric feeds this)."""
     ok = prompt_tokens <= prompt_cap and completion_tokens <= completion_cap
-    return (ok, f"prompt {prompt_tokens}/{prompt_cap}, "
-                f"completion {completion_tokens}/{completion_cap}")
+    return (
+        ok,
+        f"prompt {prompt_tokens}/{prompt_cap}, completion {completion_tokens}/{completion_cap}",
+    )
+
 
 print(token_budget_check(4200, 150, 4000, 300))
 ```
@@ -210,9 +218,11 @@ def cost_summary(traces: list[dict]) -> dict:
     for t in traces:
         f = t["metadata"].get("feature", "unknown")
         by_feature[f] = by_feature.get(f, 0.0) + t["cost_usd"]
-    return {"total_usd": round(total, 2),
-            "by_feature": {k: round(v, 2) for k, v in by_feature.items()},
-            "avg_cost_per_call": round(total / max(len(traces), 1), 5)}
+    return {
+        "total_usd": round(total, 2),
+        "by_feature": {k: round(v, 2) for k, v in by_feature.items()},
+        "avg_cost_per_call": round(total / max(len(traces), 1), 5),
+    }
 ```
 
 Output:

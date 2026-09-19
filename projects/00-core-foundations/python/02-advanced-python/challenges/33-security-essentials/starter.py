@@ -15,14 +15,15 @@ from typing import Any
 # Bronze: Password Store
 # ============================================================
 
-def hash_password(password: str, salt: bytes | None = None,
-                  iterations: int = 100_000) -> tuple[bytes, bytes]:
+
+def hash_password(
+    password: str, salt: bytes | None = None, iterations: int = 100_000
+) -> tuple[bytes, bytes]:
     """PBKDF2-HMAC-SHA256 hash with a fresh random salt. O(iterations)."""
     raise NotImplementedError
 
 
-def verify_password(password: str, digest: bytes, salt: bytes,
-                    iterations: int = 100_000) -> bool:
+def verify_password(password: str, digest: bytes, salt: bytes, iterations: int = 100_000) -> bool:
     """Timing-safe verify (hmac.compare_digest). O(iterations)."""
     raise NotImplementedError
 
@@ -30,6 +31,7 @@ def verify_password(password: str, digest: bytes, salt: bytes,
 # ============================================================
 # Silver: Safe Query Layer
 # ============================================================
+
 
 class SafeStore:
     """sqlite3 store with parameterized queries only."""

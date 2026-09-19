@@ -33,6 +33,7 @@ DuckDB, and PyTorch without conversion.
 **Example**:
 ```python
 import pyarrow as pa
+
 t = pa.table({"score": pa.array([0.9, 0.4])})
 print(t.schema)
 ```
@@ -48,6 +49,7 @@ returns an eager DataFrame. Everything before it is free.
 **Example**:
 ```python
 import polars as pl
+
 lf = pl.LazyFrame({"a": [1, 2, 3]})
 df = lf.filter(pl.col("a") > 1).collect()
 print(df.rows())
@@ -70,6 +72,7 @@ columns (Series) plus a schema. Built column-first from a dict of lists.
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"id": [1, 2], "split": ["a", "b"]})
 print(df.shape)
 ```
@@ -86,6 +89,7 @@ Parquet and Arrow.
 **Example**:
 ```python
 import polars as pl
+
 s = pl.Series("x", [1, 2])
 print(s.dtype)
 ```
@@ -111,6 +115,7 @@ filter, group_by.agg).
 **Example**:
 ```python
 import polars as pl
+
 e = (pl.col("score") * 100).alias("pct")
 print(type(e).__name__)
 ```
@@ -125,6 +130,7 @@ count. The tuple `df.shape` gives both.
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
 print(df.height, df.width, df.shape)
 ```
@@ -150,6 +156,7 @@ Created by `df.lazy()` or `scan_*`; executed by `.collect()`.
 **Example**:
 ```python
 import polars as pl
+
 lf = pl.LazyFrame({"a": [1, 2]})
 print(type(lf).__name__)
 ```
@@ -164,6 +171,7 @@ place of pandas `iloc`.
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2], "b": ["x", "y"]})
 print(df.row(1))
 ```
@@ -185,6 +193,7 @@ frame's typed contract.
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"s": [0.5], "k": ["a"]})
 print(df.schema)
 ```
@@ -212,6 +221,7 @@ raise because they cannot be viewed.
 ```python
 import polars as pl
 import numpy as np
+
 s = pl.Series("x", [1.0, 2.0])
 arr = s.to_numpy(allow_copy=False)
 print(np.shares_memory(s.to_numpy(), arr))

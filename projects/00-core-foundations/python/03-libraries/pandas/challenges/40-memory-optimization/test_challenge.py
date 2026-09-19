@@ -20,9 +20,7 @@ import tracemalloc
 from pathlib import Path
 
 TARGET = "solution" if os.environ.get("CHALLENGE_USE_SOLUTION") == "1" else "starter"
-_spec = importlib.util.spec_from_file_location(
-    TARGET, Path(__file__).parent / f"{TARGET}.py"
-)
+_spec = importlib.util.spec_from_file_location(TARGET, Path(__file__).parent / f"{TARGET}.py")
 mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(mod)
 
@@ -36,12 +34,14 @@ import pytest  # noqa: E402
 def _waste_frame(n: int) -> pd.DataFrame:
     """A deliberately memory-wasteful frame (100k rows by default)."""
     rng = np.random.RandomState(42)
-    return pd.DataFrame({
-        "user_id": rng.randint(0, 1_000_000, n),
-        "score": rng.uniform(0, 1, n),
-        "tier": rng.choice(["free", "pro", "enterprise"], n),
-        "is_active": rng.choice([True, False], n),
-    })
+    return pd.DataFrame(
+        {
+            "user_id": rng.randint(0, 1_000_000, n),
+            "score": rng.uniform(0, 1, n),
+            "tier": rng.choice(["free", "pro", "enterprise"], n),
+            "is_active": rng.choice([True, False], n),
+        }
+    )
 
 
 class TestMeasureDeep:
@@ -53,18 +53,19 @@ class TestMeasureDeep:
 
     def test_strings_cost_more_than_pointers(self) -> None:
         frame = pd.DataFrame({"s": ["x", "y", "z"]})
-        assert mod.measure_deep(frame) > 3 * 8, \
-            "object payloads must be counted (deep=True)"
+        assert mod.measure_deep(frame) > 3 * 8, "object payloads must be counted (deep=True)"
 
     def test_empty_frame(self) -> None:
         frame = pd.DataFrame({"a": pd.Series(dtype="float64")})
         assert mod.measure_deep(frame) >= 0
 
     def test_matches_reference(self) -> None:
-        frame = pd.DataFrame({
-            "a": np.arange(10),
-            "s": ["str-%d" % i for i in range(10)],
-        })
+        frame = pd.DataFrame(
+            {
+                "a": np.arange(10),
+                "s": ["str-%d" % i for i in range(10)],
+            }
+        )
         assert mod.measure_deep(frame) == int(frame.memory_usage(deep=True).sum())
 
 
@@ -82,12 +83,11 @@ class TestOptimizeDtypes:
 
     def test_dtypes_right_sized(self) -> None:
         fixed = mod.optimize_dtypes(self._frame())
-        assert fixed["user_id"].dtype == np.dtype("int32"), \
-            "user_id range fits int32"
-        assert fixed["score"].dtype == np.dtype("float32"), \
-            "score must downcast to float32"
-        assert str(fixed["tier"].dtype) == "category", \
+        assert fixed["user_id"].dtype == np.dtype("int32"), "user_id range fits int32"
+        assert fixed["score"].dtype == np.dtype("float32"), "score must downcast to float32"
+        assert str(fixed["tier"].dtype) == "category", (
             "low-cardinality strings must become category"
+        )
 
     def test_memory_reduced_below_35_percent(self) -> None:
         frame = self._frame()
@@ -101,21 +101,24 @@ class TestOptimizeDtypes:
     def test_integers_preserved_exactly(self) -> None:
         frame = self._frame()
         fixed = mod.optimize_dtypes(frame)
-        assert bool((frame["user_id"] == fixed["user_id"]).all()), \
+        assert bool((frame["user_id"] == fixed["user_id"]).all()), (
             "integer values must survive downcasting exactly"
+        )
 
     def test_floats_within_tolerance(self) -> None:
         frame = self._frame()
         fixed = mod.optimize_dtypes(frame)
-        assert np.allclose(frame["score"].values, fixed["score"].values,
-                           atol=1e-6), \
+        assert np.allclose(frame["score"].values, fixed["score"].values, atol=1e-6), (
             "float32 downcast must stay within 1e-6"
+        )
 
     def test_small_frame_not_broken(self) -> None:
-        frame = pd.DataFrame({
-            "a": np.arange(5),
-            "b": np.random.RandomState(1).uniform(0, 1, 5),
-        })
+        frame = pd.DataFrame(
+            {
+                "a": np.arange(5),
+                "b": np.random.RandomState(1).uniform(0, 1, 5),
+            }
+        )
         fixed = mod.optimize_dtypes(frame)
         assert len(fixed) == 5
         assert bool((frame["a"] == fixed["a"]).all())
@@ -126,8 +129,7 @@ class TestStreamedMean:
 
     def _csv_text(self, n: int) -> str:
         rng = np.random.RandomState(7)
-        return pd.DataFrame({"x": np.arange(n),
-                             "y": rng.uniform(0, 1, n)}).to_csv(index=False)
+        return pd.DataFrame({"x": np.arange(n), "y": rng.uniform(0, 1, n)}).to_csv(index=False)
 
     def test_three_rows(self) -> None:
         text = pd.DataFrame({"y": [1.0, 2.0, 3.0]}).to_csv(index=False)
@@ -142,8 +144,9 @@ class TestStreamedMean:
         text = self._csv_text(1000)
         expected = float(pd.read_csv(io.StringIO(text))["y"].mean())
         for cs in (1, 7, 100, 1000):
-            assert mod.streamed_mean(text, "y", cs) == pytest.approx(expected), \
+            assert mod.streamed_mean(text, "y", cs) == pytest.approx(expected), (
                 f"chunksize {cs} must agree"
+            )
 
     def test_empty_column_returns_nan(self) -> None:
         text = pd.DataFrame({"y": pd.Series(dtype="float64")}).to_csv(index=False)

@@ -24,7 +24,7 @@
 - **Related terms**: Integer, Overflow, Memory
 ```python
 # No overflow for integers!
-huge = 10 ** 1000
+huge = 10**1000
 print(huge)
 # Python handles arbitrarily large integers
 ```
@@ -37,13 +37,13 @@ print(huge)
 a = 10
 b = 3
 
-print(a + b)   # 13 (addition)
-print(a - b)   # 7 (subtraction)
-print(a * b)   # 30 (multiplication)
-print(a / b)   # 3.333... (division)
+print(a + b)  # 13 (addition)
+print(a - b)  # 7 (subtraction)
+print(a * b)  # 30 (multiplication)
+print(a / b)  # 3.333... (division)
 print(a // b)  # 3 (floor division)
-print(a % b)   # 1 (modulus)
-print(a ** b)  # 1000 (exponent)
+print(a % b)  # 1 (modulus)
+print(a**b)  # 1000 (exponent)
 ```
 
 ### B
@@ -54,14 +54,14 @@ print(a ** b)  # 1000 (exponent)
 - **Related terms**: Binary, Octal, Hexadecimal
 ```python
 # Base conversion functions
-print(bin(42))   # '0b101010' (binary)
-print(oct(42))   # '0o52' (octal)
-print(hex(42))   # '0x2a' (hexadecimal)
+print(bin(42))  # '0b101010' (binary)
+print(oct(42))  # '0o52' (octal)
+print(hex(42))  # '0x2a' (hexadecimal)
 
 # Convert from base
-print(int('101010', 2))  # 42 (from binary)
-print(int('52', 8))      # 42 (from octal)
-print(int('2a', 16))     # 42 (from hexadecimal)
+print(int("101010", 2))  # 42 (from binary)
+print(int("52", 8))  # 42 (from octal)
+print(int("2a", 16))  # 42 (from hexadecimal)
 ```
 
 ### C
@@ -73,8 +73,8 @@ print(int('2a', 16))     # 42 (from hexadecimal)
 ```python
 import math
 
-print(math.ceil(3.2))   # 4
-print(math.ceil(3.8))   # 4
+print(math.ceil(3.2))  # 4
+print(math.ceil(3.8))  # 4
 print(math.ceil(-3.2))  # -3
 ```
 
@@ -111,11 +111,11 @@ from decimal import Decimal
 print(0.1 + 0.2)  # 0.30000000000000004
 
 # Decimal solution
-print(Decimal('0.1') + Decimal('0.2'))  # 0.3
+print(Decimal("0.1") + Decimal("0.2"))  # 0.3
 
 # Financial calculations
-price = Decimal('19.99')
-tax = Decimal('0.08')
+price = Decimal("19.99")
+tax = Decimal("0.08")
 total = price * (1 + tax)
 print(total)  # 21.5892
 ```
@@ -126,9 +126,9 @@ print(total)  # 21.5892
 - **Related terms**: Float Division, Floor Division, Quotient
 ```python
 # Regular division (always returns float)
-print(10 / 2)   # 5.0
-print(10 / 3)   # 3.333...
-print(10 / 4)   # 2.5
+print(10 / 2)  # 5.0
+print(10 / 3)  # 3.333...
+print(10 / 4)  # 2.5
 
 # Floor division (returns integer)
 print(10 // 2)  # 5
@@ -158,8 +158,8 @@ print(0.1 + 0.2)  # 0.30000000000000004
 ```python
 import math
 
-print(math.floor(3.7))   # 3
-print(math.floor(3.2))   # 3
+print(math.floor(3.7))  # 3
+print(math.floor(3.2))  # 3
 print(math.floor(-3.2))  # -4
 ```
 
@@ -169,8 +169,8 @@ print(math.floor(-3.2))  # -4
 - **Related terms**: Modulus, Integer Division, Operator
 ```python
 # Floor division
-print(10 // 3)   # 3
-print(10 // 2)   # 5
+print(10 // 3)  # 3
+print(10 // 2)  # 5
 print(-10 // 3)  # -4 (rounds down, not towards zero)
 
 # Floor division with floats
@@ -185,8 +185,8 @@ print(10.0 // 3)  # 3.0
 - **Related terms**: Binary, Octal, Base Conversion
 ```python
 # Hexadecimal conversion
-print(hex(42))   # '0x2a'
-print(int('2a', 16))  # 42
+print(hex(42))  # '0x2a'
+print(int("2a", 16))  # 42
 
 # Hex literals
 x = 0x2A  # 42 in decimal
@@ -220,12 +220,12 @@ zero = 0
 large = 1_000_000  # Underscores for readability
 
 # Integer operations
-print(10 + 5)   # 15
-print(10 - 5)   # 5
-print(10 * 5)   # 50
+print(10 + 5)  # 15
+print(10 - 5)  # 5
+print(10 * 5)  # 50
 print(10 // 3)  # 3 (floor division)
-print(10 % 3)   # 1 (modulus)
-print(10 ** 2)  # 100 (exponent)
+print(10 % 3)  # 1 (modulus)
+print(10**2)  # 100 (exponent)
 ```
 
 ### M
@@ -237,13 +237,13 @@ print(10 ** 2)  # 100 (exponent)
 ```python
 import math
 
-print(math.pi)        # 3.141592653589793
-print(math.e)         # 2.718281828459045
+print(math.pi)  # 3.141592653589793
+print(math.e)  # 2.718281828459045
 print(math.sqrt(16))  # 4.0
-print(math.pow(2, 3)) # 8.0
-print(math.floor(3.7)) # 3
+print(math.pow(2, 3))  # 8.0
+print(math.floor(3.7))  # 3
 print(math.ceil(3.2))  # 4
-print(math.log(100, 10)) # 2.0
+print(math.log(100, 10))  # 2.0
 ```
 
 **Modulus**
@@ -252,9 +252,9 @@ print(math.log(100, 10)) # 2.0
 - **Related terms**: Floor Division, Remainder, Operator
 ```python
 # Modulus operation
-print(10 % 3)   # 1
-print(10 % 2)   # 0 (even)
-print(11 % 2)   # 1 (odd)
+print(10 % 3)  # 1
+print(10 % 2)  # 0 (even)
+print(11 % 2)  # 1 (odd)
 
 # Use cases
 # Check if even/odd
@@ -272,8 +272,8 @@ else:
 - **Related terms**: Binary, Hexadecimal, Base Conversion
 ```python
 # Octal conversion
-print(oct(42))   # '0o52'
-print(int('52', 8))  # 42
+print(oct(42))  # '0o52'
+print(int("52", 8))  # 42
 
 # Octal literals
 x = 0o52  # 42 in decimal
@@ -286,11 +286,12 @@ print(x)  # 42
 - **Related terms**: Arbitrary Precision, Float, Integer
 ```python
 # Python integers don't overflow!
-huge = 10 ** 1000
+huge = 10**1000
 print(huge)  # Works fine!
 
 # Floats can overflow
 import sys
+
 print(sys.float_info.max)  # 1.7976931348623157e+308
 ```
 
@@ -306,7 +307,8 @@ print(0.1 + 0.2)  # 0.30000000000000004
 
 # Decimal precision
 from decimal import Decimal
-print(Decimal('0.1') + Decimal('0.2'))  # 0.3
+
+print(Decimal("0.1") + Decimal("0.2"))  # 0.3
 ```
 
 ### R
@@ -339,7 +341,7 @@ speed_of_light = 3e8
 electron_mass = 9.109e-31
 
 # Convert to float
-print(float('1.6e-19'))  # 1.6e-19
+print(float("1.6e-19"))  # 1.6e-19
 ```
 
 ## Key Concepts Summary

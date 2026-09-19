@@ -36,6 +36,7 @@ Alphabetical reference of all key terms from the Path Parameters lecture.
 def read_file(file_path: str):
     return {"file_path": file_path}
 
+
 # URL: /files/home/user/document.txt
 # file_path = "home/user/document.txt"
 # Without :path, file_path would only be "home"
@@ -53,10 +54,12 @@ def read_file(file_path: str):
 ```python
 from enum import Enum
 
+
 class ModelName(str, Enum):
     alexnet = "alexnet"
     resnet = "resnet"
     lenet = "lenet"
+
 
 @app.get("/models/{model_name}")
 def get_model(model_name: ModelName):
@@ -66,6 +69,7 @@ def get_model(model_name: ModelName):
         return {"message": "Residual Learning FTW!"}
     elif model_name is ModelName.lenet:
         return {"message": "LeNet is best!"}
+
 
 # Valid: GET /models/alexnet → 200 OK
 # Invalid: GET /models/vgg → 422 Validation Error
@@ -89,11 +93,11 @@ def get_model(model_name: ModelName):
 ```python
 from fastapi import Path
 
+
 @app.get("/products/{product_id}")
-def get_product(
-    product_id: int = Path(..., ge=1)
-):
+def get_product(product_id: int = Path(..., ge=1)):
     return {"product_id": product_id}
+
 
 # Valid: GET /products/1 → 200 OK
 # Invalid: GET /products/0 → 422 (product_id must be >= 1)
@@ -114,6 +118,7 @@ def get_product(
 def get_score(score: int = Path(..., gt=0)):
     return {"score": score}
 
+
 # Valid: GET /scores/1 → 200 OK
 # Invalid: GET /scores/0 → 422 (score must be > 0)
 ```
@@ -130,6 +135,7 @@ def get_score(score: int = Path(..., gt=0)):
 ```python
 from fastapi import HTTPException
 
+
 @app.get("/categories/{category_name}")
 def get_category(category_name: str):
     allowed = ["electronics", "books", "clothing"]
@@ -139,6 +145,7 @@ def get_category(category_name: str):
             detail=f"Category '{category_name}' not found. Allowed: {allowed}",
         )
     return {"category": category_name.lower()}
+
 
 # GET /categories/electronics → 200 OK
 # GET /categories/invalid → 404 Not Found
@@ -155,10 +162,9 @@ def get_category(category_name: str):
 **Example:**
 ```python
 @app.get("/products/{product_id}")
-def get_product(
-    product_id: int = Path(..., ge=1, le=1000)
-):
+def get_product(product_id: int = Path(..., ge=1, le=1000)):
     return {"product_id": product_id}
+
 
 # Valid: GET /products/500 → 200 OK
 # Invalid: GET /products/1001 → 422 (must be <= 1000)
@@ -178,6 +184,7 @@ def get_product(
 def get_grade(grade: int = Path(..., gt=0, lt=101)):
     return {"grade": grade}
 
+
 # Valid: GET /grades/85 → 200 OK
 # Invalid: GET /grades/101 → 422 (must be < 101)
 ```
@@ -194,15 +201,16 @@ def get_grade(grade: int = Path(..., gt=0, lt=101)):
 ```python
 from fastapi import Path
 
+
 @app.get("/items/{item_id}")
 def read_item(
     item_id: int = Path(
-        ...,                              # Required (no default)
-        title="Item ID",                 # Display name in docs
-        description="The unique item ID", # Description in docs
-        ge=1,                            # >= 1
-        le=1000000,                      # <= 1,000,000
-    )
+        ...,  # Required (no default)
+        title="Item ID",  # Display name in docs
+        description="The unique item ID",  # Description in docs
+        ge=1,  # >= 1
+        le=1000000,  # <= 1,000,000
+    ),
 ):
     return {"item_id": item_id}
 ```
@@ -236,6 +244,7 @@ def read_item(
 def get_user(user_id: int):
     return {"user_id": user_id}
 
+
 # URL: /users/42
 # user_id = 42 (converted to int)
 ```
@@ -262,6 +271,7 @@ def get_item(item_id: int):
     # URL: /items/42
     # FastAPI converts "42" (string) → 42 (int)
     return {"item_id": item_id}
+
 
 @app.get("/orders/{order_id}")
 def get_order(order_id: UUID):
@@ -295,6 +305,7 @@ def get_order(order_id: UUID):
 def get_user(user_id: int):  # int is the type hint
     return {"user_id": user_id}
 
+
 # Without type hint, no validation
 @app.get("/users/{user_id}")
 def get_user(user_id):  # No type = string, no validation
@@ -313,9 +324,11 @@ def get_user(user_id):  # No type = string, no validation
 ```python
 from uuid import UUID
 
+
 @app.get("/orders/{order_id}")
 def get_order(order_id: UUID):
     return {"order_id": str(order_id), "status": "shipped"}
+
 
 # URL: /orders/550e8400-e29b-41d4-a716-446655440000
 # FastAPI converts string → UUID object
@@ -360,6 +373,7 @@ def get_order(order_id: UUID):
 @app.get("/users/{user_id}")
 def get_user(user_id: int): ...
 
+
 @app.get("/posts/{post_id}")
 def get_post(post_id: int): ...
 ```
@@ -376,6 +390,7 @@ class Status(str, Enum):
     active = "active"
     inactive = "inactive"
 
+
 @app.get("/users/{status}")
 def list_users(status: Status): ...
 ```
@@ -383,9 +398,7 @@ def list_users(status: Status): ...
 ### Pattern: Validated ID
 ```python
 @app.get("/products/{product_id}")
-def get_product(
-    product_id: int = Path(..., ge=1, le=1000000)
-): ...
+def get_product(product_id: int = Path(..., ge=1, le=1000000)): ...
 ```
 
 ### Pattern: File Path
@@ -397,6 +410,7 @@ def read_file(file_path: str): ...
 ### Pattern: UUID Identifier
 ```python
 from uuid import UUID
+
 
 @app.get("/orders/{order_id}")
 def get_order(order_id: UUID): ...

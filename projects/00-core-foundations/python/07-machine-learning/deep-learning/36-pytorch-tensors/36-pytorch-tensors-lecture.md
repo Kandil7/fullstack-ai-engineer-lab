@@ -43,8 +43,9 @@ By the end of this lecture, you will be able to:
 
 ```python
 import torch
+
 t = torch.tensor([[1, 2, 3], [4, 5, 6]])
-print(t.shape, t.dtype)                    # torch.Size([2, 3]) torch.int64
+print(t.shape, t.dtype)  # torch.Size([2, 3]) torch.int64
 
 ones = torch.ones(2, 3)
 zeros = torch.zeros(3)
@@ -65,8 +66,8 @@ learning uses float32 for speed and memory.
 
 ```python
 arr = np.array([1.0, 2.0, 3.0])
-t = torch.from_numpy(arr)     # shares memory with arr
-back = t.numpy()              # back to NumPy
+t = torch.from_numpy(arr)  # shares memory with arr
+back = t.numpy()  # back to NumPy
 ```
 
 Output:
@@ -80,9 +81,9 @@ Output:
 ## 3. Dtypes — float32 Is the DL Default
 
 ```python
-f64 = torch.tensor([1.0])          # float32 by default
-f16 = f64.half()                   # half precision
-i64 = torch.tensor([1]).long()     # int64
+f64 = torch.tensor([1.0])  # float32 by default
+f16 = f64.half()  # half precision
+i64 = torch.tensor([1]).long()  # int64
 print(f64.dtype, f16.dtype, i64.dtype)
 ```
 
@@ -123,7 +124,7 @@ b = torch.tensor(1.0, requires_grad=True)
 x = torch.tensor(2.0)
 y = w * x + b
 y.backward()
-print(w.grad, b.grad)          # dy/dw = x = 2.0 ; dy/db = 1.0
+print(w.grad, b.grad)  # dy/dw = x = 2.0 ; dy/db = 1.0
 ```
 
 Output:
@@ -138,7 +139,7 @@ applying the chain rule. This is backprop, automated.
 
 ```python
 with torch.no_grad():
-    z = w * x + b              # no graph, no gradient memory
+    z = w * x + b  # no graph, no gradient memory
 ```
 
 Output:
@@ -152,7 +153,7 @@ because no graph is built.
 ## 7. Gradients Accumulate — Zero Before Backward
 
 ```python
-optimizer.zero_grad()   # or w.grad.zero_()
+optimizer.zero_grad()  # or w.grad.zero_()
 loss.backward()
 optimizer.step()
 ```
@@ -170,7 +171,7 @@ accumulate and the optimizer takes increasingly wrong steps.
 ```python
 a = torch.randn(3, 1)
 b = torch.randn(1, 4)
-c = a * b                 # (3,1) * (1,4) -> (3,4)
+c = a * b  # (3,1) * (1,4) -> (3,4)
 ```
 
 Output:
@@ -185,9 +186,9 @@ exact NumPy rules from `29-broadcasting-deep`. It is how batch operations
 ## 9. Reshape / Permute / Unsqueeze / Squeeze
 
 ```python
-t2 = torch.arange(12).reshape(3, 4)   # same data, new shape (view when possible)
-tp = t2.permute(1, 0)                 # transpose dims (view, no copy)
-ts = t2.unsqueeze(0).squeeze()        # add/remove size-1 dims
+t2 = torch.arange(12).reshape(3, 4)  # same data, new shape (view when possible)
+tp = t2.permute(1, 0)  # transpose dims (view, no copy)
+ts = t2.unsqueeze(0).squeeze()  # add/remove size-1 dims
 ```
 
 Output:

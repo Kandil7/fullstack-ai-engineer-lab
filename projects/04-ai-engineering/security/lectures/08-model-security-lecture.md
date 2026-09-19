@@ -28,6 +28,7 @@ By the end of this lecture, you will be able to:
 import numpy as np
 from typing import Tuple, Optional
 
+
 class AdversarialAttack:
     """Base class for adversarial attacks."""
 
@@ -37,6 +38,7 @@ class AdversarialAttack:
 
     def attack(self, x: np.ndarray, y: int) -> np.ndarray:
         raise NotImplementedError
+
 
 class FGSMAttack(AdversarialAttack):
     """Fast Gradient Sign Method attack."""
@@ -61,19 +63,19 @@ class FGSMAttack(AdversarialAttack):
         # Simplified - in practice use autograd
         return np.random.randn(*x.shape) * 0.01
 
+
 class PGDAttack(AdversarialAttack):
     """Projected Gradient Descent attack."""
 
-    def attack(self, x: np.ndarray, y: int,
-               num_steps: int = 10, step_size: float = 0.01) -> np.ndarray:
+    def attack(
+        self, x: np.ndarray, y: int, num_steps: int = 10, step_size: float = 0.01
+    ) -> np.ndarray:
         """Generate adversarial example using PGD."""
         x_adv = x.copy()
 
         for _ in range(num_steps):
             # Compute gradient
-            gradient = self._compute_gradient(
-                np.expand_dims(x_adv, axis=0), y
-            )
+            gradient = self._compute_gradient(np.expand_dims(x_adv, axis=0), y)
 
             # Update with step
             x_adv = x_adv + step_size * np.sign(gradient[0])
@@ -91,6 +93,7 @@ class PGDAttack(AdversarialAttack):
     def _compute_gradient(self, x: np.ndarray, y: int) -> np.ndarray:
         return np.random.randn(*x.shape) * 0.01
 
+
 class BackdoorAttack:
     """Backdoor/Trojan attack on models."""
 
@@ -104,8 +107,7 @@ class BackdoorAttack:
         x_poisoned = x + self.trigger_pattern
         return np.clip(x_poisoned, 0, 1)
 
-    def create_poisoned_dataset(self, dataset: list,
-                                 poison_rate: float = 0.1) -> list:
+    def create_poisoned_dataset(self, dataset: list, poison_rate: float = 0.1) -> list:
         """Create poisoned training dataset."""
         poisoned = []
         for x, y in dataset:
@@ -123,6 +125,7 @@ class BackdoorAttack:
 import time
 from typing import List, Dict
 
+
 class ModelExtractionDetector:
     """Detect attempts to extract model via API queries."""
 
@@ -135,11 +138,13 @@ class ModelExtractionDetector:
         if user_id not in self.query_history:
             self.query_history[user_id] = []
 
-        self.query_history[user_id].append({
-            "timestamp": time.time(),
-            "input": query.get("input"),
-            "output": query.get("output"),
-        })
+        self.query_history[user_id].append(
+            {
+                "timestamp": time.time(),
+                "input": query.get("input"),
+                "output": query.get("output"),
+            }
+        )
 
     def detect_extraction_attempt(self, user_id: str) -> Dict:
         """Detect if user is trying to extract model."""
@@ -149,10 +154,7 @@ class ModelExtractionDetector:
         queries = self.query_history[user_id]
 
         # Check 1: High query rate
-        recent_queries = [
-            q for q in queries
-            if q["timestamp"] > time.time() - 3600
-        ]
+        recent_queries = [q for q in queries if q["timestamp"] > time.time() - 3600]
         query_rate = len(recent_queries) / 60  # queries per minute
 
         if query_rate > self.baseline_query_rate * 10:
@@ -195,6 +197,7 @@ class ModelExtractionDetector:
         # Look for queries with very close confidence scores
         return False
 
+
 class ModelWatermarking:
     """Watermark models to prove ownership."""
 
@@ -211,8 +214,9 @@ class ModelWatermarking:
             watermark_inputs.append(trigger)
         return watermark_inputs
 
-    def verify_watermark(self, model, watermark_inputs: list,
-                         expected_outputs: list) -> Dict:
+    def verify_watermark(
+        self, model, watermark_inputs: list, expected_outputs: list
+    ) -> Dict:
         """Verify model contains watermark."""
         correct = 0
         for x, expected in zip(watermark_inputs, expected_outputs):
@@ -260,12 +264,14 @@ class DataPoisoningDefense:
     def _extract_features(self, x) -> np.ndarray:
         """Extract statistical features from input."""
         if isinstance(x, np.ndarray):
-            return np.array([
-                np.mean(x),
-                np.std(x),
-                np.min(x),
-                np.max(x),
-            ])
+            return np.array(
+                [
+                    np.mean(x),
+                    np.std(x),
+                    np.min(x),
+                    np.max(x),
+                ]
+            )
         return np.array([0, 0, 0, 0])
 
     def apply_robust_training(self, dataset: list) -> list:
@@ -273,13 +279,11 @@ class DataPoisoningDefense:
         # Remove detected poisoned samples
         poisoned = self.detect_poisoned_samples(dataset)
         clean_dataset = [
-            (x, y) for i, (x, y) in enumerate(dataset)
-            if i not in poisoned
+            (x, y) for i, (x, y) in enumerate(dataset) if i not in poisoned
         ]
         return clean_dataset
 
-    def label_flipping_detection(self, dataset: list,
-                                  known_labels: dict) -> list:
+    def label_flipping_detection(self, dataset: list, known_labels: dict) -> list:
         """Detect label flipping attacks."""
         suspicious = []
 
@@ -287,11 +291,13 @@ class DataPoisoningDefense:
             # Use a trusted subset to verify labels
             if i in known_labels:
                 if y != known_labels[i]:
-                    suspicious.append({
-                        "index": i,
-                        "expected": known_labels[i],
-                        "actual": y,
-                    })
+                    suspicious.append(
+                        {
+                            "index": i,
+                            "expected": known_labels[i],
+                            "actual": y,
+                        }
+                    )
 
         return suspicious
 ```
@@ -306,8 +312,9 @@ class RobustnessTestSuite:
         self.model = model
         self.results = []
 
-    def test_adversarial_robustness(self, test_data: list,
-                                     epsilon: float = 0.1) -> Dict:
+    def test_adversarial_robustness(
+        self, test_data: list, epsilon: float = 0.1
+    ) -> Dict:
         """Test model against adversarial examples."""
         correct_clean = 0
         correct_adv = 0
@@ -334,8 +341,9 @@ class RobustnessTestSuite:
             "epsilon": epsilon,
         }
 
-    def test_input_perturbation(self, test_data: list,
-                                 noise_levels: list = [0.01, 0.05, 0.1]) -> Dict:
+    def test_input_perturbation(
+        self, test_data: list, noise_levels: list = [0.01, 0.05, 0.1]
+    ) -> Dict:
         """Test model robustness to random noise."""
         results = {}
 
@@ -353,25 +361,23 @@ class RobustnessTestSuite:
 
         return results
 
-    def test_distribution_shift(self, original_data: list,
-                                 shifted_data: list) -> Dict:
+    def test_distribution_shift(self, original_data: list, shifted_data: list) -> Dict:
         """Test model performance on shifted distribution."""
         # Accuracy on original
         correct_original = sum(
-            1 for x, y in original_data
-            if self.model.predict(x.reshape(1, -1))[0] == y
+            1 for x, y in original_data if self.model.predict(x.reshape(1, -1))[0] == y
         )
 
         # Accuracy on shifted
         correct_shifted = sum(
-            1 for x, y in shifted_data
-            if self.model.predict(x.reshape(1, -1))[0] == y
+            1 for x, y in shifted_data if self.model.predict(x.reshape(1, -1))[0] == y
         )
 
         return {
             "original_accuracy": correct_original / len(original_data),
             "shifted_accuracy": correct_shifted / len(shifted_data),
-            "performance_drop": (correct_original - correct_shifted) / len(original_data),
+            "performance_drop": (correct_original - correct_shifted)
+            / len(original_data),
         }
 
     def run_full_test_suite(self, test_data: list) -> Dict:
@@ -384,9 +390,9 @@ class RobustnessTestSuite:
 
         # Calculate overall robustness score
         results["overall_score"] = (
-            results["adversarial"]["adversarial_accuracy"] * 0.5 +
-            results["perturbation"]["noise_0.01"] * 0.3 +
-            results["perturbation"]["noise_0.05"] * 0.2
+            results["adversarial"]["adversarial_accuracy"] * 0.5
+            + results["perturbation"]["noise_0.01"] * 0.3
+            + results["perturbation"]["noise_0.05"] * 0.2
         )
 
         return results

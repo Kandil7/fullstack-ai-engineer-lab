@@ -64,8 +64,12 @@ print(f"Prediction: Class {prediction}")
 print("\nExample 3: Classification Data")
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=300, n_features=2, n_redundant=0,
-    n_informative=2, random_state=42, n_clusters_per_class=1
+    n_samples=300,
+    n_features=2,
+    n_redundant=0,
+    n_informative=2,
+    random_state=42,
+    n_clusters_per_class=1,
 )
 
 print(f"Samples: {X.shape[0]}")
@@ -73,9 +77,7 @@ print(f"Features: {X.shape[1]}")
 
 # Example 4: Train/test split
 print("\nExample 4: Train/Test Split")
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Scale features (important for KNN!)
 scaler = StandardScaler()
@@ -103,10 +105,10 @@ for k in range(1, 21):
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(X_train_scaled, y_train)
     acc = accuracy_score(y_test, knn.predict(X_test_scaled))
-    results.append({'k': k, 'accuracy': acc})
+    results.append({"k": k, "accuracy": acc})
 
 # Find best K
-best = max(results, key=lambda x: x['accuracy'])
+best = max(results, key=lambda x: x["accuracy"])
 print(f"Best K: {best['k']} (Accuracy: {best['accuracy']:.4f})")
 
 # Show trend
@@ -120,14 +122,14 @@ for r in results[:10]:
 
 # Example 7: Different distance metrics
 print("\nExample 7: Distance Metrics")
-metrics = ['euclidean', 'manhattan', 'chebyshev', 'minkowski']
+metrics = ["euclidean", "manhattan", "chebyshev", "minkowski"]
 results = []
 
 for metric in metrics:
     knn = KNeighborsClassifier(n_neighbors=5, metric=metric)
     knn.fit(X_train_scaled, y_train)
     acc = accuracy_score(y_test, knn.predict(X_test_scaled))
-    results.append({'metric': metric, 'accuracy': acc})
+    results.append({"metric": metric, "accuracy": acc})
     print(f"{metric:>12}: {acc:.4f}")
 
 # ============================================================
@@ -161,12 +163,12 @@ print(f"KNN Regression R^2: {r2:.4f}")
 # Example 9: Weighted voting
 print("\nExample 9: Weighted KNN")
 # Uniform weights (default)
-knn_uniform = KNeighborsClassifier(n_neighbors=5, weights='uniform')
+knn_uniform = KNeighborsClassifier(n_neighbors=5, weights="uniform")
 knn_uniform.fit(X_train_scaled, y_train)
 acc_uniform = accuracy_score(y_test, knn_uniform.predict(X_test_scaled))
 
 # Distance weights
-knn_distance = KNeighborsClassifier(n_neighbors=5, weights='distance')
+knn_distance = KNeighborsClassifier(n_neighbors=5, weights="distance")
 knn_distance.fit(X_train_scaled, y_train)
 acc_distance = accuracy_score(y_test, knn_distance.predict(X_test_scaled))
 
@@ -206,7 +208,7 @@ print("  - Struggles with high dimensions")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- KNN classifies based on K nearest neighbors")
 print("- Choose K based on validation performance")
@@ -214,4 +216,4 @@ print("- Scale features before using KNN")
 print("- Distance metrics affect performance")
 print("- Weighted voting can improve results")
 print("- Simple but slow on large datasets")
-print("="*60)
+print("=" * 60)

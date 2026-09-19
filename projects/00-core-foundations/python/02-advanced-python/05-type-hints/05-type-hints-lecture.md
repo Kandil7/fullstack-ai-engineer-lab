@@ -32,9 +32,11 @@ By the end of this lecture, you will be able:
 def process(data):
     return data["name"].upper()
 
+
 # With type hints - clear contract
 def process(data: dict[str, str]) -> str:
     return data["name"].upper()
+
 
 # Benefits:
 # 1. Documentation: Self-documenting code
@@ -49,6 +51,7 @@ def process(data: dict[str, str]) -> str:
 # Type hints are ignored at runtime
 def greet(name: str) -> str:
     return f"Hello, {name}!"
+
 
 # This works even though int is not str
 greet(42)  # No runtime error!
@@ -68,11 +71,14 @@ def greet(name: str) -> str:
     """Return a greeting string."""
     return f"Hello, {name}!"
 
+
 def add(a: int, b: int) -> int:
     return a + b
 
+
 def is_valid(email: str) -> bool:
     return "@" in email
+
 
 def log_message(message: str) -> None:
     """Print a message, returns nothing."""
@@ -89,7 +95,9 @@ height: float = 5.9
 is_active: bool = True
 
 # Multiple annotations on one line
-x: int; y: int; z: int = 1, 2, 3
+x: int
+y: int
+z: int = 1, 2, 3
 
 # Annotated without assignment
 result: str
@@ -162,6 +170,7 @@ ids: Set[int] = {1, 2, 3}
 ```python
 from typing import Optional, Union
 
+
 # Optional[X] is equivalent to Union[X, None]
 def find_user(user_id: int) -> Optional[dict]:
     """Return user dict or None if not found."""
@@ -169,11 +178,13 @@ def find_user(user_id: int) -> Optional[dict]:
         return database[user_id]
     return None
 
+
 # Union[X, Y] - value can be X or Y
 def process(value: Union[str, int]) -> str:
     if isinstance(value, int):
         return str(value)
     return value.upper()
+
 
 # Python 3.10+ pipe syntax
 def process_v2(value: str | int) -> str:
@@ -187,19 +198,23 @@ def process_v2(value: str | int) -> str:
 ```python
 from typing import Callable
 
+
 # Callable[[ArgTypes], ReturnType]
 def apply(func: Callable[[int, int], int], a: int, b: int) -> int:
     return func(a, b)
 
+
 # Callable with no arguments
 def create_factory(func: Callable[[], int]) -> Callable[[], int]:
     return func
+
 
 # Callable with any arguments
 def log_call(func: Callable[..., str]) -> Callable[..., str]:
     def wrapper(*args, **kwargs) -> str:
         print(f"Calling {func.__name__}")
         return func(*args, **kwargs)
+
     return wrapper
 ```
 
@@ -211,19 +226,23 @@ from typing import TypeVar, Sequence
 T = TypeVar("T")  # Any type
 Number = TypeVar("Number", int, float)  # Restricted type var
 
+
 def first(items: Sequence[T]) -> T:
     """Return the first item of a sequence."""
     return items[0]
+
 
 # Type is inferred correctly
 result = first([1, 2, 3])  # Type: int
 result = first(["a", "b"])  # Type: str
 
+
 def double(x: Number) -> Number:
     return x * 2
 
-double(5)      # OK: int
-double(3.14)   # OK: float
+
+double(5)  # OK: int
+double(3.14)  # OK: float
 # double("hi")  # Error: str not in (int, float)
 ```
 
@@ -235,11 +254,14 @@ from typing import TypeVar
 # Bound: T must be a subclass of Comparable
 Comparable = TypeVar("Comparable", bound="ComparableClass")
 
+
 def largest(items: list[Comparable]) -> Comparable:
     return max(items)
 
+
 # Constrained: T must be exactly one of these types
 Numeric = TypeVar("Numeric", int, float, complex)
+
 
 def sum_values(values: list[Numeric]) -> Numeric:
     return sum(values)
@@ -254,15 +276,18 @@ def sum_values(values: list[Numeric]) -> Numeric:
 ```python
 from typing import Literal
 
+
 # Restrict to specific literal values
 def set_mode(mode: Literal["read", "write", "append"]) -> None:
     print(f"Mode: {mode}")
+
 
 set_mode("read")  # OK
 # set_mode("delete")  # Error
 
 # Combined with Union
 Status = Literal["pending", "approved", "rejected"]
+
 
 def process_status(status: Status) -> None:
     match status:
@@ -279,23 +304,21 @@ def process_status(status: Status) -> None:
 ```python
 from typing import TypedDict
 
+
 class UserProfile(TypedDict):
     name: str
     age: int
     email: str
     is_active: bool
 
+
 def create_user(name: str, age: int, email: str) -> UserProfile:
-    return {
-        "name": name,
-        "age": age,
-        "email": email,
-        "is_active": True
-    }
+    return {"name": name, "age": age, "email": email, "is_active": True}
+
 
 user = create_user("Alice", 30, "alice@example.com")
 user["name"]  # Typed as str
-user["age"]   # Typed as int
+user["age"]  # Typed as int
 ```
 
 ### NamedTuple
@@ -303,12 +326,14 @@ user["age"]   # Typed as int
 ```python
 from typing import NamedTuple
 
+
 class Point(NamedTuple):
     x: float
     y: float
-    
+
     def distance_to(self, other: "Point") -> float:
         return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
+
 
 point = Point(3.0, 4.0)
 print(point.x)  # 3.0
@@ -324,14 +349,16 @@ from typing import NewType
 UserId = NewType("UserId", int)
 OrderId = NewType("OrderId", int)
 
+
 def get_user(user_id: UserId) -> dict:
     return {"id": user_id}
+
 
 # Type checker ensures correct usage
 user_id = UserId(123)
 order_id = OrderId(456)
 
-get_user(user_id)   # OK
+get_user(user_id)  # OK
 # get_user(order_id)  # Error: OrderId is not UserId
 ```
 
@@ -344,13 +371,13 @@ from typing import TypeAlias
 Vector: TypeAlias = list[float]
 Matrix: TypeAlias = list[Vector]
 
+
 def dot_product(a: Vector, b: Vector) -> float:
     return sum(x * y for x, y in zip(a, b))
 
+
 def matrix_multiply(a: Matrix, b: Matrix) -> Matrix:
-    return [[sum(x * y for x, y in zip(row, col)) 
-             for col in zip(*b)] 
-            for row in a]
+    return [[sum(x * y for x, y in zip(row, col)) for col in zip(*b)] for row in a]
 ```
 
 ---
@@ -360,21 +387,26 @@ def matrix_multiply(a: Matrix, b: Matrix) -> Matrix:
 ```python
 from typing import Protocol, runtime_checkable
 
+
 @runtime_checkable
 class Drawable(Protocol):
     def draw(self) -> str: ...
+
 
 class Circle:
     def draw(self) -> str:
         return "Drawing circle"
 
+
 class Square:
     def draw(self) -> str:
         return "Drawing square"
 
+
 def render(shape: Drawable) -> None:
     """Accepts any object with a draw() method."""
     print(shape.draw())
+
 
 render(Circle())  # OK - Circle has draw()
 render(Square())  # OK - Square has draw()
@@ -388,22 +420,27 @@ render(Square())  # OK - Square has draw()
 ```python
 from typing import Protocol
 
+
 class Readable(Protocol):
     def read(self) -> str: ...
+
 
 class Writable(Protocol):
     def write(self, data: str) -> None: ...
 
+
 class ReadWriteFile:
     def read(self) -> str:
         return "file content"
-    
+
     def write(self, data: str) -> None:
         print(f"Writing: {data}")
+
 
 def copy_data(source: Readable, dest: Writable) -> None:
     data = source.read()
     dest.write(data)
+
 
 copy_data(ReadWriteFile(), ReadWriteFile())
 ```
@@ -417,7 +454,8 @@ import functools
 from typing import TypeVar, Callable, ParamSpec
 
 P = ParamSpec("P")  # Preserves parameter types
-R = TypeVar("R")    # Preserves return type
+R = TypeVar("R")  # Preserves return type
+
 
 # Decorator that preserves function signature
 def log_calls(func: Callable[P, R]) -> Callable[P, R]:
@@ -425,11 +463,14 @@ def log_calls(func: Callable[P, R]) -> Callable[P, R]:
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         print(f"Calling {func.__name__}")
         return func(*args, **kwargs)
+
     return wrapper
+
 
 @log_calls
 def add(a: int, b: int) -> int:
     return a + b
+
 
 # Type checker knows add takes (int, int) -> int
 result = add(3, 5)  # Type: int
@@ -441,19 +482,23 @@ result = add(3, 5)  # Type: int
 ```python
 from typing import overload
 
+
 @overload
 def process(value: int) -> int: ...
 
+
 @overload
 def process(value: str) -> str: ...
+
 
 def process(value: int | str) -> int | str:
     if isinstance(value, int):
         return value * 2
     return value.upper()
 
+
 # Type checker uses overloads to determine return type
-result = process(5)      # Type: int
+result = process(5)  # Type: int
 result = process("hi")  # Type: str
 ```
 
@@ -497,11 +542,14 @@ ignore_errors = True
 def add(a, b):  # Error: Function is missing a return type annotation
     return a + b
 
+
 # Error: Incompatible types
 def greet(name: str) -> str:
     return f"Hello, {name}!"
 
+
 greet(42)  # Error: Argument 1 has incompatible type "int"; expected "str"
+
 
 # Error: Missing type annotation
 def process(data):  # Error: Function is missing a type annotation
@@ -520,8 +568,10 @@ import numpy as np
 Tensor = np.ndarray
 Vector = np.ndarray
 
+
 class Model(Protocol):
     def predict(self, X: Tensor) -> Tensor: ...
+
 
 def train_model(
     model: Model,
@@ -537,6 +587,7 @@ def train_model(
     # Training logic...
     return history
 
+
 def predict_batch(
     model: Model,
     data: Tensor,
@@ -546,7 +597,7 @@ def predict_batch(
     """Make predictions in batches."""
     predictions = []
     for i in range(0, len(data), batch_size):
-        batch = data[i:i + batch_size]
+        batch = data[i : i + batch_size]
         pred = model.predict(batch)
         predictions.append(pred)
     return np.concatenate(predictions)
@@ -585,6 +636,7 @@ Create a generic `filter_by_type` function:
 
 ```python
 T = TypeVar("T")
+
 
 def filter_by_type(items, target_type):
     # Should return list of items matching target_type

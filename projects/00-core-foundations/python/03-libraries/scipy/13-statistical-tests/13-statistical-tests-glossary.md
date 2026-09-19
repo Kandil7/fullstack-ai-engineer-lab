@@ -39,7 +39,7 @@ from scipy import stats
 
 rng = np.random.default_rng(42)
 t, p = stats.ttest_ind(rng.normal(size=60), rng.normal(loc=0.5, size=60))
-print(p < 0.05)     # decision
+print(p < 0.05)  # decision
 ```
 
 **Complexity**: —.
@@ -58,8 +58,7 @@ import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
-F, p = stats.f_oneway(rng.normal(size=50), rng.normal(size=50),
-                      rng.normal(loc=1.5, size=50))
+F, p = stats.f_oneway(rng.normal(size=50), rng.normal(size=50), rng.normal(loc=1.5, size=50))
 print(f"F={F:.3f} p={p:.2e}")
 ```
 
@@ -78,6 +77,7 @@ default.
 ```python
 import numpy as np
 
+
 def benjamini_hochberg(pvals):
     p = np.asarray(pvals, dtype=float)
     order = np.argsort(p)
@@ -86,6 +86,7 @@ def benjamini_hochberg(pvals):
     out = np.empty_like(adj)
     out[order] = np.minimum(adj, 1.0)
     return out
+
 
 print(benjamini_hochberg(np.array([0.01, 0.04, 0.05])))
 # [0.03 0.05 0.05]
@@ -106,7 +107,7 @@ rate; conservative when k is large.
 import numpy as np
 
 pvals = np.array([0.01, 0.5, 0.001])
-print(np.minimum(1.0, pvals * 3))    # [0.03 1.   0.003]
+print(np.minimum(1.0, pvals * 3))  # [0.03 1.   0.003]
 ```
 
 **Complexity**: O(k).
@@ -127,7 +128,7 @@ from scipy import stats
 
 rng = np.random.default_rng(1)
 _, obs = np.unique(rng.integers(1, 7, size=600), return_counts=True)
-print(stats.chisquare(obs))          # fair die: p large
+print(stats.chisquare(obs))  # fair die: p large
 
 table = np.array([[120, 80], [70, 130]])
 print(stats.chi2_contingency(table))  # p ~ 1e-6
@@ -147,10 +148,12 @@ print(stats.chi2_contingency(table))  # p ~ 1e-6
 ```python
 import numpy as np
 
+
 def cohen_d(g1, g2):
     n1, n2 = g1.size, g2.size
     vp = ((n1 - 1) * g1.var(ddof=1) + (n2 - 1) * g2.var(ddof=1)) / (n1 + n2 - 2)
     return (g1.mean() - g2.mean()) / np.sqrt(vp)
+
 
 rng = np.random.default_rng(2)
 print(cohen_d(rng.normal(size=100), rng.normal(loc=0.5, size=100)))
@@ -173,7 +176,7 @@ from scipy import stats
 
 table = np.array([[120, 80], [70, 130]])
 chi2, p, dof, expected = stats.chi2_contingency(table)
-print(expected)      # [[100. 100.] [90. 110.]]
+print(expected)  # [[100. 100.] [90. 110.]]
 ```
 
 **Complexity**: O(cells).
@@ -208,7 +211,7 @@ group means differ more than sampling noise explains.
 from scipy import stats
 
 F, p = stats.f_oneway([1, 2, 3], [4, 5, 6])
-print(F)          # large, p small
+print(F)  # large, p small
 ```
 
 **Complexity**: —.
@@ -226,7 +229,7 @@ phantom discovery.
 ```python
 k = 20
 alpha = 0.05
-print(1 - (1 - alpha) ** k)   # ~0.642
+print(1 - (1 - alpha) ** k)  # ~0.642
 ```
 
 **Complexity**: O(1).
@@ -243,6 +246,7 @@ meter. Reject H0 when p < alpha.
 ```python
 # H0: the mean equals 50
 from scipy import stats
+
 print(stats.ttest_1samp([51, 52, 49, 50, 53], popmean=50))
 ```
 
@@ -262,8 +266,7 @@ import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(3)
-U, p = stats.mannwhitneyu(rng.exponential(size=80),
-                          rng.exponential(scale=1.3, size=80))
+U, p = stats.mannwhitneyu(rng.exponential(size=80), rng.exponential(scale=1.3, size=80))
 print(f"U={U:.0f} p={p:.4f}")
 ```
 
@@ -284,7 +287,7 @@ from scipy import stats
 
 rng = np.random.default_rng(4)
 _, p = stats.ttest_ind(rng.normal(size=60), rng.normal(size=60))
-print(p)      # likely > 0.05: no effect found
+print(p)  # likely > 0.05: no effect found
 ```
 
 **Complexity**: —.
@@ -325,8 +328,8 @@ from scipy import stats
 
 z_alpha2 = stats.norm.ppf(1 - 0.05 / 2)
 z_beta = stats.norm.ppf(0.8)
-n = 2.0 * (z_alpha2 + z_beta) ** 2 / 0.5 ** 2
-print(f"{n:.1f}")     # ~62.8 per group
+n = 2.0 * (z_alpha2 + z_beta) ** 2 / 0.5**2
+print(f"{n:.1f}")  # ~62.8 per group
 ```
 
 **Complexity**: O(1).
@@ -345,8 +348,8 @@ import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(6)
-print(stats.shapiro(rng.normal(size=300)))    # p ~ 0.4
-print(stats.shapiro(rng.uniform(size=300)))   # p ~ 1e-8
+print(stats.shapiro(rng.normal(size=300)))  # p ~ 0.4
+print(stats.shapiro(rng.uniform(size=300)))  # p ~ 1e-8
 ```
 
 **Complexity**: O(n).
@@ -362,7 +365,7 @@ deploying a feature that does nothing.
 **Example**:
 ```python
 alpha = 0.05
-print(alpha)      # the Type-I budget you choose
+print(alpha)  # the Type-I budget you choose
 ```
 
 **Complexity**: —.
@@ -378,7 +381,7 @@ shipping nothing when the feature works.
 **Example**:
 ```python
 beta = 0.2
-print(1 - beta)   # power 0.8
+print(1 - beta)  # power 0.8
 ```
 
 **Complexity**: —.
@@ -417,7 +420,7 @@ from scipy import stats
 
 rng = np.random.default_rng(8)
 before = rng.normal(100, 10, 40)
-after = before + rng.exponential(4, 40)     # skewed deltas
+after = before + rng.exponential(4, 40)  # skewed deltas
 print(stats.wilcoxon(before, after, method="approx"))
 ```
 

@@ -122,7 +122,7 @@ print(df["city"].nunique())  # 3
 Returns random rows from the DataFrame.
 
 ```python
-print(df.sample(5))    # 5 random rows
+print(df.sample(5))  # 5 random rows
 print(df.sample(frac=0.1))  # 10% of rows
 ```
 

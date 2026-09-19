@@ -52,8 +52,8 @@ Element at index i is at address: base_address + i × element_size
 
 # Dynamic array (Python list) — auto-resizes
 arr = [10, 20, 30]
-arr.append(40)   # Automatically resizes if needed
-arr.append(50)   # Python handles memory management
+arr.append(40)  # Automatically resizes if needed
+arr.append(50)  # Python handles memory management
 ```
 
 #### How Dynamic Arrays Resize
@@ -94,8 +94,8 @@ import sys
 
 # List stores pointers, not values directly
 lst = [1, 2, 3, 4, 5]
-print(sys.getsizeof(lst))       # Size of the list object itself
-print(sys.getsizeof(lst[0]))    # Size of integer object 1
+print(sys.getsizeof(lst))  # Size of the list object itself
+print(sys.getsizeof(lst[0]))  # Size of integer object 1
 
 # Small integer caching
 a = 256
@@ -121,41 +121,41 @@ list object
 
 ```python
 # === CREATION ===
-arr1 = [1, 2, 3, 4, 5]            # List literal
-arr2 = list(range(10))             # [0, 1, 2, ..., 9]
-arr3 = [0] * 10                    # [0, 0, 0, ..., 0] (10 zeros)
-arr4 = [[0] * 3 for _ in range(3)] # 3×3 zero matrix
+arr1 = [1, 2, 3, 4, 5]  # List literal
+arr2 = list(range(10))  # [0, 1, 2, ..., 9]
+arr3 = [0] * 10  # [0, 0, 0, ..., 0] (10 zeros)
+arr4 = [[0] * 3 for _ in range(3)]  # 3×3 zero matrix
 
 # === ACCESS & MODIFICATION ===
 arr = [10, 20, 30, 40, 50]
-print(arr[0])      # 10 — O(1)
-print(arr[-1])     # 50 — O(1) — last element
-arr[2] = 99        # [10, 20, 99, 40, 50] — O(1)
+print(arr[0])  # 10 — O(1)
+print(arr[-1])  # 50 — O(1) — last element
+arr[2] = 99  # [10, 20, 99, 40, 50] — O(1)
 
 # === INSERTION ===
-arr.append(60)          # End: O(1) amortized
-arr.insert(0, 5)        # Beginning: O(n) — shifts everything
-arr.insert(3, 35)       # Middle: O(n) — shifts after index 3
+arr.append(60)  # End: O(1) amortized
+arr.insert(0, 5)  # Beginning: O(n) — shifts everything
+arr.insert(3, 35)  # Middle: O(n) — shifts after index 3
 
 # === DELETION ===
-arr.pop()               # End: O(1)
-arr.pop(0)              # Beginning: O(n) — shifts everything
-arr.remove(35)          # By value: O(n) — search + shift
+arr.pop()  # End: O(1)
+arr.pop(0)  # Beginning: O(n) — shifts everything
+arr.remove(35)  # By value: O(n) — search + shift
 
 # === SEARCHING ===
 arr = [10, 20, 30, 40, 50]
-print(30 in arr)        # O(n) — linear search
-print(arr.index(30))    # O(n) — returns first index of value
-print(arr.count(20))    # O(n) — counts occurrences
+print(30 in arr)  # O(n) — linear search
+print(arr.index(30))  # O(n) — returns first index of value
+print(arr.count(20))  # O(n) — counts occurrences
 
 # === SLICING ===
-sub = arr[1:4]          # [20, 30, 40] — O(k) where k is slice size
-sub = arr[::2]          # [10, 30, 50] — every other element
-sub = arr[::-1]         # [50, 40, 30, 20, 10] — reversed copy
+sub = arr[1:4]  # [20, 30, 40] — O(k) where k is slice size
+sub = arr[::2]  # [10, 30, 50] — every other element
+sub = arr[::-1]  # [50, 40, 30, 20, 10] — reversed copy
 
 # === SORTING ===
 arr = [3, 1, 4, 1, 5, 9]
-arr.sort()              # In-place sort: O(n log n)
+arr.sort()  # In-place sort: O(n log n)
 arr.sort(reverse=True)  # Descending sort
 sorted_arr = sorted(arr)  # Returns new sorted list: O(n log n)
 ```
@@ -173,6 +173,8 @@ Given an array of integers and a target, find two numbers that add up to the tar
 Approach 1: Brute Force — O(n²) time, O(1) space
 Approach 2: Hash Map — O(n) time, O(n) space
 """
+
+
 def two_sum_brute(nums, target):
     """Brute force: check every pair."""
     for i in range(len(nums)):
@@ -180,6 +182,7 @@ def two_sum_brute(nums, target):
             if nums[i] + nums[j] == target:
                 return [i, j]
     return []
+
 
 def two_sum_hashmap(nums, target):
     """Hash map: O(n) time by complement lookup."""
@@ -191,11 +194,12 @@ def two_sum_hashmap(nums, target):
         seen[num] = i
     return []
 
+
 # Test
 nums = [2, 7, 11, 15]
 target = 9
-print(two_sum_brute(nums, target))     # [0, 1]
-print(two_sum_hashmap(nums, target))   # [0, 1]
+print(two_sum_brute(nums, target))  # [0, 1]
+print(two_sum_hashmap(nums, target))  # [0, 1]
 ```
 
 ### Example 2: Rotate Array
@@ -209,6 +213,7 @@ Approach 1: Extra array — O(n) time, O(n) space
 Approach 2: In-place reversal — O(n) time, O(1) space
 """
 
+
 def rotate_extra_array(nums, k):
     """Use an extra array to place each element correctly."""
     n = len(nums)
@@ -217,23 +222,25 @@ def rotate_extra_array(nums, k):
         rotated[(i + k) % n] = nums[i]
     return rotated
 
+
 def rotate_inplace(nums, k):
     """Reverse technique — O(1) space."""
     n = len(nums)
     k = k % n  # Handle k > n
-    
+
     def reverse(arr, start, end):
         while start < end:
             arr[start], arr[end] = arr[end], arr[start]
             start += 1
             end -= 1
-    
+
     # Step 1: Reverse entire array
     reverse(nums, 0, n - 1)
     # Step 2: Reverse first k elements
     reverse(nums, 0, k - 1)
     # Step 3: Reverse remaining elements
     reverse(nums, k, n - 1)
+
 
 # Test
 nums = [1, 2, 3, 4, 5, 6, 7]
@@ -251,26 +258,29 @@ Approach 1: Brute force — O(n×k) time
 Approach 2: Sliding window — O(n) time, O(1) space
 """
 
+
 def max_sum_subarray_brute(arr, k):
     """Check every possible window of size k."""
-    max_sum = float('-inf')
+    max_sum = float("-inf")
     for i in range(len(arr) - k + 1):
-        window_sum = sum(arr[i:i+k])  # O(k) each time
+        window_sum = sum(arr[i : i + k])  # O(k) each time
         max_sum = max(max_sum, window_sum)
     return max_sum
+
 
 def max_sum_subarray_sliding(arr, k):
     """Sliding window — remove left element, add right element."""
     # Compute first window
     window_sum = sum(arr[:k])
     max_sum = window_sum
-    
+
     # Slide the window
     for i in range(k, len(arr)):
         window_sum += arr[i] - arr[i - k]  # Add new, remove old
         max_sum = max(max_sum, window_sum)
-    
+
     return max_sum
+
 
 # Test
 arr = [2, 1, 5, 1, 3, 2]
@@ -288,20 +298,22 @@ Returns their indices (1-based).
 Two-Pointer: O(n) time, O(1) space
 """
 
+
 def two_sum_sorted(arr, target):
     """Two pointers: one from start, one from end."""
     left, right = 0, len(arr) - 1
-    
+
     while left < right:
         current_sum = arr[left] + arr[right]
         if current_sum == target:
             return [left + 1, right + 1]  # 1-based
         elif current_sum < target:
-            left += 1    # Need larger sum → move left pointer right
+            left += 1  # Need larger sum → move left pointer right
         else:
-            right -= 1   # Need smaller sum → move right pointer left
-    
+            right -= 1  # Need smaller sum → move right pointer left
+
     return []
+
 
 # Test
 arr = [1, 2, 3, 4, 6]
@@ -322,9 +334,10 @@ Uses three pointers:
 - high: boundary for 2s (everything after high is 2)
 """
 
+
 def sort_colors(nums):
     low, mid, high = 0, 0, len(nums) - 1
-    
+
     while mid <= high:
         if nums[mid] == 0:
             nums[low], nums[mid] = nums[mid], nums[low]
@@ -336,6 +349,7 @@ def sort_colors(nums):
             nums[mid], nums[high] = nums[high], nums[mid]
             high -= 1
             # Don't increment mid — swapped element needs checking
+
 
 # Test
 arr = [2, 0, 2, 1, 1, 0]
@@ -383,13 +397,13 @@ for item in lst[:]:  # lst[:] creates a shallow copy
 ```python
 a = [1, 2, 3]
 b = [1, 2, 3]
-print(a == b)   # True — same values
-print(a is b)   # False — different objects in memory
+print(a == b)  # True — same values
+print(a is b)  # False — different objects in memory
 
 # For checking None:
 x = None
-print(x is None)     # Correct
-print(x == None)     # Works but not Pythonic
+print(x is None)  # Correct
+print(x == None)  # Works but not Pythonic
 ```
 
 ### Mistake 4: Using `in` for Sorted Arrays
@@ -400,6 +414,7 @@ if target in sorted_arr:
 
 # RIGHT: Binary search — O(log n)
 import bisect
+
 idx = bisect.bisect_left(sorted_arr, target)
 if idx < len(sorted_arr) and sorted_arr[idx] == target:
     pass

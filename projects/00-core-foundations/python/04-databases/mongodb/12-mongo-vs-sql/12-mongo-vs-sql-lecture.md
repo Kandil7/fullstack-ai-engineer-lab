@@ -49,12 +49,14 @@ relational = {
 }
 
 # document: 1 lookup returns the whole read shape
-embedded = [{
-    "_id": 1,
-    "title": "vector search",
-    "author": {"author_id": 1, "name": "sara"},
-    "comments": [{"comment_id": 1, "text": "great read"}],
-}]
+embedded = [
+    {
+        "_id": 1,
+        "title": "vector search",
+        "author": {"author_id": 1, "name": "sara"},
+        "comments": [{"comment_id": 1, "text": "great read"}],
+    }
+]
 ```
 
 The same answer, two very different read costs — and two very different write
@@ -91,8 +93,9 @@ difference is the whole performance story.
 def read_count_referenced(n_posts):
     return n_posts + 1  # 1 for the list + 1 author lookup per post
 
+
 def read_count_embedded(n_posts):
-    return n_posts      # author already inside each document
+    return n_posts  # author already inside each document
 ```
 
 The classic fix in SQL is a JOIN (one query); in MongoDB it is embedding — or

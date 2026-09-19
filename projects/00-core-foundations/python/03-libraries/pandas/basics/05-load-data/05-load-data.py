@@ -5,6 +5,7 @@ W3Schools: https://www.w3schools.com/python/pandas_csv.asp
 Pandas can read data from many formats: CSV, JSON, Excel, SQL, and more.
 This script demonstrates loading and saving data.
 """
+
 import pandas as pd
 import numpy as np
 import os
@@ -16,12 +17,14 @@ TMPDIR = tempfile.gettempdir()
 
 def save_demo_csv(path: str) -> None:
     """Create a sample CSV file for demonstration."""
-    df = pd.DataFrame({
-        "Name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
-        "Age": [25, 30, 35, 28, 22],
-        "City": ["New York", "London", "Paris", "Tokyo", "Sydney"],
-        "Salary": [70000, 80000, 95000, 75000, 65000],
-    })
+    df = pd.DataFrame(
+        {
+            "Name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
+            "Age": [25, 30, 35, 28, 22],
+            "City": ["New York", "London", "Paris", "Tokyo", "Sydney"],
+            "Salary": [70000, 80000, 95000, 75000, 65000],
+        }
+    )
     df.to_csv(path, index=False)
     print(f"Created demo CSV: {path}")
     print()
@@ -78,11 +81,13 @@ print("=" * 60)
 print("Example 3: Save to CSV")
 print("=" * 60)
 
-products = pd.DataFrame({
-    "Product": ["Widget", "Gadget", "Doohickey"],
-    "Price": [9.99, 24.99, 14.99],
-    "In Stock": [True, False, True],
-})
+products = pd.DataFrame(
+    {
+        "Product": ["Widget", "Gadget", "Doohickey"],
+        "Price": [9.99, 24.99, 14.99],
+        "In Stock": [True, False, True],
+    }
+)
 
 # Save with default settings
 out_path = os.path.join(TMPDIR, "pandas_ex05_products.csv")
@@ -105,10 +110,12 @@ print("=" * 60)
 
 # Handle missing values
 messy_csv = os.path.join(TMPDIR, "pandas_ex05_messy.csv")
-pd.DataFrame({
-    "A": [1, 2, None, 4],
-    "B": ["x", None, "z", "w"],
-}).to_csv(messy_csv, index=False)
+pd.DataFrame(
+    {
+        "A": [1, 2, None, 4],
+        "B": ["x", None, "z", "w"],
+    }
+).to_csv(messy_csv, index=False)
 
 df_messy = pd.read_csv(messy_csv)
 print("CSV with missing values:")

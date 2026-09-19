@@ -131,13 +131,17 @@ along each dimension.
 ```python
 import torch
 
-scalar = torch.tensor(3.0)          # rank 0, shape ()
-vector = torch.tensor([1., 2., 3.]) # rank 1, shape (3,)
-matrix = torch.tensor([[1., 2.],    # rank 2, shape (2, 2)
-                       [3., 4.]])
+scalar = torch.tensor(3.0)  # rank 0, shape ()
+vector = torch.tensor([1.0, 2.0, 3.0])  # rank 1, shape (3,)
+matrix = torch.tensor(
+    [
+        [1.0, 2.0],  # rank 2, shape (2, 2)
+        [3.0, 4.0],
+    ]
+)
 
 print(vector.shape)  # torch.Size([3])
-print(matrix.ndim)   # 2  (the rank)
+print(matrix.ndim)  # 2  (the rank)
 ```
 
 ```text
@@ -165,10 +169,10 @@ import torch
 x = torch.tensor(3.0).requires_grad_()
 
 # Some computation ending in a single scalar
-y = x ** 2                 # y = x^2
-y.backward()               # compute dy/dx and store in x.grad
+y = x**2  # y = x^2
+y.backward()  # compute dy/dx and store in x.grad
 
-print(x.grad)              # tensor(6.)  because dy/dx = 2x = 2*3 = 6
+print(x.grad)  # tensor(6.)  because dy/dx = 2x = 2*3 = 6
 ```
 
 ```text
@@ -190,7 +194,7 @@ iteration 1 and 2's gradients. So after stepping, reset with `grad.zero_()`.
 
 ```python
 # after using the gradient to take a step:
-weights.grad.zero_()   # in-place reset to zero (note trailing underscore)
+weights.grad.zero_()  # in-place reset to zero (note trailing underscore)
 ```
 
 ```text
@@ -251,13 +255,14 @@ them. The simplest is **ReLU** (Rectified Linear Unit): `max(x, 0)`.
 
 ```python
 def relu(x: torch.Tensor) -> torch.Tensor:
-    return x.clamp(min=0)          # same as torch.max(x, tensor(0.))
+    return x.clamp(min=0)  # same as torch.max(x, tensor(0.))
+
 
 # A tiny neural net: linear -> relu -> linear
 def simple_net(xb, w1, b1, w2, b2):
-    l1 = xb @ w1 + b1              # linear layer 1
-    l2 = relu(l1)                  # nonlinearity
-    return l2 @ w2 + b2            # linear layer 2
+    l1 = xb @ w1 + b1  # linear layer 1
+    l2 = relu(l1)  # nonlinearity
+    return l2 @ w2 + b2  # linear layer 2
 ```
 
 ```text
@@ -286,33 +291,38 @@ import torch
 torch.manual_seed(42)
 
 # --- Synthetic "roller-coaster speed vs time" data -----------------------
-time = torch.arange(0, 20, 1).float()                 # t = 0..19
+time = torch.arange(0, 20, 1).float()  # t = 0..19
 true_a, true_b, true_c = 1.0, -15.0, 60.0
 speed = true_a * time**2 + true_b * time + true_c
-speed += 5 * torch.randn(len(time))                   # add measurement noise
+speed += 5 * torch.randn(len(time))  # add measurement noise
+
 
 # --- The model: a quadratic parameterised by (a, b, c) -------------------
 def f(t: torch.Tensor, params: torch.Tensor) -> torch.Tensor:
     a, b, c = params
     return a * t**2 + b * t + c
 
+
 def mse(preds: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
     return ((preds - targets) ** 2).mean()
+
 
 # STEP 1: initialise parameters randomly, and track gradients
 params = torch.randn(3).requires_grad_()
 lr = 1e-5
 
+
 def apply_step(params: torch.Tensor, show: bool = True) -> torch.Tensor:
-    preds = f(time, params)          # STEP 2: predict
-    loss = mse(preds, speed)         # STEP 3: compute loss
-    loss.backward()                  # STEP 4: compute gradients
-    with torch.no_grad():            # don't track the update itself
-        params -= lr * params.grad   # STEP 5: step (downhill)
-    params.grad.zero_()              # reset grads for next iteration
+    preds = f(time, params)  # STEP 2: predict
+    loss = mse(preds, speed)  # STEP 3: compute loss
+    loss.backward()  # STEP 4: compute gradients
+    with torch.no_grad():  # don't track the update itself
+        params -= lr * params.grad  # STEP 5: step (downhill)
+    params.grad.zero_()  # reset grads for next iteration
     if show:
         print(f"loss = {loss.item():.2f}")
     return params
+
 
 # STEP 6: repeat
 for _ in range(10):
@@ -332,13 +342,15 @@ import torch
 torch.manual_seed(0)
 
 # Toy regression: y is a nonlinear function of a single input feature.
-x = torch.linspace(-3, 3, 100).unsqueeze(1)   # shape (100, 1)
-y = x**2 + torch.randn_like(x) * 0.3          # target is a parabola
+x = torch.linspace(-3, 3, 100).unsqueeze(1)  # shape (100, 1)
+y = x**2 + torch.randn_like(x) * 0.3  # target is a parabola
 
 n_hidden = 30
 
+
 def init_params(size, std=1.0):
     return (torch.randn(size) * std).requires_grad_()
+
 
 # Two linear layers with a ReLU between them.
 w1 = init_params((1, n_hidden))
@@ -347,21 +359,25 @@ w2 = init_params((n_hidden, 1))
 b2 = init_params(1)
 params = [w1, b1, w2, b2]
 
-def relu(t): return t.clamp(min=0)
+
+def relu(t):
+    return t.clamp(min=0)
+
 
 def model(xb):
-    h = relu(xb @ w1 + b1)     # hidden layer with nonlinearity
-    return h @ w2 + b2         # output layer
+    h = relu(xb @ w1 + b1)  # hidden layer with nonlinearity
+    return h @ w2 + b2  # output layer
+
 
 lr = 1e-2
 for epoch in range(2000):
     preds = model(x)
-    loss = ((preds - y) ** 2).mean()   # MSE
+    loss = ((preds - y) ** 2).mean()  # MSE
     loss.backward()
     with torch.no_grad():
         for p in params:
-            p -= lr * p.grad           # step every parameter
-            p.grad.zero_()             # then zero its gradient
+            p -= lr * p.grad  # step every parameter
+            p.grad.zero_()  # then zero its gradient
     if epoch % 400 == 0:
         print(f"epoch {epoch:4d}  loss {loss.item():.4f}")
 
@@ -386,7 +402,7 @@ torch.manual_seed(0)
 # 1=seven. Here we fabricate the SAME SHAPES so the code runs with no
 # download: (n, 784) inputs, (n, 1) targets.
 n = 256
-train_x = torch.randn(n, 28 * 28)          # shape (256, 784)
+train_x = torch.randn(n, 28 * 28)  # shape (256, 784)
 train_y = (train_x.mean(dim=1, keepdim=True) > 0).float()  # fake 3-vs-7 label
 
 # --- Baseline before learning: "pixel similarity" -------------------------
@@ -396,23 +412,25 @@ train_y = (train_x.mean(dim=1, keepdim=True) > 0).float()  # fake 3-vs-7 label
 
 # --- The learned model: nn.Sequential of linear layers + ReLU -------------
 model = nn.Sequential(
-    nn.Linear(28 * 28, 30),   # weights + bias registered as nn.Parameter
+    nn.Linear(28 * 28, 30),  # weights + bias registered as nn.Parameter
     nn.ReLU(),
     nn.Linear(30, 1),
 )
 
+
 def batch_accuracy(preds, yb):
-    correct = (preds.sigmoid() > 0.5) == (yb > 0.5)   # sigmoid -> probability
+    correct = (preds.sigmoid() > 0.5) == (yb > 0.5)  # sigmoid -> probability
     return correct.float().mean()
 
-opt = torch.optim.SGD(model.parameters(), lr=0.1)   # SGD over all params
+
+opt = torch.optim.SGD(model.parameters(), lr=0.1)  # SGD over all params
 loss_fn = nn.MSELoss()
 
 for epoch in range(20):
     preds = model(train_x)
-    loss = loss_fn(preds.sigmoid(), train_y)   # squash to [0,1] then compare
+    loss = loss_fn(preds.sigmoid(), train_y)  # squash to [0,1] then compare
     loss.backward()
-    opt.step()       # STEP 5: update every parameter
+    opt.step()  # STEP 5: update every parameter
     opt.zero_grad()  # zero grads (opt wraps grad.zero_() for you)
     if epoch % 5 == 0:
         acc = batch_accuracy(model(train_x), train_y)
@@ -429,7 +447,7 @@ for epoch in range(n):
     loss = mse(model(x), y)
     loss.backward()
     with torch.no_grad():
-        params -= lr * params.grad   # grad still holds ALL previous grads!
+        params -= lr * params.grad  # grad still holds ALL previous grads!
 
 # ✅ GOOD: zero the gradient after every step
 for epoch in range(n):
@@ -437,24 +455,25 @@ for epoch in range(n):
     loss.backward()
     with torch.no_grad():
         params -= lr * params.grad
-    params.grad.zero_()              # reset before the next backward()
+    params.grad.zero_()  # reset before the next backward()
 ```
 
 ```python
 # ❌ BAD: updating parameters inside autograd tracking — corrupts the graph
 loss.backward()
-params -= lr * params.grad           # RuntimeError: a leaf Variable ...
+params -= lr * params.grad  # RuntimeError: a leaf Variable ...
 
 # ✅ GOOD: wrap the in-place update in torch.no_grad()
 loss.backward()
 with torch.no_grad():
-    params -= lr * params.grad       # update is not itself recorded
+    params -= lr * params.grad  # update is not itself recorded
 ```
 
 ```python
 # ❌ BAD: stacking linear layers with no nonlinearity — still just linear
 def net(x):
-    return (x @ w1 + b1) @ w2 + b2   # collapses to one linear layer
+    return (x @ w1 + b1) @ w2 + b2  # collapses to one linear layer
+
 
 # ✅ GOOD: insert a nonlinearity so the net can model curves
 def net(x):

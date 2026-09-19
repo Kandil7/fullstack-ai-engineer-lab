@@ -32,12 +32,14 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict
 from dataclasses import dataclass
 
+
 class AuthenticationMethod:
     """Base class for authentication methods."""
 
     def authenticate(self, credentials: Dict) -> Dict:
         """Authenticate user with credentials."""
         raise NotImplementedError
+
 
 class APIKeyAuth(AuthenticationMethod):
     """API Key based authentication."""
@@ -84,6 +86,7 @@ class APIKeyAuth(AuthenticationMethod):
             return True
         return False
 
+
 class PasswordAuth(AuthenticationMethod):
     """Password-based authentication with secure hashing."""
 
@@ -98,10 +101,10 @@ class PasswordAuth(AuthenticationMethod):
         # Hash password with salt
         salt = secrets.token_hex(16)
         password_hash = hashlib.pbkdf2_hmac(
-            'sha256',
+            "sha256",
             password.encode(),
             salt.encode(),
-            100000  # Iterations
+            100000,  # Iterations
         )
 
         self.users[username] = {
@@ -127,10 +130,7 @@ class PasswordAuth(AuthenticationMethod):
 
         # Verify password
         password_hash = hashlib.pbkdf2_hmac(
-            'sha256',
-            password.encode(),
-            user["salt"].encode(),
-            100000
+            "sha256", password.encode(), user["salt"].encode(), 100000
         )
 
         if password_hash.hex() != user["password_hash"]:
@@ -156,6 +156,7 @@ import hmac
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 
+
 class JWTManager:
     """JSON Web Token management."""
 
@@ -169,11 +170,15 @@ class JWTManager:
 
         # Add standard claims
         now = datetime.utcnow()
-        payload.update({
-            "iat": int(now.timestamp()),           # Issued at
-            "exp": int((now + timedelta(seconds=expires_in)).timestamp()),  # Expiration
-            "jti": secrets.token_hex(16),          # JWT ID
-        })
+        payload.update(
+            {
+                "iat": int(now.timestamp()),  # Issued at
+                "exp": int(
+                    (now + timedelta(seconds=expires_in)).timestamp()
+                ),  # Expiration
+                "jti": secrets.token_hex(16),  # JWT ID
+            }
+        )
 
         # Encode header and payload
         header_encoded = self._base64url_encode(json.dumps(header))
@@ -182,9 +187,7 @@ class JWTManager:
         # Create signature
         message = f"{header_encoded}.{payload_encoded}"
         signature = hmac.new(
-            self.secret_key.encode(),
-            message.encode(),
-            hashlib.sha256
+            self.secret_key.encode(), message.encode(), hashlib.sha256
         ).hexdigest()
 
         return f"{header_encoded}.{payload_encoded}.{signature}"
@@ -201,9 +204,7 @@ class JWTManager:
             # Verify signature
             message = f"{header_encoded}.{payload_encoded}"
             expected_signature = hmac.new(
-                self.secret_key.encode(),
-                message.encode(),
-                hashlib.sha256
+                self.secret_key.encode(), message.encode(), hashlib.sha256
             ).hexdigest()
 
             if signature != expected_signature:
@@ -249,15 +250,14 @@ class JWTManager:
             data += "=" * padding
         return base64.urlsafe_b64decode(data).decode()
 
+
 # Usage
 jwt_manager = JWTManager("your-secret-key-here")
 
 # Create token
-token = jwt_manager.create_token({
-    "sub": "user123",
-    "role": "admin",
-    "permissions": ["read", "write"]
-})
+token = jwt_manager.create_token(
+    {"sub": "user123", "role": "admin", "permissions": ["read", "write"]}
+)
 print(f"Token: {token[:50]}...")
 
 # Validate token
@@ -272,18 +272,23 @@ print(f"Payload: {result.get('payload')}")
 from typing import List, Dict, Set
 from dataclasses import dataclass
 
+
 @dataclass
 class Role:
     """User role definition."""
+
     name: str
     permissions: Set[str]
     description: str
 
+
 @dataclass
 class User:
     """User with roles."""
+
     user_id: str
     roles: Set[str]
+
 
 class RBACSystem:
     """Role-Based Access Control system."""
@@ -293,8 +298,7 @@ class RBACSystem:
         self.users: Dict[str, User] = {}
         self.role_hierarchy: Dict[str, Set[str]] = {}
 
-    def define_role(self, name: str, permissions: Set[str],
-                    description: str = ""):
+    def define_role(self, name: str, permissions: Set[str], description: str = ""):
         """Define a new role."""
         self.roles[name] = Role(
             name=name,
@@ -350,6 +354,7 @@ class RBACSystem:
             "error": f"Missing permission: {permission}",
         }
 
+
 # Setup RBAC
 rbac = RBACSystem()
 
@@ -368,9 +373,9 @@ rbac.assign_role("user2", "editor")
 rbac.assign_role("user3", "admin")
 
 # Check permissions
-print(f"user1 can read: {rbac.check_permission('user1', 'read')}")      # True
-print(f"user1 can write: {rbac.check_permission('user1', 'write')}")    # False
-print(f"user2 can write: {rbac.check_permission('user2', 'write')}")    # True
+print(f"user1 can read: {rbac.check_permission('user1', 'read')}")  # True
+print(f"user1 can write: {rbac.check_permission('user1', 'write')}")  # False
+print(f"user2 can write: {rbac.check_permission('user2', 'write')}")  # True
 print(f"user3 can delete: {rbac.check_permission('user3', 'delete')}")  # True
 ```
 
@@ -381,17 +386,21 @@ from typing import Dict, List, Callable
 from dataclasses import dataclass
 from enum import Enum
 
+
 class PolicyEffect(Enum):
     ALLOW = "allow"
     DENY = "deny"
 
+
 @dataclass
 class Policy:
     """ABAC policy definition."""
+
     name: str
     effect: PolicyEffect
     conditions: Dict[str, Callable]
     description: str = ""
+
 
 class ABACSystem:
     """Attribute-Based Access Control system."""
@@ -403,8 +412,9 @@ class ABACSystem:
         """Add a policy."""
         self.policies.append(policy)
 
-    def evaluate(self, subject: Dict, resource: Dict,
-                 action: str, context: Dict) -> Dict:
+    def evaluate(
+        self, subject: Dict, resource: Dict, action: str, context: Dict
+    ) -> Dict:
         """Evaluate access request against policies."""
         applicable_policies = []
 
@@ -430,9 +440,9 @@ class ABACSystem:
         # Default deny
         return {"allowed": False, "reason": "No matching policy"}
 
-    def _matches_policy(self, policy: Policy, subject: Dict,
-                        resource: Dict, action: str,
-                        context: Dict) -> bool:
+    def _matches_policy(
+        self, policy: Policy, subject: Dict, resource: Dict, action: str, context: Dict
+    ) -> bool:
         """Check if a policy matches the request."""
         for condition_key, condition_func in policy.conditions.items():
             if condition_key == "subject":
@@ -449,47 +459,54 @@ class ABACSystem:
                     return False
         return True
 
+
 # Usage
 abac = ABACSystem()
 
 # Define policies
-abac.add_policy(Policy(
-    name="allow_admin_full_access",
-    effect=PolicyEffect.ALLOW,
-    conditions={
-        "subject": lambda s: s.get("role") == "admin",
-        "action": lambda a: True,  # Any action
-    },
-    description="Admins can do anything"
-))
+abac.add_policy(
+    Policy(
+        name="allow_admin_full_access",
+        effect=PolicyEffect.ALLOW,
+        conditions={
+            "subject": lambda s: s.get("role") == "admin",
+            "action": lambda a: True,  # Any action
+        },
+        description="Admins can do anything",
+    )
+)
 
-abac.add_policy(Policy(
-    name="deny_external_write",
-    effect=PolicyEffect.DENY,
-    conditions={
-        "subject": lambda s: s.get("department") != "engineering",
-        "resource": lambda r: r.get("type") == "production_data",
-        "action": lambda a: a in ["write", "delete"],
-    },
-    description="Non-engineers cannot write to production data"
-))
+abac.add_policy(
+    Policy(
+        name="deny_external_write",
+        effect=PolicyEffect.DENY,
+        conditions={
+            "subject": lambda s: s.get("department") != "engineering",
+            "resource": lambda r: r.get("type") == "production_data",
+            "action": lambda a: a in ["write", "delete"],
+        },
+        description="Non-engineers cannot write to production data",
+    )
+)
 
-abac.add_policy(Policy(
-    name="allow_business_hours",
-    effect=PolicyEffect.ALLOW,
-    conditions={
-        "context": lambda c: 9 <= c.get("hour", 0) <= 17,
-        "subject": lambda s: s.get("department") == "engineering",
-    },
-    description="Engineers can access during business hours"
-))
+abac.add_policy(
+    Policy(
+        name="allow_business_hours",
+        effect=PolicyEffect.ALLOW,
+        conditions={
+            "context": lambda c: 9 <= c.get("hour", 0) <= 17,
+            "subject": lambda s: s.get("department") == "engineering",
+        },
+        description="Engineers can access during business hours",
+    )
+)
 
 # Test access
 result = abac.evaluate(
     subject={"role": "admin", "department": "engineering"},
     resource={"type": "production_data"},
     action="write",
-    context={"hour": 14}
+    context={"hour": 14},
 )
 print(f"Admin access: {result}")  # {'allowed': True, ...}
 ```
@@ -501,6 +518,7 @@ from typing import Dict, Optional
 import secrets
 import hashlib
 
+
 class OAuth2Server:
     """Simplified OAuth 2.0 server implementation."""
 
@@ -509,8 +527,7 @@ class OAuth2Server:
         self.authorization_codes = {}
         self.access_tokens = {}
 
-    def register_client(self, client_id: str, redirect_uri: str,
-                        client_secret: str):
+    def register_client(self, client_id: str, redirect_uri: str, client_secret: str):
         """Register an OAuth client."""
         self.clients[client_id] = {
             "redirect_uri": redirect_uri,
@@ -518,9 +535,9 @@ class OAuth2Server:
             "created_at": datetime.utcnow(),
         }
 
-    def generate_authorization_code(self, client_id: str,
-                                     user_id: str,
-                                     scope: str) -> str:
+    def generate_authorization_code(
+        self, client_id: str, user_id: str, scope: str
+    ) -> str:
         """Generate authorization code."""
         code = secrets.token_urlsafe(32)
         self.authorization_codes[code] = {
@@ -532,8 +549,9 @@ class OAuth2Server:
         }
         return code
 
-    def exchange_code_for_token(self, code: str, client_id: str,
-                                 client_secret: str) -> Dict:
+    def exchange_code_for_token(
+        self, code: str, client_id: str, client_secret: str
+    ) -> Dict:
         """Exchange authorization code for access token."""
         # Validate code
         if code not in self.authorization_codes:

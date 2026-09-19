@@ -44,7 +44,7 @@ for i in range(0, 10, 2):
 # Range object — memory efficient
 r = range(1000000)
 print(type(r))  # <class 'range'>
-print(len(r))   # 1000000
+print(len(r))  # 1000000
 # r takes very little memory (just stores start, stop, step)
 
 # Converting to list uses more memory
@@ -52,8 +52,8 @@ my_list = list(range(1000000))
 # my_list stores all 1,000,000 integers in memory
 
 # Check membership efficiently
-print(5 in r)      # True — O(1)
-print(5 in my_list) # True — O(n)
+print(5 in r)  # True — O(1)
+print(5 in my_list)  # True — O(n)
 ```
 
 ### 3. Negative Step
@@ -102,8 +102,8 @@ powers = [2**i for i in range(10)]  # [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
 ```python
 r = range(2, 20, 3)
 print(r.start)  # 2
-print(r.stop)   # 20
-print(r.step)   # 3
+print(r.stop)  # 20
+print(r.step)  # 3
 
 # Index and count
 r = range(0, 10, 2)
@@ -147,10 +147,10 @@ for _ in range(3):
     do_something()
 
 # When NOT to use range (iterate directly):
-for item in items:      # Better than range(len(items))
+for item in items:  # Better than range(len(items))
     process(item)
 
-for char in "hello":    # Better than range(len("hello"))
+for char in "hello":  # Better than range(len("hello"))
     print(char)
 ```
 
@@ -169,6 +169,7 @@ def multiplication_table(n, size=10):
         table.append(row)
     return table
 
+
 table = multiplication_table(5)
 for row in table:
     print([f"{x:3d}" for x in row])
@@ -181,13 +182,14 @@ def sieve_of_eratosthenes(limit):
     """Find all primes up to limit."""
     is_prime = [True] * (limit + 1)
     is_prime[0] = is_prime[1] = False
-    
+
     for i in range(2, int(limit**0.5) + 1):
         if is_prime[i]:
-            for j in range(i*i, limit + 1, i):
+            for j in range(i * i, limit + 1, i):
                 is_prime[j] = False
-    
+
     return [i for i in range(limit + 1) if is_prime[i]]
+
 
 primes = sieve_of_eratosthenes(50)
 print(primes)  # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
@@ -200,6 +202,7 @@ def interpolate(start, end, steps):
     """Generate evenly spaced values between start and end."""
     step = (end - start) / (steps - 1)
     return [start + i * step for i in range(steps)]
+
 
 # Generate 5 values between 0 and 1
 values = interpolate(0, 1, 5)
@@ -214,13 +217,14 @@ def caesar_cipher(text, shift):
     result = []
     for char in text:
         if char.isalpha():
-            base = ord('A') if char.isupper() else ord('a')
+            base = ord("A") if char.isupper() else ord("a")
             # Use modular arithmetic with range
             shifted = (ord(char) - base + shift) % 26 + base
             result.append(chr(shifted))
         else:
             result.append(char)
-    return ''.join(result)
+    return "".join(result)
+
 
 print(caesar_cipher("Hello, World!", 3))  # Khoor, Zruog!
 ```
@@ -285,6 +289,7 @@ def sum_range(start, stop, step=1):
     # Your code here
     pass
 
+
 # Expected: 55
 print(sum_range(1, 11))
 print(sum_range(0, 10, 2))  # 0+2+4+6+8 = 20
@@ -298,6 +303,7 @@ def primes_in_range(start, end):
     # Your code here
     pass
 
+
 # Expected: [2, 3, 5, 7, 11, 13, 17, 19, 23]
 print(primes_in_range(2, 25))
 ```
@@ -309,6 +315,7 @@ Generate the first N Fibonacci numbers using range.
 def fibonacci_range(n):
     # Your code here
     pass
+
 
 # Expected: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 print(fibonacci_range(10))

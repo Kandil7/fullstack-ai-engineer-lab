@@ -29,8 +29,9 @@ In MySQL, databases are created explicitly: `CREATE DATABASE mydb;`. In sqlite3,
 
 ```python
 import sqlite3
+
 # This creates a database file if it doesn't exist
-conn = sqlite3.connect('mydatabase.db')
+conn = sqlite3.connect("mydatabase.db")
 print("Database created (or opened) successfully!")
 ```
 
@@ -47,7 +48,8 @@ In MySQL, `USE mydb;` selects which database to operate on. In sqlite3, you sele
 # and deleting the file
 conn.close()
 import os
-os.remove('mydatabase.db')
+
+os.remove("mydatabase.db")
 print("Database deleted.")
 ```
 
@@ -77,10 +79,10 @@ finally:
 ### Using reserved words as database names
 ```python
 # WRONG
-conn = sqlite3.connect('select.db')  # 'select' is a reserved word
+conn = sqlite3.connect("select.db")  # 'select' is a reserved word
 
 # RIGHT
-conn = sqlite3.connect('my_select_data.db')
+conn = sqlite3.connect("my_select_data.db")
 ```
 
 ---

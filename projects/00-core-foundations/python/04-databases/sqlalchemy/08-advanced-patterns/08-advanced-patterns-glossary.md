@@ -29,6 +29,7 @@ the assigned value — the cheap way to normalize (e.g., strip whitespace).
 ```python
 from sqlalchemy.orm import validates
 
+
 @validates("name")
 def validate_name(self, key, value):
     return value.strip()
@@ -64,6 +65,7 @@ it to TWO columns, `result_processor` reassembles it.
 ```python
 class PointType(TypeDecorator):
     impl = LargeBinary
+
     def bind_processor(self, dialect): ...
     def result_processor(self, dialect, coltype): ...
 ```
@@ -90,6 +92,7 @@ filters. Expression-level decorators chain from left to right.
 def is_leader(self) -> bool:
     return self.score >= 0.90
 
+
 @is_leader.expression
 def is_leader(cls):
     return cls.score >= 0.90
@@ -113,8 +116,7 @@ class JsonType(TypeDecorator):
 model's ranking; rank == 1 means best per model.
 **Example**:
 ```python
-rank = func.row_number().over(
-    partition_by=Experiment.model, order_by=Experiment.score.desc())
+rank = func.row_number().over(partition_by=Experiment.model, order_by=Experiment.score.desc())
 ```
 **Related**: window function
 
@@ -126,11 +128,14 @@ rank = func.row_number().over(
 ```python
 from sqlalchemy.types import TypeDecorator, LargeBinary
 
+
 class VectorType(TypeDecorator):
     impl = LargeBinary
     cache_ok = True
+
     def bind_processor(self, dialect):
         return lambda v: np.asarray(v, dtype=np.float32).tobytes()
+
     def result_processor(self, dialect, coltype):
         return lambda b: np.frombuffer(b, dtype=np.float32)
 ```

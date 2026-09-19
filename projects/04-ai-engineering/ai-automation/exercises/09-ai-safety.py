@@ -27,8 +27,10 @@ from enum import Enum
 # 1. Content Filtering
 # ---------------------------------------------------------------------------
 
+
 class ContentCategory(Enum):
     """Categories for content filtering."""
+
     SAFE = "safe"
     HATE_SPEECH = "hate_speech"
     VIOLENCE = "violence"
@@ -42,6 +44,7 @@ class ContentCategory(Enum):
 @dataclass
 class FilterResult:
     """Result of content filtering."""
+
     category: ContentCategory
     confidence: float
     flagged_words: list[str]
@@ -121,13 +124,15 @@ class ContentFilter:
         # Pattern-based checks
         pattern_results = self.check_patterns(text)
         for category, flagged_words in pattern_results:
-            results.append(FilterResult(
-                category=category,
-                confidence=0.8,
-                flagged_words=flagged_words,
-                is_safe=False,
-                explanation=f"Detected {category.value} content",
-            ))
+            results.append(
+                FilterResult(
+                    category=category,
+                    confidence=0.8,
+                    flagged_words=flagged_words,
+                    is_safe=False,
+                    explanation=f"Detected {category.value} content",
+                )
+            )
 
         # PII checks
         pii_found = self.check_pii(text)
@@ -135,34 +140,40 @@ class ContentFilter:
             all_pii = []
             for pii_type, matches in pii_found.items():
                 all_pii.extend([f"{pii_type}: {m}" for m in matches])
-            results.append(FilterResult(
-                category=ContentCategory.PII,
-                confidence=0.95,
-                flagged_words=all_pii,
-                is_safe=False,
-                explanation="Contains personally identifiable information",
-            ))
+            results.append(
+                FilterResult(
+                    category=ContentCategory.PII,
+                    confidence=0.95,
+                    flagged_words=all_pii,
+                    is_safe=False,
+                    explanation="Contains personally identifiable information",
+                )
+            )
 
         # Blocklist check
         blocklist_hits = self.check_blocklist(text)
         if blocklist_hits:
-            results.append(FilterResult(
-                category=ContentCategory.HARASSMENT,
-                confidence=0.7,
-                flagged_words=blocklist_hits,
-                is_safe=False,
-                explanation="Contains blocked words",
-            ))
+            results.append(
+                FilterResult(
+                    category=ContentCategory.HARASSMENT,
+                    confidence=0.7,
+                    flagged_words=blocklist_hits,
+                    is_safe=False,
+                    explanation="Contains blocked words",
+                )
+            )
 
         # If no issues found
         if not results:
-            results.append(FilterResult(
-                category=ContentCategory.SAFE,
-                confidence=0.9,
-                flagged_words=[],
-                is_safe=True,
-                explanation="Content passed all filters",
-            ))
+            results.append(
+                FilterResult(
+                    category=ContentCategory.SAFE,
+                    confidence=0.9,
+                    flagged_words=[],
+                    is_safe=True,
+                    explanation="Content passed all filters",
+                )
+            )
 
         return results
 
@@ -212,9 +223,11 @@ def demo_content_filtering():
 # 2. Input Validation
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ValidationRule:
     """A validation rule for input."""
+
     name: str
     validator: Callable[[Any], bool]
     error_message: str
@@ -284,9 +297,11 @@ class InputValidator:
         }
 
     @staticmethod
-    def create_string_validator(min_length: int = 0, max_length: int = 1000,
-                               pattern: str = None) -> ValidationRule:
+    def create_string_validator(
+        min_length: int = 0, max_length: int = 1000, pattern: str = None
+    ) -> ValidationRule:
         """Create a string validation rule."""
+
         def validator(value: Any) -> bool:
             if not isinstance(value, str):
                 return False
@@ -312,12 +327,13 @@ def demo_input_validation():
     validator = InputValidator()
 
     # Add validation rules
-    validator.add_rule("prompt", InputValidator.create_string_validator(
-        min_length=1, max_length=10000
-    ))
-    validator.add_rule("model", InputValidator.create_string_validator(
-        pattern=r"^(gpt-4|gpt-3\.5|claude)"
-    ))
+    validator.add_rule(
+        "prompt", InputValidator.create_string_validator(min_length=1, max_length=10000)
+    )
+    validator.add_rule(
+        "model",
+        InputValidator.create_string_validator(pattern=r"^(gpt-4|gpt-3\.5|claude)"),
+    )
 
     # Test cases
     test_cases = [
@@ -357,9 +373,11 @@ def demo_input_validation():
 # 3. Output Validation
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class OutputPolicy:
     """Policy for validating AI outputs."""
+
     max_length: int = 4000
     blocked_phrases: list[str] = field(default_factory=list)
     required_sections: list[str] = field(default_factory=list)
@@ -403,12 +421,14 @@ class OutputValidator:
                 issues.append("Output contains code blocks (not allowed)")
 
         # Record output
-        self.output_history.append({
-            "output": output[:100],
-            "policy": policy_name,
-            "issues": issues,
-            "timestamp": datetime.now().isoformat(),
-        })
+        self.output_history.append(
+            {
+                "output": output[:100],
+                "policy": policy_name,
+                "issues": issues,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
         return {
             "valid": len(issues) == 0,
@@ -420,12 +440,25 @@ class OutputValidator:
     def check_hallucination_markers(self, output: str) -> dict[str, Any]:
         """Check for common hallucination markers."""
         markers = {
-            "uncertainty": [r"(?i)I think", r"(?i)maybe", r"(?i)possibly",
-                          r"(?i)I'm not sure", r"(?i)might be"],
-            "refusal": [r"(?i)I cannot", r"(?i)I can't", r"(?i)I'm unable",
-                       r"(?i)I don't have access"],
-            "hedging": [r"(?i)it seems", r"(?i)apparently", r"(?i)generally",
-                       r"(?i)usually"],
+            "uncertainty": [
+                r"(?i)I think",
+                r"(?i)maybe",
+                r"(?i)possibly",
+                r"(?i)I'm not sure",
+                r"(?i)might be",
+            ],
+            "refusal": [
+                r"(?i)I cannot",
+                r"(?i)I can't",
+                r"(?i)I'm unable",
+                r"(?i)I don't have access",
+            ],
+            "hedging": [
+                r"(?i)it seems",
+                r"(?i)apparently",
+                r"(?i)generally",
+                r"(?i)usually",
+            ],
         }
 
         findings = {}
@@ -453,11 +486,14 @@ def demo_output_validation():
     validator = OutputValidator()
 
     # Add policy
-    validator.add_policy("customer_service", OutputPolicy(
-        max_length=500,
-        blocked_phrases=["I don't know", "I can't help", "Not my problem"],
-        required_sections=["greeting", "solution"],
-    ))
+    validator.add_policy(
+        "customer_service",
+        OutputPolicy(
+            max_length=500,
+            blocked_phrases=["I don't know", "I can't help", "Not my problem"],
+            required_sections=["greeting", "solution"],
+        ),
+    )
 
     # Test outputs
     test_outputs = [
@@ -496,6 +532,7 @@ def demo_output_validation():
 # 4. Prompt Injection Defense
 # ---------------------------------------------------------------------------
 
+
 class InjectionDefense:
     """Defense against prompt injection attacks."""
 
@@ -507,20 +544,16 @@ class InjectionDefense:
             r"(?i)pretend (?:you are |to be )",
             r"(?i)act as (?:if |a )",
             r"(?i)disregard (?:all |any )?(?:previous |prior )?rules",
-
             # Role manipulation
             r"(?i)new (?:role|persona|instructions)",
             r"(?i)switch to (?:mode|role|persona)",
             r"(?i)enter (?:developer|admin|debug) mode",
-
             # Data exfiltration
             r"(?i)(?:show|reveal|display) (?:me )?(?:your |the )?(?:system|initial) prompt",
             r"(?i)what (?:are |is )?your (?:instructions|rules|prompt)",
-
             # Bypass attempts
             r"(?i)bypass (?:all |any )?(?:safety|filter|restriction)",
             r"(?i)override (?:your |the )?(?:rules|instructions|safety)",
-
             # Encoding tricks
             r"(?i)in (?:base64|rot13|hex)",
             r"(?i)decode (?:this|the following)",
@@ -536,29 +569,35 @@ class InjectionDefense:
         for pattern in self.injection_patterns:
             matches = re.findall(pattern, prompt)
             if matches:
-                detected.append({
-                    "pattern": pattern,
-                    "matches": matches,
-                    "severity": "high",
-                })
+                detected.append(
+                    {
+                        "pattern": pattern,
+                        "matches": matches,
+                        "severity": "high",
+                    }
+                )
 
         # Check for unusual structures
         if prompt.count("\n") > 10:
-            detected.append({
-                "pattern": "excessive_newlines",
-                "matches": [f"{prompt.count(chr(10))} newlines"],
-                "severity": "medium",
-            })
+            detected.append(
+                {
+                    "pattern": "excessive_newlines",
+                    "matches": [f"{prompt.count(chr(10))} newlines"],
+                    "severity": "medium",
+                }
+            )
 
         # Check for role markers
         role_markers = ["[INST]", "<<SYS>>", "Human:", "Assistant:", "System:"]
         for marker in role_markers:
             if marker in prompt:
-                detected.append({
-                    "pattern": "role_marker",
-                    "matches": [marker],
-                    "severity": "high",
-                })
+                detected.append(
+                    {
+                        "pattern": "role_marker",
+                        "matches": [marker],
+                        "severity": "high",
+                    }
+                )
 
         return {
             "is_injection": len(detected) > 0,
@@ -594,8 +633,7 @@ class InjectionDefense:
 
         return sanitized
 
-    def wrap_with_system_prompt(self, user_prompt: str,
-                                system_prompt: str) -> str:
+    def wrap_with_system_prompt(self, user_prompt: str, system_prompt: str) -> str:
         """Wrap user prompt with system prompt for protection."""
         return f"""System: {system_prompt}
 
@@ -644,6 +682,7 @@ def demo_injection_defense():
 # 5. Rate Limiting
 # ---------------------------------------------------------------------------
 
+
 class RateLimiter:
     """Token bucket rate limiter."""
 
@@ -659,7 +698,8 @@ class RateLimiter:
 
         # Clean old requests
         self.requests[identifier] = [
-            req_time for req_time in self.requests[identifier]
+            req_time
+            for req_time in self.requests[identifier]
             if req_time > window_start
         ]
 
@@ -684,7 +724,8 @@ class RateLimiter:
         window_start = now - self.window_seconds
 
         self.requests[identifier] = [
-            req_time for req_time in self.requests[identifier]
+            req_time
+            for req_time in self.requests[identifier]
             if req_time > window_start
         ]
 
@@ -748,7 +789,7 @@ def demo_rate_limiting():
     for i in range(7):
         result = limiter.is_allowed("user_123")
         status = "✅ ALLOWED" if result["allowed"] else "🚫 BLOCKED"
-        print(f"  Request {i+1}: {status} (remaining: {result['remaining']})")
+        print(f"  Request {i + 1}: {status} (remaining: {result['remaining']})")
 
     # Sliding window rate limiter
     sliding_limiter = SlidingWindowRateLimiter(max_requests=3, window_seconds=10)
@@ -757,7 +798,7 @@ def demo_rate_limiting():
     for i in range(5):
         result = sliding_limiter.is_allowed("user_456")
         status = "✅ ALLOWED" if result["allowed"] else "🚫 BLOCKED"
-        print(f"  Request {i+1}: {status} (reset in: {result['reset_in']}s)")
+        print(f"  Request {i + 1}: {status} (reset in: {result['reset_in']}s)")
 
     # Per-user limits
     print("\nPer-User Rate Limits:")
@@ -777,9 +818,11 @@ def demo_rate_limiting():
 # 6. Audit Logging
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class AuditEvent:
     """An audit log event."""
+
     event_type: str
     user_id: str
     action: str
@@ -833,8 +876,9 @@ class AuditLogger:
                 sanitized[key] = value
         return sanitized
 
-    def log_api_request(self, user_id: str, endpoint: str,
-                       request_data: dict, response_status: int):
+    def log_api_request(
+        self, user_id: str, endpoint: str, request_data: dict, response_status: int
+    ):
         """Log an API request."""
         event = AuditEvent(
             event_type="api_request",
@@ -848,8 +892,9 @@ class AuditLogger:
         )
         return self.log_event(event)
 
-    def log_security_event(self, user_id: str, event_type: str,
-                          details: dict, ip_address: str = None):
+    def log_security_event(
+        self, user_id: str, event_type: str, details: dict, ip_address: str = None
+    ):
         """Log a security-related event."""
         event = AuditEvent(
             event_type=f"security_{event_type}",
@@ -861,8 +906,7 @@ class AuditLogger:
         )
         return self.log_event(event)
 
-    def log_ai_interaction(self, user_id: str, prompt: str,
-                          response: str, model: str):
+    def log_ai_interaction(self, user_id: str, prompt: str, response: str, model: str):
         """Log an AI interaction."""
         event = AuditEvent(
             event_type="ai_interaction",
@@ -879,10 +923,13 @@ class AuditLogger:
         )
         return self.log_event(event)
 
-    def query_events(self, event_type: str = None,
-                    user_id: str = None,
-                    start_time: str = None,
-                    limit: int = 100) -> list[AuditEvent]:
+    def query_events(
+        self,
+        event_type: str = None,
+        user_id: str = None,
+        start_time: str = None,
+        limit: int = 100,
+    ) -> list[AuditEvent]:
         """Query audit events."""
         results = self.events
 

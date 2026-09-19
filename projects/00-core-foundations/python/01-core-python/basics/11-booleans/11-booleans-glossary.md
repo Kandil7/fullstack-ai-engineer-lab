@@ -39,13 +39,13 @@ is_negative = x < 0  # False
 - **Related terms**: Truthiness, Falsiness, Type Conversion
 ```python
 # bool() conversion
-print(bool(0))      # False
-print(bool(1))      # True
-print(bool(-1))     # True
-print(bool(""))     # False
-print(bool("hi"))   # True
-print(bool([]))     # False
-print(bool([1, 2])) # True
+print(bool(0))  # False
+print(bool(1))  # True
+print(bool(-1))  # True
+print(bool(""))  # False
+print(bool("hi"))  # True
+print(bool([]))  # False
+print(bool([1, 2]))  # True
 ```
 
 ### C
@@ -74,12 +74,12 @@ if x > 10 and x < 20:
 x = 10
 y = 20
 
-print(x == y)   # Equal: False
-print(x != y)   # Not equal: True
-print(x > y)    # Greater than: False
-print(x < y)    # Less than: True
+print(x == y)  # Equal: False
+print(x != y)  # Not equal: True
+print(x > y)  # Greater than: False
+print(x < y)  # Less than: True
 print(x >= 10)  # Greater or equal: True
-print(x <= 5)   # Less or equal: False
+print(x <= 5)  # Less or equal: False
 ```
 
 ### F
@@ -101,12 +101,12 @@ print(type(is_admin))  # <class 'bool'>
 - **Related terms**: Truthiness, bool(), Boolean Context
 ```python
 # Falsy values
-print(bool(0))      # False
-print(bool(0.0))    # False
-print(bool(""))     # False
-print(bool([]))     # False
-print(bool({}))     # False
-print(bool(None))   # False
+print(bool(0))  # False
+print(bool(0.0))  # False
+print(bool(""))  # False
+print(bool([]))  # False
+print(bool({}))  # False
+print(bool(None))  # False
 ```
 
 ### L
@@ -124,11 +124,11 @@ print(x > 10 and x < 20)  # True
 print(x > 10 and x > 20)  # False
 
 # or - at least one must be True
-print(x > 10 or x > 20)   # True
-print(x > 20 or x > 30)   # False
+print(x > 10 or x > 20)  # True
+print(x > 20 or x > 30)  # False
 
 # not - reverses boolean
-print(not (x > 5))   # False
+print(not (x > 5))  # False
 print(not (x > 15))  # True
 ```
 
@@ -143,6 +143,7 @@ print(not (x > 15))  # True
 def check():
     print("Checking...")
     return True
+
 
 # This won't print "Checking..." if x is False
 x = False
@@ -161,10 +162,10 @@ if y or check():  # check() not called
 - **Related terms**: Falsiness, bool(), Boolean Context
 ```python
 # Truthy values
-print(bool(1))      # True
-print(bool(-1))     # True
-print(bool("hi"))   # True
-print(bool([1, 2])) # True
+print(bool(1))  # True
+print(bool(-1))  # True
+print(bool("hi"))  # True
+print(bool([1, 2]))  # True
 print(bool({"a": 1}))  # True
 ```
 
@@ -217,8 +218,8 @@ print(x == y)  # True (values equal)
 # Identity comparison
 a = [1, 2, 3]
 b = [1, 2, 3]
-print(a == b)   # True (values equal)
-print(a is b)   # False (different objects)
+print(a == b)  # True (values equal)
+print(a is b)  # False (different objects)
 ```
 
 ## Key Concepts Summary

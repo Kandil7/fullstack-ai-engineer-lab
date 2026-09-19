@@ -29,6 +29,7 @@ def linear_search(arr, target):
             return i
     return -1
 
+
 # Example
 arr = [10, 23, 45, 70, 11, 15]
 target = 70

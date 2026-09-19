@@ -31,8 +31,10 @@ app = FastAPI(title="Exception Handling Exercises")
 # Exercise 23.1: Custom Exception Classes
 # ============================================================
 
+
 class BankingError(Exception):
     """Base exception for all banking errors."""
+
     status_code: int = 500
     error_code: str = "BANKING_ERROR"
     message: str = "An unexpected banking error occurred"
@@ -57,7 +59,9 @@ class InsufficientFundsError(BankingError):
         self.required = amount - available
         super().__init__(
             message=f"Need ${self.required:.2f} more",
-            amount=amount, available=available, required=self.required
+            amount=amount,
+            available=available,
+            required=self.required,
         )
 
 
@@ -81,7 +85,8 @@ class AccountFrozenError(BankingError):
         self.reason = reason
         super().__init__(
             message=f"Account {account_id} is frozen: {reason}",
-            account_id=account_id, reason=reason
+            account_id=account_id,
+            reason=reason,
         )
 
 
@@ -95,7 +100,8 @@ class TransactionLimitError(BankingError):
         self.attempted = attempted
         super().__init__(
             message=f"Transaction ${attempted:.2f} exceeds limit of ${limit:.2f}",
-            limit=limit, attempted=attempted
+            limit=limit,
+            attempted=attempted,
         )
 
 
@@ -117,14 +123,14 @@ class AuthorizationError(BankingError):
         self.action = action
         self.role = role
         super().__init__(
-            message=f"Role '{role}' cannot perform '{action}'",
-            action=action, role=role
+            message=f"Role '{role}' cannot perform '{action}'", action=action, role=role
         )
 
 
 # ============================================================
 # Exercise 23.2: Exception Handler Registration
 # ============================================================
+
 
 @app.exception_handler(BankingError)
 async def banking_error_handler(request: Request, exc: BankingError):
@@ -140,7 +146,7 @@ async def banking_error_handler(request: Request, exc: BankingError):
                 "timestamp": datetime.utcnow().isoformat(),
                 "request_id": request.headers.get("x-request-id", "unknown"),
             }
-        }
+        },
     )
 
 
@@ -160,13 +166,14 @@ async def generic_error_handler(request: Request, exc: Exception):
                 "status": 500,
                 "timestamp": datetime.utcnow().isoformat(),
             }
-        }
+        },
     )
 
 
 # ============================================================
 # Exercise 23.3: Validation Error Formatting
 # ============================================================
+
 
 class UserRegistration(BaseModel):
     username: str = Field(..., min_length=3, pattern=r"^[a-zA-Z0-9_]+$")
@@ -182,7 +189,9 @@ async def validation_error_handler(request: Request, exc: RequestValidationError
     errors = {}
     for error in exc.errors():
         # Extract field name from loc tuple
-        field_parts = [str(loc) for loc in error["loc"] if loc not in ("body", "query", "path", "header")]
+        field_parts = [
+            str(loc) for loc in error["loc"] if loc not in ("body", "query", "path", "header")
+        ]
         field = ".".join(field_parts) if field_parts else str(error["loc"][-1])
 
         # Convert error type to user-friendly message
@@ -201,7 +210,7 @@ async def validation_error_handler(request: Request, exc: RequestValidationError
                 "status": 422,
                 "timestamp": datetime.utcnow().isoformat(),
             }
-        }
+        },
     )
 
 
@@ -214,13 +223,14 @@ async def register_user(user: UserRegistration):
             "username": user.username,
             "email": user.email,
             "age": user.age,
-        }
+        },
     }
 
 
 # ============================================================
 # Exercise 23.4: Error Recovery Patterns
 # ============================================================
+
 
 # --- Retry with Fallback ---
 async def unstable_operation() -> dict:
@@ -280,8 +290,12 @@ class CircuitBreaker:
                     detail={
                         "message": "Service temporarily unavailable",
                         "circuit_state": "open",
-                        "retry_after_seconds": int(self.reset_timeout - (now - self.last_failure_time)) if self.last_failure_time else self.reset_timeout
-                    }
+                        "retry_after_seconds": int(
+                            self.reset_timeout - (now - self.last_failure_time)
+                        )
+                        if self.last_failure_time
+                        else self.reset_timeout,
+                    },
                 )
 
         try:
@@ -338,10 +352,7 @@ def get_cached_response(key: str) -> Optional[dict]:
 
 def set_cached_response(key: str, data: dict, ttl: int = 60):
     """Cache a response with TTL."""
-    cache_store[key] = {
-        "data": data,
-        "expires_at": time.time() + ttl
-    }
+    cache_store[key] = {"data": data, "expires_at": time.time() + ttl}
 
 
 @app.get("/resilient/degraded")
@@ -367,7 +378,7 @@ async def graceful_degradation():
         "status": "default",
         "data": "Default fallback data",
         "quality": "minimal",
-        "source": "default"
+        "source": "default",
     }
 
 
@@ -382,18 +393,13 @@ logger.setLevel(logging.DEBUG)
 # Add console handler with formatting
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter(
-    '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-)
+formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
 
 def log_error(
-    error: Exception,
-    request: Request = None,
-    user_id: str = None,
-    extra_context: dict = None
+    error: Exception, request: Request = None, user_id: str = None, extra_context: dict = None
 ) -> dict:
     """Create structured error log entry with context."""
     log_data = {
@@ -404,7 +410,7 @@ def log_error(
         "client_ip": request.client.host if request and request.client else "unknown",
         "user_id": user_id or "anonymous",
         "timestamp": datetime.utcnow().isoformat(),
-        **(extra_context or {})
+        **(extra_context or {}),
     }
     return log_data
 
@@ -445,7 +451,9 @@ async def test_security(token: str = Header(default="")):
     """Returns a security error (logged at CRITICAL level)."""
     if not token or token == "invalid":
         error = AuthenticationError("Invalid authentication token")
-        data = log_error(error, extra_context={"token_preview": token[:10] + "..." if token else "empty"})
+        data = log_error(
+            error, extra_context={"token_preview": token[:10] + "..." if token else "empty"}
+        )
         logger.critical(f"Security error: {data}")
         raise error
     return {"status": "authenticated", "token_valid": True}

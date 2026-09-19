@@ -96,11 +96,13 @@ async def upload_multiple(files: list[UploadFile] = File(...)):
     total_size = 0
     for f in files:
         content = await f.read()
-        file_list.append({
-            "filename": f.filename,
-            "size": len(content),
-            "content_type": f.content_type,
-        })
+        file_list.append(
+            {
+                "filename": f.filename,
+                "size": len(content),
+                "content_type": f.content_type,
+            }
+        )
         total_size += len(content)
     return {"count": len(files), "files": file_list, "total_size": total_size}
 

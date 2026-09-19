@@ -23,8 +23,7 @@ import sys
 
 import numpy as np
 
-from vector_utils import (chunk_by_sentences, chunk_fixed, chunk_recursive,
-                          cosine_sim, embed_texts)
+from vector_utils import chunk_by_sentences, chunk_fixed, chunk_recursive, cosine_sim, embed_texts
 
 # ============================================================
 # 1. A synthetic manual with facts
@@ -35,14 +34,13 @@ from vector_utils import (chunk_by_sentences, chunk_fixed, chunk_recursive,
 # boundary cutting the answer sentence is fatal.
 sentences: list[str] = []
 for i in range(1, 21):
-    kind = "rate limiter" if i % 3 == 0 else "cache store" if i % 3 == 1 \
-        else "auth guard"
+    kind = "rate limiter" if i % 3 == 0 else "cache store" if i % 3 == 1 else "auth guard"
     sentences.append(f"Feature {i:02d} is the {kind}.")
     sentences.append(f"Feature {i:02d} allows {10 * i} requests per minute.")
 
 doc = " ".join(sentences)
 queries = [f"allows {10 * i} requests per minute" for i in range(1, 21)]
-nums = [str(10 * i) for i in range(1, 21)]     # the answer token per query
+nums = [str(10 * i) for i in range(1, 21)]  # the answer token per query
 print(f"manual: {len(sentences)} sentences, {len(doc)} chars")
 
 # Output:
@@ -52,10 +50,10 @@ print(f"manual: {len(sentences)} sentences, {len(doc)} chars")
 # 2. Three chunking strategies
 # ============================================================
 strategies = {
-    "fixed(45, no overlap)":    chunk_fixed(doc, chunk_size=45, overlap=0),
-    "fixed(45, overlap=10)":    chunk_fixed(doc, chunk_size=45, overlap=10),
-    "sentence(max 160)":        chunk_by_sentences(doc, max_chars=160),
-    "recursive(max 90)":        chunk_recursive(doc, max_chars=90),
+    "fixed(45, no overlap)": chunk_fixed(doc, chunk_size=45, overlap=0),
+    "fixed(45, overlap=10)": chunk_fixed(doc, chunk_size=45, overlap=10),
+    "sentence(max 160)": chunk_by_sentences(doc, max_chars=160),
+    "recursive(max 90)": chunk_recursive(doc, max_chars=90),
 }
 print("\nchunk counts per strategy:")
 for name, chunks in strategies.items():
@@ -68,6 +66,7 @@ for name, chunks in strategies.items():
 #   sentence(max 160)        ->  10 chunks
 #   recursive(max 90)        ->  40 chunks
 
+
 # ============================================================
 # 3. Boundary-straddling facts
 # ============================================================
@@ -76,8 +75,11 @@ for name, chunks in strategies.items():
 # answer is then unretrievable as a single unit.
 def broken_seams(chunks: list[str]) -> int:
     """Count chunks that begin with the orphaned tail of 'requests'."""
-    return sum(1 for c in chunks if c.startswith("uests") or
-               c.startswith("s per minute") or c.startswith("per minute"))
+    return sum(
+        1
+        for c in chunks
+        if c.startswith("uests") or c.startswith("s per minute") or c.startswith("per minute")
+    )
 
 
 for name, chunks in strategies.items():
@@ -88,6 +90,7 @@ for name, chunks in strategies.items():
 #   fixed(45, overlap=10)    -> orphaned seams = 3
 #   sentence(max 160)        -> orphaned seams = 0
 #   recursive(max 90)        -> orphaned seams = 0
+
 
 # ============================================================
 # 4. Retrieval recall per strategy
@@ -124,8 +127,7 @@ for name, chunks in strategies.items():
 # by embedding dilution — all answer chunks look alike to a bag-of-words
 # vector, which is exactly why RAG uses top-k retrieval.)
 for name, chunks in strategies.items():
-    broken = [i for i, n in enumerate(nums)
-              if not recall_at(queries[i], n, chunks, 1)]
+    broken = [i for i, n in enumerate(nums) if not recall_at(queries[i], n, chunks, 1)]
     print(f"  {name:24s} recall@1 misses = {sorted(broken)}")
 
 # Output:
@@ -171,6 +173,7 @@ print(f"-> pick size={best[1]} (highest recall@3; smaller is cheaper to embed)")
 # MISTAKE: forgetting the dilution tradeoff: bigger chunks carry more
 #   context but bury the answer token in embedding noise.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
@@ -178,36 +181,35 @@ def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # sentence chunking never cuts a sentence: every chunk ends with '.'
     for c in strategies["sentence(max 160)"]:
-        assert c.rstrip().endswith("."), \
-            "sentence chunks must end on a sentence boundary"
+        assert c.rstrip().endswith("."), "sentence chunks must end on a sentence boundary"
 
     def r3(chunks: list[str]) -> int:
         return sum(1 for q, n in zip(queries, nums) if recall_at(q, n, chunks, 3))
 
     # seam cost: no-overlap must trail the boundary-aware strategies
-    assert r3(strategies["fixed(45, no overlap)"]) < \
-        r3(strategies["sentence(max 160)"]), \
+    assert r3(strategies["fixed(45, no overlap)"]) < r3(strategies["sentence(max 160)"]), (
         "fixed no-overlap must lose answers to seams"
-    assert r3(strategies["recursive(max 90)"]) == 20, \
+    )
+    assert r3(strategies["recursive(max 90)"]) == 20, (
         "recursive must recover every answer at recall@3"
+    )
 
     # overlap must beat no-overlap (same size, seams re-covered)
-    assert r3(strategies["fixed(45, overlap=10)"]) > \
-        r3(strategies["fixed(45, no overlap)"]), \
+    assert r3(strategies["fixed(45, overlap=10)"]) > r3(strategies["fixed(45, no overlap)"]), (
         "overlap must improve recall over no-overlap"
+    )
 
     # sweep: the chosen size must be a global max on this data
     sweep = []
     for size in (40, 70, 100, 140, 200):
         chunks = chunk_fixed(doc, chunk_size=size, overlap=max(4, size // 5))
-        sweep.append((sum(1 for q, n in zip(queries, nums)
-                          if recall_at(q, n, chunks, 3)) / 20, size))
-    assert max(sweep)[0] == max(h for h, _ in sweep), \
-        "pick must be a global max of the sweep"
+        sweep.append(
+            (sum(1 for q, n in zip(queries, nums) if recall_at(q, n, chunks, 3)) / 20, size)
+        )
+    assert max(sweep)[0] == max(h for h, _ in sweep), "pick must be a global max of the sweep"
 
     # fragmentation: the smallest size must not be the best
-    assert sweep[0][0] < max(h for h, _ in sweep), \
-        "tiny chunks must hurt recall (fragmentation)"
+    assert sweep[0][0] < max(h for h, _ in sweep), "tiny chunks must hurt recall (fragmentation)"
 
     print("[OK] 07-chunking-retrieval: all checks passed")
 

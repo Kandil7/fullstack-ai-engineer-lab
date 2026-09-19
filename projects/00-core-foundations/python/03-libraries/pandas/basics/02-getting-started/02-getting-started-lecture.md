@@ -36,12 +36,9 @@ print(s)
 ```python
 import pandas as pd
 
-population = pd.Series({
-    "Tokyo": 13960000,
-    "Delhi": 11030000,
-    "Shanghai": 24870000,
-    "Sao Paulo": 12330000
-})
+population = pd.Series(
+    {"Tokyo": 13960000, "Delhi": 11030000, "Shanghai": 24870000, "Sao Paulo": 12330000}
+)
 print(population)
 # Tokyo       13960000
 # Delhi       11030000
@@ -72,9 +69,7 @@ print(s)
 import pandas as pd
 
 temps = pd.Series(
-    [72, 68, 75, 80, 65],
-    index=["Mon", "Tue", "Wed", "Thu", "Fri"],
-    name="Temperature"
+    [72, 68, 75, 80, 65], index=["Mon", "Tue", "Wed", "Thu", "Fri"], name="Temperature"
 )
 print(temps)
 # Mon    72
@@ -100,7 +95,7 @@ data = {
     "Name": ["Alice", "Bob", "Charlie", "Diana"],
     "Age": [28, 35, 42, 31],
     "City": ["New York", "London", "Paris", "Tokyo"],
-    "Salary": [75000, 82000, 95000, 68000]
+    "Salary": [75000, 82000, 95000, 68000],
 }
 df = pd.DataFrame(data)
 print(df)
@@ -119,7 +114,7 @@ import pandas as pd
 records = [
     {"product": "Laptop", "price": 999, "quantity": 5},
     {"product": "Phone", "price": 699, "quantity": 12},
-    {"product": "Tablet", "price": 449, "quantity": 8}
+    {"product": "Tablet", "price": 449, "quantity": 8},
 ]
 df = pd.DataFrame(records)
 print(df)
@@ -135,16 +130,8 @@ print(df)
 import numpy as np
 import pandas as pd
 
-arr = np.array([
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9]
-])
-df = pd.DataFrame(
-    arr,
-    columns=["A", "B", "C"],
-    index=["row1", "row2", "row3"]
-)
+arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+df = pd.DataFrame(arr, columns=["A", "B", "C"], index=["row1", "row2", "row3"])
 print(df)
 #       A  B  C
 # row1  1  2  3
@@ -157,10 +144,7 @@ print(df)
 ```python
 import pandas as pd
 
-df_original = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Age": [28, 35]
-})
+df_original = pd.DataFrame({"Name": ["Alice", "Bob"], "Age": [28, 35]})
 
 # Create a copy
 df_copy = df_original.copy()
@@ -176,10 +160,7 @@ df_slice = df_original[["Name"]]
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Age": [28, 35]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob"], "Age": [28, 35]})
 ```
 
 ### Key Components
@@ -198,11 +179,13 @@ df = pd.DataFrame({
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42],
-    "City": ["New York", "London", "Paris"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie"],
+        "Age": [28, 35, 42],
+        "City": ["New York", "London", "Paris"],
+    }
+)
 
 # Index
 print("Index:", df.index.tolist())
@@ -234,11 +217,13 @@ print("Size:", df.size)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31],
-    "Salary": [75000.50, 82000.75, 95000.00, 68000.25]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, 35, 42, 31],
+        "Salary": [75000.50, 82000.75, 95000.00, 68000.25],
+    }
+)
 ```
 
 ### Data Types
@@ -284,11 +269,11 @@ import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
 
 # First and last rows
-print("Head:\n", df.head())         # First 5 rows
-print("Tail:\n", df.tail(3))        # Last 3 rows
+print("Head:\n", df.head())  # First 5 rows
+print("Tail:\n", df.tail(3))  # Last 3 rows
 
 # Random sample
-print("Sample:\n", df.sample(5))    # 5 random rows
+print("Sample:\n", df.sample(5))  # 5 random rows
 
 # Dimensions
 print("Shape:", df.shape)
@@ -341,11 +326,13 @@ print(df["day"].value_counts())
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42],
-    "City": ["New York", "London", "Paris"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie"],
+        "Age": [28, 35, 42],
+        "City": ["New York", "London", "Paris"],
+    }
+)
 
 # Single column (returns Series)
 print(df["Name"])
@@ -398,11 +385,13 @@ print(adults)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42],
-    "SSN": ["123-45-6789", "234-56-7890", "345-67-8901"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie"],
+        "Age": [28, 35, 42],
+        "SSN": ["123-45-6789", "234-56-7890", "345-67-8901"],
+    }
+)
 
 # Set SSN as index
 df_indexed = df.set_index("SSN")
@@ -432,18 +421,14 @@ print(df_reset)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "first name": ["Alice", "Bob"],
-    "last name": ["Smith", "Jones"],
-    "age yrs": [28, 35]
-})
+df = pd.DataFrame(
+    {"first name": ["Alice", "Bob"], "last name": ["Smith", "Jones"], "age yrs": [28, 35]}
+)
 
 # Rename specific columns
-df_renamed = df.rename(columns={
-    "first name": "first_name",
-    "last name": "last_name",
-    "age yrs": "age"
-})
+df_renamed = df.rename(
+    columns={"first name": "first_name", "last name": "last_name", "age yrs": "age"}
+)
 
 # Rename all columns at once
 df.columns = ["first_name", "last_name", "age"]
@@ -461,11 +446,11 @@ import pandas as pd
 df = pd.DataFrame({"A": [10, 20, 30]}, index=["a", "b", "c"])
 
 # loc uses labels
-print(df.loc["a"])     # Works
+print(df.loc["a"])  # Works
 
 # iloc uses integer positions
-print(df.iloc[0])      # Works
-print(df.iloc["a"])    # ERROR
+print(df.iloc[0])  # Works
+print(df.iloc["a"])  # ERROR
 ```
 
 ### Mistake 2: Modifying the Original DataFrame

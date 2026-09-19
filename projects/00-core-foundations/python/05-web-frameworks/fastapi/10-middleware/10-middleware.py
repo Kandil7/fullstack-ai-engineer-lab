@@ -59,9 +59,7 @@ async def log_requests(request: Request, call_next):
     start = time.perf_counter()
     response = await call_next(request)
     duration = (time.perf_counter() - start) * 1000
-    print(
-        f"[{request.method}] {request.url.path} → {response.status_code} ({duration:.2f}ms)"
-    )
+    print(f"[{request.method}] {request.url.path} → {response.status_code} ({duration:.2f}ms)")
     return response
 
 
@@ -82,7 +80,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],           # In production, specify allowed origins
+    allow_origins=["*"],  # In production, specify allowed origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -167,6 +165,7 @@ Testing with curl:
     # Even error responses get middleware headers
 """
 
+
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
     try:
@@ -200,6 +199,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

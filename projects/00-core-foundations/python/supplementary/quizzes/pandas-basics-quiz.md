@@ -38,7 +38,8 @@ D) Both A and B
 
 ```python
 import pandas as pd
-data = {'Name': ['Alice', 'Bob'], 'Age': [25, 30]}
+
+data = {"Name": ["Alice", "Bob"], "Age": [25, 30]}
 df = pd.DataFrame(data)
 ```
 
@@ -160,7 +161,7 @@ D) Drops the column
 **Explanation:** `groupby()` splits the DataFrame into groups based on column values. You typically chain it with an aggregation method like `.mean()`, `.sum()`, or `.count()`.
 
 ```python
-df.groupby('Department')['Salary'].mean()
+df.groupby("Department")["Salary"].mean()
 ```
 
 ---

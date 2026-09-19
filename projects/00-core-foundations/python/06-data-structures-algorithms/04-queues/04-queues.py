@@ -17,6 +17,7 @@ Operations:
 # 1. BASIC QUEUE IMPLEMENTATION
 # =============================================================================
 
+
 class Queue:
     """Queue implementation using Python list"""
 
@@ -66,6 +67,7 @@ print(f"After dequeue: {queue}")
 
 from collections import deque
 
+
 class DequeQueue:
     """Queue using deque - O(1) for both ends"""
 
@@ -108,6 +110,7 @@ print(f"After dequeue: {dq}")
 # =============================================================================
 # 3. CIRCULAR QUEUE
 # =============================================================================
+
 
 class CircularQueue:
     """Circular queue using fixed-size array"""
@@ -173,10 +176,12 @@ print(f"After operations: {circular}")
 # 4. QUEUE USING LINKED LIST
 # =============================================================================
 
+
 class QueueNode:
     def __init__(self, data):
         self.data = data
         self.next = None
+
 
 class LinkedQueue:
     """Queue using linked list - no capacity limit"""
@@ -239,6 +244,7 @@ print(f"After dequeue: {linked_q}")
 # 5. DEQUE (DOUBLE-ENDED QUEUE)
 # =============================================================================
 
+
 class Deque:
     """Double-ended queue - add/remove from both ends"""
 
@@ -298,6 +304,7 @@ print(f"After removes: {d}")
 
 import heapq
 
+
 class PriorityQueue:
     """Priority queue using heap. O(log n) enqueue/dequeue"""
 
@@ -342,6 +349,7 @@ print(f"Dequeue: {pq.dequeue()}")
 # 7. QUEUE REVERSAL
 # =============================================================================
 
+
 def reverse_queue(queue):
     """Reverse a queue using recursion. O(n) time, O(n) space."""
     if queue.is_empty():
@@ -351,6 +359,7 @@ def reverse_queue(queue):
     reverse_queue(queue)
     queue.enqueue(item)
     return queue
+
 
 print("\n=== Queue Reversal ===")
 q = Queue()
@@ -364,6 +373,7 @@ print(f"Reversed: {q}")
 # =============================================================================
 # 8. STACK USING TWO QUEUES
 # =============================================================================
+
 
 class StackUsingQueues:
     """Stack implementation using two queues"""
@@ -408,6 +418,7 @@ print(f"Peek: {sq.peek()}")
 # =============================================================================
 # 9. QUEUE USING STACKS
 # =============================================================================
+
 
 class QueueUsingStacks:
     """Queue implementation using two stacks"""
@@ -460,6 +471,7 @@ print(f"After dequeue: {qs}")
 import threading
 import time
 
+
 class BoundedBuffer:
     """Thread-safe bounded buffer (producer-consumer problem)"""
 
@@ -487,18 +499,22 @@ class BoundedBuffer:
             self.not_full.notify()
             return item
 
+
 print("\n=== Bounded Buffer (Producer-Consumer) ===")
 buffer = BoundedBuffer(3)
+
 
 def producer():
     for i in range(5):
         time.sleep(0.1)
         buffer.produce(i)
 
+
 def consumer():
     for _ in range(5):
         time.sleep(0.15)
         buffer.consume()
+
 
 # Note: In real usage, these would run in separate threads
 # For demo, we run producer and consumer in REAL threads to demonstrate
@@ -522,6 +538,7 @@ print("(Producer-consumer completed successfully)")
 
 print("\n=== Queue Applications ===")
 
+
 # BFS using queue
 def bfs_example(graph, start):
     """Breadth-first search using queue"""
@@ -540,14 +557,15 @@ def bfs_example(graph, start):
 
     return order
 
+
 # Graph representation
 graph = {
-    'A': ['B', 'C'],
-    'B': ['A', 'D', 'E'],
-    'C': ['A', 'F'],
-    'D': ['B'],
-    'E': ['B', 'F'],
-    'F': ['C', 'E']
+    "A": ["B", "C"],
+    "B": ["A", "D", "E"],
+    "C": ["A", "F"],
+    "D": ["B"],
+    "E": ["B", "F"],
+    "F": ["C", "E"],
 }
 
 print(f"BFS from A: {bfs_example(graph, 'A')}")

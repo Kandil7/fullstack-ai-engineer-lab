@@ -23,11 +23,11 @@ import matplotlib.pyplot as plt
 fs = 1000  # Sampling frequency (Hz)
 t = np.linspace(0, 1, fs, endpoint=False)
 f1, f2 = 50, 120  # Signal frequencies
-signal = np.sin(2*np.pi*f1*t) + np.sin(2*np.pi*f2*t)
+signal = np.sin(2 * np.pi * f1 * t) + np.sin(2 * np.pi * f2 * t)
 
 # Compute FFT
 X = fft.fft(signal)
-freqs = fft.fftfreq(len(signal), 1/fs)
+freqs = fft.fftfreq(len(signal), 1 / fs)
 
 # Only positive frequencies
 pos_mask = freqs >= 0
@@ -51,6 +51,7 @@ filtered_signal = fft.ifft(X_filtered).real
 
 # Power spectral density
 from scipy import signal as sg
+
 f, psd = sg.periodogram(signal, fs)
 print(f"Max power at frequency: {f[np.argmax(psd)]:.1f} Hz")
 ```

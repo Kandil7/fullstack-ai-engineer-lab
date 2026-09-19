@@ -43,10 +43,13 @@ D) Cached integers
 ```python
 class Watch:
     alive = 0
+
     def __init__(self):
         type(self).alive += 1
+
     def __del__(self):
         type(self).alive -= 1
+
 
 a = Watch()
 b = a
@@ -106,11 +109,13 @@ D) `memoryview`
 ```python
 import weakref
 
+
 class Entry:
     pass
 
+
 cache = weakref.WeakValueDictionary()
-cache[1] = Entry()   # temporary
+cache[1] = Entry()  # temporary
 print(len(cache), end=" ")
 
 e = Entry()
@@ -146,8 +151,10 @@ D) It rounds to the nearest megabyte
 ```python
 import gc
 
+
 class Node:
     pass
+
 
 a, b = Node(), Node()
 a.peer, b.peer = b, a
@@ -181,8 +188,10 @@ D) When the dict exceeds 1000 entries
 ```python
 class Slotted:
     __slots__ = ("x",)
+
     def __init__(self, x):
         self.x = x
+
 
 s = Slotted(1)
 print(hasattr(s, "__dict__"), s.x)
@@ -238,8 +247,10 @@ D) RSS matches the sum of `sys.getsizeof` values
 ```python
 import sys
 
+
 class Plain:
     pass
+
 
 p = Plain()
 print(sys.getsizeof(p), hasattr(p, "__dict__"))

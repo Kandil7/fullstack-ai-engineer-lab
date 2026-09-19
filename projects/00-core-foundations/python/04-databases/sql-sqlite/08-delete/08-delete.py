@@ -44,6 +44,7 @@ conn.commit()
 print(f"Table 'orders' created with {len(orders)} rows.")
 print()
 
+
 def show_orders(label=""):
     if label:
         print(f"--- {label} ---")
@@ -51,6 +52,7 @@ def show_orders(label=""):
     for row in cursor.fetchall():
         print(f"  {row}")
     print()
+
 
 show_orders("Initial data")
 
@@ -118,20 +120,22 @@ cursor.execute("""
         status TEXT DEFAULT 'pending'
     )
 """)
-cursor.executemany("INSERT INTO orders VALUES (?, ?, ?, ?, ?)", [
-    (1, "Alice", "Laptop", 999.99, "completed"),
-    (2, "Bob", "Mouse", 29.99, "pending"),
-    (3, "Charlie", "Keyboard", 79.99, "completed"),
-    (4, "Diana", "Monitor", 449.99, "pending"),
-    (5, "Eve", "Headphones", 89.99, "pending"),
-])
+cursor.executemany(
+    "INSERT INTO orders VALUES (?, ?, ?, ?, ?)",
+    [
+        (1, "Alice", "Laptop", 999.99, "completed"),
+        (2, "Bob", "Mouse", 29.99, "pending"),
+        (3, "Charlie", "Keyboard", 79.99, "completed"),
+        (4, "Diana", "Monitor", 449.99, "pending"),
+        (5, "Eve", "Headphones", 89.99, "pending"),
+    ],
+)
 conn.commit()
 
 # MySQL supports: DELETE FROM orders WHERE status = 'pending' LIMIT 2
 # sqlite3 rejects DELETE ... LIMIT, so use a portable subquery form:
 cursor.execute(
-    "DELETE FROM orders WHERE id IN "
-    "(SELECT id FROM orders WHERE status = 'pending' LIMIT 2)"
+    "DELETE FROM orders WHERE id IN (SELECT id FROM orders WHERE status = 'pending' LIMIT 2)"
 )
 conn.commit()
 print(f"Deleted rows: {cursor.rowcount}")

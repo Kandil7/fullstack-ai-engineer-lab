@@ -36,6 +36,7 @@ from typing import Optional
 # verifier at the token exchange. A hijacked authorization code is
 # useless without the matching verifier.
 
+
 def b64url(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
 
@@ -49,9 +50,7 @@ def generate_pkce_pair() -> tuple[str, str]:
 
 def verify_pkce(verifier: str, challenge: str) -> bool:
     """Server-side: recompute S256 from the verifier and compare."""
-    return secrets.compare_digest(
-        b64url(hashlib.sha256(verifier.encode()).digest()), challenge
-    )
+    return secrets.compare_digest(b64url(hashlib.sha256(verifier.encode()).digest()), challenge)
 
 
 print("=== 1. PKCE ===")
@@ -68,11 +67,12 @@ print()
 # authorize -> 302 with ?code= -> token exchange with code+verifier.
 # The token endpoint must reject a code without the right verifier.
 
+
 class Provider:
     """Tiny stand-in for an OAuth provider (in-memory)."""
 
     def __init__(self) -> None:
-        self._codes: dict[str, dict] = {}   # code -> {challenge, client_id}
+        self._codes: dict[str, dict] = {}  # code -> {challenge, client_id}
 
     def authorize(self, client_id: str, code_challenge: str, scope: str) -> str:
         code = b64url(secrets.token_bytes(16))
@@ -109,14 +109,25 @@ print()
 # The id_token proves authentication to the app; the access_token is
 # the key to resource APIs. Never use the id_token as an API credential.
 
+
 def id_token(sub: str, aud: str, email: str) -> dict:
-    return {"iss": "https://provider.example", "sub": sub, "aud": aud,
-            "email": email, "email_verified": True, "exp": int(time.time()) + 300}
+    return {
+        "iss": "https://provider.example",
+        "sub": sub,
+        "aud": aud,
+        "email": email,
+        "email_verified": True,
+        "exp": int(time.time()) + 300,
+    }
 
 
 def access_token(sub: str, scope: str) -> dict:
-    return {"iss": "https://provider.example", "sub": sub,
-            "scope": scope, "exp": int(time.time()) + 600}
+    return {
+        "iss": "https://provider.example",
+        "sub": sub,
+        "scope": scope,
+        "exp": int(time.time()) + 600,
+    }
 
 
 print("=== 3. Scopes vs claims; id vs access token ===")
@@ -133,10 +144,10 @@ print()
 # service reads the token's kid header, picks that key, and verifies.
 # Keys rotate, so fetch JWKS (cache briefly), never hardcode.
 
+
 def jwk_from_pem_placeholder(kid: str) -> dict:
     """Stand-in for a real RSA JWK. Real providers emit n/e for RSA keys."""
-    return {"kty": "RSA", "kid": kid, "use": "sig",
-            "n": "fake-n", "e": "AQAB"}
+    return {"kty": "RSA", "kid": kid, "use": "sig", "n": "fake-n", "e": "AQAB"}
 
 
 class JwksEndpoint:
@@ -159,6 +170,7 @@ class JwksEndpoint:
 jwks = JwksEndpoint()
 jwks.add_key("key-1", jwk_from_pem_placeholder("key-1"))
 
+
 def pick_key(keys: list[dict], kid: str) -> dict | None:
     return next((k for k in keys if k["kid"] == kid), None)
 
@@ -168,10 +180,11 @@ token_kid = "key-1"
 key = pick_key(jwks.fetch(), token_kid)
 print(f"token kid={token_kid} -> JWKS key found: {key is not None}")
 jwks.rotate("key-1", "key-2")
-print(f"after rotation, old kid {token_kid} -> key found: "
-      f"{pick_key(jwks.fetch(), token_kid) is not None}")
-print("=> a cached stale key would fail verification after rotation; "
-      "refresh JWKS on failure")
+print(
+    f"after rotation, old kid {token_kid} -> key found: "
+    f"{pick_key(jwks.fetch(), token_kid) is not None}"
+)
+print("=> a cached stale key would fail verification after rotation; refresh JWKS on failure")
 print()
 
 # ============================================================
@@ -188,6 +201,7 @@ print()
 #
 # MISTAKE: hardcoding the provider's public key
 # CORRECT: fetch JWKS, honor kid, cache briefly, refresh on rotation failure
+
 
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
@@ -245,4 +259,4 @@ if __name__ == "__main__":
         print("1. PKCE: the verifier proves the app that finishes the flow")
         print("2. Scopes = authorization; claims = identity")
         print("3. JWKS + kid = verify provider tokens, survive rotation")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

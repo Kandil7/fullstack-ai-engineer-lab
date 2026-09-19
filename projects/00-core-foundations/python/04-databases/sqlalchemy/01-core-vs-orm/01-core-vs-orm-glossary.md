@@ -31,11 +31,10 @@ never as SQL text — the injection-proof way to pass values.
 **Example**:
 ```python
 from sqlalchemy import create_engine, text
+
 engine = create_engine("sqlite://")
 with engine.connect() as conn:
-    row = conn.execute(
-        text("SELECT :a + :b AS total"), {"a": 2, "b": 3}
-    ).one()
+    row = conn.execute(text("SELECT :a + :b AS total"), {"a": 2, "b": 3}).one()
     print(row.total)
 # Output:
 # 5
@@ -49,6 +48,7 @@ dicts to `table.insert()`. Saves N-1 round trips versus one INSERT per row.
 **Example**:
 ```python
 from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine
+
 engine = create_engine("sqlite://")
 meta = MetaData()
 t = Table("t", meta, Column("id", Integer, primary_key=True), Column("name", String(50)))
@@ -95,7 +95,8 @@ ORM emits is Core under the hood.
 **Example**:
 ```python
 from sqlalchemy import select
-stmt = select(t.c.name).where(t.c.name == "a")   # Core expression
+
+stmt = select(t.c.name).where(t.c.name == "a")  # Core expression
 ```
 **Complexity**: compilation O(1) per statement.
 **Related**: ORM, Engine, Table
@@ -105,7 +106,7 @@ stmt = select(t.c.name).where(t.c.name == "a")   # Core expression
 in the metadata that does not yet exist. Idempotent; the usual dev bootstrap.
 **Example**:
 ```python
-meta.create_all(engine)   # creates table 't'
+meta.create_all(engine)  # creates table 't'
 ```
 **Related**: MetaData, Table
 
@@ -150,6 +151,8 @@ relationships, and the Session unit of work. The subject of topics 02-10.
 **Example**:
 ```python
 from sqlalchemy.orm import DeclarativeBase
+
+
 class Base(DeclarativeBase):
     pass
 ```
@@ -201,7 +204,7 @@ ORM Session later wraps.
 ```python
 with engine.connect() as conn:
     conn.execute(t.insert(), {"name": "y"})
-    conn.commit()          # persisted
+    conn.commit()  # persisted
 ```
 **Related**: Connection, bulk insert
 

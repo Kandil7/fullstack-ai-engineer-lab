@@ -26,13 +26,12 @@ def compress_svd(A: np.ndarray, max_bytes: int) -> tuple[np.ndarray, int]:
     m, n = A.shape
     min_bytes = (m + n + 1) * 8
     if max_bytes < min_bytes:
-        raise ValueError(f"max_bytes {max_bytes} cannot hold rank 1 "
-                         f"(needs {min_bytes})")
+        raise ValueError(f"max_bytes {max_bytes} cannot hold rank 1 (needs {min_bytes})")
     U, s, Vh = np.linalg.svd(A)
     r = min(m, n)
     ks = np.arange(1, r + 1)
     fits = ks * (m + n + 1) * 8 <= max_bytes
-    k = int(fits.sum())                    # largest rank that fits
+    k = int(fits.sum())  # largest rank that fits
     if k == 0:
         k = 1
     approx = (U[:, :k] * s[:k]) @ Vh[:k, :]

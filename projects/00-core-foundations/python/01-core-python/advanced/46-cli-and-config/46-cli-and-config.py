@@ -114,6 +114,7 @@ print("\n=== Environment Variables ===")
 api_key = os.environ.get("OPENAI_API_KEY", "not-set")
 print(f"OPENAI_API_KEY: {api_key[:8]}..." if api_key != "not-set" else "OPENAI_API_KEY: not set")
 
+
 # Required env var (crash if missing)
 def get_required_env(key: str) -> str:
     value = os.environ.get(key)
@@ -121,9 +122,11 @@ def get_required_env(key: str) -> str:
         raise RuntimeError(f"Required environment variable {key} not set")
     return value
 
+
 # Database URL from env
 database_url = os.environ.get("DATABASE_URL", "sqlite:///./dev.db")
 print(f"DATABASE_URL: {database_url}")
+
 
 # Boolean env vars
 def get_bool_env(key: str, default: bool = False) -> bool:
@@ -134,6 +137,7 @@ def get_bool_env(key: str, default: bool = False) -> bool:
         return False
     return default
 
+
 debug = get_bool_env("DEBUG", False)
 print(f"DEBUG: {debug}")
 
@@ -141,12 +145,13 @@ print(f"DEBUG: {debug}")
 # 5. .env File Loading (12-Factor Config)
 # ============================================================
 
+
 # Example 5: Simple .env loader
 def load_env_file(path: Path = Path(".env")) -> dict[str, str]:
     """Load KEY=VALUE pairs from .env file."""
     if not path.exists():
         return {}
-    
+
     env_vars = {}
     for line in path.read_text().splitlines():
         line = line.strip()
@@ -156,6 +161,7 @@ def load_env_file(path: Path = Path(".env")) -> dict[str, str]:
             key, value = line.split("=", 1)
             env_vars[key.strip()] = value.strip()
     return env_vars
+
 
 # Demo
 with tempfile.TemporaryDirectory() as tmp:
@@ -178,6 +184,7 @@ API_KEY=sk-test123
 # 6. Config Precedence: CLI > Env > File > Default
 # ============================================================
 
+
 def build_config(
     cli_args: argparse.Namespace,
     env_file: Path = Path(".env"),
@@ -191,7 +198,7 @@ def build_config(
         "batch_size": 32,
         "fp16": False,
     }
-    
+
     # 2. Override with .env file
     if env_file.exists():
         file_config = load_env_file(env_file)
@@ -207,7 +214,7 @@ def build_config(
                     config[key_lower] = float(value)
                 else:
                     config[key_lower] = value
-    
+
     # 3. Override with environment variables
     for key in config:
         env_key = key.upper()
@@ -221,13 +228,14 @@ def build_config(
                 config[key] = float(value)
             else:
                 config[key] = value
-    
+
     # 4. Override with CLI args (highest priority)
     for key, value in vars(cli_args).items():
         if value is not None and key in config:
             config[key] = value
-    
+
     return config
+
 
 # Demo
 demo_cli = argparse.Namespace(
@@ -242,7 +250,7 @@ with tempfile.TemporaryDirectory() as tmp:
     env_file = Path(tmp) / ".env"
     env_file.write_text("MODEL=env-model\nEPOCHS=15\nLR=1e-3\n")
     os.environ["BATCH_SIZE"] = "128"
-    
+
     final_config = build_config(demo_cli, env_file)
     print(f"\n=== Config Precedence ===")
     for k, v in final_config.items():
@@ -257,16 +265,18 @@ with tempfile.TemporaryDirectory() as tmp:
 # 5. Exit Codes
 # ============================================================
 
+
 def run_command(args: list[str]) -> int:
     """Run command, return exit code."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--fail", action="store_true")
     parsed = parser.parse_args(args)
-    
+
     if parsed.fail:
         print("Error: Operation failed", file=sys.stderr)
         return 1  # Non-zero = failure
     return 0  # Success
+
 
 # Example exit codes
 # 0 = success
@@ -278,6 +288,7 @@ def run_command(args: list[str]) -> int:
 # 6. Complete Training Script Template
 # ============================================================
 
+
 def create_train_parser() -> argparse.ArgumentParser:
     """Create parser for training script."""
     parser = argparse.ArgumentParser(
@@ -285,33 +296,33 @@ def create_train_parser() -> argparse.ArgumentParser:
         description="Train a language model",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    
+
     # Required
     parser.add_argument("config", help="Path to config YAML/JSON")
-    
+
     # Model
     parser.add_argument("--model", help="Model name or path")
     parser.add_argument("--resume", help="Resume from checkpoint")
-    
+
     # Training
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--grad-accum", type=int, default=1)
-    
+
     # Hardware
     parser.add_argument("--fp16", action="store_true")
     parser.add_argument("--gpus", type=int, default=1)
     parser.add_argument("--nodes", type=int, default=1)
-    
+
     # Logging
     parser.add_argument("--wandb", action="store_true")
     parser.add_argument("--wandb-project", default="my-project")
     parser.add_argument("--log-interval", type=int, default=100)
-    
+
     # Output
     parser.add_argument("--output-dir", default="./outputs")
-    
+
     return parser
 
 
@@ -338,35 +349,36 @@ def create_train_parser() -> argparse.ArgumentParser:
 # CORRECT:
 #   sys.exit(1) on error
 
+
 # ============================================================
 # Self-Verification
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
-    
+
     # argparse basics
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", type=int, default=10)
     args = parser.parse_args(["--epochs", "20"])
     assert args.epochs == 20
-    
+
     # defaults
     args = parser.parse_args([])
     assert args.epochs == 10
-    
+
     # store_true
     parser.add_argument("--fp16", action="store_true")
     args = parser.parse_args(["--fp16"])
     assert args.fp16 == True
     args = parser.parse_args([])
     assert args.fp16 == False
-    
+
     # choices
     parser = argparse.ArgumentParser()
     parser.add_argument("--opt", choices=["a", "b", "c"])
     args = parser.parse_args(["--opt", "b"])
     assert args.opt == "b"
-    
+
     # subcommands
     root = argparse.ArgumentParser()
     subs = root.add_subparsers(dest="cmd")
@@ -375,13 +387,13 @@ def _verify() -> None:
     s2 = subs.add_parser("eval")
     args = root.parse_args(["train", "--config", "x.yaml"])
     assert args.cmd == "train" and args.config == "x.yaml"
-    
+
     # env vars
     os.environ["TEST_VAR"] = "hello"
     assert os.environ.get("TEST_VAR") == "hello"
     assert os.environ.get("MISSING", "default") == "default"
     del os.environ["TEST_VAR"]
-    
+
     # precedence logic
     defaults = {"x": 1}
     env = {"X": "2"}
@@ -390,12 +402,13 @@ def _verify() -> None:
     result.update({k.lower(): int(v) for k, v in env.items() if k.lower() in result})
     result.update({k: v for k, v in cli.items() if v is not None})
     assert result["x"] == 3  # CLI wins
-    
+
     # exit codes
     import subprocess
+
     result = subprocess.run([sys.executable, "-c", "import sys; sys.exit(42)"], capture_output=True)
     assert result.returncode == 42
-    
+
     print("[OK] 46-cli-and-config: all checks passed")
 
 

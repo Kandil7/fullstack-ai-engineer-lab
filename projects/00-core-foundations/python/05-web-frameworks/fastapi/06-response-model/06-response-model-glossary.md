@@ -35,11 +35,13 @@ Alphabetical reference of all key terms from the Response Model lecture.
 ```python
 from pydantic import BaseModel
 
+
 class UserOut(BaseModel):
     id: int
     name: str
     email: str
     is_active: bool
+
 
 # This model defines the response shape
 # Any extra fields from the data source are filtered out
@@ -61,11 +63,13 @@ class UserOutWithMeta(BaseModel):
     email: str
     profile_url: str = ""  # Computed in the function
 
+
 @app.get("/users/{user_id}/profile", response_model=UserOutWithMeta)
 def get_user_profile(user_id: int):
     user = users_db[user_id].copy()
     user["profile_url"] = f"/users/{user_id}/profile"  # Computed
     return user
+
 
 # Response includes the computed profile_url field
 ```
@@ -84,11 +88,13 @@ class Item(BaseModel):
     name: str
     price: float
     in_stock: bool = True  # Default value
-    tags: list[str] = []   # Default value
+    tags: list[str] = []  # Default value
+
 
 @app.post("/items/", response_model=Item, response_model_exclude_defaults=True)
 def create_item(item: Item):
     return item
+
 
 # Request: {"name": "Widget", "price": 9.99}
 # Response: {"name": "Widget", "price": 9.99}
@@ -111,12 +117,14 @@ class Item(BaseModel):
     price: float
     tax: float | None = None
 
+
 @app.get("/items/list", response_model=list[Item], response_model_exclude_none=True)
 def list_items():
     return [
         Item(name="Laptop", description="A laptop", price=999.99, tax=89.99),
         Item(name="Phone", price=699.99),  # description=None, tax=None
     ]
+
 
 # Response:
 # [
@@ -141,9 +149,11 @@ class Item(BaseModel):
     price: float
     tax: float | None = None
 
+
 @app.post("/items/", response_model=Item, response_model_exclude_unset=True)
 def create_item(item: Item):
     return item
+
 
 # Request: {"name": "Widget", "price": 9.99}
 # Response: {"name": "Widget", "price": 9.99}
@@ -164,14 +174,16 @@ class UserDB(BaseModel):
     id: int
     name: str
     email: str
-    password: str       # Sensitive — should NOT be in response
+    password: str  # Sensitive — should NOT be in response
     internal_note: str  # Internal — should NOT be in response
+
 
 class UserOut(BaseModel):
     id: int
     name: str
     email: str
     # password and internal_note are filtered out
+
 
 @app.get("/users/{user_id}", response_model=UserOut)
 def get_user(user_id: int):
@@ -193,6 +205,7 @@ class UserOutWithLinks(BaseModel):
     name: str
     email: str
     links: dict = {}
+
 
 @app.get("/users/{user_id}", response_model=UserOutWithLinks)
 def get_user(user_id: int):
@@ -219,6 +232,7 @@ def get_user(user_id: int):
 @app.post("/users/")
 def create_user(user: UserIn):
     return user.model_dump()  # Includes password!
+
 
 # SAFE: response_model filters password
 @app.post("/users/", response_model=UserOut)
@@ -249,15 +263,18 @@ class UserOut(BaseModel):
     name: str
     email: str
 
+
 # Single response
 @app.get("/users/{user_id}", response_model=UserOut)
 def get_user(user_id: int):
     return users_db[user_id]
 
+
 # List response
 @app.get("/users/", response_model=list[UserOut])
 def list_users():
     return list(users_db.values())
+
 
 # With exclude options
 @app.post("/items/", response_model=Item, response_model_exclude_unset=True)
@@ -288,6 +305,7 @@ class Item(BaseModel):
     name: str
     price: float
 
+
 @app.get("/item")
 def get_item():
     item = Item(name="Widget", price=9.99)
@@ -314,6 +332,7 @@ def get_user(user_id: int):
     """
     return users_db[user_id]
 
+
 # Swagger UI shows:
 # Response: UserOut { id: integer, name: string, email: string }
 ```
@@ -330,10 +349,12 @@ def get_user(user_id: int):
 ```python
 class UserIn(BaseModel):
     """What the client sends."""
+
     name: str
     email: str
     password: str  # Only in request, not in response
     age: int
+
 
 @app.post("/users/", response_model=UserOut)
 def create_user(user: UserIn):
@@ -354,11 +375,13 @@ def create_user(user: UserIn):
 ```python
 class UserOut(BaseModel):
     """What the client receives — no password."""
+
     id: int
     name: str
     email: str
     is_active: bool
     created_at: str
+
 
 @app.get("/users/{user_id}", response_model=UserOut)
 def get_user(user_id: int):
@@ -379,6 +402,7 @@ class UserOut(BaseModel):
     id: int
     name: str
     email: str
+
 
 @app.get("/users/{user_id}", response_model=UserOut)
 def get_user(user_id: int):
@@ -440,6 +464,7 @@ class UserOutWithLinks(BaseModel):
     id: int
     name: str
     links: dict = {}
+
 
 @app.get("/users/{id}", response_model=UserOutWithLinks)
 def get_user(id: int):

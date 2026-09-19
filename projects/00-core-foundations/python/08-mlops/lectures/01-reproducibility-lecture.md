@@ -77,8 +77,8 @@ and not others.
 import random
 import numpy as np
 
-random.seed(42)      # python stream
-np.random.seed(42)   # numpy stream — a DIFFERENT stream
+random.seed(42)  # python stream
+np.random.seed(42)  # numpy stream — a DIFFERENT stream
 
 # PyTorch (if installed):
 # torch.manual_seed(42)          # CPU + CUDA
@@ -106,6 +106,7 @@ def seed_all(seed: int = 42) -> None:
     np.random.seed(seed)
     try:
         import torch
+
         torch.manual_seed(seed)
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(seed)
@@ -113,6 +114,7 @@ def seed_all(seed: int = 42) -> None:
         pass
     try:
         import tensorflow as tf
+
         tf.random.set_seed(seed)
     except ImportError:
         pass
@@ -130,6 +132,7 @@ admits any future release.
 import platform
 import sys
 import hashlib
+
 
 def environment_fingerprint(lockfile_path: str) -> dict[str, str]:
     """Capture a minimal but sufficient environment fingerprint."""
@@ -159,6 +162,7 @@ large files, hash in **chunks** so you never load the whole file into memory.
 ```python
 import hashlib
 
+
 def sha256_stream(path: str, chunk_size: int = 64 * 1024) -> str:
     """Content hash without loading the file into memory. O(1) memory."""
     h = hashlib.sha256()
@@ -187,9 +191,10 @@ practical schema:
 from dataclasses import dataclass, asdict
 import json
 
+
 @dataclass
 class RunRecord:
-    run_id: str            # e.g. run_2026-08-02T18:30:00_abc123
+    run_id: str  # e.g. run_2026-08-02T18:30:00_abc123
     git_sha: str
     git_dirty: bool
     seed: int
@@ -217,9 +222,7 @@ same split without sharing a random state. This is the difference between "the
 same split" and "a split that happened to be the same".
 
 ```python
-def make_split_indices(
-    n_rows: int, val_frac: float = 0.2, seed: int = 42
-) -> dict[str, list[int]]:
+def make_split_indices(n_rows: int, val_frac: float = 0.2, seed: int = 42) -> dict[str, list[int]]:
     """Deterministic, seed-independent split indices saved as JSON."""
     rng = np.random.default_rng(seed)
     idx = rng.permutation(n_rows)

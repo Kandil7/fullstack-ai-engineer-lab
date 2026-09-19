@@ -5,6 +5,7 @@ W3Schools: https://www.w3schools.com/python/pandas_dataframe_iterrows.asp
 Pandas provides several ways to iterate over a DataFrame. While vectorized
 operations are preferred, iteration is sometimes necessary.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -12,11 +13,13 @@ import numpy as np
 # Sample data
 # ---------------------------------------------------------------------------
 
-df = pd.DataFrame({
-    "Product": ["Laptop", "Phone", "Tablet", "Monitor", "Keyboard"],
-    "Price": [999, 699, 449, 299, 129],
-    "Quantity": [10, 25, 40, 15, 50],
-})
+df = pd.DataFrame(
+    {
+        "Product": ["Laptop", "Phone", "Tablet", "Monitor", "Keyboard"],
+        "Price": [999, 699, 449, 299, 129],
+        "Quantity": [10, 25, 40, 15, 50],
+    }
+)
 
 print("Original DataFrame:")
 print(df)
@@ -80,6 +83,7 @@ print("=" * 60)
 print("Example 4: apply() – Row-wise Function")
 print("=" * 60)
 
+
 def categorize_price(row):
     """Categorize product by price."""
     if row["Price"] >= 800:
@@ -88,6 +92,7 @@ def categorize_price(row):
         return "Mid-range"
     else:
         return "Budget"
+
 
 df["Category"] = df.apply(categorize_price, axis=1)
 print("DataFrame with categories:")
@@ -111,10 +116,12 @@ print("DataFrame with computed columns (vectorized):")
 print(df)
 print()
 
+
 # np.vectorize for custom functions
 def format_currency(val):
     """Format a number as currency string."""
     return f"${val:,.2f}"
+
 
 # Apply formatting (for display only)
 print("Formatted Revenue:")

@@ -12,6 +12,7 @@ from typing import Any, Optional
 # 1. Basic Descriptor
 # =============================================================================
 
+
 class Property:
     """Simple property descriptor."""
 
@@ -35,6 +36,7 @@ class Property:
 # =============================================================================
 # 2. Validation Descriptor
 # =============================================================================
+
 
 class Validated:
     """Descriptor that validates values."""
@@ -63,8 +65,7 @@ class PositiveNumber(Validated):
 
     def __init__(self):
         super().__init__(
-            lambda x: isinstance(x, (int, float)) and x > 0,
-            "must be a positive number"
+            lambda x: isinstance(x, (int, float)) and x > 0, "must be a positive number"
         )
 
 
@@ -72,15 +73,13 @@ class NonEmptyString(Validated):
     """Descriptor for non-empty strings."""
 
     def __init__(self):
-        super().__init__(
-            lambda x: isinstance(x, str) and len(x) > 0,
-            "must be a non-empty string"
-        )
+        super().__init__(lambda x: isinstance(x, str) and len(x) > 0, "must be a non-empty string")
 
 
 # =============================================================================
 # 3. Computed Attribute Descriptor
 # =============================================================================
+
 
 class ComputedAttribute:
     """Descriptor that computes value from other attributes."""
@@ -102,6 +101,7 @@ class ComputedAttribute:
 # 4. Type-Checked Descriptor
 # =============================================================================
 
+
 class Typed:
     """Descriptor that enforces type checking."""
 
@@ -120,8 +120,7 @@ class Typed:
     def __set__(self, obj, value):
         if not isinstance(value, self.expected_type):
             raise TypeError(
-                f"{self.name} must be {self.expected_type.__name__}, "
-                f"got {type(value).__name__}"
+                f"{self.name} must be {self.expected_type.__name__}, got {type(value).__name__}"
             )
         obj.__dict__[self.name] = value
 
@@ -129,6 +128,7 @@ class Typed:
 # =============================================================================
 # 5. Caching Descriptor
 # =============================================================================
+
 
 class CachedResult:
     """Descriptor that caches computed results."""
@@ -157,6 +157,7 @@ class CachedResult:
 # =============================================================================
 # 6. Practical Example Classes
 # =============================================================================
+
 
 class Product:
     """Product with validated attributes."""
@@ -208,6 +209,7 @@ class Employee:
 # =============================================================================
 # 7. Data Descriptor vs Non-Data Descriptor
 # =============================================================================
+
 
 class DataDescriptor:
     """Data descriptor (has __set__ or __delete__)."""

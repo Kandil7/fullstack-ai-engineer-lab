@@ -25,6 +25,7 @@ except Exception:
 # async stub so the file still runs and teaches the DI shape.
 try:
     import aiosqlite  # noqa: F401
+
     HAS_AIOSQLITE = True
 except ImportError:
     HAS_AIOSQLITE = False
@@ -52,11 +53,14 @@ class AsyncDB:
     async def connect(self) -> None:
         if HAS_AIOSQLITE:
             import aiosqlite
+
             self._conn = await aiosqlite.connect(self.path)
-            await self._conn.execute("CREATE TABLE IF NOT EXISTS rows (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)")
+            await self._conn.execute(
+                "CREATE TABLE IF NOT EXISTS rows (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)"
+            )
             await self._conn.commit()
         else:
-            self._conn = object()   # stub
+            self._conn = object()  # stub
             self._rows: list[Row] = []
 
     async def close(self) -> None:
@@ -183,6 +187,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("33-database-async:app", host="127.0.0.1", port=8000)
     else:
         _verify()

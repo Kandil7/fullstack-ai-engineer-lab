@@ -83,11 +83,14 @@ additive.** Otherwise you need a version.
 v1 = APIRouter(prefix="/api/v1")
 v2 = APIRouter(prefix="/api/v2")
 
+
 @v1.get("/users/{user_id}")
 def get_user_v1(user_id: int) -> UserV1: ...
 
+
 @v2.get("/users/{user_id}")
-def get_user_v2(user_id: int) -> UserV2: ...   # adds email
+def get_user_v2(user_id: int) -> UserV2: ...  # adds email
+
 
 app.include_router(v1)
 app.include_router(v2)
@@ -134,6 +137,7 @@ The mechanism for telling clients *now* what dies *later*:
 
 ```python
 SUNSET_DATE = "Sun, 31 Dec 2026 23:59:59 GMT"
+
 
 @app.get("/api/items", headers={"Deprecation": "true", "Sunset": SUNSET_DATE})
 def get_items_v1(): ...

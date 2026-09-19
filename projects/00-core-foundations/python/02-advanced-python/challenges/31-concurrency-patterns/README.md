@@ -33,9 +33,9 @@ queue beyond `maxsize`, and may not block forever.
 class BoundedPipeline:
     def __init__(self, maxsize: int): ...
     def produce(self, item: int, timeout: float) -> bool: ...  # False if full
-    def consume(self, timeout: float) -> int | None: ...       # None if empty
-    def max_observed(self) -> int: ...   # largest size the queue ever held
-    def drained(self) -> bool: ...       # empty AND no producer blocked
+    def consume(self, timeout: float) -> int | None: ...  # None if empty
+    def max_observed(self) -> int: ...  # largest size the queue ever held
+    def drained(self) -> bool: ...  # empty AND no producer blocked
 ```
 
 | Input | Expected |
@@ -59,14 +59,14 @@ base_delay, sleep, rng)` helper. Both must be fully deterministic.
 **API:**
 ```python
 class CircuitBreaker:
-    def call(self) -> int: ...                    # raises RuntimeError when open
+    def call(self) -> int: ...  # raises RuntimeError when open
     @property
-    def state(self) -> str: ...                   # closed | open | half_open
+    def state(self) -> str: ...  # closed | open | half_open
     @property
-    def short_circuited(self) -> int: ...         # calls rejected while open
+    def short_circuited(self) -> int: ...  # calls rejected while open
 
-def retry_with_jitter(fn, attempts=4, base_delay=0.1,
-                      sleep=time.sleep, rng=None) -> int: ...
+
+def retry_with_jitter(fn, attempts=4, base_delay=0.1, sleep=time.sleep, rng=None) -> int: ...
 ```
 
 | Input | Expected |

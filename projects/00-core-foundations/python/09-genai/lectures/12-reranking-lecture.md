@@ -87,6 +87,7 @@ integrates cleanly behind the retrieval interface (L9/L10).
 ### API (Cohere Rerank)
 ```python
 import cohere
+
 co = cohere.Client()
 
 resp = co.rerank(
@@ -136,8 +137,10 @@ Query: {query}
 Candidates:
 {numbered_docs}"""
 
+
 def llm_rerank(query: str, candidates: list[str], llm_client) -> list[str]:
     import json
+
     numbered = "\n".join(f"{i}: {d[:200]}" for i, d in enumerate(candidates))
     raw = llm_client.complete(RANK_PROMPT.format(query=query, numbered_docs=numbered))
     order = json.loads(raw)["ranking"]
@@ -168,6 +171,7 @@ def rerank_budget(recall_k: int, per_pair_ms: float, budget_ms: float) -> tuple[
     max_k = int(budget_ms / per_pair_ms)
     return recall_k <= max_k, max_k
 
+
 print(rerank_budget(50, 1.2, 100))
 ```
 
@@ -191,8 +195,8 @@ def measure_rerank_gain(before_metrics: dict, after_metrics: dict) -> dict:
         "worth_it": after_metrics["recall@k"] >= before_metrics["recall@k"],
     }
 
-print(measure_rerank_gain({"recall@k": 0.70, "mrr": 0.55},
-                          {"recall@k": 0.84, "mrr": 0.78}))
+
+print(measure_rerank_gain({"recall@k": 0.70, "mrr": 0.55}, {"recall@k": 0.84, "mrr": 0.78}))
 ```
 
 Output:

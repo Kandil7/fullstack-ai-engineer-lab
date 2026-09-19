@@ -28,8 +28,9 @@ from sklearn.metrics import roc_auc_score
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 rng = np.random.RandomState(0)
-X, y = make_classification(n_samples=3000, n_features=25, n_informative=12,
-                           n_redundant=5, random_state=0)
+X, y = make_classification(
+    n_samples=3000, n_features=25, n_informative=12, n_redundant=5, random_state=0
+)
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # ============================================================
@@ -40,7 +41,9 @@ from sklearn.model_selection import GridSearchCV  # noqa: E402
 grid = GridSearchCV(
     RandomForestClassifier(random_state=0),
     {"n_estimators": [50, 100, 200], "max_depth": [5, 10, None]},
-    cv=3, scoring="roc_auc", n_jobs=-1,
+    cv=3,
+    scoring="roc_auc",
+    n_jobs=-1,
 )
 grid.fit(Xtr, ytr)
 print("Example 1: grid search (9 combos)")
@@ -56,11 +59,19 @@ param_dist = {
     "max_depth": [3, 5, 10, None],
     "min_samples_leaf": [1, 2, 5, 10],
 }
-rnd = RandomizedSearchCV(RandomForestClassifier(random_state=0), param_dist,
-                         n_iter=15, cv=3, scoring="roc_auc", n_jobs=-1, random_state=0)
+rnd = RandomizedSearchCV(
+    RandomForestClassifier(random_state=0),
+    param_dist,
+    n_iter=15,
+    cv=3,
+    scoring="roc_auc",
+    n_jobs=-1,
+    random_state=0,
+)
 rnd.fit(Xtr, ytr)
 print("\nExample 2: random search (15 of 64 combos)")
 print(f"  best params: {rnd.best_params_}  best CV AUC: {rnd.best_score_:.3f}")
+
 
 # ============================================================
 # 3. Optuna — Bayesian search (adaptive, efficient)
@@ -83,6 +94,7 @@ print("\nExample 3: Optuna Bayesian search (20 trials)")
 print(f"  best AUC: {study.best_value:.3f}")
 print(f"  best params: {study.best_params}")
 
+
 # ============================================================
 # 4. Pruning — stop unpromising trials early
 # ============================================================
@@ -104,8 +116,9 @@ from sklearn.model_selection import KFold  # noqa: E402
 
 outer_aucs = []
 for tr_o, va_o in KFold(5, shuffle=True, random_state=0).split(Xtr):
-    inner = GridSearchCV(LogisticRegression(max_iter=1000),
-                         {"C": [0.01, 0.1, 1, 10]}, cv=3, scoring="roc_auc")
+    inner = GridSearchCV(
+        LogisticRegression(max_iter=1000), {"C": [0.01, 0.1, 1, 10]}, cv=3, scoring="roc_auc"
+    )
     inner.fit(Xtr[tr_o], ytr[tr_o])
     outer_aucs.append(roc_auc_score(ytr[va_o], inner.predict_proba(Xtr[va_o])[:, 1]))
 print("\nExample 5: tuning inside CV (nested)")

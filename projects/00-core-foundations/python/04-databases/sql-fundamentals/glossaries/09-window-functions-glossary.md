@@ -34,13 +34,18 @@ its output row.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE s (id INTEGER PRIMARY KEY, region TEXT, amt REAL)")
-conn.executemany("INSERT INTO s (region, amt) VALUES (?, ?)",
-                 [("e", 10), ("e", 5), ("w", 30), ("w", 20)])
-print(conn.execute(
-    "SELECT id, region, amt, SUM(amt) OVER (PARTITION BY region) AS reg_total "
-    "FROM s ORDER BY id").fetchall())
+conn.executemany(
+    "INSERT INTO s (region, amt) VALUES (?, ?)", [("e", 10), ("e", 5), ("w", 30), ("w", 20)]
+)
+print(
+    conn.execute(
+        "SELECT id, region, amt, SUM(amt) OVER (PARTITION BY region) AS reg_total "
+        "FROM s ORDER BY id"
+    ).fetchall()
+)
 ```
 ```text
 [(1, 'e', 10.0, 15.0), (2, 'e', 5.0, 15.0), (3, 'w', 30.0, 50.0), (4, 'w', 20.0, 50.0)]
@@ -73,9 +78,12 @@ is added.
 not (1, 1, 2). Choose by whether position count matters.
 **Example**:
 ```python
-print(conn.execute(
-    "SELECT amt, RANK() OVER (ORDER BY amt DESC) r, DENSE_RANK() OVER (ORDER BY amt DESC) d "
-    "FROM s ORDER BY amt DESC").fetchall())
+print(
+    conn.execute(
+        "SELECT amt, RANK() OVER (ORDER BY amt DESC) r, DENSE_RANK() OVER (ORDER BY amt DESC) d "
+        "FROM s ORDER BY amt DESC"
+    ).fetchall()
+)
 ```
 ```text
 [(30.0, 1, 1), (20.0, 2, 2), (10.0, 3, 3), (5.0, 4, 4)]
@@ -88,8 +96,9 @@ row's value; LEAD looks forward. NULL outside the window; the classic
 for deltas and comparisons to "previous".
 **Example**:
 ```python
-print(conn.execute(
-    "SELECT amt, LAG(amt) OVER (ORDER BY amt) AS prev FROM s ORDER BY amt").fetchall())
+print(
+    conn.execute("SELECT amt, LAG(amt) OVER (ORDER BY amt) AS prev FROM s ORDER BY amt").fetchall()
+)
 ```
 ```text
 [(5.0, None), (10.0, 5.0), (20.0, 10.0), (30.0, 20.0)]
@@ -108,9 +117,12 @@ CURRENT ROW` (running total), `BETWEEN 2 PRECEDING AND CURRENT ROW`
 (3-row window), `BETWEEN 1 PRECEDING AND 1 FOLLOWING`.
 **Example**:
 ```python
-print(conn.execute(
-    "SELECT amt, AVG(amt) OVER (ORDER BY amt ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) "
-    "FROM s ORDER BY amt").fetchall())
+print(
+    conn.execute(
+        "SELECT amt, AVG(amt) OVER (ORDER BY amt ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) "
+        "FROM s ORDER BY amt"
+    ).fetchall()
+)
 ```
 ```text
 [(5.0, 5.0), (10.0, 7.5), (20.0, 15.0), (30.0, 25.0)]

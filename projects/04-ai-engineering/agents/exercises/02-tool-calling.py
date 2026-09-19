@@ -35,11 +35,13 @@ import threading
 # SECTION 1: Tool Schema Definition
 # ============================================================
 
+
 @dataclass
 class ToolParameter:
     """Defines a single parameter for a tool."""
+
     name: str
-    type: str          # "string", "number", "boolean", "array", "object"
+    type: str  # "string", "number", "boolean", "array", "object"
     description: str
     required: bool = True
     enum: list = None
@@ -64,6 +66,7 @@ class ToolDefinition:
     Complete tool definition with schema and execution logic.
     This is the standard format for defining tools in an agent system.
     """
+
     name: str
     description: str
     parameters: list[ToolParameter]
@@ -89,8 +92,8 @@ class ToolDefinition:
                     "type": "object",
                     "properties": properties,
                     "required": required,
-                }
-            }
+                },
+            },
         }
 
     def validate_args(self, args: dict) -> tuple[bool, str]:
@@ -101,7 +104,10 @@ class ToolDefinition:
             if param.name in args:
                 value = args[param.name]
                 if param.enum and value not in param.enum:
-                    return False, f"Invalid value for {param.name}: {value}. Must be one of {param.enum}"
+                    return (
+                        False,
+                        f"Invalid value for {param.name}: {value}. Must be one of {param.enum}",
+                    )
         return True, "Valid"
 
     def execute(self, **kwargs) -> dict:
@@ -139,12 +145,19 @@ class ToolDefinition:
 # SECTION 2: Built-in Tools
 # ============================================================
 
+
 def calculator_handler(expression: str = "0") -> Any:
     """Evaluate a mathematical expression."""
     allowed = {
-        "sqrt": math.sqrt, "abs": abs, "round": round,
-        "sin": math.sin, "cos": math.cos, "tan": math.tan,
-        "pi": math.pi, "e": math.e, "log": math.log,
+        "sqrt": math.sqrt,
+        "abs": abs,
+        "round": round,
+        "sin": math.sin,
+        "cos": math.cos,
+        "tan": math.tan,
+        "pi": math.pi,
+        "e": math.e,
+        "log": math.log,
     }
     return eval(expression, {"__builtins__": {}}, allowed)
 
@@ -154,8 +167,12 @@ def web_search_handler(query: str = "", max_results: int = 3) -> list[dict]:
     # Simulated search latency
     time.sleep(0.1)
     return [
-        {"title": f"About {query}", "url": f"https://example.com/{query.replace(' ', '-')}",
-         "snippet": f"Comprehensive information about {query}.", "relevance": 0.95 - i * 0.05}
+        {
+            "title": f"About {query}",
+            "url": f"https://example.com/{query.replace(' ', '-')}",
+            "snippet": f"Comprehensive information about {query}.",
+            "relevance": 0.95 - i * 0.05,
+        }
         for i in range(min(max_results, 5))
     ]
 
@@ -210,7 +227,9 @@ CALCULATOR_TOOL = ToolDefinition(
     name="calculator",
     description="Evaluate mathematical expressions. Supports +, -, *, /, **, sqrt, sin, cos, tan, log.",
     parameters=[
-        ToolParameter("expression", "string", "Mathematical expression to evaluate", required=True),
+        ToolParameter(
+            "expression", "string", "Mathematical expression to evaluate", required=True
+        ),
     ],
     handler=calculator_handler,
     tags=["math", "computation"],
@@ -221,7 +240,13 @@ WEB_SEARCH_TOOL = ToolDefinition(
     description="Search the web for information on any topic.",
     parameters=[
         ToolParameter("query", "string", "Search query", required=True),
-        ToolParameter("max_results", "number", "Maximum results to return", required=False, default=3),
+        ToolParameter(
+            "max_results",
+            "number",
+            "Maximum results to return",
+            required=False,
+            default=3,
+        ),
     ],
     handler=web_search_handler,
     tags=["search", "information"],
@@ -242,9 +267,22 @@ TEXT_TRANSFORM_TOOL = ToolDefinition(
     description="Transform text using various operations.",
     parameters=[
         ToolParameter("text", "string", "Text to transform", required=True),
-        ToolParameter("operation", "string", "Operation to apply",
-                       required=True, enum=["uppercase", "lowercase", "reverse",
-                                            "word_count", "char_count", "title", "strip", "slug"]),
+        ToolParameter(
+            "operation",
+            "string",
+            "Operation to apply",
+            required=True,
+            enum=[
+                "uppercase",
+                "lowercase",
+                "reverse",
+                "word_count",
+                "char_count",
+                "title",
+                "strip",
+                "slug",
+            ],
+        ),
     ],
     handler=text_transform_handler,
     tags=["text", "transformation"],
@@ -255,8 +293,14 @@ HASH_TOOL = ToolDefinition(
     description="Generate a cryptographic hash of text.",
     parameters=[
         ToolParameter("text", "string", "Text to hash", required=True),
-        ToolParameter("algorithm", "string", "Hash algorithm",
-                       required=False, default="sha256", enum=["md5", "sha1", "sha256"]),
+        ToolParameter(
+            "algorithm",
+            "string",
+            "Hash algorithm",
+            required=False,
+            default="sha256",
+            enum=["md5", "sha1", "sha256"],
+        ),
     ],
     handler=hash_handler,
     tags=["crypto", "text"],
@@ -266,8 +310,14 @@ TIMESTAMP_TOOL = ToolDefinition(
     name="timestamp",
     description="Get the current timestamp in various formats.",
     parameters=[
-        ToolParameter("format", "string", "Timestamp format",
-                       required=False, default="iso", enum=["iso", "unix", "readable"]),
+        ToolParameter(
+            "format",
+            "string",
+            "Timestamp format",
+            required=False,
+            default="iso",
+            enum=["iso", "unix", "readable"],
+        ),
     ],
     handler=timestamp_handler,
     tags=["time", "utility"],
@@ -277,6 +327,7 @@ TIMESTAMP_TOOL = ToolDefinition(
 # ============================================================
 # SECTION 3: Tool Registry
 # ============================================================
+
 
 class ToolRegistry:
     """
@@ -314,12 +365,14 @@ class ToolRegistry:
         for tool in self._tools.values():
             if tag and tag not in tool.tags:
                 continue
-            tools.append({
-                "name": tool.name,
-                "description": tool.description,
-                "parameters": len(tool.parameters),
-                "tags": tool.tags,
-            })
+            tools.append(
+                {
+                    "name": tool.name,
+                    "description": tool.description,
+                    "parameters": len(tool.parameters),
+                    "tags": tool.tags,
+                }
+            )
         return tools
 
     def get_schemas(self) -> list[dict]:
@@ -341,13 +394,15 @@ class ToolRegistry:
 
         # Log execution
         with self._lock:
-            self._execution_log.append({
-                "tool": name,
-                "arguments": arguments,
-                "success": result.get("success", False),
-                "execution_time_ms": result.get("execution_time_ms", 0),
-                "timestamp": datetime.now().isoformat(),
-            })
+            self._execution_log.append(
+                {
+                    "tool": name,
+                    "arguments": arguments,
+                    "success": result.get("success", False),
+                    "execution_time_ms": result.get("execution_time_ms", 0),
+                    "timestamp": datetime.now().isoformat(),
+                }
+            )
 
         return result
 
@@ -398,9 +453,11 @@ class ToolRegistry:
 # SECTION 4: LLM Tool Call Parser
 # ============================================================
 
+
 @dataclass
 class ToolCall:
     """Parsed tool call from LLM output."""
+
     id: str
     name: str
     arguments: dict
@@ -425,8 +482,9 @@ class ToolCall:
             tool: web_search(query="python tutorials")
         """
         import re
+
         calls = []
-        pattern = r'(?:tool_call|tool)\s*:\s*(\w+)\(([^)]*)\)'
+        pattern = r"(?:tool_call|tool)\s*:\s*(\w+)\(([^)]*)\)"
         matches = re.findall(pattern, text, re.IGNORECASE)
 
         for match_name, args_str in matches:
@@ -444,12 +502,14 @@ class ToolCall:
                     pass
                 args[key] = value
 
-            calls.append(cls(
-                id=str(uuid.uuid4())[:8],
-                name=match_name,
-                arguments=args,
-                raw_text=f"tool_call: {match_name}({args_str})",
-            ))
+            calls.append(
+                cls(
+                    id=str(uuid.uuid4())[:8],
+                    name=match_name,
+                    arguments=args,
+                    raw_text=f"tool_call: {match_name}({args_str})",
+                )
+            )
 
         return calls
 
@@ -457,6 +517,7 @@ class ToolCall:
 # ============================================================
 # SECTION 5: Tool Execution Pipeline
 # ============================================================
+
 
 class ToolPipeline:
     """
@@ -542,13 +603,20 @@ class ToolPipeline:
 # SECTION 6: Running the Exercises
 # ============================================================
 
+
 def exercise_1_tool_schemas():
     """Exercise 2.1: Define and inspect tool schemas."""
     print("\n" + "=" * 60)
     print("EXERCISE 2.1: Tool Schema Definition")
     print("=" * 60)
 
-    tools = [CALCULATOR_TOOL, WEB_SEARCH_TOOL, TEXT_TRANSFORM_TOOL, HASH_TOOL, TIMESTAMP_TOOL]
+    tools = [
+        CALCULATOR_TOOL,
+        WEB_SEARCH_TOOL,
+        TEXT_TRANSFORM_TOOL,
+        HASH_TOOL,
+        TIMESTAMP_TOOL,
+    ]
 
     for tool in tools:
         print(f"\n  Tool: {tool.name}")
@@ -558,7 +626,9 @@ def exercise_1_tool_schemas():
         for param in tool.parameters:
             required = "required" if param.required else "optional"
             print(f"    - {param.name} ({param.type}, {required}): {param.description}")
-        print(f"  OpenAI Schema: {json.dumps(tool.to_openai_schema(), indent=4)[:200]}...")
+        print(
+            f"  OpenAI Schema: {json.dumps(tool.to_openai_schema(), indent=4)[:200]}..."
+        )
 
 
 def exercise_2_registry():
@@ -570,7 +640,13 @@ def exercise_2_registry():
     registry = ToolRegistry()
 
     # Register tools
-    for tool in [CALCULATOR_TOOL, WEB_SEARCH_TOOL, TEXT_TRANSFORM_TOOL, HASH_TOOL, TIMESTAMP_TOOL]:
+    for tool in [
+        CALCULATOR_TOOL,
+        WEB_SEARCH_TOOL,
+        TEXT_TRANSFORM_TOOL,
+        HASH_TOOL,
+        TIMESTAMP_TOOL,
+    ]:
         registry.register(tool)
         print(f"  Registered: {tool.name}")
 
@@ -635,10 +711,7 @@ def exercise_3_tool_parsing():
     print("\n  Parsing OpenAI format:")
     openai_call = {
         "id": "call_abc123",
-        "function": {
-            "name": "calculator",
-            "arguments": '{"expression": "sqrt(144)"}'
-        }
+        "function": {"name": "calculator", "arguments": '{"expression": "sqrt(144)"}'},
     }
     parsed = ToolCall.from_openai(openai_call)
     print(f"    ID: {parsed.id}, Tool: {parsed.name}, Args: {parsed.arguments}")
@@ -659,7 +732,11 @@ def exercise_4_error_handling():
         ("calculator", {"expression": "1/0"}, "Division by zero"),
         ("unknown_tool", {"query": "test"}, "Tool not found"),
         ("calculator", {}, "Missing required param"),
-        ("text_transform", {"text": "hello", "operation": "invalid_op"}, "Invalid enum"),
+        (
+            "text_transform",
+            {"text": "hello", "operation": "invalid_op"},
+            "Invalid enum",
+        ),
         ("calculator", {"expression": "2 + 2"}, "Valid execution"),
     ]
 
@@ -682,14 +759,29 @@ def exercise_5_parallel_execution():
     print("=" * 60)
 
     registry = ToolRegistry()
-    for tool in [CALCULATOR_TOOL, WEB_SEARCH_TOOL, TEXT_TRANSFORM_TOOL, HASH_TOOL, TIMESTAMP_TOOL]:
+    for tool in [
+        CALCULATOR_TOOL,
+        WEB_SEARCH_TOOL,
+        TEXT_TRANSFORM_TOOL,
+        HASH_TOOL,
+        TIMESTAMP_TOOL,
+    ]:
         registry.register(tool)
 
     # Define parallel calls
     calls = [
         {"tool": "calculator", "arguments": {"expression": "2**20"}},
-        {"tool": "web_search", "arguments": {"query": "parallel computing", "max_results": 2}},
-        {"tool": "text_transform", "arguments": {"text": "parallel execution is powerful", "operation": "reverse"}},
+        {
+            "tool": "web_search",
+            "arguments": {"query": "parallel computing", "max_results": 2},
+        },
+        {
+            "tool": "text_transform",
+            "arguments": {
+                "text": "parallel execution is powerful",
+                "operation": "reverse",
+            },
+        },
         {"tool": "hash", "arguments": {"text": "test data", "algorithm": "md5"}},
         {"tool": "timestamp", "arguments": {"format": "unix"}},
     ]
@@ -699,10 +791,12 @@ def exercise_5_parallel_execution():
     results = registry.execute_parallel(calls, max_workers=4)
     elapsed = time.time() - start
 
-    print(f"  Completed in {elapsed*1000:.2f}ms")
+    print(f"  Completed in {elapsed * 1000:.2f}ms")
     for i, result in enumerate(results):
         status = "OK" if result.get("success") else "FAIL"
-        print(f"    [{i+1}] {status}: {result.get('tool', 'unknown')} = {str(result.get('result', result.get('error', '')))[:50]}")
+        print(
+            f"    [{i + 1}] {status}: {result.get('tool', 'unknown')} = {str(result.get('result', result.get('error', '')))[:50]}"
+        )
 
     # Stats
     stats = registry.get_execution_stats()
@@ -724,8 +818,16 @@ def exercise_6_pipeline():
     # Sequential execution with context passing
     calls = [
         ToolCall(id="1", name="timestamp", arguments={"format": "readable"}),
-        ToolCall(id="2", name="text_transform", arguments={"text": "hello world", "operation": "uppercase"}),
-        ToolCall(id="3", name="hash", arguments={"text": "hello world", "algorithm": "sha256"}),
+        ToolCall(
+            id="2",
+            name="text_transform",
+            arguments={"text": "hello world", "operation": "uppercase"},
+        ),
+        ToolCall(
+            id="3",
+            name="hash",
+            arguments={"text": "hello world", "algorithm": "sha256"},
+        ),
         ToolCall(id="4", name="calculator", arguments={"expression": "42 * 100"}),
     ]
 
@@ -733,7 +835,9 @@ def exercise_6_pipeline():
     results = pipeline.execute_sequence(calls)
     for i, result in enumerate(results):
         status = "OK" if result.get("success") else "FAIL"
-        print(f"    Step {i+1} [{status}]: {result.get('result', result.get('error'))}")
+        print(
+            f"    Step {i + 1} [{status}]: {result.get('result', result.get('error'))}"
+        )
 
     # Aggregate results
     summary = pipeline.aggregate_results(results)
@@ -754,8 +858,8 @@ def exercise_7_custom_tool():
             ("miles", "km"): lambda v: v * 1.60934,
             ("kg", "lbs"): lambda v: v * 2.20462,
             ("lbs", "kg"): lambda v: v * 0.453592,
-            ("celsius", "fahrenheit"): lambda v: v * 9/5 + 32,
-            ("fahrenheit", "celsius"): lambda v: (v - 32) * 5/9,
+            ("celsius", "fahrenheit"): lambda v: v * 9 / 5 + 32,
+            ("fahrenheit", "celsius"): lambda v: (v - 32) * 5 / 9,
             ("meters", "feet"): lambda v: v * 3.28084,
             ("feet", "meters"): lambda v: v * 0.3048,
         }

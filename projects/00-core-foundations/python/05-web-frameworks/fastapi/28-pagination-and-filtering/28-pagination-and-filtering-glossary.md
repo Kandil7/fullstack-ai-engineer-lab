@@ -69,7 +69,7 @@ items = [r for r in DB if r["id"] > start][:limit]
 m+n rows. Simple; cost grows linearly with position; breaks under inserts.
 **Example**:
 ```python
-items = DB[offset:offset + limit]
+items = DB[offset : offset + limit]
 ```
 **Complexity**: O(offset + limit).
 **Related**: Keyset pagination, OFFSET

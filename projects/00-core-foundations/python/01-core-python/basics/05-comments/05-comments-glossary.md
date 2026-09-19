@@ -41,6 +41,7 @@ def greet(name):
     """Greet a person by name."""
     return f"Hello, {name}!"
 
+
 # Access docstring
 print(greet.__doc__)  # Greet a person by name.
 help(greet)  # Shows formatted documentation
@@ -94,6 +95,7 @@ calculator.py - A simple calculator module.
 
 This module provides basic arithmetic operations.
 """
+
 
 def add(a, b):
     """Return sum of a and b."""

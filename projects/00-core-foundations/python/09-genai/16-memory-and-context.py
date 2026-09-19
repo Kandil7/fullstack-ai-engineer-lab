@@ -26,15 +26,16 @@ from dataclasses import dataclass
 # Every request = system + history + new input + reserved output.
 # Budget: window - system - reserved = what history can occupy.
 
-def history_budget(window: int, system_tokens: int, new_input_tokens: int,
-                   reserved_output: int) -> int:
+
+def history_budget(
+    window: int, system_tokens: int, new_input_tokens: int, reserved_output: int
+) -> int:
     """Tokens available for the conversation history."""
     return window - system_tokens - new_input_tokens - reserved_output
 
 
 # Example 1: budget math
-budget = history_budget(4096, system_tokens=300, new_input_tokens=200,
-                        reserved_output=1000)
+budget = history_budget(4096, system_tokens=300, new_input_tokens=200, reserved_output=1000)
 print("Example 1: context budget")
 print(f"  4096 - 300 - 200 - 1000 = {budget} tokens for history")
 assert budget == 2596
@@ -44,6 +45,7 @@ assert budget == 2596
 # ============================================================
 # Keep the last N turns; drop the oldest. Simple, lossy.
 
+
 def sliding_window(history: list[dict], max_turns: int) -> list[dict]:
     return history[-max_turns:]
 
@@ -52,8 +54,7 @@ def sliding_window(history: list[dict], max_turns: int) -> list[dict]:
 history = [{"role": "user", "content": f"msg-{i}"} for i in range(10)]
 window = sliding_window(history, 4)
 print("\nExample 2: sliding window")
-print(f"  {len(history)} turns -> keep last 4: "
-      f"{[m['content'] for m in window]}")
+print(f"  {len(history)} turns -> keep last 4: {[m['content'] for m in window]}")
 assert len(window) == 4 and window[0]["content"] == "msg-6"
 
 # ============================================================
@@ -62,6 +63,7 @@ assert len(window) == 4 and window[0]["content"] == "msg-6"
 # Instead of dropping old turns, compress them into a running summary
 # that keeps the important facts. A stub summarizer demonstrates the
 # shape; in production it is an LLM call.
+
 
 def summarize(old_turns: list[dict], summary_fn) -> dict:
     """Replace old turns with one summary message."""
@@ -86,6 +88,7 @@ assert summary["role"] == "system" and "compressed" in summary["content"]
 # For long-lived knowledge, don't stuff everything in the prompt -
 # retrieve what is relevant. The vector store IS the memory.
 
+
 @dataclass
 class FactStore:
     facts: dict[str, str]
@@ -99,10 +102,12 @@ class FactStore:
 
 
 # Example 4: retrieval-based memory
-facts = FactStore({
-    "user prefers python": "They code in Python and dislike JS.",
-    "project stack": "FastAPI + PostgreSQL + React.",
-})
+facts = FactStore(
+    {
+        "user prefers python": "They code in Python and dislike JS.",
+        "project stack": "FastAPI + PostgreSQL + React.",
+    }
+)
 memory = facts.retrieve("user prefers")
 print("\nExample 4: retrieval as memory")
 print(f"  retrieved: {memory}")
@@ -114,9 +119,10 @@ assert "Python" in memory
 # Assemble the final messages: system + summary + recent turns + input,
 # trimmed to the budget.
 
-def build_context(system: str, summary: str | None, recent: list[dict],
-                  new_input: str, budget: int,
-                  estimate_fn) -> list[dict]:
+
+def build_context(
+    system: str, summary: str | None, recent: list[dict], new_input: str, budget: int, estimate_fn
+) -> list[dict]:
     """Build a context that never exceeds the token budget."""
     messages = [{"role": "system", "content": system}]
     if summary:
@@ -138,9 +144,14 @@ def estimate_tokens(text: str) -> int:
 
 
 # Example 5: the context builder
-ctx = build_context("You are a helpful assistant", "Previous: math help",
-                    [{"role": "user", "content": "explain logs"}],
-                    "and derivatives", budget=200, estimate_fn=estimate_tokens)
+ctx = build_context(
+    "You are a helpful assistant",
+    "Previous: math help",
+    [{"role": "user", "content": "explain logs"}],
+    "and derivatives",
+    budget=200,
+    estimate_fn=estimate_tokens,
+)
 print("\nExample 5: context builder")
 for m in ctx:
     print(f"  [{m['role']}] {m['content'][:30]}")
@@ -171,8 +182,14 @@ def _verify() -> None:
     f = FactStore({"x y": "value"})
     assert f.retrieve("x") == "value" and f.retrieve("zzz") == "no relevant memory"
 
-    ctx = build_context("sys", "sum", [{"role": "u", "content": "x" * 50}], "q",
-                        budget=50, estimate_fn=estimate_tokens)
+    ctx = build_context(
+        "sys",
+        "sum",
+        [{"role": "u", "content": "x" * 50}],
+        "q",
+        budget=50,
+        estimate_fn=estimate_tokens,
+    )
     used = sum(estimate_tokens(m["content"]) for m in ctx)
     assert used <= 50, "context fits the budget"
 

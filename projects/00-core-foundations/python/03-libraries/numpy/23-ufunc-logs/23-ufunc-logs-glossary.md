@@ -31,9 +31,9 @@
 import numpy as np
 
 # Different bases
-print("log base e:", np.log(np.e))      # 1.0
-print("log base 2:", np.log2(2))        # 1.0
-print("log base 10:", np.log10(10))     # 1.0
+print("log base e:", np.log(np.e))  # 1.0
+print("log base 2:", np.log2(2))  # 1.0
+print("log base 10:", np.log10(10))  # 1.0
 ```
 
 **Related Terms:** Natural Logarithm, Common Logarithm
@@ -48,8 +48,8 @@ print("log base 10:", np.log10(10))     # 1.0
 ```python
 import numpy as np
 
-print("log10(100):", np.log10(100))     # 2.0
-print("log10(1000):", np.log10(1000))   # 3.0
+print("log10(100):", np.log10(100))  # 2.0
+print("log10(1000):", np.log10(1000))  # 3.0
 
 # Decibels
 power_ratio = 100
@@ -93,8 +93,8 @@ for t, fv in zip(years, future_value):
 import numpy as np
 
 P = 10000  # Principal
-r = 0.05   # Annual rate
-t = 10     # Years
+r = 0.05  # Annual rate
+t = 10  # Years
 
 A = P * np.exp(r * t)
 print(f"${P} at {r:.0%} for {t} years = ${A:.2f}")
@@ -112,9 +112,11 @@ print(f"${P} at {r:.0%} for {t} years = ${A:.2f}")
 ```python
 import numpy as np
 
+
 def shannon_entropy(probs):
     probs = probs[probs > 0]
     return -np.sum(probs * np.log2(probs))
+
 
 # Uniform distribution (maximum entropy)
 uniform = np.array([0.25, 0.25, 0.25, 0.25])
@@ -122,7 +124,7 @@ print(f"Uniform entropy: {shannon_entropy(uniform):.4f} bits")  # 2.0
 
 # Skewed distribution
 skewed = np.array([0.9, 0.05, 0.03, 0.02])
-print(f"Skewed entropy: {shannon_entropy(skewed):.4f} bits")    # ~1.0
+print(f"Skewed entropy: {shannon_entropy(skewed):.4f} bits")  # ~1.0
 ```
 
 **Related Terms:** log2(), Information Theory
@@ -156,7 +158,7 @@ import numpy as np
 
 x = 1e-10
 print("exp(x) - 1:", np.exp(x) - 1)  # May be 0.0
-print("expm1(x):", np.expm1(x))      # More accurate
+print("expm1(x):", np.expm1(x))  # More accurate
 ```
 
 **Related Terms:** exp(), log1p()
@@ -191,7 +193,7 @@ import numpy as np
 
 x = 1e-10
 print("log(1 + x):", np.log(1 + x))  # May be 0.0
-print("log1p(x):", np.log1p(x))      # More accurate
+print("log1p(x):", np.log1p(x))  # More accurate
 ```
 
 **Related Terms:** log(), expm1()
@@ -206,9 +208,9 @@ print("log1p(x):", np.log1p(x))      # More accurate
 ```python
 import numpy as np
 
-print("ln(e):", np.log(np.e))    # 1.0
-print("ln(1):", np.log(1))       # 0.0
-print("ln(10):", np.log(10))     # 2.303
+print("ln(e):", np.log(np.e))  # 1.0
+print("ln(1):", np.log(1))  # 0.0
+print("ln(10):", np.log(10))  # 2.303
 ```
 
 **Related Terms:** log2(), log10(), exp()
@@ -229,7 +231,7 @@ x = 1e-15
 result1 = np.log(1 + x)  # Loses precision
 
 # Stable
-result2 = np.log1p(x)    # Preserves precision
+result2 = np.log1p(x)  # Preserves precision
 ```
 
 **Related Terms:** log1p(), expm1()

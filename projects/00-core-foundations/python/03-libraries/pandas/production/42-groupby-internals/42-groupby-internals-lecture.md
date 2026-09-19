@@ -46,19 +46,21 @@ mechanics obvious — and proves groupby is not magic.
 import numpy as np
 import pandas as pd
 
-df = pd.DataFrame({
-    "team": ["a", "b", "a", "c", "b", "a"],
-    "score": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0],
-})
+df = pd.DataFrame(
+    {
+        "team": ["a", "b", "a", "c", "b", "a"],
+        "score": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0],
+    }
+)
 
 manual: dict[str, float] = {}
-for key, sub in df.groupby("team"):        # SPLIT
-    manual[key] = sub["score"].mean()      # APPLY
-manual_result = pd.Series(manual).sort_index()   # COMBINE
+for key, sub in df.groupby("team"):  # SPLIT
+    manual[key] = sub["score"].mean()  # APPLY
+manual_result = pd.Series(manual).sort_index()  # COMBINE
 
 native = df.groupby("team")["score"].mean()
-print(manual_result.tolist())              # [33.33, 35.0, 40.0]
-print(manual_result.equals(native))        # True
+print(manual_result.tolist())  # [33.33, 35.0, 40.0]
+print(manual_result.equals(native))  # True
 ```
 
 ```text
@@ -73,11 +75,11 @@ frame shrinks. Mix built-in names, callables, and per-column dictionaries.
 
 ```python
 multi = df.groupby("team").agg(["mean", "max"])
-print(multi.columns.tolist())   # [('score', 'mean'), ('score', 'max')]
+print(multi.columns.tolist())  # [('score', 'mean'), ('score', 'max')]
 
-named = df.groupby("team").agg(avg=("score", "mean"),
-                               peak=("score", "max"),
-                               count=("score", "count"))
+named = df.groupby("team").agg(
+    avg=("score", "mean"), peak=("score", "max"), count=("score", "count")
+)
 print(named.to_dict("index"))
 # {'a': {'avg': 33.33, 'peak': 60.0, 'count': 3}, ...}
 ```
@@ -120,8 +122,8 @@ Rows are never partially filtered — groups are atomic.
 
 ```python
 big = df.groupby("team").filter(lambda g: len(g) >= 2)
-print(sorted(big["team"].unique().tolist()))   # ['a', 'b']
-print(len(big))                                # 5
+print(sorted(big["team"].unique().tolist()))  # ['a', 'b']
+print(len(big))  # 5
 ```
 
 ```text
@@ -138,7 +140,7 @@ combines the results. Most flexible, **slowest**: arbitrary Python per group.
 
 ```python
 first_last = df.groupby("team")["score"].apply(lambda g: g.iloc[0] - g.iloc[-1])
-print(first_last.sort_index().tolist())   # [-50.0, -30.0, 0.0]
+print(first_last.sort_index().tolist())  # [-50.0, -30.0, 0.0]
 ```
 
 ```text
@@ -155,22 +157,27 @@ also vectorized, and `apply` is Python-per-group. On 100k groups, `apply`
 means 100k Python calls.
 
 ```python
-big_df = pd.DataFrame({
-    "key": np.random.randint(0, 1000, 20_000),
-    "val": np.random.randn(20_000),
-})
+big_df = pd.DataFrame(
+    {
+        "key": np.random.randint(0, 1000, 20_000),
+        "val": np.random.randn(20_000),
+    }
+)
 
 agg_mean = big_df.groupby("key")["val"].mean().sort_index()
 
 # transform: one value per row -> first row per key
-tf = (big_df.assign(m=big_df.groupby("key")["val"].transform("mean"))
-           .drop_duplicates("key")[["key", "m"]]
-           .set_index("key")["m"].sort_index())
+tf = (
+    big_df.assign(m=big_df.groupby("key")["val"].transform("mean"))
+    .drop_duplicates("key")[["key", "m"]]
+    .set_index("key")["m"]
+    .sort_index()
+)
 
 ap = big_df.groupby("key")["val"].apply(lambda g: g.mean()).sort_index()
 
-print(np.allclose(agg_mean.values, tf.values))   # True
-print(np.allclose(agg_mean.values, ap.values))   # True
+print(np.allclose(agg_mean.values, tf.values))  # True
+print(np.allclose(agg_mean.values, ap.values))  # True
 ```
 
 ```text
@@ -187,13 +194,15 @@ Pass a list to `groupby` for composite keys; the result has a MultiIndex.
 `unstack` turns one level into columns — the cohort-by-month matrix.
 
 ```python
-sales = pd.DataFrame({
-    "month": np.repeat(["Jan", "Feb", "Mar"], 4),
-    "city": np.tile(["NY", "SF", "NY", "SF"], 3),
-    "amount": np.random.uniform(10, 100, 12).round(1),
-})
+sales = pd.DataFrame(
+    {
+        "month": np.repeat(["Jan", "Feb", "Mar"], 4),
+        "city": np.tile(["NY", "SF", "NY", "SF"], 3),
+        "amount": np.random.uniform(10, 100, 12).round(1),
+    }
+)
 cohort = sales.groupby(["month", "city"])["amount"].sum()
-print(cohort.index.names)          # ['month', 'city']
+print(cohort.index.names)  # ['month', 'city']
 matrix = cohort.unstack()
 print(matrix.round(1).to_string())
 ```
@@ -215,12 +224,13 @@ features, then `reset_index` for the join back.
 ```python
 def group_features(frame: pd.DataFrame) -> pd.DataFrame:
     return (
-        frame
-        .groupby("user_id")
-        .agg(total_spend=("amount", "sum"),
-             avg_spend=("amount", "mean"),
-             order_count=("amount", "count"),
-             max_spend=("amount", "max"))
+        frame.groupby("user_id")
+        .agg(
+            total_spend=("amount", "sum"),
+            avg_spend=("amount", "mean"),
+            order_count=("amount", "count"),
+            max_spend=("amount", "max"),
+        )
         .reset_index()
     )
 ```
@@ -252,8 +262,8 @@ result = df.groupby("k")["v"].mean()
 
 ```python
 # default sorts keys; first-appearance order needs the flag
-df.groupby("k").mean()                 # sorted
-df.groupby("k", sort=False).mean()     # first-appearance
+df.groupby("k").mean()  # sorted
+df.groupby("k", sort=False).mean()  # first-appearance
 ```
 
 ### Mistake 4: forgetting NaN behavior

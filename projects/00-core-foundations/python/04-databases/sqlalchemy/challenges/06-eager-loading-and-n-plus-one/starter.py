@@ -21,9 +21,7 @@ class Project(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(60), nullable=False)
 
-    experiments: Mapped[list["Experiment"]] = relationship(
-        back_populates="project"
-    )
+    experiments: Mapped[list["Experiment"]] = relationship(back_populates="project")
 
 
 class Experiment(Base):
@@ -31,9 +29,7 @@ class Experiment(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(60), nullable=False)
-    project_id: Mapped[int] = mapped_column(
-        ForeignKey("projects.id"), nullable=False
-    )
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"), nullable=False)
 
     project: Mapped[Project] = relationship(back_populates="experiments")
 
@@ -56,9 +52,7 @@ class StrictExperiment(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(60), nullable=False)
-    project_id: Mapped[int] = mapped_column(
-        ForeignKey("strict_projects.id"), nullable=False
-    )
+    project_id: Mapped[int] = mapped_column(ForeignKey("strict_projects.id"), nullable=False)
 
     project: Mapped[StrictProject] = relationship(back_populates="experiments")
 

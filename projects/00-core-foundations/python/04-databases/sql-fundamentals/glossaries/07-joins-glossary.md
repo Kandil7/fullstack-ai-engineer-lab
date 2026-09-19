@@ -27,6 +27,7 @@ without a match vanish on both sides.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE a (id INTEGER PRIMARY KEY, v TEXT)")
 conn.execute("CREATE TABLE b (aid INTEGER, w TEXT)")
@@ -104,10 +105,15 @@ threads). Requires AS so each side has a name.
 **Example**:
 ```python
 conn.execute("CREATE TABLE emp (id INTEGER PRIMARY KEY, name TEXT, mgr INTEGER)")
-conn.executemany("INSERT INTO emp (id, name, mgr) VALUES (?, ?, ?)",
-                 [(1, "ana", None), (2, "bob", 1), (3, "cam", 1)])
-print(conn.execute(
-    "SELECT e.name, m.name FROM emp e LEFT JOIN emp m ON e.mgr = m.id ORDER BY e.id").fetchall())
+conn.executemany(
+    "INSERT INTO emp (id, name, mgr) VALUES (?, ?, ?)",
+    [(1, "ana", None), (2, "bob", 1), (3, "cam", 1)],
+)
+print(
+    conn.execute(
+        "SELECT e.name, m.name FROM emp e LEFT JOIN emp m ON e.mgr = m.id ORDER BY e.id"
+    ).fetchall()
+)
 ```
 ```text
 [('ana', None), ('bob', 'ana'), ('cam', 'ana')]

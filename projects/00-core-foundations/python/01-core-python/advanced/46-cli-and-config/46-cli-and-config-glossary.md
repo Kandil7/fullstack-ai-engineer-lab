@@ -31,7 +31,8 @@ name, the rest are raw strings.
 **Example**:
 ```python
 import sys
-print(sys.argv)   # ['train.py', '--epochs', '10']
+
+print(sys.argv)  # ['train.py', '--epochs', '10']
 ```
 **Related**: argparse, `parse_args()`
 
@@ -41,6 +42,7 @@ parsing, validation, and `--help` text.
 **Example**:
 ```python
 import argparse
+
 p = argparse.ArgumentParser()
 p.add_argument("--lr", type=float, default=1e-3)
 args = p.parse_args()
@@ -52,7 +54,7 @@ args = p.parse_args()
 the definition fixes order on the command line.
 **Example**:
 ```python
-p.add_argument("dataset_dir")   # python tool.py data/
+p.add_argument("dataset_dir")  # python tool.py data/
 ```
 **Related**: optional argument
 
@@ -70,7 +72,7 @@ p.add_argument("--seed", type=int, default=0)
 raising a readable error on bad input).
 **Example**:
 ```python
-p.add_argument("--epochs", type=int)   # "10" -> 10
+p.add_argument("--epochs", type=int)  # "10" -> 10
 ```
 **Related**: `choices=`
 
@@ -111,7 +113,7 @@ sub.add_parser("train").add_argument("--epochs", type=int)
 namespace of validated values.
 **Example**:
 ```python
-args = p.parse_args(["--epochs", "5"])   # testable with fake argv
+args = p.parse_args(["--epochs", "5"])  # testable with fake argv
 ```
 **Related**: `sys.argv`, testable main
 
@@ -121,6 +123,7 @@ of secrets and deployment config.
 **Example**:
 ```python
 import os
+
 key = os.environ.get("OPENAI_API_KEY")
 ```
 **Related**: `.env` file, precedence
@@ -162,7 +165,7 @@ if not os.environ.get("DATABASE_URL"):
 what CI pipelines branch on.
 **Example**:
 ```python
-sys.exit(main())     # main returns int
+sys.exit(main())  # main returns int
 ```
 **Related**: `SystemExit`, CI
 
@@ -189,6 +192,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     ...
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

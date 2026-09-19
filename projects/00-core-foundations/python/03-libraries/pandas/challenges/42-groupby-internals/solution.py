@@ -55,9 +55,7 @@ def cohort_retention(df: pd.DataFrame) -> pd.DataFrame:
     first = df.groupby("user_id")["month"].min().rename("first")
     merged = df.merge(first, left_on="user_id", right_index=True)
     merged["cohort"] = merged["first"]
-    merged["months_since"] = merged["month"].map(month_idx) - \
-        merged["cohort"].map(month_idx)
-    counts = (merged.groupby(["cohort", "months_since"])["user_id"]
-              .nunique().unstack(fill_value=0))
+    merged["months_since"] = merged["month"].map(month_idx) - merged["cohort"].map(month_idx)
+    counts = merged.groupby(["cohort", "months_since"])["user_id"].nunique().unstack(fill_value=0)
     sizes = merged.groupby("cohort")["user_id"].nunique()
     return counts.div(sizes, axis=0)

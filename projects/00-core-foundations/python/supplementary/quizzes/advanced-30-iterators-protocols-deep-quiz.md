@@ -44,6 +44,7 @@ class Countdown:
         self.current -= 1
         return v
 
+
 print(list(Countdown(2)))
 ```
 
@@ -78,6 +79,7 @@ class SliceByIndex:
     def __getitem__(self, i):
         return self.items[i]
 
+
 print(list(SliceByIndex([10, 20, 30])))
 ```
 
@@ -107,6 +109,7 @@ D) `__eq__` and `__hash__`
 ```python
 from collections.abc import Sequence
 
+
 class Pair(Sequence):
     def __init__(self, a, b):
         self._items = (a, b)
@@ -116,6 +119,7 @@ class Pair(Sequence):
 
     def __getitem__(self, i):
         return self._items[i]
+
 
 p = Pair(1, 2)
 print(1 in p, p[1:], list(reversed(p)))
@@ -155,6 +159,7 @@ class MutableKey:
     def __eq__(self, other):
         return isinstance(other, MutableKey) and self.v == other.v
 
+
 k = MutableKey("a")
 table = {k: 1}
 k.v = "b"
@@ -188,6 +193,7 @@ D) `__hash__` is inherited from `object` unchanged
 ```python
 import functools
 
+
 @functools.total_ordering
 class Score:
     def __init__(self, v):
@@ -198,6 +204,7 @@ class Score:
 
     def __lt__(self, other):
         return self.v < other.v
+
 
 a, b = Score(1), Score(2)
 print(a <= b, b >= a, a > b)
@@ -238,6 +245,7 @@ class Session:
         self.closed = True
         return False
 
+
 try:
     with Session() as s:
         raise ValueError("boom")
@@ -277,6 +285,7 @@ class Config:
     def __getattr__(self, name):
         return self.known.get(name, 0)
 
+
 cfg = Config({"batch": 8})
 print(cfg.batch, cfg.lr)
 ```
@@ -312,6 +321,7 @@ class Adder:
     def __call__(self, x):
         return x + self.n
 
+
 add10 = Adder(10)
 print(add10(5))
 ```
@@ -346,6 +356,7 @@ class TagSet:
 
     def __contains__(self, item):
         return isinstance(item, str) and item.lower() in self.tags
+
 
 print("PY" in TagSet(["py", "ml"]), "java" in TagSet(["py", "ml"]))
 ```

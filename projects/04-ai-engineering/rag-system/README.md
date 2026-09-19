@@ -39,13 +39,13 @@ through retrieval to answer generation, with quality evaluation and optimization
 def ingest_document(file_path: str, course_id: str):
     # 1. Extract text
     text = extract_text(file_path)  # PDF, Markdown, HTML
-    
+
     # 2. Chunk
     chunks = chunk_text(text, chunk_size=512, overlap=50)
-    
+
     # 3. Embed
     vectors = embed_batch(chunks)
-    
+
     # 4. Store with metadata
     for chunk, vector in zip(chunks, vectors):
         qdrant.upsert(
@@ -58,8 +58,8 @@ def ingest_document(file_path: str, course_id: str):
                     "course_id": course_id,
                     "source_file": file_path,
                     "chunk_index": chunk.index,
-                }
-            )
+                },
+            ),
         )
 ```
 

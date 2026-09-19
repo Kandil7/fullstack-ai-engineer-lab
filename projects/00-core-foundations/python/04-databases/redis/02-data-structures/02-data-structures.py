@@ -49,7 +49,7 @@ print(f"string incr -> {r.get('counter:evals')}")
 # run). Avoids re-serializing the whole object on every update.
 
 r.hset("exp:run:42", {"model": "gpt-4o", "temperature": "0.2", "status": "running"})
-r.hset("exp:run:42", {"status": "completed"})   # update ONE field
+r.hset("exp:run:42", {"status": "completed"})  # update ONE field
 print(f"hash get -> {r.hget('exp:run:42', 'status')}")
 print(f"hash all -> {r.hgetall('exp:run:42')}")
 
@@ -82,7 +82,7 @@ print(f"list pop   -> {r.lpop('queue:ingest')}")
 
 r.sadd("tags:doc:1", "ml", "rag", "python")
 r.sadd("tags:doc:2", "ml", "database")
-r.sadd("tags:doc:2", "ml")                      # duplicate: ignored
+r.sadd("tags:doc:2", "ml")  # duplicate: ignored
 print(f"set card      -> {r.scard('tags:doc:1')}")
 print(f"set member    -> {r.sismember('tags:doc:1', 'rag')}")
 print(f"set intersect -> {sorted(r.sinter('tags:doc:1', 'tags:doc:2'))}")
@@ -115,6 +115,7 @@ print(f"zset score  -> {r.zscore('leaderboard:rag-eval', 'system-b')}")
 # Bitmaps pack boolean flags: 1M users -> 125 KB. Real Redis: SETBIT/GETBIT.
 # Stand-in: we keep an int bitmask under the key.
 
+
 def setbit(mask_key: str, offset: int) -> None:
     current = int(r.get(mask_key) or 0)
     r.set(mask_key, str(current | (1 << offset)))
@@ -125,7 +126,7 @@ def getbit(mask_key: str, offset: int) -> bool:
 
 
 setbit("bitmap:users-online", 7)
-setbit("bitmap:users-online", 7)                # idempotent
+setbit("bitmap:users-online", 7)  # idempotent
 setbit("bitmap:users-online", 42)
 print(f"bitmap bit 7  -> {getbit('bitmap:users-online', 7)}")
 print(f"bitmap bit 42 -> {getbit('bitmap:users-online', 42)}")
@@ -143,9 +144,10 @@ print(f"bitmap bit 8  -> {getbit('bitmap:users-online', 8)} (unset)")
 # with ~0.81% error. Stand-in: hash each item, keep the longest leading
 # zero-run across hashes (the HLL insight in miniature).
 
+
 def pfadd(hll_key: str, *items: str) -> None:
     if not r.hexists(hll_key, "_max"):
-        r.hset(hll_key, {"_max": "0"})       # initialize once, never reset
+        r.hset(hll_key, {"_max": "0"})  # initialize once, never reset
     for item in items:
         h = int(hashlib.sha256(item.encode()).hexdigest(), 16)
         zeros = 0
@@ -192,6 +194,7 @@ print(f"HLL estimate -> ~{pfcount('hll:unique-prompts')} unique prompts (true: 3
 # MISTAKE: keeping user id lists for analytics ("how many unique users?").
 # CORRECT: HyperLogLog — fixed memory, 0.81% error, O(1) per add.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
@@ -201,8 +204,9 @@ def _verify() -> None:
 
     # hash: single-field update must not clobber other fields
     h = r.hgetall("exp:run:42")
-    assert h["model"] == "gpt-4o" and h["status"] == "completed", \
+    assert h["model"] == "gpt-4o" and h["status"] == "completed", (
         "HSET of one field must preserve the others"
+    )
 
     # list: pop is FIFO after RPUSH
     assert r.llen("queue:ingest") == 2, "LPOP must reduce list length"
@@ -210,14 +214,17 @@ def _verify() -> None:
 
     # set: duplicates ignored, intersection correct
     assert r.scard("tags:doc:2") == 2, "Duplicate SADD must be ignored"
-    assert sorted(r.sinter("tags:doc:1", "tags:doc:2")) == ["ml"], \
+    assert sorted(r.sinter("tags:doc:1", "tags:doc:2")) == ["ml"], (
         "SINTER must return shared members only"
+    )
 
     # sorted set: zincrby moves the member, zrevrange returns top-k
-    assert r.zscore("leaderboard:rag-eval", "system-b") == 0.9, \
+    assert r.zscore("leaderboard:rag-eval", "system-b") == 0.9, (
         "ZINCRBY must accumulate (0.87 + 0.03)"
-    assert r.zrevrange("leaderboard:rag-eval", 0, 0) == ["system-c"], \
+    )
+    assert r.zrevrange("leaderboard:rag-eval", 0, 0) == ["system-c"], (
         "Top of the leaderboard must be system-c (0.95)"
+    )
 
     # bitmap: idempotent set, distinct offsets independent
     assert getbit("bitmap:users-online", 7) is True, "Set bit must read back True"
@@ -226,8 +233,9 @@ def _verify() -> None:
     # HLL stand-in: dedup within a batch keeps the estimate stable
     before = pfcount("hll:unique-prompts")
     pfadd("hll:unique-prompts", "hello", "world")
-    assert pfcount("hll:unique-prompts") == before, \
+    assert pfcount("hll:unique-prompts") == before, (
         "Re-adding seen items must not raise the estimate"
+    )
 
     print("[OK] 02-data-structures: all checks passed")
 

@@ -110,8 +110,6 @@ class SqlExperimentRepository:
         raise NotImplementedError
 
 
-def register_batch_with_transaction(
-    session: Session, experiments: list[Experiment]
-) -> list[int]:
+def register_batch_with_transaction(session: Session, experiments: list[Experiment]) -> list[int]:
     """All-or-nothing batch registration; raise ValueError on duplicates."""
     raise NotImplementedError

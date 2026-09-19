@@ -35,12 +35,12 @@ import numpy as np
 matrix = np.array([[1, 2, 3], [4, 5, 6]])
 
 # Index along axis 0 (rows)
-print(matrix[0, :])   # [1 2 3] — first row
-print(matrix[:, 0])   # [1 4] — first column
+print(matrix[0, :])  # [1 2 3] — first row
+print(matrix[:, 0])  # [1 4] — first column
 
 # Index along axis 1 (columns)
-print(matrix[0, :])   # [1 2 3] — all columns of row 0
-print(matrix[1, :])   # [4 5 6] — all columns of row 1
+print(matrix[0, :])  # [1 2 3] — all columns of row 0
+print(matrix[1, :])  # [4 5 6] — all columns of row 1
 ```
 
 **Related:** ndim, shape, indexing
@@ -87,7 +87,7 @@ arr_3d = np.random.rand(2, 3, 4)
 
 # Equivalent indexing
 print(arr_3d[:, :, 0].shape)  # (2, 3)
-print(arr_3d[..., 0].shape)   # (2, 3)
+print(arr_3d[..., 0].shape)  # (2, 3)
 
 # Select all elements along last axis
 print(arr_3d[..., 0])
@@ -137,8 +137,8 @@ Position of an element in an array (0-based).
 arr = np.array([10, 20, 30, 40, 50])
 
 # Access by index
-print(arr[0])   # 10 — first element
-print(arr[4])   # 50 — last element
+print(arr[0])  # 10 — first element
+print(arr[4])  # 50 — last element
 print(arr[-1])  # 50 — last element (negative)
 
 # Out of range
@@ -195,8 +195,8 @@ row = arr[np.newaxis, :]
 print(row.shape)  # (1, 5)
 
 # For broadcasting
-a = np.array([1, 2, 3])      # shape (3,)
-b = np.array([10, 20])       # shape (2,)
+a = np.array([1, 2, 3])  # shape (3,)
+b = np.array([10, 20])  # shape (2,)
 # a[:, np.newaxis] + b  # shape (3, 2)
 ```
 
@@ -288,9 +288,9 @@ Index counting from the start (0-based).
 ```python
 arr = np.array([10, 20, 30, 40, 50])
 
-print(arr[0])   # 10 — first
-print(arr[1])   # 20 — second
-print(arr[4])   # 50 — fifth (last)
+print(arr[0])  # 10 — first
+print(arr[1])  # 20 — second
+print(arr[4])  # 50 — fifth (last)
 ```
 
 **Related:** negative index, indexing
@@ -306,12 +306,12 @@ A single element extracted from an array.
 arr = np.array([10, 20, 30, 40, 50])
 
 element = arr[0]
-print(element)      # 10
+print(element)  # 10
 print(type(element))  # <class 'numpy.int64'>
 
 # Compare with slicing (returns array)
 subset = arr[0:1]
-print(subset)        # [10]
+print(subset)  # [10]
 print(type(subset))  # <class 'numpy.ndarray'>
 ```
 
@@ -326,9 +326,9 @@ Select a range of elements using start:stop:step syntax.
 arr = np.array([10, 20, 30, 40, 50])
 
 # Basic slicing
-print(arr[1:4])    # [20 30 40]
-print(arr[::2])    # [10 30 50]
-print(arr[::-1])   # [50 40 30 20 10]
+print(arr[1:4])  # [20 30 40]
+print(arr[::2])  # [10 30 50]
+print(arr[::-1])  # [50 40 30 20 10]
 
 # 2D slicing
 matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
@@ -375,13 +375,13 @@ print(arr)
 #  [15 16 17 18 19]]
 
 # Single element
-print(arr[1, 2])        # 7
+print(arr[1, 2])  # 7
 
 # Row
-print(arr[1])           # [5 6 7 8 9]
+print(arr[1])  # [5 6 7 8 9]
 
 # Column
-print(arr[:, 2])        # [ 2  7 12 17]
+print(arr[:, 2])  # [ 2  7 12 17]
 
 # Submatrix
 print(arr[0:2, 1:3])
@@ -395,7 +395,7 @@ print(arr[np.arange(4), np.arange(4)])  # [ 0  6 12 18]
 print(arr[np.arange(4), np.arange(3, -1, -1)])  # [ 4  8 12 16]
 
 # Boolean mask
-print(arr[arr > 10])    # [11 12 13 14 15 16 17 18 19]
+print(arr[arr > 10])  # [11 12 13 14 15 16 17 18 19]
 
 # Conditional
 print(arr[(arr > 5) & (arr < 15)])  # [ 6  7  8  9 10 11 12 13 14]

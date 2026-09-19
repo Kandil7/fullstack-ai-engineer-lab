@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 # ============================================================
 # Identical questions get identical answers, stored in a dict.
 
+
 class ExactCache:
     def __init__(self) -> None:
         self._store: dict[str, str] = {}
@@ -63,6 +64,7 @@ assert cache.hit_rate() == 2 / 3
 # ============================================================
 # Similar questions should also hit. Embed both sides and match on
 # cosine similarity above a threshold.
+
 
 def cosine_similarity(a: list[float], b: list[float]) -> float:
     dot = sum(x * y for x, y in zip(a, b))
@@ -116,13 +118,14 @@ assert hit == "go to settings"
 # Easy tasks go to a cheap model; hard tasks to an expensive one.
 # Routing halves the average cost without losing quality.
 
+
 @dataclass
 class Router:
     easy_model: str = "haiku"
     hard_model: str = "opus"
-    easy_cost: float = 0.25     # $/1M tokens
-    hard_cost: float = 15.0     # $/1M tokens
-    easy_cutoff: float = 0.5    # difficulty threshold
+    easy_cost: float = 0.25  # $/1M tokens
+    hard_cost: float = 15.0  # $/1M tokens
+    easy_cutoff: float = 0.5  # difficulty threshold
 
     def route(self, difficulty: float) -> str:
         return self.easy_model if difficulty <= self.easy_cutoff else self.hard_model
@@ -145,8 +148,10 @@ assert router.route(0.2) == "haiku" and router.route(0.9) == "opus"
 # Long stable prefixes (system prompt + instructions) can be cached by
 # the provider: repeated prefix tokens are billed at a discount.
 
-def prefix_cache_cost(system_tokens: int, total_tokens: int, price: float,
-                      cache_discount: float = 0.5) -> float:
+
+def prefix_cache_cost(
+    system_tokens: int, total_tokens: int, price: float, cache_discount: float = 0.5
+) -> float:
     """Cost with the stable prefix charged at a discount."""
     uncached = total_tokens - system_tokens
     return (system_tokens * price * cache_discount + uncached * price) / 1_000_000
@@ -158,6 +163,7 @@ no_cache = 30_000 / 1_000_000 * 3.0
 print("\nExample 4: prompt caching")
 print(f"  with prefix cache: ${full:.3f} vs without: ${no_cache:.3f}")
 assert full < no_cache, "cached prefix costs less"
+
 
 # ============================================================
 # 5. Cost Per Conversation
@@ -186,11 +192,11 @@ print("\nExample 5: cost per conversation")
 print(f"  no cache: ${base:.3f}  |  40% repeat traffic + cache: ${with_cache:.3f}")
 assert with_cache < base, "cache cuts conversation cost"
 
+
 # ============================================================
 # Production Pattern
 # ============================================================
-def estimate_monthly_savings(queries_per_day: int, cost_per_query: float,
-                             hit_rate: float) -> float:
+def estimate_monthly_savings(queries_per_day: int, cost_per_query: float, hit_rate: float) -> float:
     """Dollar savings from caching over a month."""
     return queries_per_day * 30 * cost_per_query * hit_rate
 

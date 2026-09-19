@@ -87,9 +87,7 @@ print("(This is misleadingly high!)")
 ```python
 from sklearn.model_selection import train_test_split
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 print(f"Original size: {len(X)}")
 print(f"Training set: {len(X_train)}")
@@ -116,14 +114,12 @@ print("(Test R² is more realistic)")
 test_sizes = [0.1, 0.2, 0.3, 0.4]
 
 for test_size in test_sizes:
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=42
-    )
-    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+
     model = LinearRegression()
     model.fit(X_train, y_train)
     r2 = r2_score(y_test, model.predict(X_test))
-    
+
     print(f"Test size {test_size:.0%}: Train={len(X_train)}, Test={len(X_test)}, R²={r2:.4f}")
 ```
 
@@ -133,12 +129,12 @@ for test_size in test_sizes:
 print("Without random_state (different each time):")
 for i in range(3):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    print(f"  Split {i+1}: Test indices = {X_test[:3].flatten()}")
+    print(f"  Split {i + 1}: Test indices = {X_test[:3].flatten()}")
 
 print("\nWith random_state=42 (same every time):")
 for i in range(3):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    print(f"  Split {i+1}: Test indices = {X_test[:3].flatten()}")
+    print(f"  Split {i + 1}: Test indices = {X_test[:3].flatten()}")
 ```
 
 ### Example 6: Stratified Split
@@ -147,17 +143,13 @@ for i in range(3):
 from sklearn.datasets import make_classification
 
 X_clf, y_clf = make_classification(
-    n_samples=200, n_features=10,
-    n_informative=5, n_redundant=2,
-    random_state=42
+    n_samples=200, n_features=10, n_informative=5, n_redundant=2, random_state=42
 )
 
 print(f"Original class distribution: {np.bincount(y_clf)}")
 
 # Without stratify
-X_train, X_test, y_train, y_test = train_test_split(
-    X_clf, y_clf, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X_clf, y_clf, test_size=0.2, random_state=42)
 print(f"Without stratify: Train {np.bincount(y_train)}, Test {np.bincount(y_test)}")
 
 # With stratify
@@ -173,7 +165,7 @@ print(f"With stratify: Train {np.bincount(y_train)}, Test {np.bincount(y_test)}"
 from sklearn.model_selection import cross_val_score
 
 model = LinearRegression()
-scores = cross_val_score(model, X, y, cv=5, scoring='r2')
+scores = cross_val_score(model, X, y, cv=5, scoring="r2")
 
 print(f"5-fold CV R² scores: {scores}")
 print(f"Mean R²: {scores.mean():.4f} ± {scores.std():.4f}")

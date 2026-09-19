@@ -42,20 +42,22 @@ Action Input: Paris, France
 @dataclass
 class Action:
     """Represents an action taken by the agent."""
+
     name: str
     input_data: str
     timestamp: float = None
-    
+
     def execute(self, tools: dict) -> str:
         """Execute this action using the appropriate tool."""
         if self.name not in tools:
             return f"Error: Unknown action '{self.name}'"
-        
+
         try:
             result = tools[self.name](self.input_data)
             return str(result)
         except Exception as e:
             return f"Error: {type(e).__name__}: {str(e)}"
+
 
 # Usage
 action = Action(name="search", input_data="AI agents")
@@ -81,31 +83,34 @@ Action Input: SELECT * FROM users WHERE age > 30
 def parse_action_input(text: str) -> str:
     """Extract action input from LLM response."""
     import re
-    match = re.search(r"Action Input:\s*(.+?)(?=Observation:|$)", 
-                      text, re.DOTALL)
+
+    match = re.search(r"Action Input:\s*(.+?)(?=Observation:|$)", text, re.DOTALL)
     return match.group(1).strip() if match else ""
 
+
 # Validation
-def validate_action_input(tool_name: str, action_input: str, 
-                         tool_schemas: dict) -> tuple[bool, str]:
+def validate_action_input(
+    tool_name: str, action_input: str, tool_schemas: dict
+) -> tuple[bool, str]:
     """Validate action input against tool schema."""
     if tool_name not in tool_schemas:
         return False, f"Unknown tool: {tool_name}"
-    
+
     schema = tool_schemas[tool_name]
-    
+
     # Basic validation
     if not action_input:
         return False, "Action input is empty"
-    
+
     # Type-specific validation
     if schema.get("type") == "json":
         try:
             import json
+
             json.loads(action_input)
         except json.JSONDecodeError:
             return False, "Invalid JSON input"
-    
+
     return True, "Valid"
 ```
 
@@ -168,11 +173,12 @@ Final Answer: The Eiffel Tower is 330 meters tall and was built in 1889 for the 
 def extract_final_answer(response: str) -> str | None:
     """Extract the final answer from a ReAct response."""
     import re
-    
+
     match = re.search(r"Final Answer:\s*(.+)", response, re.DOTALL)
     if match:
         return match.group(1).strip()
     return None
+
 
 # Check if response contains final answer
 response = """Thought: I have all the information needed.
@@ -197,62 +203,63 @@ print(answer)  # "The answer is 42."
 from collections import Counter
 from typing import List
 
+
 class LoopDetector:
     """Detects when agent is stuck in a loop."""
-    
+
     def __init__(self, window_size: int = 3, threshold: float = 0.8):
         self.window_size = window_size
         self.threshold = threshold
         self.history: List[dict] = []
-    
+
     def add_step(self, thought: str, action: str, observation: str):
         """Record a step for analysis."""
-        self.history.append({
-            "thought": thought,
-            "action": action,
-            "observation": observation
-        })
-    
+        self.history.append(
+            {"thought": thought, "action": action, "observation": observation}
+        )
+
     def detect_action_loop(self) -> bool:
         """Detect if agent is repeating the same action."""
         if len(self.history) < self.window_size:
             return False
-        
-        recent = self.history[-self.window_size:]
+
+        recent = self.history[-self.window_size :]
         actions = [h["action"] for h in recent]
-        
+
         # All same action
         return len(set(actions)) == 1 and actions[0] is not None
-    
+
     def detect_thought_loop(self) -> bool:
         """Detect if agent is repeating the same thought."""
         if len(self.history) < self.window_size:
             return False
-        
-        recent = self.history[-self.window_size:]
+
+        recent = self.history[-self.window_size :]
         thoughts = [h["thought"] for h in recent]
-        
+
         # Similar thoughts (simple similarity)
         if all(thoughts):
             from difflib import SequenceMatcher
+
             similarities = []
             for i in range(len(thoughts) - 1):
-                sim = SequenceMatcher(None, thoughts[i], thoughts[i+1]).ratio()
+                sim = SequenceMatcher(None, thoughts[i], thoughts[i + 1]).ratio()
                 similarities.append(sim)
-            
+
             return sum(similarities) / len(similarities) > self.threshold
-        
+
         return False
-    
+
     def detect_error_loop(self) -> bool:
         """Detect if agent keeps getting errors."""
         if len(self.history) < 2:
             return False
-        
+
         recent = self.history[-3:]
         errors = [h for h in recent if "Error" in str(h.get("observation", ""))]
-        
+
         return len(errors) >= 2
+
 
 # Usage
 detector = LoopDetector()
@@ -287,27 +294,29 @@ Observation: Current weather in New York: 72°F, partly cloudy, humidity 45%
 @dataclass
 class Observation:
     """Structured observation from tool execution."""
+
     content: str
     source_tool: str
     success: bool
     timestamp: float
     metadata: dict = None
-    
+
     def to_context_string(self) -> str:
         """Format for inclusion in LLM context."""
         status = "Success" if self.success else "Error"
         return f"[{status}] {self.source_tool}: {self.content[:500]}"
-    
+
     def is_error(self) -> bool:
         """Check if observation represents an error."""
         return not self.success or "Error" in self.content
+
 
 # Create observation
 obs = Observation(
     content="Paris: 22°C, sunny",
     source_tool="get_weather",
     success=True,
-    timestamp=time.time()
+    timestamp=time.time(),
 )
 
 print(obs.to_context_string())
@@ -385,17 +394,16 @@ class ReActPattern:
 ```python
 class ReflectionModule:
     """Enables agent to reflect on its performance."""
-    
+
     def __init__(self, llm):
         self.llm = llm
-    
+
     def reflect_on_trace(self, trace: list) -> str:
         """Analyze the agent's trace and provide reflection."""
-        trace_summary = "\n".join([
-            f"Step {i+1}: {step}"
-            for i, step in enumerate(trace)
-        ])
-        
+        trace_summary = "\n".join(
+            [f"Step {i + 1}: {step}" for i, step in enumerate(trace)]
+        )
+
         prompt = f"""Analyze this agent trace and identify:
 1. What went well
 2. What went wrong
@@ -405,21 +413,21 @@ Trace:
 {trace_summary}
 
 Reflection:"""
-        
+
         return self.llm(prompt)
-    
+
     def should_retry(self, trace: list, max_retries: int = 3) -> bool:
         """Determine if agent should retry."""
         # Check for errors
         errors = [s for s in trace if "Error" in str(s)]
         if len(errors) > max_retries:
             return False
-        
+
         # Check for loops
-        actions = [getattr(s, 'action', None) for s in trace]
+        actions = [getattr(s, "action", None) for s in trace]
         if len(set(actions[-3:])) == 1:
             return True  # Try different approach
-        
+
         return False
 ```
 
@@ -447,31 +455,37 @@ def generate_thought(context: list, llm) -> str:
 {chr(10).join(context)}
 
 Thought:"""
-    
+
     response = llm(prompt)
-    
+
     # Extract thought
     if response.startswith("Thought:"):
         return response[8:].strip()
     return response.strip()
 
+
 def validate_thought(thought: str) -> bool:
     """Validate that a thought makes sense."""
     if not thought:
         return False
-    
+
     # Should not be too short
     if len(thought) < 10:
         return False
-    
+
     # Should indicate reasoning
     reasoning_indicators = [
-        "need to", "should", "because", "therefore",
-        "first", "next", "now", "based on"
+        "need to",
+        "should",
+        "because",
+        "therefore",
+        "first",
+        "next",
+        "now",
+        "based on",
     ]
-    
-    return any(indicator in thought.lower() 
-              for indicator in reasoning_indicators)
+
+    return any(indicator in thought.lower() for indicator in reasoning_indicators)
 ```
 
 **Related terms:** Reasoning, Planning, Chain-of-Thought
@@ -489,16 +503,18 @@ from typing import List, Optional
 import json
 from datetime import datetime
 
+
 @dataclass
 class TraceStep:
     """Single step in a ReAct trace."""
+
     step_number: int
     thought: str
     action: Optional[str]
     action_input: Optional[str]
     observation: Optional[str]
     timestamp: str
-    
+
     def to_dict(self) -> dict:
         return {
             "step": self.step_number,
@@ -506,21 +522,27 @@ class TraceStep:
             "action": self.action,
             "action_input": self.action_input,
             "observation": self.observation,
-            "timestamp": self.timestamp
+            "timestamp": self.timestamp,
         }
+
 
 class ReActTrace:
     """Complete trace of a ReAct execution."""
-    
+
     def __init__(self, question: str):
         self.question = question
         self.steps: List[TraceStep] = []
         self.final_answer: Optional[str] = None
         self.start_time = datetime.now()
         self.end_time: Optional[datetime] = None
-    
-    def add_step(self, thought: str, action: str = None,
-                action_input: str = None, observation: str = None):
+
+    def add_step(
+        self,
+        thought: str,
+        action: str = None,
+        action_input: str = None,
+        observation: str = None,
+    ):
         """Add a step to the trace."""
         step = TraceStep(
             step_number=len(self.steps) + 1,
@@ -528,15 +550,15 @@ class ReActTrace:
             action=action,
             action_input=action_input,
             observation=observation,
-            timestamp=datetime.now().isoformat()
+            timestamp=datetime.now().isoformat(),
         )
         self.steps.append(step)
-    
+
     def finish(self, answer: str):
         """Mark trace as complete."""
         self.final_answer = answer
         self.end_time = datetime.now()
-    
+
     def to_dict(self) -> dict:
         """Export trace as dictionary."""
         return {
@@ -545,18 +567,18 @@ class ReActTrace:
             "final_answer": self.final_answer,
             "duration_seconds": (
                 (self.end_time or datetime.now()) - self.start_time
-            ).total_seconds()
+            ).total_seconds(),
         }
-    
+
     def to_json(self) -> str:
         """Export trace as JSON."""
         return json.dumps(self.to_dict(), indent=2)
-    
+
     def print_trace(self):
         """Pretty-print the trace."""
         print(f"\nTrace for: {self.question}")
         print("=" * 50)
-        
+
         for step in self.steps:
             print(f"\nStep {step.step_number}:")
             print(f"  Thought: {step.thought}")
@@ -565,8 +587,9 @@ class ReActTrace:
                 print(f"  Input: {step.action_input}")
             if step.observation:
                 print(f"  Observation: {step.observation[:100]}...")
-        
+
         print(f"\nFinal Answer: {self.final_answer}")
+
 
 # Usage
 trace = ReActTrace("What is the capital of France?")
@@ -574,7 +597,7 @@ trace.add_step(
     thought="I need to find the capital of France.",
     action="search",
     action_input="capital of France",
-    observation="Paris is the capital of France."
+    observation="Paris is the capital of France.",
 )
 trace.finish("Paris")
 trace.print_trace()

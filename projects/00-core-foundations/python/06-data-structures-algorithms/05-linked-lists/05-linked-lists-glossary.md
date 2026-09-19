@@ -137,6 +137,7 @@ class Node:
         self.data = data
         self.next = None
 
+
 class DoublyNode:
     def __init__(self, data):
         self.data = data

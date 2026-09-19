@@ -35,24 +35,24 @@ from fastapi import APIRouter
 # Create router
 router = APIRouter()
 
+
 # Add endpoints
 @router.get("/")
 async def root():
     return {"message": "Hello"}
 
+
 @router.post("/items/")
 async def create_item(item: dict):
     return item
 
+
 # Router with configuration
-router = APIRouter(
-    prefix="/api/v1",
-    tags=["api"],
-    responses={404: {"description": "Not found"}}
-)
+router = APIRouter(prefix="/api/v1", tags=["api"], responses={404: {"description": "Not found"}})
 
 # Include in app
 from fastapi import FastAPI
+
 app = FastAPI()
 app.include_router(router)
 ```
@@ -72,13 +72,16 @@ from fastapi import APIRouter
 # Router with prefix
 users_router = APIRouter(prefix="/users")
 
+
 @router.get("/")  # Becomes /users/
 async def list_users():
     return []
 
+
 @router.get("/{user_id}")  # Becomes /users/{user_id}
 async def get_user(user_id: int):
     return {"id": user_id}
+
 
 # Nested prefixes
 api_router = APIRouter(prefix="/api")
@@ -107,23 +110,28 @@ router = APIRouter(
     tags=["users"]  # Groups all endpoints under "users" tag
 )
 
+
 @router.get("/", summary="List users")
 async def list_users():
     """List all users"""
     return []
+
 
 @router.post("/", summary="Create user")
 async def create_user(user: dict):
     """Create a new user"""
     return user
 
+
 # Multiple tags
 router = APIRouter(tags=["users", "admin"])
+
 
 # Per-endpoint tags
 @router.get("/", tags=["list", "read"])
 async def list_users():
     return []
+
 
 # In Swagger UI:
 # - Users section contains all /users/ endpoints
@@ -149,18 +157,22 @@ users_router = APIRouter(prefix="/users")
 items_router = APIRouter(prefix="/items")
 admin_router = APIRouter(prefix="/admin")
 
+
 # Add endpoints to routers
 @users_router.get("/")
 async def list_users():
     return []
 
+
 @items_router.get("/")
 async def list_items():
     return []
 
+
 @admin_router.get("/")
 async def admin_dashboard():
     return {}
+
 
 # Include routers in app
 app.include_router(users_router)
@@ -194,34 +206,38 @@ from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter()
 
+
 # Define dependency
 async def verify_token(token: str = Header(None)):
     if not token:
         raise HTTPException(status_code=401, detail="Missing token")
     return token
 
-async def verify_admin(user = Depends(get_current_user)):
+
+async def verify_admin(user=Depends(get_current_user)):
     if not user.is_admin:
         raise HTTPException(status_code=403, detail="Not admin")
     return user
 
+
 # Router-level dependencies
 router = APIRouter(dependencies=[Depends(verify_token)])
+
 
 @router.get("/users/")
 async def list_users():
     return []  # Requires valid token
 
+
 # Multiple dependencies
-router = APIRouter(dependencies=[
-    Depends(verify_token),
-    Depends(rate_limit)
-])
+router = APIRouter(dependencies=[Depends(verify_token), Depends(rate_limit)])
+
 
 # Per-route overrides
 @router.get("/admin/", dependencies=[Depends(verify_admin)])
 async def admin_route():
     return {}  # Requires admin
+
 
 # Override router dependency
 @router.get("/public/", dependencies=[])  # No dependencies
@@ -248,31 +264,38 @@ products_router = APIRouter(prefix="/products")
 reviews_router = APIRouter()
 variants_router = APIRouter()
 
+
 # Add endpoints to children
 @reviews_router.get("/")
 async def list_reviews(product_id: int):
     return []
 
+
 @reviews_router.post("/")
 async def create_review(product_id: int, review: dict):
     return review
+
 
 @variants_router.get("/")
 async def list_variants(product_id: int):
     return []
 
+
 # Nest children under parent
 products_router.include_router(reviews_router, prefix="/{product_id}/reviews")
 products_router.include_router(variants_router, prefix="/{product_id}/variants")
+
 
 # Add parent endpoints
 @products_router.get("/")
 async def list_products():
     return []
 
+
 @products_router.get("/{product_id}")
 async def get_product(product_id: int):
     return {"id": product_id}
+
 
 # Resulting endpoints:
 # GET /products/
@@ -299,33 +322,36 @@ app = FastAPI()
 # V1 router
 v1_router = APIRouter()
 
+
 @v1_router.get("/users/")
 async def list_users_v1():
     """V1: Basic user list"""
     return [{"id": 1, "name": "John"}]
 
+
 # V2 router
 v2_router = APIRouter()
+
 
 @v2_router.get("/users/")
 async def list_users_v2():
     """V2: Paginated user list"""
-    return {
-        "data": [{"id": 1, "name": "John"}],
-        "total": 100,
-        "page": 1
-    }
+    return {"data": [{"id": 1, "name": "John"}], "total": 100, "page": 1}
+
 
 # Include versioned routers
 app.include_router(v1_router, prefix="/api/v1")
 app.include_router(v2_router, prefix="/api/v2")
 
+
 # Version-specific dependencies
 async def v1_auth():
     return {"version": "1"}
 
+
 async def v2_auth():
     return {"version": "2"}
+
 
 v1_router = APIRouter(dependencies=[Depends(v1_auth)])
 v2_router = APIRouter(dependencies=[Depends(v2_auth)])
@@ -345,44 +371,43 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List, Optional
 
+
 # Response model
 class UserResponse(BaseModel):
     id: int
     name: str
     email: str
-    
+
     class Config:
         from_attributes = True
+
 
 class UserListResponse(BaseModel):
     data: List[UserResponse]
     total: int
     page: int
 
+
 router = APIRouter()
+
 
 # Single response
 @router.get("/users/{user_id}", response_model=UserResponse)
 async def get_user(user_id: int):
     return {"id": user_id, "name": "John", "email": "john@example.com"}
 
+
 # List response
 @router.get("/users/", response_model=UserListResponse)
 async def list_users():
-    return {
-        "data": [{"id": 1, "name": "John"}],
-        "total": 1,
-        "page": 1
-    }
+    return {"data": [{"id": 1, "name": "John"}], "total": 1, "page": 1}
+
 
 # Multiple response models
 @router.get(
     "/items/{item_id}",
     response_model=ItemResponse,
-    responses={
-        200: {"description": "Success"},
-        404: {"description": "Not found"}
-    }
+    responses={200: {"description": "Success"}, 404: {"description": "Not found"}},
 )
 async def get_item(item_id: int):
     return {"id": item_id, "name": "Item"}
@@ -402,32 +427,37 @@ from fastapi import APIRouter, status
 
 router = APIRouter()
 
+
 # Default 200
 @router.get("/items/")
 async def list_items():
     return []
+
 
 # Explicit status code
 @router.post("/items/", status_code=status.HTTP_201_CREATED)
 async def create_item(item: dict):
     return item
 
+
 # No content (204)
 @router.delete("/items/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_item(item_id: int):
     return None
 
+
 # Custom status codes
 from fastapi.responses import JSONResponse
+
 
 @router.post("/items/")
 async def create_item(item: dict):
     if item_exists(item["name"]):
         return JSONResponse(
-            status_code=status.HTTP_409_CONFLICT,
-            content={"detail": "Item already exists"}
+            status_code=status.HTTP_409_CONFLICT, content={"detail": "Item already exists"}
         )
     return item
+
 
 # Common status codes
 """
@@ -459,19 +489,21 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
+
 @router.get(
     "/users/",
     summary="List all users",
-    description="Retrieve a paginated list of all users in the system"
+    description="Retrieve a paginated list of all users in the system",
 )
 async def list_users():
     """
     List all users.
-    
+
     This endpoint returns a paginated list of users.
     Only authenticated users can access this endpoint.
     """
     return []
+
 
 # Summary in Swagger UI:
 # GET /users/ - List all users
@@ -495,20 +527,17 @@ from fastapi.responses import JSONResponse
 
 router = APIRouter()
 
+
 # Router-level exception handler
 @router.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
-    return JSONResponse(
-        status_code=400,
-        content={"detail": str(exc)}
-    )
+    return JSONResponse(status_code=400, content={"detail": str(exc)})
+
 
 @router.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.detail}
-    )
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
 
 @router.get("/items/")
 async def list_items():
@@ -527,14 +556,14 @@ async def list_items():
 from fastapi import APIRouter
 
 router = APIRouter(
-    prefix="/api/v1",           # URL prefix
-    tags=["api"],               # Documentation tags
+    prefix="/api/v1",  # URL prefix
+    tags=["api"],  # Documentation tags
     responses={404: {"description": "Not found"}},  # Default responses
     dependencies=[Depends(verify_token)],  # Shared dependencies
-    default_response_class=JSONResponse,   # Response class
+    default_response_class=JSONResponse,  # Response class
     responses={500: {"description": "Server error"}},  # Error responses
-    include_in_schema=True,     # Show in docs
-    deprecated=False,           # Mark as deprecated
+    include_in_schema=True,  # Show in docs
+    deprecated=False,  # Mark as deprecated
 )
 ```
 
@@ -547,6 +576,7 @@ router = APIRouter(
 def create_router(prefix: str, tags: list) -> APIRouter:
     return APIRouter(prefix=prefix, tags=tags)
 
+
 users_router = create_router("/users", ["users"])
 items_router = create_router("/items", ["items"])
 ```
@@ -556,9 +586,11 @@ items_router = create_router("/items", ["items"])
 router = APIRouter()
 
 if settings.DEBUG:
+
     @router.get("/debug/")
     async def debug():
         return {"debug": True}
+
 
 @router.get("/health/")
 async def health():

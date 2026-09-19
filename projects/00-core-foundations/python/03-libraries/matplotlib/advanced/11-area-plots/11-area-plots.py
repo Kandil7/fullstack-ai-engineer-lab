@@ -3,14 +3,17 @@ Matplotlib Area Plots - W3Schools Exercises
 =============================================
 Area (filled line) chart creation and stacked areas.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -37,11 +40,13 @@ def exercise_02():
     """Create a stacked area plot showing composition over time."""
     months = np.arange(1, 7)
     labels = ["Product A", "Product B", "Product C"]
-    data = np.array([
-        [20, 25, 30, 35, 40, 45],
-        [15, 20, 18, 22, 25, 28],
-        [10, 12, 15, 18, 20, 22],
-    ])
+    data = np.array(
+        [
+            [20, 25, 30, 35, 40, 45],
+            [15, 20, 18, 22, 25, 28],
+            [10, 12, 15, 18, 20, 22],
+        ]
+    )
     colors = ["#3498db", "#e74c3c", "#2ecc71"]
 
     plt.figure(figsize=(8, 5))
@@ -105,12 +110,18 @@ def exercise_05():
 
     # Smooth the data
     from scipy.ndimage import uniform_filter1d
+
     smoothed = uniform_filter1d(raw, size=5, axis=0)
 
     plt.figure(figsize=(10, 6))
     colors = plt.cm.tab10(np.linspace(0, 1, n_series))
-    plt.stackplot(x, *smoothed.T, colors=colors, alpha=0.8,
-                  labels=[f"Series {i+1}" for i in range(n_series)])
+    plt.stackplot(
+        x,
+        *smoothed.T,
+        colors=colors,
+        alpha=0.8,
+        labels=[f"Series {i + 1}" for i in range(n_series)],
+    )
     plt.legend(loc="upper left", ncol=2)
     plt.title("Exercise 5: Streamgraph-Style Area Plot")
     plt.xlabel("Time")

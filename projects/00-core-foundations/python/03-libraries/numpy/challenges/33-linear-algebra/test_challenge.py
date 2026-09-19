@@ -31,17 +31,15 @@ starter = _load("starter_33", os.path.join(HERE, "starter.py"))
 
 # ---------------------------------------------------------------- helpers
 
+
 def _assert_no_python_loops(mod):
     for name in ("starter", "solution"):
-        tree = ast.parse(
-            open(os.path.join(HERE, name + ".py"), encoding="utf-8").read()
-        )
+        tree = ast.parse(open(os.path.join(HERE, name + ".py"), encoding="utf-8").read())
         banned = [
             n
             for n in ast.walk(tree)
             if isinstance(
-                n, (ast.For, ast.While, ast.ListComp, ast.DictComp,
-                    ast.SetComp, ast.GeneratorExp)
+                n, (ast.For, ast.While, ast.ListComp, ast.DictComp, ast.SetComp, ast.GeneratorExp)
             )
         ]
         assert not banned, f"{name}.py contains Python loops/comprehensions"
@@ -61,12 +59,12 @@ def _manual_cosine(X):
     out = np.empty((n, n))
     for i in range(n):
         for j in range(n):
-            out[i, j] = float(np.dot(X[i], X[j]) /
-                              (np.linalg.norm(X[i]) * np.linalg.norm(X[j])))
+            out[i, j] = float(np.dot(X[i], X[j]) / (np.linalg.norm(X[i]) * np.linalg.norm(X[j])))
     return out
 
 
 # ---------------------------------------------------------------- bronze
+
 
 def test_bronze_orthogonal_rows():
     X = np.array([[1.0, 0.0], [0.0, 1.0]])
@@ -99,7 +97,7 @@ def test_bronze_memory_linear():
     # Output is O(n^2) = 32 MB for (2000, 64); the contract is
     # "no extra full-size copies": peak < input + 3 x output.
     rng = np.random.default_rng(1)
-    X = rng.normal(size=(2000, 64))          # ~1 MB
+    X = rng.normal(size=(2000, 64))  # ~1 MB
     S = solution.cosine_matrix(X)
     _, peak = _call_peak(solution.cosine_matrix, X)
     assert peak < X.nbytes + 3 * S.nbytes
@@ -110,6 +108,7 @@ def test_bronze_no_python_loops():
 
 
 # ---------------------------------------------------------------- silver
+
 
 def test_silver_clean_cubic_exact():
     t = np.linspace(-2.0, 2.0, 50)
@@ -134,11 +133,10 @@ def test_silver_overfit_degree_returns_long_vector():
     y = 3.0 + 2.0 * t + rng.normal(scale=0.05, size=t.size)
     coef = solution.fit_polynomial(t, y, 5)
     assert coef.shape == (6,)
-    resid_high = np.linalg.norm(
-        np.polynomial.polynomial.polyval(t, coef) - y)
+    resid_high = np.linalg.norm(np.polynomial.polynomial.polyval(t, coef) - y)
     resid_low = np.linalg.norm(
-        np.polynomial.polynomial.polyval(
-            t, solution.fit_polynomial(t, y, 1)) - y)
+        np.polynomial.polynomial.polyval(t, solution.fit_polynomial(t, y, 1)) - y
+    )
     assert resid_high <= resid_low + 1e-12
 
 
@@ -151,7 +149,7 @@ def test_silver_exact_interpolation():
 
 def test_silver_memory_ok():
     t = np.linspace(0.0, 1.0, 20000)
-    y = 1.0 + t + t ** 2
+    y = 1.0 + t + t**2
     _, peak = _call_peak(solution.fit_polynomial, t, y, 5)
     assert peak < 20 * t.nbytes
 
@@ -161,6 +159,7 @@ def test_silver_no_python_loops():
 
 
 # ---------------------------------------------------------------- gold
+
 
 def _gold_matrix(seed=42, shape=(64, 64)):
     return np.random.default_rng(seed).normal(size=shape)
@@ -206,7 +205,7 @@ def test_gold_error_stays_within_full_spectrum():
 
 
 def test_gold_memory_bounded():
-    A = _gold_matrix(seed=42)                 # 32 KB float64
+    A = _gold_matrix(seed=42)  # 32 KB float64
     _, peak = _call_peak(solution.compress_svd, A, 8 * (64 + 64 + 1) * 10)
     assert peak < 6 * A.nbytes, f"peak {peak} for {A.nbytes} input"
 
@@ -216,6 +215,7 @@ def test_gold_no_python_loops():
 
 
 # ---------------------------------------------------------------- starter
+
 
 def test_starter_raises_not_implemented():
     with pytest.raises(NotImplementedError):

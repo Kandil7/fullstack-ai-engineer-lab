@@ -58,9 +58,7 @@ class EvalMetric(Base):
     __tablename__ = "eval_metrics"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    experiment_id: Mapped[int] = mapped_column(
-        ForeignKey("experiments.id"), nullable=False
-    )
+    experiment_id: Mapped[int] = mapped_column(ForeignKey("experiments.id"), nullable=False)
     metric: Mapped[str] = mapped_column(String(30), nullable=False)
     value: Mapped[float] = mapped_column(nullable=False)
 
@@ -72,9 +70,7 @@ class PromptTemplate(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(60), nullable=False)
-    parent_id: Mapped[int | None] = mapped_column(
-        ForeignKey("prompt_templates.id")
-    )
+    parent_id: Mapped[int | None] = mapped_column(ForeignKey("prompt_templates.id"))
 
 
 Base.metadata.create_all(engine)
@@ -162,9 +158,7 @@ with new_session() as session:
 
 # Example 4: or_ combines alternatives in one predicate
 with new_session() as session:
-    stmt = select(Experiment).where(
-        or_(Experiment.status == "running", Experiment.model == "gpt2")
-    )
+    stmt = select(Experiment).where(or_(Experiment.status == "running", Experiment.model == "gpt2"))
     matches = session.scalars(stmt).all()
     print(f"running or gpt2: {[e.name for e in matches]}")
 
@@ -224,12 +218,7 @@ with new_session() as session:
 
 # Example 7: inner join — experiments that HAVE at least one metric
 with new_session() as session:
-    stmt = (
-        select(Experiment)
-        .join(EvalMetric)
-        .distinct()
-        .order_by(Experiment.name)
-    )
+    stmt = select(Experiment).join(EvalMetric).distinct().order_by(Experiment.name)
     with_metrics = session.scalars(stmt).all()
     print(f"experiments with metrics: {[e.name for e in with_metrics]}")
 
@@ -287,12 +276,7 @@ with new_session() as session:
 
 # Example 10: offset pagination, page 2 of size 1
 with new_session() as session:
-    page2 = (
-        session.scalars(
-            select(Experiment).order_by(Experiment.id).limit(1).offset(1)
-        )
-        .all()
-    )
+    page2 = session.scalars(select(Experiment).order_by(Experiment.id).limit(1).offset(1)).all()
     print(f"offset page 2: {[e.name for e in page2]}")
 
 # Output:
@@ -306,6 +290,7 @@ with new_session() as session:
 # "seek pagination") so deep pages stay O(page_size), not O(offset).
 # The cursor is the last (id) seen; the next query is
 # WHERE id > :last_id ORDER BY id LIMIT :size.
+
 
 def keyset_page(session: Session, after_id: int | None, size: int) -> list[Experiment]:
     """Return the next page of experiments strictly after after_id.
@@ -379,8 +364,7 @@ def _verify() -> None:
             )
             .order_by(Experiment.name)
         ).all()
-        assert names == ["bert-finetune-1", "bert-finetune-2"], \
-            "where/and_/in_/like must compose"
+        assert names == ["bert-finetune-1", "bert-finetune-2"], "where/and_/in_/like must compose"
 
         # 3. or_ alternatives work
         names = session.scalars(
@@ -388,16 +372,15 @@ def _verify() -> None:
             .where(or_(Experiment.status == "running", Experiment.model == "gpt2"))
             .order_by(Experiment.name)
         ).all()
-        assert names == ["bert-finetune-2", "gpt-finetune-1"], \
-            "or_ must combine alternatives"
+        assert names == ["bert-finetune-2", "gpt-finetune-1"], "or_ must combine alternatives"
 
         # 4. execute() rows support attribute access
         row = session.execute(
-            select(Experiment.name, Experiment.status)
-            .where(Experiment.name == "bert-finetune-1")
+            select(Experiment.name, Experiment.status).where(Experiment.name == "bert-finetune-1")
         ).one()
-        assert row.name == "bert-finetune-1" and row.status == "done", \
+        assert row.name == "bert-finetune-1" and row.status == "done", (
             "execute() Rows must expose columns as attributes"
+        )
 
         # 5. Aggregates: one f1 value per experiment with metrics
         pairs = session.execute(
@@ -405,8 +388,9 @@ def _verify() -> None:
             .group_by(EvalMetric.experiment_id)
             .order_by(EvalMetric.experiment_id)
         ).all()
-        assert [(p[0], p[1]) for p in pairs] == [(1, 2), (2, 2), (3, 1)], \
+        assert [(p[0], p[1]) for p in pairs] == [(1, 2), (2, 2), (3, 1)], (
             "group_by + count must match the seeded data"
+        )
 
         # 6. Outer join keeps experiments without metrics (none seeded, so
         #    the LEFT side count equals the total experiment count)
@@ -441,8 +425,9 @@ def _verify() -> None:
 
         # 9. Leaderboard: join-then-filter returns only qualifying rows
         leaders = metric_leaders(session, "f1", 0.90, 5)
-        assert leaders == [("gpt-finetune-1", 0.93)], \
+        assert leaders == [("gpt-finetune-1", 0.93)], (
             "metric_leaders must filter by value and metric"
+        )
 
         # 10. tuple_ row-value comparison is supported (SQLite >= 3.15);
         #     the cursor is DERIVED from the last row of the first page
@@ -453,8 +438,9 @@ def _verify() -> None:
             .where(tuple_(Experiment.id, Experiment.name) > cursor)
             .order_by(Experiment.id, Experiment.name)
         ).all()
-        assert after == ["bert-finetune-2"], \
+        assert after == ["bert-finetune-2"], (
             "row-value comparison must page forward from the cursor"
+        )
 
     print("[OK] 05-querying-2.0: all checks passed")
 

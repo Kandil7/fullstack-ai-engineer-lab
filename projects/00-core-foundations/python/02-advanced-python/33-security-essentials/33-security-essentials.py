@@ -46,6 +46,7 @@ sys.stdout.reconfigure(line_buffering=True)  # type: ignore[attr-defined]
 # random is a PRNG: deterministic given a seed, fine for simulations,
 # WRONG for anything security-relevant. secrets uses the OS CSPRNG.
 
+
 def insecure_token(length: int = 16) -> str:
     """WRONG: random.choice is predictable if the seed is known."""
     alphabet = string.ascii_letters + string.digits
@@ -78,29 +79,28 @@ print(f"secure (unpredictable): {secure_token(8)}")
 # scrypt/PBKDF2). hashlib.pbkdf2_hmac is stdlib and the pattern for
 # bcrypt/argon2 in production. MD5/SHA1 are instant to brute-force.
 
-def hash_password(password: str, salt: bytes | None = None,
-                  iterations: int = 100_000) -> tuple[bytes, bytes]:
+
+def hash_password(
+    password: str, salt: bytes | None = None, iterations: int = 100_000
+) -> tuple[bytes, bytes]:
     """PBKDF2-HMAC-SHA256: salted, slow. O(iterations) work."""
     salt = salt or secrets.token_bytes(16)
-    digest = hashlib.pbkdf2_hmac(
-        "sha256", password.encode("utf-8"), salt, iterations
-    )
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
     return digest, salt
 
 
-def verify_password(password: str, digest: bytes, salt: bytes,
-                    iterations: int = 100_000) -> bool:
+def verify_password(password: str, digest: bytes, salt: bytes, iterations: int = 100_000) -> bool:
     """Timing-safe verify. O(iterations) work."""
-    candidate = hashlib.pbkdf2_hmac(
-        "sha256", password.encode("utf-8"), salt, iterations
-    )
+    candidate = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
     return hmac.compare_digest(candidate, digest)
 
 
 # Example 2: hash + verify round trip
 stored_hash, stored_salt = hash_password("correct horse battery staple")
 print(f"hash length: {len(stored_hash)} bytes, salt length: {len(stored_salt)}")
-print(f"verify correct: {verify_password('correct horse battery staple', stored_hash, stored_salt)}")  # noqa: E501
+print(
+    f"verify correct: {verify_password('correct horse battery staple', stored_hash, stored_salt)}"
+)  # noqa: E501
 print(f"verify wrong: {verify_password('wrong', stored_hash, stored_salt)}")
 
 # Output:
@@ -115,6 +115,7 @@ print(f"verify wrong: {verify_password('wrong', stored_hash, stored_salt)}")
 # == on strings returns early on the first mismatch, leaking length and
 # prefix information over many probes. compare_digest runs in constant
 # time relative to the input length.
+
 
 def unsafe_equals(a: str, b: str) -> bool:
     """WRONG: early-exit comparison leaks timing information."""
@@ -139,6 +140,7 @@ print(f"safe: {safe_equals('abc', 'abc')}, {safe_equals('abc', 'abd')}")
 # 4. SQL injection — parameterized queries
 # ============================================================
 
+
 def unsafe_query(conn: sqlite3.Connection, user_id: str) -> list[tuple]:
     """WRONG: string interpolation builds SQL from input."""
     cursor = conn.execute(f"SELECT name FROM users WHERE id = '{user_id}'")
@@ -147,9 +149,7 @@ def unsafe_query(conn: sqlite3.Connection, user_id: str) -> list[tuple]:
 
 def safe_query(conn: sqlite3.Connection, user_id: str) -> list[tuple]:
     """RIGHT: parameters are bound, never interpolated. O(1)."""
-    cursor = conn.execute(
-        "SELECT name FROM users WHERE id = ?", (user_id,)
-    )
+    cursor = conn.execute("SELECT name FROM users WHERE id = ?", (user_id,))
     return cursor.fetchall()
 
 
@@ -176,18 +176,19 @@ print(f"safe vs injection: {safe_query(conn, injection_payload)}")
 # 5. Command injection — no shell=True
 # ============================================================
 
+
 def unsafe_run(user_input: str) -> str:
     """WRONG: shell=True turns input into a shell command."""
-    return subprocess.run(
-        f"echo {user_input}", shell=True, capture_output=True, text=True
-    ).stdout
+    return subprocess.run(f"echo {user_input}", shell=True, capture_output=True, text=True).stdout
 
 
 def safe_run(user_input: str) -> str:
     """RIGHT: argument list, no shell. O(1)."""
     return subprocess.run(
         [sys.executable, "-c", "import sys; print(sys.argv[1])", user_input],
-        capture_output=True, text=True, check=True
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout
 
 
@@ -201,6 +202,7 @@ print(f"safe echo: {safe_run('hello; whoami').strip()}")
 # ============================================================
 # 6. Path traversal — resolve and verify containment
 # ============================================================
+
 
 def unsafe_read(root: Path, filename: str) -> str:
     """WRONG: .. escapes the root."""
@@ -234,6 +236,7 @@ print(f"safe read: {safe_read(root, 'secret.txt')}")
 # ============================================================
 # 7. pickle — deserialization is code execution
 # ============================================================
+
 
 class Evil:
     """An object whose unpickling runs code."""
@@ -289,6 +292,7 @@ except yaml.YAMLError as exc:
 # 9. ReDoS — catastrophic backtracking
 # ============================================================
 
+
 def regex_ok(pattern: str, text: str) -> bool:
     """Match with a timeout-ish bound by pre-checking length. O(len)."""
     return re.search(pattern, text) is not None
@@ -308,6 +312,7 @@ print(f"simple pattern: {regex_ok(safe_pattern, long_almost)}")
 # ============================================================
 # 10. Secrets in code — never log credentials
 # ============================================================
+
 
 def redact(value: str) -> str:
     """Replace a secret with a masked placeholder. O(len)."""
@@ -361,23 +366,19 @@ def _verify() -> None:
     first = insecure_token(8)
     random.seed(7)
     second = insecure_token(8)
-    assert first == second, \
-        "seeded random is deterministic — predictable tokens"
-    assert secure_token(32) != secure_token(32), \
+    assert first == second, "seeded random is deterministic — predictable tokens"
+    assert secure_token(32) != secure_token(32), (
         "secrets tokens are unpredictable (astronomically unlikely to collide)"
+    )
     assert len(secure_token(32)) == 32, "secure_token length honored"
 
     # --- password hashing ---
     digest, salt = hash_password("p@ss")
-    assert len(digest) == 32 and len(salt) == 16, \
-        "PBKDF2 output length must be the hash size"
-    assert verify_password("p@ss", digest, salt) is True, \
-        "correct password must verify"
-    assert verify_password("p@ss2", digest, salt) is False, \
-        "wrong password must be rejected"
+    assert len(digest) == 32 and len(salt) == 16, "PBKDF2 output length must be the hash size"
+    assert verify_password("p@ss", digest, salt) is True, "correct password must verify"
+    assert verify_password("p@ss2", digest, salt) is False, "wrong password must be rejected"
     digest2, salt2 = hash_password("p@ss")
-    assert digest2 != digest, \
-        "random salt means identical passwords hash differently"
+    assert digest2 != digest, "random salt means identical passwords hash differently"
 
     # --- timing-safe comparison ---
     assert safe_equals("abc", "abc") is True, "equal secrets match"
@@ -389,37 +390,38 @@ def _verify() -> None:
     conn.execute("CREATE TABLE users (id TEXT, name TEXT)")
     conn.execute("INSERT INTO users VALUES ('1', 'alice'), ('2', 'bob')")
     dumped = unsafe_query(conn, "1' OR '1'='1")
-    assert len(dumped) >= 2, \
-        "interpolated SQL lets the injection dump the table"
-    assert safe_query(conn, "1") == [("alice",)], \
+    assert len(dumped) >= 2, "interpolated SQL lets the injection dump the table"
+    assert safe_query(conn, "1") == [("alice",)], (
         "parameterized query returns exactly the matching row"
-    assert safe_query(conn, "1' OR '1'='1") == [], \
+    )
+    assert safe_query(conn, "1' OR '1'='1") == [], (
         "parameterized query treats the payload as a literal value"
+    )
 
     # --- command injection ---
     assert "whoami" not in safe_run("x; whoami").strip() or True
-    assert safe_run("hello; whoami").strip() == "hello; whoami", \
+    assert safe_run("hello; whoami").strip() == "hello; whoami", (
         "argument-list subprocess treats metacharacters as data"
+    )
 
     # --- path traversal ---
     root = Path("__data_security_demo__")
     root.mkdir(exist_ok=True)
     (root / "secret.txt").write_text("TOP SECRET", encoding="utf-8")
-    assert safe_read(root, "secret.txt") == "TOP SECRET", \
-        "in-root reads work"
+    assert safe_read(root, "secret.txt") == "TOP SECRET", "in-root reads work"
     try:
         safe_read(root, "../02-advanced-python/33-security-essentials.py")
         raise AssertionError("traversal was not blocked")
     except ValueError:
         pass
-    assert unsafe_read(root, "secret.txt") == "TOP SECRET", \
+    assert unsafe_read(root, "secret.txt") == "TOP SECRET", (
         "unsafe read still works (demonstrating the contrast)"
+    )
 
     # --- pickle RCE ---
     payload = pickle.dumps(Evil())
     # We do NOT unpickle in verify: the demo already proved execution.
-    assert b"PWNED" in pickle.dumps(Evil()), \
-        "the payload carries the command"
+    assert b"PWNED" in pickle.dumps(Evil()), "the payload carries the command"
 
     # --- YAML safe_load ---
     bad = "!!python/object/apply:os.system ['echo x']"
@@ -428,20 +430,17 @@ def _verify() -> None:
         raise AssertionError("safe_load accepted a Python-tag payload")
     except yaml.YAMLError:
         pass
-    assert yaml.safe_load("a: 1") == {"a": 1}, \
-        "safe_load still parses plain YAML"
+    assert yaml.safe_load("a: 1") == {"a": 1}, "safe_load still parses plain YAML"
 
     # --- ReDoS awareness ---
-    assert regex_ok(r"^a+$", "a" * 30 + "b") is False, \
-        "simple pattern matches correctly"
-    assert regex_ok(r"^a+$", "a" * 30) is True, \
-        "simple pattern accepts valid input"
+    assert regex_ok(r"^a+$", "a" * 30 + "b") is False, "simple pattern matches correctly"
+    assert regex_ok(r"^a+$", "a" * 30) is True, "simple pattern accepts valid input"
 
     # --- redaction ---
-    assert "sk-1234567890abcdef" not in redact("sk-1234567890abcdef"), \
+    assert "sk-1234567890abcdef" not in redact("sk-1234567890abcdef"), (
         "redaction must remove the full secret from logs"
-    assert redact("sk-1234567890abcdef") == "***cdef", \
-        "redaction keeps only a suffix hint"
+    )
+    assert redact("sk-1234567890abcdef") == "***cdef", "redaction keeps only a suffix hint"
 
     print("[OK] 33-security-essentials: all checks passed")
 

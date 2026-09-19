@@ -63,13 +63,16 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("clf", LogisticRegression(max_iter=1000)),
-])
+pipe = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("clf", LogisticRegression(max_iter=1000)),
+    ]
+)
 # fit on X_train, y_train ...
 # package the WHOLE pipeline:
 import joblib
+
 joblib.dump(pipe, "churn_model.pkl")
 ```
 
@@ -117,17 +120,21 @@ batch jobs, and CI all talk to any model without framework-specific code.
 ```python
 import mlflow.pyfunc
 
+
 class ChurnWrapper(mlflow.pyfunc.PythonModel):
     def load_context(self, context):
         import joblib
+
         self._pipe = joblib.load(context.artifacts["model_pkl"])
 
     def predict(self, context, model_input):
         # model_input is a pandas DataFrame
         return self._pipe.predict_proba(model_input)[:, 1]
 
+
 mlflow.pyfunc.save_model(
-    "churn_pyfunc", python_model=ChurnWrapper(),
+    "churn_pyfunc",
+    python_model=ChurnWrapper(),
     artifacts={"model_pkl": "churn_model.pkl"},
 )
 loaded = mlflow.pyfunc.load_model("churn_pyfunc")
@@ -153,11 +160,13 @@ from mlflow.models import ModelSignature
 from mlflow.types import ColSpec, DataType, Schema
 
 signature = ModelSignature(
-    inputs=Schema([
-        ColSpec(DataType.double, "tenure"),
-        ColSpec(DataType.double, "monthly_charges"),
-        ColSpec(DataType.long, "contract_type_code"),
-    ]),
+    inputs=Schema(
+        [
+            ColSpec(DataType.double, "tenure"),
+            ColSpec(DataType.double, "monthly_charges"),
+            ColSpec(DataType.long, "contract_type_code"),
+        ]
+    ),
     outputs=Schema([ColSpec(DataType.double, "churn_probability")]),
 )
 ```
@@ -208,8 +217,9 @@ loaded twice.
 ```python
 import hashlib
 
+
 def model_sha256(path: str) -> str:
-    return f"sha256:{hashlib.sha256(open(path,'rb').read()).hexdigest()[:16]}"
+    return f"sha256:{hashlib.sha256(open(path, 'rb').read()).hexdigest()[:16]}"
 ```
 
 Output (conceptually):

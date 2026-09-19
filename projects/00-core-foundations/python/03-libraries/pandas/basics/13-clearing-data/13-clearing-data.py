@@ -5,6 +5,7 @@ W3Schools: https://www.w3schools.com/python/pandas_cleaning_dirty_data.asp
 Real-world data is often messy. Pandas provides powerful tools for
 handling missing values, duplicates, and inconsistencies.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -12,16 +13,31 @@ import numpy as np
 # Sample dirty data
 # ---------------------------------------------------------------------------
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", None],
-    "Age": [25, -5, 35, 28, 999, 40, 30],
-    "Email": [
-        "alice@email.com", "bob@", "charlie@email.com",
-        "diana@email.com", "not-an-email", "frank@email.com", "grace@email.com",
-    ],
-    "Salary": [70000, 80000, np.nan, 75000, 65000, np.nan, 82000],
-    "Department": ["Engineering", "marketing", "Engineering", "SALES", "Marketing", "engineering", "Sales"],
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", None],
+        "Age": [25, -5, 35, 28, 999, 40, 30],
+        "Email": [
+            "alice@email.com",
+            "bob@",
+            "charlie@email.com",
+            "diana@email.com",
+            "not-an-email",
+            "frank@email.com",
+            "grace@email.com",
+        ],
+        "Salary": [70000, 80000, np.nan, 75000, 65000, np.nan, 82000],
+        "Department": [
+            "Engineering",
+            "marketing",
+            "Engineering",
+            "SALES",
+            "Marketing",
+            "engineering",
+            "Sales",
+        ],
+    }
+)
 
 print("Dirty DataFrame:")
 print(df)
@@ -87,12 +103,14 @@ print("Normalized Department names:")
 print(df[["Name", "Department"]])
 print()
 
+
 # Fix email validation
 def is_valid_email(email):
     """Simple email validation."""
     if not isinstance(email, str):
         return False
     return "@" in email and "." in email.split("@")[-1]
+
 
 df["Email_Valid"] = df["Email"].apply(is_valid_email)
 print("Email validation:")
@@ -114,12 +132,20 @@ print("=" * 60)
 print("Example 4: Removing Duplicates")
 print("=" * 60)
 
-df_dup = pd.DataFrame({
-    "Product": ["A", "B", "A", "C", "B", "D"],
-    "Price": [10, 20, 10, 30, 20, 40],
-    "Date": ["2024-01-01", "2024-01-01", "2024-01-02", "2024-01-02",
-             "2024-01-01", "2024-01-03"],
-})
+df_dup = pd.DataFrame(
+    {
+        "Product": ["A", "B", "A", "C", "B", "D"],
+        "Price": [10, 20, 10, 30, 20, 40],
+        "Date": [
+            "2024-01-01",
+            "2024-01-01",
+            "2024-01-02",
+            "2024-01-02",
+            "2024-01-01",
+            "2024-01-03",
+        ],
+    }
+)
 print("Data with duplicates:")
 print(df_dup)
 print(f"Shape: {df_dup.shape}")
@@ -145,12 +171,14 @@ print("=" * 60)
 print("Example 5: Data Type Conversions")
 print("=" * 60)
 
-df_types = pd.DataFrame({
-    "id": ["1", "2", "3", "4"],
-    "amount": ["10.5", "20.3", "30.7", "40.1"],
-    "date": ["2024-01-01", "2024-02-15", "2024-03-20", "2024-04-10"],
-    "active": ["True", "False", "True", "True"],
-})
+df_types = pd.DataFrame(
+    {
+        "id": ["1", "2", "3", "4"],
+        "amount": ["10.5", "20.3", "30.7", "40.1"],
+        "date": ["2024-01-01", "2024-02-15", "2024-03-20", "2024-04-10"],
+        "active": ["True", "False", "True", "True"],
+    }
+)
 
 print("Before conversion:")
 print(df_types.dtypes)

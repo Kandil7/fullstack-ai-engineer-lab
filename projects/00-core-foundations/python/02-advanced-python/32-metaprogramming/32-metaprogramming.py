@@ -39,8 +39,10 @@ from typing import Callable, get_type_hints
 # __init_subclass__ (if defined). This is the clean way to auto-register
 # subclasses — no metaclass needed.
 
+
 class ToolRegistry:
     """Base class: every subclass registers itself by name."""
+
     _registry: dict[str, type["ToolRegistry"]] = {}
 
     def __init_subclass__(cls, **kwargs: object) -> None:
@@ -80,6 +82,7 @@ print(f"instantiate by name: {ToolRegistry._registry['EmbedTool']().run()}")
 # Descriptors get __set_name__(owner, name) called when the class is
 # created, so they know their attribute name without being told.
 
+
 class Column:
     """A mini descriptor: validates the attribute on assignment."""
 
@@ -108,7 +111,8 @@ class Column:
 
 class Row:
     """A typed row: id must be int, name must be str."""
-    id: int = Column(int)        # noqa: E701 - descriptor assignment
+
+    id: int = Column(int)  # noqa: E701 - descriptor assignment
     name: str = Column(str)
 
 
@@ -134,15 +138,15 @@ except TypeError as exc:
 # want a class decorator instead (explicit, visible at definition);
 # type() is for genuinely dynamic factories.
 
+
 def with_repr(cls: type) -> type:
     """Class decorator: add a default __repr__. O(1)."""
+
     def __repr__(self: object) -> str:
-        fields = ", ".join(
-            f"{k}={v!r}" for k, v in vars(self).items()
-        )
+        fields = ", ".join(f"{k}={v!r}" for k, v in vars(self).items())
         return f"{type(self).__name__}({fields})"
 
-    cls.__repr__ = __repr__          # monkey-patch the class, in place
+    cls.__repr__ = __repr__  # monkey-patch the class, in place
     return cls
 
 
@@ -182,8 +186,10 @@ print(f"PointA fields: {p.x}, {p.y}")
 # inspect.signature is the backbone of @tool: you read the parameters,
 # their types, and defaults, and turn them into a JSON schema.
 
-def embed_documents(docs: list[str], model: str = "base",
-                    batch_size: int = 32) -> list[list[float]]:
+
+def embed_documents(
+    docs: list[str], model: str = "base", batch_size: int = 32
+) -> list[list[float]]:
     """Embed a list of documents."""
     return [[0.1] * batch_size for _ in docs]
 
@@ -197,12 +203,11 @@ def describe(fn: Callable[..., object]) -> dict[str, object]:
     sig = inspect.signature(fn)
     try:
         hints = get_type_hints(fn)
-    except Exception:                          # noqa: BLE001 - unresolvable
+    except Exception:  # noqa: BLE001 - unresolvable
         hints = {}
     schema: dict[str, object] = {
         "name": fn.__name__,
-        "description": (fn.__doc__ or "").strip().splitlines()[0]
-                       if fn.__doc__ else "",
+        "description": (fn.__doc__ or "").strip().splitlines()[0] if fn.__doc__ else "",
         "parameters": {"type": "object", "properties": {}},
     }
     type_map = {
@@ -303,6 +308,7 @@ print(f"call by name: {TOOL_FUNCS['get_weather']('Cairo')}")
 # importlib lets you load modules by name at runtime — the plugin
 # mechanism behind drop-in tool directories.
 
+
 def load_plugin(module_name: str) -> types.ModuleType:
     """Import a module by name (absolute import). O(1) per load."""
     return importlib.import_module(module_name)
@@ -321,6 +327,7 @@ print(f"math has sin: {hasattr(math_mod, 'sin')}")
 # ============================================================
 # 7. getattr/setattr patterns — safe dynamic access
 # ============================================================
+
 
 def get_path(obj: object, path: str, default: object = None) -> object:
     """Resolve 'a.b.c' attribute paths safely. O(depth)."""
@@ -356,6 +363,7 @@ print(f"missing path: {get_path(cfg, 'embedding.unknown_key', 'n/a')}")
 # them is remote code execution. Prefer explicit dispatch tables:
 # {name: callable} instead of eval(name + "()").
 
+
 def dispatch_table_example() -> int:
     """Dispatch by name via a dict — the safe exec replacement. O(1)."""
 
@@ -380,6 +388,7 @@ print(f"dispatch: {dispatch_table_example()}")
 # 9. ast — read code as data (safe analysis, unlike exec)
 # ============================================================
 
+
 def count_functions(source: str) -> int:
     """Count def nodes in source without executing it. O(source size)."""
     tree = ast.parse(source)
@@ -402,6 +411,7 @@ print(f"functions found: {count_functions(sample)}")
 # does not compose across libraries. Use dependency injection instead
 # when you can.
 
+
 class ModelClient:
     """A fake client whose method we monkey-patch for tests."""
 
@@ -414,13 +424,15 @@ class ModelClient:
 client = ModelClient()
 original = client.predict
 
+
 def fake_predict(text: str) -> str:
     """Test double: no network."""
     return "fake prediction"
 
-client.predict = fake_predict                     # monkey-patch
+
+client.predict = fake_predict  # monkey-patch
 print(client.predict("x"))
-client.predict = original                         # restore
+client.predict = original  # restore
 print(client.predict("x"))
 
 # Output:
@@ -450,84 +462,88 @@ print(client.predict("x"))
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # --- __init_subclass__ auto-registration ---
-    assert "SearchTool" in ToolRegistry._registry, \
+    assert "SearchTool" in ToolRegistry._registry, (
         "__init_subclass__ must register subclasses by name"
-    assert "EmbedTool" in ToolRegistry._registry, \
-        "every subclass must be registered"
-    assert ToolRegistry._registry["EmbedTool"]().run() == "vector [0.1, 0.2]", \
+    )
+    assert "EmbedTool" in ToolRegistry._registry, "every subclass must be registered"
+    assert ToolRegistry._registry["EmbedTool"]().run() == "vector [0.1, 0.2]", (
         "registered classes must be instantiable by name"
+    )
 
     # --- __set_name__ descriptor ---
     row = Row()
     row.id = 7
-    assert Row.id.name == "id" and Row.name.name == "name", \
+    assert Row.id.name == "id" and Row.name.name == "name", (
         "__set_name__ must learn the attribute name"
+    )
     try:
-        row.id = "x"                             # type: ignore[assignment]
+        row.id = "x"  # type: ignore[assignment]
         raise AssertionError("type check failed to fire")
     except TypeError:
         pass
     assert row.name == "doc-1" or row.id == 7, "valid assignment still works"
 
     # --- class decorator + type() ---
-    assert "score=0.9" in repr(Chunk("hello", 0.9)), \
-        "class decorator must add a repr"
-    assert PointA is not PointB, \
-        "each type() call creates a distinct class"
+    assert "score=0.9" in repr(Chunk("hello", 0.9)), "class decorator must add a repr"
+    assert PointA is not PointB, "each type() call creates a distinct class"
 
     # --- inspect.signature matches the declared signature ---
     sig = inspect.signature(embed_documents)
-    assert list(sig.parameters) == ["docs", "model", "batch_size"], \
+    assert list(sig.parameters) == ["docs", "model", "batch_size"], (
         "inspect.signature must reflect the declared parameters"
-    assert sig.parameters["model"].default == "base", \
-        "defaults must be read from the signature"
+    )
+    assert sig.parameters["model"].default == "base", "defaults must be read from the signature"
 
     # --- schema from signature ---
     schema = describe(embed_documents)
     assert schema["name"] == "embed_documents", "schema carries the name"
-    assert schema["parameters"]["properties"]["docs"]["type"] == "array", \
+    assert schema["parameters"]["properties"]["docs"]["type"] == "array", (
         "list annotations map to JSON array"
-    assert schema["parameters"]["properties"]["batch_size"]["default"] == 32, \
+    )
+    assert schema["parameters"]["properties"]["batch_size"]["default"] == 32, (
         "defaults flow into the schema"
+    )
 
     # --- @tool registry ---
-    assert set(TOOL_FUNCS) == {"search", "get_weather"}, \
+    assert set(TOOL_FUNCS) == {"search", "get_weather"}, (
         "@tool must auto-register every decorated function"
-    assert TOOL_SCHEMAS["search"]["parameters"]["properties"]["top_k"] == \
-        {"default": 5, "type": "integer"}, \
-        "schemas must be derived from signatures, not hand-written"
-    assert TOOL_FUNCS["get_weather"]("Cairo") == "sunny in Cairo", \
+    )
+    assert TOOL_SCHEMAS["search"]["parameters"]["properties"]["top_k"] == {
+        "default": 5,
+        "type": "integer",
+    }, "schemas must be derived from signatures, not hand-written"
+    assert TOOL_FUNCS["get_weather"]("Cairo") == "sunny in Cairo", (
         "registered tools must be callable by name"
+    )
 
     # --- importlib dynamic import ---
     math_mod = load_plugin("math")
-    assert math_mod.floor(3.7) == 3, \
-        "dynamic import must load a module by name"
-    assert hasattr(math_mod, "sin"), \
-        "loaded module must expose its attributes"
+    assert math_mod.floor(3.7) == 3, "dynamic import must load a module by name"
+    assert hasattr(math_mod, "sin"), "loaded module must expose its attributes"
 
     # --- getattr path resolution ---
-    assert get_path(Config(), "embedding.model") == "base", \
-        "nested attribute paths must resolve"
-    assert get_path(Config(), "embedding.nope", "n/a") == "n/a", \
+    assert get_path(Config(), "embedding.model") == "base", "nested attribute paths must resolve"
+    assert get_path(Config(), "embedding.nope", "n/a") == "n/a", (
         "missing paths must return the default"
+    )
 
     # --- exec avoidance ---
-    assert dispatch_table_example() == 2, \
-        "dict dispatch replaces eval(name + '()')"
+    assert dispatch_table_example() == 2, "dict dispatch replaces eval(name + '()')"
 
     # --- ast analysis ---
-    assert count_functions("def a():\n    pass\ndef b():\n    pass") == 2, \
+    assert count_functions("def a():\n    pass\ndef b():\n    pass") == 2, (
         "ast must count def nodes without executing source"
+    )
 
     # --- monkey-patch round trip ---
     client = ModelClient()
     original = client.predict
-    client.predict = lambda text: "fake"         # noqa: E731
+    client.predict = lambda text: "fake"  # noqa: E731
     assert client.predict("x") == "fake", "patch must take effect"
     client.predict = original
-    assert client.predict("x") == "real prediction for x", \
+    assert client.predict("x") == "real prediction for x", (
         "restoring must bring back the original behavior"
+    )
 
     print("[OK] 32-metaprogramming: all checks passed")
 

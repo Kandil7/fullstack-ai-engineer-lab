@@ -97,7 +97,7 @@ import numpy as np
 # Data that follows a quadratic pattern
 np.random.seed(42)
 X = np.linspace(0, 10, 100).reshape(-1, 1)
-y = 0.5 * X.squeeze()**2 - 3 * X.squeeze() + 10 + np.random.randn(100) * 2
+y = 0.5 * X.squeeze() ** 2 - 3 * X.squeeze() + 10 + np.random.randn(100) * 2
 
 print("This data follows a quadratic pattern (parabola)")
 print("Simple linear regression won't fit well")
@@ -112,7 +112,7 @@ from sklearn.preprocessing import PolynomialFeatures
 poly = PolynomialFeatures(degree=2, include_bias=False)
 X_poly = poly.fit_transform(X)
 
-print(f"Original shape: {X.shape}")        # (100, 1)
+print(f"Original shape: {X.shape}")  # (100, 1)
 print(f"Polynomial shape: {X_poly.shape}")  # (100, 2)
 print(f"Feature names: {poly.get_feature_names_out()}")
 
@@ -184,9 +184,7 @@ print("Overfitting: Model memorizes noise instead of learning pattern")
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 best_degree = 1
 best_r2 = -np.inf
@@ -195,15 +193,15 @@ for degree in range(1, 8):
     poly = PolynomialFeatures(degree=degree, include_bias=False)
     X_train_poly = poly.fit_transform(X_train)
     X_test_poly = poly.transform(X_test)  # Use same transform!
-    
+
     model = LinearRegression()
     model.fit(X_train_poly, y_train)
-    
+
     y_pred_test = model.predict(X_test_poly)
     r2_test = r2_score(y_test, y_pred_test)
-    
+
     print(f"Degree {degree}: Test R²={r2_test:.4f}")
-    
+
     if r2_test > best_r2:
         best_r2 = r2_test
         best_degree = degree

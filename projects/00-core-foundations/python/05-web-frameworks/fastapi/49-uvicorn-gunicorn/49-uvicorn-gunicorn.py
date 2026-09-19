@@ -53,13 +53,14 @@ print()
 # A GPU inference worker holds ~GB of model memory per worker — memory,
 # not cores, becomes the limit (see topic 52).
 
+
 def recommended_workers(cores: int, workload: str) -> int:
     """Return the recommended worker count for a workload class."""
-    if workload == "cpu-bound":       # inference, heavy compute
+    if workload == "cpu-bound":  # inference, heavy compute
         return max(1, cores)
-    if workload == "io-bound":        # DB/API waiting
+    if workload == "io-bound":  # DB/API waiting
         return max(1, cores * 2 + 1)
-    return max(1, cores + 1)          # mixed default
+    return max(1, cores + 1)  # mixed default
 
 
 print("=== 2. Worker math ===")
@@ -73,6 +74,7 @@ print()
 # Each worker imports and holds the model. 4 workers × 2GB model =
 # 8GB RAM before a single request. Worker count must respect MEMORY
 # as well as cores.
+
 
 def workers_by_memory(available_gb: float, model_gb: float, overhead_gb: float = 0.3) -> int:
     per_worker = model_gb + overhead_gb
@@ -92,6 +94,7 @@ print()
 # and a hot-reload worker per process (extra memory). The deployment
 # restarts come from the orchestrator, not file watching.
 
+
 def reload_suitable(env: str) -> bool:
     return env in {"dev", "local", "test"}
 
@@ -108,6 +111,7 @@ print()
 # --timeout-graceful-shutdown: drain window (topic 46).
 # Def endpoints run in a threadpool: the threadpool size is a
 # concurrency knob for sync routes (see topic 32).
+
 
 def timeout_policy(timeout_keep_alive: int, graceful_shutdown: int) -> dict:
     return {
@@ -127,14 +131,17 @@ print()
 # The production pair: gunicorn manages N uvicorn workers; each worker
 # is one process running the app. Dev uses uvicorn directly with reload.
 
+
 def prod_command(cores: int, app_path: str, workload: str = "io-bound") -> str:
     workers = recommended_workers(cores, workload)
-    return (f"gunicorn {app_path} "
-            f"-k uvicorn.workers.UvicornWorker "
-            f"--workers {workers} "
-            f"--bind 0.0.0.0:8000 "
-            f"--timeout 60 "
-            f"--graceful-timeout 30")
+    return (
+        f"gunicorn {app_path} "
+        f"-k uvicorn.workers.UvicornWorker "
+        f"--workers {workers} "
+        f"--bind 0.0.0.0:8000 "
+        f"--timeout 60 "
+        f"--graceful-timeout 30"
+    )
 
 
 print("=== 6. Production command ===")
@@ -158,6 +165,7 @@ print()
 # MISTAKE: no graceful-timeout — SIGTERM kills in-flight generations
 # CORRECT: graceful-timeout >= drain time (topic 46)
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -165,8 +173,9 @@ def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
 
     # 1. Worker math: io > cpu
-    assert recommended_workers(4, "io-bound") > recommended_workers(4, "cpu-bound"), \
+    assert recommended_workers(4, "io-bound") > recommended_workers(4, "cpu-bound"), (
         "IO-bound should allow more workers"
+    )
     assert recommended_workers(4, "cpu-bound") == 4, "CPU-bound ~ cores"
     assert recommended_workers(2, "io-bound") == 5, "2*cores+1"
 
@@ -175,8 +184,7 @@ def _verify() -> None:
     assert workers_by_memory(8, 4.0) == 1, "8GB / 4.3GB -> 1 worker"
 
     # 3. Reload is dev-only
-    assert reload_suitable("dev") and not reload_suitable("prod"), \
-        "reload must be dev-only"
+    assert reload_suitable("dev") and not reload_suitable("prod"), "reload must be dev-only"
 
     # 4. Production command shape
     cmd = prod_command(4, "app.main:app")
@@ -201,4 +209,4 @@ if __name__ == "__main__":
         print("2. workers: CPU-bound ~ cores; IO-bound > cores; memory binds")
         print("3. --reload is dev-only; orchestrator owns prod restarts")
         print("4. Graceful timeout >= drain time")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

@@ -76,6 +76,7 @@ conda install pandas
 
 ```python
 import pandas as pd
+
 print(pd.__version__)
 # Output: 2.2.2 (or similar)
 ```
@@ -154,7 +155,7 @@ import pandas as pd
 data = {
     "Name": ["Alice", "Bob", "Charlie", "Diana"],
     "Age": [28, 35, 42, 31],
-    "City": ["New York", "London", "Paris", "Tokyo"]
+    "City": ["New York", "London", "Paris", "Tokyo"],
 }
 df = pd.DataFrame(data)
 print(df)
@@ -203,11 +204,7 @@ arr = np.array([1, 2, 3])
 print(type(arr[0]))  # <class 'numpy.int64'>
 
 # Pandas — heterogeneous via DataFrame
-df = pd.DataFrame({
-    "name": ["Alice"],
-    "age": [28],
-    "active": [True]
-})
+df = pd.DataFrame({"name": ["Alice"], "age": [28], "active": [True]})
 print(df.dtypes)
 # name      object
 # age        int64
@@ -226,7 +223,7 @@ import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
 
 # First look at the data
-print("Shape:", df.shape)          # (244, 7)
+print("Shape:", df.shape)  # (244, 7)
 print("\nFirst 5 rows:")
 print(df.head())
 
@@ -305,6 +302,7 @@ df.loc[df["A"] > 1, "B"] = 99
 ```python
 # TODO: Install pandas, then run:
 import pandas as pd
+
 print("Pandas version:", pd.__version__)
 ```
 

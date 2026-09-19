@@ -39,29 +39,37 @@ enc = tiktoken.encoding_for_model("gpt-4")
 
 # 1. Verified tokens for a known string
 toks = enc.encode("Hello, world!")
-print("tokens:", toks)              # expect [9906, 11, 1917, 0]
-print("count:", len(toks))          # expect 4
+print("tokens:", toks)  # expect [9906, 11, 1917, 0]
+print("count:", len(toks))  # expect 4
 
 # 2. Tokens per English word (rule of thumb ≈ 1.3)
 prose = ("The quick brown fox jumps over the lazy dog " * 10).strip()  # 80 words
 words = len(prose.split())
 tokens = len(enc.encode(prose))
-print(f"words={words} tokens={tokens} ratio={tokens/words:.2f}")       # expect ratio ≈ 1.2–1.5
+print(
+    f"words={words} tokens={tokens} ratio={tokens / words:.2f}"
+)  # expect ratio ≈ 1.2–1.5
 
 # 3. Context-window budget with the off-by-one handled
-CONTEXT = 200_000                       # claude-3-5-sonnet-20241022
-max_output_tokens = 4_096               # devmate config default
+CONTEXT = 200_000  # claude-3-5-sonnet-20241022
+max_output_tokens = 4_096  # devmate config default
 available_for_input = CONTEXT - max_output_tokens
-print("available_for_input:", available_for_input)   # expect 195_904 (NOT 200_000)
+print("available_for_input:", available_for_input)  # expect 195_904 (NOT 200_000)
+
 
 # 4. Estimate-before-send guard (the trap: forgetting the system prompt and a margin)
 def would_overflow(messages, max_tokens, context=CONTEXT, margin=256):
     prompt_tokens = sum(len(enc.encode(m["content"])) for m in messages)
     return prompt_tokens + max_tokens + margin > context
 
-msgs = [{"role": "system", "content": "You are a contract assistant. " * 20_000}]  # ~140k tokens
-print("overflow:", would_overflow(msgs, 4_096))      # expect True
-print("fits:", would_overflow([{"role": "user", "content": "hi"}], 4_096))  # expect False
+
+msgs = [
+    {"role": "system", "content": "You are a contract assistant. " * 20_000}
+]  # ~140k tokens
+print("overflow:", would_overflow(msgs, 4_096))  # expect True
+print(
+    "fits:", would_overflow([{"role": "user", "content": "hi"}], 4_096)
+)  # expect False
 ```
 
 Assertions: `count == 4`; `1.1 <= ratio <= 1.6`; `available_for_input == 195_904`; both overflow flags exact.
@@ -118,20 +126,20 @@ print(causal)
 #  [ 0.  0.   0.   0. ]]
 
 # 2. One attention head, tiny dims
-X = rng.normal(size=(4, 8))            # 4 tokens, 8-d embeddings
+X = rng.normal(size=(4, 8))  # 4 tokens, 8-d embeddings
 Wq, Wk, Wv = (rng.normal(size=(8, 4)) for _ in range(3))
 Q, K, V = X @ Wq, X @ Wk, X @ Wv
-scores = Q @ K.T / np.sqrt(4)          # scaled dot-product
-scores = scores + causal               # causal masking BEFORE softmax
+scores = Q @ K.T / np.sqrt(4)  # scaled dot-product
+scores = scores + causal  # causal masking BEFORE softmax
 attn = np.softmax(scores, axis=-1)
 out = attn @ V
 
 assert attn.shape == (4, 4)
-assert np.allclose(attn.sum(axis=1), 1.0)      # rows are distributions
-assert np.allclose(attn[1, 2:], 0.0)           # no attending to the future
-assert np.allclose(attn[0, 1:], 0.0)           # token 0 sees only itself
-print("attention row sums:", attn.sum(axis=1)) # [1. 1. 1. 1.]
-print("output shape:", out.shape)              # (4, 4)
+assert np.allclose(attn.sum(axis=1), 1.0)  # rows are distributions
+assert np.allclose(attn[1, 2:], 0.0)  # no attending to the future
+assert np.allclose(attn[0, 1:], 0.0)  # token 0 sees only itself
+print("attention row sums:", attn.sum(axis=1))  # [1. 1. 1. 1.]
+print("output shape:", out.shape)  # (4, 4)
 ```
 
 The assert suite is the expected output: any assertion failure means the mechanism is wrong.
@@ -177,15 +185,17 @@ The quadratic-attention cost problem: attention is O(n²), so a 200k-token promp
 import numpy as np
 
 rng = np.random.default_rng(42)
-logits = np.array([2.0, 0.5, -1.0, 3.5, 0.0])   # token 3 is the argmax
+logits = np.array([2.0, 0.5, -1.0, 3.5, 0.0])  # token 3 is the argmax
+
 
 def softmax(x):
     e = np.exp(x - x.max())
     return e / e.sum()
 
+
 def sample(logits, temperature=1.0, top_p=1.0):
     probs = softmax(logits / temperature)
-    if top_p < 1.0:                              # nucleus filtering
+    if top_p < 1.0:  # nucleus filtering
         order = np.argsort(probs)[::-1]
         cum = np.cumsum(probs[order])
         keep = order[cum <= top_p]
@@ -195,24 +205,30 @@ def sample(logits, temperature=1.0, top_p=1.0):
         probs /= probs.sum()
     return probs
 
-p_greedy = sample(logits, temperature=1e-9)      # ≈ argmax
+
+p_greedy = sample(logits, temperature=1e-9)  # ≈ argmax
 p_cold = sample(logits, temperature=0.2)
 p_hot = sample(logits, temperature=2.0)
 p_nucleus = sample(logits, temperature=1.0, top_p=0.5)
 
+
 def entropy(p):
     return float(-(p * np.log(p + 1e-12)).sum())
 
-print("greedy argmax:", int(np.argmax(p_greedy)))   # expect 3
-print("cold entropy:", round(entropy(p_cold), 4))   # low
-print("hot entropy: ", round(entropy(p_hot), 4))    # higher than cold
-print("nucleus support:", int((p_nucleus > 0).sum())) # expect 2 tokens at top_p=0.5
+
+print("greedy argmax:", int(np.argmax(p_greedy)))  # expect 3
+print("cold entropy:", round(entropy(p_cold), 4))  # low
+print("hot entropy: ", round(entropy(p_hot), 4))  # higher than cold
+print("nucleus support:", int((p_nucleus > 0).sum()))  # expect 2 tokens at top_p=0.5
 
 assert np.argmax(p_greedy) == 3
-assert entropy(p_cold) < entropy(p_hot)             # temperature spreads probability
+assert entropy(p_cold) < entropy(p_hot)  # temperature spreads probability
 assert (p_nucleus > 0).sum() == 2
-draws = [int(rng.choice(len(logits), p=sample(logits, temperature=t))) for t in (0.2, 0.2, 2.0)]
-assert draws[0] == draws[1]                         # same seed + same T → same draw
+draws = [
+    int(rng.choice(len(logits), p=sample(logits, temperature=t)))
+    for t in (0.2, 0.2, 2.0)
+]
+assert draws[0] == draws[1]  # same seed + same T → same draw
 print("draws (0.2, 0.2, 2.0):", draws)
 ```
 
@@ -261,21 +277,29 @@ The evaluation-reproducibility problem: your 10 golden cases must prove a prompt
 #   Fine-tuning:  instruction following on curated data (domain format, style, skills).
 #   RLHF/RLAIF:   preference alignment (helpfulness, harmlessness — the API already has it).
 
+
 def classify(case: str) -> str:
-    ft_cases = {"legal_contract_extraction", "startup_brand_voice_tweets",
-                "medical_coding_icd10", "low_latency_embedding_style_router"}
+    ft_cases = {
+        "legal_contract_extraction",
+        "startup_brand_voice_tweets",
+        "medical_coding_icd10",
+        "low_latency_embedding_style_router",
+    }
     return "ft" if case in ft_cases else "prompt"
 
+
 scenarios = {
-    "legal_contract_extraction":      "ft",      # fixed format, proprietary domain, high volume
-    "general_code_assistant":        "prompt",  # frontier models excel; prompts adapt fast
-    "startup_brand_voice_tweets":     "ft",      # a specific style the base model lacks
-    "medical_coding_icd10":           "ft",      # narrow, high-accuracy, labeled data
-    "silly_haiku_for_internal_tool": "prompt",   # cost of ft >> prompt value
+    "legal_contract_extraction": "ft",  # fixed format, proprietary domain, high volume
+    "general_code_assistant": "prompt",  # frontier models excel; prompts adapt fast
+    "startup_brand_voice_tweets": "ft",  # a specific style the base model lacks
+    "medical_coding_icd10": "ft",  # narrow, high-accuracy, labeled data
+    "silly_haiku_for_internal_tool": "prompt",  # cost of ft >> prompt value
     "low_latency_embedding_style_router": "ft",  # need small+fast; frontier is overkill
 }
 for case, expected in scenarios.items():
-    assert classify(case) == expected, f"{case}: got {classify(case)}, expected {expected}"
+    assert classify(case) == expected, (
+        f"{case}: got {classify(case)}, expected {expected}"
+    )
 print("classification: all 6 scenarios correct")
 ```
 
@@ -327,18 +351,30 @@ Build the full build-vs-buy model for the legal-tech scenario: 200k-token docume
 ```python
 from typing import List, Dict
 
-def anthropic_payload(system: str, messages: List[Dict[str, str]],
-                      model: str, max_tokens: int, temperature: float) -> dict:
+
+def anthropic_payload(
+    system: str,
+    messages: List[Dict[str, str]],
+    model: str,
+    max_tokens: int,
+    temperature: float,
+) -> dict:
     return {
         "model": model,
-        "system": system,                       # top-level, NOT inside messages
-        "messages": messages,                   # must alternate user/assistant, first = user
-        "max_tokens": max_tokens,               # REQUIRED by Anthropic
+        "system": system,  # top-level, NOT inside messages
+        "messages": messages,  # must alternate user/assistant, first = user
+        "max_tokens": max_tokens,  # REQUIRED by Anthropic
         "temperature": temperature,
     }
 
-def openai_payload(system: str, messages: List[Dict[str, str]],
-                   model: str, max_tokens: int, temperature: float) -> dict:
+
+def openai_payload(
+    system: str,
+    messages: List[Dict[str, str]],
+    model: str,
+    max_tokens: int,
+    temperature: float,
+) -> dict:
     return {
         "model": model,
         "messages": [{"role": "system", "content": system}] + messages,
@@ -346,21 +382,32 @@ def openai_payload(system: str, messages: List[Dict[str, str]],
         "temperature": temperature,
     }
 
+
 def validate_roles(messages: List[Dict[str, str]]) -> None:
     roles = [m["role"] for m in messages]
     assert roles and roles[0] == "user", "first message must be user"
     for a, b in zip(roles, roles[1:]):
         assert a != b, f"roles must alternate, got {a} then {b}"
 
+
 sys = "You are a financial assistant."
-msgs = [{"role": "user", "content": "What is my balance?"},
-        {"role": "assistant", "content": "Your balance is $1,234.56."},
-        {"role": "user", "content": "And my last 3 transactions?"}]
+msgs = [
+    {"role": "user", "content": "What is my balance?"},
+    {"role": "assistant", "content": "Your balance is $1,234.56."},
+    {"role": "user", "content": "And my last 3 transactions?"},
+]
 
 assert anthropic_payload(sys, msgs, "claude-3-5-sonnet-20241022", 1024, 0.1) == {
-    "model": "claude-3-5-sonnet-20241022", "system": sys, "messages": msgs,
-    "max_tokens": 1024, "temperature": 0.1}
-assert openai_payload(sys, msgs, "gpt-4o", 1024, 0.1)["messages"][0] == {"role": "system", "content": sys}
+    "model": "claude-3-5-sonnet-20241022",
+    "system": sys,
+    "messages": msgs,
+    "max_tokens": 1024,
+    "temperature": 0.1,
+}
+assert openai_payload(sys, msgs, "gpt-4o", 1024, 0.1)["messages"][0] == {
+    "role": "system",
+    "content": sys,
+}
 validate_roles(msgs)  # OK
 
 try:
@@ -411,10 +458,12 @@ Cross-provider request normalization: one internal spec (`LLMRequest`) must prod
 ```python
 import asyncio, time
 
+
 async def fake_stream(text: str, delay: float = 0.1):
-    for ch in text:                    # simulate token deltas
+    for ch in text:  # simulate token deltas
         await asyncio.sleep(delay)
         yield ch
+
 
 async def consume(stream, stop_at_chars: int | None = None):
     start = time.perf_counter()
@@ -422,16 +471,17 @@ async def consume(stream, stop_at_chars: int | None = None):
     buf = []
     async for ch in stream:
         if ttft is None:
-            ttft = time.perf_counter() - start      # FIRST token, not last
+            ttft = time.perf_counter() - start  # FIRST token, not last
         buf.append(ch)
         if stop_at_chars and len(buf) >= stop_at_chars:
             break
     return "".join(buf), ttft, time.perf_counter() - start
 
+
 async def main():
     text, ttft, total = await consume(fake_stream("streaming works", 0.05))
     assert text == "streaming works"
-    assert ttft is not None and ttft < total        # TTFT is a fraction of total
+    assert ttft is not None and ttft < total  # TTFT is a fraction of total
     print(f"ttft={ttft:.3f}s total={total:.3f}s text={text!r}")
 
     # Cancellation: consumer stops, generator cleanup must run
@@ -441,7 +491,7 @@ async def main():
                 await asyncio.sleep(0.01)
                 yield ch
         finally:
-            print("cleanup ran")                    # must print on cancel
+            print("cleanup ran")  # must print on cancel
 
     task = asyncio.create_task(_drain(stream_with_cleanup()))
     await asyncio.sleep(0.025)
@@ -451,9 +501,11 @@ async def main():
     except asyncio.CancelledError:
         pass
 
+
 async def _drain(stream):
     async for _ in stream:
         pass
+
 
 asyncio.run(main())
 ```
@@ -502,11 +554,13 @@ import json
 from pydantic import BaseModel, ValidationError
 from typing import List
 
+
 class CodeExplanation(BaseModel):
     language: str
-    complexity: str                     # "simple" | "moderate" | "complex"
+    complexity: str  # "simple" | "moderate" | "complex"
     key_concepts: List[str]
     summary: str
+
 
 def parse_and_validate(content: str, model):
     """Accept JSON text or the Anthropic {'input': {...}} tool-use shape."""
@@ -520,15 +574,53 @@ def parse_and_validate(content: str, model):
     except ValidationError as e:
         raise ValueError(f"schema mismatch: {e}") from e
 
-valid = json.dumps({"language": "python", "complexity": "moderate",
-                    "key_concepts": ["recursion", "memoization"], "summary": "Fibonacci."})
+
+valid = json.dumps(
+    {
+        "language": "python",
+        "complexity": "moderate",
+        "key_concepts": ["recursion", "memoization"],
+        "summary": "Fibonacci.",
+    }
+)
 fixtures = [
     (valid, "valid"),
-    (json.dumps({"input": {"language": "python", "complexity": "simple",
-                           "key_concepts": [], "summary": "ok"}}), "tool_use_shape"),
+    (
+        json.dumps(
+            {
+                "input": {
+                    "language": "python",
+                    "complexity": "simple",
+                    "key_concepts": [],
+                    "summary": "ok",
+                }
+            }
+        ),
+        "tool_use_shape",
+    ),
     (json.dumps({"language": "python", "complexity": "moderate"}), "missing_field"),
-    (json.dumps({"language": "python", "complexity": "impossible", "key_concepts": [], "summary": "x"}), "wrong_enum"),
-    (json.dumps({"language": "python", "complexity": "simple", "key_concepts": "notalist", "summary": "x"}), "wrong_type"),
+    (
+        json.dumps(
+            {
+                "language": "python",
+                "complexity": "impossible",
+                "key_concepts": [],
+                "summary": "x",
+            }
+        ),
+        "wrong_enum",
+    ),
+    (
+        json.dumps(
+            {
+                "language": "python",
+                "complexity": "simple",
+                "key_concepts": "notalist",
+                "summary": "x",
+            }
+        ),
+        "wrong_type",
+    ),
     ("{not json at all", "invalid_json"),
 ]
 outcomes = []
@@ -539,8 +631,14 @@ for content, name in fixtures:
     except ValueError:
         outcomes.append((name, "error"))
 print(outcomes)
-assert outcomes == [("valid", "ok"), ("tool_use_shape", "ok"), ("missing_field", "error"),
-                    ("wrong_enum", "error"), ("wrong_type", "error"), ("invalid_json", "error")]
+assert outcomes == [
+    ("valid", "ok"),
+    ("tool_use_shape", "ok"),
+    ("missing_field", "error"),
+    ("wrong_enum", "error"),
+    ("wrong_type", "error"),
+    ("invalid_json", "error"),
+]
 ```
 
 Expected output: the 6-tuple outcomes list above — exactly two parse, four fail, each in a distinct category.
@@ -590,28 +688,41 @@ Guaranteed JSON under hostile conditions (the fintech bot): a single malformed o
 ```python
 import random
 
+
 def backoff_schedule(initial=1.0, multiplier=2.0, max_wait=30.0, attempts=5):
-    return [min(initial * (multiplier ** i), max_wait) for i in range(attempts)]
+    return [min(initial * (multiplier**i), max_wait) for i in range(attempts)]
+
 
 def jittered(base, seed=1):
     rng = random.Random(seed)
-    return [b * (0.5 + rng.random()) for b in base]   # full jitter: 0.5x–1.5x
+    return [b * (0.5 + rng.random()) for b in base]  # full jitter: 0.5x–1.5x
+
 
 base = backoff_schedule()
-print("base:", base)                     # [1.0, 2.0, 4.0, 8.0, 16.0]
+print("base:", base)  # [1.0, 2.0, 4.0, 8.0, 16.0]
 assert base == [1.0, 2.0, 4.0, 8.0, 16.0]
-assert backoff_schedule(attempts=8)[-1] == 30.0       # cap applies
+assert backoff_schedule(attempts=8)[-1] == 30.0  # cap applies
 
 j = jittered(base)
 for b, w in zip(base, j):
-    assert 0.5 * b <= w <= 1.5 * b                    # jitter bounds
+    assert 0.5 * b <= w <= 1.5 * b  # jitter bounds
 print("jitter ok, sample:", [round(x, 2) for x in j])
 
 # Retryability classification — the table that prevents waste
 RETRYABLE = {429, 408, 500, 502, 503, 504}
-for code, expected in [(429, True), (500, True), (502, True), (503, True),
-                       (504, True), (408, True), (400, False), (401, False),
-                       (403, False), (404, False), (422, False)]:
+for code, expected in [
+    (429, True),
+    (500, True),
+    (502, True),
+    (503, True),
+    (504, True),
+    (408, True),
+    (400, False),
+    (401, False),
+    (403, False),
+    (404, False),
+    (422, False),
+]:
     assert (code in RETRYABLE) == expected, code
 print("classification: 11 status codes classified")
 ```
@@ -657,16 +768,19 @@ The coordinated retry storm (Black Friday): 10k clients all receive 429 at once;
 ```python
 from devmate.obs.cost import MODEL_PRICING, TokenUsage
 
+
 def calculate_cost(model: str, usage: TokenUsage) -> float:
     input_price, output_price = MODEL_PRICING.get(model, (0.0, 0.0))
-    return (usage.prompt_tokens / 1_000_000) * input_price + \
-           (usage.completion_tokens / 1_000_000) * output_price
+    return (usage.prompt_tokens / 1_000_000) * input_price + (
+        usage.completion_tokens / 1_000_000
+    ) * output_price
+
 
 cases = [
-    ("gpt-4o",               TokenUsage(100_000, 20_000, 120_000), 0.80),
+    ("gpt-4o", TokenUsage(100_000, 20_000, 120_000), 0.80),
     ("claude-3-5-sonnet-20241022", TokenUsage(100_000, 20_000, 120_000), 0.60),
-    ("claude-3-5-haiku-20241022",  TokenUsage(100_000, 20_000, 120_000), 0.16),
-    ("gpt-4o-mini",          TokenUsage(100_000, 20_000, 120_000), 0.027),
+    ("claude-3-5-haiku-20241022", TokenUsage(100_000, 20_000, 120_000), 0.16),
+    ("gpt-4o-mini", TokenUsage(100_000, 20_000, 120_000), 0.027),
 ]
 for model, usage, expected in cases:
     got = calculate_cost(model, usage)
@@ -675,10 +789,10 @@ for model, usage, expected in cases:
 
 # $/query and scale: 2,000 prompt + 500 completion on sonnet
 q = calculate_cost("claude-3-5-sonnet-20241022", TokenUsage(2_000, 500, 2_500))
-print(f"cost per devmate ask (sonnet): ${q:.4f}")      # expect $0.0135
+print(f"cost per devmate ask (sonnet): ${q:.4f}")  # expect $0.0135
 print(f"10k asks/day (sonnet): ${q * 10_000:,.0f}/day")  # expect $135/day
 q_haiku = calculate_cost("claude-3-5-haiku-20241022", TokenUsage(2_000, 500, 2_500))
-print(f"cost per devmate ask (haiku): ${q_haiku:.4f}") # expect $0.0036
+print(f"cost per devmate ask (haiku): ${q_haiku:.4f}")  # expect $0.0036
 assert abs(q - 0.0135) < 1e-6 and abs(q_haiku - 0.0036) < 1e-6
 ```
 
@@ -723,14 +837,24 @@ The $40k mystery: nobody can explain the bill. Build the cost-observability stac
 ```python
 from dataclasses import dataclass
 
-class RateLimited(Exception): pass
-class AuthFailed(Exception): pass
-class ValidationFailed(Exception): pass
+
+class RateLimited(Exception):
+    pass
+
+
+class AuthFailed(Exception):
+    pass
+
+
+class ValidationFailed(Exception):
+    pass
+
 
 @dataclass
 class FakeProvider:
     name: str
-    behavior: str          # "ok" | "rate_limited" | "auth_failed" | "validation"
+    behavior: str  # "ok" | "rate_limited" | "auth_failed" | "validation"
+
 
 def call(provider: FakeProvider):
     if provider.behavior == "rate_limited":
@@ -741,6 +865,7 @@ def call(provider: FakeProvider):
         raise ValidationFailed(f"{provider.name} bad schema")
     return f"{provider.name}:ok"
 
+
 def complete_with_fallback(providers, skip=None):
     last = None
     for p in providers:
@@ -748,17 +873,20 @@ def complete_with_fallback(providers, skip=None):
             continue
         try:
             return call(p)
-        except (RateLimited, AuthFailed) as e:      # transient/config: fall back
+        except (RateLimited, AuthFailed) as e:  # transient/config: fall back
             last = e
             continue
-        except ValidationFailed as e:               # NEVER fall back on validation
+        except ValidationFailed as e:  # NEVER fall back on validation
             raise e
     raise RuntimeError(f"all providers failed: {last}")
 
+
 primary = FakeProvider("anthropic", "rate_limited")
 backup = FakeProvider("openai", "ok")
-assert complete_with_fallback([primary, backup]) == "openai:ok"      # fallback works
-assert complete_with_fallback([FakeProvider("a", "ok"), backup]) == "a:ok"  # primary wins
+assert complete_with_fallback([primary, backup]) == "openai:ok"  # fallback works
+assert (
+    complete_with_fallback([FakeProvider("a", "ok"), backup]) == "a:ok"
+)  # primary wins
 
 try:
     complete_with_fallback([FakeProvider("a", "validation"), backup])
@@ -766,11 +894,15 @@ try:
 except ValidationFailed:
     pass
 try:
-    complete_with_fallback([FakeProvider("a", "auth_failed"), FakeProvider("b", "rate_limited")])
+    complete_with_fallback(
+        [FakeProvider("a", "auth_failed"), FakeProvider("b", "rate_limited")]
+    )
     raise SystemExit("should have raised")
 except RuntimeError as e:
     assert "all providers failed" in str(e)
-print("fallback: primary-wins, fallback-on-transient, no-fallback-on-validation, final error — all pass")
+print(
+    "fallback: primary-wins, fallback-on-transient, no-fallback-on-validation, final error — all pass"
+)
 ```
 
 Expected output: the pass line — the four invariants every fallback system must hold.
@@ -813,46 +945,78 @@ The capability-aware routing problem: a naive chain silently degrades quality an
 `projects/04-ai-engineering/devmate/labs/errors_drill.py`:
 
 ```python
-class LLMError(Exception): pass
-class LLMRateLimitError(LLMError): pass
-class LLMAuthError(LLMError): pass
-class LLMTimeoutError(LLMError): pass
-class LLMValidationError(LLMError): pass
-class LLMConnectionError(LLMError): pass
+class LLMError(Exception):
+    pass
+
+
+class LLMRateLimitError(LLMError):
+    pass
+
+
+class LLMAuthError(LLMError):
+    pass
+
+
+class LLMTimeoutError(LLMError):
+    pass
+
+
+class LLMValidationError(LLMError):
+    pass
+
+
+class LLMConnectionError(LLMError):
+    pass
+
 
 # Simulated httpx exception types (real ones subclass httpx.TimeoutException)
-class ConnectTimeout(Exception): pass
-class ReadTimeout(Exception): pass
-class WriteTimeout(Exception): pass
+class ConnectTimeout(Exception):
+    pass
+
+
+class ReadTimeout(Exception):
+    pass
+
+
+class WriteTimeout(Exception):
+    pass
+
 
 USER_MESSAGES = {
-    LLMRateLimitError:  "We're busy right now — try again in a moment.",
-    LLMTimeoutError:    "The request took too long. Please try again.",
+    LLMRateLimitError: "We're busy right now — try again in a moment.",
+    LLMTimeoutError: "The request took too long. Please try again.",
     LLMConnectionError: "We couldn't reach the AI service. Try again shortly.",
-    LLMAuthError:       "Service configuration error. Contact support.",
+    LLMAuthError: "Service configuration error. Contact support.",
     LLMValidationError: "We couldn't process the response. Please rephrase.",
-    LLMError:           "Something went wrong. Please try again.",
+    LLMError: "Something went wrong. Please try again.",
 }
+
 
 def classify(e: Exception) -> LLMError:
     if isinstance(e, (ConnectTimeout, ReadTimeout, WriteTimeout)):
         return LLMTimeoutError("timeout")
     if isinstance(e, ConnectTimeout):
-        return LLMConnectionError("connect failed")     # dead branch trap: order matters!
+        return LLMConnectionError("connect failed")  # dead branch trap: order matters!
     raise LLMError(f"unclassified: {e}")
+
 
 def user_message(e: Exception) -> str:
     return USER_MESSAGES[type(e)]
 
-assert isinstance(classify(ConnectTimeout("c")), LLMTimeoutError)   # connect = timeout
+
+assert isinstance(classify(ConnectTimeout("c")), LLMTimeoutError)  # connect = timeout
 assert isinstance(classify(ReadTimeout("r")), LLMTimeoutError)
 assert isinstance(classify(WriteTimeout("w")), LLMTimeoutError)
-assert user_message(LLMRateLimitError()) == "We're busy right now — try again in a moment."
+assert (
+    user_message(LLMRateLimitError()) == "We're busy right now — try again in a moment."
+)
 print("error taxonomy: mapping and user messages pass")
+
 
 # Timeout policy builder
 def timeout_policy(connect=10.0, read=60.0, write=30.0, pool=5.0):
     return {"connect": connect, "read": read, "write": write, "pool": pool}
+
 
 assert timeout_policy() == {"connect": 10.0, "read": 60.0, "write": 30.0, "pool": 5.0}
 print("timeout policy: 4 phases configured")
@@ -909,14 +1073,18 @@ The error contract at platform scale: define the full contract for DevMate's API
 # never" without a fallback behavior.
 REQUIRED_SECTIONS = ("role", "guidelines", "output format")
 
+
 def audit(prompt: str) -> dict:
     p = prompt.lower()
     return {
         "role": any(k in p for k in ("you are", "your role", "you're a")),
         "guidelines": any(k in p for k in ("guidelines", "rules", "always", "never")),
-        "output format": any(k in p for k in ("output format", "respond with", "format your")),
+        "output format": any(
+            k in p for k in ("output format", "respond with", "format your")
+        ),
         "contradiction": ("always" in p and "never" in p and "unless" not in p),
     }
+
 
 good = """You are an expert software engineer specializing in Python.
 Guidelines:
@@ -975,23 +1143,26 @@ Prompt injection defense in depth: DevMate ingests *arbitrary repo files* — un
 ```python
 import numpy as np
 
+
 # Toy embeddings: choose the 2 examples whose average cosine similarity to the
 # query is highest (real version: embed with text-embedding-3-small).
 def cosine(a, b):
     return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
 
+
 query = np.array([1.0, 0.0, 0.5])
 examples = {
     "how_to_read_file": np.array([0.9, 0.1, 0.4]),
-    "what_is_tuple":     np.array([0.1, 0.9, 0.1]),
+    "what_is_tuple": np.array([0.1, 0.9, 0.1]),
     "sql_join_vs_lookup": np.array([-0.2, 0.8, 0.2]),
-    "error_handling":    np.array([0.8, 0.0, 0.6]),
+    "error_handling": np.array([0.8, 0.0, 0.6]),
 }
 scores = {name: cosine(query, vec) for name, vec in examples.items()}
 top2 = sorted(scores, key=scores.get, reverse=True)[:2]
 print("scores:", {k: round(v, 3) for k, v in scores.items()})
-print("selected:", top2)                          # expect ['how_to_read_file', 'error_handling']
+print("selected:", top2)  # expect ['how_to_read_file', 'error_handling']
 assert set(top2) == {"how_to_read_file", "error_handling"}
+
 
 # Formatting: examples must be user/assistant pairs, one per role, exact order
 def format_messages(system: str, examples, question: str):
@@ -1002,12 +1173,17 @@ def format_messages(system: str, examples, question: str):
     msgs.append({"role": "user", "content": question})
     return msgs
 
+
 exs = [{"input": "q1", "output": "a1"}, {"input": "q2", "output": "a2"}]
 msgs = format_messages("sys", exs, "q3")
-assert msgs == [{"role": "system", "content": "sys"},
-                {"role": "user", "content": "q1"}, {"role": "assistant", "content": "a1"},
-                {"role": "user", "content": "q2"}, {"role": "assistant", "content": "a2"},
-                {"role": "user", "content": "q3"}]
+assert msgs == [
+    {"role": "system", "content": "sys"},
+    {"role": "user", "content": "q1"},
+    {"role": "assistant", "content": "a1"},
+    {"role": "user", "content": "q2"},
+    {"role": "assistant", "content": "a2"},
+    {"role": "user", "content": "q3"},
+]
 print("formatting: exact user/assistant structure")
 ```
 
@@ -1176,8 +1352,8 @@ Give DevMate a structured CoT path:
 - Add to `projects/04-ai-engineering/devmate/src/devmate/llm/schemas.py`:
   ```python
   class ReasonedAnswer(BaseModel):
-      reasoning: str     # step-by-step thinking, never shown in final UI
-      answer: str        # the user-facing answer
+      reasoning: str  # step-by-step thinking, never shown in final UI
+      answer: str  # the user-facing answer
   ```
 - Create `projects/04-ai-engineering/devmate/src/devmate/llm/reasoning.py`: `complete_with_reasoning(client, messages, model=None)` — calls `client.complete(..., response_model=ReasonedAnswer)` (the client already forces `tool_choice` when `response_model` is set, client.py:187–194) and returns the validated `ReasonedAnswer`.
 - Create `projects/04-ai-engineering/devmate/tests/unit/test_reasoning.py` with a fake provider returning a tool_use input `{"reasoning": "...", "answer": "..."}`; assert the parsed object's fields; assert a malformed tool_use (missing `answer`) raises `LLMValidationError`.

@@ -37,12 +37,14 @@ for smooth objectives without constraints.
 import numpy as np
 from scipy import optimize
 
+
 def rosen(z):
     x, y = z
-    return (1 - x) ** 2 + 100 * (y - x ** 2) ** 2
+    return (1 - x) ** 2 + 100 * (y - x**2) ** 2
+
 
 r = optimize.minimize(rosen, np.array([-1.2, 1.0]), method="BFGS")
-print(r.fun, r.nfev)        # ~1e-11, ~114
+print(r.fun, r.nfev)  # ~1e-11, ~114
 ```
 
 **Complexity**: O(d²) per iteration memory (Hessian approx).
@@ -60,9 +62,10 @@ to `L-BFGS-B`, `SLSQP`, `least_squares`, and
 import numpy as np
 from scipy import optimize
 
-r = optimize.minimize(lambda x: (x[0] - 5.0) ** 2, np.array([0.0]),
-                      method="L-BFGS-B", bounds=[(0.0, 2.0)])
-print(r.x[0], r.fun)        # 2.0, 9.0 -- clamped to the bound
+r = optimize.minimize(
+    lambda x: (x[0] - 5.0) ** 2, np.array([0.0]), method="L-BFGS-B", bounds=[(0.0, 2.0)]
+)
+print(r.x[0], r.fun)  # 2.0, 9.0 -- clamped to the bound
 ```
 
 **Complexity**: free — a feasibility check per evaluation.
@@ -99,9 +102,8 @@ import numpy as np
 from scipy import optimize
 
 cons = {"type": "eq", "fun": lambda z: np.sum(z) - 1.0}
-r = optimize.minimize(lambda z: np.sum(z ** 2), np.zeros(3),
-                      method="SLSQP", constraints=cons)
-print(r.x.sum())            # ~1.0
+r = optimize.minimize(lambda z: np.sum(z**2), np.zeros(3), method="SLSQP", constraints=cons)
+print(r.x.sum())  # ~1.0
 ```
 
 **Complexity**: extra gradient evaluations per constraint.
@@ -119,11 +121,12 @@ least-squares machinery with the parameter API.
 import numpy as np
 from scipy import optimize
 
+
 def decay(x, A, B, C):
     return A * np.exp(-B * x) + C
 
-popt, pcov = optimize.curve_fit(decay, t, y, p0=[1.0, 1.0, 0.0],
-                                bounds=([0, 0, 0], [10, 3, 2]))
+
+popt, pcov = optimize.curve_fit(decay, t, y, p0=[1.0, 1.0, 0.0], bounds=([0, 0, 0], [10, 3, 2]))
 ```
 
 **Complexity**: ~10¹–10² evaluations.
@@ -143,7 +146,7 @@ from scipy import optimize
 
 f = lambda x: x[0] ** 2 + 10.0 * np.sin(x[0])
 r = optimize.differential_evolution(f, bounds=[(-10.0, 10.0)], seed=42)
-print(r.x[0], r.fun)        # -1.3064, -7.9458 -- global min
+print(r.x[0], r.fun)  # -1.3064, -7.9458 -- global min
 ```
 
 **Complexity**: 10³–10⁵ evaluations by design.
@@ -195,9 +198,8 @@ from scipy import optimize
 
 x = np.linspace(0, 10, 25)
 y = 2.0 * x + 1.0
-r = optimize.least_squares(lambda p: p[0] * x + p[1] - y,
-                           x0=[0.0, 0.0], loss="cauchy")
-print(r.x[0])               # ~2.0
+r = optimize.least_squares(lambda p: p[0] * x + p[1] - y, x0=[0.0, 0.0], loss="cauchy")
+print(r.x[0])  # ~2.0
 ```
 
 **Complexity**: ~10¹–10² evaluations.
@@ -259,7 +261,7 @@ Read it when `success` is False.
 
 **Example**:
 ```python
-print(r.message)            # why the solver stopped
+print(r.message)  # why the solver stopped
 ```
 
 **Complexity**: —.
@@ -276,8 +278,7 @@ slower and less accurate than BFGS on smooth ones.
 ```python
 from scipy import optimize
 
-r = optimize.minimize(f, x0, method="Nelder-Mead",
-                      options={"xatol": 1e-6, "fatol": 1e-6})
+r = optimize.minimize(f, x0, method="Nelder-Mead", options={"xatol": 1e-6, "fatol": 1e-6})
 ```
 
 **Complexity**: ~10²–10³ evaluations.
@@ -292,7 +293,7 @@ solution.
 
 **Example**:
 ```python
-print(r.nfev)               # the evaluation budget spent
+print(r.nfev)  # the evaluation budget spent
 ```
 
 **Complexity**: —.
@@ -338,7 +339,7 @@ from `curve_fit`. Its diagonal gives parameter uncertainty:
 **Example**:
 ```python
 popt, pcov = optimize.curve_fit(decay, t, y)
-print(np.sqrt(np.diag(pcov)))       # per-parameter std errors
+print(np.sqrt(np.diag(pcov)))  # per-parameter std errors
 ```
 
 **Complexity**: O(p³) after the fit.
@@ -356,8 +357,7 @@ constrained local solver: bounds, equality (`eq`), and inequality
 from scipy import optimize
 
 cons = [{"type": "eq", "fun": lambda z: np.sum(z) - 1.0}]
-r = optimize.minimize(f, x0, method="SLSQP", bounds=[(0.0, 1.0)] * 3,
-                      constraints=cons)
+r = optimize.minimize(f, x0, method="SLSQP", bounds=[(0.0, 1.0)] * 3, constraints=cons)
 ```
 
 **Complexity**: extra constraint-gradient work per iteration.

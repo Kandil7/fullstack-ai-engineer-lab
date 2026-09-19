@@ -27,6 +27,7 @@ from collections import defaultdict
 # EASY PROBLEMS (20 XP)
 # ============================================================
 
+
 # Problem 1: PII Redactor
 # Write a function that redacts personally identifiable information from text:
 # - Emails: replace with [EMAIL]
@@ -82,12 +83,14 @@ class AuditLogger:
     def __init__(self):
         pass  # Write your code here
 
-    def log(self, user_id: str, prompt: str, response: str,
-            category: str, flagged: bool):
+    def log(
+        self, user_id: str, prompt: str, response: str, category: str, flagged: bool
+    ):
         pass  # Write your code here
 
-    def search(self, user_id: str = None, start_time: float = None,
-               end_time: float = None) -> list[dict]:
+    def search(
+        self, user_id: str = None, start_time: float = None, end_time: float = None
+    ) -> list[dict]:
         pass  # Write your code here
 
     def export(self, path: str):
@@ -97,6 +100,7 @@ class AuditLogger:
 # ============================================================
 # MEDIUM PROBLEMS (50 XP)
 # ============================================================
+
 
 # Problem 6: Prompt Injection Detector
 # Write a function that detects prompt injection attempts:
@@ -168,6 +172,7 @@ def problem_10():
 # ============================================================
 # HARD PROBLEMS (100 XP)
 # ============================================================
+
 
 # Problem 11: Multi-Layer Content Filter
 # Write a ContentFilter class with multiple filter layers:
@@ -245,8 +250,14 @@ class IncidentLogger:
     def __init__(self):
         pass  # Write your code here
 
-    def log_incident(self, user_id: str, incident_type: str,
-                     evidence: dict, action_taken: str, severity: str = "low"):
+    def log_incident(
+        self,
+        user_id: str,
+        incident_type: str,
+        evidence: dict,
+        action_taken: str,
+        severity: str = "low",
+    ):
         pass  # Write your code here
 
     def get_user_history(self, user_id: str) -> list[dict]:
@@ -276,8 +287,7 @@ class SafetySystem:
     def __init__(self):
         pass  # Write your code here
 
-    def process_request(self, user_id: str, prompt: str,
-                        generate_fn: Callable) -> dict:
+    def process_request(self, user_id: str, prompt: str, generate_fn: Callable) -> dict:
         pass  # Write your code here
 
     def get_safety_report(self, request_id: str) -> dict:

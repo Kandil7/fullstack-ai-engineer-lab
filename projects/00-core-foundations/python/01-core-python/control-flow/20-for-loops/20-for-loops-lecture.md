@@ -163,7 +163,7 @@ else:
 # Multiplication table
 for i in range(1, 6):
     for j in range(1, 6):
-        print(f"{i*j:4d}", end="")
+        print(f"{i * j:4d}", end="")
     print()
 
 # Output:
@@ -186,6 +186,7 @@ def find_item(items, target):
     else:
         print(f"{target} not found")
 
+
 find_item([1, 2, 3, 4], 3)  # Found 3!
 find_item([1, 2, 3, 4], 5)  # 5 not found
 ```
@@ -199,10 +200,7 @@ for x, y in points:
     print(f"({x}, {y})")
 
 # Unpack nested structures
-data = [
-    {"name": "Alice", "scores": [85, 90]},
-    {"name": "Bob", "scores": [78, 82]}
-]
+data = [{"name": "Alice", "scores": [85, 90]}, {"name": "Bob", "scores": [78, 82]}]
 for person in data:
     name = person["name"]
     avg = sum(person["scores"]) / len(person["scores"])
@@ -219,12 +217,13 @@ for person in data:
 def find_largest(numbers):
     if not numbers:
         return None
-    
+
     largest = numbers[0]
     for num in numbers[1:]:
         if num > largest:
             largest = num
     return largest
+
 
 print(find_largest([3, 1, 4, 1, 5, 9, 2, 6]))  # 9
 ```
@@ -236,19 +235,17 @@ def transpose(matrix):
     rows = len(matrix)
     cols = len(matrix[0])
     result = []
-    
+
     for j in range(cols):
         new_row = []
         for i in range(rows):
             new_row.append(matrix[i][j])
         result.append(new_row)
-    
+
     return result
 
-matrix = [
-    [1, 2, 3],
-    [4, 5, 6]
-]
+
+matrix = [[1, 2, 3], [4, 5, 6]]
 print(transpose(matrix))
 # [[1, 4], [2, 5], [3, 6]]
 ```
@@ -265,6 +262,7 @@ def flatten(nested_list):
             flat.append(item)
     return flat
 
+
 print(flatten([1, [2, 3], [4, [5, 6]]]))  # [1, 2, 3, 4, 5, 6]
 ```
 
@@ -277,6 +275,7 @@ def word_freq(text):
     for word in words:
         freq[word] = freq.get(word, 0) + 1
     return freq
+
 
 text = "the cat sat on the mat the cat ate the rat"
 result = word_freq(text)
@@ -362,6 +361,7 @@ def sum_digits(n):
     # Your code here
     pass
 
+
 # Expected: 15 (1 + 2 + 3 + 4 + 5)
 print(sum_digits(12345))
 ```
@@ -373,6 +373,7 @@ Write a function that checks if a string is a palindrome using a for loop.
 def is_palindrome(s):
     # Your code here
     pass
+
 
 # Expected: True
 print(is_palindrome("racecar"))
@@ -387,6 +388,7 @@ def multiply_matrices(a, b):
     # Your code here — nested for loops
     pass
 
+
 a = [[1, 2], [3, 4]]
 b = [[5, 6], [7, 8]]
 # Expected: [[19, 22], [43, 50]]
@@ -400,6 +402,7 @@ Write a function that encrypts a string using Caesar cipher (shift letters by n 
 def caesar_encrypt(text, shift):
     # Your code here
     pass
+
 
 # Expected: "Khoor"
 print(caesar_encrypt("Hello", 3))

@@ -106,9 +106,7 @@ print()
 # child rows with the parent; ON DELETE SET NULL nulls the reference.
 # Choosing the wrong one leaks orphaned rows into joins.
 
-conn.execute(
-    "CREATE TABLE model_runs (id INTEGER PRIMARY KEY, name TEXT NOT NULL)"
-)
+conn.execute("CREATE TABLE model_runs (id INTEGER PRIMARY KEY, name TEXT NOT NULL)")
 conn.execute(
     """
     CREATE TABLE metrics (
@@ -166,6 +164,7 @@ print()
 #   FKs silently do nothing otherwise
 # CORRECT: execute the PRAGMA before any DML on every new connection
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -186,11 +185,14 @@ def _verify() -> None:
         # 2. DEFAULT fills omitted values
         conn.execute("CREATE TABLE b (id INTEGER PRIMARY KEY, level INTEGER DEFAULT 3)")
         conn.execute("INSERT INTO b (id) VALUES (1)")
-        assert conn.execute("SELECT level FROM b WHERE id = 1").fetchone()[0] == 3, \
+        assert conn.execute("SELECT level FROM b WHERE id = 1").fetchone()[0] == 3, (
             "DEFAULT must fill omitted values"
+        )
 
         # 3. CHECK is enforced
-        conn.execute("CREATE TABLE c (id INTEGER PRIMARY KEY, pct REAL CHECK (pct >= 0 AND pct <= 100))")
+        conn.execute(
+            "CREATE TABLE c (id INTEGER PRIMARY KEY, pct REAL CHECK (pct >= 0 AND pct <= 100))"
+        )
         try:
             conn.execute("INSERT INTO c (pct) VALUES (?)", (101,))
             raise AssertionError("CHECK must raise IntegrityError")
@@ -207,7 +209,9 @@ def _verify() -> None:
 
         # 5. FK rejects orphans and cascades deletes
         conn.execute("CREATE TABLE p (id INTEGER PRIMARY KEY)")
-        conn.execute("CREATE TABLE k (id INTEGER PRIMARY KEY, pid INTEGER REFERENCES p(id) ON DELETE CASCADE)")
+        conn.execute(
+            "CREATE TABLE k (id INTEGER PRIMARY KEY, pid INTEGER REFERENCES p(id) ON DELETE CASCADE)"
+        )
         conn.execute("INSERT INTO p (id) VALUES (1)")
         conn.execute("INSERT INTO k (pid) VALUES (1)")
         try:
@@ -216,8 +220,9 @@ def _verify() -> None:
         except sqlite3.IntegrityError:
             pass
         conn.execute("DELETE FROM p WHERE id = 1")
-        assert conn.execute("SELECT COUNT(*) FROM k").fetchone()[0] == 0, \
+        assert conn.execute("SELECT COUNT(*) FROM k").fetchone()[0] == 0, (
             "ON DELETE CASCADE must remove children"
+        )
 
         # 6. schema metadata is queryable (sqlite_master + PRAGMA)
         names = conn.execute(
@@ -241,4 +246,4 @@ if __name__ == "__main__":
         print("2. Schema is data: sqlite_master + PRAGMA power migrations and registries")
         print("3. FK actions (CASCADE/SET NULL) decide what happens to children")
         print("4. ALTER is cheap metadata work; backfill and DROP are separate steps")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

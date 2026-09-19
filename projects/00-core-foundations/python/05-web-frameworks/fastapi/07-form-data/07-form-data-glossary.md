@@ -144,10 +144,12 @@ curl -X POST http://localhost:8000/contact/ \
 ```python
 from fastapi import Form
 
+
 # Required form field
 @app.post("/login/")
 def login(username: str = Form(...), password: str = Form(...)):
     return {"username": username}
+
 
 # Optional form field with default
 @app.post("/contact/")
@@ -156,6 +158,7 @@ def contact(
     subject: str = Form(default="General"),
 ):
     return {"name": name, "subject": subject}
+
 
 # With validation constraints
 @app.post("/register/")
@@ -187,6 +190,7 @@ def register(
 ```python
 from fastapi.responses import HTMLResponse
 
+
 @app.get("/form", response_class=HTMLResponse)
 def get_form():
     return """
@@ -209,6 +213,7 @@ def get_form():
     </html>
     """
 
+
 @app.post("/contact/")
 def contact(
     name: str = Form(...),
@@ -230,6 +235,7 @@ def contact(
 **Example:**
 ```python
 from fastapi.responses import HTMLResponse
+
 
 @app.get("/", response_class=HTMLResponse)
 def home():
@@ -265,6 +271,7 @@ def home():
 **FastAPI:**
 ```python
 from fastapi import Form, UploadFile, File
+
 
 @app.post("/upload/")
 async def upload(

@@ -24,12 +24,11 @@ rng = np.random.default_rng(42)
 
 scores = np.array([0.9, 0.4, 0.7, 0.2, 0.8])
 pick = scores[[3, 0, 4]]
-print("Example 1: fancy pick:", pick)          # [0.2 0.9 0.8]
+print("Example 1: fancy pick:", pick)  # [0.2 0.9 0.8]
 
 X = rng.normal(size=(6, 4))
 shuffled = X[rng.permutation(X.shape[0])]
-print("Example 1: shuffled rows are a copy:",
-      not np.shares_memory(shuffled, X))
+print("Example 1: shuffled rows are a copy:", not np.shares_memory(shuffled, X))
 
 # ---------------------------------------------------------------------------
 # Example 2: boolean masks — filter by condition, then assign
@@ -41,8 +40,8 @@ mask = data > 0.0
 print("Example 2: positives kept:", data[mask].shape)
 print("Example 2: mask counts:", mask.sum(), "/", data.size)
 
-data[data < -1.0] = -1.0                        # clamp via mask assignment
-print("Example 2: clamped min:", data.min())    # -1.0
+data[data < -1.0] = -1.0  # clamp via mask assignment
+print("Example 2: clamped min:", data.min())  # -1.0
 
 # ---------------------------------------------------------------------------
 # Example 3: np.ix_ — select a submatrix without broadcast traps
@@ -54,7 +53,7 @@ M = np.arange(20.0).reshape(4, 5)
 rows = np.array([0, 3])
 cols = np.array([1, 2, 4])
 grid = M[np.ix_(rows, cols)]
-print("Example 3: grid shape:", grid.shape)    # (2, 3)
+print("Example 3: grid shape:", grid.shape)  # (2, 3)
 print("Example 3: grid:\n", grid)
 
 # ---------------------------------------------------------------------------
@@ -64,12 +63,12 @@ print("Example 3: grid:\n", grid)
 # explicit boundary policy; np.put writes into a copy-free manner.
 
 x4 = np.arange(6)
-print("Example 4: take wrap:", np.take(x4, [7, 8], mode="wrap"))    # [1 2]
-print("Example 4: take clip:", np.take(x4, [-3, 9], mode="clip"))   # [0 5]
+print("Example 4: take wrap:", np.take(x4, [7, 8], mode="wrap"))  # [1 2]
+print("Example 4: take clip:", np.take(x4, [-3, 9], mode="clip"))  # [0 5]
 
 dst = np.zeros(6)
 np.put(dst, [0, 2], [9.0, -9.0])
-print("Example 4: put:", dst)                  # [ 9.  0. -9.  0.  0.  0.]
+print("Example 4: put:", dst)  # [ 9.  0. -9.  0.  0.  0.]
 
 # ---------------------------------------------------------------------------
 # Example 5: argsort and argpartition — top-k without a full sort
@@ -79,16 +78,14 @@ print("Example 4: put:", dst)                  # [ 9.  0. -9.  0.  0.  0.]
 
 x5 = rng.normal(size=100_000)
 k = 5
-idx = np.argpartition(x5, k - 1)[:k]           # k smallest
+idx = np.argpartition(x5, k - 1)[:k]  # k smallest
 top5 = np.sort(x5[idx])
 truth = np.sort(x5)[:k]
-print("Example 5: argpartition top-k matches sort:",
-      np.array_equal(top5, truth))
+print("Example 5: argpartition top-k matches sort:", np.array_equal(top5, truth))
 
 # Top-k by score for retrieval (largest k): partition at n-k.
 kidx = np.argpartition(x5, -k)[-k:]
-print("Example 5: largest k match:",
-      np.array_equal(np.sort(x5[kidx]), np.sort(x5)[-k:]))
+print("Example 5: largest k match:", np.array_equal(np.sort(x5[kidx]), np.sort(x5)[-k:]))
 
 # ---------------------------------------------------------------------------
 # Example 6: searchsorted — insertion points for sorted arrays
@@ -99,9 +96,8 @@ print("Example 5: largest k match:",
 bins = np.array([0.0, 0.25, 0.5, 0.75, 1.0])
 v = np.array([0.05, 0.25, 0.8, 2.0, -1.0])
 b = np.searchsorted(bins, v, side="right")
-print("Example 6: bucket indices:", b)         # [1 2 4 5 0]
-print("Example 6: digitize agrees:",
-      np.array_equal(b, np.digitize(v, bins)))
+print("Example 6: bucket indices:", b)  # [1 2 4 5 0]
+print("Example 6: digitize agrees:", np.array_equal(b, np.digitize(v, bins)))
 
 # ---------------------------------------------------------------------------
 # Example 7: unique + return_counts — label distribution in one call
@@ -123,7 +119,7 @@ print("Example 7: counts sum to n:", counts.sum() == labels.size)
 base = np.arange(10.0)
 view = base[::2]
 view[:] = -1.0
-print("Example 8: view wrote through:", base[0], base[2])   # -1.0 -1.0
+print("Example 8: view wrote through:", base[0], base[2])  # -1.0 -1.0
 
 fresh = np.arange(10.0)
 copy_ = fresh[[0, 2, 4]]
@@ -168,10 +164,8 @@ def _verify() -> None:
 
     # 6. searchsorted bucket assignment is correct on boundaries
     bins6 = np.array([0.0, 0.5, 1.0])
-    assert np.array_equal(np.searchsorted(bins6, [0.0, 0.5, 0.75], side="right"),
-                          [1, 2, 2])
-    assert np.array_equal(np.searchsorted(bins6, [0.0, 0.5, 0.75], side="left"),
-                          [0, 1, 2])
+    assert np.array_equal(np.searchsorted(bins6, [0.0, 0.5, 0.75], side="right"), [1, 2, 2])
+    assert np.array_equal(np.searchsorted(bins6, [0.0, 0.5, 0.75], side="left"), [0, 1, 2])
 
     # 7. unique counts partition the data
     lab = rng_v.integers(0, 5, size=2000)

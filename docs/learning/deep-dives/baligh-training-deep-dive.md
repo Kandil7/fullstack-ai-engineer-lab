@@ -56,17 +56,18 @@ covering dataset preparation, training methodology, evaluation, and production d
 ```python
 import re
 
+
 def clean_arabic(text: str) -> str:
     # Normalize alef variants: أ إ آ → ا
-    text = re.sub(r'[أإآ]', 'ا', text)
+    text = re.sub(r"[أإآ]", "ا", text)
     # Normalize ta marbuta: ة → ه
-    text = re.sub(r'ة', 'ه', text)
+    text = re.sub(r"ة", "ه", text)
     # Normalize ya: ي → ى (at end of word)
-    text = re.sub(r'ي(?=\s|$)', 'ى', text)
+    text = re.sub(r"ي(?=\s|$)", "ى", text)
     # Remove tatweel (kashida)
-    text = re.sub(r'\u0640', '', text)
+    text = re.sub(r"\u0640", "", text)
     # Normalize whitespace
-    text = re.sub(r'\s+', ' ', text).strip()
+    text = re.sub(r"\s+", " ", text).strip()
     return text
 ```
 

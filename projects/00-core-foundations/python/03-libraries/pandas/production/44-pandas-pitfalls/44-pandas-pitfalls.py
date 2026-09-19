@@ -62,8 +62,10 @@ print("One .loc write flagged rows:", int(df_chain["flag"].sum()))
 left = pd.Series([1.0, 2.0, 3.0], index=[0, 1, 2])
 right = pd.Series([10.0, 20.0, 30.0], index=[1, 2, 3])
 print("left + right:", (left + right).tolist())
-print("After reindex, alignment gone:",
-      (left.reset_index(drop=True) + right.reset_index(drop=True)).tolist())
+print(
+    "After reindex, alignment gone:",
+    (left.reset_index(drop=True) + right.reset_index(drop=True)).tolist(),
+)
 
 # Output:
 # left + right: [nan, 12.0, 23.0, nan]
@@ -121,14 +123,13 @@ print("Filtering with notna() keeps:", removed_correctly.tolist())
 
 # Example 5: one bad row silently rewrites a column's dtype
 with warnings.catch_warnings():
-    warnings.simplefilter("ignore", FutureWarning)   # suppress the 2.2 notice
+    warnings.simplefilter("ignore", FutureWarning)  # suppress the 2.2 notice
     df_up = pd.DataFrame({"id": [1, 2, 3]})
     df_up.loc[2, "id"] = "oops"
 print("id dtype after a string lands in it:", df_up["id"].dtype)
 df_mix = pd.DataFrame({"a": [1, 2]})
 df_mix["b"] = [1.5, 2.5]
-print("int column + float column ->",
-      [str(t) for t in df_mix.dtypes.tolist()])
+print("int column + float column ->", [str(t) for t in df_mix.dtypes.tolist()])
 
 # Output:
 # id dtype after a string lands in it: object
@@ -148,12 +149,14 @@ print("int column + float column ->",
 n = 5_000
 loop_df = pd.DataFrame({"a": np.arange(n), "b": np.arange(n) * 2})
 
+
 def with_iterrows(frame: pd.DataFrame) -> float:
     total = 0.0
     for _, row in frame.iterrows():
         if row["a"] % 2 == 0:
             total += row["b"]
     return total
+
 
 def with_itertuples(frame: pd.DataFrame) -> float:
     total = 0.0
@@ -162,8 +165,10 @@ def with_itertuples(frame: pd.DataFrame) -> float:
             total += row.b
     return total
 
+
 def vectorized(frame: pd.DataFrame) -> float:
     return float(frame.loc[frame["a"] % 2 == 0, "b"].sum())
+
 
 print("iterrows result:", with_iterrows(loop_df))
 print("itertuples result:", with_itertuples(loop_df))
@@ -187,10 +192,13 @@ print("vectorized result:", vectorized(loop_df))
 orders = pd.DataFrame({"cust": ["a", "a", "b"], "amt": [1, 2, 3]})
 profile = pd.DataFrame({"cust": ["a", "a", "a"], "city": ["NY", "LA", "SF"]})
 merged = orders.merge(profile, on="cust")
-print("orders rows:", len(orders), "| profile rows:", len(profile),
-      "| merged rows:", len(merged))
-print("Unique customers in orders:", orders["cust"].nunique(),
-      "| in profile:", profile["cust"].nunique())
+print("orders rows:", len(orders), "| profile rows:", len(profile), "| merged rows:", len(merged))
+print(
+    "Unique customers in orders:",
+    orders["cust"].nunique(),
+    "| in profile:",
+    profile["cust"].nunique(),
+)
 
 # Output:
 # orders rows: 3 | profile rows: 3 | merged rows: 6
@@ -206,18 +214,20 @@ print("Unique customers in orders:", orders["cust"].nunique(),
 # one and DOESN'T expect the parent to change silently corrupts
 # data today. Write code that works under BOTH.
 
+
 # Example 8: same code, two worlds (single-cell write through a
 # shared-block copy -- the clearest view/copy semantic split)
 def slice_mutation(frame: pd.DataFrame) -> list[float]:
-    view = frame.copy(deep=False)   # shares the data blocks
+    view = frame.copy(deep=False)  # shares the data blocks
     view.iloc[0, 0] = 99
     return frame["a"].tolist()
+
 
 pd.set_option("mode.copy_on_write", False)
 cow_off = slice_mutation(pd.DataFrame({"a": [1, 2, 3], "b": [5.0, 6.0, 7.0]}))
 pd.set_option("mode.copy_on_write", True)
 cow_on = slice_mutation(pd.DataFrame({"a": [1, 2, 3], "b": [5.0, 6.0, 7.0]}))
-pd.set_option("mode.copy_on_write", False)   # restore default
+pd.set_option("mode.copy_on_write", False)  # restore default
 
 print("CoW off: parent sees", cow_off, "| CoW on: parent sees", cow_on)
 print("Behavior differs between modes:", cow_off != cow_on)
@@ -234,12 +244,12 @@ print("Behavior differs between modes:", cow_off != cow_on)
 # operations. A merge guard takes 3 lines and turns a silent row
 # explosion into a loud, immediate error.
 
-def merge_with_contract(left: pd.DataFrame, right: pd.DataFrame,
-                        key: str) -> pd.DataFrame:
+
+def merge_with_contract(left: pd.DataFrame, right: pd.DataFrame, key: str) -> pd.DataFrame:
     """Merge, but refuse to explode on duplicate keys."""
-    assert right[key].is_unique, \
-        f"right side key '{key}' must be unique; found duplicates"
+    assert right[key].is_unique, f"right side key '{key}' must be unique; found duplicates"
     return left.merge(right, on=key)
+
 
 # Example 9: the guard catches a duplicate-key disaster
 try:
@@ -274,41 +284,36 @@ except AssertionError as err:
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # Chained assignment writes to a copy: the original is untouched.
-    assert int(df_chain["flag"].sum()) == 2, \
-        "only the .loc write may land in the frame"
+    assert int(df_chain["flag"].sum()) == 2, "only the .loc write may land in the frame"
 
     # Index alignment produces NaN at non-matching labels.
-    assert np.isnan((left + right).iloc[0]), \
-        "label 0 only exists in left -> NaN"
+    assert np.isnan((left + right).iloc[0]), "label 0 only exists in left -> NaN"
     assert (left + right).iloc[1] == 12.0, "label 1 exists in both"
 
     # inplace=True returns None (not the frame).
     assert result is None, "inplace methods must return None"
 
     # NaN never equals itself.
-    assert np.isnan(np.nan) and not (np.nan == np.nan), \
-        "NaN must not equal itself"
-    assert len(dropped_nothing) == 4, \
-        "filtering with != np.nan must keep every row"
-    assert removed_correctly.tolist() == [1.0, 3.0], \
-        "notna() must remove exactly the NaNs"
+    assert np.isnan(np.nan) and not (np.nan == np.nan), "NaN must not equal itself"
+    assert len(dropped_nothing) == 4, "filtering with != np.nan must keep every row"
+    assert removed_correctly.tolist() == [1.0, 3.0], "notna() must remove exactly the NaNs"
 
     # Dtype upcasting is silent and visible.
-    assert df_up["id"].dtype == np.dtype("object"), \
+    assert df_up["id"].dtype == np.dtype("object"), (
         "a string in an int column must upcast to object"
+    )
 
     # All three loop spellings agree numerically.
-    assert with_iterrows(loop_df) == with_itertuples(loop_df) == vectorized(loop_df), \
+    assert with_iterrows(loop_df) == with_itertuples(loop_df) == vectorized(loop_df), (
         "iterrows/itertuples/vectorized must agree"
+    )
 
     # Duplicate keys explode the merge row count.
     assert len(merged) == 6, "2x3 duplicate-key merge must produce 6 rows"
 
     # Copy-on-write changes slice mutation semantics.
-    assert cow_off == [99, 2, 3], \
-        "CoW off: shallow-copy write must reach the parent"
-    assert cow_on == [1, 2, 3], \
-        "CoW on: shallow-copy write must NOT reach the parent"
+    assert cow_off == [99, 2, 3], "CoW off: shallow-copy write must reach the parent"
+    assert cow_on == [1, 2, 3], "CoW on: shallow-copy write must NOT reach the parent"
 
     # The merge guard refuses duplicate keys loudly.
     try:
@@ -328,4 +333,4 @@ if __name__ == "__main__":
         print("1. One .loc selection; never chain writes.")
         print("2. isna()/notna() -- NaN never equals NaN.")
         print("3. Assert key uniqueness before every merge.")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

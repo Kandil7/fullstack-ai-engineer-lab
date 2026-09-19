@@ -194,6 +194,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("34-caching-strategies:app", host="127.0.0.1", port=8000)
     else:
         _verify()

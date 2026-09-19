@@ -15,14 +15,21 @@ from __future__ import annotations
 import sys
 
 from pydantic import (
-    BaseModel, Field, TypeAdapter, ValidationError,
-    field_validator, model_validator, computed_field, ConfigDict,
+    BaseModel,
+    Field,
+    TypeAdapter,
+    ValidationError,
+    field_validator,
+    model_validator,
+    computed_field,
+    ConfigDict,
 )
 
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception:
     pass
+
 
 # ============================================================
 # 1. Field constraints — the declarative validation surface
@@ -41,9 +48,10 @@ print("Example 1: Field constraints")
 print(f"  valid: {p.name} @ {p.price} x {p.stock}")
 
 try:
-    Product(name="X", price=-1, stock=0)   # name too short, price negative
+    Product(name="X", price=-1, stock=0)  # name too short, price negative
 except ValidationError as e:
     print(f"  invalid -> {e.errors()[0]['loc'][0]}: {e.errors()[0]['msg']}")
+
 
 # ============================================================
 # 2. field_validator — per-field logic with mode='before'/'after'
@@ -73,6 +81,7 @@ o = Order(email="  A@B.com ", qty="3")
 print("\nExample 2: field validators")
 print(f"  email normalized: {o.email!r}  qty coerced: {o.qty!r} ({type(o.qty).__name__})")
 
+
 # ============================================================
 # 3. model_validator — cross-field rules
 # ============================================================
@@ -96,6 +105,7 @@ try:
 except ValidationError as e:
     print(f"  invalid -> {e.errors()[0]['msg']}")
 
+
 # ============================================================
 # 4. computed_field + serialization aliases + strict mode
 # ============================================================
@@ -118,6 +128,7 @@ print("\nExample 4: computed fields + serialization")
 print(f"  total: {inv.total}")
 print(f"  dump: {inv.model_dump()}")
 
+
 # strict mode: reject coercion (e.g. str '1' for an int field)
 class StrictId(BaseModel):
     model_config = ConfigDict(strict=True)
@@ -126,7 +137,7 @@ class StrictId(BaseModel):
 
 
 try:
-    StrictId(user_id="42")     # str for int in strict mode
+    StrictId(user_id="42")  # str for int in strict mode
     print("  strict: accepted (unexpected)")
 except ValidationError:
     print("  strict mode rejects str '42' for user_id: int")
@@ -141,6 +152,7 @@ try:
     IntList.validate_python([1, "x"])
 except ValidationError:
     print("  invalid element -> rejected")
+
 
 # ============================================================
 # 6. Serialization aliases — JSON field names differ from Python
@@ -179,9 +191,11 @@ def _verify() -> None:
     assert Booking(start=1, end=2).end == 2
 
     # Rejections
-    for bad in (lambda: Product(name="X", price=1, stock=1),
-                lambda: Booking(start=2, end=1),
-                lambda: StrictId(user_id="1")):
+    for bad in (
+        lambda: Product(name="X", price=1, stock=1),
+        lambda: Booking(start=2, end=1),
+        lambda: StrictId(user_id="1"),
+    ):
         try:
             bad()
             assert False, "expected ValidationError"
@@ -216,6 +230,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("26-pydantic-v2-deep:app", host="127.0.0.1", port=8000)
     else:
         _verify()

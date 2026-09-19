@@ -24,12 +24,13 @@
 **Example**:
 ```python
 class Employee:
-    __slots__ = ('name', 'salary')  # Instance slots
+    __slots__ = ("name", "salary")  # Instance slots
     company = "Acme Corp"  # Class variable
-    
+
     def __init__(self, name, salary):
         self.name = name
         self.salary = salary
+
 
 emp1 = Employee("Alice", 75000)
 emp2 = Employee("Bob", 80000)
@@ -54,26 +55,28 @@ print(emp2.company)  # Still Acme Corp
 class Validated:
     def __set_name__(self, owner, name):
         self.name = name
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         return obj.__dict__.get(f"_{self.name}")
-    
+
     def __set__(self, obj, value):
         if value < 0:
             raise ValueError("Must be positive")
         obj.__dict__[f"_{self.name}"] = value
 
+
 class Circle:
     radius = Validated()
-    
+
     def __init__(self, r):
         self.radius = r  # Uses descriptor __set__
 
+
 c = Circle(5)
 print(c.radius)  # Uses descriptor __get__
-c.radius = 10    # Uses descriptor __set__
+c.radius = 10  # Uses descriptor __set__
 ```
 
 **Related Terms**: property, __get__, __set__, attribute lookup
@@ -88,18 +91,22 @@ c.radius = 10    # Uses descriptor __set__
 ```python
 import sys
 
+
 class WithSlots:
-    __slots__ = ('x', 'y', 'z')
+    __slots__ = ("x", "y", "z")
+
     def __init__(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
+
 
 class WithoutSlots:
     def __init__(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
+
 
 s = WithSlots(1, 2, 3)
 r = WithoutSlots(1, 2, 3)
@@ -124,9 +131,10 @@ class Regular:
         self.x = x
         self.y = x * 2
 
+
 obj = Regular(5)
 print(obj.__dict__)  # {'x': 5, 'y': 10}
-print(obj.x)         # 5 (from __dict__)
+print(obj.x)  # 5 (from __dict__)
 
 # Adding dynamic attribute
 obj.z = 15
@@ -139,7 +147,10 @@ print(obj.__dict__)  # {'x': 5, 'y': 10, 'z': 15}
 ```python
 import sys
 
-class Empty: pass
+
+class Empty:
+    pass
+
 
 obj = Empty()
 print(f"Empty object: {sys.getsizeof(obj)} bytes")
@@ -156,17 +167,18 @@ print(f"Empty __dict__: {sys.getsizeof(obj.__dict__)} bytes")
 **Example**:
 ```python
 class Point:
-    __slots__ = ('x', 'y')
-    
+    __slots__ = ("x", "y")
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
 
 p = Point(1, 2)
 print(p.x, p.y)  # 1 2
 
 # No __dict__
-print(hasattr(p, '__dict__'))  # False
+print(hasattr(p, "__dict__"))  # False
 
 # Cannot add dynamic attributes
 try:
@@ -180,13 +192,13 @@ except AttributeError:
 **Syntax Options**:
 ```python
 # Tuple (immutable)
-__slots__ = ('x', 'y')
+__slots__ = ("x", "y")
 
 # List (also works)
-__slots__ = ['x', 'y']
+__slots__ = ["x", "y"]
 
 # Single attribute
-__slots__ = ('x',)
+__slots__ = ("x",)
 ```
 
 ---
@@ -198,35 +210,38 @@ __slots__ = ('x',)
 **Example**:
 ```python
 class Animal:
-    __slots__ = ('species',)
-    
+    __slots__ = ("species",)
+
     def __init__(self, species):
         self.species = species
 
+
 class Dog(Animal):
-    __slots__ = ('breed',)
-    
+    __slots__ = ("breed",)
+
     def __init__(self, breed):
         super().__init__("Canine")
         self.breed = breed
 
+
 class GuideDog(Dog):
-    __slots__ = ('handler',)
-    
+    __slots__ = ("handler",)
+
     def __init__(self, breed, handler):
         super().__init__(breed)
         self.handler = handler
 
+
 # All slots are accessible
 gd = GuideDog("Labrador", "John")
-print(gd.species)   # Canine
-print(gd.breed)     # Labrador
-print(gd.handler)   # John
+print(gd.species)  # Canine
+print(gd.breed)  # Labrador
+print(gd.handler)  # John
 
 # Combined slots
 print(Animal.__slots__)  # ('species',)
-print(Dog.__slots__)     # ('breed',)
-print(GuideDog.__slots__) # ('handler',)
+print(Dog.__slots__)  # ('breed',)
+print(GuideDog.__slots__)  # ('handler',)
 ```
 
 **Related Terms**: MRO, parent class, child class
@@ -241,16 +256,20 @@ print(GuideDog.__slots__) # ('handler',)
 ```python
 import sys
 
+
 class Regular:
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
+
 class Slotted:
-    __slots__ = ('x', 'y')
+    __slots__ = ("x", "y")
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
 
 r = Regular(1, 2)
 s = Slotted(1, 2)
@@ -279,14 +298,17 @@ from collections import namedtuple
 import sys
 
 # Named tuple
-PointNT = namedtuple('Point', ['x', 'y'])
+PointNT = namedtuple("Point", ["x", "y"])
+
 
 # Slots class
 class PointSlots:
-    __slots__ = ('x', 'y')
+    __slots__ = ("x", "y")
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
 
 nt = PointNT(1, 2)
 sl = PointSlots(1, 2)
@@ -320,38 +342,40 @@ print(f"Slots mutable: {sl.x}")
 **Example**:
 ```python
 class PooledObject:
-    __slots__ = ('_in_use', '_data')
-    
+    __slots__ = ("_in_use", "_data")
+
     def __init__(self):
         self._in_use = False
         self._data = None
-    
+
     def acquire(self, data):
         if self._in_use:
             raise RuntimeError("Object already in use")
         self._in_use = True
         self._data = data
         return self
-    
+
     def release(self):
         self._in_use = False
         self._data = None
+
 
 class ObjectPool:
     def __init__(self, size):
         self._pool = [PooledObject() for _ in range(size)]
         self._available = list(range(size))
-    
+
     def acquire(self, data):
         if not self._available:
             raise RuntimeError("Pool exhausted")
         idx = self._available.pop()
         return self._pool[idx].acquire(data)
-    
+
     def release(self, obj):
         idx = self._pool.index(obj)
         obj.release()
         self._available.append(idx)
+
 
 pool = ObjectPool(3)
 obj1 = pool.acquire("data1")
@@ -371,25 +395,27 @@ pool.release(obj1)
 ```python
 import math
 
+
 class Circle:
-    __slots__ = ('_radius',)
-    
+    __slots__ = ("_radius",)
+
     def __init__(self, radius):
         self._radius = radius
-    
+
     @property
     def radius(self):
         return self._radius
-    
+
     @radius.setter
     def radius(self, value):
         if value < 0:
             raise ValueError("Radius cannot be negative")
         self._radius = value
-    
+
     @property
     def area(self):
-        return math.pi * self._radius ** 2
+        return math.pi * self._radius**2
+
 
 c = Circle(5)
 print(c.area)  # 78.539...
@@ -398,7 +424,7 @@ c.radius = 10
 print(c.area)  # 314.159...
 
 # Still has no __dict__
-print(hasattr(c, '__dict__'))  # False
+print(hasattr(c, "__dict__"))  # False
 ```
 
 **Related Terms**: descriptor, getter, setter, validation
@@ -413,15 +439,20 @@ print(hasattr(c, '__dict__'))  # False
 ```python
 import weakref
 
+
 class Bad:
-    __slots__ = ('x',)
+    __slots__ = ("x",)
+
     def __init__(self, x):
         self.x = x
 
+
 class Good:
-    __slots__ = ('x', '__weakref__')
+    __slots__ = ("x", "__weakref__")
+
     def __init__(self, x):
         self.x = x
+
 
 # Bad - no __weakref__
 try:
@@ -507,7 +538,8 @@ Slots
 ### 1. Data Class Pattern
 ```python
 class Point:
-    __slots__ = ('x', 'y', 'z')
+    __slots__ = ("x", "y", "z")
+
     def __init__(self, x, y, z):
         self.x = x
         self.y = y
@@ -517,7 +549,8 @@ class Point:
 ### 2. Entity Pattern
 ```python
 class User:
-    __slots__ = ('id', 'name', 'email', '_active')
+    __slots__ = ("id", "name", "email", "_active")
+
     def __init__(self, id, name, email):
         self.id = id
         self.name = name
@@ -528,12 +561,15 @@ class User:
 ### 3. Component Pattern (Game Engine)
 ```python
 class Position:
-    __slots__ = ('x', 'y', 'z')
+    __slots__ = ("x", "y", "z")
+
     def __init__(self, x=0, y=0, z=0):
         self.x, self.y, self.z = x, y, z
 
+
 class Velocity:
-    __slots__ = ('dx', 'dy', 'dz')
+    __slots__ = ("dx", "dy", "dz")
+
     def __init__(self, dx=0, dy=0, dz=0):
         self.dx, self.dy, self.dz = dx, dy, dz
 ```
@@ -541,7 +577,8 @@ class Velocity:
 ### 4. Cache Entry Pattern
 ```python
 class CacheEntry:
-    __slots__ = ('key', 'value', '_expiry', '_hits')
+    __slots__ = ("key", "value", "_expiry", "_hits")
+
     def __init__(self, key, value, expiry):
         self.key = key
         self.value = value
@@ -552,7 +589,8 @@ class CacheEntry:
 ### 5. Node Pattern (Linked List)
 ```python
 class Node:
-    __slots__ = ('data', 'next')
+    __slots__ = ("data", "next")
+
     def __init__(self, data):
         self.data = data
         self.next = None

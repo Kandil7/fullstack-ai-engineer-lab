@@ -169,6 +169,7 @@ print(stack[-1])
 ### Q16. What is the output of this code?
 ```python
 from collections import deque
+
 queue = deque([1, 2, 3])
 queue.append(4)
 queue.popleft()

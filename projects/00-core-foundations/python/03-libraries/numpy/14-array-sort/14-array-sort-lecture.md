@@ -61,9 +61,7 @@ print(-np.sort(-arr))  # [50 40 30 20 10]
 ### 2.1 Sort Along Axis
 
 ```python
-matrix = np.array([[3, 1, 4],
-                   [1, 5, 9],
-                   [2, 6, 5]])
+matrix = np.array([[3, 1, 4], [1, 5, 9], [2, 6, 5]])
 print("Original:")
 print(matrix)
 # [[3 1 4]
@@ -118,8 +116,7 @@ print(f"Desc sorted: {arr[indices_desc]}")  # [50 40 30 20 10]
 ### 3.2 argsort with 2D Arrays
 
 ```python
-matrix = np.array([[3, 1, 4],
-                   [1, 5, 9]])
+matrix = np.array([[3, 1, 4], [1, 5, 9]])
 
 # Sort along axis 1 (rows)
 indices = np.argsort(matrix, axis=1)
@@ -182,7 +179,7 @@ print(f"Sort: {time.time() - start:.4f}s")
 
 ```python
 # Sort by multiple keys
-names = np.array(['Alice', 'Bob', 'Charlie', 'David'])
+names = np.array(["Alice", "Bob", "Charlie", "David"])
 ages = np.array([30, 25, 35, 25])
 
 # Sort by age first, then by name
@@ -202,21 +199,16 @@ print(f"Names: {names[sorted_indices]}")
 
 ```python
 # Create structured array
-dt = np.dtype([('name', 'U10'), ('age', 'i4')])
-employees = np.array([
-    ('Alice', 30),
-    ('Bob', 25),
-    ('Charlie', 35),
-    ('David', 25)
-], dtype=dt)
+dt = np.dtype([("name", "U10"), ("age", "i4")])
+employees = np.array([("Alice", 30), ("Bob", 25), ("Charlie", 35), ("David", 25)], dtype=dt)
 
 # Sort by age
-sorted_by_age = np.sort(employees, order='age')
+sorted_by_age = np.sort(employees, order="age")
 print(sorted_by_age)
 # [('Bob', 25) ('David', 25) ('Alice', 30) ('Charlie', 35)]
 
 # Sort by name
-sorted_by_name = np.sort(employees, order='name')
+sorted_by_name = np.sort(employees, order="name")
 print(sorted_by_name)
 ```
 
@@ -230,16 +222,16 @@ print(sorted_by_name)
 arr = np.random.rand(1000000)
 
 # QuickSort (default, O(n log n))
-sorted_arr = np.sort(arr, kind='quicksort')
+sorted_arr = np.sort(arr, kind="quicksort")
 
 # MergeSort (stable, O(n log n))
-sorted_arr = np.sort(arr, kind='mergesort')
+sorted_arr = np.sort(arr, kind="mergesort")
 
 # HeapSort (O(n log n))
-sorted_arr = np.sort(arr, kind='heapsort')
+sorted_arr = np.sort(arr, kind="heapsort")
 
 # Stable sort (preserves order of equal elements)
-sorted_arr = np.sort(arr, kind='stable')
+sorted_arr = np.sort(arr, kind="stable")
 ```
 
 ### 7.2 Performance Comparison
@@ -249,7 +241,7 @@ import time
 
 arr = np.random.rand(1000000)
 
-for kind in ['quicksort', 'mergesort', 'heapsort', 'stable']:
+for kind in ["quicksort", "mergesort", "heapsort", "stable"]:
     start = time.time()
     _ = np.sort(arr, kind=kind)
     print(f"{kind}: {time.time() - start:.4f}s")
@@ -265,18 +257,17 @@ arr = np.array([30, 10, 50, 20, 40])
 
 # sort() returns new array
 sorted_arr = np.sort(arr)
-print(arr)        # [30 10 50 20 40] — unchanged!
-print(sorted_arr) # [10 20 30 40 50]
+print(arr)  # [30 10 50 20 40] — unchanged!
+print(sorted_arr)  # [10 20 30 40 50]
 
 # Use .sort() for in-place
 arr.sort()
-print(arr)        # [10 20 30 40 50]
+print(arr)  # [10 20 30 40 50]
 ```
 
 ### Mistake 2: Wrong Axis for Sorting
 ```python
-matrix = np.array([[3, 1, 4],
-                   [1, 5, 9]])
+matrix = np.array([[3, 1, 4], [1, 5, 9]])
 
 # axis=1 sorts rows
 sorted_rows = np.sort(matrix, axis=1)
@@ -344,9 +335,7 @@ print(f"Using argsort: {arr[indices]}")
 
 ### Exercise 2: 2D Sorting
 ```python
-matrix = np.array([[3, 1, 4, 1],
-                   [5, 9, 2, 6],
-                   [5, 3, 5, 8]])
+matrix = np.array([[3, 1, 4, 1], [5, 9, 2, 6], [5, 3, 5, 8]])
 
 # a) Sort each row
 # b) Sort each column
@@ -364,13 +353,13 @@ print("Sorted all:", sorted_all)
 ### Exercise 3: argsort
 ```python
 scores = np.array([85, 92, 78, 95, 88])
-names = np.array(['Alice', 'Bob', 'Charlie', 'David', 'Eve'])
+names = np.array(["Alice", "Bob", "Charlie", "David", "Eve"])
 
 # Sort names by scores
 indices = np.argsort(scores)[::-1]  # Descending
 print("Ranking:")
 for i, idx in enumerate(indices):
-    print(f"{i+1}. {names[idx]}: {scores[idx]}")
+    print(f"{i + 1}. {names[idx]}: {scores[idx]}")
 ```
 
 ### Exercise 4: Partition
@@ -383,7 +372,7 @@ arr = np.random.rand(20)
 
 smallest = np.partition(arr, 5)[:5]
 largest = np.partition(arr, -5)[-5:]
-median = np.partition(arr, len(arr)//2)[len(arr)//2]
+median = np.partition(arr, len(arr) // 2)[len(arr) // 2]
 
 print(f"5 smallest: {np.sort(smallest)}")
 print(f"5 largest: {np.sort(largest)}")

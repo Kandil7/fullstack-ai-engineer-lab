@@ -72,8 +72,8 @@ EVAL_SET = [
     # (input, expected_label)
     ("The app crashed three times today.", "Negative"),
     ("Love the new dashboard!", "Positive"),
-    ("", "Neutral"),                       # edge: empty
-    ("Billing " * 2000, "Neutral"),        # edge: huge
+    ("", "Neutral"),  # edge: empty
+    ("Billing " * 2000, "Neutral"),  # edge: huge
 ]
 ```
 
@@ -92,6 +92,7 @@ exact output is not fixed.
 ```python
 def accuracy(preds: list[str], gold: list[str]) -> float:
     return sum(p == g for p, g in zip(preds, gold)) / len(preds)
+
 
 print(accuracy(["Positive", "Negative", "Neutral"], ["Positive", "Positive", "Neutral"]))
 ```
@@ -113,7 +114,7 @@ def judge_score(judge_fn, output: str, rubric: str) -> int:
     try:
         return int(resp.strip())
     except ValueError:
-        return 0   # judge format drift → score 0 and log it
+        return 0  # judge format drift → score 0 and log it
 ```
 
 Output:
@@ -141,8 +142,15 @@ def compare(prompt_a, prompt_b, eval_set, score_fn) -> dict:
         "verdict": "ship B" if sum(b) > sum(a) else "keep A",
     }
 
-print(compare(lambda t: "Positive", lambda t: "Negative",
-              [("x", "Positive")] * 100, lambda p: 1.0 if p == "Positive" else 0.0))
+
+print(
+    compare(
+        lambda t: "Positive",
+        lambda t: "Negative",
+        [("x", "Positive")] * 100,
+        lambda p: 1.0 if p == "Positive" else 0.0,
+    )
+)
 ```
 
 Output:
@@ -174,11 +182,15 @@ go through CI with the eval as a gate — a candidate must not regress the
 frozen set:
 
 ```python
-def prompt_ci_gate(candidate_metrics: dict, baseline_metrics: dict,
-                   key: str = "accuracy", min_delta: float = 0.0) -> tuple[bool, str]:
+def prompt_ci_gate(
+    candidate_metrics: dict, baseline_metrics: dict, key: str = "accuracy", min_delta: float = 0.0
+) -> tuple[bool, str]:
     regress = candidate_metrics[key] < baseline_metrics[key] - min_delta
-    return (not regress,
-            f"{key}: {candidate_metrics[key]:.3f} vs baseline {baseline_metrics[key]:.3f}")
+    return (
+        not regress,
+        f"{key}: {candidate_metrics[key]:.3f} vs baseline {baseline_metrics[key]:.3f}",
+    )
+
 
 print(prompt_ci_gate({"accuracy": 0.88}, {"accuracy": 0.91}))
 ```

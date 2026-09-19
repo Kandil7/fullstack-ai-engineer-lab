@@ -2,8 +2,8 @@
 Observability module for DevMate.
 """
 
-from devmate.obs.tracing import tracer, Span, Trace, traced
-from devmate.obs.cost import cost_tracker, TokenUsage, CostRecord, CostSummary
+from devmate.obs.cost import CostRecord, CostSummary, TokenUsage, cost_tracker
+from devmate.obs.tracing import Span, Trace, traced, tracer
 
 __all__ = [
     "tracer",

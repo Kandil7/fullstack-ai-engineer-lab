@@ -94,8 +94,12 @@ print("resample == groupby(Grouper):", by_resample.equals(by_grouper))
 
 # Example 4: daily -> hourly, forward-filled
 hourly = daily.asfreq("h").ffill()
-print("Daily->hourly asfreq+ffill length:", len(hourly),
-      "| value at 01:00 Jan 2:", hourly.loc["2024-01-02 01:00"])
+print(
+    "Daily->hourly asfreq+ffill length:",
+    len(hourly),
+    "| value at 01:00 Jan 2:",
+    hourly.loc["2024-01-02 01:00"],
+)
 print("No gaps left:", bool(hourly.notna().all()))
 
 # Output:
@@ -173,7 +177,8 @@ print("Same instant:", utc.timestamp() == nyc.timestamp())
 
 # Example 8: custom calendar that also skips a holiday
 from pandas.tseries.offsets import CustomBusinessDay
-holiday = pd.Timestamp("2024-01-15")          # e.g. a national holiday
+
+holiday = pd.Timestamp("2024-01-15")  # e.g. a national holiday
 cal = CustomBusinessDay(holidays=[holiday])
 dates = pd.date_range("2024-01-11", periods=5, freq=cal)
 print("Custom business days:", dates.strftime("%Y-%m-%d").tolist())
@@ -189,6 +194,7 @@ print("Custom business days:", dates.strftime("%Y-%m-%d").tolist())
 # decision cadence, build each feature from PAST data only, verify
 # the last row of the feature table is complete before predicting.
 
+
 def build_features(series: pd.Series, window: int) -> pd.DataFrame:
     """Lag + rolling features where every row only uses past data.
 
@@ -201,6 +207,7 @@ def build_features(series: pd.Series, window: int) -> pd.DataFrame:
     out["mean_w"] = series.rolling(window).mean().shift(1)
     out["pct_chg"] = series.pct_change()
     return out
+
 
 # Example 9: feature table on daily closes -- last rows must be usable
 daily_prices = pd.Series(
@@ -248,54 +255,53 @@ print("Mean_w at end uses only past:", round(float(last["mean_w"]), 2))
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # resample: weekly means are correct: (1..7)/7=4, (8..14)/7=11.
-    assert weekly.tolist() == [4.0, 11.0], \
-        "weekly means of 1..14 must be [4, 11]"
+    assert weekly.tolist() == [4.0, 11.0], "weekly means of 1..14 must be [4, 11]"
 
     # resample and groupby(Grouper) are the same engine.
-    assert by_resample.equals(by_grouper), \
-        "resample must equal groupby(Grouper)"
+    assert by_resample.equals(by_grouper), "resample must equal groupby(Grouper)"
 
     # asfreq+ffill: daily value 2.0 propagates to 01:00 on Jan 2.
-    assert hourly.loc["2024-01-02 01:00"] == 2.0, \
+    assert hourly.loc["2024-01-02 01:00"] == 2.0, (
         "ffill must propagate the Jan-2 value to the next hour"
+    )
     assert bool(hourly.notna().all()), "ffill must leave no gaps"
 
     # shift direction: shift(1) moves yesterday into today's row.
     lag1 = s.shift(1)
     lead1 = s.shift(-1)
-    assert np.isnan(lag1.iloc[0]) and lag1.iloc[1] == 10.0, \
-        "shift(1) must lag by one period"
-    assert lead1.iloc[-2] == 50.0 and np.isnan(lead1.iloc[-1]), \
-        "shift(-1) must lead by one period"
+    assert np.isnan(lag1.iloc[0]) and lag1.iloc[1] == 10.0, "shift(1) must lag by one period"
+    assert lead1.iloc[-2] == 50.0 and np.isnan(lead1.iloc[-1]), "shift(-1) must lead by one period"
 
     # diff and pct_change derive from shifts.
     assert np.isnan(s.diff().iloc[0]), "first diff must be NaN"
-    assert s.diff().iloc[1:].tolist() == [10.0, 10.0, 20.0], \
-        "diff must be value - previous value"
+    assert s.diff().iloc[1:].tolist() == [10.0, 10.0, 20.0], "diff must be value - previous value"
 
     # Rolling includes the current row; the shifted version excludes it.
-    assert rolling_now.dropna().tolist() == [2.0, 3.0, 4.0], \
+    assert rolling_now.dropna().tolist() == [2.0, 3.0, 4.0], (
         "rolling(3).mean() must include the current value"
-    assert rolling_lag.dropna().tolist() == [2.0, 3.0], \
+    )
+    assert rolling_lag.dropna().tolist() == [2.0, 3.0], (
         "rolling(3).mean().shift(1) must exclude the current value"
+    )
 
     # Time zone conversion preserves the instant.
-    assert utc.timestamp() == nyc.timestamp(), \
-        "tz_convert must not change the underlying instant"
-    assert str(nyc.tz) == "America/New_York", \
-        "nyc must be tz-aware in America/New_York"
+    assert utc.timestamp() == nyc.timestamp(), "tz_convert must not change the underlying instant"
+    assert str(nyc.tz) == "America/New_York", "nyc must be tz-aware in America/New_York"
 
     # Custom business calendar skips the holiday.
-    assert pd.Timestamp("2024-01-15") not in dates, \
+    assert pd.Timestamp("2024-01-15") not in dates, (
         "custom calendar must skip the configured holiday"
+    )
 
     # Feature table: no leakage means the lag equals yesterday's value.
-    assert features["lag_1"].iloc[-1] == features["value"].iloc[-2], \
+    assert features["lag_1"].iloc[-1] == features["value"].iloc[-2], (
         "lag_1 at t must equal value at t-1"
+    )
     # The window mean at t uses rows t-5..t-1 only.
     expected_mean = float(features["value"].iloc[-6:-1].mean())
-    assert abs(features["mean_w"].iloc[-1] - expected_mean) < 1e-9, \
+    assert abs(features["mean_w"].iloc[-1] - expected_mean) < 1e-9, (
         "mean_w at t must use only past rows"
+    )
 
     print("[OK] 41-timeseries-advanced: all checks passed")
 
@@ -308,4 +314,4 @@ if __name__ == "__main__":
         print("1. resample and Grouper share one bucketing engine.")
         print("2. shift before rolling: never leak the current row.")
         print("3. UTC in storage, local zones only at the edge.")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

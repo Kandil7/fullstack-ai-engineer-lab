@@ -40,6 +40,7 @@ class Adder:
     def __call__(self, x):
         return x + self.n
 
+
 add5 = Adder(5)
 print(add5(3))
 ```
@@ -59,6 +60,7 @@ class TagSet:
 
     def __contains__(self, item):
         return isinstance(item, str) and item.lower() in self.tags
+
 
 print("PY" in TagSet(["py", "ml"]))
 ```
@@ -84,6 +86,7 @@ class Session:
         self.closed = True
         return False
 
+
 with Session() as s:
     pass
 print(s.closed)
@@ -104,6 +107,7 @@ class Config:
 
     def __getattr__(self, name):
         return self.known.get(name, 0)
+
 
 cfg = Config({"batch": 8})
 print(cfg.batch, cfg.lr)
@@ -126,6 +130,7 @@ class Locked:
         if name == "secret":
             raise AttributeError("denied")
         return object.__getattribute__(self, name)
+
 
 l = Locked(1)
 print(l.value)
@@ -152,6 +157,7 @@ class Letters:
     def __getitem__(self, i):
         return self.s[i]
 
+
 print(list(Letters("ab")))
 ```
 ```text
@@ -173,6 +179,7 @@ class Key:
 
     def __eq__(self, other):
         return isinstance(other, Key) and self.v == other.v
+
 
 print(Key("a") in {Key("a")})
 ```
@@ -200,6 +207,7 @@ class Odds:
             raise StopIteration
         return self.i
 
+
 print(list(Odds(7)))
 ```
 ```text
@@ -218,6 +226,7 @@ class Box:
 
     def __len__(self):
         return len(self.items)
+
 
 print(len(Box([1, 2, 3])))
 ```
@@ -238,6 +247,7 @@ class Down:
     def __reversed__(self):
         return iter(range(self.n, 0, -1))
 
+
 print(list(reversed(Down(3))))
 ```
 ```text
@@ -254,6 +264,7 @@ mixin methods.
 ```python
 from collections.abc import Sequence
 
+
 class Pair(Sequence):
     def __init__(self, a, b):
         self._items = (a, b)
@@ -263,6 +274,7 @@ class Pair(Sequence):
 
     def __getitem__(self, i):
         return self._items[i]
+
 
 print(isinstance(Pair(1, 2), Sequence), 0 in Pair(1, 2))
 ```
@@ -300,8 +312,10 @@ class Positive:
             raise ValueError("negative")
         obj.__dict__["_v"] = value
 
+
 class Temp:
     celsius = Positive()
+
 
 t = Temp()
 t.celsius = 25
@@ -327,6 +341,7 @@ class Good:
 
     def __eq__(self, other):
         return isinstance(other, Good) and self.v == other.v
+
 
 print(Good(1) in {Good(1)})
 ```
@@ -375,6 +390,7 @@ exhausted
 ```python
 from collections.abc import Mapping
 
+
 class One(Mapping):
     def __init__(self):
         self._d = {"k": 1}
@@ -387,6 +403,7 @@ class One(Mapping):
 
     def __iter__(self):
         return iter(self._d)
+
 
 print(One().get("k"))
 ```
@@ -403,6 +420,7 @@ print(One().get("k"))
 ```python
 from collections.abc import Sequence
 
+
 class Two(Sequence):
     def __init__(self, a, b):
         self._items = (a, b)
@@ -412,6 +430,7 @@ class Two(Sequence):
 
     def __getitem__(self, i):
         return self._items[i]
+
 
 print(Two(1, 2)[1:2], 1 in Two(1, 2))
 ```
@@ -428,6 +447,7 @@ raised by `__next__` and caught by `for`/`next()` machinery.
 class Empty:
     def __next__(self):
         raise StopIteration
+
 
 try:
     next(Empty())
@@ -446,6 +466,7 @@ from `__eq__` plus one comparison (usually `__lt__`).
 ```python
 import functools
 
+
 @functools.total_ordering
 class Rank:
     def __init__(self, n):
@@ -456,6 +477,7 @@ class Rank:
 
     def __lt__(self, other):
         return self.n < other.n
+
 
 r = Rank(2)
 print(r <= Rank(3), r >= Rank(2))

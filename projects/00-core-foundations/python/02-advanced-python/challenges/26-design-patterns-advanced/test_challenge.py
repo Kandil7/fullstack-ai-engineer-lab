@@ -51,9 +51,15 @@ class TestRegistrySource:
         # __init_subclass__ line uses `cls.__name__`, so it is exempt.
         src_path = HERE / (os.environ.get("CHALLENGE_MODULE", "starter") + ".py")
         src = src_path.read_text(encoding="utf-8")
-        manual = [line.strip() for line in src.splitlines()
-                  if ("registry[" in line and "=" in line
-                      and ('registry["' in line or "registry['" in line))]
+        manual = [
+            line.strip()
+            for line in src.splitlines()
+            if (
+                "registry[" in line
+                and "=" in line
+                and ('registry["' in line or "registry['" in line)
+            )
+        ]
         assert manual == [], f"manual registration lines found: {manual}"
 
 
@@ -90,10 +96,10 @@ class TestEditor:
         e = target.Editor()
         e.insert(0, "hello")
         e.insert(5, "!")
-        e.undo()                    # removes "!"
-        e.insert(5, "?")            # new edit: redo history must be gone
+        e.undo()  # removes "!"
+        e.insert(5, "?")  # new edit: redo history must be gone
         assert e.text() == "hello?"
-        e.redo()                    # must do nothing now
+        e.redo()  # must do nothing now
         assert e.text() == "hello?"
 
     def test_delete_undo_middle(self):
@@ -121,9 +127,7 @@ class TestDependencyInjection:
 
     def test_constructor_injection_signature(self):
         params = list(inspect.signature(target.Summarizer.__init__).parameters)
-        assert "llm" in params, (
-            f"no llm parameter ({params}): the client is constructed inside"
-        )
+        assert "llm" in params, f"no llm parameter ({params}): the client is constructed inside"
 
     def test_both_satisfy_protocol(self):
         assert isinstance(target.FakeLLMClient(), target.LLMClient)

@@ -59,14 +59,14 @@ By the end of this lecture, you will be able to:
 ```python
 @dataclass
 class AgentMessage:
-    id: str                    # Unique message ID
-    sender: str                # Sender agent ID
-    receiver: str              # Receiver agent ID (or "all")
-    content: Any               # Message payload
-    message_type: str          # request, response, notification
-    timestamp: float           # When message was sent
-    correlation_id: str = None # For matching requests to responses
-    metadata: dict = None      # Additional information
+    id: str  # Unique message ID
+    sender: str  # Sender agent ID
+    receiver: str  # Receiver agent ID (or "all")
+    content: Any  # Message payload
+    message_type: str  # request, response, notification
+    timestamp: float  # When message was sent
+    correlation_id: str = None  # For matching requests to responses
+    metadata: dict = None  # Additional information
 ```
 
 ### 3. Communication Infrastructure
@@ -113,6 +113,7 @@ class AgentMessage:
 Multi-Agent Communication System
 Implements various communication patterns.
 """
+
 import json
 import time
 import uuid
@@ -126,6 +127,7 @@ from queue import Queue
 
 class MessageType(Enum):
     """Types of messages agents can send."""
+
     REQUEST = "request"
     RESPONSE = "response"
     NOTIFICATION = "notification"
@@ -136,6 +138,7 @@ class MessageType(Enum):
 @dataclass
 class Message:
     """A message between agents."""
+
     id: str
     sender: str
     receiver: str
@@ -144,7 +147,7 @@ class Message:
     timestamp: float
     correlation_id: Optional[str] = None
     metadata: Dict = field(default_factory=dict)
-    
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -154,9 +157,9 @@ class Message:
             "type": self.message_type.value,
             "timestamp": self.timestamp,
             "correlation_id": self.correlation_id,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
-    
+
     @classmethod
     def from_dict(cls, data: dict) -> "Message":
         return cls(
@@ -167,56 +170,59 @@ class Message:
             message_type=MessageType(data["type"]),
             timestamp=data["timestamp"],
             correlation_id=data.get("correlation_id"),
-            metadata=data.get("metadata", {})
+            metadata=data.get("metadata", {}),
         )
 
 
 class MessageBus:
     """
     Central message bus for agent communication.
-    
+
     Features:
     - Message routing
     - Topic-based pub/sub
     - Message history
     - Delivery guarantees
     """
-    
+
     def __init__(self):
         self.agents: Dict[str, Callable] = {}
         self.inboxes: Dict[str, Queue] = defaultdict(Queue)
         self.subscribers: Dict[str, Set[str]] = defaultdict(set)
         self.message_history: List[Message] = []
         self._lock = threading.Lock()
-    
-    def register_agent(self, agent_id: str, 
-                      message_handler: Callable):
+
+    def register_agent(self, agent_id: str, message_handler: Callable):
         """Register an agent with the message bus."""
         self.agents[agent_id] = message_handler
-    
+
     def unregister_agent(self, agent_id: str):
         """Unregister an agent."""
         self.agents.pop(agent_id, None)
         self.inboxes.pop(agent_id, None)
-    
+
     def send(self, message: Message) -> bool:
         """
         Send a message to a specific agent.
-        
+
         Returns True if delivered, False otherwise.
         """
         with self._lock:
             self.message_history.append(message)
-        
+
         # Direct message
         if message.receiver in self.agents:
             self.inboxes[message.receiver].put(message)
             return True
-        
+
         return False
-    
-    def broadcast(self, sender: str, content: Any,
-                 message_type: MessageType = MessageType.BROADCAST):
+
+    def broadcast(
+        self,
+        sender: str,
+        content: Any,
+        message_type: MessageType = MessageType.BROADCAST,
+    ):
         """Broadcast a message to all agents except sender."""
         message = Message(
             id=str(uuid.uuid4()),
@@ -224,16 +230,16 @@ class MessageBus:
             receiver="all",
             content=content,
             message_type=message_type,
-            timestamp=time.time()
+            timestamp=time.time(),
         )
-        
+
         with self._lock:
             self.message_history.append(message)
-        
+
         for agent_id in self.agents:
             if agent_id != sender:
                 self.inboxes[agent_id].put(message)
-    
+
     def publish(self, topic: str, sender: str, content: Any):
         """Publish a message to a topic."""
         message = Message(
@@ -243,42 +249,44 @@ class MessageBus:
             content=content,
             message_type=MessageType.NOTIFICATION,
             timestamp=time.time(),
-            metadata={"topic": topic}
+            metadata={"topic": topic},
         )
-        
+
         with self._lock:
             self.message_history.append(message)
-        
+
         # Deliver to topic subscribers
         for subscriber in self.subscribers.get(topic, []):
             if subscriber != sender:
                 self.inboxes[subscriber].put(message)
-    
+
     def subscribe(self, agent_id: str, topic: str):
         """Subscribe an agent to a topic."""
         self.subscribers[topic].add(agent_id)
-    
+
     def unsubscribe(self, agent_id: str, topic: str):
         """Unsubscribe an agent from a topic."""
         self.subscribers[topic].discard(agent_id)
-    
+
     def get_messages(self, agent_id: str) -> List[Message]:
         """Get all pending messages for an agent."""
         messages = []
         while not self.inboxes[agent_id].empty():
             messages.append(self.inboxes[agent_id].get())
         return messages
-    
-    def get_message_history(self, agent_id: str = None,
-                          limit: int = 100) -> List[Message]:
+
+    def get_message_history(
+        self, agent_id: str = None, limit: int = 100
+    ) -> List[Message]:
         """Get message history, optionally filtered by agent."""
         with self._lock:
             history = self.message_history.copy()
-        
+
         if agent_id:
-            history = [m for m in history 
-                      if m.sender == agent_id or m.receiver == agent_id]
-        
+            history = [
+                m for m in history if m.sender == agent_id or m.receiver == agent_id
+            ]
+
         return history[-limit:]
 
 
@@ -286,20 +294,25 @@ class CommunicatingAgent:
     """
     Agent with built-in communication capabilities.
     """
-    
-    def __init__(self, agent_id: str, message_bus: MessageBus,
-                 llm_caller: Callable = None):
+
+    def __init__(
+        self, agent_id: str, message_bus: MessageBus, llm_caller: Callable = None
+    ):
         self.agent_id = agent_id
         self.bus = message_bus
         self.llm = llm_caller
         self.message_handlers: Dict[str, Callable] = {}
-        
+
         # Register with message bus
         self.bus.register_agent(agent_id, self.handle_message)
-    
-    def send_message(self, receiver: str, content: Any,
-                    msg_type: MessageType = MessageType.REQUEST,
-                    correlation_id: str = None) -> Message:
+
+    def send_message(
+        self,
+        receiver: str,
+        content: Any,
+        msg_type: MessageType = MessageType.REQUEST,
+        correlation_id: str = None,
+    ) -> Message:
         """Send a message to another agent."""
         message = Message(
             id=str(uuid.uuid4()),
@@ -308,67 +321,63 @@ class CommunicatingAgent:
             content=content,
             message_type=msg_type,
             timestamp=time.time(),
-            correlation_id=correlation_id
+            correlation_id=correlation_id,
         )
-        
+
         self.bus.send(message)
         return message
-    
+
     def send_request(self, receiver: str, content: Any) -> Message:
         """Send a request and wait for response."""
-        return self.send_message(
-            receiver, content, MessageType.REQUEST
-        )
-    
-    def send_response(self, receiver: str, content: Any,
-                     correlation_id: str) -> Message:
+        return self.send_message(receiver, content, MessageType.REQUEST)
+
+    def send_response(
+        self, receiver: str, content: Any, correlation_id: str
+    ) -> Message:
         """Send a response to a request."""
         return self.send_message(
             receiver, content, MessageType.RESPONSE, correlation_id
         )
-    
+
     def broadcast(self, content: Any):
         """Broadcast a message to all agents."""
         self.bus.broadcast(self.agent_id, content)
-    
+
     def publish(self, topic: str, content: Any):
         """Publish to a topic."""
         self.bus.publish(topic, self.agent_id, content)
-    
+
     def subscribe(self, topic: str):
         """Subscribe to a topic."""
         self.bus.subscribe(self.agent_id, topic)
-    
+
     def receive_messages(self) -> List[Message]:
         """Get pending messages."""
         return self.bus.get_messages(self.agent_id)
-    
+
     def handle_message(self, message: Message):
         """Handle an incoming message."""
         # Default handling - can be overridden
         pass
-    
-    def register_handler(self, message_type: str, 
-                        handler: Callable):
+
+    def register_handler(self, message_type: str, handler: Callable):
         """Register a handler for a specific message type."""
         self.message_handlers[message_type] = handler
-    
+
     def process_inbox(self):
         """Process all messages in inbox."""
         messages = self.receive_messages()
-        
+
         for message in messages:
             # Check for registered handler
-            handler = self.message_handlers.get(
-                message.message_type.value
-            )
+            handler = self.message_handlers.get(message.message_type.value)
             if handler:
                 handler(message)
-            
+
             # Handle responses to our requests
             if message.message_type == MessageType.RESPONSE:
                 self._handle_response(message)
-    
+
     def _handle_response(self, message: Message):
         """Handle a response message."""
         # Store response for request correlation
@@ -378,55 +387,56 @@ class CommunicatingAgent:
 class RequestResponseAgent(CommunicatingAgent):
     """
     Agent that implements request-response pattern.
-    
+
     Can send requests and await responses.
     """
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.pending_requests: Dict[str, dict] = {}
         self._lock = threading.Lock()
-    
-    def request_and_wait(self, receiver: str, content: Any,
-                        timeout: float = 30.0) -> Optional[Message]:
+
+    def request_and_wait(
+        self, receiver: str, content: Any, timeout: float = 30.0
+    ) -> Optional[Message]:
         """
         Send a request and wait for response.
-        
+
         Args:
             receiver: Target agent
             content: Request content
             timeout: Max seconds to wait
-            
+
         Returns:
             Response message or None if timeout
         """
         request_id = str(uuid.uuid4())
-        
+
         # Store pending request
         with self._lock:
             self.pending_requests[request_id] = {
                 "receiver": receiver,
                 "timestamp": time.time(),
-                "response": None
+                "response": None,
             }
-        
+
         # Send request
-        self.send_message(
-            receiver, content, MessageType.REQUEST, request_id
-        )
-        
+        self.send_message(receiver, content, MessageType.REQUEST, request_id)
+
         # Wait for response
         start_time = time.time()
         while time.time() - start_time < timeout:
             messages = self.receive_messages()
-            
+
             for msg in messages:
-                if (msg.message_type == MessageType.RESPONSE and 
-                    msg.correlation_id == request_id):
+                if (
+                    msg.message_type == MessageType.RESPONSE
+                    and msg.correlation_id == request_id
+                ):
                     return msg
-            
+
             time.sleep(0.1)
-        
+
         # Timeout
         return None
 
@@ -469,14 +479,17 @@ def agent_a():
     response = request_from_b()  # Waits for B
     process(response)
 
+
 def agent_b():
     response = request_from_a()  # Waits for A - DEADLOCK!
     process(response)
+
 
 # ✅ GOOD: Use async communication
 def agent_a():
     send_to_b(message)
     # Don't wait - handle response asynchronously
+
 
 def agent_b():
     send_to_a(message)
@@ -502,15 +515,16 @@ process_response(response, request_id)  # Clear which request
 class BadAgent:
     def __init__(self):
         self.messages = []  # Never cleaned up!
-    
+
     def receive(self, msg):
         self.messages.append(msg)  # Memory leak!
+
 
 # ✅ GOOD: Process and clear messages
 class GoodAgent:
     def __init__(self, max_queue=100):
         self.messages = deque(maxlen=max_queue)
-    
+
     def process_messages(self):
         while self.messages:
             msg = self.messages.popleft()

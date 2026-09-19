@@ -45,8 +45,10 @@ from statistics import mean, stdev, median
 # Core Data Structures
 # ============================================================
 
+
 class MetricType(Enum):
     """Types of metrics for agent evaluation."""
+
     LATENCY = "latency"
     COST = "cost"
     QUALITY = "quality"
@@ -57,6 +59,7 @@ class MetricType(Enum):
 
 class QualityDimension(Enum):
     """Dimensions for quality assessment."""
+
     ACCURACY = "accuracy"
     RELEVANCE = "relevance"
     COMPLETENESS = "completeness"
@@ -68,6 +71,7 @@ class QualityDimension(Enum):
 @dataclass
 class EvaluationResult:
     """Result of a single evaluation run."""
+
     evaluation_id: str
     agent_id: str
     task_id: str
@@ -84,6 +88,7 @@ class EvaluationResult:
 @dataclass
 class EvaluationSummary:
     """Aggregated evaluation metrics."""
+
     agent_id: str
     total_evaluations: int
     success_rate: float
@@ -101,6 +106,7 @@ class EvaluationSummary:
 @dataclass
 class ABTestResult:
     """Result of an A/B test comparison."""
+
     test_id: str
     variant_a: str
     variant_b: str
@@ -119,10 +125,11 @@ class ABTestResult:
 # Example 1: Task Completion Metrics
 # ============================================================
 
+
 class TaskCompletionEvaluator:
     """
     Evaluates task completion rates and success metrics.
-    
+
     Metrics tracked:
     - Success rate (tasks completed successfully)
     - Failure rate (tasks that failed)
@@ -142,9 +149,7 @@ class TaskCompletionEvaluator:
         self.task_categories[category].append(result.evaluation_id)
 
     def calculate_success_rate(
-        self,
-        agent_id: Optional[str] = None,
-        category: Optional[str] = None
+        self, agent_id: Optional[str] = None, category: Optional[str] = None
     ) -> float:
         """Calculate success rate with optional filters."""
         filtered = self._filter_results(agent_id, category)
@@ -155,8 +160,7 @@ class TaskCompletionEvaluator:
         return successes / len(filtered)
 
     def calculate_failure_analysis(
-        self,
-        agent_id: Optional[str] = None
+        self, agent_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """Analyze failure patterns."""
         filtered = self._filter_results(agent_id)
@@ -173,7 +177,8 @@ class TaskCompletionEvaluator:
             "failure_rate": len(failures) / len(filtered) if filtered else 0,
             "error_distribution": dict(error_types),
             "most_common_error": max(error_types.items(), key=lambda x: x[1])[0]
-                                  if error_types else None
+            if error_types
+            else None,
         }
 
     def get_retry_rate(self, agent_id: Optional[str] = None) -> float:
@@ -186,10 +191,7 @@ class TaskCompletionEvaluator:
         retried = sum(1 for attempts in task_attempts.values() if attempts > 1)
         return retried / len(task_attempts) if task_attempts else 0
 
-    def get_first_attempt_success_rate(
-        self,
-        agent_id: Optional[str] = None
-    ) -> float:
+    def get_first_attempt_success_rate(self, agent_id: Optional[str] = None) -> float:
         """Calculate first-attempt success rate."""
         filtered = self._filter_results(agent_id)
         task_first_attempt = {}
@@ -202,17 +204,14 @@ class TaskCompletionEvaluator:
         return sum(task_first_attempt.values()) / len(task_first_attempt)
 
     def _filter_results(
-        self,
-        agent_id: Optional[str] = None,
-        category: Optional[str] = None
+        self, agent_id: Optional[str] = None, category: Optional[str] = None
     ) -> List[EvaluationResult]:
         """Filter results by agent and/or category."""
         filtered = self.results
         if agent_id:
             filtered = [r for r in filtered if r.agent_id == agent_id]
         if category:
-            filtered = [r for r in filtered
-                       if r.metadata.get("category") == category]
+            filtered = [r for r in filtered if r.metadata.get("category") == category]
         return filtered
 
     def generate_report(self) -> Dict[str, Any]:
@@ -225,7 +224,7 @@ class TaskCompletionEvaluator:
             "by_category": {
                 cat: self.calculate_success_rate(category=cat)
                 for cat in self.task_categories
-            }
+            },
         }
 
 
@@ -233,10 +232,11 @@ class TaskCompletionEvaluator:
 # Example 2: Latency Measurement
 # ============================================================
 
+
 class LatencyTracker:
     """
     Tracks and analyzes latency metrics.
-    
+
     Provides:
     - Percentile calculations (p50, p95, p99)
     - Latency distribution analysis
@@ -276,7 +276,7 @@ class LatencyTracker:
             "min": sorted_latencies[0],
             "max": sorted_latencies[-1],
             "mean": mean(sorted_latencies),
-            "median": median(sorted_latencies)
+            "median": median(sorted_latencies),
         }
 
     def get_statistics(self) -> Dict[str, float]:
@@ -290,16 +290,13 @@ class LatencyTracker:
             "std_dev": stdev(self.latencies) if len(self.latencies) > 1 else 0,
             "min": min(self.latencies),
             "max": max(self.latencies),
-            "range": max(self.latencies) - min(self.latencies)
+            "range": max(self.latencies) - min(self.latencies),
         }
 
-    def detect_anomalies(
-        self,
-        threshold: float = 2.0
-    ) -> List[Tuple[int, float]]:
+    def detect_anomalies(self, threshold: float = 2.0) -> List[Tuple[int, float]]:
         """
         Detect latency anomalies using Z-score method.
-        
+
         Returns list of (index, latency) tuples for anomalies.
         """
         if len(self.latencies) < 10:
@@ -322,14 +319,14 @@ class LatencyTracker:
     def get_trend(self, window: int = 10) -> Dict[str, Any]:
         """
         Analyze latency trend over time.
-        
+
         Returns trend direction and rate of change.
         """
         if len(self.latencies) < window * 2:
             return {"direction": "insufficient_data"}
 
         recent = self.latencies[-window:]
-        previous = self.latencies[-window*2:-window]
+        previous = self.latencies[-window * 2 : -window]
 
         recent_mean = mean(recent)
         previous_mean = mean(previous)
@@ -349,7 +346,7 @@ class LatencyTracker:
             "recent_mean": recent_mean,
             "previous_mean": previous_mean,
             "change_ms": change,
-            "change_percent": change_pct
+            "change_percent": change_pct,
         }
 
     def get_sliding_window_stats(self) -> Dict[str, float]:
@@ -361,7 +358,7 @@ class LatencyTracker:
             "window_size": len(self._sliding_window),
             "mean": mean(self._sliding_window),
             "min": min(self._sliding_window),
-            "max": max(self._sliding_window)
+            "max": max(self._sliding_window),
         }
 
 
@@ -369,10 +366,11 @@ class LatencyTracker:
 # Example 3: Cost Tracking
 # ============================================================
 
+
 class CostTracker:
     """
     Tracks and manages API costs for agent operations.
-    
+
     Features:
     - Token-level cost tracking
     - Budget management
@@ -398,10 +396,7 @@ class CostTracker:
         self.model_costs: Dict[str, float] = defaultdict(float)
 
     def calculate_cost(
-        self,
-        model: str,
-        input_tokens: int,
-        output_tokens: int
+        self, model: str, input_tokens: int, output_tokens: int
     ) -> float:
         """Calculate cost for a model invocation."""
         pricing = self.MODEL_PRICING.get(model, {"input": 0.01, "output": 0.03})
@@ -417,7 +412,7 @@ class CostTracker:
         model: str,
         input_tokens: int,
         output_tokens: int,
-        task_id: Optional[str] = None
+        task_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Record API usage and calculate cost."""
         cost = self.calculate_cost(model, input_tokens, output_tokens)
@@ -437,7 +432,7 @@ class CostTracker:
             "cost_usd": cost,
             "total_cost_usd": self.total_cost,
             "budget_remaining": self.budget_limit - self.total_cost,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
         self.cost_history.append(record)
 
@@ -457,8 +452,9 @@ class CostTracker:
             "total_spent": self.total_cost,
             "remaining": self.budget_limit - self.total_cost,
             "percent_used": (self.total_cost / self.budget_limit * 100)
-                           if self.budget_limit > 0 else 0,
-            "is_over_budget": self.total_cost > self.budget_limit
+            if self.budget_limit > 0
+            else 0,
+            "is_over_budget": self.total_cost > self.budget_limit,
         }
 
     def get_cost_breakdown(self) -> Dict[str, Any]:
@@ -467,14 +463,12 @@ class CostTracker:
             "by_model": dict(self.model_costs),
             "by_day": dict(self.daily_costs),
             "average_per_request": self.total_cost / len(self.cost_history)
-                                   if self.cost_history else 0,
-            "total_requests": len(self.cost_history)
+            if self.cost_history
+            else 0,
+            "total_requests": len(self.cost_history),
         }
 
-    def forecast_daily_cost(
-        self,
-        days: int = 7
-    ) -> List[Dict[str, Any]]:
+    def forecast_daily_cost(self, days: int = 7) -> List[Dict[str, Any]]:
         """Forecast costs for the next N days."""
         if not self.daily_costs:
             return []
@@ -485,24 +479,23 @@ class CostTracker:
         forecasts = []
         for i in range(1, days + 1):
             future_date = (datetime.now() + timedelta(days=i)).strftime("%Y-%m-%d")
-            forecasts.append({
-                "date": future_date,
-                "forecasted_cost": avg_daily,
-                "confidence": max(0.5, 1 - (i * 0.1))
-            })
+            forecasts.append(
+                {
+                    "date": future_date,
+                    "forecasted_cost": avg_daily,
+                    "confidence": max(0.5, 1 - (i * 0.1)),
+                }
+            )
 
         return forecasts
 
-    def suggest_model(
-        self,
-        task_complexity: str
-    ) -> Tuple[str, float]:
+    def suggest_model(self, task_complexity: str) -> Tuple[str, float]:
         """Suggest the most cost-effective model for a task."""
         suggestions = {
             "simple": ("gpt-3.5-turbo", 0.002),
             "moderate": ("claude-3-sonnet", 0.018),
             "complex": ("gpt-4-turbo", 0.04),
-            "critical": ("gpt-4", 0.09)
+            "critical": ("gpt-4", 0.09),
         }
         return suggestions.get(task_complexity, ("gpt-3.5-turbo", 0.002))
 
@@ -511,10 +504,11 @@ class CostTracker:
 # Example 4: Quality Assessment
 # ============================================================
 
+
 class QualityAssessor:
     """
     Assesses the quality of agent outputs across multiple dimensions.
-    
+
     Dimensions:
     - Accuracy: Factual correctness
     - Relevance: Topic appropriateness
@@ -533,35 +527,45 @@ class QualityAssessor:
         """Set up default quality rubrics."""
         self.rubrics = {
             QualityDimension.ACCURACY.value: {
-                "weights": {"factual_correctness": 0.4, "source_quality": 0.3,
-                           "citation_accuracy": 0.3},
-                "threshold": 0.7
+                "weights": {
+                    "factual_correctness": 0.4,
+                    "source_quality": 0.3,
+                    "citation_accuracy": 0.3,
+                },
+                "threshold": 0.7,
             },
             QualityDimension.RELEVANCE.value: {
-                "weights": {"topic_match": 0.5, "context_appropriateness": 0.3,
-                           "user_intent": 0.2},
-                "threshold": 0.6
+                "weights": {
+                    "topic_match": 0.5,
+                    "context_appropriateness": 0.3,
+                    "user_intent": 0.2,
+                },
+                "threshold": 0.6,
             },
             QualityDimension.COMPLETENESS.value: {
-                "weights": {"requirement_coverage": 0.4, "detail_level": 0.3,
-                           "edge_cases": 0.3},
-                "threshold": 0.7
+                "weights": {
+                    "requirement_coverage": 0.4,
+                    "detail_level": 0.3,
+                    "edge_cases": 0.3,
+                },
+                "threshold": 0.7,
             },
             QualityDimension.COHERENCE.value: {
-                "weights": {"logical_flow": 0.4, "consistency": 0.3,
-                           "clarity": 0.3},
-                "threshold": 0.6
+                "weights": {"logical_flow": 0.4, "consistency": 0.3, "clarity": 0.3},
+                "threshold": 0.6,
             },
             QualityDimension.SAFETY.value: {
-                "weights": {"harmful_content": 0.5, "bias_detection": 0.25,
-                           "privacy_compliance": 0.25},
-                "threshold": 0.9
+                "weights": {
+                    "harmful_content": 0.5,
+                    "bias_detection": 0.25,
+                    "privacy_compliance": 0.25,
+                },
+                "threshold": 0.9,
             },
             QualityDimension.HELPFULNESS.value: {
-                "weights": {"actionability": 0.4, "clarity": 0.3,
-                           "completeness": 0.3},
-                "threshold": 0.6
-            }
+                "weights": {"actionability": 0.4, "clarity": 0.3, "completeness": 0.3},
+                "threshold": 0.6,
+            },
         }
 
     def assess_quality(
@@ -570,11 +574,11 @@ class QualityAssessor:
         task_id: str,
         output: str,
         criteria: Dict[str, float],
-        ground_truth: Optional[str] = None
+        ground_truth: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Assess the quality of an agent's output.
-        
+
         Args:
             agent_id: Agent identifier
             task_id: Task identifier
@@ -592,14 +596,18 @@ class QualityAssessor:
         # Calculate weighted overall score
         weights = {dim: 1.0 for dim in dimension_scores}
         total_weight = sum(weights.values())
-        overall_score = sum(
-            dimension_scores[dim] * weights[dim]
-            for dim in dimension_scores
-        ) / total_weight if total_weight > 0 else 0
+        overall_score = (
+            sum(dimension_scores[dim] * weights[dim] for dim in dimension_scores)
+            / total_weight
+            if total_weight > 0
+            else 0
+        )
 
         # Check for safety violations
         safety_score = dimension_scores.get(QualityDimension.SAFETY.value, 1.0)
-        has_safety_violation = safety_score < self.rubrics[QualityDimension.SAFETY.value]["threshold"]
+        has_safety_violation = (
+            safety_score < self.rubrics[QualityDimension.SAFETY.value]["threshold"]
+        )
 
         # Simulate hallucination detection
         hallucination_score = dimension_scores.get(QualityDimension.ACCURACY.value, 1.0)
@@ -613,17 +621,16 @@ class QualityAssessor:
             "overall_score": overall_score,
             "has_safety_violation": has_safety_violation,
             "potential_hallucinations": potential_hallucinations,
-            "hallucination_rate": len(potential_hallucinations) / max(len(output.split()), 1),
-            "timestamp": datetime.now().isoformat()
+            "hallucination_rate": len(potential_hallucinations)
+            / max(len(output.split()), 1),
+            "timestamp": datetime.now().isoformat(),
         }
 
         self.assessments.append(result)
         return result
 
     def _detect_hallucinations(
-        self,
-        output: str,
-        ground_truth: Optional[str]
+        self, output: str, ground_truth: Optional[str]
     ) -> List[str]:
         """Detect potential hallucinations in output."""
         if not ground_truth:
@@ -636,7 +643,7 @@ class QualityAssessor:
         potential_hallucinations = []
         words = output.split()
         for i in range(len(words) - 2):
-            phrase = " ".join(words[i:i+3]).lower()
+            phrase = " ".join(words[i : i + 3]).lower()
             if phrase not in ground_truth.lower():
                 potential_hallucinations.append(phrase)
 
@@ -654,15 +661,13 @@ class QualityAssessor:
 
         return {
             "total_assessments": len(self.assessments),
-            "average_scores": {
-                dim: mean(scores) for dim, scores in avg_scores.items()
-            },
+            "average_scores": {dim: mean(scores) for dim, scores in avg_scores.items()},
             "safety_violations": sum(
                 1 for a in self.assessments if a["has_safety_violation"]
             ),
             "average_hallucination_rate": mean(
                 a["hallucination_rate"] for a in self.assessments
-            )
+            ),
         }
 
 
@@ -670,10 +675,11 @@ class QualityAssessor:
 # Example 5: A/B Testing Agents
 # ============================================================
 
+
 class ABTestFramework:
     """
     Framework for A/B testing different agent configurations.
-    
+
     Features:
     - Random traffic splitting
     - Statistical significance testing
@@ -690,7 +696,7 @@ class ABTestFramework:
         variant_a_id: str,
         variant_b_id: str,
         metric_name: str,
-        confidence_level: float = 0.95
+        confidence_level: float = 0.95,
     ) -> Dict:
         """Create a new A/B test."""
         test = {
@@ -701,7 +707,7 @@ class ABTestFramework:
             "confidence_level": confidence_level,
             "status": "running",
             "created_at": datetime.now().isoformat(),
-            "traffic_split": 0.5  # 50/50 split
+            "traffic_split": 0.5,  # 50/50 split
         }
         self.tests[test_id] = test
         return test
@@ -709,7 +715,7 @@ class ABTestFramework:
     def assign_variant(self, test_id: str, user_id: str) -> str:
         """
         Assign a variant to a user using deterministic hashing.
-        
+
         Ensures the same user always sees the same variant.
         """
         test = self.tests.get(test_id)
@@ -723,24 +729,19 @@ class ABTestFramework:
         return test["variant_b"]
 
     def record_result(
-        self,
-        test_id: str,
-        variant_id: str,
-        metric_value: float,
-        user_id: str
+        self, test_id: str, variant_id: str, metric_value: float, user_id: str
     ) -> None:
         """Record a test result."""
-        self.results[test_id].append({
-            "variant": variant_id,
-            "metric_value": metric_value,
-            "user_id": user_id,
-            "timestamp": datetime.now().isoformat()
-        })
+        self.results[test_id].append(
+            {
+                "variant": variant_id,
+                "metric_value": metric_value,
+                "user_id": user_id,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
-    def analyze_results(
-        self,
-        test_id: str
-    ) -> ABTestResult:
+    def analyze_results(self, test_id: str) -> ABTestResult:
         """Analyze A/B test results with statistical testing."""
         test = self.tests.get(test_id)
         if not test:
@@ -750,12 +751,10 @@ class ABTestFramework:
 
         # Separate results by variant
         variant_a_values = [
-            r["metric_value"] for r in results
-            if r["variant"] == test["variant_a"]
+            r["metric_value"] for r in results if r["variant"] == test["variant_a"]
         ]
         variant_b_values = [
-            r["metric_value"] for r in results
-            if r["variant"] == test["variant_b"]
+            r["metric_value"] for r in results if r["variant"] == test["variant_b"]
         ]
 
         if not variant_a_values or not variant_b_values:
@@ -812,19 +811,19 @@ class ABTestFramework:
             p_value=p_value,
             significant=significant,
             confidence_level=test["confidence_level"],
-            recommendation=recommendation
+            recommendation=recommendation,
         )
 
     def estimate_sample_size(
         self,
         mde: float = 0.1,  # Minimum detectable effect
         power: float = 0.8,
-        alpha: float = 0.05
+        alpha: float = 0.05,
     ) -> int:
         """Estimate required sample size for desired power."""
         # Simplified sample size calculation
         z_alpha = 1.96  # For alpha = 0.05
-        z_beta = 0.84   # For power = 0.8
+        z_beta = 0.84  # For power = 0.8
 
         n = 2 * ((z_alpha + z_beta) / mde) ** 2
         return math.ceil(n)
@@ -833,6 +832,7 @@ class ABTestFramework:
 # ============================================================
 # Example 6: Complete Evaluation System
 # ============================================================
+
 
 class AgentEvaluationSystem:
     """Complete agent evaluation system combining all components."""
@@ -849,7 +849,7 @@ class AgentEvaluationSystem:
         agent_id: str,
         task_id: str,
         task_fn: Callable,
-        model: str = "gpt-3.5-turbo"
+        model: str = "gpt-3.5-turbo",
     ) -> EvaluationResult:
         """Run a complete evaluation of an agent on a task."""
         start_time = time.time()
@@ -888,7 +888,7 @@ class AgentEvaluationSystem:
             token_usage={"input": input_tokens, "output": output_tokens},
             cost_usd=cost_record["cost_usd"],
             quality_scores={},
-            error=error
+            error=error,
         )
 
         # Record in task evaluator
@@ -901,16 +901,11 @@ class AgentEvaluationSystem:
         test_id: str,
         variant_a_fn: Callable,
         variant_b_fn: Callable,
-        n_samples: int = 100
+        n_samples: int = 100,
     ) -> ABTestResult:
         """Run an A/B test between two agent variants."""
         # Create test
-        self.ab_framework.create_test(
-            test_id,
-            "variant_a",
-            "variant_b",
-            "success_rate"
-        )
+        self.ab_framework.create_test(test_id, "variant_a", "variant_b", "success_rate")
 
         # Simulate test execution
         for i in range(n_samples):
@@ -945,7 +940,7 @@ class AgentEvaluationSystem:
             "cost": self.cost_tracker.get_cost_breakdown(),
             "quality": self.quality_assessor.get_quality_summary(),
             "budget_status": self.cost_tracker.get_budget_status(),
-            "generated_at": datetime.now().isoformat()
+            "generated_at": datetime.now().isoformat(),
         }
 
 
@@ -953,11 +948,12 @@ class AgentEvaluationSystem:
 # Main Entry Point
 # ============================================================
 
+
 async def main():
     """Run all examples."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXERCISE 08: AGENT EVALUATION")
-    print("="*60)
+    print("=" * 60)
 
     system = AgentEvaluationSystem()
 
@@ -974,7 +970,7 @@ async def main():
             token_usage={"input": 100, "output": 50},
             cost_usd=0.001,
             quality_scores={},
-            error=None if success else "Timeout"
+            error=None if success else "Timeout",
         )
         system.task_evaluator.record_result(result)
 
@@ -999,9 +995,10 @@ async def main():
     print("\n--- Cost Tracking ---")
     for i in range(10):
         system.cost_tracker.record_usage(
-            "agent_1", "gpt-3.5-turbo",
+            "agent_1",
+            "gpt-3.5-turbo",
             random.randint(100, 500),
-            random.randint(50, 300)
+            random.randint(50, 300),
         )
 
     budget = system.cost_tracker.get_budget_status()
@@ -1020,8 +1017,8 @@ async def main():
             "completeness": 0.8,
             "coherence": 0.9,
             "safety": 1.0,
-            "helpfulness": 0.85
-        }
+            "helpfulness": 0.85,
+        },
     )
     print(f"Quality Score: {assessment['overall_score']:.2f}")
 
@@ -1031,7 +1028,7 @@ async def main():
         "test_1",
         lambda: random.gauss(0.75, 0.1),
         lambda: random.gauss(0.80, 0.1),
-        n_samples=50
+        n_samples=50,
     )
     print(f"Test: {ab_result.variant_a} vs {ab_result.variant_b}")
     print(f"Mean A: {ab_result.mean_a:.3f}, Mean B: {ab_result.mean_b:.3f}")
@@ -1044,9 +1041,9 @@ async def main():
     full_report = system.generate_comprehensive_report()
     print(json.dumps(full_report, indent=2, default=str))
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXERCISE COMPLETE")
-    print("="*60)
+    print("=" * 60)
 
 
 if __name__ == "__main__":

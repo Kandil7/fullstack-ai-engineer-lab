@@ -20,18 +20,20 @@ import numpy as np
 from scipy import optimize
 
 # 1D minimization
-result = optimize.minimize_scalar(lambda x: x**2 + 10*np.sin(x))
+result = optimize.minimize_scalar(lambda x: x**2 + 10 * np.sin(x))
 print(f"Minimum at x = {result.x:.4f}, f(x) = {result.fun:.4f}")
+
 
 # Multi-dimensional
 def rosenbrock(x):
-    return (1 - x[0])**2 + 100 * (x[1] - x[0]**2)**2
+    return (1 - x[0]) ** 2 + 100 * (x[1] - x[0] ** 2) ** 2
 
-result = optimize.minimize(rosenbrock, [0, 0], method='Nelder-Mead')
+
+result = optimize.minimize(rosenbrock, [0, 0], method="Nelder-Mead")
 print(f"Rosenbrock minimum: {result.x}")
 
 # With gradient (BFGS)
-result = optimize.minimize(rosenbrock, [0, 0], method='BFGS')
+result = optimize.minimize(rosenbrock, [0, 0], method="BFGS")
 print(f"BFGS: {result.x}")
 ```
 
@@ -42,20 +44,20 @@ print(f"BFGS: {result.x}")
 ```python
 # Bounds
 result = optimize.minimize(
-    lambda x: (x[0] - 1)**2 + (x[1] - 2.5)**2,
-    [2, 0],
-    bounds=[(0, None), (0, None)]
+    lambda x: (x[0] - 1) ** 2 + (x[1] - 2.5) ** 2, [2, 0], bounds=[(0, None), (0, None)]
 )
 print(f"With bounds: {result.x}")
 
+
 # Constraints
 def constraint(x):
-    return x[0] + 2*x[1] - 2  # Must be >= 0
+    return x[0] + 2 * x[1] - 2  # Must be >= 0
+
 
 result = optimize.minimize(
-    lambda x: (x[0] - 1)**2 + (x[1] - 2.5)**2,
+    lambda x: (x[0] - 1) ** 2 + (x[1] - 2.5) ** 2,
     [2, 0],
-    constraints={'type': 'ineq', 'fun': constraint}
+    constraints={"type": "ineq", "fun": constraint},
 )
 print(f"With constraints: {result.x}")
 ```
@@ -69,19 +71,20 @@ print(f"With constraints: {result.x}")
 def model(x, a, b, c):
     return a * np.exp(-b * x) + c
 
+
 x_data = np.linspace(0, 4, 50)
 y_data = model(x_data, 2.5, 1.3, 0.5) + np.random.normal(0, 0.1, 50)
 
+
 def residuals(params):
     return model(x_data, *params) - y_data
+
 
 result = optimize.least_squares(residuals, [1, 1, 1])
 print(f"Fitted: {result.x}")
 
 # Global optimization
-result = optimize.differential_evolution(
-    rosenbrock, bounds=[(-5, 5), (-5, 5)]
-)
+result = optimize.differential_evolution(rosenbrock, bounds=[(-5, 5), (-5, 5)])
 print(f"Global minimum: {result.x}")
 ```
 

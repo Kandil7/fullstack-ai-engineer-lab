@@ -17,8 +17,10 @@ Terminology:
 # 1. GENERAL TREE IMPLEMENTATION
 # =============================================================================
 
+
 class TreeNode:
     """A node in a general tree"""
+
     def __init__(self, data):
         self.data = data
         self.children = []
@@ -167,6 +169,7 @@ print(f"Leaf nodes: {tree.count_leaves(root)}")
 # 2. N-ARY TREE
 # =============================================================================
 
+
 class NaryTreeNode:
     """Node for N-ary tree (up to N children)"""
 
@@ -207,6 +210,7 @@ print(f"B's children: {[str(c) for c in b.children]}")
 # 3. TREE SERIALIZATION
 # =============================================================================
 
+
 def serialize_tree(node):
     """Serialize tree to string. O(n) time."""
     if not node:
@@ -215,6 +219,7 @@ def serialize_tree(node):
     for child in node.children:
         result.append(serialize_tree(child))
     return "(" + " ".join(result) + ")"
+
 
 def deserialize_tree(data):
     """Deserialize string to tree. O(n) time."""
@@ -243,6 +248,7 @@ def deserialize_tree(data):
 
     return root
 
+
 print("\n=== Tree Serialization ===")
 serialized = serialize_tree(root)
 print(f"Serialized: {serialized}")
@@ -251,6 +257,7 @@ print(f"Serialized: {serialized}")
 # =============================================================================
 # 4. TREE HEIGHT AND DEPTH
 # =============================================================================
+
 
 def tree_height(root):
     """Calculate height using BFS. O(n)"""
@@ -269,6 +276,7 @@ def tree_height(root):
 
     return height
 
+
 def node_depth(root, target, depth=0):
     """Find depth of a specific node. O(n)"""
     if not root:
@@ -282,6 +290,7 @@ def node_depth(root, target, depth=0):
             return result
     return -1
 
+
 print("\n=== Height and Depth ===")
 print(f"Tree height: {tree_height(root)}")
 print(f"Depth of 'E': {node_depth(root, 'E')}")
@@ -290,6 +299,7 @@ print(f"Depth of 'E': {node_depth(root, 'E')}")
 # =============================================================================
 # 5. TREE PATH
 # =============================================================================
+
 
 def find_path(root, target, path=None):
     """Find path from root to target node. O(n)"""
@@ -311,6 +321,7 @@ def find_path(root, target, path=None):
 
     return None
 
+
 print("\n=== Find Path ===")
 print(f"Path to 'Dev 1': {find_path(root, 'Dev 1')}")
 print(f"Path to 'Sales Lead': {find_path(root, 'Sales Lead')}")
@@ -320,6 +331,7 @@ print(f"Path to 'Sales Lead': {find_path(root, 'Sales Lead')}")
 # 6. COPY/MIRROR TREE
 # =============================================================================
 
+
 def copy_tree(node):
     """Create deep copy of tree. O(n)"""
     if not node:
@@ -328,6 +340,7 @@ def copy_tree(node):
     for child in node.children:
         new_node.add_child(copy_tree(child))
     return new_node
+
 
 def are_identical(t1, t2):
     """Check if two trees are identical. O(n)"""
@@ -341,6 +354,7 @@ def are_identical(t1, t2):
         return False
     return all(are_identical(c1, c2) for c1, c2 in zip(t1.children, t2.children))
 
+
 def mirror_tree(node):
     """Create mirror of tree. O(n)"""
     if not node:
@@ -349,6 +363,7 @@ def mirror_tree(node):
     for child in reversed(node.children):
         mirrored.add_child(mirror_tree(child))
     return mirrored
+
 
 print("\n=== Copy and Mirror ===")
 copy = copy_tree(root)
@@ -361,6 +376,7 @@ print(f"Mirrored root children: {[str(c) for c in mirrored.children]}")
 # 7. ANCESTOR AND DESCENDANT
 # =============================================================================
 
+
 def is_ancestor(root, ancestor, descendant):
     """Check if ancestor is ancestor of descendant. O(n)"""
     if not root:
@@ -369,12 +385,14 @@ def is_ancestor(root, ancestor, descendant):
         return _has_descendant(root, descendant)
     return any(is_ancestor(child, ancestor, descendant) for child in root.children)
 
+
 def _has_descendant(node, target):
     """Check if node has descendant with target value"""
     for child in node.children:
         if child.data == target or _has_descendant(child, target):
             return True
     return False
+
 
 print("\n=== Ancestor/Descendant ===")
 print(f"'CEO' is ancestor of 'Dev 1': {is_ancestor(root, 'CEO', 'Dev 1')}")
@@ -384,6 +402,7 @@ print(f"'Dev 1' is ancestor of 'CEO': {is_ancestor(root, 'Dev 1', 'CEO')}")
 # =============================================================================
 # 8. COMMON ANCESTOR
 # =============================================================================
+
 
 def lowest_common_ancestor(root, p, q):
     """Find lowest common ancestor. O(n)"""
@@ -397,6 +416,7 @@ def lowest_common_ancestor(root, p, q):
     if len(found) >= 2:
         return root
     return found[0] if found else None
+
 
 print("\n=== Lowest Common Ancestor ===")
 lca_root = TreeNode("CEO")
@@ -416,6 +436,7 @@ print(f"LCA(D1, VP2): {lowest_common_ancestor(lca_root, 'D1', 'VP2')}")  # CEO
 # 9. TREE SIZE
 # =============================================================================
 
+
 def tree_size_bfs(root):
     """Count nodes using BFS. O(n)"""
     if not root:
@@ -431,6 +452,7 @@ def tree_size_bfs(root):
 
     return count
 
+
 print("\n=== Tree Size (BFS) ===")
 print(f"Tree size: {tree_size_bfs(root)}")
 
@@ -438,6 +460,7 @@ print(f"Tree size: {tree_size_bfs(root)}")
 # =============================================================================
 # 10. TREE TO LIST
 # =============================================================================
+
 
 def tree_to_level_lists(root):
     """Convert tree to list of lists by level. O(n)"""
@@ -457,6 +480,7 @@ def tree_to_level_lists(root):
         result.append(level)
 
     return result
+
 
 print("\n=== Tree to Level Lists ===")
 levels = tree_to_level_lists(root)

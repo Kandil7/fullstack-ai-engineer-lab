@@ -63,10 +63,10 @@ x = 10  # Creates and assigns in one step
 - **Related terms**: Static Typing, Type Inference, Duck Typing
 ```python
 # Dynamic typing example
-x = 10          # int
+x = 10  # int
 print(type(x))  # <class 'int'>
 
-x = "hello"     # str
+x = "hello"  # str
 print(type(x))  # <class 'str'>
 ```
 
@@ -80,8 +80,10 @@ print(type(x))  # <class 'str'>
 # Global variable
 global_var = "I'm global"
 
+
 def my_function():
     print(global_var)  # Can access global
+
 
 my_function()
 print(global_var)  # Can access global
@@ -96,8 +98,12 @@ print(global_var)  # Can access global
 ```python
 # Valid identifiers
 user_name = "Alice"
+
+
 def calculate_total():
     pass
+
+
 class UserAccount:
     pass
 ```
@@ -108,7 +114,7 @@ class UserAccount:
 - **Related terms**: Assignment, Default Value
 ```python
 # Initialization
-x = 10          # Initialize with value
+x = 10  # Initialize with value
 name = "Alice"  # Initialize with string
 is_active = True  # Initialize with boolean
 ```
@@ -140,6 +146,7 @@ def my_function():
     local_var = "I'm local"  # Local variable
     print(local_var)  # Accessible here
 
+
 my_function()
 # print(local_var)  # Error! Not accessible here
 ```
@@ -152,12 +159,18 @@ my_function()
 - **Related terms**: PEP 8, Identifier, Convention
 ```python
 # Variable naming conventions
-user_name = "Alice"      # snake_case for variables
-def calculate_total():   # snake_case for functions
+user_name = "Alice"  # snake_case for variables
+
+
+def calculate_total():  # snake_case for functions
     pass
-class UserAccount:       # PascalCase for classes
+
+
+class UserAccount:  # PascalCase for classes
     pass
-MAX_SIZE = 100           # UPPER_SNAKE_CASE for constants
+
+
+MAX_SIZE = 100  # UPPER_SNAKE_CASE for constants
 ```
 
 ### O
@@ -170,11 +183,11 @@ MAX_SIZE = 100           # UPPER_SNAKE_CASE for constants
 # Everything is an object
 x = 10
 print(type(x))  # <class 'int'>
-print(id(x))    # Memory address
+print(id(x))  # Memory address
 
 name = "Hello"
 print(type(name))  # <class 'str'>
-print(id(name))    # Memory address
+print(id(name))  # Memory address
 ```
 
 ### P
@@ -230,14 +243,16 @@ print(x)  # 20
 # Variable scope
 x = "global"  # Global scope
 
+
 def outer():
     y = "outer"  # Enclosing scope
-    
+
     def inner():
         z = "local"  # Local scope
         print(x, y, z)  # Can access all
-    
+
     inner()
+
 
 outer()
 ```
@@ -274,11 +289,11 @@ print(my_dict["name"])  # Alice
 - **Related terms**: Data Type, Dynamic Typing, Type Inference
 ```python
 # Different types
-x = 10          # int
-y = 3.14        # float
-z = "hello"     # str
-w = True        # bool
-a = [1, 2, 3]   # list
+x = 10  # int
+y = 3.14  # float
+z = "hello"  # str
+w = True  # bool
+a = [1, 2, 3]  # list
 
 print(type(x))  # <class 'int'>
 print(type(y))  # <class 'float'>
@@ -290,9 +305,9 @@ print(type(y))  # <class 'float'>
 - **Related terms**: Dynamic Typing, Type System
 ```python
 # Type inference in action
-x = 10          # int (inferred)
-y = 3.14        # float (inferred)
-z = "hello"     # str (inferred)
+x = 10  # int (inferred)
+y = 3.14  # float (inferred)
+z = "hello"  # str (inferred)
 print(type(x))  # <class 'int'>
 ```
 
@@ -321,10 +336,10 @@ x, y = y, x  # Now x=10, y=5
 - **Related terms**: Assignment, Value, Reference
 ```python
 # Variable examples
-name = "Alice"      # String variable
-age = 25            # Integer variable
-height = 1.65       # Float variable
-is_student = True   # Boolean variable
+name = "Alice"  # String variable
+age = 25  # Integer variable
+height = 1.65  # Float variable
+is_student = True  # Boolean variable
 ```
 
 ### W

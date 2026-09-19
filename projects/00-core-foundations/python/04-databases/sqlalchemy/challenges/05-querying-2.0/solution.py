@@ -29,20 +29,14 @@ class EvalMetric(Base):
     __tablename__ = "eval_metrics"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    experiment_id: Mapped[int] = mapped_column(
-        ForeignKey("experiments.id"), nullable=False
-    )
+    experiment_id: Mapped[int] = mapped_column(ForeignKey("experiments.id"), nullable=False)
     metric: Mapped[str] = mapped_column(String(30), nullable=False)
     value: Mapped[float] = mapped_column(nullable=False)
 
 
 def done_experiments(session: Session) -> list[str]:
     """Names of experiments with status == 'done', sorted ascending."""
-    stmt = (
-        select(Experiment.name)
-        .where(Experiment.status == "done")
-        .order_by(Experiment.name)
-    )
+    stmt = select(Experiment.name).where(Experiment.status == "done").order_by(Experiment.name)
     return list(session.scalars(stmt).all())
 
 
@@ -51,7 +45,7 @@ def best_f1_per_model(session: Session) -> list[tuple[str, float]]:
     stmt = (
         select(Experiment.model, func.max(EvalMetric.value))
         .join(EvalMetric, EvalMetric.experiment_id == Experiment.id)
-        .where(EvalMetric.metric == "f1")       # narrow BEFORE grouping
+        .where(EvalMetric.metric == "f1")  # narrow BEFORE grouping
         .group_by(Experiment.model)
         .order_by(Experiment.model)
     )

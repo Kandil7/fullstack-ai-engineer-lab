@@ -160,19 +160,20 @@ from fastapi.templating import Jinja2Templates
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/profile/{user_id}")
 async def profile(request: Request, user_id: int):
     user = get_user(user_id)
-    
+
     # Context dictionary
     context = {
-        "request": request,      # Required
-        "user": user,            # User object
-        "title": "Profile",      # String
-        "is_owner": True,        # Boolean
-        "items": ["a", "b"],    # List
+        "request": request,  # Required
+        "user": user,  # User object
+        "title": "Profile",  # String
+        "is_owner": True,  # Boolean
+        "items": ["a", "b"],  # List
     }
-    
+
     return templates.TemplateResponse("profile.html", context)
 ```
 
@@ -289,12 +290,10 @@ from fastapi.templating import Jinja2Templates
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/")
 async def root(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request, "name": "World"}
-    )
+    return templates.TemplateResponse("index.html", {"request": request, "name": "World"})
 ```
 
 **Template syntax:**
@@ -389,6 +388,7 @@ from fastapi.templating import Jinja2Templates
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/")
 async def root(request: Request):
     # request is required by Jinja2
@@ -396,8 +396,8 @@ async def root(request: Request):
         "index.html",
         {
             "request": request,  # REQUIRED
-            "title": "Home"
-        }
+            "title": "Home",
+        },
     )
 ```
 
@@ -435,9 +435,11 @@ async def root(request: Request):
 ```python
 from markupsafe import Markup
 
+
 def nl2br(text: str) -> Markup:
     """Convert newlines to <br> tags"""
     return Markup(text.replace("\n", "<br>"))
+
 
 templates.env.filters["nl2br"] = nl2br
 ```
@@ -568,13 +570,12 @@ from fastapi.responses import HTMLResponse
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+
 # Basic usage
 @app.get("/")
 async def root(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse("index.html", {"request": request})
+
 
 # With status code and headers
 @app.get("/custom")
@@ -583,8 +584,9 @@ async def custom(request: Request):
         "page.html",
         {"request": request, "data": "value"},
         status_code=200,
-        headers={"X-Custom": "header"}
+        headers={"X-Custom": "header"},
     )
+
 
 # With media type
 @app.get("/json-or-html")
@@ -611,13 +613,10 @@ async def user_profile(request: Request, user_id: int):
         "age": 30,
         "is_active": True,
         "roles": ["admin", "user"],
-        "address": {"city": "NYC", "zip": "10001"}
+        "address": {"city": "NYC", "zip": "10001"},
     }
-    
-    return templates.TemplateResponse(
-        "profile.html",
-        {"request": request, "user": user}
-    )
+
+    return templates.TemplateResponse("profile.html", {"request": request, "user": user})
 ```
 
 **Template usage:**
@@ -668,40 +667,36 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Templates
 templates = Jinja2Templates(directory="templates")
 
+
 # Custom filters
 def format_date(value, fmt="%B %d, %Y"):
     return value.strftime(fmt)
 
+
 templates.env.filters["dateformat"] = format_date
+
 
 # Routes
 @app.get("/")
 async def home(request: Request):
-    return templates.TemplateResponse(
-        "home.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse("home.html", {"request": request})
+
 
 @app.get("/about")
 async def about(request: Request):
-    return templates.TemplateResponse(
-        "about.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse("about.html", {"request": request})
+
 
 @app.get("/contact")
 async def contact_form(request: Request):
     return templates.TemplateResponse(
-        "contact.html",
-        {"request": request, "errors": {}, "values": {}}
+        "contact.html", {"request": request, "errors": {}, "values": {}}
     )
+
 
 @app.post("/contact")
 async def contact_submit(
-    request: Request,
-    name: str = Form(...),
-    email: str = Form(...),
-    message: str = Form(...)
+    request: Request, name: str = Form(...), email: str = Form(...), message: str = Form(...)
 ):
     # Validate
     errors = {}
@@ -709,22 +704,24 @@ async def contact_submit(
         errors["name"] = "Name too short"
     if "@" not in email:
         errors["email"] = "Invalid email"
-    
+
     if errors:
         return templates.TemplateResponse(
             "contact.html",
-            {"request": request, "errors": errors, "values": {"name": name, "email": email, "message": message}}
+            {
+                "request": request,
+                "errors": errors,
+                "values": {"name": name, "email": email, "message": message},
+            },
         )
-    
+
     # Process form
     return RedirectResponse("/contact/success", status_code=303)
 
+
 @app.get("/contact/success")
 async def contact_success(request: Request):
-    return templates.TemplateResponse(
-        "success.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse("success.html", {"request": request})
 ```
 
 ### Template Helper Functions
@@ -798,12 +795,10 @@ from fastapi.templating import Jinja2Templates
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/")
 async def root(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request, "key": "value"}
-    )
+    return templates.TemplateResponse("index.html", {"request": request, "key": "value"})
 ```
 
 ### File Structure

@@ -62,6 +62,7 @@ the type appears once in the annotation and once in the column definition.
 ```python
 from sqlalchemy.orm import DeclarativeBase
 
+
 class Base(DeclarativeBase):
     """Application-wide declarative base (SQLAlchemy 2.0 style)."""
 ```
@@ -82,7 +83,7 @@ class Experiment(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(80), unique=True)
     model: Mapped[str] = mapped_column(String(60), nullable=False)
-    notes: Mapped[Optional[str]] = mapped_column(String(200))   # NULL allowed
+    notes: Mapped[Optional[str]] = mapped_column(String(200))  # NULL allowed
     score: Mapped[float] = mapped_column(default=0.0)
 ```
 
@@ -124,10 +125,10 @@ at flush time, not construction time, so `exp.score` is `None` until flush if
 you read it too early.
 
 ```python
-exp = Experiment(name="run-1", model="bert")   # score not set yet
+exp = Experiment(name="run-1", model="bert")  # score not set yet
 session.add(exp)
-session.flush()                                # defaults apply here
-print(exp.score)                               # 0.0
+session.flush()  # defaults apply here
+print(exp.score)  # 0.0
 ```
 
 ## 5. Table-Level Constraints via __table_args__
@@ -168,9 +169,7 @@ class EvalMetric(Base):
     __tablename__ = "eval_metrics"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    experiment_id: Mapped[int] = mapped_column(
-        ForeignKey("experiments.id"), nullable=False
-    )
+    experiment_id: Mapped[int] = mapped_column(ForeignKey("experiments.id"), nullable=False)
     metric: Mapped[str] = mapped_column(String(30), nullable=False)
     value: Mapped[float] = mapped_column(nullable=False)
 ```

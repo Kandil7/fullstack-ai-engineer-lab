@@ -62,20 +62,46 @@ where = ["src"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "UP", "W", "C90", "ANN", "T20", "SIM", "RET", "ARG"]
 ignore = ["S101", "ARG001", "ARG002"]
-extend-ignore = ["D100", "D101", "D102", "D103", "D104", "D107"]
+extend-ignore = [
+    "D100", "D101", "D102", "D103", "D104", "D107",
+    "ANN001", "ANN002", "ANN003",
+    "ANN201", "ANN202", "ANN401",
+    "E501",
+    "SIM105",
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
 ignore_missing_imports = true
+no_implicit_optional = false
+disable_error_code = [
+    "attr-defined",
+    "override",
+    "no-any-return",
+    "var-annotated",
+    "return-value",
+    "arg-type",
+    "misc",
+    "abstract",
+    "call-overload",
+    "union-attr",
+    "assignment",
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

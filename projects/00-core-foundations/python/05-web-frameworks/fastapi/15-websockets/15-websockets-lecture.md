@@ -86,6 +86,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 app = FastAPI()
 
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -93,7 +94,7 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             # Receive message from client
             data = await websocket.receive_text()
-            
+
             # Echo message back
             await websocket.send_text(f"Message: {data}")
     except WebSocketDisconnect:
@@ -107,11 +108,12 @@ from fastapi import FastAPI, WebSocket
 
 app = FastAPI()
 
+
 @app.websocket("/ws/{room_id}")
 async def websocket_room(websocket: WebSocket, room_id: str):
     await websocket.accept()
     await websocket.send_text(f"Connected to room: {room_id}")
-    
+
     try:
         while True:
             data = await websocket.receive_text()
@@ -128,27 +130,30 @@ from typing import List
 
 app = FastAPI()
 
+
 class ConnectionManager:
     """Manages WebSocket connections"""
-    
+
     def __init__(self):
         self.active_connections: List[WebSocket] = []
-    
+
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
-    
+
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
-    
+
     async def broadcast(self, message: str):
         for connection in self.active_connections:
             await connection.send_text(message)
-    
+
     async def send_personal(self, websocket: WebSocket, message: str):
         await websocket.send_text(message)
 
+
 manager = ConnectionManager()
+
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -173,55 +178,59 @@ from datetime import datetime
 
 app = FastAPI()
 
+
 class ChatRoom:
     def __init__(self, room_id: str):
         self.room_id = room_id
         self.connections: List[WebSocket] = []
         self.messages: List[dict] = []
-    
+
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.connections.append(websocket)
         # Send message history
         for msg in self.messages[-50:]:  # Last 50 messages
             await websocket.send_json(msg)
-    
+
     def disconnect(self, websocket: WebSocket):
         self.connections.remove(websocket)
-    
+
     async def broadcast(self, message: dict):
         self.messages.append(message)
         for connection in self.connections:
             await connection.send_json(message)
 
+
 class ChatManager:
     def __init__(self):
         self.rooms: Dict[str, ChatRoom] = {}
-    
+
     def get_room(self, room_id: str) -> ChatRoom:
         if room_id not in self.rooms:
             self.rooms[room_id] = ChatRoom(room_id)
         return self.rooms[room_id]
 
+
 chat_manager = ChatManager()
+
 
 @app.websocket("/ws/chat/{room_id}")
 async def chat_websocket(websocket: WebSocket, room_id: str):
     room = chat_manager.get_room(room_id)
     await room.connect(websocket)
-    
+
     try:
         while True:
             data = await websocket.receive_json()
-            
+
             # Create message
             message = {
                 "user": data.get("user", "Anonymous"),
                 "message": data.get("message", ""),
                 "timestamp": datetime.utcnow().isoformat(),
-                "room": room_id
+                "room": room_id,
             }
-            
+
             await room.broadcast(message)
     except WebSocketDisconnect:
         room.disconnect(websocket)
@@ -237,6 +246,7 @@ app = FastAPI()
 
 SECRET_KEY = "your-secret-key"
 
+
 async def get_user_from_token(token: str):
     """Validate JWT token and return user"""
     try:
@@ -245,27 +255,22 @@ async def get_user_from_token(token: str):
     except JWTError:
         return None
 
+
 @app.websocket("/ws/secure")
-async def secure_websocket(
-    websocket: WebSocket,
-    token: str = Query(...)
-):
+async def secure_websocket(websocket: WebSocket, token: str = Query(...)):
     # Authenticate before accepting connection
     user = await get_user_from_token(token)
     if not user:
         await websocket.close(code=4001, reason="Unauthorized")
         return
-    
+
     await websocket.accept()
     await websocket.send_json({"type": "welcome", "user": user})
-    
+
     try:
         while True:
             data = await websocket.receive_text()
-            await websocket.send_json({
-                "user": user,
-                "message": data
-            })
+            await websocket.send_json({"user": user, "message": data})
     except WebSocketDisconnect:
         print(f"User {user} disconnected")
 ```
@@ -279,69 +284,69 @@ import json
 
 app = FastAPI()
 
+
 class WebSocketManager:
     def __init__(self):
         # room_id -> set of websockets
         self.rooms: Dict[str, Set[WebSocket]] = {}
         # websocket -> user info
         self.user_info: Dict[WebSocket, dict] = {}
-    
+
     async def join_room(self, websocket: WebSocket, room_id: str, user: str):
         await websocket.accept()
-        
+
         if room_id not in self.rooms:
             self.rooms[room_id] = set()
-        
+
         self.rooms[room_id].add(websocket)
         self.user_info[websocket] = {"user": user, "room": room_id}
-        
+
         # Notify others
-        await self.broadcast_to_room(room_id, {
-            "type": "user_joined",
-            "user": user,
-            "users": self.get_room_users(room_id)
-        })
-    
+        await self.broadcast_to_room(
+            room_id, {"type": "user_joined", "user": user, "users": self.get_room_users(room_id)}
+        )
+
     async def leave_room(self, websocket: WebSocket):
         if websocket in self.user_info:
             room_id = self.user_info[websocket]["room"]
             user = self.user_info[websocket]["user"]
-            
+
             self.rooms[room_id].discard(websocket)
             del self.user_info[websocket]
-            
+
             if not self.rooms[room_id]:
                 del self.rooms[room_id]
             else:
-                await self.broadcast_to_room(room_id, {
-                    "type": "user_left",
-                    "user": user,
-                    "users": self.get_room_users(room_id)
-                })
-    
+                await self.broadcast_to_room(
+                    room_id,
+                    {"type": "user_left", "user": user, "users": self.get_room_users(room_id)},
+                )
+
     def get_room_users(self, room_id: str) -> list:
         return [
             self.user_info[ws]["user"]
             for ws in self.rooms.get(room_id, set())
             if ws in self.user_info
         ]
-    
+
     async def broadcast_to_room(self, room_id: str, message: dict):
         for ws in self.rooms.get(room_id, set()):
             try:
                 await ws.send_json(message)
             except:
                 pass
-    
+
     async def send_to_user(self, websocket: WebSocket, message: dict):
         await websocket.send_json(message)
 
+
 manager = WebSocketManager()
+
 
 @app.websocket("/ws/chat/{room_id}")
 async def chat(websocket: WebSocket, room_id: str, user: str):
     await manager.join_room(websocket, room_id, user)
-    
+
     try:
         while True:
             data = await websocket.receive_json()
@@ -349,7 +354,7 @@ async def chat(websocket: WebSocket, room_id: str, user: str):
                 "type": "message",
                 "user": user,
                 "message": data.get("message", ""),
-                "room": room_id
+                "room": room_id,
             }
             await manager.broadcast_to_room(room_id, message)
     except WebSocketDisconnect:
@@ -364,43 +369,46 @@ import asyncio
 
 app = FastAPI()
 
+
 @app.websocket("/ws/binary")
 async def binary_websocket(websocket: WebSocket):
     await websocket.accept()
-    
+
     try:
         while True:
             # Receive binary data
             data = await websocket.receive_bytes()
-            
+
             # Process binary data
             processed = process_binary(data)
-            
+
             # Send binary response
             await websocket.send_bytes(processed)
     except Exception as e:
         print(f"Error: {e}")
 
+
 def process_binary(data: bytes) -> bytes:
     # Example: reverse bytes
     return data[::-1]
+
 
 # Or with JSON for structured messages
 @app.websocket("/ws/json")
 async def json_websocket(websocket: WebSocket):
     await websocket.accept()
-    
+
     try:
         while True:
             data = await websocket.receive_json()
-            
+
             # Process JSON data
             response = {
                 "received": data,
                 "processed": True,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.utcnow().isoformat(),
             }
-            
+
             await websocket.send_json(response)
     except Exception as e:
         print(f"Error: {e}")
@@ -415,17 +423,18 @@ from typing import List
 
 app = FastAPI()
 
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: List[WebSocket] = []
-    
+
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
-    
+
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
-    
+
     async def broadcast(self, message: str):
         for connection in self.active_connections:
             try:
@@ -433,7 +442,9 @@ class ConnectionManager:
             except:
                 pass
 
+
 manager = ConnectionManager()
+
 
 async def periodic_broadcast():
     """Background task that broadcasts periodically"""
@@ -442,9 +453,11 @@ async def periodic_broadcast():
         timestamp = datetime.utcnow().isoformat()
         await manager.broadcast(f"Server time: {timestamp}")
 
+
 @app.on_event("startup")
 async def startup():
     asyncio.create_task(periodic_broadcast())
+
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -472,6 +485,7 @@ async def websocket(websocket: WebSocket):
         data = await websocket.receive_text()  # Crashes on disconnect
         await websocket.send_text(data)
 
+
 # ✅ CORRECT - Handle disconnections
 @app.websocket("/ws")
 async def websocket(websocket: WebSocket):
@@ -495,8 +509,10 @@ async def websocket(websocket: WebSocket):
     while True:
         data = await websocket.receive_text()
 
+
 # ✅ CORRECT - Track connections
 manager = ConnectionManager()
+
 
 @app.websocket("/ws")
 async def websocket(websocket: WebSocket):
@@ -522,6 +538,7 @@ async def websocket(websocket: WebSocket):
         time.sleep(1)  # ❌
         result = requests.get("https://api.example.com")  # ❌
         await websocket.send_text(result)
+
 
 # ✅ CORRECT - Non-blocking operations
 @app.websocket("/ws")

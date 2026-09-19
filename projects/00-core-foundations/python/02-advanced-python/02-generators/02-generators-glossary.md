@@ -42,9 +42,10 @@ def my_generator():
     finally:
         print("Cleanup executed")
 
+
 gen = my_generator()
-next(gen)      # "data"
-gen.close()    # "Cleanup executed"
+next(gen)  # "data"
+gen.close()  # "Cleanup executed"
 
 # Cannot use gen anymore
 try:
@@ -68,7 +69,7 @@ def average():
     total = 0.0
     count = 0
     average = None
-    
+
     while True:
         value = yield average
         if value is None:
@@ -77,11 +78,12 @@ def average():
         count += 1
         average = total / count
 
+
 avg = average()
-next(avg)            # Initialize: None
-avg.send(10)         # -> 10.0
-avg.send(20)         # -> 15.0
-avg.send(30)         # -> 20.0
+next(avg)  # Initialize: None
+avg.send(10)  # -> 10.0
+avg.send(20)  # -> 15.0
+avg.send(30)  # -> 20.0
 ```
 
 **Related**: `send()`, Generator, Bidirectional Communication
@@ -119,14 +121,14 @@ while True:
 **Example**:
 ```python
 # List comprehension (eager - all values in memory)
-squares_list = [x ** 2 for x in range(1000000)]
+squares_list = [x**2 for x in range(1000000)]
 
 # Generator expression (lazy - one value at a time)
-squares_gen = (x ** 2 for x in range(1000000))
+squares_gen = (x**2 for x in range(1000000))
 
 # Using in function calls (parentheses optional)
-total = sum(x ** 2 for x in range(100))
-max_val = max(x ** 2 for x in range(100))
+total = sum(x**2 for x in range(100))
+max_val = max(x**2 for x in range(100))
 
 # Complex expressions
 processed = (x.strip().lower() for x in data if x.strip())
@@ -149,6 +151,7 @@ def countdown(n):
         yield n
         n -= 1
     print("Done!")
+
 
 # Calling returns generator iterator (no code runs yet)
 gen = countdown(3)
@@ -173,6 +176,7 @@ next(gen)  # 1
 def make_gen():
     yield 1
     yield 2
+
 
 gen_iter = make_gen()  # This IS the generator iterator
 print(type(gen_iter))  # <class 'generator'>
@@ -200,11 +204,13 @@ def fibonacci():
         yield a
         a, b = b, a + b
 
+
 from itertools import islice
 
 # Take first 10 values
 first_10 = list(islice(fibonacci(), 10))
 print(first_10)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
 
 # Take values until condition
 def take_until(gen, condition):
@@ -212,6 +218,7 @@ def take_until(gen, condition):
         if not condition(value):
             return
         yield value
+
 
 under_100 = list(take_until(fibonacci(), lambda x: x < 100))
 print(under_100)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
@@ -230,19 +237,20 @@ print(under_100)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 class MyIterable:
     def __init__(self, data):
         self.data = data
-    
+
     def __iter__(self):
         return iter(self.data)
+
 
 my_list = MyIterable([1, 2, 3])
 for item in my_list:
     print(item)  # 1, 2, 3
 
 # Built-in iterables
-for char in "hello":      # str
+for char in "hello":  # str
     print(char)
 
-for key in {"a": 1}:     # dict
+for key in {"a": 1}:  # dict
     print(key)
 ```
 
@@ -260,16 +268,17 @@ class Counter:
     def __init__(self, start, end):
         self.current = start
         self.end = end
-    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         if self.current >= self.end:
             raise StopIteration
         value = self.current
         self.current += 1
         return value
+
 
 counter = Counter(1, 5)
 print(list(counter))  # [1, 2, 3, 4]
@@ -291,10 +300,10 @@ class Fibonacci:
         self.max_count = max_count
         self.count = 0
         self.a, self.b = 0, 1
-    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         if self.count >= self.max_count:
             raise StopIteration
@@ -302,6 +311,7 @@ class Fibonacci:
         self.a, self.b = self.b, self.a + self.b
         self.count += 1
         return value
+
 
 # Works with for loop, list(), next(), etc.
 fib = Fibonacci(5)
@@ -320,10 +330,12 @@ print(list(fib))  # [0, 1, 1, 2, 3]
 ```python
 from itertools import islice
 
+
 def infinite_count(start=0):
     while True:
         yield start
         start += 1
+
 
 # Take first 5 from infinite generator
 first_5 = list(islice(infinite_count(), 5))
@@ -350,19 +362,21 @@ print(stepped)  # [0, 3, 6, 9, 12, 15, 18]
 ```python
 from itertools import tee
 
+
 def expensive_generator():
     print("Generating...")
     for i in range(5):
         yield i * 2
 
+
 # Without tee: second pass gets empty generator
 gen = expensive_generator()
-first_pass = list(gen)   # "Generating..." -> [0, 2, 4, 6, 8]
+first_pass = list(gen)  # "Generating..." -> [0, 2, 4, 6, 8]
 second_pass = list(gen)  # [] — exhausted
 
 # With tee: independent iterators
 gen1, gen2 = tee(expensive_generator())
-first_pass = list(gen1)   # "Generating..." -> [0, 2, 4, 6, 8]
+first_pass = list(gen1)  # "Generating..." -> [0, 2, 4, 6, 8]
 second_pass = list(gen2)  # [0, 2, 4, 6, 8] — same data
 ```
 
@@ -377,10 +391,10 @@ second_pass = list(gen2)  # [0, 2, 4, 6, 8] — same data
 **Example**:
 ```python
 # Eager: all values computed immediately
-eager = [x ** 2 for x in range(10_000_000)]  # Takes time, uses memory
+eager = [x**2 for x in range(10_000_000)]  # Takes time, uses memory
 
 # Lazy: values computed on demand
-lazy = (x ** 2 for x in range(10_000_000))   # Instant, minimal memory
+lazy = (x**2 for x in range(10_000_000))  # Instant, minimal memory
 
 # Only computes what's needed
 first_5 = list(islice(lazy, 5))  # Only computes 5 values
@@ -399,12 +413,13 @@ first_5 = list(islice(lazy, 5))  # Only computes 5 values
 import sys
 
 # Memory-inefficient: 8+ MB for 1M integers
-squares_list = [x ** 2 for x in range(1_000_000)]
+squares_list = [x**2 for x in range(1_000_000)]
 print(f"List: {sys.getsizeof(squares_list):,} bytes")
 
 # Memory-efficient: ~200 bytes regardless of size
-squares_gen = (x ** 2 for x in range(1_000_000))
+squares_gen = (x**2 for x in range(1_000_000))
 print(f"Generator: {sys.getsizeof(squares_gen):,} bytes")
+
 
 # Process large file line by line
 def process_file(filename):
@@ -427,14 +442,17 @@ def read_data(source):
     for item in source:
         yield item
 
+
 def validate(items):
     for item in items:
         if is_valid(item):
             yield item
 
+
 def transform(items):
     for item in items:
         yield process(item)
+
 
 def aggregate(items):
     total = 0
@@ -443,6 +461,7 @@ def aggregate(items):
         total += item
         count += 1
     return total / count
+
 
 # Pipeline: data flows through stages
 raw = range(1000)
@@ -469,12 +488,15 @@ try:
 except StopIteration:
     print("No more items")
 
+
 # Custom iterator
 class OneShot:
     def __iter__(self):
         return self
+
     def __next__(self):
         raise StopIteration
+
 
 list(OneShot())  # []
 ```
@@ -526,6 +548,7 @@ def simple():
     yield 2
     print("After yield 2")
 
+
 gen = simple()
 print(next(gen))
 # Output: "Before yield 1" -> 1
@@ -545,13 +568,15 @@ print(next(gen))
 ```python
 def generator():
     yield "before"
-    yield from [1, 2, 3]     # Delegates to list iterator
-    yield from inner_gen()    # Delegates to sub-generator
+    yield from [1, 2, 3]  # Delegates to list iterator
+    yield from inner_gen()  # Delegates to sub-generator
     yield "after"
+
 
 def inner_gen():
     yield "inner1"
     yield "inner2"
+
 
 print(list(generator()))
 # ["before", 1, 2, 3, "inner1", "inner2", "after"]
@@ -575,6 +600,7 @@ grades = ["A", "B+", "A-"]
 zipped = zip(names, scores, grades)
 print(type(zipped))  # <class 'zip'>
 print(list(zipped))  # [("Alice", 95, "A"), ("Bob", 87, "B+"), ...]
+
 
 # Useful in generator pipelines
 def combine_data(names, scores):

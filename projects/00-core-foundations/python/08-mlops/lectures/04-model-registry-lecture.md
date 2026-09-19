@@ -63,11 +63,12 @@ require evidence (metrics, approval, shadow-test results).
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class ModelVersion:
     name: str
     version: int
-    stage: str = "none"            # none | staging | production | archived
+    stage: str = "none"  # none | staging | production | archived
     metrics: dict[str, float] = field(default_factory=dict)
     data_hash: str = ""
     git_sha: str = ""
@@ -123,9 +124,7 @@ candidate's metrics against the incumbent's, checks it passed validation, and
 records the operator's decision. A simple gate:
 
 ```python
-def promote_to_production(
-    candidate: ModelVersion, incumbent: ModelVersion | None
-) -> bool:
+def promote_to_production(candidate: ModelVersion, incumbent: ModelVersion | None) -> bool:
     """Promotion gate: candidate must beat incumbent on the target metric."""
     if incumbent is None:
         return True

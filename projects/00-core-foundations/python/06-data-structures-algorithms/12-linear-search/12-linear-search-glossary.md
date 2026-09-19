@@ -78,6 +78,7 @@ def linear_search(arr, target):
             return i
     return -1
 
+
 # Sentinel Linear Search
 def sentinel_search(arr, target):
     n = len(arr)
@@ -86,10 +87,11 @@ def sentinel_search(arr, target):
     i = 0
     while arr[i] != target:
         i += 1
-    arr[n - 1] = last    # Restore original
+    arr[n - 1] = last  # Restore original
     if i < n - 1 or arr[n - 1] == target:
         return i
     return -1
+
 
 # Linear Search in Linked List
 def search_linked_list(head, target):
@@ -101,6 +103,7 @@ def search_linked_list(head, target):
         current = current.next
         index += 1
     return -1
+
 
 # Count Occurrences
 def count_occurrences(arr, target):

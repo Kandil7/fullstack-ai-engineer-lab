@@ -101,7 +101,7 @@ import numpy as np
 arr = np.array([1.2345, 2.3456, 3.4567])
 
 print("2 decimals:", np.round(arr, 2))  # [1.23 2.35 3.46]
-print("1 decimal:", np.round(arr, 1))   # [1.2 2.3 3.5]
+print("1 decimal:", np.round(arr, 1))  # [1.2 2.3 3.5]
 
 # Negative decimals - round to nearest 10, 100
 arr2 = np.array([12, 27, 33, 48, 55])

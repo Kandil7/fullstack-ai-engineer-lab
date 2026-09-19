@@ -91,9 +91,9 @@ The `np` alias is:
 
 ```python
 # DON'T use these in production code:
-from numpy import *          # Pollutes namespace
-import numpy as num         # Non-standard
-import numpy                # Too verbose
+from numpy import *  # Pollutes namespace
+import numpy as num  # Non-standard
+import numpy  # Too verbose
 from numpy import array, zeros  # Only for specific small scripts
 ```
 
@@ -108,20 +108,18 @@ import numpy as np
 
 # 1D array (vector)
 arr_1d = np.array([1, 2, 3, 4, 5])
-print(arr_1d)        # [1 2 3 4 5]
+print(arr_1d)  # [1 2 3 4 5]
 print(arr_1d.shape)  # (5,)
 
 # 2D array (matrix)
-arr_2d = np.array([[1, 2, 3],
-                   [4, 5, 6]])
+arr_2d = np.array([[1, 2, 3], [4, 5, 6]])
 print(arr_2d)
 # [[1 2 3]
 #  [4 5 6]]
 print(arr_2d.shape)  # (2, 3)
 
 # 3D array (tensor)
-arr_3d = np.array([[[1, 2], [3, 4]],
-                   [[5, 6], [7, 8]]])
+arr_3d = np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
 print(arr_3d.shape)  # (2, 2, 2)
 ```
 
@@ -151,9 +149,7 @@ print(arr.dtype)  # int64 — True becomes 1
 
 ```python
 # 2D — nested lists
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 print(matrix.shape)  # (3, 3)
 print(matrix)
 # [[1 2 3]
@@ -273,30 +269,28 @@ print(np.array_equal(arr1, arr2))  # True
 ## 5. Inspecting Array Attributes
 
 ```python
-arr = np.array([[1.0, 2.0, 3.0],
-                [4.0, 5.0, 6.0],
-                [7.0, 8.0, 9.0]])
+arr = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]])
 
 # Shape — dimensions as tuple
-print(arr.shape)        # (3, 3)
+print(arr.shape)  # (3, 3)
 
 # Dtype — data type of elements
-print(arr.dtype)        # float64
+print(arr.dtype)  # float64
 
 # ndim — number of dimensions
-print(arr.ndim)         # 2
+print(arr.ndim)  # 2
 
 # Size — total number of elements
-print(arr.size)         # 9
+print(arr.size)  # 9
 
 # Itemsize — bytes per element
-print(arr.itemsize)     # 8
+print(arr.itemsize)  # 8
 
 # nbytes — total bytes consumed
-print(arr.nbytes)       # 72
+print(arr.nbytes)  # 72
 
 # T — transpose
-print(arr.T.shape)      # (3, 3)
+print(arr.T.shape)  # (3, 3)
 
 # flags — memory information
 print(arr.flags)
@@ -312,12 +306,12 @@ print(arr.flags)
 a = np.array([1, 2, 3, 4, 5])
 b = np.array([10, 20, 30, 40, 50])
 
-print(a + b)     # [11 22 33 44 55]
-print(a - b)     # [-9 -18 -27 -36 -45]
-print(a * b)     # [10 40 90 160 250]
-print(b / a)     # [10. 10. 10. 10. 10.]
-print(a ** 2)    # [1 4 9 16 25]
-print(a % 3)     # [1 2 0 1 2]
+print(a + b)  # [11 22 33 44 55]
+print(a - b)  # [-9 -18 -27 -36 -45]
+print(a * b)  # [10 40 90 160 250]
+print(b / a)  # [10. 10. 10. 10. 10.]
+print(a**2)  # [1 4 9 16 25]
+print(a % 3)  # [1 2 0 1 2]
 ```
 
 ### 6.2 Scalar Operations (Broadcasting)
@@ -325,10 +319,10 @@ print(a % 3)     # [1 2 0 1 2]
 ```python
 arr = np.array([1, 2, 3, 4, 5])
 
-print(arr + 10)    # [11 12 13 14 15]
-print(arr * 3)     # [3 6 9 12 15]
-print(arr ** 2)    # [1 4 9 16 25]
-print(arr / 2)     # [0.5 1.  1.5 2.  2.5]
+print(arr + 10)  # [11 12 13 14 15]
+print(arr * 3)  # [3 6 9 12 15]
+print(arr**2)  # [1 4 9 16 25]
+print(arr / 2)  # [0.5 1.  1.5 2.  2.5]
 ```
 
 ### 6.3 Comparison Operations
@@ -336,9 +330,9 @@ print(arr / 2)     # [0.5 1.  1.5 2.  2.5]
 ```python
 arr = np.array([1, 2, 3, 4, 5])
 
-print(arr > 3)     # [False False False  True  True]
-print(arr == 3)    # [False False  True False False]
-print(arr <= 2)    # [ True  True False False False]
+print(arr > 3)  # [False False False  True  True]
+print(arr == 3)  # [False False  True False False]
+print(arr <= 2)  # [ True  True False False False]
 ```
 
 ### 6.4 Aggregate Operations
@@ -346,12 +340,12 @@ print(arr <= 2)    # [ True  True False False False]
 ```python
 arr = np.array([1, 2, 3, 4, 5, 6])
 
-print(arr.sum())    # 21
-print(arr.mean())   # 3.5
-print(arr.min())    # 1
-print(arr.max())    # 6
-print(arr.std())    # 1.7078...
-print(arr.var())    # 2.9166...
+print(arr.sum())  # 21
+print(arr.mean())  # 3.5
+print(arr.min())  # 1
+print(arr.max())  # 6
+print(arr.std())  # 1.7078...
+print(arr.var())  # 2.9166...
 ```
 
 ---
@@ -377,8 +371,8 @@ arr * 2  # [2, 4, 6] — element-wise
 
 ### Mistake 3: Wrong Shape for Operations
 ```python
-a = np.array([1, 2, 3])       # shape (3,)
-b = np.array([[1, 2, 3]])     # shape (1, 3)
+a = np.array([1, 2, 3])  # shape (3,)
+b = np.array([[1, 2, 3]])  # shape (1, 3)
 # a + b  — broadcasting works but may be confusing
 ```
 
@@ -392,9 +386,9 @@ arr[1]  # Correct — returns 20
 ### Mistake 5: Modifying a View
 ```python
 a = np.array([1, 2, 3, 4])
-b = a[1:3]     # View into a
+b = a[1:3]  # View into a
 b[0] = 99
-print(a)       # [ 1 99  3  4] — a is modified!
+print(a)  # [ 1 99  3  4] — a is modified!
 ```
 
 ---
@@ -442,8 +436,7 @@ print(f"Linspace: {arr_lin}")
 ### Exercise 2: Array Attributes
 ```python
 # Create this array and print ALL attributes
-arr = np.array([[1.0, 2.0, 3.0, 4.0],
-                [5.0, 6.0, 7.0, 8.0]])
+arr = np.array([[1.0, 2.0, 3.0, 4.0], [5.0, 6.0, 7.0, 8.0]])
 
 # Print: shape, dtype, ndim, size, itemsize, nbytes
 print(f"Shape: {arr.shape}")
@@ -470,7 +463,7 @@ print(f"a * b = {a * b}")
 print(f"a / b = {a / b}")
 
 # d) a raised to power of b
-print(f"a ** b = {a ** b}")
+print(f"a ** b = {a**b}")
 
 # e) Sum, mean, min, max of a
 print(f"Sum: {a.sum()}, Mean: {a.mean()}, Min: {a.min()}, Max: {a.max()}")

@@ -3,14 +3,17 @@ Matplotlib Box Plots - W3Schools Exercises
 ============================================
 Box plot creation for statistical data visualization.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -38,8 +41,13 @@ def exercise_02():
     data = [np.random.normal(50 + i * 8, 10 + i * 2, 80) for i in range(4)]
 
     plt.figure(figsize=(8, 5))
-    plt.boxplot(data, tick_labels=categories, orientation="horizontal", patch_artist=True,
-                boxprops=dict(facecolor="lightblue"))
+    plt.boxplot(
+        data,
+        tick_labels=categories,
+        orientation="horizontal",
+        patch_artist=True,
+        boxprops=dict(facecolor="lightblue"),
+    )
     plt.title("Exercise 2: Horizontal Box Plot")
     plt.xlabel("Response")
     plt.savefig(OUTPUT_DIR / "13_exercise_02.png", dpi=100, bbox_inches="tight")
@@ -115,8 +123,12 @@ def exercise_05():
     full_data = np.concatenate([data, outliers])
 
     plt.figure(figsize=(8, 5))
-    bp = plt.boxplot([full_data], tick_labels=["Data"], patch_artist=True,
-                     flierprops=dict(marker="D", markerfacecolor="red", markersize=8))
+    bp = plt.boxplot(
+        [full_data],
+        tick_labels=["Data"],
+        patch_artist=True,
+        flierprops=dict(marker="D", markerfacecolor="red", markersize=8),
+    )
     bp["boxes"][0].set_facecolor("lightyellow")
     plt.title("Exercise 5: Box Plot with Outliers")
     plt.ylabel("Value")

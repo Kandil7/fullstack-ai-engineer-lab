@@ -95,18 +95,18 @@ print(f"math.ceil(pi): {math.ceil(pi)}")  # Ceiling: 4
 ### Example 3: Boolean Conversion
 ```python
 # Number to boolean
-print(bool(0))     # False
-print(bool(1))     # True
-print(bool(-1))    # True
+print(bool(0))  # False
+print(bool(1))  # True
+print(bool(-1))  # True
 print(bool(3.14))  # True
 
 # String to boolean
-print(bool(""))      # False (empty string)
-print(bool("hello")) # True (non-empty string)
+print(bool(""))  # False (empty string)
+print(bool("hello"))  # True (non-empty string)
 
 # Other types to boolean
-print(bool(None))    # False
-print(bool([]))      # False (empty list)
+print(bool(None))  # False
+print(bool([]))  # False (empty list)
 print(bool([1, 2]))  # True (non-empty list)
 ```
 

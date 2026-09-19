@@ -30,8 +30,10 @@ execute — the hook that makes query counting honest.
 ```python
 from sqlalchemy import event
 
+
 def count(conn, cursor, statement, parameters, context, executemany):
     queries.append(statement)
+
 
 event.listen(engine, "before_cursor_execute", count)
 ```
@@ -55,8 +57,9 @@ relationship is touched — the loud failure that replaces silent N+1.
 **Example**:
 ```python
 from sqlalchemy.exc import InvalidRequestError
+
 try:
-    _ = project.experiments   # lazy="raise" configured
+    _ = project.experiments  # lazy="raise" configured
 except InvalidRequestError:
     print("lazy access rejected")
 # Output:
@@ -70,9 +73,8 @@ except InvalidRequestError:
 **Example**:
 ```python
 from sqlalchemy.orm import joinedload
-projects = session.scalars(
-    select(Project).options(joinedload(Project.experiments))
-).unique().all()
+
+projects = session.scalars(select(Project).options(joinedload(Project.experiments))).unique().all()
 ```
 **Complexity**: 1 query; O(parents x children) rows transferred.
 **Related**: row duplication, unique()
@@ -88,9 +90,7 @@ first attribute access. One extra query per child — the seed of N+1.
 a test failure anywhere in the codebase.
 **Example**:
 ```python
-experiments: Mapped[list["Experiment"]] = relationship(
-    back_populates="project", lazy="raise"
-)
+experiments: Mapped[list["Experiment"]] = relationship(back_populates="project", lazy="raise")
 ```
 **Related**: InvalidRequestError, loader strategy
 
@@ -99,8 +99,8 @@ experiments: Mapped[list["Experiment"]] = relationship(
 children. Turns a 5 ms listing into a 500 ms one.
 **Example**:
 ```python
-for project in projects:            # 1 parent query
-    _ = len(project.experiments)    # N child queries
+for project in projects:  # 1 parent query
+    _ = len(project.experiments)  # N child queries
 ```
 **Complexity**: O(N) round trips.
 **Related**: round trip, eager loading
@@ -129,6 +129,7 @@ child (4 parents x 3 runs = 12 rows). `unique()` restores one row per parent.
 **Example**:
 ```python
 from sqlalchemy.orm import selectinload
+
 stmt = select(Project).options(selectinload(Project.experiments))
 ```
 **Complexity**: 2 round trips.

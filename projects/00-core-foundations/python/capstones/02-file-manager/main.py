@@ -58,13 +58,15 @@ class FileManager:
                 continue
 
             stat = item.stat()
-            items.append({
-                "name": name,
-                "type": "dir" if item.is_dir() else "file",
-                "size": stat.st_size,
-                "modified": datetime.fromtimestamp(stat.st_mtime),
-                "permissions": oct(stat.st_mode)[-3:],
-            })
+            items.append(
+                {
+                    "name": name,
+                    "type": "dir" if item.is_dir() else "file",
+                    "size": stat.st_size,
+                    "modified": datetime.fromtimestamp(stat.st_mtime),
+                    "permissions": oct(stat.st_mode)[-3:],
+                }
+            )
         return items
 
     def tree(self, max_depth: int = 2, indent: str = "") -> list[str]:
@@ -193,8 +195,9 @@ class FileManager:
                     break
         return results
 
-    def find_text(self, search_term: str, pattern: str = "*",
-                   max_results: int = 20) -> list[tuple[str, int, str]]:
+    def find_text(
+        self, search_term: str, pattern: str = "*", max_results: int = 20
+    ) -> list[tuple[str, int, str]]:
         """Find files containing specific text."""
         results = []
         for item in self.current_dir.rglob(pattern):
@@ -466,8 +469,14 @@ def main():
             else:
                 print(f"  Unknown command: {command}. Type 'help' for commands.")
 
-        except (FileNotFoundError, NotADirectoryError, FileExistsError,
-                PermissionError, ValueError, IsADirectoryError) as e:
+        except (
+            FileNotFoundError,
+            NotADirectoryError,
+            FileExistsError,
+            PermissionError,
+            ValueError,
+            IsADirectoryError,
+        ) as e:
             print(f"  ⚠️  {e}")
 
 

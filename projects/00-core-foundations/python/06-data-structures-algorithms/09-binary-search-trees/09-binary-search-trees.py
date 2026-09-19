@@ -18,13 +18,16 @@ Worst case (degenerate): O(n) - same as linked list
 # 1. BST IMPLEMENTATION
 # =============================================================================
 
+
 class BSTNode:
     """Node in a Binary Search Tree"""
+
     def __init__(self, key):
         self.key = key
         self.left = None
         self.right = None
         self.height = 1  # For AVL balancing
+
 
 class BST:
     """Binary Search Tree implementation"""
@@ -208,15 +211,16 @@ class BST:
 
     def is_valid_bst(self):
         """Validate BST property. O(n)"""
-        return self._validate(self.root, float('-inf'), float('inf'))
+        return self._validate(self.root, float("-inf"), float("inf"))
 
     def _validate(self, node, min_val, max_val):
         if not node:
             return True
         if node.key <= min_val or node.key >= max_val:
             return False
-        return (self._validate(node.left, min_val, node.key) and
-                self._validate(node.right, node.key, max_val))
+        return self._validate(node.left, min_val, node.key) and self._validate(
+            node.right, node.key, max_val
+        )
 
     def kth_smallest(self, k):
         """Find kth smallest element. O(k)"""
@@ -285,6 +289,7 @@ print(f"After deleting 50: {bst.inorder()}")
 # 2. BST FROM SORTED ARRAY
 # =============================================================================
 
+
 def sorted_array_to_bst(arr):
     """Convert sorted array to balanced BST. O(n)"""
     if not arr:
@@ -293,13 +298,15 @@ def sorted_array_to_bst(arr):
     mid = len(arr) // 2
     node = BSTNode(arr[mid])
     node.left = sorted_array_to_bst(arr[:mid])
-    node.right = sorted_array_to_bst(arr[mid + 1:])
+    node.right = sorted_array_to_bst(arr[mid + 1 :])
     return node
+
 
 def inorder_list(node):
     if not node:
         return []
     return inorder_list(node.left) + [node.key] + inorder_list(node.right)
+
 
 print("\n=== BST from Sorted Array ===")
 sorted_arr = [1, 2, 3, 4, 5, 6, 7]
@@ -311,6 +318,7 @@ print(f"From {sorted_arr}: {inorder_list(balanced_root)}")
 # 3. LOWEST COMMON ANCESTOR
 # =============================================================================
 
+
 def lca_bst(root, p, q):
     """Find LCA in BST. O(log n)"""
     if not root:
@@ -321,6 +329,7 @@ def lca_bst(root, p, q):
         return lca_bst(root.right, p, q)
     return root.key
 
+
 print("\n=== Lowest Common Ancestor ===")
 print(f"LCA of 20 and 40: {lca_bst(bst.root, 20, 40)}")
 print(f"LCA of 20 and 80: {lca_bst(bst.root, 20, 80)}")
@@ -330,6 +339,7 @@ print(f"LCA of 20 and 80: {lca_bst(bst.root, 20, 80)}")
 # 4. RANGE SUM QUERY
 # =============================================================================
 
+
 def range_sum_bst(root, low, high):
     """Sum of all keys in range [low, high]. O(n)"""
     if not root:
@@ -338,9 +348,8 @@ def range_sum_bst(root, low, high):
         return range_sum_bst(root.right, low, high)
     if root.key > high:
         return range_sum_bst(root.left, low, high)
-    return (root.key +
-            range_sum_bst(root.left, low, high) +
-            range_sum_bst(root.right, low, high))
+    return root.key + range_sum_bst(root.left, low, high) + range_sum_bst(root.right, low, high)
+
 
 print("\n=== Range Sum ===")
 print(f"Sum in range [30, 70]: {range_sum_bst(bst.root, 30, 70)}")
@@ -350,11 +359,13 @@ print(f"Sum in range [30, 70]: {range_sum_bst(bst.root, 30, 70)}")
 # 5. BST TO DOUBLY LINKED LIST
 # =============================================================================
 
+
 class DLLNode:
     def __init__(self, val):
         self.val = val
         self.left = None
         self.right = None
+
 
 def bst_to_dll(root):
     """Convert BST to sorted doubly linked list. O(n)"""
@@ -385,6 +396,7 @@ def bst_to_dll(root):
     head = left_head if left_head else dll_node
     return head
 
+
 print("\n=== BST to Doubly Linked List ===")
 dll_root = bst_to_dll(bst.root)
 # Traverse forward
@@ -400,6 +412,7 @@ print(f"Forward: {forward}")
 # 6. BST SUCCESSOR AND PREDECESSOR
 # =============================================================================
 
+
 def find_successor(root, key):
     """Find inorder successor. O(log n)"""
     successor = None
@@ -413,6 +426,7 @@ def find_successor(root, key):
             current = current.right
 
     return successor
+
 
 def find_predecessor(root, key):
     """Find inorder predecessor. O(log n)"""
@@ -428,6 +442,7 @@ def find_predecessor(root, key):
 
     return predecessor
 
+
 print("\n=== Successor and Predecessor ===")
 print(f"Successor of 40: {find_successor(bst.root, 40)}")
 print(f"Predecessor of 40: {find_predecessor(bst.root, 40)}")
@@ -436,6 +451,7 @@ print(f"Predecessor of 40: {find_predecessor(bst.root, 40)}")
 # =============================================================================
 # 7. TWO SUM IN BST
 # =============================================================================
+
 
 def two_sum_bst(root, target):
     """Find two elements that sum to target. O(n)"""
@@ -462,6 +478,7 @@ def two_sum_bst(root, target):
             right -= 1
     return None
 
+
 print("\n=== Two Sum in BST ===")
 result = two_sum_bst(bst.root, 90)
 print(f"Two elements summing to 90: {result}")
@@ -471,11 +488,12 @@ print(f"Two elements summing to 90: {result}")
 # 8. BST FROM PREORDER
 # =============================================================================
 
+
 def bst_from_preorder(preorder):
     """Construct BST from preorder traversal. O(n)"""
     index = [0]
 
-    def helper(lower=float('-inf'), upper=float('inf')):
+    def helper(lower=float("-inf"), upper=float("inf")):
         if index[0] == len(preorder):
             return None
 
@@ -491,6 +509,7 @@ def bst_from_preorder(preorder):
 
     return helper()
 
+
 print("\n=== BST from Preorder ===")
 preorder = [10, 5, 1, 7, 40, 50]
 new_root = bst_from_preorder(preorder)
@@ -500,6 +519,7 @@ print(f"Preorder {preorder}: {inorder_list(new_root)}")
 # =============================================================================
 # 9. FLATTEN BST TO SORTED ARRAY
 # =============================================================================
+
 
 def flatten_bst(root):
     """Flatten BST to sorted linked list in-place. O(n)"""

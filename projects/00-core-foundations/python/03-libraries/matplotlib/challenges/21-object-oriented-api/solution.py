@@ -6,7 +6,8 @@ Challenge 21: The Object-Oriented API — Reference Solution
 from __future__ import annotations
 
 import matplotlib
-matplotlib.use("Agg")   # MUST precede pyplot import: headless tests
+
+matplotlib.use("Agg")  # MUST precede pyplot import: headless tests
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -35,8 +36,7 @@ def mosaic_layout() -> dict[str, plt.Axes]:
     the returned dict is keyed by name — no (row, col) arithmetic.
     """
     fig, axd = plt.subplot_mosaic(
-        [["loss", "loss"],
-         ["grad", "hist"]],
+        [["loss", "loss"], ["grad", "hist"]],
         figsize=(8, 5),
         width_ratios=(2, 1),
     )
@@ -60,10 +60,7 @@ def shared_x_propagates() -> bool:
     ax1.plot(x, np.cos(x))
     ax2.plot(x, np.sin(x))
     ax1.set_xlim(2, 8)
-    same_limits = all(
-        abs(a - b) < 1e-9
-        for a, b in zip(ax2.get_xlim(), ax1.get_xlim())
-    )
+    same_limits = all(abs(a - b) < 1e-9 for a, b in zip(ax2.get_xlim(), ax1.get_xlim()))
     joined = ax1.get_shared_x_axes().joined(ax1, ax2)
     plt.close(fig)
     return bool(same_limits and joined)

@@ -38,7 +38,11 @@ async def homepage(request: Request):
     try:
         return templates.TemplateResponse(
             "home.html",
-            {"request": request, "title": "Welcome to My Site", "content": "This is the homepage content."}
+            {
+                "request": request,
+                "title": "Welcome to My Site",
+                "content": "This is the homepage content.",
+            },
         )
     except Exception:
         return HTMLResponse(
@@ -52,7 +56,11 @@ async def about(request: Request):
     try:
         return templates.TemplateResponse(
             "about.html",
-            {"request": request, "title": "About Us", "content": "We are learning FastAPI templates!"}
+            {
+                "request": request,
+                "title": "About Us",
+                "content": "We are learning FastAPI templates!",
+            },
         )
     except Exception:
         return HTMLResponse(
@@ -80,16 +88,11 @@ users = [
 async def list_users(request: Request):
     try:
         return templates2.TemplateResponse(
-            "users.html",
-            {"request": request, "users": users, "total": len(users)}
+            "users.html", {"request": request, "users": users, "total": len(users)}
         )
     except Exception:
-        user_list = "".join(
-            f"<li>{u['name']} - {u['email']}</li>" for u in users
-        )
-        return HTMLResponse(
-            f"<h1>Users ({len(users)})</h1><ul>{user_list}</ul>"
-        )
+        user_list = "".join(f"<li>{u['name']} - {u['email']}</li>" for u in users)
+        return HTMLResponse(f"<h1>Users ({len(users)})</h1><ul>{user_list}</ul>")
 
 
 @app2.get("/users/{user_id}", response_class=HTMLResponse)
@@ -100,19 +103,14 @@ async def get_user(request: Request, user_id: int):
             return templates2.TemplateResponse(
                 "404.html",
                 {"request": request, "message": f"User {user_id} not found"},
-                status_code=404
+                status_code=404,
             )
         except Exception:
             return HTMLResponse(f"<h1>404 - User {user_id} not found</h1>", status_code=404)
     try:
-        return templates2.TemplateResponse(
-            "user.html",
-            {"request": request, "user": user}
-        )
+        return templates2.TemplateResponse("user.html", {"request": request, "user": user})
     except Exception:
-        return HTMLResponse(
-            f"<h1>{user['name']}</h1><p>Email: {user['email']}</p>"
-        )
+        return HTMLResponse(f"<h1>{user['name']}</h1><p>Email: {user['email']}</p>")
 
 
 # =============================================================================
@@ -129,10 +127,7 @@ messages: List[dict] = []
 @app3.get("/contact", response_class=HTMLResponse)
 async def contact_form(request: Request):
     try:
-        return templates3.TemplateResponse(
-            "contact.html",
-            {"request": request}
-        )
+        return templates3.TemplateResponse("contact.html", {"request": request})
     except Exception:
         return HTMLResponse("""
         <h1>Contact Us</h1>
@@ -156,8 +151,7 @@ async def submit_contact(
     messages.append(msg)
     try:
         return templates3.TemplateResponse(
-            "success.html",
-            {"request": request, "name": name, "email": email}
+            "success.html", {"request": request, "name": name, "email": email}
         )
     except Exception:
         return HTMLResponse(f"""
@@ -171,14 +165,17 @@ async def submit_contact(
 async def list_messages(request: Request):
     try:
         return templates3.TemplateResponse(
-            "messages.html",
-            {"request": request, "messages": messages}
+            "messages.html", {"request": request, "messages": messages}
         )
     except Exception:
-        msg_list = "".join(
-            f"<li><strong>{m['name']}</strong> ({m['email']}): {m['message']}</li>"
-            for m in messages
-        ) if messages else "<li>No messages yet.</li>"
+        msg_list = (
+            "".join(
+                f"<li><strong>{m['name']}</strong> ({m['email']}): {m['message']}</li>"
+                for m in messages
+            )
+            if messages
+            else "<li>No messages yet.</li>"
+        )
         return HTMLResponse(f"<h1>Messages</h1><ul>{msg_list}</ul>")
 
 

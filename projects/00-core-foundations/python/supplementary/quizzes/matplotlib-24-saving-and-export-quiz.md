@@ -27,6 +27,7 @@ print(6 * 150, 4 * 150)
 **E3 (code-output).** What prints?
 ```python
 import struct
+
 with open("fig.png", "rb") as fh:
     head = fh.read(8)
 print(head[:4] == b"\x89PNG")
@@ -47,6 +48,7 @@ print(head[:4] == b"\x89PNG")
 **E5 (code-output).** What prints?
 ```python
 import struct
+
 with open("fig.png", "rb") as fh:
     data = fh.read(33)
 w, h = struct.unpack(">II", data[16:24])
@@ -157,11 +159,15 @@ print("<svg" in head)
 **H1 (code-output).** What prints?
 ```python
 import struct
+
+
 def dims(path):
     with open(path, "rb") as fh:
         data = fh.read(33)
     assert data[:8] == b"\x89PNG\r\n\x1a\n"
     return struct.unpack(">II", data[16:24])
+
+
 fig.savefig("loose.png", dpi=100)
 fig.savefig("tight.png", dpi=100, bbox_inches="tight")
 wl, hl = dims("loose.png")

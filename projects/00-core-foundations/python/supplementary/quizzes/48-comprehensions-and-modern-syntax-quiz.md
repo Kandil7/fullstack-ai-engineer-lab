@@ -132,6 +132,7 @@ D) Returns an empty list
 def train(model, /, *, epochs: int):
     return f"{model}:{epochs}"
 
+
 print(train("bert", epochs=3))
 ```
 
@@ -182,6 +183,7 @@ D) Error
 **What is the output of this code?**
 ```python
 import itertools
+
 deltas = [b - a for a, b in itertools.pairwise([1, 4, 9])]
 print(deltas)
 ```

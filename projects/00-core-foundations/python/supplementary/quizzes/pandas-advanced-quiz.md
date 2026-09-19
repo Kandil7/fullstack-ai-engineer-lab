@@ -24,8 +24,8 @@ D) An index with duplicate values
 **Explanation:** MultiIndex allows hierarchical (multi-level) indexing, enabling you to work with higher-dimensional data in a 2D DataFrame. It's like having multiple index columns.
 
 ```python
-arrays = [['bar', 'bar', 'baz'], ['one', 'two', 'one']]
-index = pd.MultiIndex.from_arrays(arrays, names=['first', 'second'])
+arrays = [["bar", "bar", "baz"], ["one", "two", "one"]]
+index = pd.MultiIndex.from_arrays(arrays, names=["first", "second"])
 ```
 
 ---
@@ -68,8 +68,8 @@ D) `rolling()` groups by time periods
 **Explanation:** `resample()` aggregates data over fixed time periods (e.g., monthly averages). `rolling()` creates sliding window calculations (e.g., 7-day moving average).
 
 ```python
-df.resample('M').mean()      # Monthly averages
-df['price'].rolling(7).mean()  # 7-day moving average
+df.resample("M").mean()  # Monthly averages
+df["price"].rolling(7).mean()  # 7-day moving average
 ```
 
 ---
@@ -87,10 +87,11 @@ D) Creates a data pipeline
 
 ```python
 def add_mean(df, col):
-    df[f'{col}_mean'] = df[col].mean()
+    df[f"{col}_mean"] = df[col].mean()
     return df
 
-df.pipe(add_mean, 'price').pipe(add_mean, 'quantity')
+
+df.pipe(add_mean, "price").pipe(add_mean, "quantity")
 ```
 
 ---
@@ -120,7 +121,7 @@ D) Removes rows
 **Explanation:** `pd.cut()` bins continuous values into discrete intervals (like a histogram). Useful for creating categorical variables from numeric data.
 
 ```python
-pd.cut(df['age'], bins=[0, 18, 35, 60, 100], labels=['child', 'young', 'middle', 'senior'])
+pd.cut(df["age"], bins=[0, 18, 35, 60, 100], labels=["child", "young", "middle", "senior"])
 ```
 
 ---
@@ -150,10 +151,7 @@ D) Only sum values
 **Explanation:** `agg()` (or `aggregate()`) allows you to apply different functions to different columns in one call, making it more flexible than `apply()` for mixed aggregations.
 
 ```python
-df.groupby('department').agg({
-    'salary': ['mean', 'max'],
-    'name': 'count'
-})
+df.groupby("department").agg({"salary": ["mean", "max"], "name": "count"})
 ```
 
 ---
@@ -170,7 +168,7 @@ D) Evaluating model performance
 **Explanation:** `pd.eval()` evaluates string expressions efficiently using NumPy under the hood. It's faster than equivalent Python operations for large DataFrames and uses less memory.
 
 ```python
-pd.eval('df.a + df.b * df.c')
+pd.eval("df.a + df.b * df.c")
 ```
 
 ---
@@ -278,7 +276,7 @@ D) Multiplies DataFrames
 **Explanation:** `from_product()` creates a MultiIndex from the Cartesian product of all input iterables. This is useful for creating all combinations of index levels.
 
 ```python
-pd.MultiIndex.from_product([['A', 'B'], [1, 2, 3]], names=['letter', 'number'])
+pd.MultiIndex.from_product([["A", "B"], [1, 2, 3]], names=["letter", "number"])
 # Creates: (A,1), (A,2), (A,3), (B,1), (B,2), (B,3)
 ```
 

@@ -34,8 +34,10 @@ from fastapi import FastAPI, BackgroundTasks
 
 app = FastAPI()
 
+
 def send_email(email: str, subject: str):
     print(f"Sending {subject} to {email}")
+
 
 @app.post("/register/")
 async def register(background_tasks: BackgroundTasks):
@@ -55,10 +57,12 @@ async def register(background_tasks: BackgroundTasks):
 ```python
 import asyncio
 
+
 async def fetch_data(url: str):
     """Async background task"""
     await asyncio.sleep(2)  # Simulate network call
     return {"status": "fetched"}
+
 
 @app.post("/fetch/")
 async def trigger_fetch(background_tasks: BackgroundTasks):
@@ -78,9 +82,11 @@ async def trigger_fetch(background_tasks: BackgroundTasks):
 ```python
 from fastapi import BackgroundTasks
 
+
 def process_data(data: dict):
     # Heavy processing here
     pass
+
 
 @app.post("/process/")
 async def process(background_tasks: BackgroundTasks):
@@ -101,11 +107,8 @@ async def process(background_tasks: BackgroundTasks):
 # Celery configuration with Redis broker
 from celery import Celery
 
-celery_app = Celery(
-    "tasks",
-    broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/0"
-)
+celery_app = Celery("tasks", broker="redis://localhost:6379/0", backend="redis://localhost:6379/0")
+
 
 @celery_app.task
 def send_email(email: str):
@@ -125,8 +128,10 @@ def send_email(email: str):
 def on_success(result):
     print(f"Task succeeded: {result}")
 
+
 def on_failure(error):
     print(f"Task failed: {error}")
+
 
 def long_running_task(callback_success, callback_error):
     try:
@@ -135,13 +140,10 @@ def long_running_task(callback_success, callback_error):
     except Exception as e:
         callback_error(e)
 
+
 @app.post("/task/")
 async def run_task(background_tasks: BackgroundTasks):
-    background_tasks.add_task(
-        long_running_task,
-        on_success,
-        on_failure
-    )
+    background_tasks.add_task(long_running_task, on_success, on_failure)
     return {"message": "Task started"}
 ```
 
@@ -159,12 +161,15 @@ def step_one():
     print("Step 1: Validate")
     return True
 
+
 def step_two():
     print("Step 2: Process")
     return True
 
+
 def step_three():
     print("Step 3: Notify")
+
 
 @app.post("/pipeline/")
 async def run_pipeline(background_tasks: BackgroundTasks):
@@ -189,6 +194,7 @@ from celery import Celery
 
 app_celery = Celery("worker", broker="redis://localhost")
 
+
 @app_celery.task(bind=True, max_retries=3)
 def process_payment(self, payment_id: int):
     try:
@@ -196,6 +202,7 @@ def process_payment(self, payment_id: int):
         pass
     except Exception as exc:
         self.retry(exc=exc, countdown=60)
+
 
 # In FastAPI
 @app.post("/pay/")
@@ -220,11 +227,9 @@ async def fetch_user_data(user_id: int):
         response = await client.get(f"https://api/users/{user_id}")
         return response.json()
 
+
 @app.post("/enrich/")
-async def enrich_user(
-    user_id: int,
-    background_tasks: BackgroundTasks
-):
+async def enrich_user(user_id: int, background_tasks: BackgroundTasks):
     # Pass coroutine to background task
     background_tasks.add_task(fetch_user_data, user_id)
     return {"message": "Enrichment queued"}
@@ -262,6 +267,7 @@ celery_app.conf.update(
 ```python
 from fastapi import BackgroundTasks
 
+
 # BackgroundTasks is automatically injected
 @app.post("/task/")
 async def run_task(background_tasks: BackgroundTasks):
@@ -269,9 +275,11 @@ async def run_task(background_tasks: BackgroundTasks):
     background_tasks.add_task(my_function)
     return {"status": "ok"}
 
+
 # Can also use in sub-dependencies
 def get_task_runner(background_tasks: BackgroundTasks):
     return background_tasks
+
 
 @app.post("/subtask/")
 async def subtask(runner: BackgroundTasks = Depends(get_task_runner)):
@@ -310,6 +318,7 @@ async def demo_order(background_tasks: BackgroundTasks):
 import asyncio
 from functools import wraps
 
+
 def retry_with_backoff(max_retries=3, base_delay=1):
     def decorator(func):
         @wraps(func)
@@ -320,10 +329,13 @@ def retry_with_backoff(max_retries=3, base_delay=1):
                 except Exception as e:
                     if attempt == max_retries - 1:
                         raise
-                    delay = base_delay * (2 ** attempt)
+                    delay = base_delay * (2**attempt)
                     await asyncio.sleep(delay)
+
         return wrapper
+
     return decorator
+
 
 @retry_with_backoff(max_retries=3)
 async def unreliable_api_call():
@@ -344,9 +356,9 @@ async def unreliable_api_call():
 @app.post("/fifo/")
 async def fifo_demo(background_tasks: BackgroundTasks):
     # Tasks processed in order added
-    background_tasks.add_task(first)   # Executes 1st
+    background_tasks.add_task(first)  # Executes 1st
     background_tasks.add_task(second)  # Executes 2nd
-    background_tasks.add_task(third)   # Executes 3rd
+    background_tasks.add_task(third)  # Executes 3rd
     return {"message": "FIFO order"}
 ```
 
@@ -366,10 +378,12 @@ async def fetch_external_data(url: str):
         response = await client.get(url)
         return response.json()
 
+
 async def read_file(path: str):
     """I/O bound - waits for disk"""
     async with aiofiles.open(path) as f:
         return await f.read()
+
 
 @app.post("/io/")
 async def io_task(background_tasks: BackgroundTasks):
@@ -391,6 +405,7 @@ import logging
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
+
 
 def monitored_task(task_id: str):
     start_time = datetime.now()
@@ -416,15 +431,18 @@ def monitored_task(task_id: str):
 ```python
 import asyncio
 
+
 async def non_blocking_task():
     """This is non-blocking"""
     await asyncio.sleep(10)  # Other tasks can run during this
     print("Done")
 
+
 async def blocking_task():
     """This blocks the event loop"""
     time.sleep(10)  # Nothing else can run!
     print("Done")
+
 
 # Use non-blocking in background tasks
 @app.post("/async/")
@@ -467,6 +485,7 @@ async def add_to_queue(background_tasks: BackgroundTasks):
 ```python
 import asyncio
 
+
 async def send_webhook(url: str, data: dict, max_retries: int = 3):
     for attempt in range(max_retries):
         try:
@@ -476,18 +495,15 @@ async def send_webhook(url: str, data: dict, max_retries: int = 3):
                 return {"success": True}
         except Exception as e:
             if attempt < max_retries - 1:
-                delay = 2 ** attempt  # Exponential backoff
+                delay = 2**attempt  # Exponential backoff
                 await asyncio.sleep(delay)
             else:
                 raise
 
+
 @app.post("/webhook/")
 async def trigger_webhook(background_tasks: BackgroundTasks):
-    background_tasks.add_task(
-        send_webhook,
-        "https://hooks.example.com",
-        {"event": "user.created"}
-    )
+    background_tasks.add_task(send_webhook, "https://hooks.example.com", {"event": "user.created"})
     return {"message": "Webhook queued"}
 ```
 
@@ -507,12 +523,14 @@ from celery import Celery
 celery_app = Celery(
     "tasks",
     broker="redis://localhost",
-    backend="redis://localhost"  # Result backend
+    backend="redis://localhost",  # Result backend
 )
+
 
 @celery_app.task
 def compute(x, y):
     return x + y
+
 
 # In FastAPI
 @app.get("/compute/")
@@ -535,11 +553,14 @@ async def compute_endpoint(background_tasks: BackgroundTasks):
 def validate(data: dict) -> dict:
     return {"valid": True, "data": data}
 
+
 def process(validated: dict) -> dict:
     return {"processed": True, "id": 123}
 
+
 def notify(result: dict):
     print(f"Notifying about result: {result}")
+
 
 @app.post("/chain/")
 async def run_chain(background_tasks: BackgroundTasks):
@@ -564,18 +585,20 @@ import uuid
 # In-memory task storage
 task_storage = {}
 
+
 @app.post("/task/")
 async def create_task(background_tasks: BackgroundTasks):
     task_id = str(uuid.uuid4())
     task_storage[task_id] = {"status": "queued"}
-    
+
     def run_task(tid: str):
         task_storage[tid] = {"status": "running"}
         # Do work...
         task_storage[tid] = {"status": "completed"}
-    
+
     background_tasks.add_task(run_task, task_id)
     return {"task_id": task_id}
+
 
 @app.get("/task/{task_id}")
 async def get_task_status(task_id: str):
@@ -629,6 +652,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+
 def process_order(order_id: int):
     """Background task with logging and error handling"""
     start_time = datetime.now()
@@ -636,23 +660,21 @@ def process_order(order_id: int):
         logger.info(f"Processing order {order_id}")
         # Simulate processing
         import time
+
         time.sleep(2)
         duration = (datetime.now() - start_time).total_seconds()
         logger.info(f"Order {order_id} processed in {duration}s")
     except Exception as e:
         logger.error(f"Order {order_id} failed: {e}")
 
+
 @app.post("/orders/")
 async def create_order(background_tasks: BackgroundTasks):
     order_id = 12345
-    
+
     background_tasks.add_task(process_order, order_id)
-    
-    return {
-        "message": "Order received",
-        "order_id": order_id,
-        "status": "processing"
-    }
+
+    return {"message": "Order received", "order_id": order_id, "status": "processing"}
 ```
 
 ### Error Handling Pattern
@@ -663,20 +685,25 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def safe_background_task(func):
     """Decorator for safe background task execution"""
+
     async def wrapper(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
         except Exception as e:
             logger.error(f"Background task {func.__name__} failed: {e}")
             # Could store error, send alert, etc.
+
     return wrapper
+
 
 @safe_background_task
 async def risky_operation(data: dict):
     # Task that might fail
     pass
+
 
 @app.post("/safe/")
 async def safe_endpoint(background_tasks: BackgroundTasks):
@@ -690,6 +717,7 @@ async def safe_endpoint(background_tasks: BackgroundTasks):
 import httpx
 from fastapi import BackgroundTasks
 
+
 async def send_webhook(url: str, payload: dict):
     """Send webhook in background"""
     async with httpx.AsyncClient() as client:
@@ -700,16 +728,13 @@ async def send_webhook(url: str, payload: dict):
         except httpx.HTTPError as e:
             logger.error(f"Webhook failed: {e}")
 
+
 @app.post("/event/")
 async def trigger_event(background_tasks: BackgroundTasks):
     event = {"type": "user.created", "user_id": 123}
-    
-    background_tasks.add_task(
-        send_webhook,
-        "https://hooks.slack.com/xxx",
-        event
-    )
-    
+
+    background_tasks.add_task(send_webhook, "https://hooks.slack.com/xxx", event)
+
     return {"message": "Event triggered"}
 ```
 
@@ -722,14 +747,15 @@ async def trigger_event(background_tasks: BackgroundTasks):
 ```python
 from fastapi import BackgroundTasks
 
+
 # Inject into endpoint
 async def endpoint(background_tasks: BackgroundTasks):
     # Add synchronous task
     background_tasks.add_task(sync_func, arg1, arg2)
-    
+
     # Add async task
     background_tasks.add_task(async_func, arg1, arg2)
-    
+
     # Add method
     background_tasks.add_task(service.method, arg1)
 ```
@@ -741,9 +767,11 @@ from celery import Celery
 
 celery = Celery("tasks", broker="redis://localhost")
 
+
 @celery.task
 def my_task(arg):
     pass
+
 
 # In FastAPI
 async def endpoint(background_tasks: BackgroundTasks):
@@ -756,6 +784,7 @@ async def endpoint(background_tasks: BackgroundTasks):
 # 1. Simple fire-and-forget
 background_tasks.add_task(send_email, email)
 
+
 # 2. With error handling
 def safe_task():
     try:
@@ -763,12 +792,15 @@ def safe_task():
     except Exception as e:
         logger.error(e)
 
+
 background_tasks.add_task(safe_task)
+
 
 # 3. Async with httpx
 async def fetch_data(url: str):
     async with httpx.AsyncClient() as client:
         return await client.get(url)
+
 
 background_tasks.add_task(fetch_data, "https://api.example.com")
 ```

@@ -28,15 +28,13 @@ def save_user(session: Session, name: str) -> int:
     """Create and COMMIT a user; return the new primary key."""
     user = User(name=name)
     session.add(user)
-    session.commit()      # flush + COMMIT: the transaction ends here
-    return user.id        # PK survives expiry — no refresh needed
+    session.commit()  # flush + COMMIT: the transaction ends here
+    return user.id  # PK survives expiry — no refresh needed
 
 
 def get_or_create(session: Session, name: str) -> tuple[User, bool]:
     """Return (user, created); existing rows come back from the identity map."""
-    user = session.scalars(
-        select(User).where(User.name == name)
-    ).first()
+    user = session.scalars(select(User).where(User.name == name)).first()
     if user is not None:
         return user, False
     user = User(name=name)
@@ -50,7 +48,7 @@ def guarded_commit(session: Session, name: str, fail: bool) -> int | None:
     user = User(name=name)
     session.add(user)
     if fail:
-        session.rollback()   # pending INSERT is discarded, not committed
+        session.rollback()  # pending INSERT is discarded, not committed
         return None
     session.commit()
     return user.id

@@ -52,11 +52,8 @@ Indexing (HNSW parameters)
 def embed_batch(texts: list[str], batch_size: int = 100) -> list[list[float]]:
     embeddings = []
     for i in range(0, len(texts), batch_size):
-        batch = texts[i:i+batch_size]
-        response = openai.embeddings.create(
-            model="text-embedding-3-small",
-            input=batch
-        )
+        batch = texts[i : i + batch_size]
+        response = openai.embeddings.create(model="text-embedding-3-small", input=batch)
         embeddings.extend([item.embedding for item in response.data])
     return embeddings
 ```
@@ -119,8 +116,8 @@ Create golden pairs:
 # Evaluation example
 test_pairs = [
     ("ما هو العدد الأولي؟", "What is a prime number?", 0.9),  # Should be similar
-    ("النسبة المئوية", "Percentage", 0.85),                    # Should be similar
-    ("النسبة المئوية", "Physics", 0.3),                       # Should be different
+    ("النسبة المئوية", "Percentage", 0.85),  # Should be similar
+    ("النسبة المئوية", "Physics", 0.3),  # Should be different
 ]
 ```
 

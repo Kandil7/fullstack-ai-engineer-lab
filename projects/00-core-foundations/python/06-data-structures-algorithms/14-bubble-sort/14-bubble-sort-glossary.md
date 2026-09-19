@@ -103,6 +103,7 @@ def bubble_sort(arr):
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
     return arr
 
+
 # Optimized with Early Termination
 def bubble_sort_optimized(arr):
     n = len(arr)
@@ -116,6 +117,7 @@ def bubble_sort_optimized(arr):
             break
     return arr
 
+
 # Count Inversions (related to swap count)
 def count_inversions(arr):
     """Number of swaps needed equals number of inversions."""
@@ -126,6 +128,7 @@ def count_inversions(arr):
             if arr[i] > arr[j]:
                 inversions += 1
     return inversions
+
 
 # Stable Sort Demonstration
 def bubble_sort_stable(data, key):

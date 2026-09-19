@@ -35,8 +35,7 @@ def query_above(conn, threshold: float) -> list[tuple[int, str, float]]:
     text() + bound parameter: the DB filters, Python only consumes.
     """
     stmt = text(
-        "SELECT id, metric, value FROM metrics "
-        "WHERE value > :threshold ORDER BY value DESC"
+        "SELECT id, metric, value FROM metrics WHERE value > :threshold ORDER BY value DESC"
     )
     return [(row[0], row[1], row[2]) for row in conn.execute(stmt, {"threshold": threshold})]
 

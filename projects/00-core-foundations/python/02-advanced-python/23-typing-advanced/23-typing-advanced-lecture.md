@@ -40,17 +40,20 @@ Nominal typing says "you are a `Retriever` because you inherit from it." **Struc
 ```python
 from typing import Protocol
 
+
 class Retriever(Protocol):
-    def retrieve(self, query: str, k: int = 5) -> list[str]:
-        ...
+    def retrieve(self, query: str, k: int = 5) -> list[str]: ...
+
 
 class QdrantRetriever:
     def retrieve(self, query: str, k: int = 5) -> list[str]:
         return [f"qdrant:{query[:10]}-{i}" for i in range(k)]
 
+
 class ChromaRetriever:
     def retrieve(self, query: str, k: int = 5) -> list[str]:
         return [f"chroma:{query[:10]}-{i}" for i in range(k)]
+
 
 def search(retriever: Retriever, query: str, k: int) -> list[str]:
     return retriever.retrieve(query, k)
@@ -74,6 +77,7 @@ from typing import Generic, TypeVar
 
 T = TypeVar("T")
 
+
 class Result(Generic[T]):
     def __init__(self, ok: bool, value: T | None, error: str | None = None) -> None:
         self.ok = ok
@@ -87,6 +91,7 @@ class Result(Generic[T]):
     @classmethod
     def failure(cls, error: str) -> "Result[T]":
         return cls(False, None, error)
+
 
 def demo_generic() -> tuple[Result[int], Result[int]]:
     ok = Result.success(42)
@@ -110,11 +115,13 @@ A **bound** narrows what a type variable may be. `TypeVar("U", bound=float)` acc
 ```python
 Num = TypeVar("Num", bound=float)
 
+
 def scale(v: Num, factor: float) -> Num:
-    return v * factor          # type checker sees Num -> Num
+    return v * factor  # type checker sees Num -> Num
+
 
 def demo_bounds() -> tuple[int, float, str]:
-    i: int = scale(10, 1.5)     # int in -> int out
+    i: int = scale(10, 1.5)  # int in -> int out
     f: float = scale(2.5, 2.0)  # float in -> float out
     return i, f, "int 10 * 1.5 -> 15 | float 2.5 * 2.0 -> 5.0"
 ```
@@ -137,6 +144,7 @@ import functools
 
 P = ParamSpec("P")
 
+
 def retry(times: int = 3) -> Callable[[Callable[P, str]], Callable[P, str]]:
     def decorator(func: Callable[P, str]) -> Callable[P, str]:
         @functools.wraps(func)
@@ -148,8 +156,11 @@ def retry(times: int = 3) -> Callable[[Callable[P, str]], Callable[P, str]]:
                     if attempt == times:
                         raise
             return "unreachable"
+
         return wrapper
+
     return decorator
+
 
 @retry(times=3)
 def call_llm(prompt: str, temperature: float = 0.0) -> str:
@@ -173,24 +184,32 @@ from typing import Literal, TypeGuard
 
 Env = Literal["dev", "prod", "test"]
 
+
 class DocChunk:
     def __init__(self, chunk_id: int, text: str) -> None:
         self.chunk_id = chunk_id
         self.text = text
+
 
 class BadChunk:
     def __init__(self, chunk_id: int, text: str) -> None:
         self.chunk_id = chunk_id
         self.text = text
 
+
 def is_doc_chunk(obj: object) -> TypeGuard[DocChunk]:
     return hasattr(obj, "chunk_id") and hasattr(obj, "text")
+
 
 def demo_narrowing() -> tuple[str, str]:
     env: Env = "prod"
     good: object = DocChunk(1, "text")
     bad: object = BadChunk(1, "text")
-    return (env + "-valid", "chunk" if is_doc_chunk(good) else "not", "chunk" if is_doc_chunk(bad) else "not")
+    return (
+        env + "-valid",
+        "chunk" if is_doc_chunk(good) else "not",
+        "chunk" if is_doc_chunk(bad) else "not",
+    )
 ```
 
 ```
@@ -208,9 +227,11 @@ The honest caveat: `is_doc_chunk(BadChunk(1, "text"))` returns **True** because 
 ```python
 from typing import runtime_checkable
 
+
 class WrongSignatureRetriever:
-    def retrieve(self, top_k: int) -> list[str]:   # different signature entirely
+    def retrieve(self, top_k: int) -> list[str]:  # different signature entirely
         return ["x"]
+
 
 def demo_checkable() -> tuple[bool, str]:
     wrong = WrongSignatureRetriever()
@@ -231,6 +252,7 @@ Python does not evaluate annotations at function definition time (unless you opt
 
 ```python
 import inspect
+
 
 def demo_hints() -> tuple[list[str], list[str]]:
     sig = inspect.signature(search)

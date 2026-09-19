@@ -26,6 +26,7 @@ from typing import Any
 # EASY PROBLEMS (20 XP)
 # ============================================================
 
+
 # Problem 1: Environment Config Loader
 # Write a function that loads configuration from environment variables:
 # - Takes a config spec: {"MODEL_NAME": str, "MAX_TOKENS": int, "TEMPERATURE": float}
@@ -82,6 +83,7 @@ def problem_05():
 # ============================================================
 # MEDIUM PROBLEMS (50 XP)
 # ============================================================
+
 
 # Problem 6: Rate Limiter
 # Write a RateLimiter class that:
@@ -171,6 +173,7 @@ class MetricsCollector:
 # ============================================================
 # HARD PROBLEMS (100 XP)
 # ============================================================
+
 
 # Problem 11: Graceful Shutdown Handler
 # Write a GracefulShutdown class that:

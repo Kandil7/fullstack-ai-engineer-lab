@@ -31,6 +31,7 @@ runtime, not just static typing.
 ```python
 from typing import Protocol, runtime_checkable
 
+
 @runtime_checkable
 class ExperimentRepository(Protocol):
     def add(self, experiment): ...
@@ -97,9 +98,8 @@ write — the repository raises instead of silently overwriting.
 **Example**:
 ```python
 result = session.execute(
-    update(Experiment).where(
-        Experiment.id == exp.id,
-        Experiment.version == exp.version))
+    update(Experiment).where(Experiment.id == exp.id, Experiment.version == exp.version)
+)
 if result.rowcount == 0:
     raise OptimisticLockError(...)
 ```

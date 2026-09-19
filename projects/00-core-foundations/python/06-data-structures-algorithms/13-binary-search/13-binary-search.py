@@ -15,6 +15,7 @@ Prerequisites: Array must be SORTED
 # 1. BASIC BINARY SEARCH
 # =============================================================================
 
+
 def binary_search_iterative(arr, target):
     """Iterative binary search. O(log n) time, O(1) space"""
     low, high = 0, len(arr) - 1
@@ -30,6 +31,7 @@ def binary_search_iterative(arr, target):
             high = mid - 1
 
     return -1
+
 
 def binary_search_recursive(arr, target, low=0, high=None):
     """Recursive binary search. O(log n) time, O(log n) space"""
@@ -48,6 +50,7 @@ def binary_search_recursive(arr, target, low=0, high=None):
     else:
         return binary_search_recursive(arr, target, low, mid - 1)
 
+
 print("=== Basic Binary Search ===")
 arr = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]
 print(f"Array: {arr}")
@@ -63,6 +66,7 @@ print(f"Search {target}: index {binary_search_iterative(arr, target)}")
 # =============================================================================
 # 2. FIND FIRST AND LAST OCCURRENCE
 # =============================================================================
+
 
 def find_first_occurrence(arr, target):
     """Find first occurrence of target. O(log n)"""
@@ -81,6 +85,7 @@ def find_first_occurrence(arr, target):
 
     return result
 
+
 def find_last_occurrence(arr, target):
     """Find last occurrence of target. O(log n)"""
     low, high = 0, len(arr) - 1
@@ -98,6 +103,7 @@ def find_last_occurrence(arr, target):
 
     return result
 
+
 def count_occurrences(arr, target):
     """Count occurrences using first and last. O(log n)"""
     first = find_first_occurrence(arr, target)
@@ -105,6 +111,7 @@ def count_occurrences(arr, target):
         return 0
     last = find_last_occurrence(arr, target)
     return last - first + 1
+
 
 print("\n=== First and Last Occurrence ===")
 arr = [1, 2, 2, 2, 3, 3, 5, 5, 5, 5, 7]
@@ -118,6 +125,7 @@ print(f"Count of 4: {count_occurrences(arr, 4)}")
 # =============================================================================
 # 3. FIND CEILING AND FLOOR
 # =============================================================================
+
 
 def find_floor(arr, target):
     """Largest element <= target. O(log n)"""
@@ -136,6 +144,7 @@ def find_floor(arr, target):
 
     return result
 
+
 def find_ceiling(arr, target):
     """Smallest element >= target. O(log n)"""
     low, high = 0, len(arr) - 1
@@ -153,6 +162,7 @@ def find_ceiling(arr, target):
 
     return result
 
+
 print("\n=== Floor and Ceiling ===")
 arr = [2, 5, 8, 12, 16, 23, 38]
 print(f"Array: {arr}")
@@ -165,6 +175,7 @@ print(f"Ceiling of 40: {find_ceiling(arr, 40)}")
 # =============================================================================
 # 4. SEARCH IN ROTATED SORTED ARRAY
 # =============================================================================
+
 
 def search_rotated(arr, target):
     """Search in rotated sorted array. O(log n)"""
@@ -191,6 +202,7 @@ def search_rotated(arr, target):
 
     return -1
 
+
 print("\n=== Search in Rotated Array ===")
 rotated = [4, 5, 6, 7, 0, 1, 2]
 print(f"Array: {rotated}")
@@ -201,6 +213,7 @@ print(f"Search 5: {search_rotated(rotated, 5)}")
 # =============================================================================
 # 5. FIND PEAK ELEMENT
 # =============================================================================
+
 
 def find_peak_element(arr):
     """Find a peak element (greater than neighbors). O(log n)"""
@@ -216,6 +229,7 @@ def find_peak_element(arr):
 
     return low
 
+
 print("\n=== Find Peak Element ===")
 arr = [1, 3, 5, 4, 2]
 print(f"Array: {arr}")
@@ -225,6 +239,7 @@ print(f"Peak at index: {find_peak_element(arr)} (value: {arr[find_peak_element(a
 # =============================================================================
 # 6. FIND MINIMUM IN ROTATED ARRAY
 # =============================================================================
+
 
 def find_min_rotated(arr):
     """Find minimum in rotated sorted array. O(log n)"""
@@ -240,6 +255,7 @@ def find_min_rotated(arr):
 
     return low
 
+
 print("\n=== Find Minimum in Rotated Array ===")
 rotated = [4, 5, 6, 7, 0, 1, 2]
 print(f"Array: {rotated}")
@@ -250,6 +266,7 @@ print(f"Minimum at index: {min_idx} (value: {rotated[min_idx]})")
 # =============================================================================
 # 7. SQUARE ROOT using BINARY SEARCH
 # =============================================================================
+
 
 def sqrt_binary_search(n):
     """Find integer square root. O(log n)"""
@@ -269,6 +286,7 @@ def sqrt_binary_search(n):
 
     return result
 
+
 print("\n=== Square Root ===")
 for n in [0, 1, 4, 8, 16, 27, 100]:
     print(f"sqrt({n}) = {sqrt_binary_search(n)}")
@@ -277,6 +295,7 @@ for n in [0, 1, 4, 8, 16, 27, 100]:
 # =============================================================================
 # 8. SEARCH IN INFINITE SORTED ARRAY
 # =============================================================================
+
 
 def search_infinite(arr, target):
     """Search in effectively infinite sorted array"""
@@ -301,6 +320,7 @@ def search_infinite(arr, target):
 
     return -1
 
+
 print("\n=== Search in Infinite Array ===")
 arr = list(range(0, 1000, 2))  # Even numbers
 print(f"Search 500: {search_infinite(arr, 500)}")
@@ -311,8 +331,10 @@ print(f"Search 501: {search_infinite(arr, 501)}")
 # 9. BINARY SEARCH ON ANSWER
 # =============================================================================
 
+
 def split_array_largest_sum(arr, m):
     """Minimize largest sum when splitting array into m parts"""
+
     def can_split(max_sum):
         cuts = 1
         current_sum = 0
@@ -338,6 +360,7 @@ def split_array_largest_sum(arr, m):
 
     return result
 
+
 print("\n=== Binary Search on Answer ===")
 arr = [7, 2, 5, 10, 8]
 m = 2
@@ -348,6 +371,7 @@ print(f"Minimize largest sum: {split_array_largest_sum(arr, m)}")
 # =============================================================================
 # 10. MEDIAN OF TWO SORTED ARRAYS
 # =============================================================================
+
 
 def median_two_sorted(nums1, nums2):
     """Find median of two sorted arrays. O(log(min(m,n)))"""
@@ -361,23 +385,23 @@ def median_two_sorted(nums1, nums2):
         i = (low + high) // 2
         j = (m + n + 1) // 2 - i
 
-        max_left_1 = float('-inf') if i == 0 else nums1[i - 1]
-        min_right_1 = float('inf') if i == m else nums1[i]
-        max_left_2 = float('-inf') if j == 0 else nums2[j - 1]
-        min_right_2 = float('inf') if j == n else nums2[j]
+        max_left_1 = float("-inf") if i == 0 else nums1[i - 1]
+        min_right_1 = float("inf") if i == m else nums1[i]
+        max_left_2 = float("-inf") if j == 0 else nums2[j - 1]
+        min_right_2 = float("inf") if j == n else nums2[j]
 
         if max_left_1 <= min_right_2 and max_left_2 <= min_right_1:
             if (m + n) % 2 == 1:
                 return max(max_left_1, max_left_2)
             else:
-                return (max(max_left_1, max_left_2) +
-                        min(min_right_1, min_right_2)) / 2
+                return (max(max_left_1, max_left_2) + min(min_right_1, min_right_2)) / 2
         elif max_left_1 > min_right_2:
             high = i - 1
         else:
             low = i + 1
 
     return -1
+
 
 print("\n=== Median of Two Sorted Arrays ===")
 print(f"nums1=[1,3], nums2=[2]: {median_two_sorted([1, 3], [2])}")
@@ -387,6 +411,7 @@ print(f"nums1=[1,2], nums2=[3,4]: {median_two_sorted([1, 2], [3, 4])}")
 # =============================================================================
 # 11. NEXT LETTER (CEILING)
 # =============================================================================
+
 
 def next_letter(arr, target):
     """Find smallest letter greater than target. O(log n)"""
@@ -405,15 +430,17 @@ def next_letter(arr, target):
 
     return arr[low % len(arr)]
 
+
 print("\n=== Next Letter ===")
-letters = ['a', 'c', 'f', 'h']
-for target in ['b', 'f', 'h', 'z']:
+letters = ["a", "c", "f", "h"]
+for target in ["b", "f", "h", "z"]:
     print(f"Next letter after '{target}': '{next_letter(letters, target)}'")
 
 
 # =============================================================================
 # 12. SEARCH MATRIX
 # =============================================================================
+
 
 def search_matrix(matrix, target):
     """Search in row-sorted, col-sorted matrix. O(log(m*n))"""
@@ -436,12 +463,9 @@ def search_matrix(matrix, target):
 
     return False
 
+
 print("\n=== Search Matrix ===")
-matrix = [
-    [1, 3, 5, 7],
-    [10, 11, 16, 20],
-    [23, 30, 34, 60]
-]
+matrix = [[1, 3, 5, 7], [10, 11, 16, 20], [23, 30, 34, 60]]
 print(f"Search 3: {search_matrix(matrix, 3)}")
 print(f"Search 13: {search_matrix(matrix, 13)}")
 

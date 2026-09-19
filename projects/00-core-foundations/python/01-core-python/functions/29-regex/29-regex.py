@@ -98,9 +98,11 @@ text = "The rain in Spain stays mainly in the plain"
 result = re.sub("ain", "AIN", text)
 print(f"Replace 'ain': {result}")
 
+
 # Replace with function
 def double_match(match):
     return match.group().upper() * 2
+
 
 result = re.sub(r"\b\w{4}\b", double_match, text)
 print(f"Double uppercase 4-letter words: {result}")
@@ -264,10 +266,12 @@ print(f"Dotall: {matches}")
 # Example 10: Real-world regex usage
 print("\n--- Practical Examples ---")
 
+
 # Validate email
 def is_valid_email(email):
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     return bool(re.match(pattern, email))
+
 
 emails = ["test@example.com", "invalid@", "@invalid.com", "valid.email+tag@domain.co"]
 for email in emails:

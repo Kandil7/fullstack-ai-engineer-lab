@@ -33,6 +33,7 @@ CSV-in-a-column violates 1NF.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 # 1NF violation: comma list of skills in one cell
 conn.execute("CREATE TABLE bad (id INTEGER PRIMARY KEY, skills TEXT)")

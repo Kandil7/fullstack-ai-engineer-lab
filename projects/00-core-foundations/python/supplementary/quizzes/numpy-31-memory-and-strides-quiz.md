@@ -81,6 +81,7 @@ D) Neither
 
 ```python
 import numpy as np
+
 a = np.arange(12).reshape(3, 4)
 print(a.T.strides)
 ```
@@ -97,6 +98,7 @@ D) `(4, 16)`
 
 ```python
 import numpy as np
+
 a = np.arange(10)
 b = a[2:5]
 b[0] = 99
@@ -125,6 +127,7 @@ D) `np.ascontiguousarray(a).base is a` for any `a`
 
 ```python
 import numpy as np
+
 a = np.arange(12).reshape(3, 4)
 print(a.reshape(4, 3).base is a)
 ```
@@ -153,6 +156,7 @@ D) It triggers garbage collection
 
 ```python
 import numpy as np
+
 a = np.zeros((1000, 1000), dtype=np.float64)
 b = a[:, 0]
 print(b.nbytes, b.base is a)
@@ -181,6 +185,7 @@ D) `np.ascontiguousarray(X)`
 
 ```python
 import numpy as np
+
 a = np.arange(6)
 print(np.shares_memory(a, a[::2]))
 ```
@@ -207,6 +212,7 @@ D) When `x` is larger than the L3 cache
 
 ```python
 import numpy as np
+
 a = np.arange(12).reshape(3, 4)
 b = a.T
 print(b.reshape(12).base is a)
@@ -259,6 +265,7 @@ D) The kernel re-checking contiguity per element
 
 ```python
 import numpy as np
+
 a = np.arange(8).reshape(2, 4)
 b = a[0:1, :]
 c = np.ascontiguousarray(a)

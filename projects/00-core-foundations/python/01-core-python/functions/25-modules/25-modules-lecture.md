@@ -30,18 +30,21 @@ def greet(name):
     """Greet someone by name."""
     return f"Hello, {name}!"
 
+
 def add(a, b):
     """Add two numbers."""
     return a + b
 
+
 PI = 3.14159
+
 
 class Circle:
     def __init__(self, radius):
         self.radius = radius
-    
+
     def area(self):
-        return PI * self.radius ** 2
+        return PI * self.radius**2
 ```
 
 ### 2. Importing Modules
@@ -49,10 +52,12 @@ class Circle:
 ```python
 # Import entire module
 import math
+
 print(math.sqrt(16))  # 4.0
 
 # Import specific items
 from math import sqrt, pi
+
 print(sqrt(16))  # 4.0
 print(pi)  # 3.14159...
 
@@ -71,6 +76,7 @@ from math import *
 def greet(name):
     return f"Hello, {name}!"
 
+
 # Only runs when file is executed directly
 if __name__ == "__main__":
     print(greet("World"))  # Only runs when python mymodule.py
@@ -82,37 +88,43 @@ if __name__ == "__main__":
 ```python
 # math — mathematical functions
 import math
-print(math.sqrt(25))     # 5.0
-print(math.ceil(4.3))    # 5
-print(math.floor(4.7))   # 4
-print(math.pi)           # 3.14159...
+
+print(math.sqrt(25))  # 5.0
+print(math.ceil(4.3))  # 5
+print(math.floor(4.7))  # 4
+print(math.pi)  # 3.14159...
 
 # datetime — date and time
 from datetime import datetime, date, timedelta
+
 now = datetime.now()
 print(now.strftime("%Y-%m-%d %H:%M:%S"))
 tomorrow = date.today() + timedelta(days=1)
 
 # random — random number generation
 import random
-print(random.randint(1, 10))      # Random int 1-10
+
+print(random.randint(1, 10))  # Random int 1-10
 print(random.choice(["a", "b"]))  # Random element
-print(random.random())            # Float 0.0-1.0
+print(random.random())  # Float 0.0-1.0
 
 # os — operating system interface
 import os
-print(os.getcwd())              # Current directory
-print(os.listdir("."))          # List files
+
+print(os.getcwd())  # Current directory
+print(os.listdir("."))  # List files
 os.makedirs("new_dir", exist_ok=True)
 
 # json — JSON encoding/decoding
 import json
+
 data = {"name": "Alice", "age": 30}
 json_str = json.dumps(data)
 parsed = json.loads(json_str)
 
 # re — regular expressions
 import re
+
 pattern = r"\d+"
 numbers = re.findall(pattern, "abc123def456")
 print(numbers)  # ['123', '456']
@@ -134,6 +146,7 @@ print(numbers)  # ['123', '456']
 # mypackage/__init__.py
 def init():
     print("Package initialized")
+
 
 # Importing from packages
 from mypackage import module1
@@ -189,6 +202,7 @@ pip freeze > requirements.txt
 # utils.py
 """Common utility functions."""
 
+
 def flatten(nested_list):
     """Flatten a nested list."""
     result = []
@@ -199,14 +213,17 @@ def flatten(nested_list):
             result.append(item)
     return result
 
+
 def chunk(lst, size):
     """Split list into chunks."""
-    return [lst[i:i+size] for i in range(0, len(lst), size)]
+    return [lst[i : i + size] for i in range(0, len(lst), size)]
+
 
 def unique(lst):
     """Remove duplicates preserving order."""
     seen = set()
     return [x for x in lst if not (x in seen or seen.add(x))]
+
 
 if __name__ == "__main__":
     # Test functions
@@ -223,17 +240,21 @@ if __name__ == "__main__":
 
 import os
 
+
 class Config:
     DEBUG = os.getenv("DEBUG", "False").lower() == "true"
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///db.sqlite3")
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
     API_KEY = os.getenv("API_KEY", "")
 
+
 class DevelopmentConfig(Config):
     DEBUG = True
 
+
 class ProductionConfig(Config):
     DEBUG = False
+
 
 def get_config():
     env = os.getenv("ENV", "development")
@@ -284,6 +305,7 @@ __all__ = ["main_function", "User", "Product"]
 # SOLUTION: Use lazy imports or restructure code
 def function_a():
     from b import function_b  # Import inside function
+
     return function_b()
 ```
 

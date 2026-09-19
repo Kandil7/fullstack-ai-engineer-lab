@@ -130,7 +130,7 @@ Two ways to lay out the same table in memory:
 import polars as pl
 
 df = pl.DataFrame({"score": [0.9, 0.4, 0.87, 0.12]})
-mean = df["score"].mean()          # one contiguous f64 buffer, SIMD-able
+mean = df["score"].mean()  # one contiguous f64 buffer, SIMD-able
 print(f"{mean:.3f}")
 ```
 
@@ -177,9 +177,9 @@ import polars as pl
 
 df = pl.DataFrame({"score": [0.9, 0.4, 0.87, 0.12], "split": ["a", "a", "b", "b"]})
 
-eager = df.filter(pl.col("score") > 0.5)              # runs now
-lazy = df.lazy().filter(pl.col("score") > 0.5)        # just a plan
-result = lazy.collect()                               # runs now
+eager = df.filter(pl.col("score") > 0.5)  # runs now
+lazy = df.lazy().filter(pl.col("score") > 0.5)  # just a plan
+result = lazy.collect()  # runs now
 
 print(eager.equals(result))
 ```
@@ -204,7 +204,7 @@ import polars as pl
 
 lf = pl.LazyFrame({"score": [0.9, 0.4], "split": ["a", "b"]})
 plan = lf.filter(pl.col("score") > 0.5).explain(optimized=True)
-print("FILTER" in plan)     # the optimizer kept the filter node
+print("FILTER" in plan)  # the optimizer kept the filter node
 print(lf.collect_schema().names())
 ```
 
@@ -227,8 +227,8 @@ than RAM.
 ```python
 import polars as pl
 
-lf = pl.scan_csv("events.csv")       # schema + row estimate, no data
-print(lf.collect().height)           # now the file is actually read
+lf = pl.scan_csv("events.csv")  # schema + row estimate, no data
+print(lf.collect().height)  # now the file is actually read
 ```
 
 ```text
@@ -277,7 +277,7 @@ import polars as pl
 import numpy as np
 
 df = pl.DataFrame({"x": np.arange(5.0)})
-arr = df["x"].to_numpy(allow_copy=False)   # zero-copy view when possible
+arr = df["x"].to_numpy(allow_copy=False)  # zero-copy view when possible
 print(np.shares_memory(df["x"].to_numpy(), arr))
 ```
 

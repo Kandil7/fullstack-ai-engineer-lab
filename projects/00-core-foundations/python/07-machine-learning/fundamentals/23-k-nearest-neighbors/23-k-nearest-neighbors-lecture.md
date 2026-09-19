@@ -98,14 +98,16 @@ from sklearn.preprocessing import StandardScaler
 # Generate data
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=300, n_features=2, n_redundant=0,
-    n_informative=2, random_state=42, n_clusters_per_class=1
+    n_samples=300,
+    n_features=2,
+    n_redundant=0,
+    n_informative=2,
+    random_state=42,
+    n_clusters_per_class=1,
 )
 
 # Split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Scale features (IMPORTANT for KNN!)
 scaler = StandardScaler()
@@ -134,8 +136,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 np.random.seed(42)
-X, y = make_classification(n_samples=300, n_features=2, 
-                           n_redundant=0, random_state=42)
+X, y = make_classification(n_samples=300, n_features=2, n_redundant=0, random_state=42)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -149,22 +150,22 @@ for k in range(1, 21):
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(X_train_scaled, y_train)
     acc = accuracy_score(y_test, knn.predict(X_test_scaled))
-    results.append({'k': k, 'accuracy': acc})
+    results.append({"k": k, "accuracy": acc})
 
 # Find best K
-best = max(results, key=lambda x: x['accuracy'])
+best = max(results, key=lambda x: x["accuracy"])
 print(f"Best K: {best['k']} (Accuracy: {best['accuracy']:.4f})")
 
 # Plot
 plt.figure(figsize=(8, 4))
-plt.plot([r['k'] for r in results], [r['accuracy'] for r in results], 'bo-')
-plt.axvline(x=best['k'], color='r', linestyle='--', label=f"Best K={best['k']}")
-plt.xlabel('K')
-plt.ylabel('Accuracy')
-plt.title('KNN: Accuracy vs K')
+plt.plot([r["k"] for r in results], [r["accuracy"] for r in results], "bo-")
+plt.axvline(x=best["k"], color="r", linestyle="--", label=f"Best K={best['k']}")
+plt.xlabel("K")
+plt.ylabel("Accuracy")
+plt.title("KNN: Accuracy vs K")
 plt.legend()
 plt.grid(True, alpha=0.3)
-plt.savefig('knn_k_selection.png', dpi=100)
+plt.savefig("knn_k_selection.png", dpi=100)
 plt.show()
 ```
 
@@ -179,8 +180,7 @@ from sklearn.datasets import make_classification
 import numpy as np
 
 np.random.seed(42)
-X, y = make_classification(n_samples=300, n_features=2, 
-                           n_redundant=0, random_state=42)
+X, y = make_classification(n_samples=300, n_features=2, n_redundant=0, random_state=42)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -189,7 +189,7 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # Test different metrics
-metrics = ['euclidean', 'manhattan', 'chebyshev', 'minkowski']
+metrics = ["euclidean", "manhattan", "chebyshev", "minkowski"]
 print("Distance Metric Comparison:")
 print("-" * 35)
 
@@ -238,8 +238,7 @@ from sklearn.datasets import make_classification
 import numpy as np
 
 np.random.seed(42)
-X, y = make_classification(n_samples=300, n_features=2, 
-                           n_redundant=0, random_state=42)
+X, y = make_classification(n_samples=300, n_features=2, n_redundant=0, random_state=42)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -248,12 +247,12 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # Uniform weights (default)
-knn_uniform = KNeighborsClassifier(n_neighbors=5, weights='uniform')
+knn_uniform = KNeighborsClassifier(n_neighbors=5, weights="uniform")
 knn_uniform.fit(X_train_scaled, y_train)
 acc_uniform = accuracy_score(y_test, knn_uniform.predict(X_test_scaled))
 
 # Distance weights
-knn_distance = KNeighborsClassifier(n_neighbors=5, weights='distance')
+knn_distance = KNeighborsClassifier(n_neighbors=5, weights="distance")
 knn_distance.fit(X_train_scaled, y_train)
 acc_distance = accuracy_score(y_test, knn_distance.predict(X_test_scaled))
 
@@ -296,6 +295,7 @@ knn_unscaled.fit(X_train, y_train)  # Bad results
 
 # CORRECT: Always scale for KNN
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
@@ -340,10 +340,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('knn', KNeighborsClassifier(n_neighbors=5))
-])
+pipeline = Pipeline([("scaler", StandardScaler()), ("knn", KNeighborsClassifier(n_neighbors=5))])
 
 pipeline.fit(X_train, y_train)
 ```
@@ -359,7 +356,7 @@ knn = KNeighborsClassifier(n_neighbors=5)  # Odd
 
 ```python
 # Distance weights give closer neighbors more influence
-knn = KNeighborsClassifier(n_neighbors=5, weights='distance')
+knn = KNeighborsClassifier(n_neighbors=5, weights="distance")
 ```
 
 ### 4. Tune K with Cross-Validation
@@ -370,14 +367,11 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('knn', KNeighborsClassifier())
-])
+pipeline = Pipeline([("scaler", StandardScaler()), ("knn", KNeighborsClassifier())])
 
 for k in range(1, 11):
     pipeline.set_params(knn__n_neighbors=k)
-    scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
     print(f"K={k:2d}: {scores.mean():.4f}")
 ```
 
@@ -395,6 +389,7 @@ Find the optimal K value for KNN.
 3. Plot results
 4. Choose best K
 """
+
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.pipeline import Pipeline
@@ -402,34 +397,30 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.datasets import make_classification
 import matplotlib.pyplot as plt
 
-X, y = make_classification(n_samples=300, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=300, n_features=10, n_informative=5, random_state=42)
 
 # Your code here
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('knn', KNeighborsClassifier())
-])
+pipeline = Pipeline([("scaler", StandardScaler()), ("knn", KNeighborsClassifier())])
 
 k_range = range(1, 21)
 scores = []
 
 for k in k_range:
     pipeline.set_params(knn__n_neighbors=k)
-    cv_scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+    cv_scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
     scores.append(cv_scores.mean())
 
 best_k = list(k_range)[np.argmax(scores)]
 print(f"Best K: {best_k}")
 
 plt.figure(figsize=(8, 4))
-plt.plot(k_range, scores, 'bo-')
-plt.axvline(x=best_k, color='r', linestyle='--')
-plt.xlabel('K')
-plt.ylabel('CV Accuracy')
-plt.title('KNN: K Selection')
+plt.plot(k_range, scores, "bo-")
+plt.axvline(x=best_k, color="r", linestyle="--")
+plt.xlabel("K")
+plt.ylabel("CV Accuracy")
+plt.title("KNN: K Selection")
 plt.grid(True)
-plt.savefig('knn_optimal_k.png', dpi=100)
+plt.savefig("knn_optimal_k.png", dpi=100)
 plt.show()
 ```
 
@@ -443,24 +434,23 @@ Compare different distance metrics for KNN.
 3. Compare accuracy
 4. Recommend best metric
 """
+
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 from sklearn.datasets import make_classification
 
-X, y = make_classification(n_samples=300, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=300, n_features=10, n_informative=5, random_state=42)
 
 # Your code here
-metrics = ['euclidean', 'manhattan', 'chebyshev', 'minkowski']
+metrics = ["euclidean", "manhattan", "chebyshev", "minkowski"]
 
 for metric in metrics:
-    pipeline = Pipeline([
-        ('scaler', StandardScaler()),
-        ('knn', KNeighborsClassifier(n_neighbors=5, metric=metric))
-    ])
-    scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+    pipeline = Pipeline(
+        [("scaler", StandardScaler()), ("knn", KNeighborsClassifier(n_neighbors=5, metric=metric))]
+    )
+    scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
     print(f"{metric:>12}: {scores.mean():.4f} +/- {scores.std():.4f}")
 ```
 
@@ -473,23 +463,25 @@ Compare uniform and distance-weighted KNN.
 2. Test both weighting methods
 3. Compare across different K values
 """
+
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 from sklearn.datasets import make_classification
 
-X, y = make_classification(n_samples=300, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=300, n_features=10, n_informative=5, random_state=42)
 
 # Your code here
 for k in [3, 5, 7, 11]:
-    for weights in ['uniform', 'distance']:
-        pipeline = Pipeline([
-            ('scaler', StandardScaler()),
-            ('knn', KNeighborsClassifier(n_neighbors=k, weights=weights))
-        ])
-        scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+    for weights in ["uniform", "distance"]:
+        pipeline = Pipeline(
+            [
+                ("scaler", StandardScaler()),
+                ("knn", KNeighborsClassifier(n_neighbors=k, weights=weights)),
+            ]
+        )
+        scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
         print(f"K={k:2d}, {weights:8s}: {scores.mean():.4f}")
 ```
 

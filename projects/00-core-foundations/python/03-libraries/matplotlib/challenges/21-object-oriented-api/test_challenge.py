@@ -10,6 +10,7 @@ import importlib.util
 import os
 
 import matplotlib
+
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
@@ -39,6 +40,7 @@ def _close_figures():
 
 # ---------------------------------------------------------------- bronze
 
+
 def test_bronze_returns_fig_ax():
     fig, ax = solution.explicit_line_plot()
     assert isinstance(fig, plt.Figure)
@@ -65,6 +67,7 @@ def test_bronze_starter_raises():
 
 # ---------------------------------------------------------------- silver
 
+
 def test_silver_has_exact_keys():
     axd = solution.mosaic_layout()
     assert set(axd) == {"loss", "grad", "hist"}
@@ -83,6 +86,7 @@ def test_silver_starter_raises():
 
 
 # ---------------------------------------------------------------- gold
+
 
 def test_gold_returns_true():
     assert solution.shared_x_propagates() is True

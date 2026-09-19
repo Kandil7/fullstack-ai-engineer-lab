@@ -61,6 +61,7 @@ pl_src = pl.DataFrame(records)
 # wrap it without conversion: pl.from_arrow() shares the buffers. This is
 # the zero-copy handoff point between every Arrow-native tool.
 
+
 def build_arrow_table() -> pa.Table:
     """Build an Arrow Table from numpy arrays."""
     return pa.table(
@@ -91,6 +92,7 @@ print(at.schema)
 # buffer. np.shares_memory() proves no copy happened. Strings are the
 # exception: they need per-value offsets, so copies are unavoidable there.
 
+
 def arrow_to_numpy_view() -> tuple[np.ndarray, bool]:
     """Convert an Arrow column to a numpy view; return (array, is_view)."""
     table = build_arrow_table()
@@ -114,6 +116,7 @@ print(f"numpy dtype: {arr.dtype}, zero-copy view: {shared}")
 # columns. Compression is per-column: zstd/snappy for floats, dictionary
 # encoding for low-cardinality strings. Same data, same schema — wildly
 # different file sizes.
+
 
 def write_parquet_variants() -> dict[str, int]:
     """Write uncompressed, snappy, and zstd parquet; return byte sizes."""
@@ -147,6 +150,7 @@ for name, size in sizes.items():
 # label=value/... — the layout Polars, DuckDB, and Spark all read
 # natively. Filters on the partition column skip files entirely.
 
+
 def write_partitioned() -> Path:
     """Write a hive-partitioned parquet dataset by 'label'."""
     target = _OUT / "partitioned"
@@ -169,14 +173,10 @@ print(sorted(p.name for p in part_dir.iterdir()))
 # pushes a filter on it into the file selection: only matching files
 # are opened.
 
+
 def read_partitioned_count(target: Path, label: str) -> int:
     """Count rows for one partition label via a pushed-down filter."""
-    return (
-        pl.scan_parquet(target)
-        .filter(pl.col("label") == label)
-        .collect()
-        .height
-    )
+    return pl.scan_parquet(target).filter(pl.col("label") == label).collect().height
 
 
 # Example 5: partition pruning returns only the matching rows
@@ -195,6 +195,7 @@ print(f"neg rows: {neg}, pos rows: {pos}, total: {neg + pos}")
 # table as CSV is 2-4x larger and every read re-parses the text. Parquet
 # carries the schema, compresses, and skips whole row groups via
 # statistics.
+
 
 def csv_vs_parquet() -> tuple[int, int]:
     """Return (csv_bytes, parquet_bytes) for the same data."""
@@ -237,22 +238,23 @@ def _verify() -> None:
     at = build_arrow_table()
     assert isinstance(at, pa.Table), "pa.table must build an Arrow Table"
     assert at.num_rows == n, "Arrow table must hold all rows"
-    assert at.schema.field("emb_0").type == pa.float64(), \
-        "Arrow schema must type emb_0 as float64"
+    assert at.schema.field("emb_0").type == pa.float64(), "Arrow schema must type emb_0 as float64"
 
     arr, shared = arrow_to_numpy_view()
     assert arr.dtype == np.float64, "numeric Arrow column must map to float64"
     assert shared, "Arrow -> Polars -> NumPy must be zero-copy for numerics"
 
     sizes = write_parquet_variants()
-    assert sizes["none"] > sizes["snappy"] > sizes["zstd"], \
+    assert sizes["none"] > sizes["snappy"] > sizes["zstd"], (
         "compression must strictly reduce file size in this order"
+    )
     assert sizes["zstd"] > 1_000_000, "dataset must stay non-trivial"
 
     part_dir = write_partitioned()
     names = sorted(p.name for p in part_dir.iterdir())
-    assert names == ["label=neg", "label=pos"], \
+    assert names == ["label=neg", "label=pos"], (
         "partition_by must create label=value subdirectories"
+    )
 
     neg = read_partitioned_count(part_dir, "neg")
     pos = read_partitioned_count(part_dir, "pos")
@@ -261,15 +263,15 @@ def _verify() -> None:
     assert neg == 50119, "seeded split must reproduce the exact partition size"
 
     csv_bytes, pq_bytes = csv_vs_parquet()
-    assert pq_bytes < csv_bytes, \
-        "parquet (zstd) must beat CSV bytes for the same data"
+    assert pq_bytes < csv_bytes, "parquet (zstd) must beat CSV bytes for the same data"
     assert csv_bytes > 1_000_000, "CSV baseline must be non-trivial"
 
     # Round-trip: Arrow -> parquet -> Polars -> Arrow keeps everything
     pq.write_table(at, _OUT / "roundtrip.parquet", compression="zstd")
     back = pl.read_parquet(_OUT / "roundtrip.parquet").to_arrow()
-    assert back.num_rows == n and back.num_columns == 3, \
+    assert back.num_rows == n and back.num_columns == 3, (
         "parquet round-trip must preserve rows and columns"
+    )
 
     print("[OK] 05-pyarrow-parquet: all checks passed")
 
@@ -283,6 +285,6 @@ if __name__ == "__main__":
             print("1. Arrow is the zero-copy interchange: pa.Table -> polars -> numpy")
             print("2. Parquet compresses per column; zstd beats snappy beats none")
             print("3. partition_by creates label=value dirs; filters prune files")
-            _verify()   # always runs, so plain execution is also a test
+            _verify()  # always runs, so plain execution is also a test
     finally:
-        _TMP.cleanup()   # close handles + delete temp files (Windows-safe)
+        _TMP.cleanup()  # close handles + delete temp files (Windows-safe)

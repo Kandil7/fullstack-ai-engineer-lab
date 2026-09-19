@@ -50,6 +50,7 @@ def search_items(q: str = "", page: int = 1, per_page: int = 10):
 def list_users(limit: int = 10):
     return {"limit": limit}
 
+
 # Required (no default)
 @app.get("/filter")
 def filter_users(department: str):
@@ -63,6 +64,7 @@ def filter_users(department: str):
 
 ```python
 from fastapi import Query
+
 
 @app.get("/users/")
 def list_users(
@@ -97,6 +99,7 @@ def get_active_users(active: bool = True):
     """Boolean params: /active-users?active=false"""
     filtered = [u for u in USERS if u["active"] == active]
     return {"active": active, "count": len(filtered)}
+
 
 # True values: "true", "1", "yes"
 # False values: "false", "0", "no"
@@ -155,6 +158,7 @@ def list_products(
     """
     return {"product_name": product_name}
 
+
 # GET /products/?name=phone
 # product_name = "phone"
 ```
@@ -172,8 +176,9 @@ def list_users(
     return {
         "skip": skip,
         "limit": limit,
-        "results": USERS[skip:skip + limit],
+        "results": USERS[skip : skip + limit],
     }
+
 
 # GET /users/?skip=0&limit=10  → first 10 users
 # GET /users/?skip=10&limit=10 → users 11-20
@@ -196,6 +201,7 @@ USERS = [
     {"id": 3, "name": "Charlie", "age": 35, "department": "Engineering"},
 ]
 
+
 @app.get("/search")
 def search_items(q: str = "", page: int = 1, per_page: int = 10):
     results = [u for u in USERS if q.lower() in u["name"].lower()] if q else USERS
@@ -208,6 +214,7 @@ def search_items(q: str = "", page: int = 1, per_page: int = 10):
         "total": len(results),
         "results": results[start:end],
     }
+
 
 # GET /search?q=alice        → Alice
 # GET /search?page=1&per_page=2  → first 2 users
@@ -234,13 +241,14 @@ def filter_users(
 
     total = len(results)
     start = (page - 1) * page_size
-    paginated = results[start:start + page_size]
+    paginated = results[start : start + page_size]
 
     return {
         "filters": {"department": department, "age_range": [min_age, max_age]},
         "pagination": {"page": page, "total": total},
         "results": paginated,
     }
+
 
 # GET /users/filter?department=Engineering&min_age=25&page=1
 ```
@@ -258,6 +266,7 @@ def list_items(
 ):
     return {"filters": {"q": q, "category": category, "tags": tags}}
 
+
 # GET /items/?q=phone&tags=new&tags=sale
 ```
 
@@ -271,6 +280,7 @@ def list_items(
 @app.get("/items/{item_id}")
 def get_item(item_id: int): ...
 
+
 # This is a query parameter (has default, not in URL)
 @app.get("/items/")
 def list_items(limit: int = 10): ...
@@ -282,6 +292,7 @@ def list_items(limit: int = 10): ...
 @app.get("/filter")
 def filter_users(department: str):  # No default = required
     ...
+
 
 # Fix: Add default if you want it optional
 @app.get("/filter")
@@ -296,6 +307,7 @@ def filter_users(department: str | None = None):  # Optional
 def list_items(limit: int = 10):
     return {"limit": limit}
 
+
 # Fix: Add validation constraints
 @app.get("/items/")
 def list_items(limit: int = Query(default=10, ge=1, le=100)):
@@ -308,6 +320,8 @@ def list_items(limit: int = Query(default=10, ge=1, le=100)):
 @app.get("/active")
 def get_active(active: bool = True):
     return {"active": active}
+
+
 # GET /active?active=false → active = False (FastAPI handles this)
 
 # But be careful with manual checks
@@ -373,9 +387,11 @@ from fastapi import FastAPI, Query
 
 app = FastAPI()
 
+
 # Basic
 @app.get("/items/")
 def list_items(skip: int = 0, limit: int = 10): ...
+
 
 # With validation
 @app.get("/items/")

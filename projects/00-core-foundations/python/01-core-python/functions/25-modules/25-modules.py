@@ -21,16 +21,19 @@ Reference: https://www.w3schools.com/python/python_modules.asp
 
 # Method 1: Import entire module
 import math
+
 print(f"pi = {math.pi}")
 print(f"sqrt(144) = {math.sqrt(144)}")
 
 # Method 2: Import with alias
 import datetime as dt
+
 today = dt.date.today()
 print(f"\nToday: {today}")
 
 # Method 3: Import specific items
 from random import randint, choice
+
 print(f"\nRandom int: {randint(1, 100)}")
 print(f"Random choice: {choice(['a', 'b', 'c'])}")
 
@@ -51,21 +54,21 @@ print(f"inf = {math.inf}")
 print(f"nan = {math.nan}")
 
 # Rounding
-print(f"\nceil(4.3) = {math.ceil(4.3)}")      # 5
-print(f"floor(4.7) = {math.floor(4.7)}")     # 4
-print(f"trunc(4.7) = {math.trunc(4.7)}")     # 4
+print(f"\nceil(4.3) = {math.ceil(4.3)}")  # 5
+print(f"floor(4.7) = {math.floor(4.7)}")  # 4
+print(f"trunc(4.7) = {math.trunc(4.7)}")  # 4
 
 # Power and logarithmic
-print(f"\npow(2, 10) = {math.pow(2, 10)}")   # 1024.0
-print(f"sqrt(144) = {math.sqrt(144)}")        # 12.0
+print(f"\npow(2, 10) = {math.pow(2, 10)}")  # 1024.0
+print(f"sqrt(144) = {math.sqrt(144)}")  # 12.0
 print(f"log(100, 10) = {math.log(100, 10)}")  # 2.0
-print(f"log2(8) = {math.log2(8)}")            # 3.0
-print(f"log10(1000) = {math.log10(1000)}")    # 3.0
+print(f"log2(8) = {math.log2(8)}")  # 3.0
+print(f"log10(1000) = {math.log10(1000)}")  # 3.0
 
 # Trigonometry
-print(f"\nsin(pi/2) = {math.sin(math.pi/2)}")
+print(f"\nsin(pi/2) = {math.sin(math.pi / 2)}")
 print(f"cos(0) = {math.cos(0)}")
-print(f"tan(pi/4) = {math.tan(math.pi/4)}")
+print(f"tan(pi/4) = {math.tan(math.pi / 4)}")
 print(f"degrees(pi) = {math.degrees(math.pi)}")
 print(f"radians(180) = {math.radians(180)}")
 
@@ -80,7 +83,7 @@ print(f"gcd(48, 18) = {math.gcd(48, 18)}")
 import random
 
 print("\n--- random Module ---")
-print(f"random() = {random.random()}")          # 0.0 to 1.0
+print(f"random() = {random.random()}")  # 0.0 to 1.0
 print(f"randint(1, 10) = {random.randint(1, 10)}")  # 1 to 10
 print(f"randrange(0, 10, 2) = {random.randrange(0, 10, 2)}")  # Even numbers 0-8
 print(f"uniform(1.5, 6.5) = {random.uniform(1.5, 6.5):.2f}")  # Float in range
@@ -183,27 +186,32 @@ print("\n--- Useful Modules ---")
 
 # os - operating system interface
 import os
+
 print(f"Current dir: {os.getcwd()}")
 print(f"List dir: {os.listdir('.')[:3]}...")
 
 # sys - system parameters
 import sys
+
 print(f"Python version: {sys.version_info[:2]}")
 print(f"Platform: {sys.platform}")
 
 # json - JSON handling
 import json
+
 data = {"name": "Alice", "age": 30}
 json_str = json.dumps(data)
 print(f"JSON: {json_str}")
 
 # collections - specialized containers
 from collections import Counter, defaultdict
+
 words = ["apple", "banana", "apple", "cherry", "banana", "apple"]
 print(f"Counter: {Counter(words)}")
 
 # itertools - iterator utilities
 import itertools
+
 print(f"Chain: {list(itertools.chain([1, 2], [3, 4]))}")
 
 # ============================================================

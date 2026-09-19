@@ -28,6 +28,7 @@ from dataclasses import dataclass
 # Strip tags, keep structure (headings/paragraphs), unescape entities.
 # Naive regex tag-stripping corrupts content with '<' in code or math.
 
+
 def html_to_text(html: str) -> str:
     """Convert HTML to readable text, preserving headings and paragraphs."""
     # mark headings with newlines so structure survives
@@ -40,8 +41,10 @@ def html_to_text(html: str) -> str:
 
 
 # Example 1: HTML extraction
-sample_html = ("<html><body><h1>Pricing</h1><p>Plans start at "
-               "<b>$10</b>/mo &amp; include API access.</p></body></html>")
+sample_html = (
+    "<html><body><h1>Pricing</h1><p>Plans start at "
+    "<b>$10</b>/mo &amp; include API access.</p></body></html>"
+)
 text = html_to_text(sample_html)
 print("Example 1: HTML extraction")
 print(f"  {text!r}")
@@ -52,6 +55,7 @@ assert "Pricing" in text and "$10" in text and "&" in text, "tags stripped, enti
 # ============================================================
 # Headings carry semantic structure - keep them as metadata, not text
 # soup. Splitting by heading yields natural, structure-aware chunks.
+
 
 def split_by_headings(md: str) -> list[dict]:
     """Split markdown into (heading, body) sections.
@@ -65,16 +69,17 @@ def split_by_headings(md: str) -> list[dict]:
         m = re.match(r"^(#{1,6})\s+(.*)", line)
         if m:
             if current is not None:
-                sections.append({
-                    "heading": current["heading"],
-                    "body": "\n".join(current["body"]).strip(),
-                })
+                sections.append(
+                    {
+                        "heading": current["heading"],
+                        "body": "\n".join(current["body"]).strip(),
+                    }
+                )
             current = {"heading": m.group(2), "body": []}
         elif current is not None:
             current["body"].append(line)
     if current is not None:
-        sections.append({"heading": current["heading"],
-                         "body": "\n".join(current["body"]).strip()})
+        sections.append({"heading": current["heading"], "body": "\n".join(current["body"]).strip()})
     return sections
 
 
@@ -114,10 +119,12 @@ def clean_document(text: str) -> str:
 
 
 # Example 3: cleaning
-noisy = ("Welcome to our site! Please sign up for our newsletter.\n"
-         "The API accepts JSON payloads.\n"
-         "Copyright 2026 Example Corp. All rights reserved.\n"
-         "Use POST /v1/predict.")
+noisy = (
+    "Welcome to our site! Please sign up for our newsletter.\n"
+    "The API accepts JSON payloads.\n"
+    "Copyright 2026 Example Corp. All rights reserved.\n"
+    "Use POST /v1/predict."
+)
 cleaned = clean_document(noisy)
 print("\nExample 3: cleaning")
 print(f"  cleaned: {cleaned!r}")
@@ -129,6 +136,7 @@ assert "API accepts JSON" in cleaned
 # ============================================================
 # Tables lose meaning as plain text. Convert them to a readable,
 # searchable form (pipe-delimited) rather than concatenated cells.
+
 
 def table_to_text(header: list[str], rows: list[list[str]]) -> str:
     """Render a table as a markdown-ish block for retrieval."""
@@ -150,6 +158,7 @@ assert "rf" in table_text and "0.96" in table_text and "accuracy" in table_text
 # ============================================================
 # The ingestion pipeline: extract -> structure -> clean -> attach
 # metadata. Test each stage against a fixture corpus.
+
 
 @dataclass
 class ProcessedDocument:

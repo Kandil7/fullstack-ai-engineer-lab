@@ -233,7 +233,7 @@ for i, fold in enumerate(folds):
 data = np.random.rand(100, 5)  # 100 samples, 5 features
 
 X = data[:, :-1]  # Features (first 4 columns)
-y = data[:, -1]   # Target (last column)
+y = data[:, -1]  # Target (last column)
 
 print(f"X shape: {X.shape}")  # (100, 4)
 print(f"y shape: {y.shape}")  # (100,)

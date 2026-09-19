@@ -101,11 +101,12 @@ def confirm(message):
     """Get yes/no confirmation from user."""
     while True:
         response = input(f"{message} (yes/no): ").lower().strip()
-        if response in ['yes', 'y']:
+        if response in ["yes", "y"]:
             return True
-        elif response in ['no', 'n']:
+        elif response in ["no", "n"]:
             return False
         print("Please enter 'yes' or 'no'")
+
 
 # Usage
 if confirm("Do you want to continue?"):
@@ -129,17 +130,18 @@ def show_menu():
     print("4. Exit")
     print("============")
 
+
 while True:
     show_menu()
     choice = input("Enter choice (1-4): ")
-    
-    if choice == '1':
+
+    if choice == "1":
         print("Option A selected")
-    elif choice == '2':
+    elif choice == "2":
         print("Option B selected")
-    elif choice == '3':
+    elif choice == "3":
         print("Option C selected")
-    elif choice == '4':
+    elif choice == "4":
         print("Goodbye!")
         break
     else:
@@ -184,10 +186,8 @@ print(f"Arguments: {sys.argv[1:]}")
 import argparse
 
 parser = argparse.ArgumentParser(description="Process some integers.")
-parser.add_argument('numbers', type=int, nargs='+',
-                    help='numbers to sum')
-parser.add_argument('--verbose', '-v', action='store_true',
-                    help='enable verbose output')
+parser.add_argument("numbers", type=int, nargs="+", help="numbers to sum")
+parser.add_argument("--verbose", "-v", action="store_true", help="enable verbose output")
 
 args = parser.parse_args()
 
@@ -213,6 +213,7 @@ def get_required(prompt):
             return value
         print("This field is required!")
 
+
 name = get_required("Enter your name: ")
 ```
 
@@ -232,7 +233,7 @@ def get_choice(options, prompt="Select: "):
     """Get validated choice from user."""
     for i, option in enumerate(options, 1):
         print(f"{i}. {option}")
-    
+
     while True:
         try:
             choice = int(input(prompt))
@@ -241,6 +242,7 @@ def get_choice(options, prompt="Select: "):
             print(f"Enter 1-{len(options)}")
         except ValueError:
             print("Enter a number!")
+
 
 color = get_choice(["Red", "Green", "Blue"])
 ```
@@ -308,6 +310,7 @@ if age < 0 or age > 150:
 ```python
 from datetime import datetime
 
+
 def get_valid_date():
     """Get a valid date from user."""
     while True:
@@ -317,16 +320,18 @@ def get_valid_date():
         except ValueError:
             print("Invalid date format! Use YYYY-MM-DD")
 
+
 def calculate_age():
     """Calculate age from birthdate."""
     birth_date = get_valid_date()
     today = datetime.now()
-    
+
     age = today.year - birth_date.year
     if (today.month, today.day) < (birth_date.month, birth_date.day):
         age -= 1
-    
+
     return age
+
 
 age = calculate_age()
 print(f"You are approximately {age} years old!")
@@ -339,26 +344,26 @@ def calculator():
     """Simple calculator with user input."""
     print("Simple Calculator")
     print("Operations: +, -, *, /")
-    
+
     while True:
         try:
             num1 = float(input("First number (or 'q' to quit): "))
         except ValueError:
             choice = input("Quit? (y/n): ").lower()
-            if choice == 'y':
+            if choice == "y":
                 break
             continue
-        
+
         op = input("Operation (+, -, *, /): ")
         num2 = float(input("Second number: "))
-        
-        if op == '+':
+
+        if op == "+":
             result = num1 + num2
-        elif op == '-':
+        elif op == "-":
             result = num1 - num2
-        elif op == '*':
+        elif op == "*":
             result = num1 * num2
-        elif op == '/':
+        elif op == "/":
             if num2 == 0:
                 print("Cannot divide by zero!")
                 continue
@@ -366,8 +371,9 @@ def calculator():
         else:
             print("Invalid operation!")
             continue
-        
+
         print(f"Result: {result}")
+
 
 calculator()
 ```

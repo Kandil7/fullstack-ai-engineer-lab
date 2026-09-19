@@ -27,6 +27,7 @@ from typing import Any, Callable
 # Minimal building blocks (reused from earlier topics, compact)
 # ============================================================
 
+
 class Validator:
     """Data validation: type/range contract (topic 10)."""
 
@@ -89,16 +90,17 @@ class DriftDetector:
 # The pipeline
 # ============================================================
 
+
 def train_stub(params: dict[str, Any]) -> dict[str, float]:
     """Toy training: accuracy depends on n_estimators + seed noise."""
     random.seed(params["seed"])
-    accuracy = min(0.99, 0.70 + 0.003 * params["n_estimators"]
-                   + random.uniform(-0.01, 0.01))
+    accuracy = min(0.99, 0.70 + 0.003 * params["n_estimators"] + random.uniform(-0.01, 0.01))
     return {"accuracy": round(accuracy, 4), "latency_ms": 2.0}
 
 
-def run_e2e(data: list[float], configs: list[dict[str, Any]],
-            min_accuracy: float = 0.80) -> dict[str, Any]:
+def run_e2e(
+    data: list[float], configs: list[dict[str, Any]], min_accuracy: float = 0.80
+) -> dict[str, Any]:
     """The closed loop: validate -> train -> track -> register -> monitor."""
     # 1. VALIDATE - fail the pipeline, not the model
     validator = Validator(0.0, 100.0)
@@ -114,8 +116,7 @@ def run_e2e(data: list[float], configs: list[dict[str, Any]],
 
     # 4. REGISTER
     registry = Registry(min_accuracy=min_accuracy)
-    ok, msg = registry.promote(best["params"].get("name", "model"),
-                               best["metrics"]["accuracy"])
+    ok, msg = registry.promote(best["params"].get("name", "model"), best["metrics"]["accuracy"])
     if not ok:
         return {"status": "FAILED", "stage": "register", "detail": msg}
 
@@ -146,8 +147,7 @@ configs = [
 result = run_e2e(data, configs)
 print(f"  status: {result['status']}")
 if result["status"] == "OK":
-    print(f"  best: {result['best_config']['name']} "
-          f"acc={result['best_accuracy']}")
+    print(f"  best: {result['best_config']['name']} acc={result['best_accuracy']}")
     print(f"  tracked runs: {result['runs']}")
     print(f"  {result['message']}")
     print(f"  drift alert on training data: {result['drift_alert']}")
@@ -163,8 +163,8 @@ print(f"\n  bad data -> {bad_result['status']} at stage {bad_result.get('stage')
 # The loop continues after deployment: periodic drift checks on live
 # features trigger a retrain - closing the circle.
 
-def continuous_monitor(live_features: list[float],
-                       detector: DriftDetector) -> str:
+
+def continuous_monitor(live_features: list[float], detector: DriftDetector) -> str:
     if detector.alert(live_features):
         return "DRIFT - trigger retrain pipeline"
     return "stable - no action"

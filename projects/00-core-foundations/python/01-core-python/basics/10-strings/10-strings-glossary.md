@@ -76,10 +76,10 @@ print(reconstructed)  # "Alice | 25 | alice@email.com"
 - **Related terms**: Raw String, Special Character, Backslash
 ```python
 # Common escape sequences
-print("Hello\nWorld")    # Newline
-print("Name\tAge")       # Tab
-print("Quote: \"Hi\"")   # Double quote
-print("Backslash: \\")   # Backslash
+print("Hello\nWorld")  # Newline
+print("Name\tAge")  # Tab
+print('Quote: "Hi"')  # Double quote
+print("Backslash: \\")  # Backslash
 ```
 
 ### F
@@ -92,7 +92,7 @@ print("Backslash: \\")   # Backslash
 name = "Alice"
 age = 25
 print(f"Hello, {name}!")  # Hello, Alice!
-print(f"Age: {age}")      # Age: 25
+print(f"Age: {age}")  # Age: 25
 print(f"Next year: {age + 1}")  # Next year: 26
 ```
 
@@ -102,9 +102,9 @@ print(f"Next year: {age + 1}")  # Next year: 26
 - **Related terms**: Format Mini-Language, Formatting, Precision
 ```python
 pi = 3.14159
-print(f"Pi: {pi:.2f}")    # 2 decimal places
+print(f"Pi: {pi:.2f}")  # 2 decimal places
 print(f"Number: {1234:,}")  # With commas
-print(f"Text: {'hi':^10}") # Centered
+print(f"Text: {'hi':^10}")  # Centered
 ```
 
 ### I
@@ -128,9 +128,9 @@ text = "h" + text[1:]  # "hello"
 - **Related terms**: Slicing, Position, Zero-based
 ```python
 text = "Hello"
-print(text[0])   # H (first character)
+print(text[0])  # H (first character)
 print(text[-1])  # o (last character)
-print(text[1])   # e (second character)
+print(text[1])  # e (second character)
 ```
 
 ### J
@@ -141,12 +141,12 @@ print(text[1])   # e (second character)
 - **Related terms**: Split, Concatenation, Iterable
 ```python
 # join() method
-fruits = ['apple', 'banana', 'cherry']
+fruits = ["apple", "banana", "cherry"]
 text = ", ".join(fruits)
 print(text)  # "apple, banana, cherrry"
 
 # Join with different delimiter
-words = ['Hello', 'World']
+words = ["Hello", "World"]
 sentence = " ".join(words)
 print(sentence)  # "Hello World"
 ```
@@ -160,8 +160,8 @@ print(sentence)  # "Hello World"
 ```python
 # String methods
 text = "Hello, World!"
-print(text.upper())      # HELLO, WORLD!
-print(text.lower())      # hello, world!
+print(text.upper())  # HELLO, WORLD!
+print(text.lower())  # hello, world!
 print(text.find("World"))  # 7
 print(text.replace("World", "Python"))  # "Hello, Python!"
 ```
@@ -218,8 +218,8 @@ print(r"C:\new\folder")  # C:\new\folder
 
 # Regular string - interprets escape sequences
 print("C:\new\folder")  # C:
-                        # ew
-                        # older
+# ew
+# older
 ```
 
 **Replace**
@@ -242,11 +242,11 @@ print(text.replace("l", "L", 2))  # "HeLLo, World!" (replace first 2)
 - **Related terms**: Indexing, Substring, Range
 ```python
 text = "Hello, World!"
-print(text[0:5])   # Hello
+print(text[0:5])  # Hello
 print(text[7:12])  # World
-print(text[:5])    # Hello (start to index 5)
-print(text[7:])    # World! (index 7 to end)
-print(text[::2])   # Hlo ol! (every 2nd character)
+print(text[:5])  # Hello (start to index 5)
+print(text[7:])  # World! (index 7 to end)
+print(text[::2])  # Hlo ol! (every 2nd character)
 ```
 
 **split()**
@@ -275,7 +275,7 @@ print(text.split(",", 2))  # ['a', 'b', 'c,d']
 - **Related terms**: Quote, Delimiter, Syntax
 ```python
 # String literals
-single = 'Hello'
+single = "Hello"
 double = "Hello"
 multi = """Hello
 World"""
@@ -304,9 +304,9 @@ print(str(my_list))  # "[1, 2, 3]"
 ```python
 # strip() methods
 text = "  Hello, World!  "
-print(text.strip())     # "Hello, World!"
-print(text.lstrip())    # "Hello, World!  "
-print(text.rstrip())    # "  Hello, World!"
+print(text.strip())  # "Hello, World!"
+print(text.lstrip())  # "Hello, World!  "
+print(text.rstrip())  # "  Hello, World!"
 
 # Strip specific characters
 text = "###Hello###"
@@ -320,7 +320,7 @@ print(text.strip("#"))  # "Hello"
 ```python
 # Check suffix
 text = "Hello, World!"
-print(text.endswith("!"))    # True
+print(text.endswith("!"))  # True
 print(text.endswith("World"))  # False
 ```
 
@@ -351,8 +351,8 @@ text = "Hello, 世界!"
 print(text)  # Works with any Unicode character
 
 # Check Unicode code point
-print(ord('A'))  # 65
-print(chr(65))   # A
+print(ord("A"))  # 65
+print(chr(65))  # A
 ```
 
 **Upper/Lower**
@@ -362,11 +362,11 @@ print(chr(65))   # A
 ```python
 # Case methods
 text = "Hello, World!"
-print(text.upper())      # HELLO, WORLD!
-print(text.lower())      # hello, world!
-print(text.title())      # Hello, World!
-print(text.capitalize()) # Hello, world!
-print(text.swapcase())   # hELLO, wORLD!
+print(text.upper())  # HELLO, WORLD!
+print(text.lower())  # hello, world!
+print(text.title())  # Hello, World!
+print(text.capitalize())  # Hello, world!
+print(text.swapcase())  # hELLO, wORLD!
 ```
 
 ## Key Concepts Summary

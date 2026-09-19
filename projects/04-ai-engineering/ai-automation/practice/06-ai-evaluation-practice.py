@@ -23,6 +23,7 @@ from dataclasses import dataclass, field
 # EASY PROBLEMS (20 XP)
 # ============================================================
 
+
 # Problem 1: Precision Calculator
 # Write a function that computes precision: tp / (tp + fp)
 # Handle the edge case where tp + fp = 0 (return 0.0).
@@ -62,6 +63,7 @@ def problem_05():
 # ============================================================
 # MEDIUM PROBLEMS (50 XP)
 # ============================================================
+
 
 # Problem 6: Precision@K
 # Write a function that computes Precision@K:
@@ -116,6 +118,7 @@ def problem_10():
 # ============================================================
 # HARD PROBLEMS (100 XP)
 # ============================================================
+
 
 # Problem 11: Faithfulness Evaluator
 # Write a FaithfulnessEvaluator class that:

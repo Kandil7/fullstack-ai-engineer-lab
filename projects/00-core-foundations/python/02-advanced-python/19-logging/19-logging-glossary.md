@@ -28,10 +28,10 @@ import logging
 # Basic configuration
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
-    filename='app.log',
-    filemode='w'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    filename="app.log",
+    filemode="w",
 )
 
 logger = logging.getLogger(__name__)
@@ -120,12 +120,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def risky_operation():
     try:
         result = 1 / 0
     except Exception:
         logger.exception("Error in risky_operation")
         raise
+
 
 try:
     risky_operation()
@@ -145,9 +147,11 @@ except Exception:
 ```python
 import logging
 
+
 class InfoFilter(logging.Filter):
     def filter(self, record):
         return record.levelno == logging.INFO
+
 
 logger = logging.getLogger("myapp")
 logger.setLevel(logging.DEBUG)
@@ -159,7 +163,7 @@ handler.addFilter(InfoFilter())
 logger.addHandler(handler)
 
 logger.debug("This won't appear")  # Filtered out
-logger.info("This will appear")    # Passes filter
+logger.info("This will appear")  # Passes filter
 logger.warning("This won't appear")  # Filtered out
 ```
 
@@ -178,12 +182,12 @@ import logging
 logger = logging.getLogger("myapp")
 
 # Simple formatter
-simple = logging.Formatter('%(levelname)s: %(message)s')
+simple = logging.Formatter("%(levelname)s: %(message)s")
 
 # Detailed formatter
 detailed = logging.Formatter(
-    '%(asctime)s | %(name)s | %(levelname)-8s | %(funcName)s:%(lineno)d | %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    "%(asctime)s | %(name)s | %(levelname)-8s | %(funcName)s:%(lineno)d | %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 
 handler = logging.StreamHandler()
@@ -221,14 +225,12 @@ logger.setLevel(logging.DEBUG)
 # Console handler
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
-console.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+console.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
 
 # File handler
 file_handler = logging.FileHandler("app.log")
 file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-))
+file_handler.setFormatter(logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 
 logger.addHandler(console)
 logger.addHandler(file_handler)
@@ -302,7 +304,7 @@ logger.setLevel(logging.DEBUG)
 
 # Configure
 handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter('%(name)s - %(message)s'))
+handler.setFormatter(logging.Formatter("%(name)s - %(message)s"))
 logger.addHandler(handler)
 
 # Log messages
@@ -340,10 +342,10 @@ import logging
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
-logger.debug("Not shown")     # Below WARNING
-logger.info("Not shown")      # Below WARNING
-logger.warning("Shown")       # At WARNING
-logger.error("Shown")         # Above WARNING
+logger.debug("Not shown")  # Below WARNING
+logger.info("Not shown")  # Below WARNING
+logger.warning("Shown")  # At WARNING
+logger.error("Shown")  # Above WARNING
 ```
 
 **Related Terms**: DEBUG, INFO, WARNING, ERROR, CRITICAL
@@ -446,9 +448,9 @@ Logging Module
 ### 1. Basic Configuration
 ```python
 import logging
+
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 ```
 
@@ -486,7 +488,7 @@ from logging.handlers import RotatingFileHandler
 
 handler = RotatingFileHandler(
     "app.log",
-    maxBytes=1024*1024,  # 1MB
-    backupCount=5
+    maxBytes=1024 * 1024,  # 1MB
+    backupCount=5,
 )
 ```

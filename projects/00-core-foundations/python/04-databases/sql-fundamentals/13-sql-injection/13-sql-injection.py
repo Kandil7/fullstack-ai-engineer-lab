@@ -27,6 +27,7 @@ import sys
 # WRONG: f-strings / % formatting merge user input into the SQL text.
 # The input is parsed as SQL, not treated as a value.
 
+
 def vulnerable_login(conn: sqlite3.Connection, username: str) -> list:
     """BROKEN — do not copy. Demonstrates the injection primitive."""
     sql = f"SELECT * FROM users WHERE username = '{username}'"
@@ -54,6 +55,7 @@ print()
 # Parameterized SQL separates the statement (fixed) from the values
 # (bound). The engine treats the bound value as data, never as SQL text.
 
+
 def safe_login(conn: sqlite3.Connection, username: str) -> list:
     sql = "SELECT * FROM users WHERE username = ?"
     return conn.execute(sql, (username,)).fetchall()
@@ -71,6 +73,7 @@ print()
 # validated against a whitelist, because identifiers change the parse tree.
 
 ALLOWED_COLUMNS = {"id", "username", "role"}  # whitelist
+
 
 def select_column(conn: sqlite3.Connection, column: str) -> list:
     if column not in ALLOWED_COLUMNS:
@@ -118,6 +121,7 @@ print()
 # same interpolation risk. The ORM protects you only while you use its
 # query builders / bound parameters.
 
+
 def orm_like_raw(conn: sqlite3.Connection, order: str) -> list:
     # The 'order' string is dropped into the SQL text — same risk as #1.
     return conn.execute(f"SELECT username FROM users ORDER BY {order}").fetchall()
@@ -150,6 +154,7 @@ print()
 #   app can't drop tables even if a payload gets through
 # CORRECT: scoped roles; read-only connections for reads
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -165,13 +170,9 @@ def _verify() -> None:
 
         # 1. Interpolation leaks all rows; parameterization leaks none
         payload = "' OR '1'='1' --"
-        leaked = db.execute(
-            f"SELECT username FROM users WHERE username = '{payload}'"
-        ).fetchall()
+        leaked = db.execute(f"SELECT username FROM users WHERE username = '{payload}'").fetchall()
         assert len(leaked) == 2, "interpolated payload must bypass the filter"
-        safe = db.execute(
-            "SELECT username FROM users WHERE username = ?", (payload,)
-        ).fetchall()
+        safe = db.execute("SELECT username FROM users WHERE username = ?", (payload,)).fetchall()
         assert safe == [], "parameterized query must treat payload as a literal value"
 
         # 2. Bound values can never change the statement shape
@@ -208,4 +209,4 @@ if __name__ == "__main__":
         print("2. Parameterize values; whitelist identifiers")
         print("3. Least privilege: the app role can't drop anything")
         print("4. ORMs protect you only while you use their builders")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

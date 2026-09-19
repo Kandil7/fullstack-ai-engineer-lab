@@ -29,6 +29,7 @@ from typing import Any, Callable
 # want. Small and curated beats large and messy - you must be able to
 # read every case.
 
+
 @dataclass
 class GoldenCase:
     input: str
@@ -48,6 +49,7 @@ GOLDEN_SENTIMENT = [
 # 2. The Eval Runner
 # ============================================================
 
+
 def run_eval(model: Callable[[str], str], cases: list[GoldenCase]) -> dict:
     correct = sum(1 for c in cases if model(c.input) == c.expected)
     return {
@@ -59,8 +61,13 @@ def run_eval(model: Callable[[str], str], cases: list[GoldenCase]) -> dict:
 
 # Example 1: two candidate prompts
 def prompt_a(text: str) -> str:
-    return "POSITIVE" if "great" in text.lower() or "love" in text.lower() else \
-        "NEGATIVE" if "terrible" in text.lower() or "worst" in text.lower() else "NEUTRAL"
+    return (
+        "POSITIVE"
+        if "great" in text.lower() or "love" in text.lower()
+        else "NEGATIVE"
+        if "terrible" in text.lower() or "worst" in text.lower()
+        else "NEUTRAL"
+    )
 
 
 def prompt_b(text: str) -> str:
@@ -81,6 +88,7 @@ assert res_a["accuracy"] >= res_b["accuracy"], "better prompt scores better"
 # Lock the eval into CI: a prompt change that drops accuracy below the
 # baseline must fail the build.
 
+
 @dataclass
 class PromptRegressionGuard:
     baseline_accuracy: float
@@ -88,8 +96,7 @@ class PromptRegressionGuard:
 
     def approve(self, accuracy: float) -> tuple[bool, str]:
         if accuracy < self.baseline_accuracy - self.threshold:
-            return False, (f"regression: {accuracy:.0%} < baseline "
-                           f"{self.baseline_accuracy:.0%}")
+            return False, (f"regression: {accuracy:.0%} < baseline {self.baseline_accuracy:.0%}")
         return True, f"accepted: {accuracy:.0%} >= {self.baseline_accuracy:.0%}"
 
 
@@ -110,6 +117,7 @@ assert not blocked
 # (prefers the first answer), verbosity bias (prefers longer), and
 # self-preference (prefers its own style). Mitigate with pairwise
 # comparison and swapped order.
+
 
 @dataclass
 class PairwiseJudge:
@@ -137,8 +145,13 @@ assert pair_a == "B" and pair_b == "A", "order-swap detects position bias"
 # measure -> accept/reject. Optimizing without an eval loop is tuning
 # by vibes.
 
-def eval_loop(current: Callable[[str], str], candidate: Callable[[str], str],
-              cases: list[GoldenCase], guard: PromptRegressionGuard) -> str:
+
+def eval_loop(
+    current: Callable[[str], str],
+    candidate: Callable[[str], str],
+    cases: list[GoldenCase],
+    guard: PromptRegressionGuard,
+) -> str:
     cur_res = run_eval(current, cases)
     cand_res = run_eval(candidate, cases)
     if cand_res["accuracy"] > cur_res["accuracy"]:
@@ -158,6 +171,7 @@ assert verdict == "adopt candidate"
 # ============================================================
 # The production eval suite: golden set + regression guard + a
 # periodic re-run against real traffic (sampled, labeled).
+
 
 def eval_report(name: str, model: Callable[[str], str]) -> str:
     res = run_eval(model, GOLDEN_SENTIMENT)

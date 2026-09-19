@@ -29,8 +29,9 @@ app = FastAPI(title="RFC 9457 Problem Details Demo")
 # ============================================================
 # 1. The Problem Details envelope (RFC 9457)
 # ============================================================
-def problem_detail(status: int, title: str, detail: str,
-                   type_: str = "about:blank", **extra) -> dict:
+def problem_detail(
+    status: int, title: str, detail: str, type_: str = "about:blank", **extra
+) -> dict:
     """RFC 9457 problem document: type, title, status, detail, instance."""
     body = {"type": type_, "title": title, "status": status, "detail": detail}
     body.update(extra)
@@ -57,14 +58,19 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     """422s become actionable: point at the failing field and why."""
     errors = []
     for err in exc.errors():
-        errors.append({
-            "field": ".".join(str(p) for p in err["loc"]),
-            "message": err["msg"],
-            "input": err.get("input"),
-        })
+        errors.append(
+            {
+                "field": ".".join(str(p) for p in err["loc"]),
+                "message": err["msg"],
+                "input": err.get("input"),
+            }
+        )
     body = problem_detail(
-        status=422, title="Validation error", detail="Request body failed validation",
-        instance=str(request.url.path), errors=errors,
+        status=422,
+        title="Validation error",
+        detail="Request body failed validation",
+        instance=str(request.url.path),
+        errors=errors,
     )
     return JSONResponse(status_code=422, content=body)
 
@@ -79,6 +85,7 @@ class Item(BaseModel):
 
 def Field_min_length_3():
     from pydantic import Field
+
     return Field(min_length=3)
 
 
@@ -133,7 +140,7 @@ def _verify() -> None:
         r = client.post("/items", json={"name": "ok", "qty": 1})
         assert r.status_code == 201
 
-        r = client.post("/items", json={"name": "x", "qty": 1})   # name too short
+        r = client.post("/items", json={"name": "x", "qty": 1})  # name too short
         assert r.status_code == 422, "validation failure must be 422"
         body = r.json()
         assert body["type"] == "about:blank" and body["status"] == 422
@@ -159,6 +166,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("29-error-handling-rfc9457:app", host="127.0.0.1", port=8000)
     else:
         _verify()

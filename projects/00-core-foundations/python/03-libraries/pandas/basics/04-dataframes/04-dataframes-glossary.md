@@ -30,10 +30,7 @@
 Reducing grouped data to summary statistics using functions like sum, mean, count.
 
 ```python
-df.groupby("Department").agg(
-    avg_salary=("Salary", "mean"),
-    count=("Employee", "count")
-)
+df.groupby("Department").agg(avg_salary=("Salary", "mean"), count=("Employee", "count"))
 ```
 
 **Assign**
@@ -83,8 +80,8 @@ df = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
 Removes specified rows or columns from a DataFrame.
 
 ```python
-df.drop(columns=["A"])       # Drop column
-df.drop(index=[0, 1])        # Drop rows
+df.drop(columns=["A"])  # Drop column
+df.drop(index=[0, 1])  # Drop rows
 ```
 
 **Dtypes**
@@ -102,9 +99,9 @@ print(df.dtypes)
 Replaces missing values with a specified value or strategy.
 
 ```python
-df.fillna(0)                          # Fill with 0
-df.fillna({"A": 0, "B": "Unknown"})   # Fill per column
-df.fillna(method="ffill")             # Forward fill
+df.fillna(0)  # Fill with 0
+df.fillna({"A": 0, "B": "Unknown"})  # Fill per column
+df.fillna(method="ffill")  # Forward fill
 ```
 
 ### G
@@ -146,9 +143,9 @@ df.info()
 Position-based indexing (integer positions).
 
 ```python
-df.iloc[0]           # First row
-df.iloc[0:5]         # First 5 rows
-df.iloc[0, 1]        # Row 0, column 1
+df.iloc[0]  # First row
+df.iloc[0:5]  # First 5 rows
+df.iloc[0, 1]  # Row 0, column 1
 ```
 
 **Isnull**
@@ -164,9 +161,9 @@ print(df.isnull().sum())
 Label-based indexing (index labels).
 
 ```python
-df.loc["emp1"]              # Row with label "emp1"
-df.loc["emp1", "Name"]      # Row and column
-df.loc["emp1":"emp3"]       # Slice
+df.loc["emp1"]  # Row with label "emp1"
+df.loc["emp1", "Name"]  # Row and column
+df.loc["emp1":"emp3"]  # Slice
 ```
 
 ### R
@@ -234,11 +231,13 @@ print(df.tail(3))
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42],
-    "City": ["New York", "London", "Paris"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie"],
+        "Age": [28, 35, 42],
+        "City": ["New York", "London", "Paris"],
+    }
+)
 
 # Single column (Series)
 print(df["Name"])
@@ -252,10 +251,10 @@ print(df[["Name", "Age"]])
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31]
-}, index=["emp1", "emp2", "emp3", "emp4"])
+df = pd.DataFrame(
+    {"Name": ["Alice", "Bob", "Charlie", "Diana"], "Age": [28, 35, 42, 31]},
+    index=["emp1", "emp2", "emp3", "emp4"],
+)
 
 # loc — label-based
 print(df.loc["emp2"])
@@ -274,11 +273,13 @@ print(df[df["Age"] > 30])
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Department": ["Eng", "Mkt", "Eng", "Sales"],
-    "Employee": ["Alice", "Bob", "Charlie", "Diana"],
-    "Salary": [95000, 72000, 88000, 65000]
-})
+df = pd.DataFrame(
+    {
+        "Department": ["Eng", "Mkt", "Eng", "Sales"],
+        "Employee": ["Alice", "Bob", "Charlie", "Diana"],
+        "Salary": [95000, 72000, 88000, 65000],
+    }
+)
 
 print(df.groupby("Department")["Salary"].agg(["mean", "sum", "count"]))
 ```

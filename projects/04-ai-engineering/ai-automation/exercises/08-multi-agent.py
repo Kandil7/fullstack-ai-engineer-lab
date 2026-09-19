@@ -27,8 +27,10 @@ from enum import Enum
 # 1. Agent Base Classes
 # ---------------------------------------------------------------------------
 
+
 class AgentRole(Enum):
     """Roles agents can play in a system."""
+
     ORCHESTRATOR = "orchestrator"
     WORKER = "worker"
     ROUTER = "router"
@@ -39,6 +41,7 @@ class AgentRole(Enum):
 @dataclass
 class AgentMessage:
     """Message passed between agents."""
+
     sender: str
     receiver: str
     content: Any
@@ -50,6 +53,7 @@ class AgentMessage:
 @dataclass
 class AgentState:
     """Current state of an agent."""
+
     agent_id: str
     status: str = "idle"  # idle, busy, error
     current_task: str | None = None
@@ -72,8 +76,9 @@ class BaseAgent:
         """Process an incoming message."""
         raise NotImplementedError
 
-    def send_message(self, receiver: str, content: Any,
-                    message_type: str = "task") -> AgentMessage:
+    def send_message(
+        self, receiver: str, content: Any, message_type: str = "task"
+    ) -> AgentMessage:
         """Create and queue an outgoing message."""
         message = AgentMessage(
             sender=self.agent_id,
@@ -104,6 +109,7 @@ class BaseAgent:
 # 2. Orchestrator-Worker Pattern
 # ---------------------------------------------------------------------------
 
+
 class OrchestratorAgent(BaseAgent):
     """Orchestrator that coordinates multiple worker agents."""
 
@@ -121,8 +127,11 @@ class OrchestratorAgent(BaseAgent):
         """Break a task into subtasks for workers."""
         # Simple decomposition (in real use, use LLM)
         subtasks = [
-            {"id": f"subtask_{i}", "description": f"Part {i+1} of: {task}",
-             "assigned_to": None}
+            {
+                "id": f"subtask_{i}",
+                "description": f"Part {i + 1} of: {task}",
+                "assigned_to": None,
+            }
             for i in range(3)
         ]
         return subtasks
@@ -131,9 +140,7 @@ class OrchestratorAgent(BaseAgent):
         """Assign a subtask to a worker."""
         subtask["assigned_to"] = worker_id
         message = self.send_message(
-            worker_id,
-            {"type": "task", "subtask": subtask},
-            "task_assignment"
+            worker_id, {"type": "task", "subtask": subtask}, "task_assignment"
         )
         if worker_id in self.workers:
             self.workers[worker_id].receive_message(message)
@@ -200,9 +207,7 @@ class WorkerAgent(BaseAgent):
             task = message.content.get("subtask", {})
             result = await self._execute_task(task)
             return self.send_message(
-                message.sender,
-                {"type": "task_result", "result": result},
-                "task_result"
+                message.sender, {"type": "task_result", "result": result}, "task_result"
             )
         return None
 
@@ -250,7 +255,7 @@ def demo_orchestrator_worker():
 
     print(f"\nTask: {task}")
     print(f"\nSubtasks created: {len(result['subtasks'])}")
-    for subtask in result['subtasks']:
+    for subtask in result["subtasks"]:
         print(f"  - {subtask['description']} -> {subtask['assigned_to']}")
 
     print(f"\nFinal Result: {result['final_result']}")
@@ -265,6 +270,7 @@ def demo_orchestrator_worker():
 # ---------------------------------------------------------------------------
 # 3. Agent Communication Patterns
 # ---------------------------------------------------------------------------
+
 
 class MessageBus:
     """Central message bus for agent communication."""
@@ -317,9 +323,7 @@ class CommunicationAgent(BaseAgent):
 
         # Publish result
         response = self.send_message(
-            message.sender,
-            {"type": "result", "data": result},
-            "results"
+            message.sender, {"type": "result", "data": result}, "results"
         )
         self.message_bus.publish(response, "results")
 
@@ -346,6 +350,7 @@ def demo_agent_communication():
 
     # Subscribe to results
     results_received = []
+
     def on_result(msg: AgentMessage):
         results_received.append(msg)
 
@@ -379,6 +384,7 @@ def demo_agent_communication():
 # ---------------------------------------------------------------------------
 # 4. Sequential vs Parallel Execution
 # ---------------------------------------------------------------------------
+
 
 class TaskGraph:
     """Define task dependencies for sequential/parallel execution."""
@@ -496,12 +502,13 @@ def demo_sequential_vs_parallel():
     print(f"\nDAG Execution: {dag_time:.3f}s")
     print(f"  Results: {dag_results}")
 
-    print(f"\nSpeedup (Parallel vs Sequential): {seq_time/par_time:.1f}x")
+    print(f"\nSpeedup (Parallel vs Sequential): {seq_time / par_time:.1f}x")
 
 
 # ---------------------------------------------------------------------------
 # 5. Consensus Patterns
 # ---------------------------------------------------------------------------
+
 
 class ConsensusProtocol:
     """Implement consensus patterns for multi-agent decision making."""
@@ -535,8 +542,9 @@ class ConsensusProtocol:
             "vote_counts": dict(vote_counts),
         }
 
-    async def weighted_voting(self, proposal: Any,
-                             weights: dict[str, float]) -> dict[str, Any]:
+    async def weighted_voting(
+        self, proposal: Any, weights: dict[str, float]
+    ) -> dict[str, Any]:
         """Weighted voting consensus."""
         votes = []
         for agent in self.agents:
@@ -565,6 +573,7 @@ class ConsensusProtocol:
         """Get vote from an agent (simulated)."""
         # Simulate different agents having different opinions
         import random
+
         return random.choice(["approve", "reject", "abstain"])
 
 
@@ -586,11 +595,13 @@ class DebateProtocol:
             for agent in self.agents:
                 # Each agent provides argument
                 argument = await self._get_argument(agent, topic, arguments)
-                round_arguments.append({
-                    "agent": agent.agent_id,
-                    "round": round_num + 1,
-                    "argument": argument,
-                })
+                round_arguments.append(
+                    {
+                        "agent": agent.agent_id,
+                        "round": round_num + 1,
+                        "argument": argument,
+                    }
+                )
 
             arguments.extend(round_arguments)
             self.rounds.append({"round": round_num + 1, "arguments": round_arguments})
@@ -605,8 +616,9 @@ class DebateProtocol:
             "winner": winner,
         }
 
-    async def _get_argument(self, agent: BaseAgent, topic: str,
-                           previous_arguments: list) -> str:
+    async def _get_argument(
+        self, agent: BaseAgent, topic: str, previous_arguments: list
+    ) -> str:
         """Get argument from an agent."""
         # Simulate argument generation
         return f"Argument from {agent.agent_id} on round {len(previous_arguments) // len(self.agents) + 1}"
@@ -660,6 +672,7 @@ def demo_consensus_patterns():
 # 6. Message Passing Patterns
 # ---------------------------------------------------------------------------
 
+
 class Mailbox:
     """Mailbox for asynchronous message passing."""
 
@@ -697,6 +710,7 @@ class Mailbox:
 
 class MailboxFullError(Exception):
     """Raised when mailbox is full."""
+
     pass
 
 
@@ -712,8 +726,7 @@ class MessagePassingAgent(BaseAgent):
         """Register another agent's mailbox."""
         self.mailboxes[agent_id] = mailbox
 
-    async def send_to(self, receiver_id: str, content: Any,
-                     message_type: str = "task"):
+    async def send_to(self, receiver_id: str, content: Any, message_type: str = "task"):
         """Send a message to another agent's mailbox."""
         if receiver_id not in self.mailboxes:
             raise ValueError(f"No mailbox registered for {receiver_id}")
@@ -736,9 +749,7 @@ class MessagePassingAgent(BaseAgent):
         if message.message_type == "task":
             result = await self._handle_task(message.content)
             return self.send_message(
-                message.sender,
-                {"type": "result", "data": result},
-                "result"
+                message.sender, {"type": "result", "data": result}, "result"
             )
         return None
 

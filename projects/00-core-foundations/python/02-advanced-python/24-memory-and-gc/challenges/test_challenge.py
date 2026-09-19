@@ -45,9 +45,7 @@ class TestCollectCycle:
 class TestSlotsRatio:
     def test_slots_win_at_scale(self):
         ratio = target.slots_ratio(10_000)
-        assert ratio >= 1.5, (
-            f"ratio {ratio:.2f}: got sizeof-only ~1.0? __dict__ must be included"
-        )
+        assert ratio >= 1.5, f"ratio {ratio:.2f}: got sizeof-only ~1.0? __dict__ must be included"
 
     def test_ratio_is_finite(self):
         ratio = target.slots_ratio(1_000)
@@ -58,9 +56,7 @@ class TestSlotsRatio:
 class TestWeakCacheTrap:
     def test_temp_is_evicted_instantly(self):
         trap_len, alive_len, after_del_len = target.weak_cache_trap()
-        assert trap_len == 0, (
-            f"trap_len {trap_len}: temporaries must be evicted at line end"
-        )
+        assert trap_len == 0, f"trap_len {trap_len}: temporaries must be evicted at line end"
 
     def test_owned_entry_lives(self):
         _, alive_len, _ = target.weak_cache_trap()

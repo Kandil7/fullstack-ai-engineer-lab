@@ -3,6 +3,7 @@ Challenge 29: Functional Python — Hidden Tests
 ===============================================
 Correctness + purity (no input mutation) + cache-hit operation guards.
 """
+
 from __future__ import annotations
 
 import importlib.util
@@ -29,6 +30,7 @@ starter = _load("starter")
 
 # --- Bronze: square_evens ---------------------------------------------------
 
+
 def test_bronze_basic():
     assert solution.square_evens([1, 2, 3, 4]) == [4, 16]
 
@@ -52,6 +54,7 @@ def test_bronze_input_not_mutated():
 
 
 # --- Silver: compose / memoize / pipeline -----------------------------------
+
 
 def test_silver_compose_order():
     double = lambda x: x * 2  # noqa: E731
@@ -92,6 +95,7 @@ def test_silver_memoize_computes_once():
 
 # --- Gold: steps_fingerprint / cacheable_pipeline ---------------------------
 
+
 def _double(x: int) -> int:
     return x * 2
 
@@ -101,13 +105,15 @@ def _square(x: int) -> int:
 
 
 def test_gold_fingerprint_order_sensitive():
-    assert solution.steps_fingerprint([_double, _square]) != \
-        solution.steps_fingerprint([_square, _double])
+    assert solution.steps_fingerprint([_double, _square]) != solution.steps_fingerprint(
+        [_square, _double]
+    )
 
 
 def test_gold_fingerprint_stable():
-    assert solution.steps_fingerprint([_double, _square]) == \
-        solution.steps_fingerprint([_double, _square])
+    assert solution.steps_fingerprint([_double, _square]) == solution.steps_fingerprint(
+        [_double, _square]
+    )
 
 
 def test_gold_correctness():
@@ -122,17 +128,18 @@ def test_gold_second_call_runs_zero_steps():
         def fn(x: int) -> int:
             calls["n"] += 1
             return x * 2
+
         return fn
 
     from typing import Callable  # noqa: F401 - re-export for annotation
+
     steps = [counting("a"), counting("b")]
     first = solution.cacheable_pipeline(steps, [1, 2, 3])
     assert first == [4, 8, 12]
     calls_before = calls["n"]
     second = solution.cacheable_pipeline(steps, [1, 2, 3])
     assert second == first
-    assert calls["n"] == calls_before, \
-        "repeat call with equal data must not re-run any step"
+    assert calls["n"] == calls_before, "repeat call with equal data must not re-run any step"
 
 
 def test_gold_pure():
@@ -153,6 +160,7 @@ def test_gold_memory_guard():
 
 
 # --- Starter must be unimplemented -----------------------------------------
+
 
 def test_starter_not_implemented():
     with pytest.raises(NotImplementedError):

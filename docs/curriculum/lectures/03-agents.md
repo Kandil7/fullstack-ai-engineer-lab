@@ -75,30 +75,32 @@ def agent_loop(goal: str, max_iterations: int = 10) -> str:
         "history": [],
         "observations": [],
     }
-    
+
     for iteration in range(max_iterations):
         # Step 1: Perception
         observation = perceive(context)
-        
+
         # Step 2: Reasoning (LLM call)
         thought = llm_reason(observation, context["history"])
-        
+
         # Step 3: Action
         action = parse_action(thought)
         result = execute_action(action)
-        
+
         # Step 4: Update context
-        context["history"].append({
-            "thought": thought,
-            "action": action,
-            "result": result,
-        })
+        context["history"].append(
+            {
+                "thought": thought,
+                "action": action,
+                "result": result,
+            }
+        )
         context["observations"].append(result)
-        
+
         # Step 5: Check completion
         if goal_achieved(result, goal):
             return format_final_answer(result)
-    
+
     return "Max iterations reached without completing task."
 ```
 
@@ -137,7 +139,7 @@ Rules:
 class SearchCodeTool:
     name = "search_code"
     description = "Search for code snippets, functions, or patterns in the repository"
-    
+
     parameters = {
         "type": "object",
         "properties": {
@@ -147,14 +149,15 @@ class SearchCodeTool:
         },
         "required": ["query"],
     }
-    
+
     async def execute(self, query: str, language: str = None, top_k: int = 5):
         # Uses RAG retriever
         retriever = await get_retriever()
         embedding = await embedding_service.embed([query])
-        results = await retriever.retrieve(query, embedding[0], 
-                                           filter={"language": language} if language else None)
-        
+        results = await retriever.retrieve(
+            query, embedding[0], filter={"language": language} if language else None
+        )
+
         return format_search_results(results[:top_k])
 
 
@@ -162,15 +165,18 @@ class SearchCodeTool:
 class ReadFileTool:
     name = "read_file"
     description = "Read the full content of a file from the repository"
-    
+
     parameters = {
         "type": "object",
         "properties": {
-            "file_path": {"type": "string", "description": "Relative path from repo root"},
+            "file_path": {
+                "type": "string",
+                "description": "Relative path from repo root",
+            },
         },
         "required": ["file_path"],
     }
-    
+
     async def execute(self, file_path: str):
         path = Path.cwd() / file_path
         # Security: prevent path traversal
@@ -182,7 +188,7 @@ class ReadFileTool:
 class RunTestsTool:
     name = "run_tests"
     description = "Run the test suite for the repository"
-    
+
     parameters = {
         "type": "object",
         "properties": {
@@ -190,21 +196,25 @@ class RunTestsTool:
             "args": {"type": "string", "default": "-v"},
         },
     }
-    
+
     async def execute(self, test_path: str = None, args: str = "-v"):
         cmd = ["python", "-m", "pytest"]
-        if args: cmd.extend(args.split())
-        if test_path: cmd.append(test_path)
-        
+        if args:
+            cmd.extend(args.split())
+        if test_path:
+            cmd.append(test_path)
+
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-        return result.stdout + ("\n--- STDERR ---\n" + result.stderr if result.stderr else "")
+        return result.stdout + (
+            "\n--- STDERR ---\n" + result.stderr if result.stderr else ""
+        )
 
 
 # Tool 4: Propose Patch
 class ProposePatchTool:
     name = "propose_patch"
     description = "Propose a code change as a unified diff"
-    
+
     parameters = {
         "type": "object",
         "properties": {
@@ -214,12 +224,12 @@ class ProposePatchTool:
         },
         "required": ["file_path", "diff", "description"],
     }
-    
+
     async def execute(self, file_path: str, diff: str, description: str):
         # Validate diff format
         if not diff.startswith("---") or "+++" not in diff:
             raise ValueError("Invalid diff format")
-        
+
         # In production: create PR, save to file, etc.
         return f"Patch proposed for {file_path}:\n{description}\n\n```diff\n{diff}\n```"
 ```
@@ -240,7 +250,7 @@ class ReActAgent:
         self.model = model
         self.max_steps = max_steps
         self.llm_client = get_llm_client()
-    
+
     def _build_system_prompt(self) -> str:
         tool_descriptions = "\n".join(
             f"- {t.name}: {t.description}" for t in self.tools.values()
@@ -249,7 +259,7 @@ class ReActAgent:
             tool_descriptions=tool_descriptions,
             max_steps=self.max_steps,
         )
-    
+
     async def _call_llm(self, messages: List[Dict]) -> str:
         response = await self.llm_client.complete(
             messages=messages,
@@ -258,20 +268,22 @@ class ReActAgent:
             temperature=0.1,
         )
         return response.content
-    
-    def _parse_response(self, response: str) -> Tuple[str, Optional[str], Dict, Optional[str]]:
+
+    def _parse_response(
+        self, response: str
+    ) -> Tuple[str, Optional[str], Dict, Optional[str]]:
         """Parse: Thought, Action, Input, Final Answer"""
         thought = ""
         action = None
         action_input = {}
         final_answer = None
-        
+
         current_section = None
         buffer = []
-        
+
         for line in response.split("\n"):
             stripped = line.strip()
-            
+
             if stripped.startswith("Thought:"):
                 if current_section:
                     self._save_section(current_section, buffer, locals())
@@ -294,12 +306,12 @@ class ReActAgent:
                 buffer = [stripped[13:].strip()]
             elif current_section:
                 buffer.append(line)
-        
+
         if current_section:
             self._save_section(current_section, buffer, locals())
-        
+
         return thought, action, action_input, final_answer
-    
+
     def _save_section(self, section: str, buffer: List[str], local_vars: dict):
         text = "\n".join(buffer).strip()
         if section == "thought":
@@ -313,30 +325,34 @@ class ReActAgent:
                 local_vars["action_input"] = {"raw": text}
         elif section == "final":
             local_vars["final_answer"] = text
-    
+
     async def run(self, goal: str) -> str:
         context = AgentContext(goal=goal, max_steps=self.max_steps, tools=self.tools)
         messages = [
             {"role": "system", "content": self._build_system_prompt()},
             {"role": "user", "content": f"Goal: {goal}"},
         ]
-        
+
         for step_num in range(self.max_steps):
             # Reason
             response = await self._call_llm(messages)
             thought, action, action_input, final_answer = self._parse_response(response)
-            
+
             if final_answer:
                 return final_answer
-            
+
             # Act
             if action and action in self.tools:
                 tool = self.tools[action]
                 result = await tool.execute(**action_input)
-                observation = result.content if result.success else f"Error: {result.error}"
+                observation = (
+                    result.content if result.success else f"Error: {result.error}"
+                )
             else:
-                observation = f"Unknown action: {action}. Available: {list(self.tools.keys())}"
-            
+                observation = (
+                    f"Unknown action: {action}. Available: {list(self.tools.keys())}"
+                )
+
             # Record step
             step = AgentStep(
                 step_id=step_num + 1,
@@ -346,14 +362,16 @@ class ReActAgent:
                 observation=observation,
             )
             context.add_step(step)
-            
+
             # Next iteration
             messages.append({"role": "assistant", "content": response})
-            messages.append({
-                "role": "user",
-                "content": f"Observation: {observation}\n\nWhat should I do next?",
-            })
-        
+            messages.append(
+                {
+                    "role": "user",
+                    "content": f"Observation: {observation}\n\nWhat should I do next?",
+                }
+            )
+
         return "Maximum steps reached without completing the task."
 ```
 
@@ -373,14 +391,17 @@ from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolExecutor
 from langgraph.checkpoint.sqlite import SqliteSaver
 
+
 # Define state
 class AgentState(TypedDict):
     messages: List[BaseMessage]
     goal: str
     steps: int
 
+
 # Tool executor
 tool_executor = ToolExecutor([search_code, read_file, run_tests, propose_patch])
+
 
 # Nodes
 def agent_node(state: AgentState) -> AgentState:
@@ -389,18 +410,20 @@ def agent_node(state: AgentState) -> AgentState:
     response = llm.invoke(messages)
     return {"messages": messages + [response], "steps": state["steps"] + 1}
 
+
 def tool_node(state: AgentState) -> AgentState:
     """Execute tool calls"""
     last_message = state["messages"][-1]
     tool_calls = last_message.tool_calls
-    
+
     results = []
     for tc in tool_calls:
         tool = tool_executor.get_tool(tc["name"])
         result = tool.invoke(tc["args"])
         results.append(ToolMessage(content=str(result), tool_call_id=tc["id"]))
-    
+
     return {"messages": state["messages"] + results}
+
 
 def should_continue(state: AgentState) -> str:
     """Decide: continue to tools, or end"""
@@ -408,6 +431,7 @@ def should_continue(state: AgentState) -> str:
     if last_message.tool_calls:
         return "tools"
     return END
+
 
 # Build graph
 workflow = StateGraph(AgentState)
@@ -425,11 +449,14 @@ agent = workflow.compile(checkpointer=checkpointer)
 
 # Run
 config = {"configurable": {"thread_id": "session-123"}}
-result = agent.invoke({
-    "messages": [HumanMessage(content="Find and fix the bug in auth_service")],
-    "goal": "Fix auth bug",
-    "steps": 0,
-}, config=config)
+result = agent.invoke(
+    {
+        "messages": [HumanMessage(content="Find and fix the bug in auth_service")],
+        "goal": "Fix auth bug",
+        "steps": 0,
+    },
+    config=config,
+)
 ```
 
 ---
@@ -444,6 +471,7 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 
 app = Server("devmate-mcp")
+
 
 @app.list_tools()
 async def list_tools() -> List[types.Tool]:
@@ -479,6 +507,7 @@ async def list_tools() -> List[types.Tool]:
         ),
     ]
 
+
 @app.call_tool()
 async def call_tool(name: str, arguments: Dict) -> Sequence[types.TextContent]:
     if name == "search_code":
@@ -489,6 +518,7 @@ async def call_tool(name: str, arguments: Dict) -> Sequence[types.TextContent]:
         return await stats_tool()
     else:
         raise ValueError(f"Unknown tool: {name}")
+
 
 # Run stdio server (for Claude Desktop)
 async def main():
@@ -528,38 +558,42 @@ async def main():
 class AgentEvaluator:
     def __init__(self, agent: ReActAgent):
         self.agent = agent
-    
+
     async def evaluate(self, test_cases: List[Dict]) -> Dict:
         results = []
-        
+
         for case in test_cases:
             start = time.perf_counter()
-            
+
             try:
                 result = await self.agent.run(case["goal"])
                 latency = time.perf_counter() - start
-                
+
                 # Check completion
                 completed = self._check_completion(result, case.get("expected"))
-                
+
                 # Analyze tool usage
                 tool_usage = self._analyze_tool_usage(self.agent.context)
-                
-                results.append({
-                    "goal": case["goal"],
-                    "completed": completed,
-                    "latency": latency,
-                    "steps": self.agent.context.current_step,
-                    "tools_used": tool_usage,
-                    "result": result,
-                })
+
+                results.append(
+                    {
+                        "goal": case["goal"],
+                        "completed": completed,
+                        "latency": latency,
+                        "steps": self.agent.context.current_step,
+                        "tools_used": tool_usage,
+                        "result": result,
+                    }
+                )
             except Exception as e:
-                results.append({
-                    "goal": case["goal"],
-                    "completed": False,
-                    "error": str(e),
-                })
-        
+                results.append(
+                    {
+                        "goal": case["goal"],
+                        "completed": False,
+                        "error": str(e),
+                    }
+                )
+
         # Aggregate metrics
         return {
             "completion_rate": sum(r["completed"] for r in results) / len(results),

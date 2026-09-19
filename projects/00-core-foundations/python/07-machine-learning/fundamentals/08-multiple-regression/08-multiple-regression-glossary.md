@@ -39,13 +39,7 @@
 from sklearn.linear_model import LinearRegression
 import numpy as np
 
-X = np.array([
-    [1500, 3, 10],
-    [2000, 4, 5],
-    [1200, 2, 15],
-    [1800, 3, 8],
-    [2200, 4, 3]
-])
+X = np.array([[1500, 3, 10], [2000, 4, 5], [1200, 2, 15], [1800, 3, 8], [2200, 4, 3]])
 y = np.array([300000, 450000, 250000, 400000, 500000])
 
 model = LinearRegression()
@@ -79,10 +73,9 @@ import numpy as np
 abs_coef = np.abs(model.coef_)
 importance = abs_coef / abs_coef.sum()
 
-feature_names = ['Square Feet', 'Bedrooms', 'Age']
-for name, imp in sorted(zip(feature_names, importance), 
-                       key=lambda x: x[1], reverse=True):
-    print(f"  {name}: {imp:.3f} ({imp*100:.1f}%)")
+feature_names = ["Square Feet", "Bedrooms", "Age"]
+for name, imp in sorted(zip(feature_names, importance), key=lambda x: x[1], reverse=True):
+    print(f"  {name}: {imp:.3f} ({imp * 100:.1f}%)")
 ```
 
 **Related Terms:** Coefficients, Permutation Importance, Feature Selection
@@ -156,11 +149,13 @@ y = b₀ + b₁x₁ + b₂x₂ + ... + bₙxₙ
 from sklearn.linear_model import LinearRegression
 
 # Multiple features
-X = np.array([
-    [1500, 3, 10],  # sqft, bedrooms, age
-    [2000, 4, 5],
-    [1200, 2, 15]
-])
+X = np.array(
+    [
+        [1500, 3, 10],  # sqft, bedrooms, age
+        [2000, 4, 5],
+        [1200, 2, 15],
+    ]
+)
 y = np.array([300000, 450000, 250000])
 
 model = LinearRegression()
@@ -222,20 +217,22 @@ where R²ᵢ is the R² from regressing feature i on all other features.
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
+
 def calculate_vif(X):
     vif_scores = []
     for i in range(X.shape[1]):
         # Regress feature i on all other features
         X_other = np.delete(X, i, axis=1)
         y_i = X[:, i]
-        
+
         model = LinearRegression()
         model.fit(X_other, y_i)
         r2 = model.score(X_other, y_i)
-        
+
         vif = 1 / (1 - r2) if r2 < 1 else np.inf
         vif_scores.append(vif)
     return vif_scores
+
 
 vif_scores = calculate_vif(X)
 for name, vif in zip(feature_names, vif_scores):

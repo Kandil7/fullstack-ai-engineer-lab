@@ -67,9 +67,9 @@ curriculum_content = {
     "topic": "derivatives",
     "content": """
     المشتقات في الرياضيات
-    
+
     التعريف: المشتقة هي معدل تغير الدالة بالنسبة لمتغيرها
-    
+
     القواعد:
     1. مشتقة الثابت = 0
     2. مشتقة x^n = n*x^(n-1)
@@ -77,13 +77,13 @@ curriculum_content = {
     """,
     "examples": [
         "إذا كانت f(x) = x²، فإن f'(x) = 2x",
-        "إذا كانت f(x) = 3x³، فإن f'(x) = 9x²"
+        "إذا كانت f(x) = 3x³، فإن f'(x) = 9x²",
     ],
     "metadata": {
         "difficulty": "medium",
         "exam_weight": 0.15,
-        "prerequisites": ["algebra", "functions"]
-    }
+        "prerequisites": ["algebra", "functions"],
+    },
 }
 ```
 
@@ -93,14 +93,15 @@ curriculum_content = {
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
+
 class EmbeddingService:
     def __init__(self):
-        self.model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
-    
+        self.model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+
     async def generate_embedding(self, text: str) -> list[float]:
         embedding = self.model.encode(text)
         return embedding.tolist()
-    
+
     async def generate_batch_embeddings(self, texts: list[str]) -> list[list[float]]:
         embeddings = self.model.encode(texts)
         return embeddings.tolist()
@@ -112,11 +113,12 @@ class EmbeddingService:
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 
+
 class VectorStore:
     def __init__(self):
         self.client = QdrantClient(host="localhost", port=6333)
         self._ensure_collection()
-    
+
     def _ensure_collection(self):
         collections = self.client.get_collections().collections
         if "curriculum" not in [c.name for c in collections]:
@@ -124,32 +126,23 @@ class VectorStore:
                 collection_name="curriculum",
                 vectors_config=VectorParams(
                     size=384,  # MiniLM output size
-                    distance=Distance.COSINE
-                )
+                    distance=Distance.COSINE,
+                ),
             )
-    
-    async def upsert_content(self, content_id: str, embedding: list[float], metadata: dict):
+
+    async def upsert_content(
+        self, content_id: str, embedding: list[float], metadata: dict
+    ):
         self.client.upsert(
             collection_name="curriculum",
-            points=[
-                PointStruct(
-                    id=content_id,
-                    vector=embedding,
-                    payload=metadata
-                )
-            ]
+            points=[PointStruct(id=content_id, vector=embedding, payload=metadata)],
         )
-    
+
     async def search(self, query_embedding: list[float], limit: int = 5) -> list[dict]:
         results = self.client.search(
-            collection_name="curriculum",
-            query_vector=query_embedding,
-            limit=limit
+            collection_name="curriculum", query_vector=query_embedding, limit=limit
         )
-        return [
-            {"id": r.id, "score": r.score, "payload": r.payload}
-            for r in results
-        ]
+        return [{"id": r.id, "score": r.score, "payload": r.payload} for r in results]
 ```
 
 ## LLM Integration
@@ -159,48 +152,51 @@ class VectorStore:
 ```python
 from abc import ABC, abstractmethod
 
+
 class LLMProvider(ABC):
     @abstractmethod
     async def generate(self, prompt: str, **kwargs) -> str:
         pass
-    
+
     @abstractmethod
     async def stream(self, prompt: str, **kwargs):
         pass
 
+
 class OpenAIProvider(LLMProvider):
     def __init__(self, api_key: str):
         self.client = openai.AsyncOpenAI(api_key=api_key)
-    
+
     async def generate(self, prompt: str, model: str = "gpt-4", **kwargs) -> str:
         response = await self.client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            **kwargs
+            model=model, messages=[{"role": "user", "content": prompt}], **kwargs
         )
         return response.choices[0].message.content
-    
+
     async def stream(self, prompt: str, model: str = "gpt-4", **kwargs):
         response = await self.client.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
             stream=True,
-            **kwargs
+            **kwargs,
         )
         async for chunk in response:
             if chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content
 
+
 class ClaudeProvider(LLMProvider):
     def __init__(self, api_key: str):
         self.client = anthropic.AsyncAnthropic(api_key=api_key)
-    
-    async def generate(self, prompt: str, model: str = "claude-3-opus", **kwargs) -> str:
+
+    async def generate(
+        self, prompt: str, model: str = "claude-3-opus", **kwargs
+    ) -> str:
         response = await self.client.messages.create(
             model=model,
             max_tokens=4096,
             messages=[{"role": "user", "content": prompt}],
-            **kwargs
+            **kwargs,
         )
         return response.content[0].text
 ```
@@ -291,28 +287,22 @@ class TutorAgent:
     def __init__(self, rag_service: RAGService, llm_service: LLMService):
         self.rag = rag_service
         self.llm = llm_service
-    
+
     async def answer_question(
-        self,
-        question: str,
-        subject: str,
-        conversation_history: list[dict]
+        self, question: str, subject: str, conversation_history: list[dict]
     ) -> AsyncGenerator[str, None]:
         # 1. Retrieve relevant context
         context = await self.rag.retrieve_context(question, subject)
-        
+
         # 2. Build prompt with context
-        prompt = TUTOR_SYSTEM_PROMPT.substitute(
-            subject=subject,
-            context=context
-        )
-        
+        prompt = TUTOR_SYSTEM_PROMPT.substitute(subject=subject, context=context)
+
         # 3. Add conversation history
         messages = [{"role": "system", "content": prompt}]
         for msg in conversation_history[-10:]:  # Last 10 messages
             messages.append({"role": msg["role"], "content": msg["content"]})
         messages.append({"role": "user", "content": question})
-        
+
         # 4. Stream response
         async for chunk in self.llm.stream(messages):
             yield chunk
@@ -325,21 +315,18 @@ class QuestionGeneratorAgent:
     def __init__(self, rag_service: RAGService, llm_service: LLMService):
         self.rag = rag_service
         self.llm = llm_service
-    
+
     async def generate_questions(
         self,
         subject: str,
         topic: str,
         count: int = 5,
         difficulty: str = "medium",
-        question_type: str = "multiple_choice"
+        question_type: str = "multiple_choice",
     ) -> list[dict]:
         # 1. Retrieve curriculum context
-        context = await self.rag.retrieve_context(
-            f"{subject} {topic}",
-            subject
-        )
-        
+        context = await self.rag.retrieve_context(f"{subject} {topic}", subject)
+
         # 2. Build prompt
         prompt = QUESTION_GENERATOR_PROMPT.substitute(
             count=count,
@@ -347,16 +334,16 @@ class QuestionGeneratorAgent:
             topic=topic,
             difficulty=difficulty,
             question_type=question_type,
-            context=context
+            context=context,
         )
-        
+
         # 3. Generate questions
         response = await self.llm.generate(prompt)
-        
+
         # 4. Parse and validate
         questions = json.loads(response)
         return self._validate_questions(questions)
-    
+
     def _validate_questions(self, questions: list[dict]) -> list[dict]:
         validated = []
         for q in questions:
@@ -372,24 +359,20 @@ class ExamBuilderAgent:
     def __init__(self, question_service: QuestionService, llm_service: LLMService):
         self.questions = question_service
         self.llm = llm_service
-    
+
     async def build_exam(
-        self,
-        user_id: str,
-        subject: str,
-        duration: int = 60,
-        topics: list[str] = None
+        self, user_id: str, subject: str, duration: int = 60, topics: list[str] = None
     ) -> dict:
         # 1. Get user's weak areas
         weak_areas = await self._analyze_weak_areas(user_id, subject)
-        
+
         # 2. Select questions based on weak areas
         questions = await self.questions.select_questions(
             subject=subject,
             topics=topics or weak_areas,
-            count=self._calculate_question_count(duration)
+            count=self._calculate_question_count(duration),
         )
-        
+
         # 3. Create exam
         exam = {
             "id": str(uuid.uuid4()),
@@ -397,11 +380,11 @@ class ExamBuilderAgent:
             "subject": subject,
             "duration": duration,
             "questions": questions,
-            "created_at": datetime.now().isoformat()
+            "created_at": datetime.now().isoformat(),
         }
-        
+
         return exam
-    
+
     def _calculate_question_count(self, duration: int) -> int:
         # Roughly 2 minutes per question
         return max(10, duration // 2)
@@ -415,29 +398,26 @@ class ExamBuilderAgent:
 class ResponseEvaluator:
     def __init__(self, llm_service: LLMService):
         self.llm = llm_service
-    
+
     async def evaluate_response(
-        self,
-        question: str,
-        response: str,
-        context: str
+        self, question: str, response: str, context: str
     ) -> dict:
         prompt = f"""
         قيّم جودة الإجابة التالية:
-        
+
         السؤال: {question}
         الإجابة: {response}
         السياق: {context}
-        
+
         قيّم على المقياس من 1-10:
         1. الدقة العلمية (Scientific Accuracy)
         2. وضوح الشرح (Clarity)
         3. اكتمال الإجابة (Completeness)
         4. التوافق مع المنهج (Curriculum Alignment)
-        
+
         أرجع الإجابة بصيغة JSON.
         """
-        
+
         evaluation = await self.llm.generate(prompt)
         return json.loads(evaluation)
 ```
@@ -449,33 +429,22 @@ class HallucinationDetector:
     def __init__(self, rag_service: RAGService, llm_service: LLMService):
         self.rag = rag_service
         self.llm = llm_service
-    
-    async def detect_hallucination(
-        self,
-        response: str,
-        context: str
-    ) -> dict:
+
+    async def detect_hallucination(self, response: str, context: str) -> dict:
         # 1. Extract claims from response
         claims = await self._extract_claims(response)
-        
+
         # 2. Verify each claim against context
         verified = []
         for claim in claims:
             is_supported = await self._verify_claim(claim, context)
-            verified.append({
-                "claim": claim,
-                "supported": is_supported
-            })
-        
+            verified.append({"claim": claim, "supported": is_supported})
+
         # 3. Calculate hallucination score
         unsupported = sum(1 for v in verified if not v["supported"])
         score = unsupported / len(verified) if verified else 0
-        
-        return {
-            "score": score,
-            "claims": verified,
-            "hallucinated": score > 0.3
-        }
+
+        return {"score": score, "claims": verified, "hallucinated": score > 0.3}
 ```
 
 ## Project Structure

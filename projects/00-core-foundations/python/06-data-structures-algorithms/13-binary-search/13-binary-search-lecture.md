@@ -249,7 +249,7 @@ print(find_insertion_point(arr, 6))  # Output: 3 (insert before index 3)
 def binary_search_wrong(arr, target):
     left = 0
     right = len(arr) - 1
-    
+
     while left < right:  # BUG: misses case when left == right
         mid = (left + right) // 2
         if arr[mid] == target:
@@ -258,14 +258,15 @@ def binary_search_wrong(arr, target):
             left = mid + 1
         else:
             right = mid - 1
-    
+
     return -1
+
 
 # CORRECT: Use <=
 def binary_search_correct(arr, target):
     left = 0
     right = len(arr) - 1
-    
+
     while left <= right:  # Correct: includes single element case
         mid = (left + right) // 2
         if arr[mid] == target:
@@ -274,7 +275,7 @@ def binary_search_correct(arr, target):
             left = mid + 1
         else:
             right = mid - 1
-    
+
     return -1
 ```
 
@@ -394,7 +395,7 @@ import bisect
 arr = [1, 3, 5, 7, 9]
 
 # Find insertion point
-idx = bisect.bisect_left(arr, 5)   # Returns 2
+idx = bisect.bisect_left(arr, 5)  # Returns 2
 idx = bisect.bisect_right(arr, 5)  # Returns 3
 
 # Check if element exists

@@ -24,11 +24,11 @@
 - **Related terms**: Raw String, Special Character, Backslash
 ```python
 # Common escape sequences
-print("Hello\nWorld")    # Newline
-print("Name\tAge")       # Tab
-print("Quote: \"Hi\"")   # Double quote
-print("Backslash: \\")   # Backslash
-print("Bell: \a")        # Alert sound
+print("Hello\nWorld")  # Newline
+print("Name\tAge")  # Tab
+print('Quote: "Hi"')  # Double quote
+print("Backslash: \\")  # Backslash
+print("Bell: \a")  # Alert sound
 ```
 
 **Expression**
@@ -38,9 +38,9 @@ print("Bell: \a")        # Alert sound
 ```python
 name = "Alice"
 age = 25
-print(f"Name: {name}")      # Variable expression
-print(f"Age: {age + 1}")    # Arithmetic expression
-print(f"PI: {3.14159:.2f}") # Function call expression
+print(f"Name: {name}")  # Variable expression
+print(f"Age: {age + 1}")  # Arithmetic expression
+print(f"PI: {3.14159:.2f}")  # Function call expression
 ```
 
 ### F
@@ -53,7 +53,7 @@ print(f"PI: {3.14159:.2f}") # Function call expression
 name = "Alice"
 age = 25
 print(f"Hello, {name}!")  # Hello, Alice!
-print(f"Age: {age}")      # Age: 25
+print(f"Age: {age}")  # Age: 25
 print(f"Next year: {age + 1}")  # Next year: 26
 ```
 
@@ -63,10 +63,10 @@ print(f"Next year: {age + 1}")  # Next year: 26
 - **Related terms**: Format Mini-Language, Formatting, Precision
 ```python
 pi = 3.14159
-print(f"Pi: {pi:.2f}")    # 2 decimal places
-print(f"Pi: {pi:.4f}")    # 4 decimal places
+print(f"Pi: {pi:.2f}")  # 2 decimal places
+print(f"Pi: {pi:.4f}")  # 4 decimal places
 print(f"Number: {1234:,}")  # With commas
-print(f"Text: {'hi':^10}") # Centered
+print(f"Text: {'hi':^10}")  # Centered
 ```
 
 **Format Mini-Language**
@@ -104,9 +104,9 @@ print("Line 1\nLine 2")
 - **Related terms**: Argument, Function, print()
 ```python
 # print() parameters
-print("a", "b", sep="-")    # Separator
-print("Hello", end=" ")     # End character
-print("World")              # Output: Hello World
+print("a", "b", sep="-")  # Separator
+print("Hello", end=" ")  # End character
+print("World")  # Output: Hello World
 ```
 
 **print()**
@@ -141,8 +141,8 @@ print(f"Pi: {pi:.0f}")  # 3
 ```python
 # Regular string - interprets escape sequences
 print("C:\new\folder")  # C:
-                        # ew
-                        # older
+# ew
+# older
 
 # Raw string - literal backslashes
 print(r"C:\new\folder")  # C:\new\folder
@@ -220,10 +220,10 @@ print("Bob\t30\tBoston")
 ```python
 name = "Alice"
 print(f"{'Name':<10}")  # "Name      "
-print(f"{name:<10}")    # "Alice     "
-print(f"{name:>10}")    # "     Alice"
-print(f"{name:^10}")    # "  Alice   "
-print(f"{name:*^10}")   # "**Alice***"
+print(f"{name:<10}")  # "Alice     "
+print(f"{name:>10}")  # "     Alice"
+print(f"{name:^10}")  # "  Alice   "
+print(f"{name:*^10}")  # "**Alice***"
 ```
 
 ## Key Concepts Summary

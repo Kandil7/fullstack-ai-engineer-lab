@@ -55,6 +55,7 @@ time-series DB) — sampled if volume demands.
 ```python
 import time, hashlib, json
 
+
 def predict_and_log(features: dict, predict_fn) -> dict:
     t0 = time.perf_counter()
     proba = float(predict_fn(features))
@@ -62,12 +63,12 @@ def predict_and_log(features: dict, predict_fn) -> dict:
     record = {
         "ts": int(time.time()),
         "req_id": hashlib.sha1(json.dumps(features, sort_keys=True).encode()).hexdigest()[:12],
-        "features": features,          # or a feature hash for privacy
+        "features": features,  # or a feature hash for privacy
         "proba": proba,
         "latency_ms": latency_ms,
         "model_version": "v2",
     }
-    _append(record)                    # structured log to monitoring store
+    _append(record)  # structured log to monitoring store
     return record
 ```
 
@@ -93,6 +94,7 @@ trained on?* Three standard metrics:
 ```python
 import numpy as np
 
+
 def psi(reference: np.ndarray, live: np.ndarray, bins: int = 10) -> float:
     """Population Stability Index between two 1-D distributions."""
     edges = np.percentile(reference, np.linspace(0, 100, bins + 1))
@@ -102,8 +104,17 @@ def psi(reference: np.ndarray, live: np.ndarray, bins: int = 10) -> float:
     live_p = live_h / live_h.sum() + 1e-6
     return float(np.sum((live_p - ref_p) * np.log(live_p / ref_p)))
 
-print("PSI:", round(psi(np.random.default_rng(0).normal(50, 10, 10000),
-                        np.random.default_rng(1).normal(55, 12, 10000)), 3))
+
+print(
+    "PSI:",
+    round(
+        psi(
+            np.random.default_rng(0).normal(50, 10, 10000),
+            np.random.default_rng(1).normal(55, 12, 10000),
+        ),
+        3,
+    ),
+)
 ```
 
 Output (conceptually):
@@ -134,8 +145,12 @@ def feedback_score(predictions: list[tuple[float, bool]]) -> dict[str, float]:
     fn = sum(1 for p, y in predictions if p < 0.5 and y)
     precision = tp / (tp + fp + 1e-9)
     recall = tp / (tp + fn + 1e-9)
-    return {"precision": precision, "recall": recall,
-            "n_positive": tp + fp, "n_labels": len(predictions)}
+    return {
+        "precision": precision,
+        "recall": recall,
+        "n_positive": tp + fp,
+        "n_labels": len(predictions),
+    }
 ```
 
 Output (conceptually):
@@ -161,7 +176,8 @@ def should_alert(window: list[float], threshold: float = 0.25, need: int = 3) ->
     """Alert only when `need` of the last windows breached the threshold."""
     return sum(1 for v in window[-5:] if v > threshold) >= need
 
-print(should_alert([0.12, 0.18, 0.31, 0.28, 0.33]))   # 3 of last 5 breach
+
+print(should_alert([0.12, 0.18, 0.31, 0.28, 0.33]))  # 3 of last 5 breach
 ```
 
 Output (conceptually):

@@ -32,7 +32,7 @@ import time
 from collections import Counter
 
 random.seed(42)
-os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
+os.environ.setdefault("MPLBACKEND", "Agg")  # never open a GUI window
 
 # ============================================================
 # 1. timeit: Microbenchmarks and Their Traps
@@ -42,9 +42,11 @@ os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
 # slower than local -- pass globals= or bind to a local; (c) building the
 # object INSIDE the timed statement measures construction, not the op.
 
+
 def demo_timeit_traps() -> None:
     """Show stable timing and the global-lookup trap."""
     import timeit
+
     data = list(range(1000))
     # timeit only sees the namespace you hand it via globals=; a local
     # variable is invisible unless you put it there.
@@ -67,6 +69,7 @@ def demo_timeit_traps() -> None:
 # Profile first, optimize second. pstats sorts by cumulative or self time
 # and prints the top rows; tottime is time INSIDE the function, excluding
 # callees -- the usual place to look first.
+
 
 def _mix_work(rows: int) -> list[float]:
     """A plausible pipeline: nested loops, string work, a sort."""
@@ -103,6 +106,7 @@ def demo_cprofile() -> None:
 # Complexity annotations:
 #   naive_dedup: O(n^2) time, O(1) extra space
 #   linear_dedup: O(n) time, O(n) space
+
 
 def naive_dedup(items: list[int]) -> list[int]:
     """Keep first occurrences, scanning a prefix each time (O(n^2))."""
@@ -142,6 +146,7 @@ def demo_algorithmic_win() -> tuple[float, float]:
 # is O(1) per lookup; keys must be hashable. For AI work: caching the
 # embedding of a repeated query is the same pattern.
 
+
 def _fib(n: int) -> int:
     """Raw Fibonacci: T(n) = T(n-1) + T(n-2), exponential calls."""
     return n if n < 2 else _fib(n - 1) + _fib(n - 2)
@@ -174,6 +179,7 @@ def demo_cache() -> tuple[int, int]:
 # making attribute access faster. At 1M embedding records this is
 # hundreds of MB. (See 13-slots.py for the deep dive.)
 
+
 class RowRegular:
     """A plain row object with a per-instance dict."""
 
@@ -199,6 +205,7 @@ def demo_slots() -> tuple[int, int]:
     the real cost of a regular class is its per-instance __dict__, so
     the comparison must include it.
     """
+
     def instance_bytes(obj: object) -> int:
         total = sys.getsizeof(obj)
         d = getattr(obj, "__dict__", None)
@@ -226,10 +233,11 @@ def demo_slots() -> tuple[int, int]:
 # concatenation can no longer reuse the buffer. join is O(n) either way.
 # Complexity: concat_with_plus O(n^2) total copies; join O(n).
 
+
 def concat_with_plus(chunks: list[str]) -> str:
     """Quadratic assembly: every intermediate stays referenced."""
     s = ""
-    progress: list[str] = []          # holds refs -> blocks in-place resize
+    progress: list[str] = []  # holds refs -> blocks in-place resize
     for chunk in chunks:
         s = s + chunk
         progress.append(s)
@@ -263,6 +271,7 @@ def demo_join_vs_plus() -> tuple[float, float]:
 # O(n^2) dedup, and building lists of throwaway objects. The optimized
 # version keeps the same I/O contract but fixes all three.
 
+
 def build_report_slow(rows: list[dict[str, int]]) -> str:
     """The 'before': naive in every dimension (same output format).
 
@@ -284,7 +293,7 @@ def build_report_slow(rows: list[dict[str, int]]) -> str:
                 line = line + ","
             line = line + str(row[key])
         lines = lines + line + "\n"
-        audit.append(lines)              # holds refs -> O(n^2) copies
+        audit.append(lines)  # holds refs -> O(n^2) copies
     return header + "\n" + lines
 
 
@@ -336,41 +345,46 @@ def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # 1. Correctness first: optimized paths must match naive ones.
     data = [random.randrange(50) for _ in range(3000)]
-    assert linear_dedup(data) == naive_dedup(data), \
+    assert linear_dedup(data) == naive_dedup(data), (
         "linear dedup must return the same elements as naive dedup"
+    )
     chunks = [f"chunk-{i};" for i in range(8_000)]
-    assert concat_with_join(chunks) == concat_with_plus(chunks), \
+    assert concat_with_join(chunks) == concat_with_plus(chunks), (
         "join and plus assembly must produce identical strings"
+    )
 
     # 2. Algorithmic win: linear dedup is far faster (generous ratio).
     naive_t, linear_t = demo_algorithmic_win()
-    assert linear_t < naive_t * 0.2, \
-        "linear dedup must be >5x faster than naive O(n^2) (got %.2fx)" % (
-            naive_t / linear_t)
+    assert linear_t < naive_t * 0.2, (
+        "linear dedup must be >5x faster than naive O(n^2) (got %.2fx)" % (naive_t / linear_t)
+    )
 
     # 3. functools.cache cuts calls by orders of magnitude (deterministic).
     uncached_calls, cached_calls = demo_cache()
-    assert uncached_calls > cached_calls * 1000, \
-        "cache must eliminate >1000x the recursive calls (got %d vs %d)" % (
-            uncached_calls, cached_calls)
+    assert uncached_calls > cached_calls * 1000, (
+        "cache must eliminate >1000x the recursive calls (got %d vs %d)"
+        % (uncached_calls, cached_calls)
+    )
 
     # 4. __slots__ saves memory (measured, not wall-clock).
     reg_bytes, slot_bytes = demo_slots()
-    assert slot_bytes < reg_bytes, \
-        "__slots__ must reduce per-instance memory"
+    assert slot_bytes < reg_bytes, "__slots__ must reduce per-instance memory"
 
     # 5. str.join beats fresh-allocation concatenation (generous ratio).
     plus_t, join_t = demo_join_vs_plus()
-    assert join_t < plus_t * 0.2, \
-        "join must be >5x faster than s = s + c (got %.2fx)" % (plus_t / join_t)
+    assert join_t < plus_t * 0.2, "join must be >5x faster than s = s + c (got %.2fx)" % (
+        plus_t / join_t
+    )
 
     # 6. Case study: the optimized report is much faster AND identical.
     rows = [{"id": i, "score": random.randrange(1000)} for i in range(8000)]
-    assert build_report_fast(rows) == build_report_slow(rows), \
+    assert build_report_fast(rows) == build_report_slow(rows), (
         "optimized report must be byte-identical to the slow one"
+    )
     slow_t, fast_t = demo_case_study()
-    assert fast_t < slow_t * 0.2, \
-        "optimized pipeline must be >5x faster (got %.2fx)" % (slow_t / fast_t)
+    assert fast_t < slow_t * 0.2, "optimized pipeline must be >5x faster (got %.2fx)" % (
+        slow_t / fast_t
+    )
 
     # 7. cProfile runs without error and reports the hot function.
     profiler = cProfile.Profile()
@@ -380,8 +394,7 @@ def _verify() -> None:
     stats = pstats.Stats(profiler)
     stats.sort_stats("tottime")
     top = stats.stats
-    assert any("_mix_work" in fn[2] for fn in top), \
-        "cProfile must record _mix_work in its stats"
+    assert any("_mix_work" in fn[2] for fn in top), "cProfile must record _mix_work in its stats"
 
     print("\n[OK] 25-profiling-and-optimization: all checks passed")
 

@@ -32,17 +32,15 @@ starter = _load("starter_15", os.path.join(HERE, "starter.py"))
 
 # ---------------------------------------------------------------- helpers
 
+
 def _assert_no_python_loops(mod):
     for name in ("starter", "solution"):
-        tree = ast.parse(
-            open(os.path.join(HERE, name + ".py"), encoding="utf-8").read()
-        )
+        tree = ast.parse(open(os.path.join(HERE, name + ".py"), encoding="utf-8").read())
         banned = [
             n
             for n in ast.walk(tree)
             if isinstance(
-                n, (ast.For, ast.While, ast.ListComp, ast.DictComp,
-                    ast.SetComp, ast.GeneratorExp)
+                n, (ast.For, ast.While, ast.ListComp, ast.DictComp, ast.SetComp, ast.GeneratorExp)
             )
         ]
         assert not banned, f"{name}.py contains Python loops/comprehensions"
@@ -62,38 +60,47 @@ def _anchor_docs(n_each=1000, seed=7):
 
 # ---------------------------------------------------------------- bronze
 
+
 def test_bronze_stats_coo():
     coo = sp.coo_matrix(
-        (np.array([1.0, 2.0, 3.0, 4.0, 5.0]),
-         (np.array([0, 1, 2, 0, 3]), np.array([0, 1, 2, 2, 1]))),
-        shape=(4, 3))
+        (
+            np.array([1.0, 2.0, 3.0, 4.0, 5.0]),
+            (np.array([0, 1, 2, 0, 3]), np.array([0, 1, 2, 2, 1])),
+        ),
+        shape=(4, 3),
+    )
     s = solution.sparse_stats(coo)
     assert s["nnz"] == 5
     assert s["density"] == pytest.approx(5 / 12)
-    assert s["bytes"] == 5 * 8 + 5 * 4 + 5 * 4          # data+idx+ptr
+    assert s["bytes"] == 5 * 8 + 5 * 4 + 5 * 4  # data+idx+ptr
     assert s["shape"] == (4, 3)
 
 
 def test_bronze_stats_counts_stored_zeros():
-    coo = sp.coo_matrix((np.array([1.0, 0.0, 2.0]),
-                         (np.array([0, 1, 2]), np.array([0, 1, 2]))),
-                        shape=(3, 3))
+    coo = sp.coo_matrix(
+        (np.array([1.0, 0.0, 2.0]), (np.array([0, 1, 2]), np.array([0, 1, 2]))), shape=(3, 3)
+    )
     s = solution.sparse_stats(coo)
     assert s["nnz"] == 3, "explicit zeros count until eliminate_zeros()"
 
 
 def test_bronze_stats_csc_matches_csr():
     coo = sp.coo_matrix(
-        (np.array([1.0, 2.0, 3.0]),
-         (np.array([0, 1, 2]), np.array([2, 0, 1]))), shape=(3, 3))
-    assert solution.sparse_stats(coo.tocsr()) == \
-        solution.sparse_stats(coo.tocsc())
+        (np.array([1.0, 2.0, 3.0]), (np.array([0, 1, 2]), np.array([2, 0, 1]))), shape=(3, 3)
+    )
+    assert solution.sparse_stats(coo.tocsr()) == solution.sparse_stats(coo.tocsc())
 
 
 def test_bronze_stats_round_trip_truth():
     rng = np.random.default_rng(0)
-    coo = sp.random(50, 30, density=0.2, format="coo", random_state=0,
-                    data_rvs=lambda k: rng.uniform(1.0, 2.0, size=k))
+    coo = sp.random(
+        50,
+        30,
+        density=0.2,
+        format="coo",
+        random_state=0,
+        data_rvs=lambda k: rng.uniform(1.0, 2.0, size=k),
+    )
     s = solution.sparse_stats(coo)
     assert s["nnz"] == coo.nnz
     assert s["density"] == pytest.approx(0.2, abs=1e-6)
@@ -102,10 +109,17 @@ def test_bronze_stats_round_trip_truth():
 
 # ---------------------------------------------------------------- silver
 
+
 def test_silver_row_normalize_units():
     rng = np.random.default_rng(1)
-    X = sp.random(5, 4, density=0.5, format="csr", random_state=1,
-                  data_rvs=lambda k: rng.uniform(0.1, 1.0, size=k))
+    X = sp.random(
+        5,
+        4,
+        density=0.5,
+        format="csr",
+        random_state=1,
+        data_rvs=lambda k: rng.uniform(0.1, 1.0, size=k),
+    )
     Xn = solution.row_normalize_csr(X)
     l2 = np.asarray(Xn.power(2).sum(axis=1)).ravel() ** 0.5
     assert isinstance(Xn, sp.csr_matrix)
@@ -121,8 +135,14 @@ def test_silver_row_normalize_zero_row_raises():
 
 def test_silver_row_normalize_accepts_csc():
     rng = np.random.default_rng(2)
-    Xcsc = sp.random(4, 5, density=0.6, format="csc", random_state=2,
-                     data_rvs=lambda k: rng.uniform(0.1, 1.0, size=k))
+    Xcsc = sp.random(
+        4,
+        5,
+        density=0.6,
+        format="csc",
+        random_state=2,
+        data_rvs=lambda k: rng.uniform(0.1, 1.0, size=k),
+    )
     Xn = solution.row_normalize_csr(Xcsc)
     l2 = np.asarray(Xn.power(2).sum(axis=1)).ravel() ** 0.5
     assert isinstance(Xn, sp.csr_matrix)
@@ -131,10 +151,22 @@ def test_silver_row_normalize_accepts_csc():
 
 def test_silver_sparse_dot_matches_dense():
     rng = np.random.default_rng(3)
-    A = sp.random(60, 50, density=0.1, format="csr", random_state=3,
-                  data_rvs=lambda k: rng.uniform(0.0, 1.0, size=k))
-    B = sp.random(50, 40, density=0.1, format="csr", random_state=4,
-                  data_rvs=lambda k: rng.uniform(0.0, 1.0, size=k))
+    A = sp.random(
+        60,
+        50,
+        density=0.1,
+        format="csr",
+        random_state=3,
+        data_rvs=lambda k: rng.uniform(0.0, 1.0, size=k),
+    )
+    B = sp.random(
+        50,
+        40,
+        density=0.1,
+        format="csr",
+        random_state=4,
+        data_rvs=lambda k: rng.uniform(0.0, 1.0, size=k),
+    )
     C = solution.sparse_dot(A, B)
     assert isinstance(C, sp.csr_matrix)
     assert np.allclose(C.toarray(), A.toarray() @ B.toarray(), atol=1e-12)
@@ -148,6 +180,7 @@ def test_silver_sparse_dot_shape_mismatch_raises():
 
 
 # ---------------------------------------------------------------- gold
+
 
 def test_gold_retrieval_anchor_a():
     docs = _anchor_docs()
@@ -207,6 +240,7 @@ def test_gold_no_python_loops():
 
 
 # ---------------------------------------------------------------- starter
+
 
 def test_starter_raises_not_implemented():
     with pytest.raises(NotImplementedError):

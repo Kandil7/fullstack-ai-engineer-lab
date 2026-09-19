@@ -437,6 +437,7 @@ class ListNode:
         self.val = val
         self.next = next
 
+
 def reverse_list(head):
     prev = None
     curr = head
@@ -447,6 +448,7 @@ def reverse_list(head):
         curr = next_node
     return prev
 
+
 # Helper: build list from array
 def build_list(arr):
     dummy = ListNode(0)
@@ -456,6 +458,7 @@ def build_list(arr):
         curr = curr.next
     return dummy.next
 
+
 # Helper: list to array
 def to_array(head):
     result = []
@@ -463,6 +466,7 @@ def to_array(head):
         result.append(head.val)
         head = head.next
     return result
+
 
 # Test
 head = build_list([1, 2, 3, 4, 5])
@@ -490,6 +494,7 @@ def merge_two_lists(l1, l2):
     curr.next = l1 or l2
     return dummy.next
 
+
 # Test
 l1 = build_list([1, 2, 4])
 l2 = build_list([1, 3, 4])
@@ -509,6 +514,7 @@ def has_cycle(head):
         if slow == fast:
             return True
     return False
+
 
 # Test
 head = build_list([3, 2, 0, -4])
@@ -537,6 +543,7 @@ def remove_nth_from_end(head, n):
 
     slow.next = slow.next.next
     return dummy.next
+
 
 # Test
 head = build_list([1, 2, 3, 4, 5])
@@ -571,6 +578,7 @@ def reverse_between(head, m, n):
 
     return dummy.next
 
+
 # Test
 head = build_list([1, 2, 3, 4, 5])
 assert to_array(reverse_between(head, 2, 4)) == [1, 4, 3, 2, 5]
@@ -600,6 +608,7 @@ def add_two_numbers(l1, l2):
 
     return dummy.next
 
+
 # Test
 l1 = build_list([2, 4, 3])
 l2 = build_list([5, 6, 4])
@@ -616,6 +625,7 @@ class RandomNode:
         self.val = val
         self.next = next
         self.random = random
+
 
 def copy_random_list(head):
     if not head:
@@ -675,6 +685,7 @@ def flatten(head):
 ```python
 from collections import OrderedDict
 
+
 class LRUCache:
     def __init__(self, capacity):
         self.cache = OrderedDict()
@@ -692,6 +703,7 @@ class LRUCache:
         self.cache[key] = value
         if len(self.cache) > self.capacity:
             self.cache.popitem(last=False)
+
 
 # Test
 cache = LRUCache(2)
@@ -727,6 +739,7 @@ def partition(head, x):
     greater.next = None
     less.next = greater_head.next
     return less_head.next
+
 
 # Test
 head = build_list([1, 4, 3, 2, 5, 2])

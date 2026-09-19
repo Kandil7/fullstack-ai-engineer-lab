@@ -30,12 +30,14 @@ When a function parameter is a Pydantic model, FastAPI reads the request body as
 ```python
 from pydantic import BaseModel
 
+
 class UserCreate(BaseModel):
     name: str
     email: str
     age: int
     bio: str | None = None
     is_active: bool = True
+
 
 @app.post("/users/", status_code=201)
 def create_user(user: UserCreate):
@@ -49,6 +51,7 @@ def create_user(user: UserCreate):
 
 ```python
 from pydantic import BaseModel, Field
+
 
 class UserCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100, description="User's full name")
@@ -83,10 +86,12 @@ class Address(BaseModel):
     zip_code: str
     country: str = "USA"
 
+
 class OrderItem(BaseModel):
     product_name: str
     quantity: int = Field(..., ge=1)
     unit_price: float = Field(..., gt=0)
+
 
 class Order(BaseModel):
     customer_name: str
@@ -121,6 +126,7 @@ def full_update(user_id: int, user: UserCreate):
     users_db[user_id] = user.model_dump()
     return users_db[user_id]
 
+
 # PATCH = partial update (only changed fields)
 @app.patch("/users/{user_id}")
 def partial_update(user_id: int, user: UserUpdate):
@@ -139,6 +145,7 @@ class UserUpdate(BaseModel):
     name: str | None = None
     email: str | None = None
     age: int | None = None
+
 
 @app.patch("/users/{user_id}")
 def update_user(user_id: int, user: UserUpdate):
@@ -184,15 +191,19 @@ Always define separate models for input and output:
 ```python
 class UserIn(BaseModel):
     """What the client sends."""
+
     name: str
     email: str
     password: str  # Sensitive — should NOT be in response
 
+
 class UserOut(BaseModel):
     """What the client receives."""
+
     id: int
     name: str
     email: str
+
 
 @app.post("/users/", response_model=UserOut)
 def create_user(user: UserIn):
@@ -213,6 +224,7 @@ from datetime import datetime
 
 app = FastAPI()
 
+
 class UserCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     email: str = Field(..., description="User's email")
@@ -220,14 +232,17 @@ class UserCreate(BaseModel):
     bio: str | None = Field(default=None, max_length=500)
     is_active: bool = Field(default=True)
 
+
 class UserUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1)
     email: str | None = None
     age: int | None = Field(default=None, ge=0, le=150)
     bio: str | None = None
 
+
 users_db: dict[int, dict] = {}
 next_id = 1
+
 
 @app.post("/users/", status_code=201)
 def create_user(user: UserCreate):
@@ -238,6 +253,7 @@ def create_user(user: UserCreate):
     users_db[next_id] = user_dict
     next_id += 1
     return user_dict
+
 
 @app.patch("/users/{user_id}")
 def update_user(user_id: int, user: UserUpdate):
@@ -258,16 +274,19 @@ class Address(BaseModel):
     zip_code: str
     country: str = "USA"
 
+
 class OrderItem(BaseModel):
     product_name: str
     quantity: int = Field(..., ge=1)
     unit_price: float = Field(..., gt=0)
+
 
 class Order(BaseModel):
     customer_name: str
     items: list[OrderItem]
     shipping_address: Address
     notes: str | None = None
+
 
 @app.post("/orders/")
 def create_order(order: Order):
@@ -292,6 +311,7 @@ def batch_create(users: list[UserCreate]):
         created.append(user_dict)
     return {"created_count": len(created), "users": created}
 
+
 # Request body: JSON array
 # [{"name": "Alice", "email": "a@test.com", "age": 30},
 #  {"name": "Bob", "email": "b@test.com", "age": 25}]
@@ -308,6 +328,7 @@ def batch_create(users: list[UserCreate]):
 def create_user(user: UserCreate):
     return user.model_dump()  # Includes password!
 
+
 # Fix: Use response_model to filter
 @app.post("/users/", response_model=UserOut)
 def create_user(user: UserCreate):
@@ -318,8 +339,8 @@ def create_user(user: UserCreate):
 ```python
 # PUT: All fields required (full replacement)
 @app.put("/users/{user_id}")
-def update(user_id: int, user: UserCreate):
-    ...  # Client must send ALL fields
+def update(user_id: int, user: UserCreate): ...  # Client must send ALL fields
+
 
 # PATCH: Only changed fields (partial update)
 @app.patch("/users/{user_id}")
@@ -334,6 +355,7 @@ def patch(user_id: int, user: UserUpdate):
 class User(BaseModel):
     age: int  # Could be -1000!
 
+
 # Fix: Use Field() constraints
 class User(BaseModel):
     age: int = Field(..., ge=0, le=150)
@@ -345,6 +367,7 @@ class User(BaseModel):
 # FastAPI validates the entire nested structure automatically
 class Order(BaseModel):
     items: list[OrderItem]  # Each OrderItem is validated
+
 
 # Ensure nested models have their own validation
 class OrderItem(BaseModel):
@@ -407,15 +430,18 @@ Request bodies are where FastAPI's Pydantic integration truly shines — automat
 ```python
 from pydantic import BaseModel, Field
 
+
 class UserCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     email: str = Field(..., description="Email address")
     age: int = Field(..., ge=0, le=150)
     bio: str | None = Field(default=None, max_length=500)
 
+
 @app.post("/users/", status_code=201)
 def create_user(user: UserCreate):
     return user.model_dump()
+
 
 @app.patch("/users/{user_id}")
 def update_user(user_id: int, user: UserUpdate):

@@ -66,9 +66,9 @@ tools = [
                     "course_id": {"type": "string", "description": "Filter by course"},
                     "language": {"type": "string", "enum": ["ar", "en", "tr"]},
                 },
-                "required": ["query"]
-            }
-        }
+                "required": ["query"],
+            },
+        },
     }
 ]
 ```

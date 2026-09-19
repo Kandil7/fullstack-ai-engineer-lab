@@ -23,9 +23,9 @@ x = np.array([0, 1, 2, 3, 4, 5])
 y = np.array([0, 2, 1, 4, 3, 5])
 
 # Create interpolation functions
-f_linear = interpolate.interp1d(x, y, kind='linear')
-f_cubic = interpolate.interp1d(x, y, kind='cubic')
-f_quadratic = interpolate.interp1d(x, y, kind='quadratic')
+f_linear = interpolate.interp1d(x, y, kind="linear")
+f_cubic = interpolate.interp1d(x, y, kind="cubic")
+f_quadratic = interpolate.interp1d(x, y, kind="quadratic")
 
 # Query at new points
 x_new = np.linspace(0, 5, 50)
@@ -78,16 +78,14 @@ points = np.random.rand(50, 2) * 10
 values = np.sin(points[:, 0]) * np.cos(points[:, 1])
 
 # Grid for evaluation
-grid_x, grid_y = np.meshgrid(np.linspace(0, 10, 50), 
-                              np.linspace(0, 10, 50))
+grid_x, grid_y = np.meshgrid(np.linspace(0, 10, 50), np.linspace(0, 10, 50))
 
 # Cubic interpolation
-grid_z = interpolate.griddata(points, values, (grid_x, grid_y), 
-                               method='cubic')
+grid_z = interpolate.griddata(points, values, (grid_x, grid_y), method="cubic")
 print(f"Interpolated grid shape: {grid_z.shape}")
 
 # Radial basis function (RBF) interpolation
-rbf = interpolate.RBFInterpolator(points, values, kernel='thin_plate_spline')
+rbf = interpolate.RBFInterpolator(points, values, kernel="thin_plate_spline")
 grid_z_rbf = rbf(np.column_stack([grid_x.ravel(), grid_y.ravel()]))
 grid_z_rbf = grid_z_rbf.reshape(grid_z.shape)
 ```

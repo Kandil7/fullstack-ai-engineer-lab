@@ -22,16 +22,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 x = np.arange(6)
-shapes = ['.', ',', 'o', 'v', '^', '<', '>', 's', 'D', '*', 'P', 'X']
+shapes = [".", ",", "o", "v", "^", "<", ">", "s", "D", "*", "P", "X"]
 
 plt.figure(figsize=(12, 5))
 for i, marker in enumerate(shapes):
-    plt.plot(x, np.full_like(x, i), marker=marker, markersize=10,
-             label=f"'{marker}'", linestyle='none')
+    plt.plot(
+        x, np.full_like(x, i), marker=marker, markersize=10, label=f"'{marker}'", linestyle="none"
+    )
 
 plt.legend(ncol=6, fontsize=10)
 plt.ylim(-1, len(shapes))
-plt.title('Common Marker Styles')
+plt.title("Common Marker Styles")
 plt.show()
 ```
 
@@ -63,27 +64,33 @@ y2 = np.cos(x)
 plt.figure(figsize=(12, 6))
 
 # Marker with all properties
-plt.plot(x, y1,
-         color='steelblue',
-         marker='o',
-         markersize=10,
-         markerfacecolor='white',    # Inside color
-         markeredgecolor='steelblue', # Edge color
-         markeredgewidth=2,           # Edge width
-         linewidth=2,
-         alpha=0.9,
-         label='sin(x)')
+plt.plot(
+    x,
+    y1,
+    color="steelblue",
+    marker="o",
+    markersize=10,
+    markerfacecolor="white",  # Inside color
+    markeredgecolor="steelblue",  # Edge color
+    markeredgewidth=2,  # Edge width
+    linewidth=2,
+    alpha=0.9,
+    label="sin(x)",
+)
 
-plt.plot(x, y2,
-         color='crimson',
-         marker='s',
-         markersize=10,
-         markerfacecolor='white',
-         markeredgecolor='crimson',
-         markeredgewidth=2,
-         linewidth=2,
-         alpha=0.9,
-         label='cos(x)')
+plt.plot(
+    x,
+    y2,
+    color="crimson",
+    marker="s",
+    markersize=10,
+    markerfacecolor="white",
+    markeredgecolor="crimson",
+    markeredgewidth=2,
+    linewidth=2,
+    alpha=0.9,
+    label="cos(x)",
+)
 
 plt.legend(fontsize=12)
 plt.grid(True, alpha=0.3)
@@ -102,25 +109,25 @@ x = np.linspace(0, 10, 10)
 
 # Strategy 1: Markers only (no lines) - sparse data
 plt.subplot(2, 2, 1)
-plt.plot(x, np.sin(x), 'o', markersize=8)
-plt.title('Markers Only')
+plt.plot(x, np.sin(x), "o", markersize=8)
+plt.title("Markers Only")
 
 # Strategy 2: Lines only - smooth continuous data
 plt.subplot(2, 2, 2)
 x_dense = np.linspace(0, 10, 100)
-plt.plot(x_dense, np.sin(x_dense), '-', linewidth=2)
-plt.title('Line Only')
+plt.plot(x_dense, np.sin(x_dense), "-", linewidth=2)
+plt.title("Line Only")
 
 # Strategy 3: Lines + Markers - show data points on line
 plt.subplot(2, 2, 3)
-plt.plot(x, np.sin(x), '-o', linewidth=2, markersize=8)
-plt.title('Line + Markers')
+plt.plot(x, np.sin(x), "-o", linewidth=2, markersize=8)
+plt.title("Line + Markers")
 
 # Strategy 4: Marker spacing - every Nth data point
 plt.subplot(2, 2, 4)
-plt.plot(x_dense, np.sin(x_dense), '-', linewidth=2)
-plt.plot(x, np.sin(x), 'o', markersize=10, color='red')
-plt.title('Selective Markers')
+plt.plot(x_dense, np.sin(x_dense), "-", linewidth=2)
+plt.plot(x, np.sin(x), "o", markersize=10, color="red")
+plt.title("Selective Markers")
 
 plt.tight_layout()
 plt.show()
@@ -135,11 +142,15 @@ x = np.linspace(0, 10, 100)
 y = np.sin(x)
 
 plt.figure(figsize=(12, 6))
-plt.plot(x, y, '-o',
-         markevery=10,          # Every 10th point
-         markersize=8,
-         linewidth=2,
-         color='steelblue')
+plt.plot(
+    x,
+    y,
+    "-o",
+    markevery=10,  # Every 10th point
+    markersize=8,
+    linewidth=2,
+    color="steelblue",
+)
 
 # markevery can be:
 # - int: every N points

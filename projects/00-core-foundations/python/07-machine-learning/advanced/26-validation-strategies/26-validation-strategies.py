@@ -20,8 +20,13 @@ from __future__ import annotations
 
 import numpy as np
 from sklearn.model_selection import (
-    KFold, StratifiedKFold, GroupKFold, TimeSeriesSplit,
-    train_test_split, GridSearchCV, cross_val_score,
+    KFold,
+    StratifiedKFold,
+    GroupKFold,
+    TimeSeriesSplit,
+    train_test_split,
+    GridSearchCV,
+    cross_val_score,
 )
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -30,8 +35,14 @@ from sklearn.metrics import roc_auc_score
 
 rng = np.random.RandomState(0)
 
-X, y = make_classification(n_samples=1000, n_features=20, n_informative=8,
-                           n_redundant=4, weights=[0.9, 0.1], random_state=0)
+X, y = make_classification(
+    n_samples=1000,
+    n_features=20,
+    n_informative=8,
+    n_redundant=4,
+    weights=[0.9, 0.1],
+    random_state=0,
+)
 
 # ============================================================
 # 1. KFold vs StratifiedKFold on imbalance
@@ -77,11 +88,14 @@ print("  every training fold ends BEFORE its test fold begins")
 # WRONG pattern: pick best params on the whole train set, then report CV.
 # The CV score is now optimistic (the data was used to choose params).
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=0)
-grid = GridSearchCV(RandomForestClassifier(random_state=0),
-                    {"n_estimators": [50, 100]}, cv=3, scoring="roc_auc")
+grid = GridSearchCV(
+    RandomForestClassifier(random_state=0), {"n_estimators": [50, 100]}, cv=3, scoring="roc_auc"
+)
 grid.fit(Xtr, ytr)
 print("\nExample 4: nested CV")
-print(f"  outer-model test AUC (honest holdout): {roc_auc_score(yte, grid.predict_proba(Xte)[:, 1]):.3f}")
+print(
+    f"  outer-model test AUC (honest holdout): {roc_auc_score(yte, grid.predict_proba(Xte)[:, 1]):.3f}"
+)
 print(f"  inner best CV AUC (slightly optimistic): {grid.best_score_:.3f}")
 
 # Full nested CV: inner loop picks params, outer loop scores the pipeline
@@ -89,8 +103,9 @@ from sklearn.model_selection import cross_val_score as cvs  # noqa: E402
 
 outer_aucs = []
 for tr_outer, te_outer in skf.split(X, y):
-    inner = GridSearchCV(RandomForestClassifier(random_state=0),
-                         {"n_estimators": [50, 100]}, cv=3, scoring="roc_auc")
+    inner = GridSearchCV(
+        RandomForestClassifier(random_state=0), {"n_estimators": [50, 100]}, cv=3, scoring="roc_auc"
+    )
     inner.fit(X[tr_outer], y[tr_outer])
     outer_aucs.append(roc_auc_score(y[te_outer], inner.predict_proba(X[te_outer])[:, 1]))
 print(f"  nested CV mean AUC: {np.mean(outer_aucs):.3f}  (the number to trust)")

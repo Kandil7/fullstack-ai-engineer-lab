@@ -34,12 +34,9 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 rf = RandomForestClassifier(n_estimators=100, random_state=42)
 rf.fit(X_train, y_train)
@@ -71,13 +68,13 @@ from sklearn.datasets import make_classification
 X, y = make_classification(n_samples=500, n_features=10, random_state=42)
 
 models = {
-    'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
-    'Gradient Boosting': GradientBoostingClassifier(n_estimators=100, random_state=42),
-    'Logistic Regression': LogisticRegression(random_state=42)
+    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
+    "Gradient Boosting": GradientBoostingClassifier(n_estimators=100, random_state=42),
+    "Logistic Regression": LogisticRegression(random_state=42),
 }
 
 for name, model in models.items():
-    scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
     print(f"{name:25s}: {scores.mean():.4f}")
 ```
 
@@ -103,7 +100,7 @@ print("Original data:", y)
 # Bootstrap samples
 for i in range(3):
     indices = resample(range(len(X)), n_samples=len(X), random_state=i)
-    print(f"Bootstrap {i+1}: {y[indices]}")
+    print(f"Bootstrap {i + 1}: {y[indices]}")
 
 # Each sample has ~63% unique points
 # ~37% are duplicates (out-of-bag samples)
@@ -124,16 +121,15 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 from sklearn.model_selection import cross_val_score
 
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 # Single tree
 dt = DecisionTreeClassifier(random_state=42)
-dt_scores = cross_val_score(dt, X, y, cv=5, scoring='accuracy')
+dt_scores = cross_val_score(dt, X, y, cv=5, scoring="accuracy")
 
 # Random Forest (many trees)
 rf = RandomForestClassifier(n_estimators=100, random_state=42)
-rf_scores = cross_val_score(rf, X, y, cv=5, scoring='accuracy')
+rf_scores = cross_val_score(rf, X, y, cv=5, scoring="accuracy")
 
 print(f"Single Tree: {dt_scores.mean():.4f} +/- {dt_scores.std():.4f}")
 print(f"Random Forest: {rf_scores.mean():.4f} +/- {rf_scores.std():.4f}")
@@ -160,7 +156,7 @@ unique = np.unique(bootstrap)
 
 print(f"Original: {original}")
 print(f"Bootstrap: {bootstrap}")
-print(f"Unique in bootstrap: {len(unique)}/{len(original)} ({len(unique)/len(original):.0%})")
+print(f"Unique in bootstrap: {len(unique)}/{len(original)} ({len(unique) / len(original):.0%})")
 # Expected: ~63% unique
 ```
 
@@ -179,8 +175,7 @@ from sklearn.datasets import make_classification
 import numpy as np
 import pandas as pd
 
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 feature_names = [f"Feature_{i}" for i in range(10)]
 
@@ -193,7 +188,7 @@ indices = np.argsort(importances)[::-1]
 
 print("Feature Ranking:")
 for i, idx in enumerate(indices):
-    print(f"  {i+1}. {feature_names[idx]}: {importances[idx]:.4f}")
+    print(f"  {i + 1}. {feature_names[idx]}: {importances[idx]:.4f}")
 
 # Select important features
 threshold = 0.05
@@ -215,8 +210,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 import numpy as np
 
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 # With OOB score
 rf_oob = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=42)
@@ -226,7 +220,8 @@ print(f"OOB Score: {rf_oob.oob_score_:.4f}")
 
 # Compare with cross-validation
 from sklearn.model_selection import cross_val_score
-scores = cross_val_score(rf_oob, X, y, cv=5, scoring='accuracy')
+
+scores = cross_val_score(rf_oob, X, y, cv=5, scoring="accuracy")
 print(f"CV Score: {scores.mean():.4f}")
 # OOB is a good approximation of CV score
 ```
@@ -246,14 +241,13 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import cross_val_score
 import time
 
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 print("Effect of n_estimators:")
 for n in [10, 50, 100, 200, 500]:
     start = time.time()
     rf = RandomForestClassifier(n_estimators=n, random_state=42)
-    scores = cross_val_score(rf, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(rf, X, y, cv=5, scoring="accuracy")
     time_taken = time.time() - start
     print(f"  {n:3d} trees: {scores.mean():.4f} ({time_taken:.2f}s)")
 ```
@@ -272,13 +266,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 from sklearn.model_selection import cross_val_score
 
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 print("Effect of max_depth:")
 for depth in [3, 5, 10, 20, None]:
     rf = RandomForestClassifier(n_estimators=100, max_depth=depth, random_state=42)
-    scores = cross_val_score(rf, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(rf, X, y, cv=5, scoring="accuracy")
     print(f"  depth={str(depth):5s}: {scores.mean():.4f}")
 ```
 
@@ -296,14 +289,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 from sklearn.model_selection import cross_val_score
 
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 print("Effect of min_samples_split:")
 for split in [2, 5, 10, 20]:
-    rf = RandomForestClassifier(n_estimators=100, min_samples_split=split, 
-                                random_state=42)
-    scores = cross_val_score(rf, X, y, cv=5, scoring='accuracy')
+    rf = RandomForestClassifier(n_estimators=100, min_samples_split=split, random_state=42)
+    scores = cross_val_score(rf, X, y, cv=5, scoring="accuracy")
     print(f"  split={split:2d}: {scores.mean():.4f}")
 ```
 
@@ -321,14 +312,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 from sklearn.model_selection import cross_val_score
 
-X, y = make_classification(n_samples=500, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=500, n_features=10, n_informative=5, random_state=42)
 
 print("Effect of max_features:")
-for features in ['sqrt', 'log2', 0.5, 0.8, 1.0]:
-    rf = RandomForestClassifier(n_estimators=100, max_features=features, 
-                                random_state=42)
-    scores = cross_val_score(rf, X, y, cv=5, scoring='accuracy')
+for features in ["sqrt", "log2", 0.5, 0.8, 1.0]:
+    rf = RandomForestClassifier(n_estimators=100, max_features=features, random_state=42)
+    scores = cross_val_score(rf, X, y, cv=5, scoring="accuracy")
     print(f"  features={str(features):5s}: {scores.mean():.4f}")
 ```
 
@@ -364,6 +353,7 @@ print(f"\nFinal predictions: {final_predictions}")
 
 # Manual majority vote
 from scipy import stats
+
 manual_vote = stats.mode(tree_predictions, axis=0)[0]
 print(f"Manual majority vote: {manual_vote}")
 ```
@@ -389,6 +379,7 @@ print(f"Manual majority vote: {manual_vote}")
 ```python
 # Basic Random Forest
 from sklearn.ensemble import RandomForestClassifier
+
 rf = RandomForestClassifier(n_estimators=100, random_state=42)
 rf.fit(X_train, y_train)
 y_pred = rf.predict(X_test)
@@ -401,11 +392,13 @@ rf = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=42)
 
 # Random Forest Regressor
 from sklearn.ensemble import RandomForestRegressor
+
 rf_reg = RandomForestRegressor(n_estimators=100, random_state=42)
 
 # Parameter Tuning
 from sklearn.model_selection import GridSearchCV
-param_grid = {'n_estimators': [50, 100, 200], 'max_depth': [5, 10, None]}
+
+param_grid = {"n_estimators": [50, 100, 200], "max_depth": [5, 10, None]}
 grid = GridSearchCV(rf, param_grid, cv=5)
 grid.fit(X, y)
 

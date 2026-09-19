@@ -56,11 +56,12 @@ from sqlalchemy import Column, ForeignKey, String, Table, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship
 from sqlalchemy.pool import StaticPool
 
-engine = create_engine("sqlite://", connect_args={"check_same_thread": False},
-                       poolclass=StaticPool)
+engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
+
 
 class Base(DeclarativeBase):
     pass
+
 
 class Author(Base):
     __tablename__ = "authors"
@@ -70,12 +71,14 @@ class Author(Base):
         back_populates="author", cascade="all, delete-orphan"
     )
 
+
 class Book(Base):
     __tablename__ = "books"
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(120), nullable=False)
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"))
     author: Mapped["Author"] = relationship(back_populates="books")
+
 
 Base.metadata.create_all(engine)
 
@@ -132,13 +135,12 @@ book_tag = Table(
     Column("tag_id", ForeignKey("tags.id"), primary_key=True),
 )
 
+
 class Tag(Base):
     __tablename__ = "tags"
     id: Mapped[int] = mapped_column(primary_key=True)
     label: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
-    books: Mapped[list["Book"]] = relationship(
-        secondary=book_tag, back_populates="tags"
-    )
+    books: Mapped[list["Book"]] = relationship(secondary=book_tag, back_populates="tags")
 ```
 
 The `Book` class gains `tags: Mapped[list["Tag"]] = relationship(
@@ -179,6 +181,7 @@ class PromptTemplate(Base):
         back_populates="children", remote_side="PromptTemplate.id"
     )
 
+
 Base.metadata.create_all(engine)
 
 with Session(bind=engine) as session:
@@ -205,14 +208,15 @@ FK the schema declares (here, `Book.author_id` is NOT NULL, so the author must
 exist).
 
 ```python
-def create_review_graph(session: Session, title: str, tags: list[str],
-                        author_name: str = "Review Bot") -> tuple[int, list[int]]:
+def create_review_graph(
+    session: Session, title: str, tags: list[str], author_name: str = "Review Bot"
+) -> tuple[int, list[int]]:
     author = session.scalars(select(Author).where(Author.name == author_name)).first()
     if author is None:
         author = Author(name=author_name)
-        session.add(author)          # persistent BEFORE backref wiring
+        session.add(author)  # persistent BEFORE backref wiring
     book = Book(title=title)
-    session.add(book)                # avoids "not in session" SAWarning
+    session.add(book)  # avoids "not in session" SAWarning
     book.author = author
     for label in tags:
         existing = session.scalars(select(Tag).where(Tag.label == label)).first()

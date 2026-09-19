@@ -115,6 +115,7 @@ class DatabaseConnection:
         # return False أو None معناها "خلي الـ exception يكمل"
         return False
 
+
 with DatabaseConnection() as conn:
     print("بستخدم:", conn)
     # لو حصل error هنا، __exit__ لسه هيتنفذ
@@ -132,6 +133,7 @@ with DatabaseConnection() as conn:
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def database_connection():
     print("بفتح الاتصال")
@@ -140,6 +142,7 @@ def database_connection():
         yield conn  # ده اللي بيترجع في as
     finally:
         print("بقفل الاتصال")  # بيتنفذ دايماً
+
 
 with database_connection() as conn:
     print("بستخدم:", conn)
@@ -155,11 +158,13 @@ with database_connection() as conn:
 import time
 from contextlib import contextmanager
 
+
 @contextmanager
 def timer(name):
     start = time.time()
     yield
     print(f"{name} استغرق {time.time() - start:.2f} ثانية")
+
 
 with timer("Training"):
     model.fit(X_train, y_train)
@@ -187,6 +192,7 @@ def eval_mode(model):
     finally:
         model.train()  # يرجع الوضع الأصلي حتى لو حصل error
 
+
 with eval_mode(model):
     output = model(x)
 ```
@@ -202,6 +208,7 @@ class SafeExecution:
         if exc_type is not None:
             print(f"حصل error: {exc_value}")
         return True  # ⚠️ يبلع الـ exception ومايخليهوش يطلع برا
+
 
 with SafeExecution():
     raise ValueError("مشكلة!")
@@ -256,8 +263,9 @@ class model_trainer:    # كلاسات بـ PascalCase مش snake_case
 # طول السطر: 79 حرف (كتير بيستخدموا 88 أو 100 في المشاريع الحديثة - زي Black formatter)
 
 # مسافات حوالين العمليات
-x = 1 + 2          # صح
-x = 1+2             # غلط
+x = 1 + 2  # صح
+x = 1 + 2  # غلط
+
 
 # مسافتين قبل تعريف دالة/كلاس على مستوى الملف
 def func_one():
@@ -266,6 +274,7 @@ def func_one():
 
 def func_two():
     pass
+
 
 # imports في الأول، كل مكتبة في سطر، مترتبة
 import os
@@ -294,10 +303,10 @@ ruff check my_file.py  # بيقولك المشاكل
 # مش Pythonic
 squares = []
 for i in range(10):
-    squares.append(i ** 2)
+    squares.append(i**2)
 
 # Pythonic
-squares = [i ** 2 for i in range(10)]
+squares = [i**2 for i in range(10)]
 
 # نفس الفكرة لـ dict
 labels = {i: f"class_{i}" for i in range(5)}
@@ -361,6 +370,7 @@ if x == None:       # غلط (شغال بس مش idiomatic)
 def add_item(item, items=[]):
     items.append(item)
     return items
+
 
 # صح
 def add_item(item, items=None):
@@ -445,11 +455,8 @@ def double_positive_values(data: list[float]) -> list[float]:
 - **Type hints** في المشاريع الجدية:
 ```python
 def train_model(
-    X_train: np.ndarray,
-    y_train: np.ndarray,
-    epochs: int = 10
-) -> "Model":
-    ...
+    X_train: np.ndarray, y_train: np.ndarray, epochs: int = 10
+) -> "Model": ...
 ```
 
 ---
@@ -487,6 +494,7 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+
 @app.get("/")
 def home():
     return {"message": "Hello AI Engineer"}
@@ -509,9 +517,11 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+
 @app.get("/predict")
 def predict_get(text: str):
     return {"input": text, "prediction": "positive"}
+
 
 @app.post("/predict")
 def predict_post(data: dict):
@@ -533,23 +543,24 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+
 class PredictionRequest(BaseModel):
     text: str
     max_length: int = 100  # قيمة افتراضية
+
 
 class PredictionResponse(BaseModel):
     text: str
     label: str
     confidence: float
 
+
 @app.post("/predict", response_model=PredictionResponse)
 def predict(request: PredictionRequest):
     # request.text و request.max_length متأكدين إنهم من النوع الصح تلقائياً
     result = run_model(request.text)
     return PredictionResponse(
-        text=request.text,
-        label=result["label"],
-        confidence=result["confidence"]
+        text=request.text, label=result["label"], confidence=result["confidence"]
     )
 ```
 
@@ -570,12 +581,15 @@ app = FastAPI(title="Sentiment API")
 # تحميل الموديل مرة واحدة وقت الـ startup، مش مع كل request
 model = joblib.load("model.pkl")
 
+
 class TextInput(BaseModel):
     text: str
+
 
 class PredictionOutput(BaseModel):
     label: str
     confidence: float
+
 
 @app.post("/predict", response_model=PredictionOutput)
 def predict(input_data: TextInput):
@@ -586,6 +600,7 @@ def predict(input_data: TextInput):
     confidence = float(np.max(model.predict_proba([input_data.text])))
 
     return PredictionOutput(label=prediction, confidence=confidence)
+
 
 @app.get("/health")
 def health_check():
@@ -603,6 +618,7 @@ def health_check():
 
 ```python
 import httpx
+
 
 @app.get("/external-call")
 async def call_external_api():
@@ -622,10 +638,12 @@ async def call_external_api():
 ```python
 from fastapi import Depends, Header, HTTPException
 
+
 def verify_api_key(x_api_key: str = Header(...)):
     if x_api_key != "secret-key-123":
         raise HTTPException(status_code=401, detail="مفتاح غير صحيح")
     return x_api_key
+
 
 @app.post("/predict")
 def predict(input_data: TextInput, api_key: str = Depends(verify_api_key)):
@@ -655,9 +673,11 @@ def get_model(model_id: str, version: int = 1):
 ```python
 from fastapi.responses import StreamingResponse
 
+
 async def generate_tokens(prompt: str):
     for token in llm_stream(prompt):  # generator بيرجع token واحد كل مرة
         yield token
+
 
 @app.post("/chat")
 async def chat(prompt: str):
@@ -687,9 +707,11 @@ from fastapi import APIRouter
 
 router = APIRouter(prefix="/predict", tags=["prediction"])
 
+
 @router.post("/")
 def predict(data: dict):
     return {"result": "..."}
+
 
 # main.py
 from fastapi import FastAPI

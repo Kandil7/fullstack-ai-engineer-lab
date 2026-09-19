@@ -18,23 +18,26 @@ a DataFrame into a report artifact.
 import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    "region": ["north", "south", "east", "west"],
-    "revenue": [120, 95, 140, 80],
-    "growth": [0.12, -0.03, 0.25, -0.08],
-    "users": [5000, 4200, 6100, 3800],
-})
+df = pd.DataFrame(
+    {
+        "region": ["north", "south", "east", "west"],
+        "revenue": [120, 95, 140, 80],
+        "growth": [0.12, -0.03, 0.25, -0.08],
+        "users": [5000, 4200, 6100, 3800],
+    }
+)
 ```
 
 ## 2. Basic Styling Methods
 
 ```python
 styled = (
-    df.style
-    .highlight_max(subset=["revenue", "users"], color="lightgreen")
+    df.style.highlight_max(subset=["revenue", "users"], color="lightgreen")
     .highlight_min(subset=["revenue"], color="salmon")
     .set_properties(**{"text-align": "center"})
-    .set_table_styles([{"selector": "th", "props": [("background-color", "#4F81BD"), ("color", "white")]}])
+    .set_table_styles(
+        [{"selector": "th", "props": [("background-color", "#4F81BD"), ("color", "white")]}]
+    )
 )
 ```
 
@@ -49,9 +52,12 @@ CSS string:
 
 ```python
 def color_growth(v):
-    if v > 0.10: return "color: green; font-weight: bold"
-    if v < 0:    return "color: red"
+    if v > 0.10:
+        return "color: green; font-weight: bold"
+    if v < 0:
+        return "color: red"
     return ""
+
 
 styled = df.style.applymap(color_growth, subset=["growth"])
 ```
@@ -69,11 +75,13 @@ styled = df.style.bar(subset=["revenue"], color="#5DADE2")
 styled = df.style.background_gradient(subset=["growth"], cmap="RdYlGn")
 
 # Format numbers nicely
-styled = df.style.format({
-    "revenue": "${:,.0f}",
-    "growth": "{:+.1%}",
-    "users": "{:,.0f}",
-})
+styled = df.style.format(
+    {
+        "revenue": "${:,.0f}",
+        "growth": "{:+.1%}",
+        "users": "{:,.0f}",
+    }
+)
 ```
 
 `bar` gives instant visual comparison; `background_gradient` shows magnitude;
@@ -97,19 +105,22 @@ writes the formatting into the workbook.
 ## 6. Real-World Use Case — KPI Report
 
 ```python
-kpis = pd.DataFrame({
-    "metric": ["Revenue", "New users", "Churn", "NPS"],
-    "value": [1_240_000, 18_500, 0.034, 42],
-    "target": [1_100_000, 15_000, 0.05, 40],
-})
+kpis = pd.DataFrame(
+    {
+        "metric": ["Revenue", "New users", "Churn", "NPS"],
+        "value": [1_240_000, 18_500, 0.034, 42],
+        "target": [1_100_000, 15_000, 0.05, 40],
+    }
+)
+
 
 def status(v, s):
     good = ["color: green; font-weight: bold", "color: red"]
     return [good[0] if a >= b else good[1] for a, b in zip(v, s)]
 
+
 report = (
-    kpis.style
-    .format({"value": "{:,.0f}", "target": "{:,.0f}"})
+    kpis.style.format({"value": "{:,.0f}", "target": "{:,.0f}"})
     .bar(subset=["value"], color="#5DADE2")
     .apply(status, subset=["value", "target"], axis=0)
     .hide(axis="index")

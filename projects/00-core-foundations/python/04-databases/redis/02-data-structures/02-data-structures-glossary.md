@@ -105,8 +105,8 @@ push/pop at both ends — the raw material of queues.
 from redis_client import get_client
 
 r = get_client()
-r.lpush("q", "a", "b")      # ['b', 'a']
-print(r.rpop("q"))          # -> a  (FIFO with LPUSH/RPOP)
+r.lpush("q", "a", "b")  # ['b', 'a']
+print(r.rpop("q"))  # -> a  (FIFO with LPUSH/RPOP)
 ```
 ```text
 # same-side push/pop = stack; opposite ends = queue
@@ -123,7 +123,7 @@ from redis_client import get_client
 
 r = get_client()
 r.lpush("jobs", "j1")
-r.lpush("jobs", "j2")       # head is now j2
+r.lpush("jobs", "j2")  # head is now j2
 print(r.lrange("jobs", 0, -1))  # -> ['j2', 'j1']
 ```
 ```text
@@ -157,8 +157,8 @@ from redis_client import get_client
 
 r = get_client()
 r.lpush("log", "e1", "e2", "e3", "e4")
-r.ltrim("log", 0, 1)            # keep newest 2
-print(r.lrange("log", 0, -1))   # -> ['e4', 'e3']
+r.ltrim("log", 0, 1)  # keep newest 2
+print(r.lrange("log", 0, -1))  # -> ['e4', 'e3']
 ```
 ```text
 # prevents unbounded growth of feed/queue keys
@@ -174,9 +174,9 @@ each tuned to a different query — Redis's answer to denormalization.
 from redis_client import get_client
 
 r = get_client()
-r.hset("user:42", "name", "sara")      # profile: hash
-r.sadd("followers:42", "1", "2")       # membership: set
-r.zadd("leaderboard", {"sara": 100})   # ranking: sorted set
+r.hset("user:42", "name", "sara")  # profile: hash
+r.sadd("followers:42", "1", "2")  # membership: set
+r.zadd("leaderboard", {"sara": 100})  # ranking: sorted set
 ```
 ```text
 # writes pay fan-out; reads are single O(1) calls
@@ -327,8 +327,8 @@ from redis_client import get_client
 
 r = get_client()
 r.zadd("scores", {"a": 10, "b": 30})
-r.zadd("scores", {"a": 20})      # update a's score
-print(r.zscore("scores", "a"))   # -> 20.0
+r.zadd("scores", {"a": 20})  # update a's score
+print(r.zscore("scores", "a"))  # -> 20.0
 ```
 ```text
 # insert and update are the same command

@@ -46,11 +46,12 @@ class Watch:
     def __del__(self) -> None:
         type(self).alive -= 1
 
+
 def demo_refcount() -> int:
     a = Watch()
-    b = a          # refcount: 2
-    del a          # refcount: 1 -- still alive
-    del b          # refcount: 0 -- __del__ runs NOW
+    b = a  # refcount: 2
+    del a  # refcount: 1 -- still alive
+    del b  # refcount: 0 -- __del__ runs NOW
     return Watch.alive
 ```
 
@@ -69,17 +70,19 @@ Two objects referring to each other never reach zero: each keeps the other alive
 ```python
 import gc
 
+
 class Node:
     def __init__(self, name: str) -> None:
         self.name = name
         self.peer: Node | None = None
 
+
 def demo_cycle() -> tuple[int, int]:
     a, b = Node("a"), Node("b")
-    a.peer, b.peer = b, a   # cycle: a -> b -> a
+    a.peer, b.peer = b, a  # cycle: a -> b -> a
     before = len(gc.get_objects())
-    del a, b                # refcounts cannot reach zero
-    gc.collect()            # the cycle collector breaks the graph
+    del a, b  # refcounts cannot reach zero
+    gc.collect()  # the cycle collector breaks the graph
     return before, len(gc.get_objects())
 ```
 
@@ -98,17 +101,19 @@ A weak reference observes an object without keeping it alive. `WeakValueDictiona
 ```python
 import weakref
 
+
 class Entry:
     def __init__(self, text: str) -> None:
         self.text = text
 
+
 def demo_weak_cache() -> tuple[int, int]:
     cache: weakref.WeakValueDictionary[int, Entry] = weakref.WeakValueDictionary()
     key = 1
-    e = Entry("stored")       # strong ref keeps the value alive
+    e = Entry("stored")  # strong ref keeps the value alive
     cache[key] = e
     before = len(cache)
-    del e                     # no strong refs left
+    del e  # no strong refs left
     return before, len(cache)
 ```
 
@@ -127,9 +132,11 @@ Every normal instance carries a `__dict__` (and, for most classes, a weakref slo
 ```python
 class SlottedEntry:
     __slots__ = ("text", "chunk_id")
+
     def __init__(self, text: str, chunk_id: int) -> None:
         self.text = text
         self.chunk_id = chunk_id
+
 
 def demo_slots() -> tuple[bool, bool]:
     e = SlottedEntry("hello", 1)
@@ -151,13 +158,14 @@ Guessing which line leaks is expensive. `tracemalloc` records where memory was a
 ```python
 import tracemalloc
 
+
 def demo_tracemalloc() -> tuple[int, int]:
     tracemalloc.start()
     before = tracemalloc.get_traced_memory()[0]
-    big = [b"x" * 1024 for _ in range(10_000)]     # ~10 MB
+    big = [b"x" * 1024 for _ in range(10_000)]  # ~10 MB
     current, peak = tracemalloc.get_traced_memory()
     after = current - before
-    top = tracemalloc.get_traced_memory()[1]       # peak
+    top = tracemalloc.get_traced_memory()[1]  # peak
     tracemalloc.stop()
     return after // 1024, peak // 1024
 ```

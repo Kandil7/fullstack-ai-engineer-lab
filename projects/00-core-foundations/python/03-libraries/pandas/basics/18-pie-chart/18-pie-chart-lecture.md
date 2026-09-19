@@ -24,15 +24,17 @@ A pie chart shows how a whole is divided into parts. Each "slice" represents a c
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.DataFrame({
-    'category': ['Electronics', 'Clothing', 'Food', 'Books', 'Other'],
-    'sales': [45000, 32000, 28000, 15000, 8000]
-})
+df = pd.DataFrame(
+    {
+        "category": ["Electronics", "Clothing", "Food", "Books", "Other"],
+        "sales": [45000, 32000, 28000, 15000, 8000],
+    }
+)
 
 # Basic pie chart
 fig, ax = plt.subplots(figsize=(8, 8))
-ax.pie(df['sales'], labels=df['category'], autopct='%1.1f%%')
-ax.set_title('Sales by Category')
+ax.pie(df["sales"], labels=df["category"], autopct="%1.1f%%")
+ax.set_title("Sales by Category")
 plt.tight_layout()
 plt.show()
 ```
@@ -46,21 +48,21 @@ plt.show()
 ```python
 fig, ax = plt.subplots(figsize=(8, 8))
 
-colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6']
+colors = ["#3498db", "#e74c3c", "#2ecc71", "#f39c12", "#9b59b6"]
 explode = (0.05, 0, 0, 0, 0.1)  # Explode first and last slices
 
 ax.pie(
-    df['sales'],
-    labels=df['category'],
-    autopct='%1.1f%%',
+    df["sales"],
+    labels=df["category"],
+    autopct="%1.1f%%",
     colors=colors,
     explode=explode,
-    startangle=90,           # Rotate starting angle
-    shadow=True,             # Add shadow
-    textprops={'fontsize': 12}
+    startangle=90,  # Rotate starting angle
+    shadow=True,  # Add shadow
+    textprops={"fontsize": 12},
 )
 
-ax.set_title('Sales by Category', fontsize=14, fontweight='bold')
+ax.set_title("Sales by Category", fontsize=14, fontweight="bold")
 plt.tight_layout()
 plt.show()
 ```
@@ -72,18 +74,20 @@ def make_autopct(values):
     def my_autopct(pct):
         total = sum(values)
         val = int(round(pct * total / 100.0))
-        return f'{pct:.1f}%\n(${val:,})'
+        return f"{pct:.1f}%\n(${val:,})"
+
     return my_autopct
+
 
 fig, ax = plt.subplots(figsize=(8, 8))
 ax.pie(
-    df['sales'],
-    labels=df['category'],
-    autopct=make_autopct(df['sales']),
+    df["sales"],
+    labels=df["category"],
+    autopct=make_autopct(df["sales"]),
     colors=colors,
-    startangle=90
+    startangle=90,
 )
-ax.set_title('Sales by Category (with Values)')
+ax.set_title("Sales by Category (with Values)")
 plt.tight_layout()
 plt.show()
 ```
@@ -94,23 +98,19 @@ plt.show()
 fig, ax = plt.subplots(figsize=(10, 8))
 
 wedges, texts, autotexts = ax.pie(
-    df['sales'],
-    autopct='%1.1f%%',
+    df["sales"],
+    autopct="%1.1f%%",
     colors=colors,
     startangle=90,
-    pctdistance=0.85         # Distance of percentage labels from center
+    pctdistance=0.85,  # Distance of percentage labels from center
 )
 
 # Add legend
 ax.legend(
-    wedges,
-    df['category'],
-    title='Categories',
-    loc='center left',
-    bbox_to_anchor=(1, 0, 0.5, 1)
+    wedges, df["category"], title="Categories", loc="center left", bbox_to_anchor=(1, 0, 0.5, 1)
 )
 
-ax.set_title('Sales Distribution')
+ax.set_title("Sales Distribution")
 plt.tight_layout()
 plt.show()
 ```
@@ -123,19 +123,21 @@ plt.show()
 fig, ax = plt.subplots(figsize=(8, 8))
 
 wedges, texts, autotexts = ax.pie(
-    df['sales'],
-    labels=df['category'],
-    autopct='%1.1f%%',
+    df["sales"],
+    labels=df["category"],
+    autopct="%1.1f%%",
     colors=colors,
     startangle=90,
     pctdistance=0.85,
-    wedgeprops=dict(width=0.4)  # Creates donut hole
+    wedgeprops=dict(width=0.4),  # Creates donut hole
 )
 
 # Add center text
-ax.text(0, 0, f'Total\n${df["sales"].sum():,}', ha='center', va='center', fontsize=14, fontweight='bold')
+ax.text(
+    0, 0, f"Total\n${df['sales'].sum():,}", ha="center", va="center", fontsize=14, fontweight="bold"
+)
 
-ax.set_title('Sales by Category (Donut Chart)')
+ax.set_title("Sales by Category (Donut Chart)")
 plt.tight_layout()
 plt.show()
 ```
@@ -148,24 +150,18 @@ plt.show()
 fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
 # 2023 data
-df_2023 = pd.DataFrame({
-    'category': ['A', 'B', 'C', 'D'],
-    'sales': [30, 25, 25, 20]
-})
+df_2023 = pd.DataFrame({"category": ["A", "B", "C", "D"], "sales": [30, 25, 25, 20]})
 
 # 2024 data
-df_2024 = pd.DataFrame({
-    'category': ['A', 'B', 'C', 'D'],
-    'sales': [20, 35, 25, 20]
-})
+df_2024 = pd.DataFrame({"category": ["A", "B", "C", "D"], "sales": [20, 35, 25, 20]})
 
-axes[0].pie(df_2023['sales'], labels=df_2023['category'], autopct='%1.0f%%', colors=colors)
-axes[0].set_title('2023')
+axes[0].pie(df_2023["sales"], labels=df_2023["category"], autopct="%1.0f%%", colors=colors)
+axes[0].set_title("2023")
 
-axes[1].pie(df_2024['sales'], labels=df_2024['category'], autopct='%1.0f%%', colors=colors)
-axes[1].set_title('2024')
+axes[1].pie(df_2024["sales"], labels=df_2024["category"], autopct="%1.0f%%", colors=colors)
+axes[1].set_title("2024")
 
-plt.suptitle('Sales Distribution Comparison', fontsize=14)
+plt.suptitle("Sales Distribution Comparison", fontsize=14)
 plt.tight_layout()
 plt.show()
 ```

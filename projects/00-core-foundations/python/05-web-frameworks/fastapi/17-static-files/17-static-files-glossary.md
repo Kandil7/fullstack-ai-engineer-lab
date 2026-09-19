@@ -61,17 +61,19 @@ app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
 from starlette.staticfiles import StaticFiles
 from starlette.responses import Response
 
+
 class CachedStaticFiles(StaticFiles):
     async def get_response(self, path, scope):
         response = await super().get_response(path, scope)
-        
+
         # Set cache duration based on file type
-        if path.endswith(('.css', '.js', '.png', '.jpg')):
+        if path.endswith((".css", ".js", ".png", ".jpg")):
             response.headers["Cache-Control"] = "public, max-age=31536000"  # 1 year
-        elif path.endswith('.html'):
+        elif path.endswith(".html"):
             response.headers["Cache-Control"] = "no-cache"
-        
+
         return response
+
 
 app.mount("/static", CachedStaticFiles(directory="static"), name="static")
 ```
@@ -97,15 +99,12 @@ app.mount("/static", CachedStaticFiles(directory="static"), name="static")
 headers = {
     # Cache for 1 year (immutable assets)
     "Cache-Control": "public, max-age=31536000, immutable",
-    
     # Cache for 1 hour
     "Cache-Control": "public, max-age=3600",
-    
     # No caching
     "Cache-Control": "no-cache, no-store, must-revalidate",
-    
     # Revalidate with server
-    "Cache-Control": "private, must-revalidate"
+    "Cache-Control": "private, must-revalidate",
 }
 ```
 
@@ -143,6 +142,7 @@ headers = {
 ```python
 CDN_BASE = "https://cdn.jsdelivr.net/npm"
 
+
 @app.get("/")
 async def root(request: Request):
     return templates.TemplateResponse(
@@ -150,8 +150,8 @@ async def root(request: Request):
         {
             "request": request,
             "bootstrap_css": f"{CDN_BASE}/bootstrap@5.3.0/dist/css/bootstrap.min.css",
-            "bootstrap_js": f"{CDN_BASE}/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-        }
+            "bootstrap_js": f"{CDN_BASE}/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js",
+        },
     )
 ```
 
@@ -196,23 +196,23 @@ gzip_min_length 1000;
 ```python
 from starlette.responses import FileResponse
 
+
 @app.get("/files/{filename}")
 async def serve_file(filename: str):
     file_path = f"static/{filename}"
-    
+
     # Content-Type is auto-detected
     return FileResponse(file_path)
+
 
 # Or set manually
 from starlette.responses import Response
 
+
 @app.get("/custom")
 async def custom_content():
     content = b"<h1>Hello</h1>"
-    return Response(
-        content=content,
-        media_type="text/html"
-    )
+    return Response(content=content, media_type="text/html")
 ```
 
 **Common MIME Types:**
@@ -243,22 +243,24 @@ async def get_file(filename: str):
     # Attacker could use: ../../etc/passwd
     return FileResponse(f"static/{filename}")
 
+
 # ✅ SECURE - Validate path
 from pathlib import Path
 
 STATIC_DIR = Path("static").resolve()
 
+
 @app.get("/files/{filename}")
 async def get_file(filename: str):
     file_path = (STATIC_DIR / filename).resolve()
-    
+
     # Ensure path is within static directory
     if not str(file_path).startswith(str(STATIC_DIR)):
         raise HTTPException(403, "Forbidden")
-    
+
     if not file_path.is_file():
         raise HTTPException(404, "Not found")
-    
+
     return FileResponse(file_path)
 ```
 
@@ -636,9 +638,11 @@ if STATIC_DIR.exists():
 # Templates
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
+
 @app.get("/")
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
 
 @app.get("/about")
 async def about(request: Request):
@@ -710,10 +714,12 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
+
 def get_file_hash(filepath: str) -> str:
     """Generate short hash for cache busting"""
     with open(filepath, "rb") as f:
         return hashlib.md5(f.read()).hexdigest()[:8]
+
 
 # Store file hashes
 static_hashes = {}
@@ -741,28 +747,30 @@ app = FastAPI()
 
 STATIC_DIR = Path("static").resolve()
 
+
 # Secure file serving
 @app.get("/files/{file_path:path}")
 async def serve_file(file_path: str):
     """Serve static files with path validation"""
-    
+
     # Resolve full path
     full_path = (STATIC_DIR / file_path).resolve()
-    
+
     # Security check 1: Ensure within static directory
     if not str(full_path).startswith(str(STATIC_DIR)):
         raise HTTPException(status_code=403, detail="Forbidden")
-    
+
     # Security check 2: File must exist
     if not full_path.is_file():
         raise HTTPException(status_code=404, detail="Not found")
-    
+
     # Security check 3: Check extension (optional)
-    allowed_extensions = {'.css', '.js', '.png', '.jpg', '.svg', '.woff2'}
+    allowed_extensions = {".css", ".js", ".png", ".jpg", ".svg", ".woff2"}
     if full_path.suffix.lower() not in allowed_extensions:
         raise HTTPException(status_code=403, detail="File type not allowed")
-    
+
     from starlette.responses import FileResponse
+
     return FileResponse(full_path)
 ```
 

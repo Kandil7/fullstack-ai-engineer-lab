@@ -6,8 +6,20 @@ and provide better IDE support.
 """
 
 from typing import (
-    List, Dict, Tuple, Set, Optional, Union, Any, Callable,
-    TypeVar, Generic, Protocol, Literal, Final, TypeAlias
+    List,
+    Dict,
+    Tuple,
+    Set,
+    Optional,
+    Union,
+    Any,
+    Callable,
+    TypeVar,
+    Generic,
+    Protocol,
+    Literal,
+    Final,
+    TypeAlias,
 )
 from dataclasses import dataclass
 
@@ -15,6 +27,7 @@ from dataclasses import dataclass
 # =============================================================================
 # 1. Basic Type Hints
 # =============================================================================
+
 
 def greet(name: str) -> str:
     """Simple function with type hints."""
@@ -50,10 +63,8 @@ def process_items(items: List[str], uppercase: bool = False) -> Dict[str, int]:
 # 2. Complex Types
 # =============================================================================
 
-def merge_dicts(
-    dict1: Dict[str, Any],
-    dict2: Dict[str, Any]
-) -> Dict[str, Any]:
+
+def merge_dicts(dict1: Dict[str, Any], dict2: Dict[str, Any]) -> Dict[str, Any]:
     """Merge two dictionaries."""
     return {**dict1, **dict2}
 
@@ -128,8 +139,10 @@ class Pair(Generic[K, V]):
 # 4. Protocol and Structural Typing
 # =============================================================================
 
+
 class Drawable(Protocol):
     """Protocol for anything that can be drawn."""
+
     def draw(self) -> str: ...
 
 
@@ -152,6 +165,7 @@ def draw_shape(shape: Drawable) -> str:
 # 5. Literal and Final Types
 # =============================================================================
 
+
 def set_mode(mode: Literal["read", "write", "append"]) -> str:
     """Only accept specific string literals."""
     return f"Mode set to: {mode}"
@@ -170,18 +184,18 @@ def scale_vector(vector: Vector, factor: float) -> Vector:
 # 6. Callable and Function Types
 # =============================================================================
 
-def apply_operation(
-    values: List[float],
-    operation: Callable[[float], float]
-) -> List[float]:
+
+def apply_operation(values: List[float], operation: Callable[[float], float]) -> List[float]:
     """Apply a function to each value."""
     return [operation(v) for v in values]
 
 
 def create_multiplier(factor: float) -> Callable[[float], float]:
     """Create a multiplier function."""
+
     def multiplier(x: float) -> float:
         return x * factor
+
     return multiplier
 
 
@@ -189,9 +203,11 @@ def create_multiplier(factor: float) -> Callable[[float], float]:
 # 7. Class Annotations
 # =============================================================================
 
+
 @dataclass
 class User:
     """User class with full type annotations."""
+
     name: str
     email: str
     age: int

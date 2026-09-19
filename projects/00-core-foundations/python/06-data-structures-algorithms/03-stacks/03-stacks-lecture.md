@@ -56,46 +56,47 @@ Visual representation:
 ```python
 class Stack:
     """Stack implementation using a Python list."""
-    
+
     def __init__(self):
         self.items = []
-    
+
     def push(self, item):
         """Add item to top. O(1) amortized."""
         self.items.append(item)
-    
+
     def pop(self):
         """Remove and return top item. O(1)."""
         if self.is_empty():
             raise IndexError("Pop from empty stack")
         return self.items.pop()
-    
+
     def peek(self):
         """Return top item without removing. O(1)."""
         if self.is_empty():
             raise IndexError("Peek at empty stack")
         return self.items[-1]
-    
+
     def is_empty(self):
         """Check if stack is empty. O(1)."""
         return len(self.items) == 0
-    
+
     def size(self):
         """Return number of items. O(1)."""
         return len(self.items)
-    
+
     def __str__(self):
         return f"Stack({self.items})"
+
 
 # Usage
 stack = Stack()
 stack.push(1)
 stack.push(2)
 stack.push(3)
-print(stack)          # Stack([1, 2, 3])
-print(stack.pop())    # 3
-print(stack.peek())   # 2
-print(stack.size())   # 2
+print(stack)  # Stack([1, 2, 3])
+print(stack.pop())  # 3
+print(stack.peek())  # 2
+print(stack.size())  # 2
 ```
 
 ### 3. Stack Implementation Using a Linked List
@@ -106,20 +107,21 @@ class Node:
         self.data = data
         self.next = None
 
+
 class LinkedStack:
     """Stack implementation using a singly linked list."""
-    
+
     def __init__(self):
         self.top = None
         self._size = 0
-    
+
     def push(self, item):
         """Add item to top. O(1)."""
         new_node = Node(item)
         new_node.next = self.top
         self.top = new_node
         self._size += 1
-    
+
     def pop(self):
         """Remove and return top item. O(1)."""
         if self.is_empty():
@@ -128,16 +130,16 @@ class LinkedStack:
         self.top = self.top.next
         self._size -= 1
         return data
-    
+
     def peek(self):
         """Return top item without removing. O(1)."""
         if self.is_empty():
             raise IndexError("Peek at empty stack")
         return self.top.data
-    
+
     def is_empty(self):
         return self.top is None
-    
+
     def size(self):
         return self._size
 ```
@@ -170,26 +172,28 @@ Check if a string has balanced brackets: (), [], {}
 Time: O(n), Space: O(n)
 """
 
+
 def is_balanced(expression):
     stack = []
-    matching = {')': '(', ']': '[', '}': '{'}
-    
+    matching = {")": "(", "]": "[", "}": "{"}
+
     for char in expression:
-        if char in '([{':           # Opening bracket
+        if char in "([{":  # Opening bracket
             stack.append(char)
-        elif char in ')]}':         # Closing bracket
+        elif char in ")]}":  # Closing bracket
             if not stack or stack[-1] != matching[char]:
                 return False
             stack.pop()
-    
+
     return len(stack) == 0  # Stack should be empty if balanced
 
+
 # Tests
-print(is_balanced("({[()]})"))      # True
-print(is_balanced("({[()]})"))      # True
-print(is_balanced("({[()]"))        # False — missing closing
-print(is_balanced("({[()]}"))       # False — wrong order
-print(is_balanced(""))              # True — empty is balanced
+print(is_balanced("({[()]})"))  # True
+print(is_balanced("({[()]})"))  # True
+print(is_balanced("({[()]"))  # False — missing closing
+print(is_balanced("({[()]}"))  # False — wrong order
+print(is_balanced(""))  # True — empty is balanced
 ```
 
 ### Example 2: Postfix Expression Evaluation
@@ -208,32 +212,34 @@ Algorithm:
 Time: O(n), Space: O(n)
 """
 
+
 def evaluate_postfix(expression):
     stack = []
     tokens = expression.split()
-    
+
     for token in tokens:
-        if token.lstrip('-').isdigit():  # Handle negative numbers
+        if token.lstrip("-").isdigit():  # Handle negative numbers
             stack.append(int(token))
         else:
             # Pop two operands (note order!)
             b = stack.pop()  # Second operand (popped first)
             a = stack.pop()  # First operand
-            
-            if token == '+':
+
+            if token == "+":
                 stack.append(a + b)
-            elif token == '-':
+            elif token == "-":
                 stack.append(a - b)
-            elif token == '*':
+            elif token == "*":
                 stack.append(a * b)
-            elif token == '/':
+            elif token == "/":
                 stack.append(int(a / b))  # Integer division
-    
+
     return stack[0]
 
+
 # Tests
-print(evaluate_postfix("3 4 +"))            # 7
-print(evaluate_postfix("3 4 + 2 *"))        # 14
+print(evaluate_postfix("3 4 +"))  # 7
+print(evaluate_postfix("3 4 + 2 *"))  # 14
 print(evaluate_postfix("5 1 2 + 4 * + 3 -"))  # 14
 ```
 
@@ -258,38 +264,43 @@ Algorithm:
 Time: O(n), Space: O(n)
 """
 
+
 def infix_to_postfix(expression):
-    precedence = {'+': 1, '-': 1, '*': 2, '/': 2}
+    precedence = {"+": 1, "-": 1, "*": 2, "/": 2}
     stack = []
     output = []
-    
-    tokens = expression.replace('(', '( ').replace(')', ' )').split()
-    
+
+    tokens = expression.replace("(", "( ").replace(")", " )").split()
+
     for token in tokens:
-        if token.lstrip('-').isdigit():
+        if token.lstrip("-").isdigit():
             output.append(token)
-        elif token == '(':
+        elif token == "(":
             stack.append(token)
-        elif token == ')':
-            while stack and stack[-1] != '(':
+        elif token == ")":
+            while stack and stack[-1] != "(":
                 output.append(stack.pop())
             stack.pop()  # Remove '('
         else:  # Operator
-            while (stack and stack[-1] != '(' and
-                   stack[-1] in precedence and
-                   precedence[stack[-1]] >= precedence[token]):
+            while (
+                stack
+                and stack[-1] != "("
+                and stack[-1] in precedence
+                and precedence[stack[-1]] >= precedence[token]
+            ):
                 output.append(stack.pop())
             stack.append(token)
-    
+
     while stack:
         output.append(stack.pop())
-    
-    return ' '.join(output)
+
+    return " ".join(output)
+
 
 # Tests
-print(infix_to_postfix("3 + 4"))              # "3 4 +"
-print(infix_to_postfix("3 + 4 * 2"))          # "3 4 2 * +"
-print(infix_to_postfix("( 3 + 4 ) * 2"))      # "3 4 + 2 *"
+print(infix_to_postfix("3 + 4"))  # "3 4 +"
+print(infix_to_postfix("3 + 4 * 2"))  # "3 4 2 * +"
+print(infix_to_postfix("( 3 + 4 ) * 2"))  # "3 4 + 2 *"
 print(infix_to_postfix("3 + 4 * 2 - 6 / 3"))  # "3 4 2 * + 6 3 / -"
 ```
 
@@ -306,17 +317,18 @@ Min stack tracks the minimum at each level.
 Time: O(1) for all operations, Space: O(n)
 """
 
+
 class MinStack:
     def __init__(self):
         self.stack = []
         self.min_stack = []  # Tracks minimums
-    
+
     def push(self, val):
         self.stack.append(val)
         # Push to min_stack if it's empty or val <= current min
         if not self.min_stack or val <= self.min_stack[-1]:
             self.min_stack.append(val)
-    
+
     def pop(self):
         if not self.stack:
             return None
@@ -324,12 +336,13 @@ class MinStack:
         if val == self.min_stack[-1]:
             self.min_stack.pop()
         return val
-    
+
     def top(self):
         return self.stack[-1] if self.stack else None
-    
+
     def get_min(self):
         return self.min_stack[-1] if self.min_stack else None
+
 
 # Usage
 ms = MinStack()
@@ -351,26 +364,28 @@ Advanced bracket validation with different bracket types
 and error reporting.
 """
 
+
 def validate_brackets(s):
     """Returns (is_valid, error_position) tuple."""
     stack = []
-    pairs = {')': '(', ']': '[', '}': '{'}
-    brackets = set('()[]{}')
-    
+    pairs = {")": "(", "]": "[", "}": "{"}
+    brackets = set("()[]{}")
+
     for i, char in enumerate(s):
-        if char in '([{':
+        if char in "([{":
             stack.append((char, i))
-        elif char in ')]}':
+        elif char in ")]}":
             if not stack:
                 return False, i  # Unmatched closing bracket
             top, _ = stack.pop()
             if top != pairs[char]:
                 return False, i  # Mismatched brackets
-    
+
     if stack:
         return False, stack[-1][1]  # Unclosed opening bracket
-    
+
     return True, -1
+
 
 # Tests
 tests = ["{[()]}", "((())", "([)]", ""]
@@ -392,6 +407,7 @@ for test in tests:
 def pop_unsafe(stack):
     return stack.pop()  # Crashes if stack is empty!
 
+
 # RIGHT: Always check first
 def pop_safe(stack):
     if not stack:
@@ -404,12 +420,12 @@ def pop_safe(stack):
 # WRONG: Subtraction and division are not commutative
 b = stack.pop()  # This is the SECOND operand
 a = stack.pop()  # This is the FIRST operand
-result = b - a   # WRONG: Should be a - b
+result = b - a  # WRONG: Should be a - b
 
 # RIGHT
 b = stack.pop()  # Second operand
 a = stack.pop()  # First operand
-result = a - b   # Correct: first - second
+result = a - b  # Correct: first - second
 ```
 
 ### Mistake 3: Using `insert(0, x)` for Stack Push
@@ -430,6 +446,7 @@ stack.pop()  # Returns 3 (last added)
 
 # Queue: FIFO — first in, first out
 from collections import deque
+
 queue = deque([1, 2, 3])
 queue.popleft()  # Returns 1 (first added)
 ```
@@ -454,14 +471,15 @@ queue.popleft()  # Returns 1 (first added)
 ```python
 class QueueFromStacks:
     """Implement a queue using two stacks."""
+
     def __init__(self):
-        self.stack_in = []    # For enqueue
-        self.stack_out = []   # For dequeue
-    
+        self.stack_in = []  # For enqueue
+        self.stack_out = []  # For dequeue
+
     def enqueue(self, item):
         # Your solution here
         pass
-    
+
     def dequeue(self):
         # Your solution here
         pass
@@ -500,6 +518,7 @@ class CircularStack:
     Stack with fixed capacity that wraps around.
     When full, pushing a new element overwrites the oldest.
     """
+
     def __init__(self, capacity):
         # Your solution here
         pass

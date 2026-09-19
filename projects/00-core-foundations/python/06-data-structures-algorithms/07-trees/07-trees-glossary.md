@@ -28,6 +28,7 @@
 ```python
 from collections import deque
 
+
 def bfs(root):
     if not root:
         return []
@@ -36,8 +37,10 @@ def bfs(root):
     while queue:
         node = queue.popleft()
         result.append(node.val)
-        if node.left: queue.append(node.left)
-        if node.right: queue.append(node.right)
+        if node.left:
+            queue.append(node.left)
+        if node.right:
+            queue.append(node.right)
     return result
 ```
 
@@ -72,7 +75,7 @@ class TreeNode:
 def dfs(node):
     if not node:
         return
-    print(node.val)    # Preorder: process first
+    print(node.val)  # Preorder: process first
     dfs(node.left)
     dfs(node.right)
 ```

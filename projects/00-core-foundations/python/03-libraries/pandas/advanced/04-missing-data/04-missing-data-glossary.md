@@ -29,8 +29,9 @@ arithmetic and compares unequal to itself.
 **Example**:
 ```python
 import numpy as np
+
 x = np.nan
-print(x == x)   # False
+print(x == x)  # False
 ```
 **Related**: `isna()`, `None`
 
@@ -44,7 +45,7 @@ in object columns it stays `None`.
 `Int64`, `string`, `boolean` dtypes.
 **Example**:
 ```python
-s = pd.Series([1, 2, None], dtype="Int64")   # stays integer-typed
+s = pd.Series([1, 2, None], dtype="Int64")  # stays integer-typed
 ```
 **Related**: nullable dtypes, NaN
 
@@ -134,7 +135,7 @@ eval scores.
 **Example**:
 ```python
 # WRONG
-df["c"] = df["c"].fillna(df["c"].mean())   # before the split
+df["c"] = df["c"].fillna(df["c"].mean())  # before the split
 ```
 **Related**: imputation, train/test discipline
 

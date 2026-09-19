@@ -146,14 +146,17 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 # User model
 class User(BaseModel):
     username: str
     email: str
     disabled: bool = False
 
+
 class UserInDB(User):
     hashed_password: str
+
 
 # Fake database
 fake_users_db = {
@@ -165,13 +168,16 @@ fake_users_db = {
     }
 }
 
+
 def get_user(db, username: str):
     if username in db:
         user_dict = db[username]
         return UserInDB(**user_dict)
 
+
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
 
 def authenticate_user(fake_db, username: str, password: str):
     user = get_user(fake_db, username)
@@ -180,6 +186,7 @@ def authenticate_user(fake_db, username: str, password: str):
     if not verify_password(password, user.hashed_password):
         return False
     return user
+
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -190,6 +197,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
@@ -209,10 +217,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return user
 
+
 async def get_current_active_user(current_user: User = Depends(get_current_user)):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
 
 @app.post("/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -229,9 +239,11 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+
 @app.get("/users/me")
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user
+
 
 @app.get("/users/me/items")
 async def read_own_items(current_user: User = Depends(get_current_active_user)):
@@ -257,15 +269,18 @@ REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 class Token(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str
 
+
 class TokenPayload(BaseModel):
     sub: Optional[str] = None
     exp: Optional[int] = None
     type: Optional[str] = None  # "access" or "refresh"
+
 
 def create_token(data: dict, expires_delta: timedelta, token_type: str = "access"):
     to_encode = data.copy()
@@ -273,31 +288,34 @@ def create_token(data: dict, expires_delta: timedelta, token_type: str = "access
     to_encode.update({"exp": expire, "type": token_type})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+
 def create_tokens(user_id: str):
     access_token = create_token(
         data={"sub": user_id},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-        token_type="access"
+        token_type="access",
     )
     refresh_token = create_token(
         data={"sub": user_id},
         expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
-        token_type="refresh"
+        token_type="refresh",
     )
     return {"access_token": access_token, "refresh_token": refresh_token}
+
 
 @app.post("/token", response_model=Token)
 async def login(username: str, password: str):
     user = authenticate_user(username, password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     tokens = create_tokens(user.id)
     return {
         "access_token": tokens["access_token"],
         "refresh_token": tokens["refresh_token"],
-        "token_type": "bearer"
+        "token_type": "bearer",
     }
+
 
 @app.post("/token/refresh")
 async def refresh_token(refresh_token: str):
@@ -305,19 +323,20 @@ async def refresh_token(refresh_token: str):
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         token_type: str = payload.get("type")
-        
+
         if username is None or token_type != "refresh":
             raise HTTPException(status_code=401, detail="Invalid token")
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
-    
+
     # Create new tokens
     tokens = create_tokens(username)
     return {
         "access_token": tokens["access_token"],
         "refresh_token": tokens["refresh_token"],
-        "token_type": "bearer"
+        "token_type": "bearer",
     }
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
@@ -328,19 +347,20 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         token_type: str = payload.get("type")
-        
+
         if username is None or token_type != "access":
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
+
     user = get_user(username)
     if user is None:
         raise credentials_exception
     return user
 
+
 @app.get("/users/me")
-async def read_users_me(current_user = Depends(get_current_user)):
+async def read_users_me(current_user=Depends(get_current_user)):
     return current_user
 ```
 
@@ -363,25 +383,27 @@ blacklisted_tokens: Set[str] = set()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=30)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+
 def is_token_blacklisted(token: str) -> bool:
     return token in blacklisted_tokens
 
+
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid token"
+        status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
     )
-    
+
     # Check if token is blacklisted
     if is_token_blacklisted(token):
         raise credentials_exception
-    
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
@@ -389,16 +411,18 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
+
     return username
+
 
 @app.post("/token")
 async def login(username: str, password: str):
     if not authenticate_user(username, password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     access_token = create_access_token(data={"sub": username})
     return {"access_token": access_token}
+
 
 @app.post("/logout")
 async def logout(token: str = Depends(oauth2_scheme)):
@@ -406,8 +430,9 @@ async def logout(token: str = Depends(oauth2_scheme)):
     blacklisted_tokens.add(token)
     return {"message": "Successfully logged out"}
 
+
 @app.get("/protected")
-async def protected_route(current_user = Depends(get_current_user)):
+async def protected_route(current_user=Depends(get_current_user)):
     return {"message": f"Hello {current_user}"}
 ```
 
@@ -426,6 +451,7 @@ app = FastAPI()
 SECRET_KEY = "your-secret-key"
 ALGORITHM = "HS256"
 
+
 class TokenPayload(BaseModel):
     sub: str
     email: str
@@ -435,12 +461,8 @@ class TokenPayload(BaseModel):
     iat: datetime
     jti: str  # JWT ID for uniqueness
 
-def create_token(
-    user_id: str,
-    email: str,
-    roles: List[str],
-    permissions: List[str]
-):
+
+def create_token(user_id: str, email: str, roles: List[str], permissions: List[str]):
     now = datetime.utcnow()
     payload = {
         "sub": user_id,
@@ -449,9 +471,10 @@ def create_token(
         "permissions": permissions,
         "iat": now,
         "exp": now + timedelta(minutes=30),
-        "jti": str(uuid.uuid4())  # Unique token ID
+        "jti": str(uuid.uuid4()),  # Unique token ID
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
 
 def decode_token(token: str) -> TokenPayload:
     try:
@@ -460,34 +483,36 @@ def decode_token(token: str) -> TokenPayload:
     except jwt.JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     return decode_token(token)
 
+
 @app.get("/admin/")
-async def admin_only(current_user = Depends(get_current_user)):
+async def admin_only(current_user=Depends(get_current_user)):
     if "admin" not in current_user.roles:
         raise HTTPException(status_code=403, detail="Admin role required")
     return {"message": f"Welcome admin {current_user.email}"}
 
+
 @app.get("/user/")
-async def user_only(current_user = Depends(get_current_user)):
+async def user_only(current_user=Depends(get_current_user)):
     if "user" not in current_user.roles:
         raise HTTPException(status_code=403, detail="User role required")
     return {"message": f"Welcome {current_user.email}"}
+
 
 @app.post("/token")
 async def login(username: str, password: str):
     user = authenticate_user(username, password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     token = create_token(
-        user_id=user.id,
-        email=user.email,
-        roles=user.roles,
-        permissions=user.permissions
+        user_id=user.id, email=user.email, roles=user.roles, permissions=user.permissions
     )
     return {"access_token": token}
 ```
@@ -510,27 +535,32 @@ DATABASE_URL = "sqlite:///./jwt_demo.db"
 database = databases.Database(DATABASE_URL)
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = "users"
-    
+
     id = Column(String, primary_key=True)
     username = Column(String, unique=True)
     email = Column(String)
     hashed_password = Column(String)
     is_active = Column(bool, default=True)
 
+
 @app.on_event("startup")
 async def startup():
     await database.connect()
+
 
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
 
+
 async def get_user_from_db(username: str):
     query = User.__table__.select().where(User.username == username)
     result = await database.fetch_one(query)
     return result
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
@@ -540,20 +570,17 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             raise HTTPException(status_code=401)
     except jwt.JWTError:
         raise HTTPException(status_code=401)
-    
+
     user = await get_user_from_db(username)
     if user is None:
         raise HTTPException(status_code=401)
-    
+
     return user
 
+
 @app.get("/users/me")
-async def read_users_me(current_user = Depends(get_current_user)):
-    return {
-        "id": current_user.id,
-        "username": current_user.username,
-        "email": current_user.email
-    }
+async def read_users_me(current_user=Depends(get_current_user)):
+    return {"id": current_user.id, "username": current_user.username, "email": current_user.email}
 ```
 
 ---
@@ -568,6 +595,7 @@ SECRET_KEY = "secret123"
 
 # ✅ CORRECT - Strong, random secret
 import secrets
+
 SECRET_KEY = secrets.token_urlsafe(32)
 # Or from environment variable
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -580,6 +608,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 def get_user(token: str):
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     return payload.get("sub")
+
 
 # ✅ CORRECT - Validate token type
 def get_user(token: str):

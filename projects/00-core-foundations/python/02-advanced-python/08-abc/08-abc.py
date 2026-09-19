@@ -14,6 +14,7 @@ from dataclasses import dataclass
 # 1. Basic Abstract Class
 # =============================================================================
 
+
 class Shape(ABC):
     """Abstract base class for shapes."""
 
@@ -46,7 +47,7 @@ class Circle(Shape):
         self.radius = radius
 
     def area(self) -> float:
-        return 3.14159 * self.radius ** 2
+        return 3.14159 * self.radius**2
 
     def perimeter(self) -> float:
         return 2 * 3.14159 * self.radius
@@ -85,6 +86,7 @@ class Triangle(Shape):
 # =============================================================================
 # 2. Plugin System
 # =============================================================================
+
 
 class Plugin(ABC):
     """Abstract plugin interface."""
@@ -151,23 +153,29 @@ class PluginManager:
 # 3. Abstract Collection
 # =============================================================================
 
+
 class AbstractCollection(ABC):
     """Abstract collection interface."""
 
     @abstractmethod
-    def add(self, item) -> None: pass
+    def add(self, item) -> None:
+        pass
 
     @abstractmethod
-    def remove(self, item) -> bool: pass
+    def remove(self, item) -> bool:
+        pass
 
     @abstractmethod
-    def contains(self, item) -> bool: pass
+    def contains(self, item) -> bool:
+        pass
 
     @abstractmethod
-    def size(self) -> int: pass
+    def size(self) -> int:
+        pass
 
     @abstractmethod
-    def is_empty(self) -> bool: pass
+    def is_empty(self) -> bool:
+        pass
 
     def __len__(self) -> int:
         return self.size()
@@ -209,11 +217,13 @@ class UniqueList(AbstractCollection):
 # 4. Mixin Pattern
 # =============================================================================
 
+
 class Printable(ABC):
     """Mixin for printable objects."""
 
     @abstractmethod
-    def to_string(self) -> str: pass
+    def to_string(self) -> str:
+        pass
 
     def print(self) -> None:
         print(f"  {self.to_string()}")
@@ -223,7 +233,8 @@ class Comparable(ABC):
     """Mixin for comparable objects."""
 
     @abstractmethod
-    def value(self) -> float: pass
+    def value(self) -> float:
+        pass
 
     def __lt__(self, other) -> bool:
         return self.value() < other.value()
@@ -238,16 +249,17 @@ class Comparable(ABC):
 @dataclass
 class Temperature(Comparable, Printable):
     """Temperature that is both printable and comparable."""
+
     celsius: float
 
     def value(self) -> float:
         return self.celsius
 
     def to_string(self) -> str:
-        return f"{self.celsius}°C ({self.celsius * 9/5 + 32:.1f}°F)"
+        return f"{self.celsius}°C ({self.celsius * 9 / 5 + 32:.1f}°F)"
 
     def to_fahrenheit(self) -> float:
-        return self.celsius * 9/5 + 32
+        return self.celsius * 9 / 5 + 32
 
 
 # =============================================================================

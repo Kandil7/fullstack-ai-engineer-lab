@@ -34,6 +34,7 @@ are at the end.
 
 ```python
 from datetime import datetime, timezone
+
 d = datetime(1970, 1, 1, 0, 0, 1, tzinfo=timezone.utc)
 print(d.timestamp())
 ```
@@ -48,7 +49,8 @@ print(d.timestamp())
 
 ```python
 from datetime import datetime, timezone
-n = datetime(2026, 8, 6, 12, 0)                     # naive
+
+n = datetime(2026, 8, 6, 12, 0)  # naive
 a = datetime(2026, 8, 6, 12, 0, tzinfo=timezone.utc)  # aware
 print(n - a)
 ```
@@ -64,6 +66,7 @@ print(n - a)
 ```python
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
+
 tokyo = ZoneInfo("Asia/Tokyo")
 d = datetime(2026, 8, 6, 3, 0, tzinfo=timezone.utc)
 print(d.astimezone(tokyo))
@@ -88,6 +91,7 @@ print(d.astimezone(tokyo))
 ```python
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
+
 ny = ZoneInfo("America/New_York")
 a = datetime(2026, 11, 1, 1, 30, fold=0).replace(tzinfo=ny)
 b = datetime(2026, 11, 1, 1, 30, fold=1).replace(tzinfo=ny)
@@ -104,6 +108,7 @@ print(a == b)
 
 ```python
 from datetime import datetime, timezone
+
 d = datetime.fromisoformat("2026-08-06T12:00:00+00:00")
 print(d.tzinfo is not None, d.hour)
 ```
@@ -134,6 +139,7 @@ print(d.tzinfo is not None, d.hour)
 
 ```python
 from datetime import date, timedelta
+
 print(date(2026, 3, 1) + timedelta(days=30))
 ```
 
@@ -156,6 +162,7 @@ print(date(2026, 3, 1) + timedelta(days=30))
 ```python
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
+
 d = datetime(2026, 8, 6, 9, 0).replace(tzinfo=ZoneInfo("Africa/Cairo"))
 print(d.astimezone(timezone.utc).isoformat())
 ```
@@ -178,6 +185,7 @@ print(d.astimezone(timezone.utc).isoformat())
 
 ```python
 from datetime import datetime, timezone
+
 d = datetime(2026, 3, 8, 2, 30).replace(tzinfo=ZoneInfo("America/New_York"))
 print(d.utcoffset())
 ```
@@ -211,6 +219,7 @@ print(d.utcoffset())
 ```python
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
+
 ny = ZoneInfo("America/New_York")
 d = datetime(2026, 3, 8, 2, 30).replace(tzinfo=ny)
 print(d.astimezone(timezone.utc).astimezone(ny).strftime("%H:%M %z"))

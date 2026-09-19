@@ -15,8 +15,10 @@
 class ArrayStack:
     def __init__(self):
         self.items = []
+
     def push(self, item):
         self.items.append(item)
+
     def pop(self):
         return self.items.pop()
 ```
@@ -33,11 +35,11 @@ class ArrayStack:
 ```python
 def is_balanced(s):
     stack = []
-    pairs = {')': '(', ']': '[', '}': '{'}
+    pairs = {")": "(", "]": "[", "}": "{"}
     for char in s:
-        if char in '([{':
+        if char in "([{":
             stack.append(char)
-        elif char in ')]}':
+        elif char in ")]}":
             if not stack or stack[-1] != pairs[char]:
                 return False
             stack.pop()
@@ -55,11 +57,12 @@ def is_balanced(s):
 
 ```python
 from collections import deque
+
 dq = deque([1, 2, 3])
-dq.append(4)      # Add to right (stack push)
+dq.append(4)  # Add to right (stack push)
 dq.appendleft(0)  # Add to left (queue front)
-dq.pop()           # Remove from right (stack pop)
-dq.popleft()       # Remove from left (queue dequeue)
+dq.pop()  # Remove from right (stack pop)
+dq.popleft()  # Remove from left (queue dequeue)
 ```
 
 ---
@@ -102,10 +105,10 @@ Prefix:  + 3 * 4 2        → No precedence needed (stack-based)
 
 ```python
 stack = []
-stack.append("first")   # Bottom
+stack.append("first")  # Bottom
 stack.append("second")  # Middle
-stack.append("third")   # Top
-print(stack.pop())      # "third" — last in, first out
+stack.append("third")  # Top
+print(stack.pop())  # "third" — last in, first out
 ```
 
 ### Linked Stack
@@ -119,13 +122,16 @@ class Node:
         self.data = data
         self.next = None
 
+
 class LinkedStack:
     def __init__(self):
         self.top = None
+
     def push(self, item):
         node = Node(item)
         node.next = self.top
         self.top = node
+
     def pop(self):
         data = self.top.data
         self.top = self.top.next
@@ -162,15 +168,18 @@ class MinStack:
     def __init__(self):
         self.stack = []
         self.min_stack = []
+
     def push(self, val):
         self.stack.append(val)
         if not self.min_stack or val <= self.min_stack[-1]:
             self.min_stack.append(val)
+
     def pop(self):
         val = self.stack.pop()
         if val == self.min_stack[-1]:
             self.min_stack.pop()
         return val
+
     def get_min(self):
         return self.min_stack[-1]
 ```
@@ -235,12 +244,13 @@ item = stack.pop()  # Returns 3, stack is now [1, 2]
 def eval_postfix(expr):
     stack = []
     for token in expr.split():
-        if token in '+-*/':
+        if token in "+-*/":
             b, a = stack.pop(), stack.pop()
-            stack.append({'+' : a+b, '-': a-b, '*': a*b, '/': a//b}[token])
+            stack.append({"+": a + b, "-": a - b, "*": a * b, "/": a // b}[token])
         else:
             stack.append(int(token))
     return stack[0]
+
 
 print(eval_postfix("3 4 + 2 *"))  # 14
 ```
@@ -264,7 +274,7 @@ stack = []
 stack.push(10)  # [10]
 stack.push(20)  # [10, 20]
 stack.push(30)  # [10, 20, 30]
-stack.pop()     # Returns 30 → [10, 20]
+stack.pop()  # Returns 30 → [10, 20]
 ```
 
 ### Stack Overflow
@@ -290,19 +300,23 @@ def infinite_recursion(n):
 ```python
 def shunting_yard(expression):
     """Convert infix to postfix using Shunting-Yard algorithm."""
-    precedence = {'+': 1, '-': 1, '*': 2, '/': 2}
+    precedence = {"+": 1, "-": 1, "*": 2, "/": 2}
     output, stack = [], []
     for token in expression.split():
         if token.isdigit():
             output.append(token)
-        elif token == '(':
+        elif token == "(":
             stack.append(token)
-        elif token == ')':
-            while stack[-1] != '(':
+        elif token == ")":
+            while stack[-1] != "(":
                 output.append(stack.pop())
             stack.pop()
         else:
-            while stack and stack[-1] != '(' and precedence.get(stack[-1], 0) >= precedence.get(token, 0):
+            while (
+                stack
+                and stack[-1] != "("
+                and precedence.get(stack[-1], 0) >= precedence.get(token, 0)
+            ):
                 output.append(stack.pop())
             stack.append(token)
     output.extend(reversed(stack))
@@ -331,14 +345,17 @@ class UndoRedo:
     def __init__(self):
         self.undo_stack = []
         self.redo_stack = []
+
     def do(self, action):
         self.undo_stack.append(action)
         self.redo_stack.clear()  # New action clears redo
+
     def undo(self):
         if self.undo_stack:
             action = self.undo_stack.pop()
             self.redo_stack.append(action)
             return action
+
     def redo(self):
         if self.redo_stack:
             action = self.redo_stack.pop()

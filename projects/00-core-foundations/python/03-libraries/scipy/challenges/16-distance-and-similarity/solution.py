@@ -10,8 +10,9 @@ from scipy.spatial import cKDTree
 from scipy.spatial.distance import cdist, pdist, squareform
 
 
-def nearest_brute(Q: np.ndarray, X: np.ndarray, k: int,
-                  metric: str = "euclidean") -> tuple[np.ndarray, np.ndarray]:
+def nearest_brute(
+    Q: np.ndarray, X: np.ndarray, k: int, metric: str = "euclidean"
+) -> tuple[np.ndarray, np.ndarray]:
     """Top-k nearest rows of X per query row, via cdist + argsort."""
     if k > len(X):
         raise ValueError(f"k={k} exceeds corpus size {len(X)}")
@@ -29,8 +30,7 @@ def cosine_pair(u: np.ndarray, v: np.ndarray) -> float:
     return float(1.0 - np.dot(u, v) / (nu * nv))
 
 
-def normalized_topk(Q: np.ndarray, X: np.ndarray,
-                    k: int) -> np.ndarray:
+def normalized_topk(Q: np.ndarray, X: np.ndarray, k: int) -> np.ndarray:
     """Top-k indices by euclidean on L2-normalized rows."""
     Qn = Q / np.linalg.norm(Q, axis=1, keepdims=True)
     Xn = X / np.linalg.norm(X, axis=1, keepdims=True)
@@ -43,16 +43,16 @@ def spread(V: np.ndarray) -> float:
     return float(squareform(pdist(V, metric="cosine")).std())
 
 
-def fast_neighbors(points: np.ndarray, queries: np.ndarray,
-                   k: int) -> tuple[np.ndarray, np.ndarray]:
+def fast_neighbors(
+    points: np.ndarray, queries: np.ndarray, k: int
+) -> tuple[np.ndarray, np.ndarray]:
     """Exact top-k via cKDTree."""
     if k > len(points):
         raise ValueError(f"k={k} exceeds corpus size {len(points)}")
     return cKDTree(points).query(queries, k=k)
 
 
-def spread_ratio(d_low: int, d_high: int, n: int = 2000,
-                 seed: int = 42) -> float:
+def spread_ratio(d_low: int, d_high: int, n: int = 2000, seed: int = 42) -> float:
     """spread(d_low) / spread(d_high) for random unit vectors."""
     rng = np.random.default_rng(seed)
 

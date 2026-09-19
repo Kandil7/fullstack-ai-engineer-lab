@@ -60,13 +60,16 @@ class ToolRegistry:
         super().__init_subclass__(**kwargs)
         ToolRegistry._registry[cls.__name__] = cls
 
+
 class SearchTool(ToolRegistry):
     def run(self):
         return "search results"
 
+
 class EmbedTool(ToolRegistry):
     def run(self):
         return "vector [0.1, 0.2]"
+
 
 print(sorted(ToolRegistry._registry))
 print(ToolRegistry._registry["EmbedTool"]().run())
@@ -96,7 +99,7 @@ class Column:
         self.name = "<unset>"
 
     def __set_name__(self, owner, name):
-        self.name = name          # called when the class is built
+        self.name = name  # called when the class is built
 
     def __get__(self, obj, objtype=None):
         if obj is None:
@@ -108,14 +111,16 @@ class Column:
             raise TypeError(f"{self.name} must be {self.dtype.__name__}")
         obj.__dict__[self.name] = value
 
+
 class Row:
     id = Column(int)
     name = Column(str)
 
+
 row = Row()
 row.id = 7
 row.name = "doc-1"
-print(Row.id.name, Row.name.name)     # descriptors know their names
+print(Row.id.name, Row.name.name)  # descriptors know their names
 try:
     row.id = "not-an-int"
 except TypeError as exc:
@@ -148,14 +153,17 @@ def with_repr(cls):
     def __repr__(self):
         fields = ", ".join(f"{k}={v!r}" for k, v in vars(self).items())
         return f"{type(self).__name__}({fields})"
+
     cls.__repr__ = __repr__
     return cls
+
 
 @with_repr
 class Chunk:
     def __init__(self, text, score):
         self.text = text
         self.score = score
+
 
 print(Chunk("hello", 0.9))
 ```
@@ -171,9 +179,10 @@ print(Chunk("hello", 0.9))
 def make_point(name):
     return type(name, (), {"x": 0, "y": 0})
 
+
 PointA = make_point("PointA")
 PointB = make_point("PointB")
-print(PointA is PointB)     # distinct classes
+print(PointA is PointB)  # distinct classes
 p = PointA()
 print(p.x, p.y)
 ```
@@ -198,10 +207,13 @@ The heart of the `@tool` pattern. `inspect.signature(fn)` returns a
 ```python
 import inspect
 
-def embed_documents(docs: list[str], model: str = "base",
-                    batch_size: int = 32) -> list[list[float]]:
+
+def embed_documents(
+    docs: list[str], model: str = "base", batch_size: int = 32
+) -> list[list[float]]:
     """Embed a list of documents."""
     return [[0.1] * batch_size for _ in docs]
+
 
 sig = inspect.signature(embed_documents)
 print(list(sig.parameters))
@@ -228,6 +240,7 @@ from typing import Callable, get_type_hints
 TOOL_SCHEMAS = {}
 TOOL_FUNCS = {}
 
+
 def describe(fn):
     sig = inspect.signature(fn)
     hints = get_type_hints(fn)
@@ -236,8 +249,14 @@ def describe(fn):
         "description": (fn.__doc__ or "").strip().splitlines()[0],
         "parameters": {"type": "object", "properties": {}},
     }
-    type_map = {str: "string", int: "integer", float: "number",
-                bool: "boolean", list: "array", dict: "object"}
+    type_map = {
+        str: "string",
+        int: "integer",
+        float: "number",
+        bool: "boolean",
+        list: "array",
+        dict: "object",
+    }
     for param in sig.parameters.values():
         if param.name in ("self", "cls"):
             continue
@@ -253,15 +272,18 @@ def describe(fn):
         schema["parameters"]["properties"][param.name] = prop
     return schema
 
+
 def tool(fn):
     TOOL_SCHEMAS[fn.__name__] = describe(fn)
     TOOL_FUNCS[fn.__name__] = fn
     return fn
 
+
 @tool
 def search(query: str, top_k: int = 5) -> list[str]:
     """Search the knowledge base."""
     return [f"result-{i}" for i in range(top_k)]
+
 
 print(TOOL_SCHEMAS["search"])
 ```
@@ -304,6 +326,7 @@ by name, and any class subclassing your base registers itself (4.1).
 ```python
 import types
 
+
 def get_path(obj, path, default=None):
     current = obj
     for part in path.split("."):
@@ -312,9 +335,11 @@ def get_path(obj, path, default=None):
         current = getattr(current, part)
     return current
 
+
 class Config:
     def __init__(self):
         self.embedding = types.SimpleNamespace(model="base", dim=384)
+
 
 cfg = Config()
 print(get_path(cfg, "embedding.model"))
@@ -343,8 +368,10 @@ The replacement is a dispatch table:
 def op_a():
     return 1
 
+
 def op_b():
     return 2
+
 
 table = {"op_a": op_a, "op_b": op_b}
 print(table["op_b"]())
@@ -367,10 +394,11 @@ it** — safe analysis (linting, counting, extracting, rewriting):
 ```python
 import ast
 
+
 def count_functions(source):
     tree = ast.parse(source)
-    return sum(1 for n in ast.walk(tree)
-               if isinstance(n, ast.FunctionDef))
+    return sum(1 for n in ast.walk(tree) if isinstance(n, ast.FunctionDef))
+
 
 print(count_functions("def a():\n    pass\ndef b():\n    pass\nx = 1"))
 ```
@@ -391,15 +419,18 @@ class ModelClient:
     def predict(self, text):
         return f"real prediction for {text}"
 
+
 client = ModelClient()
 original = client.predict
+
 
 def fake_predict(text):
     return "fake prediction"
 
-client.predict = fake_predict      # patch
+
+client.predict = fake_predict  # patch
 print(client.predict("x"))
-client.predict = original          # restore
+client.predict = original  # restore
 print(client.predict("x"))
 ```
 

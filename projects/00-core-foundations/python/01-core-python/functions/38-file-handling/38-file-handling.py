@@ -163,7 +163,7 @@ data = [
     ["Name", "Age", "City"],
     ["Alice", 30, "New York"],
     ["Bob", 25, "London"],
-    ["Charlie", 35, "Paris"]
+    ["Charlie", 35, "Paris"],
 ]
 
 with open("people.csv", "w", newline="") as f:
@@ -222,7 +222,7 @@ print("\n--- Temporary Files ---")
 import tempfile
 
 # Create temporary file
-with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt') as f:
+with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".txt") as f:
     f.write("Temporary data")
     temp_name = f.name
 
@@ -239,6 +239,7 @@ print(f"After cleanup: {os.path.exists(temp_name)}")
 # Example 12: Real-world file operations
 print("\n--- Practical Examples ---")
 
+
 # Count words in a file
 def count_words(filename):
     """Count words in a text file."""
@@ -247,24 +248,28 @@ def count_words(filename):
         words = content.split()
         return len(words)
 
+
 word_count = count_words("example.txt")
 print(f"Word count in example.txt: {word_count}")
+
 
 # Find and replace in file
 def find_replace(filename, find, replace):
     """Find and replace text in a file."""
     with open(filename, "r") as f:
         content = f.read()
-    
+
     new_content = content.replace(find, replace)
-    
+
     with open(filename, "w") as f:
         f.write(new_content)
-    
+
     return content.count(find)
+
 
 replacements = find_replace("example.txt", "line", "LINE")
 print(f"Replaced {replacements} occurrences of 'line' with 'LINE'")
+
 
 # Merge multiple files
 def merge_files(output_file, input_files):
@@ -274,6 +279,7 @@ def merge_files(output_file, input_files):
             with open(input_file, "r") as infile:
                 outfile.write(infile.read())
                 outfile.write("\n")
+
 
 # ============================================================
 # Cleanup

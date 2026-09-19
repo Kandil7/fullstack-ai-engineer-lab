@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 # 1. Deployment Strategies
 # ============================================================
 
+
 @dataclass
 class Strategy:
     name: str
@@ -34,8 +35,10 @@ class Strategy:
     observes_real_users: bool
 
     def describe(self) -> str:
-        return f"{self.name}: blast radius {self.blast_radius}, " \
-               f"{'sees' if self.observes_real_users else 'does not affect'} real users"
+        return (
+            f"{self.name}: blast radius {self.blast_radius}, "
+            f"{'sees' if self.observes_real_users else 'does not affect'} real users"
+        )
 
 
 # Example 1: the deployment ladder
@@ -54,6 +57,7 @@ for s in strategies:
 # ============================================================
 # Deterministic bucketing: hash the user id, route by bucket.
 
+
 def bucket_of(user_id: str, pct_a: float) -> str:
     """Return 'A' or 'B' deterministically for a user."""
     h = hash(user_id) % 1000
@@ -67,8 +71,7 @@ counts = {"A": 0, "B": 0}
 for u in users:
     counts[bucket_of(u, 50.0)] += 1
 print("\nExample 2: 50/50 traffic split")
-print(f"  A={counts['A']} B={counts['B']} "
-      f"(ratio {counts['A']/sum(counts.values()):.2f})")
+print(f"  A={counts['A']} B={counts['B']} (ratio {counts['A'] / sum(counts.values()):.2f})")
 total = sum(counts.values())
 assert abs(counts["A"] / total - 0.5) < 0.05, "split is approximately even"
 assert bucket_of("user-1", 50.0) == bucket_of("user-1", 50.0), "bucketing is stable"
@@ -76,6 +79,7 @@ assert bucket_of("user-1", 50.0) == bucket_of("user-1", 50.0), "bucketing is sta
 # ============================================================
 # 3. Statistical Significance (z-test on proportions)
 # ============================================================
+
 
 def z_test_proportions(n_a: int, conv_a: int, n_b: int, conv_b: int) -> float:
     """Two-proportion z-test; returns the z statistic."""
@@ -92,7 +96,7 @@ def is_significant(z: float, threshold: float = 1.96) -> bool:
 
 
 # Example 3: real difference vs noise
-sig = z_test_proportions(5000, 450, 5000, 550)   # 9.0% vs 11.0%
+sig = z_test_proportions(5000, 450, 5000, 550)  # 9.0% vs 11.0%
 noise = z_test_proportions(5000, 450, 5000, 452)  # 9.0% vs 9.04%
 print("\nExample 3: statistical significance")
 print(f"  9.0% vs 11.0% -> z={sig:.2f} significant={is_significant(sig)}")
@@ -105,6 +109,7 @@ assert not is_significant(noise), "small gap is noise"
 # ============================================================
 # The treatment must not only win the target metric; it must not wreck
 # the guardrails (latency, error rate, retention).
+
 
 @dataclass
 class ABResult:
@@ -132,13 +137,15 @@ assert not r2.can_roll_out(), "latency regression blocks rollout"
 # significance threshold, and guardrail budget. Then let the experiment
 # run until one of the stopping conditions fires.
 
+
 @dataclass
 class ABExperiment:
     min_sample: int
     significance_threshold: float = 1.96
 
-    def evaluate(self, n_a: int, ca: int, n_b: int, cb: int,
-                 guardrails_ok: bool) -> tuple[str, bool]:
+    def evaluate(
+        self, n_a: int, ca: int, n_b: int, cb: int, guardrails_ok: bool
+    ) -> tuple[str, bool]:
         if n_a < self.min_sample or n_b < self.min_sample:
             return "continue - sample too small", False
         z = z_test_proportions(n_a, ca, n_b, cb)

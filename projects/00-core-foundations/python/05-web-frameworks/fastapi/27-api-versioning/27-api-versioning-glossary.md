@@ -29,7 +29,7 @@ Companion lecture: `27-api-versioning-lecture.md`
 new optional fields, new endpoints, new enum values, relaxed constraints.
 **Example**:
 ```python
-is_additive({"a": 1}, {"a": 1, "b": 2})   # True — new key only
+is_additive({"a": 1}, {"a": 1, "b": 2})  # True — new key only
 ```
 **Related**: Breaking change
 

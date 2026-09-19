@@ -181,16 +181,17 @@ print(data)  # Output: [1, 1, 2, 3, 6, 8, 10]
 ```python
 import random
 
+
 def quicksort_randomized(arr, low=0, high=None):
     """
     Quick sort with random pivot selection.
-    
+
     Avoids worst-case on sorted/nearly sorted data.
     Expected time: O(n log n)
     """
     if high is None:
         high = len(arr) - 1
-    
+
     if low < high:
         pivot_idx = random_partition(arr, low, high)
         quicksort_randomized(arr, low, pivot_idx - 1)
@@ -292,6 +293,7 @@ def partition_wrong(arr, low, high):
     # BUG: Not swapping pivot into position!
     return i  # Wrong return value
 
+
 # CORRECT: Swap pivot into position and return its index
 def partition_correct(arr, low, high):
     pivot = arr[high]
@@ -314,6 +316,7 @@ def quicksort_wrong(arr, low, high):
         quicksort_wrong(arr, low, pivot_idx)  # BUG: Should be pivot_idx - 1
         quicksort_wrong(arr, pivot_idx, high)  # BUG: Should be pivot_idx + 1
 
+
 # CORRECT: Proper base case and recursive calls
 def quicksort_correct(arr, low, high):
     if low < high:
@@ -333,12 +336,12 @@ def three_way_partition(arr, low, high):
     """Partition into < pivot, == pivot, > pivot."""
     if low >= high:
         return
-    
+
     pivot = arr[low]
-    lt = low      # arr[low..lt-1] < pivot
-    gt = high     # arr[gt+1..high] > pivot
-    i = low       # arr[lt..i-1] == pivot
-    
+    lt = low  # arr[low..lt-1] < pivot
+    gt = high  # arr[gt+1..high] > pivot
+    i = low  # arr[lt..i-1] == pivot
+
     while i <= gt:
         if arr[i] < pivot:
             arr[lt], arr[i] = arr[i], arr[lt]
@@ -349,7 +352,7 @@ def three_way_partition(arr, low, high):
             gt -= 1
         else:
             i += 1
-    
+
     # Recursively sort elements < pivot and > pivot
     three_way_partition(arr, low, lt - 1)
     three_way_partition(arr, gt + 1, high)
@@ -363,6 +366,7 @@ def quicksort_bad_pivot(arr, low, high):
     if low < high:
         pivot_idx = partition_lomuto(arr, low, high)  # Pivot is last!
         # On sorted data: pivot is largest → unbalanced → O(n) depth
+
 
 # CORRECT: Use randomized or median-of-three pivot
 def quicksort_good_pivot(arr, low, high):

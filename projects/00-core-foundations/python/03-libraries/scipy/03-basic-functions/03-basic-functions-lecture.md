@@ -18,18 +18,22 @@ SciPy extends NumPy with advanced mathematical functions for optimization, root 
 import numpy as np
 from scipy import optimize
 
+
 # Single variable root finding
 def f(x):
     return x**2 - 4  # Roots at x = ±2
+
 
 # Using root_scalar
 sol = optimize.root_scalar(f, bracket=[0, 5])  # Find positive root
 print(f"Root: x = {sol.root:.4f}")
 
+
 # Using root (multivariate)
 def system(vars):
     x, y = vars
     return [x**2 + y**2 - 25, x - y - 1]
+
 
 sol = optimize.root(system, [1, 4])
 print(f"Solution: x={sol.x[0]:.3f}, y={sol.x[1]:.3f}")
@@ -43,9 +47,10 @@ print(f"Solution: x={sol.x[0]:.3f}, y={sol.x[1]:.3f}")
 # Function minimization
 def rosenbrock(x):
     """Rosenbrock banana function."""
-    return (1 - x[0])**2 + 100 * (x[1] - x[0]**2)**2
+    return (1 - x[0]) ** 2 + 100 * (x[1] - x[0] ** 2) ** 2
 
-result = optimize.minimize(rosenbrock, [0, 0], method='Nelder-Mead')
+
+result = optimize.minimize(rosenbrock, [0, 0], method="Nelder-Mead")
 print(f"Optimal at: x={result.x[0]:.4f}, y={result.x[1]:.4f}")
 print(f"Function value: {result.fun:.6f}")
 
@@ -65,9 +70,11 @@ true_params = (2.5, 1.3, 0.5)
 y = true_params[0] * np.exp(-true_params[1] * x) + true_params[2]
 y_noisy = y + np.random.normal(0, 0.1, size=len(x))
 
+
 # Define model
 def model(x, a, b, c):
     return a * np.exp(-b * x) + c
+
 
 # Fit
 popt, pcov = optimize.curve_fit(model, x, y_noisy, p0=[1, 1, 1])

@@ -29,20 +29,24 @@ starter = _load("starter_04", os.path.join(HERE, "starter.py"))
 
 
 def _small() -> pd.DataFrame:
-    return pd.DataFrame({
-        "campaign": ["a", "b", "a", "c", "b"],
-        "converted": [1, 0, 1, 1, 0],
-        "revenue": [10.0, 5.0, 30.0, 12.0, 3.0],
-    })
+    return pd.DataFrame(
+        {
+            "campaign": ["a", "b", "a", "c", "b"],
+            "converted": [1, 0, 1, 1, 0],
+            "revenue": [10.0, 5.0, 30.0, 12.0, 3.0],
+        }
+    )
 
 
 def _large(n: int = 200_000) -> pd.DataFrame:
     rng = np.random.default_rng(42)
-    return pd.DataFrame({
-        "campaign": rng.choice(["a", "b", "c", "d"], n),
-        "converted": rng.integers(0, 2, n),
-        "revenue": rng.uniform(0.0, 50.0, n),
-    })
+    return pd.DataFrame(
+        {
+            "campaign": rng.choice(["a", "b", "c", "d"], n),
+            "converted": rng.integers(0, 2, n),
+            "revenue": rng.uniform(0.0, 50.0, n),
+        }
+    )
 
 
 def _assert_polars_pure():
@@ -52,6 +56,7 @@ def _assert_polars_pure():
 
 
 # ---------------------------------------------------------------- bronze
+
 
 def test_bronze_matches_pandas_mask():
     pdf = _small()
@@ -81,13 +86,15 @@ def test_bronze_starter_raises():
 
 # ---------------------------------------------------------------- silver
 
+
 def test_silver_matches_groupby_small():
     pdf = _small()
-    expected = (pdf.groupby("campaign")
-                .agg(conversions=("converted", "sum"),
-                     revenue=("revenue", "mean"))
-                .reset_index()
-                .sort_values("campaign"))
+    expected = (
+        pdf.groupby("campaign")
+        .agg(conversions=("converted", "sum"), revenue=("revenue", "mean"))
+        .reset_index()
+        .sort_values("campaign")
+    )
     out = solution.polars_groupby_equivalent(pdf)
     assert out.columns == ["campaign", "conversions", "revenue"]
     assert out["conversions"].to_list() == expected["conversions"].tolist()
@@ -96,10 +103,12 @@ def test_silver_matches_groupby_small():
 
 def test_silver_matches_groupby_large():
     pdf = _large()
-    expected = (pdf.groupby("campaign")
-                .agg(conversions=("converted", "sum"))
-                .reset_index()
-                .sort_values("campaign"))
+    expected = (
+        pdf.groupby("campaign")
+        .agg(conversions=("converted", "sum"))
+        .reset_index()
+        .sort_values("campaign")
+    )
     out = solution.polars_groupby_equivalent(pdf)
     assert out["conversions"].to_list() == expected["conversions"].tolist()
 
@@ -114,6 +123,7 @@ def test_silver_starter_raises():
 
 
 # ---------------------------------------------------------------- gold
+
 
 def test_gold_verdict_true_large():
     report = solution.parity_suite(_large())

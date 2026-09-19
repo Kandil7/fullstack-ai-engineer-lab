@@ -256,6 +256,7 @@ def bubble_sort_wrong(arr):
                 result[j], result[j + 1] = result[j + 1], result[j]
     return result
 
+
 # CORRECT: Sort in-place
 def bubble_sort_correct(arr):
     n = len(arr)
@@ -284,7 +285,7 @@ def bubble_sort_correct(arr):
 
 ```python
 # Stability demonstration
-data = [('Alice', 85), ('Bob', 90), ('Charlie', 85), ('David', 90)]
+data = [("Alice", 85), ("Bob", 90), ("Charlie", 85), ("David", 90)]
 
 # Sort by score using bubble sort (stable)
 bubble_sort_optimized(data, key=lambda x: x[1])

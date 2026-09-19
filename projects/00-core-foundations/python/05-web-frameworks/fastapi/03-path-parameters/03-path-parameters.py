@@ -67,9 +67,9 @@ def get_product(
         ...,
         title="Product ID",
         description="The unique identifier of the product",
-        ge=1,       # greater than or equal
-        le=1000,    # less than or equal
-    )
+        ge=1,  # greater than or equal
+        le=1000,  # less than or equal
+    ),
 ):
     """
     Using Path() for additional validation and documentation.
@@ -127,6 +127,7 @@ def get_order(order_id: UUID):
 # ----- Path parameter with regex pattern -----
 from fastapi import HTTPException
 
+
 @app.get("/categories/{category_name}")
 def get_category(category_name: str):
     """
@@ -157,6 +158,7 @@ Testing with curl:
     curl http://127.0.0.1:8000/categories/electronics
     curl http://127.0.0.1:8000/categories/invalid
 """
+
 
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
@@ -222,6 +224,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

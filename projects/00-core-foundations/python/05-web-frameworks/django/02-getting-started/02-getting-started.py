@@ -99,13 +99,10 @@ DJANGO_SETTINGS_EXAMPLE = {
     # Security
     # Load from env in real projects: os.environ["DJANGO_SECRET_KEY"]
     "SECRET_KEY": "django-insecure-REPLACE-ME-generate-with-get_random_secret_key()",
-
     # Debug mode (NEVER True in production)
     "DEBUG": True,
-
     # Hosts/domains this site can serve
     "ALLOWED_HOSTS": ["localhost", "127.0.0.1"],
-
     # Installed apps (Django's own + your apps)
     "INSTALLED_APPS": [
         # Django built-in apps
@@ -119,7 +116,6 @@ DJANGO_SETTINGS_EXAMPLE = {
         # "blog",
         # "accounts",
     ],
-
     # Middleware (request/response processing)
     "MIDDLEWARE": [
         "django.middleware.security.SecurityMiddleware",
@@ -130,10 +126,8 @@ DJANGO_SETTINGS_EXAMPLE = {
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ],
-
     # URL configuration
     "ROOT_URLCONF": "mysite.urls",
-
     # Database
     "DATABASES": {
         "default": {
@@ -141,7 +135,6 @@ DJANGO_SETTINGS_EXAMPLE = {
             "NAME": "db.sqlite3",
         }
     },
-
     # Templates
     "TEMPLATES": [
         {
@@ -158,11 +151,9 @@ DJANGO_SETTINGS_EXAMPLE = {
             },
         },
     ],
-
     # Static files (CSS, JavaScript, Images)
     "STATIC_URL": "/static/",
     "STATICFILES_DIRS": [],  # Extra static file directories
-
     # Authentication
     "AUTH_USER_MODEL": "auth.User",  # Default user model
     "LOGIN_URL": "/accounts/login/",

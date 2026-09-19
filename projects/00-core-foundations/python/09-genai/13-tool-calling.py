@@ -26,11 +26,12 @@ from typing import Any, Callable
 # 1. Tools: Schema + Implementation
 # ============================================================
 
+
 @dataclass
 class Tool:
     name: str
     description: str
-    parameters: dict[str, str]       # name -> type
+    parameters: dict[str, str]  # name -> type
     required: list[str]
     impl: Callable[..., Any]
 
@@ -41,8 +42,11 @@ class Tool:
             "function": {
                 "name": self.name,
                 "description": self.description,
-                "parameters": {"type": "object", "properties": properties,
-                               "required": self.required},
+                "parameters": {
+                    "type": "object",
+                    "properties": properties,
+                    "required": self.required,
+                },
             },
         }
 
@@ -73,8 +77,13 @@ def search_db(query: str, limit: int = 5) -> list[str]:
     return [f"result-{i} for {query!r}" for i in range(min(limit, 3))]
 
 
-search_tool = Tool("search_db", "Search the database", 
-                   {"query": "string", "limit": "integer"}, ["query"], search_db)
+search_tool = Tool(
+    "search_db",
+    "Search the database",
+    {"query": "string", "limit": "integer"},
+    ["query"],
+    search_db,
+)
 print("Example 1: tool schema")
 print(f"  {search_tool.schema()['function']['name']} required={search_tool.required}")
 
@@ -84,8 +93,8 @@ print(f"  {search_tool.schema()['function']['name']} required={search_tool.requi
 # Model returns a tool call -> validate args -> execute -> feed result
 # back as a 'tool' message -> model continues.
 
-def run_tool_loop(tools: dict[str, Tool], initial_tool_call: dict,
-                  rounds: int = 3) -> list[dict]:
+
+def run_tool_loop(tools: dict[str, Tool], initial_tool_call: dict, rounds: int = 3) -> list[dict]:
     """Execute a model-requested tool call and return the message trail."""
     trail: list[dict] = [{"role": "assistant", "tool_calls": [initial_tool_call]}]
     for _ in range(rounds):
@@ -107,8 +116,9 @@ def run_tool_loop(tools: dict[str, Tool], initial_tool_call: dict,
 
 
 # Example 2: valid call
-trail = run_tool_loop({"search_db": search_tool},
-                      {"name": "search_db", "arguments": {"query": "users", "limit": 2}})
+trail = run_tool_loop(
+    {"search_db": search_tool}, {"name": "search_db", "arguments": {"query": "users", "limit": 2}}
+)
 print("\nExample 2: valid tool call")
 for m in trail:
     print(f"  [{m['role']}] {m.get('content', m.get('error', ''))}")
@@ -121,8 +131,9 @@ assert trail[-1]["role"] == "tool" and "result-0" in trail[-1]["content"]
 # never run tools with unvalidated input.
 
 # Example 3: bad args rejected
-bad_trail = run_tool_loop({"search_db": search_tool},
-                          {"name": "search_db", "arguments": {"limit": "ten"}})
+bad_trail = run_tool_loop(
+    {"search_db": search_tool}, {"name": "search_db", "arguments": {"limit": "ten"}}
+)
 print("\nExample 3: invalid args")
 print(f"  {bad_trail[-1]}")
 assert "error" in bad_trail[-1] and "limit" in bad_trail[-1]["error"], "args validated"
@@ -132,6 +143,7 @@ assert "error" in bad_trail[-1] and "limit" in bad_trail[-1]["error"], "args val
 # ============================================================
 # Models can request several tools at once. Execute them (ideally in
 # parallel) and merge the results.
+
 
 def run_parallel(tools: dict[str, Tool], calls: list[dict]) -> list[dict]:
     results = []
@@ -148,10 +160,13 @@ def run_parallel(tools: dict[str, Tool], calls: list[dict]) -> list[dict]:
 
 
 # Example 4: parallel calls
-parallel = run_parallel({"search_db": search_tool}, [
-    {"name": "search_db", "arguments": {"query": "a"}},
-    {"name": "search_db", "arguments": {"query": "b"}},
-])
+parallel = run_parallel(
+    {"search_db": search_tool},
+    [
+        {"name": "search_db", "arguments": {"query": "a"}},
+        {"name": "search_db", "arguments": {"query": "b"}},
+    ],
+)
 print("\nExample 4: parallel tool calls")
 for r in parallel:
     print(f"  {r}")
@@ -163,14 +178,15 @@ assert len(parallel) == 2 and all("result-0" in r["content"] for r in parallel)
 # The production loop: schema from type hints, validate args, execute
 # with a safety wrapper, never expose raw errors to the model.
 
-def tool_from_callable(name: str, description: str, fn: Callable,
-                       required: list[str]) -> Tool:
+
+def tool_from_callable(name: str, description: str, fn: Callable, required: list[str]) -> Tool:
     """Derive a Tool from a callable's annotated signature.
 
     Works whether annotations are evaluated (str class) or deferred
     (string forms under `from __future__ import annotations`).
     """
     import inspect
+
     hints = inspect.signature(fn).parameters
     params: dict[str, str] = {}
     for p in hints:
@@ -198,8 +214,9 @@ def tool_from_callable(name: str, description: str, fn: Callable,
 # Self-Verification
 # ============================================================
 def _verify() -> None:
-    t = Tool("add", "add two numbers", {"a": "number", "b": "number"},
-             ["a", "b"], lambda a, b: a + b)
+    t = Tool(
+        "add", "add two numbers", {"a": "number", "b": "number"}, ["a", "b"], lambda a, b: a + b
+    )
     assert t.execute({"a": 1, "b": 2}) == 3
     assert t.schema()["function"]["name"] == "add"
 
@@ -230,6 +247,7 @@ def _verify() -> None:
     # derived tool
     def greet(name: str) -> str:
         return f"hi {name}"
+
     gt = tool_from_callable("greet", "greet a user", greet, ["name"])
     assert gt.execute({"name": "bob"}) == "hi bob"
     print("[OK] 13-tool-calling: all checks passed")

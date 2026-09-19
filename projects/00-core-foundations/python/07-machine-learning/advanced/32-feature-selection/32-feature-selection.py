@@ -24,7 +24,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import (
-    RFE, SelectFromModel, VarianceThreshold, mutual_info_classif, f_classif,
+    RFE,
+    SelectFromModel,
+    VarianceThreshold,
+    mutual_info_classif,
+    f_classif,
     SelectKBest,
 )
 from sklearn.metrics import roc_auc_score
@@ -32,8 +36,9 @@ from sklearn.metrics import roc_auc_score
 rng = np.random.RandomState(0)
 
 # 40 features, only 10 informative + 10 redundant (so ~20 useful)
-X, y = make_classification(n_samples=3000, n_features=40, n_informative=10,
-                           n_redundant=10, n_repeated=2, random_state=0)
+X, y = make_classification(
+    n_samples=3000, n_features=40, n_informative=10, n_redundant=10, n_repeated=2, random_state=0
+)
 feature_names = [f"f{i}" for i in range(40)]
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0)
 
@@ -73,6 +78,7 @@ print(f"  L1 zeroed {40 - n_l1}/40 coefficients")
 sfm = SelectFromModel(RandomForestClassifier(n_estimators=100, random_state=0), threshold="median")
 sfm.fit(Xtr, ytr)
 print(f"  SelectFromModel(RF, median) kept {sfm.transform(Xtr).shape[1]} features")
+
 
 # ============================================================
 # 4. Multicollinearity & VIF

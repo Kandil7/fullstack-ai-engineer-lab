@@ -24,8 +24,8 @@
 **align**
 Controls bar position relative to tick mark. `'center'` centers the bar on the tick. `'edge'` aligns the left edge.
 ```python
-ax.bar(x, heights, align='center')  # Default
-ax.bar(x, heights, align='edge')    # Left-aligned
+ax.bar(x, heights, align="center")  # Default
+ax.bar(x, heights, align="edge")  # Left-aligned
 ```
 
 ### B
@@ -45,7 +45,7 @@ ax.invert_yaxis()  # Largest at top
 **Color Coding**
 Assigning colors to bars based on category or value. Use consistent colors across charts for the same categories.
 ```python
-colors = ['green' if v > threshold else 'red' for v in values]
+colors = ["green" if v > threshold else "red" for v in values]
 ax.bar(categories, values, color=colors)
 ```
 
@@ -56,8 +56,8 @@ Side-by-side bars for comparing values across two categorical variables. Each gr
 ```python
 x = np.arange(n_categories)
 width = 0.35
-ax.bar(x - width/2, group1, width, label='Group 1')
-ax.bar(x + width/2, group2, width, label='Group 2')
+ax.bar(x - width / 2, group1, width, label="Group 1")
+ax.bar(x + width / 2, group2, width, label="Group 2")
 ```
 
 ### H
@@ -65,7 +65,7 @@ ax.bar(x + width/2, group2, width, label='Group 2')
 **Horizontal Bar Chart**
 Bars extend left to right. Better for long labels and many categories.
 ```python
-ax.barh(categories, values, color='steelblue')
+ax.barh(categories, values, color="steelblue")
 ```
 
 ### P
@@ -82,14 +82,14 @@ df_pct.plot.bar(stacked=True)
 **Stacked Bar Chart**
 Bars stacked on top of each other. Shows total and composition simultaneously.
 ```python
-df.plot.bar(stacked=True, color=['#3498db', '#e74c3c', '#2ecc71'])
+df.plot.bar(stacked=True, color=["#3498db", "#e74c3c", "#2ecc71"])
 ```
 
 **Sorted Bars**
 Arranging bars by value (ascending or descending) makes comparison easier than alphabetical order.
 ```python
-df_sorted = df.sort_values('revenue', ascending=True)
-ax.barh(df_sorted['product'], df_sorted['revenue'])
+df_sorted = df.sort_values("revenue", ascending=True)
+ax.barh(df_sorted["product"], df_sorted["revenue"])
 ```
 
 ### V
@@ -99,8 +99,14 @@ Text annotations on or above bars showing exact values. Added with `ax.text()`.
 ```python
 for bar in bars:
     height = bar.get_height()
-    ax.text(bar.get_x() + bar.get_width()/2., height, f'{height:,.0f}',
-            ha='center', va='bottom', fontsize=10)
+    ax.text(
+        bar.get_x() + bar.get_width() / 2.0,
+        height,
+        f"{height:,.0f}",
+        ha="center",
+        va="bottom",
+        fontsize=10,
+    )
 ```
 
 ### W
@@ -121,28 +127,36 @@ ax.bar(x, heights, width=0.6)
 import matplotlib.pyplot as plt
 import pandas as pd
 
-df = pd.DataFrame({
-    'language': ['Python', 'JavaScript', 'Java', 'C++', 'Go', 'Rust', 'TypeScript'],
-    'users_millions': [15.8, 12.1, 10.5, 7.2, 4.8, 3.5, 8.9]
-}).sort_values('users_millions')
+df = pd.DataFrame(
+    {
+        "language": ["Python", "JavaScript", "Java", "C++", "Go", "Rust", "TypeScript"],
+        "users_millions": [15.8, 12.1, 10.5, 7.2, 4.8, 3.5, 8.9],
+    }
+).sort_values("users_millions")
 
 fig, ax = plt.subplots(figsize=(10, 6))
-colors = plt.cm.viridis(df['users_millions'] / df['users_millions'].max())
+colors = plt.cm.viridis(df["users_millions"] / df["users_millions"].max())
 
-bars = ax.barh(df['language'], df['users_millions'], color=colors, edgecolor='white', height=0.6)
+bars = ax.barh(df["language"], df["users_millions"], color=colors, edgecolor="white", height=0.6)
 
 # Add value labels
 for bar in bars:
     width = bar.get_width()
-    ax.text(width + 0.2, bar.get_y() + bar.get_height()/2,
-            f'{width:.1f}M', va='center', fontsize=10, fontweight='bold')
+    ax.text(
+        width + 0.2,
+        bar.get_y() + bar.get_height() / 2,
+        f"{width:.1f}M",
+        va="center",
+        fontsize=10,
+        fontweight="bold",
+    )
 
-ax.set_title('Programming Language Users (Millions)', fontsize=14, fontweight='bold')
-ax.set_xlabel('Users (Millions)')
-ax.set_xlim(0, max(df['users_millions']) * 1.15)
-ax.grid(axis='x', alpha=0.3)
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
+ax.set_title("Programming Language Users (Millions)", fontsize=14, fontweight="bold")
+ax.set_xlabel("Users (Millions)")
+ax.set_xlim(0, max(df["users_millions"]) * 1.15)
+ax.grid(axis="x", alpha=0.3)
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
 
 plt.tight_layout()
 plt.show()
@@ -153,24 +167,36 @@ plt.show()
 ```python
 import numpy as np
 
-categories = ['Method A', 'Method B', 'Method C', 'Method D']
+categories = ["Method A", "Method B", "Method C", "Method D"]
 accuracy = [0.85, 0.92, 0.78, 0.88]
 std_dev = [0.03, 0.02, 0.05, 0.04]
 
 fig, ax = plt.subplots(figsize=(10, 6))
-bars = ax.bar(categories, accuracy, yerr=std_dev, capsize=5,
-              color=['#3498db', '#2ecc71', '#e74c3c', '#f39c12'],
-              edgecolor='white', error_kw={'linewidth': 1.5})
+bars = ax.bar(
+    categories,
+    accuracy,
+    yerr=std_dev,
+    capsize=5,
+    color=["#3498db", "#2ecc71", "#e74c3c", "#f39c12"],
+    edgecolor="white",
+    error_kw={"linewidth": 1.5},
+)
 
 # Value labels
 for bar, acc in zip(bars, accuracy):
-    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.02,
-            f'{acc:.1%}', ha='center', va='bottom', fontweight='bold')
+    ax.text(
+        bar.get_x() + bar.get_width() / 2,
+        bar.get_height() + 0.02,
+        f"{acc:.1%}",
+        ha="center",
+        va="bottom",
+        fontweight="bold",
+    )
 
-ax.set_ylabel('Accuracy')
-ax.set_title('Model Comparison (with Std Dev)')
+ax.set_ylabel("Accuracy")
+ax.set_title("Model Comparison (with Std Dev)")
 ax.set_ylim(0, 1.0)
-ax.grid(axis='y', alpha=0.3)
+ax.grid(axis="y", alpha=0.3)
 
 plt.tight_layout()
 plt.show()
@@ -180,7 +206,7 @@ plt.show()
 
 ```python
 # Approximate waterfall chart
-categories = ['Revenue', 'COGS', 'Gross', 'Expenses', 'Taxes', 'Net Income']
+categories = ["Revenue", "COGS", "Gross", "Expenses", "Taxes", "Net Income"]
 values = [100, -40, 60, -25, -10, 25]
 
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -199,18 +225,24 @@ for i, v in enumerate(values):
     elif i == 0:
         cumulative = v
 
-colors = ['#3498db' if v >= 0 else '#e74c3c' for v in values]
-bars = ax.bar(categories, [abs(v) for v in values], bottom=bottoms, color=colors, edgecolor='white')
+colors = ["#3498db" if v >= 0 else "#e74c3c" for v in values]
+bars = ax.bar(categories, [abs(v) for v in values], bottom=bottoms, color=colors, edgecolor="white")
 
 # Value labels
 for bar, val, bot in zip(bars, values, bottoms):
     y_pos = bot + abs(val) + 1 if val >= 0 else bot - 2
-    ax.text(bar.get_x() + bar.get_width()/2, y_pos,
-            f'${val:+d}K', ha='center', va='bottom', fontweight='bold')
+    ax.text(
+        bar.get_x() + bar.get_width() / 2,
+        y_pos,
+        f"${val:+d}K",
+        ha="center",
+        va="bottom",
+        fontweight="bold",
+    )
 
-ax.set_title('Income Statement Waterfall')
-ax.set_ylabel('Amount ($K)')
-ax.grid(axis='y', alpha=0.3)
+ax.set_title("Income Statement Waterfall")
+ax.set_ylabel("Amount ($K)")
+ax.grid(axis="y", alpha=0.3)
 
 plt.tight_layout()
 plt.show()

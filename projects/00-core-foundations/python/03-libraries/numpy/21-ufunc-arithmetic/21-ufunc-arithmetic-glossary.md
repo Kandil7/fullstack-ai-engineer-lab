@@ -52,8 +52,7 @@ print(np.add(a, 10))
 ```python
 import numpy as np
 
-arr2d = np.array([[1, 2, 3],
-                  [4, 5, 6]])
+arr2d = np.array([[1, 2, 3], [4, 5, 6]])
 arr1d = np.array([10, 20, 30])
 
 # Broadcasting: 1D added to each row
@@ -286,9 +285,9 @@ import numpy as np
 
 arr = np.array([1, 2, 3, 4, 5])
 
-print(arr + 10)   # [11 12 13 14 15]
-print(arr * 2)    # [ 2  4  6  8 10]
-print(arr ** 2)   # [ 1  4  9 16 25]
+print(arr + 10)  # [11 12 13 14 15]
+print(arr * 2)  # [ 2  4  6  8 10]
+print(arr**2)  # [ 1  4  9 16 25]
 ```
 
 **Related Terms:** Broadcasting, Element-wise Operation

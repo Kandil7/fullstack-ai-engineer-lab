@@ -38,8 +38,7 @@ def assert_no_python_loops(func) -> None:
     tree = ast.parse(src)
     for node in ast.walk(tree):
         assert not isinstance(
-            node, (ast.For, ast.While, ast.ListComp, ast.SetComp,
-                   ast.DictComp, ast.GeneratorExp)
+            node, (ast.For, ast.While, ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)
         ), f"{func.__name__} must be vectorized: no Python loops"
 
 
@@ -128,8 +127,7 @@ class TestEnsureContiguous:
         finally:
             tracemalloc.stop()
         assert out is x
-        assert peak < 1024, \
-            f"fast path must not allocate (peak {peak} bytes)"
+        assert peak < 1024, f"fast path must not allocate (peak {peak} bytes)"
 
     def test_no_python_loops(self):
         assert_no_python_loops(solution.ensure_contiguous)
@@ -137,15 +135,13 @@ class TestEnsureContiguous:
 
 class TestDowncastWhenSafe:
     def test_identity_for_float32(self):
-        X = np.random.default_rng(6).normal(size=(5000, 1000)
-                                            ).astype(np.float32)
+        X = np.random.default_rng(6).normal(size=(5000, 1000)).astype(np.float32)
         out = solution.downcast_when_safe(X)
         assert out is X, "float32 input must be returned as-is"
         assert out.dtype == np.float32
 
     def test_float32_path_allocates_nothing(self):
-        X = np.random.default_rng(7).normal(size=(5000, 1000)
-                                            ).astype(np.float32)
+        X = np.random.default_rng(7).normal(size=(5000, 1000)).astype(np.float32)
         tracemalloc.start()
         try:
             out = solution.downcast_when_safe(X)
@@ -153,8 +149,7 @@ class TestDowncastWhenSafe:
         finally:
             tracemalloc.stop()
         assert out is X
-        assert peak < 1024, \
-            f"float32 path must not allocate (peak {peak} bytes)"
+        assert peak < 1024, f"float32 path must not allocate (peak {peak} bytes)"
 
     def test_float64_downcast(self):
         X = np.random.default_rng(8).normal(size=(5000, 1000))
@@ -168,20 +163,17 @@ class TestDowncastWhenSafe:
         assert np.allclose(out, X, atol=1e-6)
         # Result is 5000*1000*4 = 20 MB; a double-copy path exceeds
         # 30 MB because it allocates an extra full-size temporary.
-        assert peak < 30 * 1024 * 1024, \
-            f"downcast must be a single copy (peak {peak / 1e6:.0f} MB)"
+        assert peak < 30 * 1024 * 1024, f"downcast must be a single copy (peak {peak / 1e6:.0f} MB)"
 
     def test_int64_downcast(self):
         X = np.arange(1_000_000, dtype=np.int64).reshape(1000, 1000)
         out = solution.downcast_when_safe(X)
         assert out.dtype == np.float32
-        assert np.allclose(out, X)   # integers < 2^24 are exact
+        assert np.allclose(out, X)  # integers < 2^24 are exact
 
     def test_small_inputs(self):
-        assert solution.downcast_when_safe(
-            np.zeros(0, dtype=np.float64)).dtype == np.float32
-        single = solution.downcast_when_safe(
-            np.array([3.5], dtype=np.float64))
+        assert solution.downcast_when_safe(np.zeros(0, dtype=np.float64)).dtype == np.float32
+        single = solution.downcast_when_safe(np.array([3.5], dtype=np.float64))
         assert single.dtype == np.float32 and single[0] == 3.5
 
     def test_no_python_loops(self):

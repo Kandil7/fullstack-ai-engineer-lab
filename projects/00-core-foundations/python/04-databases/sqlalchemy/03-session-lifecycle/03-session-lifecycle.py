@@ -70,9 +70,9 @@ def new_session() -> Session:
 # Example 1: add + mutate + commit — one transaction, two SQL statements
 with new_session() as session:
     ada = User(name="ada", role="annotator")
-    session.add(ada)          # pending: no SQL yet
-    ada.role = "reviewer"     # still pending; change is tracked
-    session.commit()          # INSERT users ... ; then nothing to update
+    session.add(ada)  # pending: no SQL yet
+    ada.role = "reviewer"  # still pending; change is tracked
+    session.commit()  # INSERT users ... ; then nothing to update
     print(f"committed user id={ada.id} role={ada.role}")
 
 # Output:
@@ -89,7 +89,7 @@ with new_session() as session:
 # Example 2: two loads, one object
 with new_session() as session:
     first = session.get(User, 1)
-    second = session.get(User, 1)   # no SQL: served from identity map
+    second = session.get(User, 1)  # no SQL: served from identity map
     print(f"same object: {first is second}")
 
 # Output:
@@ -116,12 +116,10 @@ with new_session() as session_a, new_session() as session_b:
 with new_session() as session:
     grace = User(name="grace")
     session.add(grace)
-    session.flush()                        # INSERT issued now
-    found = session.scalars(
-        select(User).where(User.name == "grace")
-    ).first()
+    session.flush()  # INSERT issued now
+    found = session.scalars(select(User).where(User.name == "grace")).first()
     print(f"flush-then-query found pending row: {found is grace}")
-    session.rollback()                     # undo the INSERT
+    session.rollback()  # undo the INSERT
 
 # Output:
 # flush-then-query found pending row: True
@@ -132,9 +130,7 @@ with new_session() as session:
     ghost = User(name="ghost")
     session.add(ghost)
     session.rollback()
-count_ghost = len(
-    new_session().scalars(select(User).where(User.name == "ghost")).all()
-)
+count_ghost = len(new_session().scalars(select(User).where(User.name == "ghost")).all())
 print(f"ghost rows after rollback: {count_ghost}")
 
 # Output:
@@ -152,11 +148,12 @@ print(f"ghost rows after rollback: {count_ghost}")
 # Example 6: expiry — value is reloaded lazily (still attached)
 with new_session() as session:
     u = session.get(User, 1)
-    session.expire(u)                  # drop loaded attribute values
-    print(f"reloaded after expire: {u.role}")   # re-SELECT happens here
+    session.expire(u)  # drop loaded attribute values
+    print(f"reloaded after expire: {u.role}")  # re-SELECT happens here
 
 # Output:
 # reloaded after expire: reviewer
+
 
 # Example 7: detached instance — expired attribute access raises
 def _detached_error_demo(name: str) -> str:
@@ -164,10 +161,10 @@ def _detached_error_demo(name: str) -> str:
     session = new_session()
     u = User(name=name)
     session.add(u)
-    session.commit()          # expiry: attribute values dropped
-    session.close()           # now u is detached
+    session.commit()  # expiry: attribute values dropped
+    session.close()  # now u is detached
     try:
-        _ = u.role            # expired + detached -> DetachedInstanceError
+        _ = u.role  # expired + detached -> DetachedInstanceError
     except DetachedInstanceError as exc:
         return type(exc).__name__
     return "no error"
@@ -195,6 +192,7 @@ print(f"pk readable while detached: {pk}")
 # Real services create ONE session per HTTP request, close it in a
 # finally block, and never share sessions across requests or threads.
 # This gives each request its own transaction boundary.
+
 
 def get_db():
     """FastAPI dependency generator: one session per request."""
@@ -272,9 +270,7 @@ def _verify() -> None:
         alan = User(name="alan")
         session.add(alan)
         session.flush()
-        found = session.scalars(
-            select(User).where(User.name == "alan")
-        ).first()
+        found = session.scalars(select(User).where(User.name == "alan")).first()
         assert found is alan, "flush must make pending rows queryable"
         session.rollback()
 
@@ -282,23 +278,20 @@ def _verify() -> None:
     with new_session() as session:
         session.add(User(name="persist-me"))
         session.commit()
-    persisted = new_session().scalars(
-        select(User).where(User.name == "persist-me")
-    ).first()
+    persisted = new_session().scalars(select(User).where(User.name == "persist-me")).first()
     assert persisted is not None, "commit must persist across sessions"
 
     # 4. Rollback leaves no trace
     with new_session() as session:
         session.add(User(name="ghost"))
         session.rollback()
-    ghosts = new_session().scalars(
-        select(User).where(User.name == "ghost")
-    ).all()
+    ghosts = new_session().scalars(select(User).where(User.name == "ghost")).all()
     assert ghosts == [], "rollback must undo pending inserts"
 
     # 5. Detached + expired attribute raises DetachedInstanceError
-    assert _detached_error_demo("bob-verify") == "DetachedInstanceError", \
+    assert _detached_error_demo("bob-verify") == "DetachedInstanceError", (
         "expired attribute access on detached instance must raise"
+    )
 
     # 6. Primary key survives detachment
     with new_session() as session:
@@ -311,8 +304,7 @@ def _verify() -> None:
     outcomes = simulate_two_requests("ada-lovelace", "grace-hopper")
     assert len(outcomes) == 2, "both requests must complete"
     names = new_session().scalars(select(User.name)).all()
-    assert "ada-lovelace" in names and "grace-hopper" in names, \
-        "each request's commit must persist"
+    assert "ada-lovelace" in names and "grace-hopper" in names, "each request's commit must persist"
 
     print("[OK] 03-session-lifecycle: all checks passed")
 

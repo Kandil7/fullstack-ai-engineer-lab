@@ -3,14 +3,17 @@ Matplotlib Subplots - W3Schools Exercises
 ===========================================
 Creating multi-panel figure layouts.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -59,7 +62,7 @@ def exercise_02():
     axes[0].set_title("Exercise 2: Shared Axes")
     axes[-1].set_xlabel("x")
     for i, ax in enumerate(axes):
-        ax.set_ylabel(f"Signal {i+1}")
+        ax.set_ylabel(f"Signal {i + 1}")
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / "08_exercise_02.png", dpi=100, bbox_inches="tight")
     plt.close()

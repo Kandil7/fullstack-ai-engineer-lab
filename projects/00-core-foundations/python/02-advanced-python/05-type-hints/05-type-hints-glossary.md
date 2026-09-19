@@ -47,16 +47,16 @@ from typing import Annotated
 UserId = Annotated[int, "Unique user identifier"]
 UserName = Annotated[str, "Min 3 characters"]
 
+
 def get_user(user_id: UserId) -> dict:
     return {"id": user_id}
+
 
 # Framework usage (FastAPI)
 from fastapi import Query
 
-def search(
-    q: Annotated[str, Query(min_length=3)],
-    limit: Annotated[int, Query(ge=1, le=100)] = 10
-):
+
+def search(q: Annotated[str, Query(min_length=3)], limit: Annotated[int, Query(ge=1, le=100)] = 10):
     pass
 ```
 
@@ -72,19 +72,23 @@ def search(
 ```python
 from typing import Callable
 
+
 # Callable[[ArgTypes], ReturnType]
 def apply(func: Callable[[int, int], int], a: int, b: int) -> int:
     return func(a, b)
 
+
 # No arguments
 def create_factory(f: Callable[[], int]) -> Callable[[], int]:
     return f
+
 
 # Any arguments
 def log_call(f: Callable[..., str]) -> Callable[..., str]:
     def wrapper(*args, **kwargs) -> str:
         print(f"Calling {f.__name__}")
         return f(*args, **kwargs)
+
     return wrapper
 ```
 
@@ -103,14 +107,17 @@ from typing import TypeVar, Callable
 Animal = TypeVar("Animal")
 Dog = TypeVar("Dog", bound=Animal)
 
+
 # A function that accepts any Animal can be used
 # where a function accepting Dog is expected
 def handle_animal(func: Callable[[Animal], None]) -> None:
     # This is contravariant: func accepts broader type
     func(Animal())
 
+
 def handle_dog(dog: Dog) -> None:
     pass
+
 
 # Contravariance: handle_animal can be used where handle_dog expected
 ```
@@ -129,16 +136,24 @@ from typing import TypeVar, Generic
 
 T_co = TypeVar("T_co", covariant=True)
 
+
 class Box(Generic[T_co]):
     def __init__(self, item: T_co):
         self.item = item
 
-class Animal: pass
-class Dog(Animal): pass
+
+class Animal:
+    pass
+
+
+class Dog(Animal):
+    pass
+
 
 # Box[Dog] can be used where Box[Animal] expected
 dog_box: Box[Dog] = Box(Dog())
 animal_box: Box[Animal] = dog_box  # OK: covariant
+
 
 # Return types are covariant
 def get_animal() -> Animal:
@@ -157,20 +172,26 @@ def get_animal() -> Animal:
 ```python
 from typing import Literal
 
+
 def set_mode(mode: Literal["read", "write", "append"]) -> None:
     print(f"Mode: {mode}")
 
-set_mode("read")   # OK
+
+set_mode("read")  # OK
 # set_mode("delete")  # Error: not a valid literal
 
 # Combined with Union
 Status = Literal["pending", "approved", "rejected"]
 
+
 def process(status: Status) -> None:
     match status:
-        case "pending": print("Processing...")
-        case "approved": print("Approved!")
-        case "rejected": print("Rejected")
+        case "pending":
+            print("Processing...")
+        case "approved":
+            print("Approved!")
+        case "rejected":
+            print("Rejected")
 ```
 
 **Related**: Enum, Literal Types, Narrowing
@@ -185,21 +206,24 @@ def process(status: Status) -> None:
 ```python
 from typing import NamedTuple
 
+
 class Point(NamedTuple):
     x: float
     y: float
 
+
 # Usage
 p = Point(3.0, 4.0)
-print(p.x)     # 3.0 (named access)
-print(p[0])    # 3.0 (index access)
-print(p.y)     # 4.0
+print(p.x)  # 3.0 (named access)
+print(p[0])  # 3.0 (index access)
+print(p.y)  # 4.0
+
 
 # With methods
 class Employee(NamedTuple):
     name: str
     salary: float
-    
+
     def annual_salary(self) -> float:
         return self.salary * 12
 ```
@@ -219,17 +243,20 @@ from typing import NewType
 UserId = NewType("UserId", int)
 OrderId = NewType("OrderId", int)
 
+
 def get_user(user_id: UserId) -> dict:
     return {"id": user_id}
 
+
 def process_order(order_id: OrderId) -> None:
     print(f"Order {order_id}")
+
 
 # Type-safe usage
 user_id = UserId(123)
 order_id = OrderId(456)
 
-get_user(user_id)    # OK
+get_user(user_id)  # OK
 # get_user(order_id)  # Error: OrderId is not UserId
 
 # Runtime: NewType returns the value unchanged
@@ -249,17 +276,21 @@ print(type(user_id))  # <class 'int'>
 from typing import TypeVar, Callable, ParamSpec
 
 P = ParamSpec("P")  # Captures parameter types
-R = TypeVar("R")    # Captures return type
+R = TypeVar("R")  # Captures return type
+
 
 def decorator(func: Callable[P, R]) -> Callable[P, R]:
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         print(f"Calling {func.__name__}")
         return func(*args, **kwargs)
+
     return wrapper
+
 
 @decorator
 def add(a: int, b: int) -> int:
     return a + b
+
 
 # Type checker knows add takes (int, int) -> int
 result = add(3, 5)  # Type: int
@@ -277,20 +308,25 @@ result = add(3, 5)  # Type: int
 ```python
 from typing import Protocol, runtime_checkable
 
+
 @runtime_checkable
 class Drawable(Protocol):
     def draw(self) -> str: ...
+
 
 class Circle:
     def draw(self) -> str:
         return "Circle"
 
+
 class Square:
     def draw(self) -> str:
         return "Square"
 
+
 def render(shape: Drawable) -> None:
     print(shape.draw())
+
 
 render(Circle())  # OK - structural match
 render(Square())  # OK - structural match
@@ -314,8 +350,10 @@ Vector: TypeAlias = list[float]
 Matrix: TypeAlias = list[Vector]
 JSON: TypeAlias = dict[str, "JSON"] | list["JSON"] | str | int | float | bool | None
 
+
 def dot_product(a: Vector, b: Vector) -> float:
     return sum(x * y for x, y in zip(a, b))
+
 
 def process_json(data: JSON) -> None:
     # Recursive JSON type
@@ -337,15 +375,18 @@ from typing import TypeVar, Sequence
 T = TypeVar("T")  # Any type
 Numeric = TypeVar("Numeric", int, float)
 
+
 def first(items: Sequence[T]) -> T:
     return items[0]
+
 
 def double(x: Numeric) -> Numeric:
     return x * 2
 
+
 # Type inference works
-result = first([1, 2, 3])     # Type: int
-result = first(["a", "b"])   # Type: str
+result = first([1, 2, 3])  # Type: int
+result = first(["a", "b"])  # Type: str
 ```
 
 **Related**: Generics, Generic Classes, Type Inference
@@ -360,24 +401,22 @@ result = first(["a", "b"])   # Type: str
 ```python
 from typing import TypedDict, Required, NotRequired
 
+
 class UserProfile(TypedDict):
     name: str
     age: int
     email: str
     is_active: bool  # Required by default
 
+
 class APIResponse(TypedDict, total=False):
     data: dict
     error: str
     status: int  # All optional with total=False
 
+
 # Usage
-user: UserProfile = {
-    "name": "Alice",
-    "age": 30,
-    "email": "alice@example.com",
-    "is_active": True
-}
+user: UserProfile = {"name": "Alice", "age": 30, "email": "alice@example.com", "is_active": True}
 ```
 
 **Related**: `NamedTuple`, Dictionary Type Safety, JSON
@@ -396,9 +435,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from my_module import MyClass  # Only imported during type checking
 
+
 def process(obj: "MyClass") -> None:
     # String annotation (forward reference)
     pass
+
 
 # Runtime: no import error even if my_module isn't installed
 # Type checking: mypy sees the import and validates types
@@ -416,14 +457,18 @@ def process(obj: "MyClass") -> None:
 ```python
 from typing import overload
 
+
 @overload
 def process(value: int) -> int: ...
+
 
 @overload
 def process(value: str) -> str: ...
 
+
 @overload
 def process(value: list) -> list: ...
+
 
 def process(value: int | str | list) -> int | str | list:
     if isinstance(value, int):
@@ -433,10 +478,11 @@ def process(value: int | str | list) -> int | str | list:
     else:
         return [process(v) for v in value]
 
+
 # Type checker uses overloads
-result = process(5)          # Type: int
-result = process("hello")   # Type: str
-result = process([1, 2])    # Type: list
+result = process(5)  # Type: int
+result = process("hello")  # Type: str
+result = process([1, 2])  # Type: list
 ```
 
 **Related**: Function Overloading, Union Types, Type Narrowing
@@ -451,26 +497,31 @@ result = process([1, 2])    # Type: list
 ```python
 from typing import Protocol
 
+
 class Serializable(Protocol):
     def to_dict(self) -> dict: ...
+
 
 class User:
     def __init__(self, name: str):
         self.name = name
-    
+
     def to_dict(self) -> dict:
         return {"name": self.name}
+
 
 class Product:
     def __init__(self, title: str):
         self.title = title
-    
+
     def to_dict(self) -> dict:
         return {"title": self.title}
+
 
 def save(item: Serializable) -> None:
     data = item.to_dict()
     database.save(data)
+
 
 # Both work - structural match, no inheritance needed
 save(User("Alice"))
@@ -491,20 +542,24 @@ class Animal:
     def speak(self) -> str:
         return "..."
 
+
 class Dog(Animal):
     def speak(self) -> str:
         return "Woof!"
+
 
 class Cat(Animal):
     def speak(self) -> str:
         return "Meow!"
 
+
 def pet(animal: Animal) -> None:
     print(animal.speak())
 
+
 # Nominal: Dog is subtype of Animal through inheritance
-pet(Dog())   # OK
-pet(Cat())   # OK
+pet(Dog())  # OK
+pet(Cat())  # OK
 ```
 
 **Related**: Inheritance, `Protocol`, Liskov Substitution
@@ -518,23 +573,29 @@ pet(Cat())   # OK
 **Example**:
 ```python
 from collections.abc import (
-    Callable, Iterable, Iterator, Sequence,
-    Mapping, MutableMapping, Set, MutableSet
+    Callable,
+    Iterable,
+    Iterator,
+    Sequence,
+    Mapping,
+    MutableMapping,
+    Set,
+    MutableSet,
 )
+
 
 def process(items: Iterable[int]) -> list[int]:
     return [x * 2 for x in items]
 
-def merge(
-    base: MutableMapping[str, int],
-    updates: Mapping[str, int]
-) -> None:
+
+def merge(base: MutableMapping[str, int], updates: Mapping[str, int]) -> None:
     base.update(updates)
 
+
 # Works with any compatible type
-process([1, 2, 3])           # list
-process((1, 2, 3))           # tuple
-process(range(10))            # range
+process([1, 2, 3])  # list
+process((1, 2, 3))  # tuple
+process(range(10))  # range
 ```
 
 **Related**: ABC, Type Hints, Collections
@@ -549,11 +610,13 @@ process(range(10))            # range
 ```python
 from typing import TypeVar, Generic
 
-T_co = TypeVar("T_co", covariant=True)    # Covariant
+T_co = TypeVar("T_co", covariant=True)  # Covariant
 T_contra = TypeVar("T_contra", contravariant=True)  # Contravariant
+
 
 class Producer(Generic[T_co]):
     def get(self) -> T_co: ...
+
 
 class Consumer(Generic[T_contra]):
     def put(self, item: T_contra) -> None: ...
@@ -573,15 +636,18 @@ class Consumer(Generic[T_contra]):
 def add(a, b):
     return a + b
 
-add(1, 2)       # OK
-add("a", "b")   # OK
-add(1, "2")     # Runtime error!
+
+add(1, 2)  # OK
+add("a", "b")  # OK
+add(1, "2")  # Runtime error!
+
 
 # Type-safe (static typing)
 def add_safe(a: int, b: int) -> int:
     return a + b
 
-add_safe(1, 2)      # OK
+
+add_safe(1, 2)  # OK
 # add_safe("a", "b")  # Type error caught by mypy
 ```
 

@@ -93,6 +93,7 @@ this way.
 ```python
 SAFE_METHODS = {"GET", "HEAD", "OPTIONS", "TRACE"}
 
+
 def can_retry(method, has_idempotency_key):
     if method in SAFE_METHODS:
         return True, "safe method: retry freely"
@@ -115,8 +116,7 @@ POST and DELETE need an explicit key to be retried safely.
 ## 4. Retry-After — Server-Driven Backoff
 
 ```python
-raise HTTPException(429, detail="Rate limit exceeded",
-                    headers={"Retry-After": "2"})
+raise HTTPException(429, detail="Rate limit exceeded", headers={"Retry-After": "2"})
 ```
 
 Output:
@@ -147,7 +147,7 @@ perform the side effect. The lookup-and-insert must be atomic: a database
 unique constraint, a Redis `SET NX`, or an in-process lock around the check.
 
 ```python
-with _LOCK:                       # or a DB unique constraint on the key
+with _LOCK:  # or a DB unique constraint on the key
     existing = _IDEMPOTENCY.get(key)
     if existing is None:
         # side effect happens exactly once

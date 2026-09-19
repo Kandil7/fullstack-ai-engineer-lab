@@ -38,6 +38,7 @@ DATA = {f"user-{i}": {"tenant": f"t{i % 3}"} for i in range(6)}
 
 def _b64url(data: bytes) -> str:
     import base64
+
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
 
 
@@ -54,6 +55,7 @@ def verify_token(token: str) -> dict | None:
     try:
         h, p, s = token.split(".")
         import base64
+
         expected = hmac.new(SECRET.encode(), f"{h}.{p}".encode(), hashlib.sha256).digest()
         if not hmac.compare_digest(expected, base64.urlsafe_b64decode(s + "==")):
             return None
@@ -74,7 +76,7 @@ def api_get_user(token: str, target: str) -> tuple[int, dict | None]:
     if user is None:
         return 404, None
     if user["tenant"] != claims["tenant"]:
-        return 404, None                     # hide existence (40-authorization)
+        return 404, None  # hide existence (40-authorization)
     return 200, {"sub": target, "tenant": user["tenant"]}
 
 
@@ -91,24 +93,27 @@ print()
 #   no token / garbage token / expired token / forged (unsigned) token /
 #   token signed with the wrong secret / cross-tenant access.
 
+
 def tamper_role(token: str) -> str:
     """Change the payload without re-signing -> must fail verification."""
     h, p, s = token.split(".")
     import base64
+
     claims = json.loads(base64.urlsafe_b64decode(p + "=="))
-    claims["tenant"] = "t0"                  # attacker tries to widen access
+    claims["tenant"] = "t0"  # attacker tries to widen access
     new_p = _b64url(json.dumps(claims, separators=(",", ":")).encode())
     return f"{h}.{new_p}.{s}"
 
 
 def run_bypass_suite() -> list[str]:
     """Return the list of bypass attempts that FAILED to bypass (good)."""
-    good = issue_token("user-1", "t0", expires_in=-10)   # expired
+    good = issue_token("user-1", "t0", expires_in=-10)  # expired
     forged = tamper_role(issue_token("user-1", "t1"))
-    wrong_secret = issue_token("user-1", "t0")           # then sign wrong
+    wrong_secret = issue_token("user-1", "t0")  # then sign wrong
     h, p, _ = wrong_secret.split(".")
     wrong_sig = hmac.new("other-secret".encode(), f"{h}.{p}".encode(), hashlib.sha256).digest()
     import base64
+
     wrong_token = f"{h}.{p}.{_b64url(wrong_sig)}"
 
     attempts = {
@@ -137,6 +142,7 @@ print()
 # Send random payloads that are VALID SHAPES but hostile content:
 # null bytes, very long strings, unicode, sql-ish text, path-ish text.
 # The endpoint must never 500 on input it should reject cleanly.
+
 
 def fuzz_payloads(seed: int = 7, n: int = 500) -> list[str]:
     rng = random.Random(seed)
@@ -178,6 +184,7 @@ BANDIT_RULES = {
     "B105": "hardcoded password string",
 }
 
+
 def static_scan(code: str) -> list[str]:
     """Tiny stand-in for bandit: flag obvious dangerous patterns."""
     findings = []
@@ -204,6 +211,7 @@ print()
 # For each endpoint: assets, attackers, attack vectors, mitigations.
 # The output is the TEST list — every threat becomes a test or a
 # documented residual risk.
+
 
 def threat_model_endpoint(path: str, assets: list[str]) -> list[str]:
     """Return the test list derived from a quick threat model."""
@@ -237,6 +245,7 @@ print()
 # MISTAKE: threat models that never become tests
 # CORRECT: every threat -> a test or a documented residual risk
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -249,9 +258,9 @@ def _verify() -> None:
 
     # 2. Bypass suite: all five attempts blocked with 401
     blocked = run_bypass_suite()
-    assert set(blocked) == {"no token", "garbage", "expired",
-                            "tampered payload", "wrong secret"}, \
+    assert set(blocked) == {"no token", "garbage", "expired", "tampered payload", "wrong secret"}, (
         f"bypass suite must block all five, blocked={blocked}"
+    )
 
     # 3. Cross-tenant is 404 (existence hidden), not 403 or 200
     assert api_get_user(tok, "user-3")[0] == 404, "cross-tenant must 404"
@@ -262,8 +271,7 @@ def _verify() -> None:
 
     # 5. Static scan flags known-dangerous patterns
     assert "eval" in static_scan("eval(expr)")[0]
-    assert static_scan("safe = os.environ.get('X')") == [], \
-        "clean code must scan clean"
+    assert static_scan("safe = os.environ.get('X')") == [], "clean code must scan clean"
 
     # 6. Threat model produces tests
     assert "ssrf-metadata" in threat_model_endpoint("/fetch-url", ["net"])
@@ -281,4 +289,4 @@ if __name__ == "__main__":
         print("2. Fuzz boundaries; zero 5xx is the contract")
         print("3. bandit + pip-audit automate static + dependency scanning")
         print("4. Every threat-model finding becomes a test")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

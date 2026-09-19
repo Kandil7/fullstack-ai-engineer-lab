@@ -32,6 +32,7 @@ except ZeroDivisionError:
 # Example 2: Different exception types
 print("\n--- Multiple Exceptions ---")
 
+
 def divide_numbers(a, b):
     try:
         result = a / b
@@ -44,8 +45,9 @@ def divide_numbers(a, b):
     finally:
         print("Operation completed.")
 
-divide_numbers(10, 2)    # Works
-divide_numbers(10, 0)    # ZeroDivisionError
+
+divide_numbers(10, 2)  # Works
+divide_numbers(10, 0)  # ZeroDivisionError
 divide_numbers("10", 2)  # TypeError
 
 # Output:
@@ -78,14 +80,16 @@ else:
 # Example 4: Code that always runs
 print("\n--- finally Clause ---")
 
+
 def read_file(filename):
     try:
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             content = f.read()
     except FileNotFoundError:
         print(f"File '{filename}' not found!")
     finally:
         print("Cleanup: File operation attempted.")
+
 
 read_file("nonexistent.txt")
 
@@ -99,12 +103,14 @@ read_file("nonexistent.txt")
 # Example 5: Manually raising exceptions
 print("\n--- Raising Exceptions ---")
 
+
 def set_age(age):
     if not isinstance(age, int):
         raise TypeError("Age must be an integer!")
     if age < 0 or age > 150:
         raise ValueError("Age must be between 0 and 150!")
     return age
+
 
 # Test valid age
 try:
@@ -218,11 +224,13 @@ except TypeError as e:
 # Example 8: Chaining exceptions
 print("\n--- Exception Chaining ---")
 
+
 def process_data(data):
     try:
         value = int(data)
     except ValueError as e:
         raise RuntimeError("Failed to process data") from e
+
 
 try:
     process_data("not a number")
@@ -236,6 +244,7 @@ except RuntimeError as e:
 # Example 9: Real-world error handling
 print("\n--- Practical Examples ---")
 
+
 # Safe division
 def safe_divide(a, b):
     try:
@@ -245,9 +254,11 @@ def safe_divide(a, b):
     except TypeError:
         return None
 
+
 print(f"10 / 3 = {safe_divide(10, 3)}")
 print(f"10 / 0 = {safe_divide(10, 0)}")
 print(f"'10' / 3 = {safe_divide('10', 3)}")
+
 
 # Safe dictionary access
 def safe_get(d, key, default=None):
@@ -256,9 +267,11 @@ def safe_get(d, key, default=None):
     except (KeyError, TypeError):
         return default
 
+
 data = {"name": "Alice", "age": 30}
 print(f"\nName: {safe_get(data, 'name')}")
 print(f"Phone: {safe_get(data, 'phone', 'N/A')}")
+
 
 # Input validation loop
 def get_valid_number(prompt, min_val=None, max_val=None):
@@ -275,6 +288,7 @@ def get_valid_number(prompt, min_val=None, max_val=None):
         except ValueError:
             print("Please enter a valid number!")
 
+
 # Uncomment to test interactively:
 # age = get_valid_number("Enter your age", 0, 150)
 # print(f"Your age: {age}")
@@ -285,21 +299,24 @@ def get_valid_number(prompt, min_val=None, max_val=None):
 # Example 10: Creating custom exceptions
 print("\n--- Custom Exceptions ---")
 
+
 class InsufficientFundsError(Exception):
     def __init__(self, balance, amount):
         self.balance = balance
         self.amount = amount
         super().__init__(f"Cannot withdraw ${amount}. Balance: ${balance}")
 
+
 class BankAccount:
     def __init__(self, balance=0):
         self.balance = balance
-    
+
     def withdraw(self, amount):
         if amount > self.balance:
             raise InsufficientFundsError(self.balance, amount)
         self.balance -= amount
         return self.balance
+
 
 account = BankAccount(100)
 

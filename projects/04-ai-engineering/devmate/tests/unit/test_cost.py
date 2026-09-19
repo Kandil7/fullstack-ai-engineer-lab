@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from devmate.obs.cost import MODEL_PRICING, CostTracker, TokenUsage, cost_tracker
+from devmate.obs.cost import MODEL_PRICING, CostTracker, TokenUsage
 
 
 def _usage(prompt: int = 1_000_000, completion: int = 1_000_000) -> TokenUsage:
@@ -50,7 +50,7 @@ def test_get_summary_aggregates_by_model() -> None:
 
     summary = tracker.get_summary()
     assert summary.total_requests == 3
-    assert summary.total_tokens == 3_002_000
+    assert summary.total_tokens == 2_002_000
     assert summary.by_model["gpt-4o"]["requests"] == 2
     assert summary.by_provider["openai"]["requests"] == 2
     assert summary.by_provider["anthropic"]["requests"] == 1

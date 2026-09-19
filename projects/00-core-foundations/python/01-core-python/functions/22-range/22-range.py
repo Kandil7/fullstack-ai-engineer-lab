@@ -130,9 +130,9 @@ for i in range(1, 11):
 # ============================================================
 # Example 10: Empty ranges
 print("\n--- Edge Cases ---")
-print(f"range(5, 2): {list(range(5, 2))}")    # Empty (start > stop, no negative step)
-print(f"range(0): {list(range(0))}")            # Empty
-print(f"range(2, 2): {list(range(2, 2))}")      # Empty
+print(f"range(5, 2): {list(range(5, 2))}")  # Empty (start > stop, no negative step)
+print(f"range(0): {list(range(0))}")  # Empty
+print(f"range(2, 2): {list(range(2, 2))}")  # Empty
 
 # Negative numbers work too
 print(f"\nrange(-5, 0): {list(range(-5, 0))}")

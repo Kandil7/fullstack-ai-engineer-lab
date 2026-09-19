@@ -113,6 +113,7 @@ match user:
 
 # Output: Welcome, active admin Alice!
 
+
 # ============================================================
 # Matching with Classes
 # ============================================================
@@ -120,19 +121,23 @@ match user:
 class Shape:
     pass
 
+
 class Circle(Shape):
     def __init__(self, radius):
         self.radius = radius
+
 
 class Rectangle(Shape):
     def __init__(self, width, height):
         self.width = width
         self.height = height
 
+
 class Triangle(Shape):
     def __init__(self, base, height):
         self.base = base
         self.height = height
+
 
 def describe_shape(shape):
     match shape:
@@ -144,6 +149,7 @@ def describe_shape(shape):
             return f"Triangle with base {b} and height {h}"
         case _:
             return "Unknown shape"
+
 
 shapes = [Circle(5), Rectangle(10, 20), Triangle(8, 12)]
 print("\n--- Shapes ---")

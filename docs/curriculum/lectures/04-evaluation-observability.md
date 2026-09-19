@@ -93,6 +93,7 @@ def context_recall(retrieved_chunks, all_relevant_chunks):
     relevant_ids = set(all_relevant_chunks)
     return len(retrieved_ids & relevant_ids) / len(relevant_ids)
 
+
 # If corpus has 10 relevant chunks, we retrieved 7 → recall = 0.7
 ```
 
@@ -136,30 +137,32 @@ class LLMJudge:
     def __init__(self, llm_client, model="claude-3-5-sonnet-20241022"):
         self.client = llm_client
         self.model = model
-    
-    async def judge_faithfulness(self, question: str, answer: str, contexts: List[str]) -> float:
+
+    async def judge_faithfulness(
+        self, question: str, answer: str, contexts: List[str]
+    ) -> float:
         prompt = FAITHFULNESS_PROMPT.format(
             question=question,
             answer=answer,
-            context="\n\n".join(f"[{i+1}] {c}" for i, c in enumerate(contexts))
+            context="\n\n".join(f"[{i + 1}] {c}" for i, c in enumerate(contexts)),
         )
-        
+
         response = await self.client.complete(
             messages=[{"role": "user", "content": prompt}],
             model=self.model,
             temperature=0.0,
         )
-        
+
         # Parse claims
         claims = parse_claims(response.content)
         supported = sum(1 for c in claims if c.supported)
         total = len(claims)
-        
+
         return supported / max(total, 1)
-    
+
     async def judge_relevancy(self, question: str, answer: str) -> float:
         prompt = f"""Rate how well the answer addresses the question on a scale of 1-10.
-        
+
 Question: {question}
 Answer: {answer}
 
@@ -175,7 +178,7 @@ Return only a number 1-10."""
             model=self.model,
             temperature=0.0,
         )
-        
+
         return float(response.content.strip()) / 10.0
 ```
 
@@ -188,72 +191,81 @@ class EvaluationHarness:
     def __init__(self, rag_pipeline, judge: LLMJudge):
         self.pipeline = rag_pipeline
         self.judge = judge
-    
+
     async def run_evaluation(
         self,
         dataset_path: str,
         output_path: str = None,
     ) -> EvaluationReport:
-        
+
         # Load golden set
         golden_set = load_jsonl(dataset_path)
-        
+
         results = []
-        
+
         for item in golden_set:
             # Run RAG pipeline
-            rag_result = await self.pipeline.query(RAGRequest(
-                query=item["question"],
-                stream=False,
-            ))
-            
+            rag_result = await self.pipeline.query(
+                RAGRequest(
+                    query=item["question"],
+                    stream=False,
+                )
+            )
+
             # Compute metrics
             context_precision = context_precision_at_k(
                 rag_result.contexts, item.get("relevant_chunk_ids", []), k=5
             )
-            
+
             faithfulness = await self.judge.judge_faithfulness(
-                item["question"], rag_result.answer, 
-                [c.content for c in rag_result.contexts]
+                item["question"],
+                rag_result.answer,
+                [c.content for c in rag_result.contexts],
             )
-            
+
             answer_relevancy = await self.judge.judge_relevancy(
                 item["question"], rag_result.answer
             )
-            
-            results.append(EvalResult(
-                question=item["question"],
-                answer=rag_result.answer,
-                ground_truth=item.get("ground_truth"),
-                contexts=[c.content for c in rag_result.contexts],
-                scores={
-                    "context_precision": context_precision,
-                    "faithfulness": faithfulness,
-                    "answer_relevancy": answer_relevancy,
-                },
-                latency_ms=rag_result.latency_ms,
-                cost_usd=rag_result.usage.get("total_cost", 0),
-            ))
-        
+
+            results.append(
+                EvalResult(
+                    question=item["question"],
+                    answer=rag_result.answer,
+                    ground_truth=item.get("ground_truth"),
+                    contexts=[c.content for c in rag_result.contexts],
+                    scores={
+                        "context_precision": context_precision,
+                        "faithfulness": faithfulness,
+                        "answer_relevancy": answer_relevancy,
+                    },
+                    latency_ms=rag_result.latency_ms,
+                    cost_usd=rag_result.usage.get("total_cost", 0),
+                )
+            )
+
         # Aggregate
         report = EvaluationReport(
             dataset=dataset_path,
             timestamp=datetime.utcnow(),
             num_questions=len(results),
             aggregate_scores={
-                "context_precision": np.mean([r.scores["context_precision"] for r in results]),
+                "context_precision": np.mean(
+                    [r.scores["context_precision"] for r in results]
+                ),
                 "faithfulness": np.mean([r.scores["faithfulness"] for r in results]),
-                "answer_relevancy": np.mean([r.scores["answer_relevancy"] for r in results]),
+                "answer_relevancy": np.mean(
+                    [r.scores["answer_relevancy"] for r in results]
+                ),
             },
             per_question=results,
             latency_p50=np.percentile([r.latency_ms for r in results], 50),
             latency_p95=np.percentile([r.latency_ms for r in results], 95),
             total_cost_usd=sum(r.cost_usd for r in results),
         )
-        
+
         if output_path:
             report.save(output_path)
-        
+
         return report
 ```
 
@@ -264,47 +276,53 @@ class EvaluationHarness:
 ```python
 class RegressionTester:
     """Compare new version against baseline."""
-    
+
     def __init__(self, baseline_report: EvaluationReport):
         self.baseline = baseline_report
-    
+
     def compare(self, new_report: EvaluationReport) -> RegressionReport:
         """Check for regressions."""
         regressions = []
         improvements = []
-        
+
         for metric in ["context_precision", "faithfulness", "answer_relevancy"]:
             baseline_score = self.baseline.aggregate_scores[metric]
             new_score = new_report.aggregate_scores[metric]
             diff = new_score - baseline_score
-            
+
             if diff < -0.05:  # 5% regression threshold
-                regressions.append({
-                    "metric": metric,
-                    "baseline": baseline_score,
-                    "new": new_score,
-                    "diff": diff,
-                })
+                regressions.append(
+                    {
+                        "metric": metric,
+                        "baseline": baseline_score,
+                        "new": new_score,
+                        "diff": diff,
+                    }
+                )
             elif diff > 0.02:
-                improvements.append({
-                    "metric": metric,
-                    "baseline": baseline_score,
-                    "new": new_score,
-                    "diff": diff,
-                })
-        
+                improvements.append(
+                    {
+                        "metric": metric,
+                        "baseline": baseline_score,
+                        "new": new_score,
+                        "diff": diff,
+                    }
+                )
+
         # Per-question comparison
         question_regressions = []
         for bq, nq in zip(self.baseline.per_question, new_report.per_question):
             for metric in bq.scores:
                 if nq.scores[metric] - bq.scores[metric] < -0.1:
-                    question_regressions.append({
-                        "question": bq.question,
-                        "metric": metric,
-                        "baseline": bq.scores[metric],
-                        "new": nq.scores[metric],
-                    })
-        
+                    question_regressions.append(
+                        {
+                            "question": bq.question,
+                            "metric": metric,
+                            "baseline": bq.scores[metric],
+                            "new": nq.scores[metric],
+                        }
+                    )
+
         return RegressionReport(
             passed=len(regressions) == 0,
             regressions=regressions,
@@ -374,6 +392,7 @@ langfuse = Langfuse(
     host=settings.langfuse_host,
 )
 
+
 @traced("rag.query")
 async def traced_rag_query(request: RAGRequest):
     trace = langfuse.trace(
@@ -381,27 +400,27 @@ async def traced_rag_query(request: RAGRequest):
         input={"question": request.query},
         metadata={"model": request.model},
     )
-    
+
     # Embedding
     with trace.span(name="embedding") as span:
         embedding = await embed(request.query)
         span.end(output={"dimensions": len(embedding)})
-    
+
     # Retrieval
     with trace.span(name="retrieval") as span:
         results = await retrieve(embedding)
         span.end(output={"num_results": len(results)})
-    
+
     # Reranking
     with trace.span(name="reranking") as span:
         reranked = await rerank(request.query, results)
         span.end(output={"top_scores": [r.score for r in reranked[:3]]})
-    
+
     # Generation
     with trace.span(name="generation") as span:
         answer = await generate(reranked)
         span.end(output={"answer_length": len(answer)})
-    
+
     trace.end(output={"answer": answer})
     return answer
 ```
@@ -413,30 +432,28 @@ async def traced_rag_query(request: RAGRequest):
 ```python
 class DriftDetector:
     """Detect shifts in query distribution."""
-    
+
     def __init__(self, embedding_model, reference_queries: List[str]):
         self.embedder = embedding_model
         self.reference_embeddings = self.embedder.embed(reference_queries)
         self.reference_centroid = np.mean(self.reference_embeddings, axis=0)
-    
+
     def compute_drift(self, recent_queries: List[str]) -> DriftReport:
         recent_embeddings = self.embedder.embed(recent_queries)
         recent_centroid = np.mean(recent_embeddings, axis=0)
-        
+
         # Cosine distance between centroids
-        drift_score = 1 - cosine_similarity(
-            self.reference_centroid, recent_centroid
-        )
-        
+        drift_score = 1 - cosine_similarity(self.reference_centroid, recent_centroid)
+
         # Per-query distances
         query_distances = []
         for q, emb in zip(recent_queries, recent_embeddings):
             dist = 1 - cosine_similarity(emb, self.reference_centroid)
             query_distances.append({"query": q, "distance": dist})
-        
+
         # Alert if drift > threshold
         alert = drift_score > 0.3  # 30% shift
-        
+
         return DriftReport(
             drift_score=drift_score,
             alert=alert,

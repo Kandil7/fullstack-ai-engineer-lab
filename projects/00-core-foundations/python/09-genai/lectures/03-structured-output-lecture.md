@@ -74,13 +74,16 @@ client = OpenAI()
 resp = client.chat.completions.create(
     model="gpt-4o-mini",
     messages=[
-        {"role": "system",
-         "content": "Output JSON. Schema: {\"name\": str, \"age\": int, \"plan\": str}"},
+        {
+            "role": "system",
+            "content": 'Output JSON. Schema: {"name": str, "age": int, "plan": str}',
+        },
         {"role": "user", "content": "Extract: Jane, 28, on the pro plan."},
     ],
     response_format={"type": "json_object"},
 )
 import json
+
 data = json.loads(resp.choices[0].message.content)
 print(data)
 ```
@@ -108,8 +111,7 @@ from openai import OpenAI
 client = OpenAI()
 resp = client.chat.completions.create(
     model="gpt-4o-mini",
-    messages=[{"role": "user",
-               "content": "Extract: Bob, 41, on the free plan."}],
+    messages=[{"role": "user", "content": "Extract: Bob, 41, on the free plan."}],
     response_format={
         "type": "json_schema",
         "json_schema": {
@@ -150,10 +152,12 @@ always check it at the boundary.
 from pydantic import BaseModel, Field, ValidationError
 import json
 
+
 class UserExtract(BaseModel):
     name: str
     age: int = Field(ge=0, le=120)
     plan: str = Field(pattern="^(free|pro)$")
+
 
 def safe_parse(raw: str) -> UserExtract:
     """Parse + validate; raise a clear error on any mismatch."""
@@ -181,7 +185,7 @@ Even with all rungs, output can fail. The repair ladder:
 ```python
 def extract_with_repair(client, text: str, schema, *, max_repairs=2):
     """Validate → on failure, re-prompt the model with the error."""
-    raw = client.complete(text)          # rung 1-3 call
+    raw = client.complete(text)  # rung 1-3 call
     for _ in range(max_repairs):
         try:
             return schema.model_validate(json.loads(raw))
@@ -189,7 +193,8 @@ def extract_with_repair(client, text: str, schema, *, max_repairs=2):
             # give the model its own error as feedback — a repair loop
             raw = client.complete(
                 f"Your previous JSON was invalid. Fix it.\nPrevious: {raw}\n"
-                f"Schema: {schema.schema()}")
+                f"Schema: {schema.schema()}"
+            )
     raise ValueError("could not repair model output")
 ```
 
@@ -212,6 +217,8 @@ The same discipline applies to CSV, enums, and structured text:
 
 ```python
 VALID = {"approve", "reject", "escalate"}
+
+
 def classify_verdict(raw: str) -> str:
     v = raw.strip().lower()
     if v not in VALID:

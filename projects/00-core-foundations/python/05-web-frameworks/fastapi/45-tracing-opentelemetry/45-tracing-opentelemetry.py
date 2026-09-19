@@ -28,6 +28,7 @@ from opentelemetry import trace, context as otel_context
 from opentelemetry.sdk.trace import TracerProvider, ReadableSpan
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 
+
 # ============================================================
 # 0. In-memory exporter so we can inspect spans without a backend
 # ============================================================
@@ -63,11 +64,12 @@ def reset() -> None:
 # spans form a tree: the root is the request; children are the calls
 # it made. The trace_id is shared across the whole tree.
 
+
 def single_span() -> None:
     with TRACER.start_as_current_span("http.request", kind=trace.SpanKind.SERVER) as span:
         span.set_attribute("http.path", "/generate")
         span.set_attribute("http.status_code", 200)
-        time.sleep(0.01)   # simulated work
+        time.sleep(0.01)  # simulated work
         with TRACER.start_as_current_span("inference.call") as child:
             child.set_attribute("model", "gpt-4o-mini")
             time.sleep(0.005)
@@ -78,7 +80,7 @@ reset()
 single_span()
 root = exporter.spans[0]
 child = exporter.spans[1]
-print(f"root span : {root.name} ({root.duration_s*1000:.1f}ms)")
+print(f"root span : {root.name} ({root.duration_s * 1000:.1f}ms)")
 print(f"child span: {child.name} model={child.attributes.get('model')}")
 print(f"shared trace_id: {root.context.trace_id == child.context.trace_id}")
 print(f"parent link     : {child.parent.span_id == root.context.span_id}")
@@ -89,6 +91,7 @@ print()
 # ============================================================
 # The trace tree reveals WHERE latency goes. Without it you only know
 # the total; with it you know retrieval vs embed vs LLM vs rerank.
+
 
 def rag_query(query: str) -> float:
     """Simulated RAG pipeline; each stage is a child span."""
@@ -111,7 +114,7 @@ print("=== 2. RAG pipeline trace ===")
 reset()
 total = rag_query("what is RAG?")
 rows = [(s.name, round(s.duration_s * 1000, 1)) for s in exporter.spans]
-print(f"total {total*1000:.1f}ms split into:")
+print(f"total {total * 1000:.1f}ms split into:")
 for name, ms in rows:
     print(f"  {name:<16} {ms:>6.1f}ms")
 print()
@@ -122,6 +125,7 @@ print()
 # Context is carried explicitly across process boundaries (HTTP
 # headers: traceparent). Here we simulate it with a dict 'wire'.
 
+
 def propagate_across_boundary() -> tuple[str, str]:
     """Pass the tracing context over a simulated wire, then continue."""
     reset()
@@ -130,6 +134,7 @@ def propagate_across_boundary() -> tuple[str, str]:
         ctx = otel_context.get_current()
         carrier: dict[str, str] = {}
         from opentelemetry.propagators.tracecontext import TraceContextTextMapPropagator
+
         TraceContextTextMapPropagator().inject(carrier, context=ctx)
         # downstream service extracts and creates a child span
         extracted = TraceContextTextMapPropagator().extract(carrier)
@@ -153,6 +158,7 @@ print()
 # Traces are expensive to store. Head sampling decides BEFORE the
 # request (fixed % / rate); tail sampling decides AFTER (keep the
 # slow/failing ones). Parent-based sampling keeps trees consistent.
+
 
 def head_sample(rate: float, trace_id: int) -> bool:
     """Deterministic head sampling: hash the trace_id vs the rate."""
@@ -198,6 +204,7 @@ print()
 # MISTAKE: manual-only (framework spans missing) or auto-only (no domain)
 # CORRECT: both layers
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -242,4 +249,4 @@ if __name__ == "__main__":
         print("2. RAG trace: retrieval/embed/LLM each visible")
         print("3. traceparent propagation continues the trace across services")
         print("4. Head sampling bounds volume; auto+manual cover both layers")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

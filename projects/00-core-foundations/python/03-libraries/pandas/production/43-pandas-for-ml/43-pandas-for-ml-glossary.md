@@ -38,10 +38,12 @@ different columns and concatenates results — the replayable way to handle
 mixed numeric/categorical frames.
 **Example**:
 ```python
-ColumnTransformer([
-    ("scale", StandardScaler(), ["amount"]),
-    ("onehot", OneHotEncoder(drop="first"), ["region"]),
-])
+ColumnTransformer(
+    [
+        ("scale", StandardScaler(), ["amount"]),
+        ("onehot", OneHotEncoder(drop="first"), ["region"]),
+    ]
+)
 ```
 **Related**: `StandardScaler`, `OneHotEncoder`
 

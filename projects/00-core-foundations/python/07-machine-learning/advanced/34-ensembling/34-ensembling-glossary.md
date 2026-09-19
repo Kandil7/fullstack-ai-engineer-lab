@@ -30,7 +30,8 @@ the data so their errors decorrelate. Random forests are bagged trees.
 **Example**:
 ```python
 from sklearn.ensemble import RandomForestClassifier
-rf = RandomForestClassifier(n_estimators=100)   # 100 bagged trees
+
+rf = RandomForestClassifier(n_estimators=100)  # 100 bagged trees
 ```
 **Complexity**: Training x members; parallelizable.
 **Related**: Diversity, Variance

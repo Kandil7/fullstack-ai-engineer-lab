@@ -50,9 +50,9 @@ practice:
 Two shapes of call:
 
 ```python
-pdist(X)                 # all pairwise distances within X: n(n-1)/2
-squareform(pdist(X))     # the n x n symmetric matrix
-cdist(Q, X)              # every query x every reference: (nq, n)
+pdist(X)  # all pairwise distances within X: n(n-1)/2
+squareform(pdist(X))  # the n x n symmetric matrix
+cdist(Q, X)  # every query x every reference: (nq, n)
 ```
 
 `pdist` is for clustering; `cdist` is for retrieval (one query,
@@ -83,8 +83,8 @@ reason RAG pipelines L2-normalize embeddings before storing them.
 ```python
 X = X / np.linalg.norm(X, axis=1, keepdims=True)
 Q = Q / np.linalg.norm(Q, axis=1, keepdims=True)
-dists = cdist(Q, X, metric="euclidean")     # == cosine ranking
-idx = np.argsort(dists, axis=1)[:, :k]      # top-k neighbors
+dists = cdist(Q, X, metric="euclidean")  # == cosine ranking
+idx = np.argsort(dists, axis=1)[:, :k]  # top-k neighbors
 ```
 
 This matters beyond aesthetics: distance-based indexes (KD-trees,
@@ -97,7 +97,7 @@ semantics for free.
 ```python
 from scipy.spatial import cKDTree
 
-tree = cKDTree(points)          # build once
+tree = cKDTree(points)  # build once
 dist, idx = tree.query(queries, k=3)
 ```
 
@@ -238,13 +238,13 @@ exists for a reason.
 from scipy.spatial import cKDTree
 from scipy.spatial.distance import cdist, pdist, squareform
 
-D = squareform(pdist(X, metric="euclidean"))   # n x n
-M = cdist(Q, X, metric="cosine")               # (nq, n); 1 - cos
-M = cdist(Q, X, metric="cityblock")            # manhattan
-Xn = X / np.linalg.norm(X, axis=1, keepdims=True)   # normalize
-idx = np.argsort(cdist(Qn, Xn), axis=1)[:, :k]      # top-k euclid
+D = squareform(pdist(X, metric="euclidean"))  # n x n
+M = cdist(Q, X, metric="cosine")  # (nq, n); 1 - cos
+M = cdist(Q, X, metric="cityblock")  # manhattan
+Xn = X / np.linalg.norm(X, axis=1, keepdims=True)  # normalize
+idx = np.argsort(cdist(Qn, Xn), axis=1)[:, :k]  # top-k euclid
 tree = cKDTree(points)
-dist, idx = tree.query(queries, k=3)           # exact, low-d only
+dist, idx = tree.query(queries, k=3)  # exact, low-d only
 ```
 
 ## Next Steps

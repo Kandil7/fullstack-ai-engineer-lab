@@ -40,19 +40,20 @@ class AlertFatigueMonitor:
 
     def track_alert(self, alert: dict, outcome: str):
         """Track alert and its outcome."""
-        self.alert_history.append({
-            "alert": alert,
-            "outcome": outcome,  # "true_positive", "false_positive"
-            "timestamp": datetime.utcnow(),
-        })
+        self.alert_history.append(
+            {
+                "alert": alert,
+                "outcome": outcome,  # "true_positive", "false_positive"
+                "timestamp": datetime.utcnow(),
+            }
+        )
         self._update_metrics()
 
     def _update_metrics(self):
         """Update fatigue metrics."""
         if self.alert_history:
             false_positives = sum(
-                1 for a in self.alert_history
-                if a["outcome"] == "false_positive"
+                1 for a in self.alert_history if a["outcome"] == "false_positive"
             )
             self.false_positive_rate = false_positives / len(self.alert_history)
 
@@ -67,9 +68,9 @@ class AlertFatigueMonitor:
 
         # Weighted fatigue score (0-1, higher = more fatigued)
         fatigue_score = (
-            factors["false_positive_rate"] * 0.5 +
-            factors["alert_volume"] * 0.3 +
-            factors["duplicate_rate"] * 0.2
+            factors["false_positive_rate"] * 0.5
+            + factors["alert_volume"] * 0.3
+            + factors["duplicate_rate"] * 0.2
         )
 
         return {
@@ -112,6 +113,7 @@ class AnomalyDetector:
     def establish_baseline(self, data: list):
         """Establish baseline from normal behavior."""
         import numpy as np
+
         self.baseline = {
             "mean": np.mean(data),
             "std": np.std(data),
@@ -131,6 +133,7 @@ class AnomalyDetector:
             "z_score": z_score,
             "threshold": threshold,
         }
+
 
 # Usage
 detector = AnomalyDetector()
@@ -155,11 +158,13 @@ class SecurityDashboard:
 
     def add_widget(self, widget_type: str, title: str, data_source: str):
         """Add a widget to the dashboard."""
-        self.widgets.append({
-            "type": widget_type,
-            "title": title,
-            "data_source": data_source,
-        })
+        self.widgets.append(
+            {
+                "type": widget_type,
+                "title": title,
+                "data_source": data_source,
+            }
+        )
 
     def generate_dashboard(self) -> dict:
         """Generate dashboard configuration."""
@@ -170,6 +175,7 @@ class SecurityDashboard:
             "alerts_panel": True,
             "metrics_panel": True,
         }
+
 
 # Usage
 dashboard = SecurityDashboard()
@@ -195,8 +201,9 @@ class DigitalForensics:
     def __init__(self):
         self.evidence_chain = []
 
-    def collect_evidence(self, evidence_type: str, source: str,
-                         data: dict, collector: str) -> str:
+    def collect_evidence(
+        self, evidence_type: str, source: str, data: dict, collector: str
+    ) -> str:
         """Collect and log evidence."""
         import hashlib
         import json
@@ -208,22 +215,24 @@ class DigitalForensics:
             json.dumps(data, sort_keys=True).encode()
         ).hexdigest()
 
-        self.evidence_chain.append({
-            "id": evidence_id,
-            "type": evidence_type,
-            "source": source,
-            "data": data,
-            "hash": evidence_hash,
-            "collector": collector,
-            "timestamp": datetime.utcnow().isoformat(),
-            "chain_of_custody": [
-                {
-                    "action": "collected",
-                    "by": collector,
-                    "timestamp": datetime.utcnow().isoformat(),
-                }
-            ],
-        })
+        self.evidence_chain.append(
+            {
+                "id": evidence_id,
+                "type": evidence_type,
+                "source": source,
+                "data": data,
+                "hash": evidence_hash,
+                "collector": collector,
+                "timestamp": datetime.utcnow().isoformat(),
+                "chain_of_custody": [
+                    {
+                        "action": "collected",
+                        "by": collector,
+                        "timestamp": datetime.utcnow().isoformat(),
+                    }
+                ],
+            }
+        )
 
         return evidence_id
 
@@ -246,18 +255,21 @@ class DigitalForensics:
 
         return {"verified": False, "reason": "evidence_not_found"}
 
-    def transfer_custody(self, evidence_id: str, from_person: str,
-                         to_person: str, reason: str):
+    def transfer_custody(
+        self, evidence_id: str, from_person: str, to_person: str, reason: str
+    ):
         """Transfer evidence custody."""
         for evidence in self.evidence_chain:
             if evidence["id"] == evidence_id:
-                evidence["chain_of_custody"].append({
-                    "action": "transferred",
-                    "from": from_person,
-                    "to": to_person,
-                    "reason": reason,
-                    "timestamp": datetime.utcnow().isoformat(),
-                })
+                evidence["chain_of_custody"].append(
+                    {
+                        "action": "transferred",
+                        "from": from_person,
+                        "to": to_person,
+                        "reason": reason,
+                        "timestamp": datetime.utcnow().isoformat(),
+                    }
+                )
                 return True
         return False
 ```
@@ -284,8 +296,14 @@ class IoCManager:
             "email_addresses": set(),
         }
 
-    def add_ioc(self, ioc_type: str, value: str, confidence: float,
-                source: str, description: str = ""):
+    def add_ioc(
+        self,
+        ioc_type: str,
+        value: str,
+        confidence: float,
+        source: str,
+        description: str = "",
+    ):
         """Add an indicator of compromise."""
         if ioc_type in self.iocs:
             if isinstance(self.iocs[ioc_type], set):
@@ -304,6 +322,7 @@ class IoCManager:
             else:
                 # Pattern matching for URL patterns
                 import re
+
                 for pattern in self.iocs[ioc_type]:
                     if re.search(pattern, value):
                         return {"matched": True, "type": ioc_type, "pattern": pattern}
@@ -318,14 +337,16 @@ class IoCManager:
             "url_patterns": len(self.iocs["url_patterns"]),
             "email_addresses": len(self.iocs["email_addresses"]),
             "total": sum(
-                len(v) if isinstance(v, set) else len(v)
-                for v in self.iocs.values()
+                len(v) if isinstance(v, set) else len(v) for v in self.iocs.values()
             ),
         }
 
+
 # Usage
 ioc_manager = IoCManager()
-ioc_manager.add_ioc("ip_addresses", "192.168.1.100", 0.9, "threat_intel", "Known C2 server")
+ioc_manager.add_ioc(
+    "ip_addresses", "192.168.1.100", 0.9, "threat_intel", "Known C2 server"
+)
 ioc_manager.add_ioc("domains", "malware.example.com", 0.85, "threat_intel")
 result = ioc_manager.check_ioc("ip_addresses", "192.168.1.100")
 print(f"IoC matched: {result['matched']}")
@@ -405,8 +426,7 @@ class IncidentResponsePlan:
             checklist[phase] = {
                 "description": details["description"],
                 "tasks": [
-                    {"activity": a, "completed": False}
-                    for a in details["activities"]
+                    {"activity": a, "completed": False} for a in details["activities"]
                 ],
             }
         return checklist
@@ -443,9 +463,9 @@ class LogAggregator:
         log_entry["_ingested_at"] = datetime.utcnow().isoformat()
         self.aggregated_logs.append(log_entry)
 
-    def query_logs(self, time_range: dict = None,
-                   source: str = None,
-                   level: str = None) -> list:
+    def query_logs(
+        self, time_range: dict = None, source: str = None, level: str = None
+    ) -> list:
         """Query aggregated logs."""
         results = self.aggregated_logs
 
@@ -522,6 +542,7 @@ mitre_ai_tactics = {
     },
 }
 
+
 def map_attack_to_mitre(attack_type: str) -> dict:
     """Map AI attack to MITRE ATT&CK framework."""
     for tactic, details in mitre_ai_tactics.items():
@@ -560,25 +581,27 @@ class PostMortem:
             "lessons_learned": [],
         }
 
-    def add_timeline_entry(self, timestamp: str, event: str,
-                          actor: str = "system"):
+    def add_timeline_entry(self, timestamp: str, event: str, actor: str = "system"):
         """Add entry to incident timeline."""
-        self.sections["timeline"].append({
-            "timestamp": timestamp,
-            "event": event,
-            "actor": actor,
-        })
+        self.sections["timeline"].append(
+            {
+                "timestamp": timestamp,
+                "event": event,
+                "actor": actor,
+            }
+        )
 
-    def add_action_item(self, action: str, owner: str,
-                       due_date: str, priority: str):
+    def add_action_item(self, action: str, owner: str, due_date: str, priority: str):
         """Add a follow-up action item."""
-        self.sections["action_items"].append({
-            "action": action,
-            "owner": owner,
-            "due_date": due_date,
-            "priority": priority,
-            "status": "open",
-        })
+        self.sections["action_items"].append(
+            {
+                "action": action,
+                "owner": owner,
+                "due_date": due_date,
+                "priority": priority,
+                "status": "open",
+            }
+        )
 
     def generate_report(self) -> dict:
         """Generate post-mortem report."""
@@ -589,15 +612,13 @@ class PostMortem:
             "generated_at": datetime.utcnow().isoformat(),
         }
 
+
 # Usage
 post_mortem = PostMortem("INC-001", "API Security Incident")
 post_mortem.add_timeline_entry("2024-01-01T10:00:00Z", "Incident detected")
 post_mortem.add_timeline_entry("2024-01-01T10:30:00Z", "Investigation started")
 post_mortem.add_action_item(
-    "Implement rate limiting",
-    "Engineering Team",
-    "2024-01-15",
-    "high"
+    "Implement rate limiting", "Engineering Team", "2024-01-15", "high"
 )
 report = post_mortem.generate_report()
 ```
@@ -619,14 +640,15 @@ class RootCauseAnalysis:
         self.findings = []
         self.root_causes = []
 
-    def add_finding(self, category: str, description: str,
-                   evidence: list):
+    def add_finding(self, category: str, description: str, evidence: list):
         """Add a finding from the investigation."""
-        self.findings.append({
-            "category": category,
-            "description": description,
-            "evidence": evidence,
-        })
+        self.findings.append(
+            {
+                "category": category,
+                "description": description,
+                "evidence": evidence,
+            }
+        )
 
     def identify_root_causes(self) -> list:
         """Identify root causes from findings."""
@@ -641,11 +663,13 @@ class RootCauseAnalysis:
         # Analyze each category
         for cat, findings in categories.items():
             if len(findings) >= 2:  # Multiple related findings
-                self.root_causes.append({
-                    "category": cat,
-                    "description": f"Systemic issue in {cat}",
-                    "findings_count": len(findings),
-                })
+                self.root_causes.append(
+                    {
+                        "category": cat,
+                        "description": f"Systemic issue in {cat}",
+                        "findings_count": len(findings),
+                    }
+                )
 
         return self.root_causes
 
@@ -653,11 +677,31 @@ class RootCauseAnalysis:
         """Generate 5 Whys analysis."""
         # Simplified - in practice would be interactive
         return [
-            {"why": 1, "question": f"Why did {problem} happen?", "answer": "Investigation needed"},
-            {"why": 2, "question": "Why did that happen?", "answer": "Investigation needed"},
-            {"why": 3, "question": "Why did that happen?", "answer": "Investigation needed"},
-            {"why": 4, "question": "Why did that happen?", "answer": "Investigation needed"},
-            {"why": 5, "question": "Why did that happen?", "answer": "Root cause identified"},
+            {
+                "why": 1,
+                "question": f"Why did {problem} happen?",
+                "answer": "Investigation needed",
+            },
+            {
+                "why": 2,
+                "question": "Why did that happen?",
+                "answer": "Investigation needed",
+            },
+            {
+                "why": 3,
+                "question": "Why did that happen?",
+                "answer": "Investigation needed",
+            },
+            {
+                "why": 4,
+                "question": "Why did that happen?",
+                "answer": "Investigation needed",
+            },
+            {
+                "why": 5,
+                "question": "Why did that happen?",
+                "answer": "Root cause identified",
+            },
         ]
 ```
 
@@ -681,20 +725,23 @@ class SIEMSystem:
 
     def add_log_source(self, name: str, source_type: str):
         """Add a log source."""
-        self.log_sources.append({
-            "name": name,
-            "type": source_type,
-            "status": "active",
-        })
+        self.log_sources.append(
+            {
+                "name": name,
+                "type": source_type,
+                "status": "active",
+            }
+        )
 
-    def add_correlation_rule(self, name: str, conditions: dict,
-                            alert_severity: str):
+    def add_correlation_rule(self, name: str, conditions: dict, alert_severity: str):
         """Add a correlation rule."""
-        self.correlation_rules.append({
-            "name": name,
-            "conditions": conditions,
-            "severity": alert_severity,
-        })
+        self.correlation_rules.append(
+            {
+                "name": name,
+                "conditions": conditions,
+                "severity": alert_severity,
+            }
+        )
 
     def ingest_logs(self, logs: list):
         """Ingest and correlate logs."""
@@ -702,12 +749,14 @@ class SIEMSystem:
             # Check against correlation rules
             for rule in self.correlation_rules:
                 if self._match_rule(log, rule):
-                    self.alerts.append({
-                        "rule": rule["name"],
-                        "severity": rule["severity"],
-                        "log": log,
-                        "timestamp": datetime.utcnow(),
-                    })
+                    self.alerts.append(
+                        {
+                            "rule": rule["name"],
+                            "severity": rule["severity"],
+                            "log": log,
+                            "timestamp": datetime.utcnow(),
+                        }
+                    )
 
     def _match_rule(self, log: dict, rule: dict) -> bool:
         """Check if log matches correlation rule."""
@@ -738,16 +787,19 @@ class ThreatHunter:
         self.hypotheses = []
         self.findings = []
 
-    def create_hypothesis(self, hypothesis: str, data_sources: list,
-                         search_queries: list):
+    def create_hypothesis(
+        self, hypothesis: str, data_sources: list, search_queries: list
+    ):
         """Create a threat hunting hypothesis."""
-        self.hypotheses.append({
-            "hypothesis": hypothesis,
-            "data_sources": data_sources,
-            "queries": search_queries,
-            "status": "active",
-            "created_at": datetime.utcnow(),
-        })
+        self.hypotheses.append(
+            {
+                "hypothesis": hypothesis,
+                "data_sources": data_sources,
+                "queries": search_queries,
+                "status": "active",
+                "created_at": datetime.utcnow(),
+            }
+        )
 
     def execute_hunt(self, hypothesis_index: int) -> dict:
         """Execute a threat hunt."""

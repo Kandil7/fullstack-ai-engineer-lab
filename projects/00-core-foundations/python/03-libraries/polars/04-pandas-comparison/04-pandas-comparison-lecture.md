@@ -48,8 +48,7 @@ predicate.
 import pandas as pd
 import polars as pl
 
-pdf = pd.DataFrame({"campaign": ["a", "b", "a", "c"],
-                    "revenue": [10.0, 5.0, 30.0, 12.0]})
+pdf = pd.DataFrame({"campaign": ["a", "b", "a", "c"], "revenue": [10.0, 5.0, 30.0, 12.0]})
 plf = pl.from_pandas(pdf)
 
 p_out = pdf[(pdf["campaign"] == "a") & (pdf["revenue"] >= 10.0)]
@@ -75,19 +74,22 @@ dict of strings, can be inspected and reused by the optimizer.
 import pandas as pd
 import polars as pl
 
-pdf = pd.DataFrame({"campaign": ["a", "b", "a"],
-                    "converted": [1, 0, 1], "revenue": [10.0, 5.0, 30.0]})
+pdf = pd.DataFrame(
+    {"campaign": ["a", "b", "a"], "converted": [1, 0, 1], "revenue": [10.0, 5.0, 30.0]}
+)
 plf = pl.from_pandas(pdf)
 
-g_p = (pdf.groupby("campaign")
-       .agg(conversions=("converted", "sum"),
-            revenue=("revenue", "mean"))
-       .reset_index())
+g_p = (
+    pdf.groupby("campaign")
+    .agg(conversions=("converted", "sum"), revenue=("revenue", "mean"))
+    .reset_index()
+)
 
-g_l = (plf.group_by("campaign")
-       .agg(pl.col("converted").sum().alias("conversions"),
-            pl.col("revenue").mean().alias("revenue"))
-       .sort("campaign"))
+g_l = (
+    plf.group_by("campaign")
+    .agg(pl.col("converted").sum().alias("conversions"), pl.col("revenue").mean().alias("revenue"))
+    .sort("campaign")
+)
 
 print(g_p.sort_values("campaign")["conversions"].tolist())
 print(g_l.sort("campaign")["conversions"].to_list())
@@ -120,7 +122,7 @@ j_p = pdf.merge(meta_p, on="campaign", how="left")
 j_l = plf.join(meta_l, on="campaign", how="left")
 
 print(j_p.shape, j_l.shape)
-print(j_l.filter(pl.col("budget").is_null()).height)   # c has no budget
+print(j_l.filter(pl.col("budget").is_null()).height)  # c has no budget
 ```
 
 ```text
@@ -150,12 +152,11 @@ n_p = pdf.copy()
 n_p["revenue_per_user"] = n_p["revenue"] / n_p.groupby("user")["revenue"].transform("sum")
 
 n_l = plf.with_columns(
-    (pl.col("revenue") / pl.col("revenue").sum().over("user"))
-    .alias("revenue_per_user")
+    (pl.col("revenue") / pl.col("revenue").sum().over("user")).alias("revenue_per_user")
 )
 
 print(n_p["revenue_per_user"].iloc[0], n_l["revenue_per_user"][0])
-print(list(pdf.columns))          # original untouched by the polars chain
+print(list(pdf.columns))  # original untouched by the polars chain
 ```
 
 ```text
@@ -187,9 +188,7 @@ plf = pl.from_pandas(pdf)
 p_out = pdf["x"].apply(lambda v: v * 2 if v > 1 else 0.0)
 
 # polars expression - same logic, vectorized, optimizer-visible
-l_out = plf.with_columns(
-    pl.when(pl.col("x") > 1).then(pl.col("x") * 2).otherwise(0.0).alias("y")
-)
+l_out = plf.with_columns(pl.when(pl.col("x") > 1).then(pl.col("x") * 2).otherwise(0.0).alias("y"))
 
 print(p_out.tolist(), l_out["y"].to_list())
 ```
@@ -218,6 +217,7 @@ import polars as pl
 pdf = pd.DataFrame({"a": range(1_000_000), "b": range(1_000_000)})
 plf = pl.from_pandas(pdf)
 
+
 def measure(fn):
     best = float("inf")
     for _ in range(3):
@@ -225,6 +225,7 @@ def measure(fn):
         fn()
         best = min(best, time.perf_counter() - t0)
     return best * 1000
+
 
 ms_p = measure(lambda: pdf[pdf["a"] > 500_000])
 ms_l = measure(lambda: plf.filter(pl.col("a") > 500_000))

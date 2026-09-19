@@ -8,7 +8,8 @@ from __future__ import annotations
 import struct
 
 import matplotlib
-matplotlib.use("Agg")   # MUST precede pyplot import: headless tests
+
+matplotlib.use("Agg")  # MUST precede pyplot import: headless tests
 
 import matplotlib.pyplot as plt
 
@@ -80,6 +81,6 @@ def tight_crops(fig: plt.Figure, loose_path: str, tight_path: str, dpi: int) -> 
     fig.savefig(tight_path, dpi=dpi, bbox_inches="tight")
     w_loose, h_loose = _png_dimensions(loose_path)
     w_tight, h_tight = _png_dimensions(tight_path)
-    cropped = (w_tight <= w_loose and h_tight <= h_loose)
+    cropped = w_tight <= w_loose and h_tight <= h_loose
     changed = (w_tight, h_tight) != (w_loose, h_loose)
     return bool(cropped and changed)

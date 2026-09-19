@@ -32,6 +32,7 @@ DEP_COL: str = "Survived"
 # SECTION 1: Build and clean a tiny Titanic-style dataset
 # ============================================================
 
+
 def make_dataframe() -> pd.DataFrame:
     """Return a small synthetic frame with a missing value and a skewed Fare."""
     return pd.DataFrame(
@@ -39,8 +40,16 @@ def make_dataframe() -> pd.DataFrame:
             "Age": [22.0, 38.0, 26.0, None, 35.0, 54.0, 2.0, 27.0],
             "SibSp": [1, 1, 0, 1, 0, 0, 3, 0],
             "Fare": [7.25, 71.28, 7.92, 53.1, 8.05, 51.86, 21.07, 11.13],
-            "Sex": ["male", "female", "female", "female",
-                    "male", "male", "male", "female"],
+            "Sex": [
+                "male",
+                "female",
+                "female",
+                "female",
+                "male",
+                "male",
+                "male",
+                "female",
+            ],
             "Survived": [0, 1, 1, 1, 0, 0, 0, 1],
         }
     )
@@ -72,6 +81,7 @@ def prep_data(df: pd.DataFrame) -> tuple[Tensor, Tensor]:
 # ============================================================
 # SECTION 2: Linear model from scratch
 # ============================================================
+
 
 def init_coeffs(n_coeff: int) -> Tensor:
     """Random coefficients centered on zero, tracking gradients."""
@@ -105,8 +115,9 @@ def one_epoch(coeffs: Tensor, indeps: Tensor, deps: Tensor, lr: float) -> float:
     return float(loss)
 
 
-def train_linear(indeps: Tensor, deps: Tensor,
-                 epochs: int = 30, lr: float = 2.0) -> Tensor:
+def train_linear(
+    indeps: Tensor, deps: Tensor, epochs: int = 30, lr: float = 2.0
+) -> Tensor:
     """Train the linear model and return the fitted coefficients."""
     coeffs = init_coeffs(indeps.shape[1])
     for _ in range(epochs):
@@ -123,6 +134,7 @@ def accuracy(coeffs: Tensor, indeps: Tensor, deps: Tensor) -> float:
 # ============================================================
 # SECTION 3: Turn it into a neural net (hidden layer + ReLU)
 # ============================================================
+
 
 def init_nn(n_coeff: int, n_hidden: int = 20) -> list[Tensor]:
     """Two weight matrices + a constant, all tracking gradients."""
@@ -146,8 +158,9 @@ def nn_loss(coeffs: list[Tensor], indeps: Tensor, deps: Tensor) -> Tensor:
     return torch.abs(nn_preds(coeffs, indeps) - deps).mean()
 
 
-def train_nn(indeps: Tensor, deps: Tensor,
-             epochs: int = 30, lr: float = 1.5) -> list[Tensor]:
+def train_nn(
+    indeps: Tensor, deps: Tensor, epochs: int = 30, lr: float = 1.5
+) -> list[Tensor]:
     """Same loop shape as the linear model, applied to a neural net."""
     coeffs = init_nn(indeps.shape[1])
     for _ in range(epochs):
@@ -163,6 +176,7 @@ def train_nn(indeps: Tensor, deps: Tensor,
 # ============================================================
 # SECTION 4: Run everything
 # ============================================================
+
 
 def main() -> None:
     indeps, deps = prep_data(make_dataframe())

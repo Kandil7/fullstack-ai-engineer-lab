@@ -43,9 +43,11 @@ import re
 # SECTION 1: Container Security
 # =============================================================
 
+
 @dataclass
 class ContainerImage:
     """Represents a container image with security metadata."""
+
     name: str
     tag: str
     registry: str
@@ -90,30 +92,36 @@ class ContainerSecurityScanner:
 
         # 1. Check registry
         if self._allowed_registries and image.registry not in self._allowed_registries:
-            findings.append({
-                "severity": "critical",
-                "category": "registry",
-                "message": f"Image from unapproved registry: {image.registry}",
-            })
+            findings.append(
+                {
+                    "severity": "critical",
+                    "category": "registry",
+                    "message": f"Image from unapproved registry: {image.registry}",
+                }
+            )
             risk_score += 30
 
         # 2. Check for 'latest' tag
         if image.tag == "latest":
-            findings.append({
-                "severity": "high",
-                "category": "tag",
-                "message": "Using 'latest' tag is unpredictable and insecure",
-            })
+            findings.append(
+                {
+                    "severity": "high",
+                    "category": "tag",
+                    "message": "Using 'latest' tag is unpredictable and insecure",
+                }
+            )
             risk_score += 20
 
         # 3. Check image age
         age_days = (time.time() - image.created_at) / 86400
         if age_days > 90:
-            findings.append({
-                "severity": "medium",
-                "category": "age",
-                "message": f"Image is {int(age_days)} days old (may have unpatched vulnerabilities)",
-            })
+            findings.append(
+                {
+                    "severity": "medium",
+                    "category": "age",
+                    "message": f"Image is {int(age_days)} days old (may have unpatched vulnerabilities)",
+                }
+            )
             risk_score += 15
 
         # 4. Check layers for secrets
@@ -126,12 +134,14 @@ class ContainerSecurityScanner:
             ]
             for pattern in secret_patterns:
                 if re.search(pattern, layer_str):
-                    findings.append({
-                        "severity": "critical",
-                        "category": "secrets",
-                        "message": f"Potential secret found in layer {i}",
-                        "layer_index": i,
-                    })
+                    findings.append(
+                        {
+                            "severity": "critical",
+                            "category": "secrets",
+                            "message": f"Potential secret found in layer {i}",
+                            "layer_index": i,
+                        }
+                    )
                     risk_score += 40
                     break
 
@@ -141,20 +151,24 @@ class ContainerSecurityScanner:
             if layer.get("command", "").startswith("USER "):
                 has_user_instruction = True
                 if "root" in layer.get("command", ""):
-                    findings.append({
-                        "severity": "high",
-                        "category": "privilege",
-                        "message": "Container runs as root",
-                    })
+                    findings.append(
+                        {
+                            "severity": "high",
+                            "category": "privilege",
+                            "message": "Container runs as root",
+                        }
+                    )
                     risk_score += 25
                 break
 
         if not has_user_instruction:
-            findings.append({
-                "severity": "high",
-                "category": "privilege",
-                "message": "No USER instruction found (default is root)",
-            })
+            findings.append(
+                {
+                    "severity": "high",
+                    "category": "privilege",
+                    "message": "No USER instruction found (default is root)",
+                }
+            )
             risk_score += 25
 
         # 6. Check for blocked packages
@@ -162,24 +176,27 @@ class ContainerSecurityScanner:
             cmd = layer.get("command", "")
             for package in self._blocked_packages:
                 if package in cmd:
-                    findings.append({
-                        "severity": "high",
-                        "category": "packages",
-                        "message": f"Blocked package found: {package}",
-                    })
+                    findings.append(
+                        {
+                            "severity": "high",
+                            "category": "packages",
+                            "message": f"Blocked package found: {package}",
+                        }
+                    )
                     risk_score += 20
 
         # 7. Check for health check
         has_healthcheck = any(
-            "HEALTHCHECK" in layer.get("command", "")
-            for layer in image.layers
+            "HEALTHCHECK" in layer.get("command", "") for layer in image.layers
         )
         if not has_healthcheck:
-            findings.append({
-                "severity": "low",
-                "category": "reliability",
-                "message": "No HEALTHCHECK instruction found",
-            })
+            findings.append(
+                {
+                    "severity": "low",
+                    "category": "reliability",
+                    "message": "No HEALTHCHECK instruction found",
+                }
+            )
             risk_score += 5
 
         risk_score = min(100, risk_score)
@@ -272,20 +289,25 @@ class ContainerRuntimeSecurity:
 
         return True
 
-    def _log_event(self, container_id: str, action: Dict, result: str, policy: Optional[Dict]):
+    def _log_event(
+        self, container_id: str, action: Dict, result: str, policy: Optional[Dict]
+    ):
         """Log security event."""
-        self._events.append({
-            "timestamp": time.time(),
-            "container_id": container_id,
-            "action": action,
-            "result": result,
-            "policy": policy.get("name") if policy else None,
-        })
+        self._events.append(
+            {
+                "timestamp": time.time(),
+                "container_id": container_id,
+                "action": action,
+                "result": result,
+                "policy": policy.get("name") if policy else None,
+            }
+        )
 
 
 # =============================================================
 # SECTION 2: Secret Management
 # =============================================================
+
 
 class SecretManager:
     """
@@ -342,11 +364,13 @@ class SecretManager:
         }
 
         # Store version history
-        self._secrets[name]["versions"].append({
-            "version": version,
-            "encrypted": encrypted,
-            "created_at": time.time(),
-        })
+        self._secrets[name]["versions"].append(
+            {
+                "version": version,
+                "encrypted": encrypted,
+                "created_at": time.time(),
+            }
+        )
 
         self._log_access(name, "store", "system")
         return {"secret_id": name, "version": version}
@@ -420,12 +444,14 @@ class SecretManager:
 
     def _log_access(self, secret_name: str, action: str, user_id: str):
         """Log secret access."""
-        self._access_log.append({
-            "timestamp": time.time(),
-            "secret_name": secret_name,
-            "action": action,
-            "user_id": user_id,
-        })
+        self._access_log.append(
+            {
+                "timestamp": time.time(),
+                "secret_name": secret_name,
+                "action": action,
+                "user_id": user_id,
+            }
+        )
 
     def get_audit_log(self, secret_name: Optional[str] = None) -> List[Dict]:
         """Get audit log for secret access."""
@@ -451,16 +477,18 @@ class SecretManager:
 # SECTION 3: Network Security
 # =============================================================
 
+
 @dataclass
 class FirewallRule:
     """Represents a firewall rule."""
+
     name: str
     direction: str  # inbound, outbound
-    protocol: str    # tcp, udp, icmp
-    source: str      # IP/CIDR or *
-    destination: str # IP/CIDR or *
-    port: str        # port or range
-    action: str      # allow, deny
+    protocol: str  # tcp, udp, icmp
+    source: str  # IP/CIDR or *
+    destination: str  # IP/CIDR or *
+    port: str  # port or range
+    action: str  # allow, deny
     priority: int = 100
     enabled: bool = True
     logging: bool = False
@@ -500,9 +528,13 @@ class NetworkSecurityManager:
                 continue
 
             if rule.direction == "inbound":
-                if self._ip_matches(source_ip, rule.source) and self._ip_matches(dest_ip, rule.destination):
+                if self._ip_matches(source_ip, rule.source) and self._ip_matches(
+                    dest_ip, rule.destination
+                ):
                     if self._port_matches(dest_port, rule.port):
-                        self._log_connection(source_ip, dest_ip, dest_port, rule.action, rule.name)
+                        self._log_connection(
+                            source_ip, dest_ip, dest_port, rule.action, rule.name
+                        )
                         return {
                             "allowed": rule.action == "allow",
                             "rule": rule.name,
@@ -510,9 +542,13 @@ class NetworkSecurityManager:
                         }
 
             elif rule.direction == "outbound":
-                if self._ip_matches(source_ip, rule.source) and self._ip_matches(dest_ip, rule.destination):
+                if self._ip_matches(source_ip, rule.source) and self._ip_matches(
+                    dest_ip, rule.destination
+                ):
                     if self._port_matches(dest_port, rule.port):
-                        self._log_connection(source_ip, dest_ip, dest_port, rule.action, rule.name)
+                        self._log_connection(
+                            source_ip, dest_ip, dest_port, rule.action, rule.name
+                        )
                         return {
                             "allowed": rule.action == "allow",
                             "rule": rule.name,
@@ -545,14 +581,16 @@ class NetworkSecurityManager:
 
     def _log_connection(self, src: str, dst: str, port: int, action: str, rule: str):
         """Log connection attempt."""
-        self._connection_log.append({
-            "timestamp": time.time(),
-            "source": src,
-            "destination": dst,
-            "port": port,
-            "action": action,
-            "rule": rule,
-        })
+        self._connection_log.append(
+            {
+                "timestamp": time.time(),
+                "source": src,
+                "destination": dst,
+                "port": port,
+                "action": action,
+                "rule": rule,
+            }
+        )
 
     def create_network_segment(
         self,
@@ -599,6 +637,7 @@ class NetworkSecurityManager:
 # =============================================================
 # SECTION 4: Database Encryption
 # =============================================================
+
 
 class DatabaseEncryptionManager:
     """
@@ -659,7 +698,9 @@ class DatabaseEncryptionManager:
         for col in columns_to_encrypt:
             if col in encrypted_row:
                 column_id = f"{table}.{col}"
-                encrypted_row[col] = self.encrypt_value(column_id, str(encrypted_row[col]))
+                encrypted_row[col] = self.encrypt_value(
+                    column_id, str(encrypted_row[col])
+                )
                 encrypted_row[f"{col}_encrypted"] = True
         return encrypted_row
 
@@ -691,9 +732,11 @@ class DatabaseEncryptionManager:
 # SECTION 5: Backup Security
 # =============================================================
 
+
 @dataclass
 class BackupJob:
     """Represents a backup job."""
+
     job_id: str
     name: str
     source: str
@@ -818,6 +861,7 @@ class BackupSecurityManager:
 # SECTION 6: Disaster Recovery
 # =============================================================
 
+
 class DisasterRecoveryManager:
     """
     Disaster recovery planning and execution.
@@ -856,14 +900,16 @@ class DisasterRecoveryManager:
         """Generate recovery steps for components."""
         steps = []
         for i, component in enumerate(components):
-            steps.append({
-                "step": i + 1,
-                "component": component,
-                "action": f"Restore {component} from latest backup",
-                "estimated_time": 30,  # minutes
-                "dependencies": [],
-                "verification": f"Verify {component} health check passes",
-            })
+            steps.append(
+                {
+                    "step": i + 1,
+                    "component": component,
+                    "action": f"Restore {component} from latest backup",
+                    "estimated_time": 30,  # minutes
+                    "dependencies": [],
+                    "verification": f"Verify {component} health check passes",
+                }
+            )
         return steps
 
     def declare_incident(
@@ -887,7 +933,9 @@ class DisasterRecoveryManager:
         self._incidents.append(incident)
         return incident
 
-    def update_incident(self, incident_id: str, update: str, status: Optional[str] = None):
+    def update_incident(
+        self, incident_id: str, update: str, status: Optional[str] = None
+    ):
         """Update an incident."""
         incident = next(
             (i for i in self._incidents if i["incident_id"] == incident_id),
@@ -939,18 +987,13 @@ class DisasterRecoveryManager:
         return {
             "total_plans": len(self._recovery_plans),
             "active_plans": sum(
-                1 for p in self._recovery_plans.values()
-                if p["status"] == "active"
+                1 for p in self._recovery_plans.values() if p["status"] == "active"
             ),
-            "open_incidents": sum(
-                1 for i in self._incidents
-                if i["status"] == "open"
-            ),
+            "open_incidents": sum(1 for i in self._incidents if i["status"] == "open"),
             "total_tests": len(self._recovery_tests),
             "recent_tests": self._recovery_tests[-5:] if self._recovery_tests else [],
             "plans_needing_test": [
-                p["name"] for p in self._recovery_plans.values()
-                if not p["last_tested"]
+                p["name"] for p in self._recovery_plans.values() if not p["last_tested"]
             ],
         }
 
@@ -958,6 +1001,7 @@ class DisasterRecoveryManager:
 # =============================================================
 # SECTION 7: Infrastructure Audit
 # =============================================================
+
 
 class InfrastructureAuditor:
     """
@@ -1090,6 +1134,7 @@ class InfrastructureAuditor:
 # DEMONSTRATIONS
 # =============================================================
 
+
 def demo_container_security():
     """Demonstrate container security scanning."""
     print("\n" + "=" * 60)
@@ -1158,7 +1203,9 @@ def demo_secret_management():
 
     # Rotate secret
     rotation = sm.rotate_secret("db/password", "new_password_456")
-    print(f"Rotated db/password: v{rotation['old_version']} -> v{rotation['new_version']}")
+    print(
+        f"Rotated db/password: v{rotation['old_version']} -> v{rotation['new_version']}"
+    )
 
     # Check audit log
     audit = sm.get_audit_log()
@@ -1178,38 +1225,44 @@ def demo_network_security():
     nsm = NetworkSecurityManager()
 
     # Add rules
-    nsm.add_rule(FirewallRule(
-        name="Allow HTTPS",
-        direction="inbound",
-        protocol="tcp",
-        source="*",
-        destination="*",
-        port="443",
-        action="allow",
-        priority=10,
-    ))
+    nsm.add_rule(
+        FirewallRule(
+            name="Allow HTTPS",
+            direction="inbound",
+            protocol="tcp",
+            source="*",
+            destination="*",
+            port="443",
+            action="allow",
+            priority=10,
+        )
+    )
 
-    nsm.add_rule(FirewallRule(
-        name="Allow SSH from VPN",
-        direction="inbound",
-        protocol="tcp",
-        source="10.0.0.0/8",
-        destination="*",
-        port="22",
-        action="allow",
-        priority=20,
-    ))
+    nsm.add_rule(
+        FirewallRule(
+            name="Allow SSH from VPN",
+            direction="inbound",
+            protocol="tcp",
+            source="10.0.0.0/8",
+            destination="*",
+            port="22",
+            action="allow",
+            priority=20,
+        )
+    )
 
-    nsm.add_rule(FirewallRule(
-        name="Block all other inbound",
-        direction="inbound",
-        protocol="any",
-        source="*",
-        destination="*",
-        port="*",
-        action="deny",
-        priority=100,
-    ))
+    nsm.add_rule(
+        FirewallRule(
+            name="Block all other inbound",
+            direction="inbound",
+            protocol="any",
+            source="*",
+            destination="*",
+            port="*",
+            action="deny",
+            priority=100,
+        )
+    )
 
     # Test connections
     tests = [
@@ -1439,4 +1492,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n[FAIL] Error: {e}")
         import traceback
+
         traceback.print_exc()

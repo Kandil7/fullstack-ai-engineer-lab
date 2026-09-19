@@ -55,10 +55,10 @@ its type and propagates through operations without the float-cast surprise.
 ## 2. Detecting and Counting
 
 ```python
-df.isna()            # element-wise boolean frame
-df.isna().sum()      # per-column counts
-df.isna().mean()     # per-column fractions
-df[df["score"].isna()]   # rows with missing score
+df.isna()  # element-wise boolean frame
+df.isna().sum()  # per-column counts
+df.isna().mean()  # per-column fractions
+df[df["score"].isna()]  # rows with missing score
 ```
 
 `isna().mean()` is the decision input: 0.001 missing is noise (drop those
@@ -68,9 +68,9 @@ should be deleted or turned into a flag.
 ## 3. Dropping — `dropna`
 
 ```python
-df.dropna()                              # drop any row with ANY missing
-df.dropna(how="all")                     # drop rows where ALL missing
-df.dropna(subset=["score", "label"])     # require these columns complete
+df.dropna()  # drop any row with ANY missing
+df.dropna(how="all")  # drop rows where ALL missing
+df.dropna(subset=["score", "label"])  # require these columns complete
 df.dropna(axis=1, thresh=int(0.8 * len(df)))  # keep cols with >=80% data
 ```
 
@@ -80,10 +80,10 @@ data-quality gate at intake.
 ## 4. Filling — `fillna`
 
 ```python
-df["score"].fillna(0.0)                      # constant
-df["score"].fillna(df["score"].mean())       # mean imputation
-df["prev"].fillna(method="ffill")            # forward fill (ordered data)
-df["next"].fillna(method="bfill")            # backward fill
+df["score"].fillna(0.0)  # constant
+df["score"].fillna(df["score"].mean())  # mean imputation
+df["prev"].fillna(method="ffill")  # forward fill (ordered data)
+df["next"].fillna(method="bfill")  # backward fill
 df["score"].fillna(df.groupby("split")["score"].transform("mean"))  # per-group mean
 ```
 
@@ -94,9 +94,9 @@ sensor/price gaps.
 ## 5. Interpolation — `interpolate`
 
 ```python
-df["temp"].interpolate(method="linear")      # fill along the index
-df["temp"].interpolate(method="time")        # time-weighted
-df["temp"].interpolate(method="quadratic")   # curve-fitted
+df["temp"].interpolate(method="linear")  # fill along the index
+df["temp"].interpolate(method="time")  # time-weighted
+df["temp"].interpolate(method="quadratic")  # curve-fitted
 ```
 
 For ordered data (time series, sequences), interpolation is smarter than a
@@ -180,7 +180,7 @@ df["income"].fillna(0)
 
 ```python
 # WRONG — int column with NaN silently becomes float
-s = pd.Series([1, 2, None])    # dtype float64 — surprised?
+s = pd.Series([1, 2, None])  # dtype float64 — surprised?
 # CORRECT — use Int64 nullable dtype if you must keep integers
 s = pd.Series([1, 2, None], dtype="Int64")
 ```

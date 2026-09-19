@@ -28,9 +28,11 @@ from collections import deque
 # 1. FastAPI AI Service
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ServiceConfig:
     """Configuration for the AI service."""
+
     model_name: str = "gpt-4o-mini"
     max_tokens: int = 1024
     temperature: float = 0.7
@@ -52,6 +54,7 @@ class ServiceConfig:
 @dataclass
 class ServiceMetrics:
     """Track service metrics."""
+
     total_requests: int = 0
     successful_requests: int = 0
     failed_requests: int = 0
@@ -114,6 +117,7 @@ class AIService:
     async def generate(self, prompt: str, **kwargs) -> dict[str, Any]:
         """Generate a response with caching and metrics."""
         import hashlib
+
         start_time = time.time()
 
         # Check cache
@@ -296,6 +300,7 @@ volumes:
   redis_data:
 """
 
+
 def generate_docker_files():
     """Generate Docker configuration files."""
     print("\n" + "=" * 60)
@@ -318,6 +323,7 @@ def generate_docker_files():
 # ---------------------------------------------------------------------------
 # 3. Health Checks
 # ---------------------------------------------------------------------------
+
 
 class HealthChecker:
     """Comprehensive health checking for AI services."""
@@ -378,22 +384,26 @@ async def check_model_availability() -> dict:
     # Simulate model availability check
     return {"model": "gpt-4o-mini", "status": "available"}
 
+
 async def check_database_connection() -> dict:
     """Check database connectivity."""
     # Simulate database check
     return {"database": "connected", "latency_ms": 5.0}
+
 
 async def check_cache_availability() -> dict:
     """Check cache availability."""
     # Simulate cache check
     return {"cache": "connected", "keys": 150}
 
+
 async def check_disk_space() -> dict:
     """Check available disk space."""
     import shutil
+
     usage = shutil.disk_usage("/")
-    free_gb = usage.free / (1024 ** 3)
-    return {"free_gb": round(free_gb, 2), "total_gb": round(usage.total / (1024 ** 3), 2)}
+    free_gb = usage.free / (1024**3)
+    return {"free_gb": round(free_gb, 2), "total_gb": round(usage.total / (1024**3), 2)}
 
 
 def demo_health_checks():
@@ -462,6 +472,7 @@ API_KEY_HEADER=X-API-Key
 DATABASE_URL=postgresql://user:pass@localhost:5432/ai_service
 REDIS_URL=redis://localhost:6379/0
 """
+
 
 class ConfigManager:
     """Manage environment configuration with validation."""
@@ -553,6 +564,7 @@ def demo_environment_config():
 # 5. Basic Monitoring
 # ---------------------------------------------------------------------------
 
+
 class MetricsCollector:
     """Collect and expose metrics for monitoring."""
 
@@ -617,10 +629,18 @@ class MetricsCollector:
             lines.append(f"# TYPE {name} histogram")
             lines.append(f"{name}_count {stats['count']}")
             lines.append(f"{name}_sum {sum(values)}")
-            lines.append(f"{name}_bucket{{le=\"0.1\"}} {sum(1 for v in values if v <= 0.1)}")
-            lines.append(f"{name}_bucket{{le=\"0.5\"}} {sum(1 for v in values if v <= 0.5)}")
-            lines.append(f"{name}_bucket{{le=\"1.0\"}} {sum(1 for v in values if v <= 1.0)}")
-            lines.append(f"{name}_bucket{{le=\"5.0\"}} {sum(1 for v in values if v <= 5.0)}")
+            lines.append(
+                f'{name}_bucket{{le="0.1"}} {sum(1 for v in values if v <= 0.1)}'
+            )
+            lines.append(
+                f'{name}_bucket{{le="0.5"}} {sum(1 for v in values if v <= 0.5)}'
+            )
+            lines.append(
+                f'{name}_bucket{{le="1.0"}} {sum(1 for v in values if v <= 1.0)}'
+            )
+            lines.append(
+                f'{name}_bucket{{le="5.0"}} {sum(1 for v in values if v <= 5.0)}'
+            )
 
         return "\n".join(lines)
 
@@ -632,8 +652,7 @@ class MetricsCollector:
             "counters": dict(self.counters),
             "gauges": dict(self.gauges),
             "histograms": {
-                name: self.get_histogram_stats(name)
-                for name in self.histograms
+                name: self.get_histogram_stats(name) for name in self.histograms
             },
         }
 

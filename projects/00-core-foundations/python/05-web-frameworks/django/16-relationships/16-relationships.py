@@ -21,6 +21,7 @@ from django.contrib.auth.models import User
 
 class Author(models.Model):
     """Author model (the 'one' side)."""
+
     name = models.CharField(max_length=100)
     bio = models.TextField(blank=True)
 
@@ -30,20 +31,22 @@ class Author(models.Model):
 
 class Post(models.Model):
     """Post model (the 'many' side)."""
+
     title = models.CharField(max_length=200)
     content = models.TextField()
 
     # ForeignKey: Many Posts → One Author
     author = models.ForeignKey(
         Author,
-        on_delete=models.CASCADE,       # Delete posts when author is deleted
-        related_name='posts',           # author.posts.all()
-        related_query_name='post',      # Author.objects.filter(post__title='...')
-        db_index=True,                  # Index for faster lookups
+        on_delete=models.CASCADE,  # Delete posts when author is deleted
+        related_name="posts",  # author.posts.all()
+        related_query_name="post",  # Author.objects.filter(post__title='...')
+        db_index=True,  # Index for faster lookups
     )
 
     def __str__(self):
         return self.title
+
 
 # on_delete options:
 # CASCADE        → Delete all related objects
@@ -65,21 +68,24 @@ class Post(models.Model):
 # One record in Table A is linked to exactly one record in Table B.
 # Example: One User → One Profile
 
+
 class Profile(models.Model):
     """User profile (extended user info)."""
+
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        related_name='profile',
-        primary_key=False,              # Don't make it the primary key
+        related_name="profile",
+        primary_key=False,  # Don't make it the primary key
     )
     bio = models.TextField(max_length=500, blank=True)
-    avatar = models.ImageField(upload_to='avatars/', blank=True)
+    avatar = models.ImageField(upload_to="avatars/", blank=True)
     birth_date = models.DateField(null=True, blank=True)
     website = models.URLField(blank=True)
 
     def __str__(self):
-        return f'Profile of {self.user.username}'
+        return f"Profile of {self.user.username}"
+
 
 # Usage:
 # user = User.objects.get(pk=1)
@@ -105,8 +111,10 @@ class Profile(models.Model):
 # Records in both tables can be linked to multiple records in the other.
 # Example: Many Posts ↔ Many Tags
 
+
 class Tag(models.Model):
     """Tag model."""
+
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=50, unique=True)
 
@@ -116,6 +124,7 @@ class Tag(models.Model):
 
 class Article(models.Model):
     """Article with many-to-many relationship to Tag."""
+
     title = models.CharField(max_length=200)
     content = models.TextField()
 
@@ -123,14 +132,15 @@ class Article(models.Model):
     tags = models.ManyToManyField(
         Tag,
         blank=True,
-        related_name='articles',
-        related_query_name='article',
+        related_name="articles",
+        related_query_name="article",
         # through='ArticleTag',         # Custom through model
         # through_fields=('article', 'tag'),  # Specify FK fields
     )
 
     def __str__(self):
         return self.title
+
 
 # Usage:
 # article = Article.objects.get(pk=1)
@@ -158,19 +168,22 @@ class Article(models.Model):
 # ---------------------------------------------------------------------------
 # For extra data on the relationship, use a through model.
 
+
 class ArticleTag(models.Model):
     """Custom through model for Article-Tag relationship."""
+
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     class Meta:
-        unique_together = ('article', 'tag')  # Prevent duplicates
-        ordering = ['-created_at']
+        unique_together = ("article", "tag")  # Prevent duplicates
+        ordering = ["-created_at"]
 
     def __str__(self):
-        return f'{self.article} - {self.tag}'
+        return f"{self.article} - {self.tag}"
+
 
 # Update Article model:
 # class Article(models.Model):
@@ -264,15 +277,17 @@ class ArticleTag(models.Model):
 # ---------------------------------------------------------------------------
 # A model can relate to itself (e.g., tree structures).
 
+
 class Category(models.Model):
     """Category with parent-child hierarchy."""
+
     name = models.CharField(max_length=100)
     parent = models.ForeignKey(
-        'self',
+        "self",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name='children',
+        related_name="children",
     )
 
     def __str__(self):
@@ -291,6 +306,7 @@ class Category(models.Model):
             depth += 1
             current = current.parent
         return depth
+
 
 # Usage:
 # root = Category.objects.create(name='Technology')

@@ -46,6 +46,7 @@ import base64
 # SECTION 1: Security Logging
 # =============================================================
 
+
 class LogLevel(Enum):
     DEBUG = 10
     INFO = 20
@@ -74,6 +75,7 @@ class SecurityEventType(Enum):
 @dataclass
 class SecurityEvent:
     """Structured security event."""
+
     event_id: str
     event_type: SecurityEventType
     timestamp: float
@@ -152,9 +154,7 @@ class SecurityLogger:
 
         # Create chain hash for tamper evidence
         event_data = json.dumps(event.to_dict(), sort_keys=True)
-        chain_hash = hashlib.sha256(
-            (self._prev_hash + event_data).encode()
-        ).hexdigest()
+        chain_hash = hashlib.sha256((self._prev_hash + event_data).encode()).hexdigest()
         self._log_chain.append(chain_hash)
         self._prev_hash = chain_hash
 
@@ -227,6 +227,7 @@ class SecurityLogger:
 # SECTION 2: Intrusion Detection System
 # =============================================================
 
+
 class IntrusionDetectionSystem:
     """
     Rule-based intrusion detection for AI systems.
@@ -248,37 +249,45 @@ class IntrusionDetectionSystem:
 
     def _setup_default_rules(self):
         """Setup default detection rules."""
-        self.add_rule({
-            "name": "brute_force_detection",
-            "description": "Detect brute force login attempts",
-            "condition": lambda events: self._check_brute_force(events),
-            "severity": "high",
-            "action": "block_ip",
-        })
+        self.add_rule(
+            {
+                "name": "brute_force_detection",
+                "description": "Detect brute force login attempts",
+                "condition": lambda events: self._check_brute_force(events),
+                "severity": "high",
+                "action": "block_ip",
+            }
+        )
 
-        self.add_rule({
-            "name": "port_scan_detection",
-            "description": "Detect port scanning activity",
-            "condition": lambda events: self._check_port_scan(events),
-            "severity": "medium",
-            "action": "alert",
-        })
+        self.add_rule(
+            {
+                "name": "port_scan_detection",
+                "description": "Detect port scanning activity",
+                "condition": lambda events: self._check_port_scan(events),
+                "severity": "medium",
+                "action": "alert",
+            }
+        )
 
-        self.add_rule({
-            "name": "data_exfiltration",
-            "description": "Detect potential data exfiltration",
-            "condition": lambda events: self._check_exfiltration(events),
-            "severity": "critical",
-            "action": "block_and_alert",
-        })
+        self.add_rule(
+            {
+                "name": "data_exfiltration",
+                "description": "Detect potential data exfiltration",
+                "condition": lambda events: self._check_exfiltration(events),
+                "severity": "critical",
+                "action": "block_and_alert",
+            }
+        )
 
-        self.add_rule({
-            "name": "api_abuse",
-            "description": "Detect API abuse patterns",
-            "condition": lambda events: self._check_api_abuse(events),
-            "severity": "high",
-            "action": "rate_limit",
-        })
+        self.add_rule(
+            {
+                "name": "api_abuse",
+                "description": "Detect API abuse patterns",
+                "condition": lambda events: self._check_api_abuse(events),
+                "severity": "high",
+                "action": "rate_limit",
+            }
+        )
 
     def add_rule(self, rule: Dict):
         """Add a detection rule."""
@@ -329,7 +338,8 @@ class IntrusionDetectionSystem:
     def _check_brute_force(self, events: List[Dict]) -> bool:
         """Check for brute force login pattern."""
         auth_failures = [
-            e for e in events
+            e
+            for e in events
             if e.get("event_type") == "auth.failure"
             and time.time() - e.get("timestamp", 0) < 300  # Last 5 minutes
         ]
@@ -348,7 +358,8 @@ class IntrusionDetectionSystem:
     def _check_exfiltration(self, events: List[Dict]) -> bool:
         """Check for data exfiltration pattern."""
         large_downloads = [
-            e for e in events
+            e
+            for e in events
             if e.get("event_type") == "data.download"
             and e.get("details", {}).get("size_bytes", 0) > 10 * 1024 * 1024  # 10MB
         ]
@@ -357,7 +368,8 @@ class IntrusionDetectionSystem:
     def _check_api_abuse(self, events: List[Dict]) -> bool:
         """Check for API abuse pattern."""
         api_calls = [
-            e for e in events
+            e
+            for e in events
             if e.get("event_type") == "api.call"
             and time.time() - e.get("timestamp", 0) < 60  # Last minute
         ]
@@ -378,6 +390,7 @@ class IntrusionDetectionSystem:
 # =============================================================
 # SECTION 3: Anomaly Detection
 # =============================================================
+
 
 class AnomalyDetector:
     """
@@ -454,10 +467,12 @@ class AnomalyDetector:
         }
 
         if is_anomaly:
-            self._anomalies.append({
-                **result,
-                "timestamp": time.time(),
-            })
+            self._anomalies.append(
+                {
+                    **result,
+                    "timestamp": time.time(),
+                }
+            )
 
         return result
 
@@ -483,7 +498,9 @@ class AnomalyDetector:
             recent_mean = statistics.mean(recent)
             historical_mean = statistics.mean(historical)
 
-            change_ratio = abs(recent_mean - historical_mean) / max(abs(historical_mean), 1e-10)
+            change_ratio = abs(recent_mean - historical_mean) / max(
+                abs(historical_mean), 1e-10
+            )
 
             if change_ratio > 0.5:  # 50% change
                 return {
@@ -526,6 +543,7 @@ class AnomalyDetector:
 # SECTION 4: Alert System
 # =============================================================
 
+
 class AlertSeverity(Enum):
     LOW = "low"
     MEDIUM = "medium"
@@ -544,6 +562,7 @@ class AlertStatus(Enum):
 @dataclass
 class Alert:
     """Security alert."""
+
     alert_id: str
     title: str
     description: str
@@ -653,7 +672,8 @@ class AlertManager:
 
         # Check time-based escalation
         open_alerts = [
-            a for a in self._alerts.values()
+            a
+            for a in self._alerts.values()
             if a.status == AlertStatus.OPEN
             and a.severity in (AlertSeverity.HIGH, AlertSeverity.CRITICAL)
         ]
@@ -702,6 +722,7 @@ class AlertManager:
 # SECTION 5: Incident Response
 # =============================================================
 
+
 class IncidentPhase(Enum):
     PREPARATION = "preparation"
     DETECTION = "detection"
@@ -714,6 +735,7 @@ class IncidentPhase(Enum):
 @dataclass
 class Incident:
     """Security incident."""
+
     incident_id: str
     title: str
     description: str
@@ -750,57 +772,84 @@ class IncidentResponseManager:
         self._playbooks["data_breach"] = {
             "name": "Data Breach Response",
             "phases": [
-                {"phase": "detection", "steps": [
-                    "Verify the breach",
-                    "Identify affected data",
-                    "Assess scope and impact",
-                ]},
-                {"phase": "containment", "steps": [
-                    "Isolate affected systems",
-                    "Preserve evidence",
-                    "Block attacker access",
-                ]},
-                {"phase": "eradication", "steps": [
-                    "Remove attacker presence",
-                    "Patch vulnerabilities",
-                    "Reset compromised credentials",
-                ]},
-                {"phase": "recovery", "steps": [
-                    "Restore from clean backups",
-                    "Verify system integrity",
-                    "Monitor for reinfection",
-                ]},
-                {"phase": "lessons_learned", "steps": [
-                    "Document findings",
-                    "Update procedures",
-                    "Conduct post-mortem",
-                ]},
+                {
+                    "phase": "detection",
+                    "steps": [
+                        "Verify the breach",
+                        "Identify affected data",
+                        "Assess scope and impact",
+                    ],
+                },
+                {
+                    "phase": "containment",
+                    "steps": [
+                        "Isolate affected systems",
+                        "Preserve evidence",
+                        "Block attacker access",
+                    ],
+                },
+                {
+                    "phase": "eradication",
+                    "steps": [
+                        "Remove attacker presence",
+                        "Patch vulnerabilities",
+                        "Reset compromised credentials",
+                    ],
+                },
+                {
+                    "phase": "recovery",
+                    "steps": [
+                        "Restore from clean backups",
+                        "Verify system integrity",
+                        "Monitor for reinfection",
+                    ],
+                },
+                {
+                    "phase": "lessons_learned",
+                    "steps": [
+                        "Document findings",
+                        "Update procedures",
+                        "Conduct post-mortem",
+                    ],
+                },
             ],
         }
 
         self._playbooks["model_theft"] = {
             "name": "Model Theft Response",
             "phases": [
-                {"phase": "detection", "steps": [
-                    "Verify unauthorized model access",
-                    "Identify exfiltration method",
-                    "Assess model sensitivity",
-                ]},
-                {"phase": "containment", "steps": [
-                    "Revoke compromised credentials",
-                    "Block extraction endpoints",
-                    "Enable enhanced logging",
-                ]},
-                {"phase": "eradication", "steps": [
-                    "Rotate all API keys",
-                    "Update access controls",
-                    "Patch extraction vectors",
-                ]},
-                {"phase": "recovery", "steps": [
-                    "Redeploy with new credentials",
-                    "Verify model integrity",
-                    "Implement additional protections",
-                ]},
+                {
+                    "phase": "detection",
+                    "steps": [
+                        "Verify unauthorized model access",
+                        "Identify exfiltration method",
+                        "Assess model sensitivity",
+                    ],
+                },
+                {
+                    "phase": "containment",
+                    "steps": [
+                        "Revoke compromised credentials",
+                        "Block extraction endpoints",
+                        "Enable enhanced logging",
+                    ],
+                },
+                {
+                    "phase": "eradication",
+                    "steps": [
+                        "Rotate all API keys",
+                        "Update access controls",
+                        "Patch extraction vectors",
+                    ],
+                },
+                {
+                    "phase": "recovery",
+                    "steps": [
+                        "Redeploy with new credentials",
+                        "Verify model integrity",
+                        "Implement additional protections",
+                    ],
+                },
             ],
         }
 
@@ -823,7 +872,11 @@ class IncidentResponseManager:
             status="open",
             affected_systems=affected_systems,
             timeline=[
-                {"time": time.time(), "event": "Incident declared", "phase": "detection"},
+                {
+                    "time": time.time(),
+                    "event": "Incident declared",
+                    "phase": "detection",
+                },
             ],
         )
 
@@ -845,27 +898,33 @@ class IncidentResponseManager:
 
         if phase:
             incident.phase = phase
-            incident.timeline.append({
-                "time": time.time(),
-                "event": f"Phase transition to {phase.value}",
-                "phase": phase.value,
-            })
+            incident.timeline.append(
+                {
+                    "time": time.time(),
+                    "event": f"Phase transition to {phase.value}",
+                    "phase": phase.value,
+                }
+            )
 
         if status:
             incident.status = status
 
         if resolution:
             incident.resolution = resolution
-            incident.timeline.append({
-                "time": time.time(),
-                "event": f"Resolution: {resolution}",
-            })
+            incident.timeline.append(
+                {
+                    "time": time.time(),
+                    "event": f"Resolution: {resolution}",
+                }
+            )
 
         if event:
-            incident.timeline.append({
-                "time": time.time(),
-                "event": event,
-            })
+            incident.timeline.append(
+                {
+                    "time": time.time(),
+                    "event": event,
+                }
+            )
 
         return incident
 
@@ -882,10 +941,7 @@ class IncidentResponseManager:
 
     def get_open_incidents(self) -> List[Incident]:
         """Get all open incidents."""
-        return [
-            i for i in self._incidents.values()
-            if i.status == "open"
-        ]
+        return [i for i in self._incidents.values() if i.status == "open"]
 
     def generate_incident_report(self, incident_id: str) -> Optional[Dict]:
         """Generate an incident report."""
@@ -913,6 +969,7 @@ class IncidentResponseManager:
 # SECTION 6: Compliance Auditing
 # =============================================================
 
+
 class ComplianceFramework(Enum):
     SOC2 = "soc2"
     GDPR = "gdpr"
@@ -924,6 +981,7 @@ class ComplianceFramework(Enum):
 @dataclass
 class ComplianceControl:
     """A compliance control."""
+
     control_id: str
     framework: ComplianceFramework
     title: str
@@ -935,6 +993,7 @@ class ComplianceControl:
 @dataclass
 class ComplianceAssessment:
     """Assessment result for a control."""
+
     control_id: str
     status: str  # compliant, non_compliant, partial, not_applicable
     evidence: List[str]
@@ -1085,19 +1144,19 @@ class ComplianceAuditor:
                 elif status == "partial":
                     results["partial"] += 1
 
-            results["control_details"].append({
-                "control_id": control.control_id,
-                "title": control.title,
-                "framework": control.framework.value,
-                "status": status,
-            })
+            results["control_details"].append(
+                {
+                    "control_id": control.control_id,
+                    "title": control.title,
+                    "framework": control.framework.value,
+                    "status": status,
+                }
+            )
 
         # Calculate compliance score
         assessed = results["total_controls"] - results["not_assessed"]
         if assessed > 0:
-            results["compliance_score"] = (
-                (results["compliant"] / assessed) * 100
-            )
+            results["compliance_score"] = (results["compliant"] / assessed) * 100
 
         return results
 
@@ -1109,35 +1168,40 @@ class ComplianceAuditor:
         for control in controls:
             assessments = self._assessments.get(control.control_id, [])
             if not assessments:
-                gaps.append({
-                    "control_id": control.control_id,
-                    "title": control.title,
-                    "gap_type": "not_assessed",
-                    "recommendation": f"Conduct assessment for {control.title}",
-                })
+                gaps.append(
+                    {
+                        "control_id": control.control_id,
+                        "title": control.title,
+                        "gap_type": "not_assessed",
+                        "recommendation": f"Conduct assessment for {control.title}",
+                    }
+                )
             elif assessments[-1].status == "non_compliant":
-                gaps.append({
-                    "control_id": control.control_id,
-                    "title": control.title,
-                    "gap_type": "non_compliant",
-                    "findings": assessments[-1].findings,
-                    "recommendation": f"Remediate: {control.title}",
-                })
+                gaps.append(
+                    {
+                        "control_id": control.control_id,
+                        "title": control.title,
+                        "gap_type": "non_compliant",
+                        "findings": assessments[-1].findings,
+                        "recommendation": f"Remediate: {control.title}",
+                    }
+                )
 
         return {
             "framework": framework.value,
             "total_controls": len(controls),
             "gaps_found": len(gaps),
             "gaps": gaps,
-            "compliance_score": (
-                (len(controls) - len(gaps)) / len(controls) * 100
-            ) if controls else 0,
+            "compliance_score": ((len(controls) - len(gaps)) / len(controls) * 100)
+            if controls
+            else 0,
         }
 
 
 # =============================================================
 # DEMONSTRATIONS
 # =============================================================
+
 
 def demo_security_logging():
     """Demonstrate security logging."""
@@ -1234,7 +1298,7 @@ def demo_intrusion_detection():
             "details": {"user": "legitimate_user"},
         }
         alerts = ids.analyze_event(event)
-        print(f"  Event {i+1}: {len(alerts)} alerts")
+        print(f"  Event {i + 1}: {len(alerts)} alerts")
 
     # Check blocked IPs
     blocked = ids.get_blocked_ips()
@@ -1285,15 +1349,19 @@ def demo_anomaly_detection():
     # Sudden spike
     spike_result = detector.detect_time_series_anomaly("requests_per_second", 500)
     print(f"  Spike detected: {spike_result['is_anomaly']}")
-    if spike_result['is_anomaly']:
+    if spike_result["is_anomaly"]:
         print(f"  Type: {spike_result.get('type')}")
-        print(f"  Change ratio: {spike_result.get('change_ratio', spike_result.get('z_score'))}")
+        print(
+            f"  Change ratio: {spike_result.get('change_ratio', spike_result.get('z_score'))}"
+        )
 
     # Baseline summary
     summary = detector.get_baseline_summary()
     print(f"\nBaseline summary:")
     for metric, stats in summary.items():
-        print(f"  {metric}: mean={stats['mean']}, std={stats['std']}, samples={stats['count']}")
+        print(
+            f"  {metric}: mean={stats['mean']}, std={stats['std']}, samples={stats['count']}"
+        )
 
     print("\n[OK] Anomaly detection demonstrated")
 
@@ -1403,7 +1471,7 @@ def demo_incident_response():
     timeline = irm.get_incident_timeline(incident.incident_id)
     print(f"\nIncident Timeline:")
     for entry in timeline:
-        phase = entry.get('phase', 'update')
+        phase = entry.get("phase", "update")
         print(f"  [{phase}] {entry['event']}")
 
     # Generate report
@@ -1540,4 +1608,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n[FAIL] Error: {e}")
         import traceback
+
         traceback.print_exc()

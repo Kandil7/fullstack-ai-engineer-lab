@@ -11,6 +11,7 @@ Run: python projects/05-ml-pipeline/main.py
 import numpy as np
 import pandas as pd
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
@@ -27,8 +28,15 @@ try:
     from sklearn.tree import DecisionTreeClassifier
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.svm import SVC
-    from sklearn.metrics import (accuracy_score, precision_score, recall_score,
-                                 f1_score, confusion_matrix, classification_report)
+    from sklearn.metrics import (
+        accuracy_score,
+        precision_score,
+        recall_score,
+        f1_score,
+        confusion_matrix,
+        classification_report,
+    )
+
     HAS_SKLEARN = True
 except ImportError:
     HAS_SKLEARN = False
@@ -48,8 +56,7 @@ def load_data() -> tuple:
 def create_synthetic_data() -> tuple:
     """Create a synthetic classification dataset with known properties."""
     X, y = make_classification(
-        n_samples=1000, n_features=10, n_informative=5,
-        n_redundant=2, n_classes=2, random_state=42
+        n_samples=1000, n_features=10, n_informative=5, n_redundant=2, n_classes=2, random_state=42
     )
     feature_names = [f"feature_{i}" for i in range(X.shape[1])]
     target_names = ["Class_0", "Class_1"]
@@ -85,13 +92,15 @@ def evaluate_models(models: dict, X_test, y_test, target_names: list) -> pd.Data
     results = []
     for name, model in models.items():
         y_pred = model.predict(X_test)
-        results.append({
-            "Model": name,
-            "Accuracy": round(accuracy_score(y_test, y_pred), 4),
-            "Precision": round(precision_score(y_test, y_pred, average="weighted"), 4),
-            "Recall": round(recall_score(y_test, y_pred, average="weighted"), 4),
-            "F1-Score": round(f1_score(y_test, y_pred, average="weighted"), 4),
-        })
+        results.append(
+            {
+                "Model": name,
+                "Accuracy": round(accuracy_score(y_test, y_pred), 4),
+                "Precision": round(precision_score(y_test, y_pred, average="weighted"), 4),
+                "Recall": round(recall_score(y_test, y_pred, average="weighted"), 4),
+                "F1-Score": round(f1_score(y_test, y_pred, average="weighted"), 4),
+            }
+        )
 
         # Cross-validation score
         cv_scores = cross_val_score(model, X_test, y_test, cv=5)

@@ -5,6 +5,7 @@ W3Schools: https://www.w3schools.com/python/pandas_dataframe_groupby.asp
 GroupBy splits data into groups, applies a function independently to each
 group, and combines the results. This is one of Pandas' most powerful features.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -13,13 +14,15 @@ import numpy as np
 # ---------------------------------------------------------------------------
 
 np.random.seed(42)
-df = pd.DataFrame({
-    "Department": np.random.choice(["Engineering", "Marketing", "Sales", "HR"], 50),
-    "Employee": [f"Emp_{i}" for i in range(1, 51)],
-    "Salary": np.random.randint(50000, 120000, 50),
-    "Years": np.random.randint(1, 15, 50),
-    "Performance": np.random.randint(60, 100, 50),
-})
+df = pd.DataFrame(
+    {
+        "Department": np.random.choice(["Engineering", "Marketing", "Sales", "HR"], 50),
+        "Employee": [f"Emp_{i}" for i in range(1, 51)],
+        "Salary": np.random.randint(50000, 120000, 50),
+        "Years": np.random.randint(1, 15, 50),
+        "Performance": np.random.randint(60, 100, 50),
+    }
+)
 
 print("Sample DataFrame (first 10 rows):")
 print(df.head(10))
@@ -47,13 +50,17 @@ print("=" * 60)
 print("Example 2: Multiple Aggregations with agg()")
 print("=" * 60)
 
-dept_stats = df.groupby("Department").agg(
-    count=("Employee", "size"),
-    avg_salary=("Salary", "mean"),
-    max_salary=("Salary", "max"),
-    avg_years=("Years", "mean"),
-    avg_performance=("Performance", "mean"),
-).round(0)
+dept_stats = (
+    df.groupby("Department")
+    .agg(
+        count=("Employee", "size"),
+        avg_salary=("Salary", "mean"),
+        max_salary=("Salary", "max"),
+        avg_years=("Years", "mean"),
+        avg_performance=("Performance", "mean"),
+    )
+    .round(0)
+)
 
 print("Department statistics:")
 print(dept_stats)
@@ -68,14 +75,16 @@ print("Example 3: GroupBy Multiple Columns")
 print("=" * 60)
 
 # Create a seniority column
-df["Seniority"] = df["Years"].apply(
-    lambda y: "Senior" if y >= 5 else "Junior"
-)
+df["Seniority"] = df["Years"].apply(lambda y: "Senior" if y >= 5 else "Junior")
 
-grouped = df.groupby(["Department", "Seniority"]).agg(
-    count=("Employee", "size"),
-    avg_salary=("Salary", "mean"),
-).round(0)
+grouped = (
+    df.groupby(["Department", "Seniority"])
+    .agg(
+        count=("Employee", "size"),
+        avg_salary=("Salary", "mean"),
+    )
+    .round(0)
+)
 
 print("By Department and Seniority:")
 print(grouped)
@@ -94,18 +103,24 @@ print("=" * 60)
 print("Example 4: Custom Aggregation Functions")
 print("=" * 60)
 
+
 def salary_range(s):
     """Calculate the range of salaries."""
     return s.max() - s.min()
 
-custom_stats = df.groupby("Department").agg(
-    count=("Salary", "size"),
-    mean=("Salary", "mean"),
-    median=("Salary", "median"),
-    std=("Salary", "std"),
-    salary_range=("Salary", salary_range),
-    pct_high_performer=("Performance", lambda x: (x >= 90).mean() * 100),
-).round(0)
+
+custom_stats = (
+    df.groupby("Department")
+    .agg(
+        count=("Salary", "size"),
+        mean=("Salary", "mean"),
+        median=("Salary", "median"),
+        std=("Salary", "std"),
+        salary_range=("Salary", salary_range),
+        pct_high_performer=("Performance", lambda x: (x >= 90).mean() * 100),
+    )
+    .round(0)
+)
 
 print("Custom aggregations by department:")
 print(custom_stats)

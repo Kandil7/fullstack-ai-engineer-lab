@@ -30,10 +30,12 @@ import threading
 condition = threading.Condition()
 items = []
 
+
 def producer():
     with condition:
         items.append("item")
         condition.notify()  # Wake up one waiting thread
+
 
 def consumer():
     with condition:
@@ -41,6 +43,7 @@ def consumer():
             condition.wait()  # Wait for notification
         item = items.pop()
         print(f"Consumed: {item}")
+
 
 t1 = threading.Thread(target=consumer)
 t2 = threading.Thread(target=producer)
@@ -68,10 +71,12 @@ t2.join()
 import threading
 import time
 
+
 def background_task():
     while True:
         print("Background...")
         time.sleep(0.1)
+
 
 # Daemon thread
 daemon = threading.Thread(target=background_task, daemon=True)
@@ -97,15 +102,18 @@ import time
 
 event = threading.Event()
 
+
 def waiter():
     print("Waiting for event...")
     event.wait()  # Blocks until event is set
     print("Event received!")
 
+
 def setter():
     time.sleep(0.2)
     print("Setting event...")
     event.set()  # Signal waiting threads
+
 
 t1 = threading.Thread(target=waiter)
 t2 = threading.Thread(target=setter)
@@ -134,9 +142,11 @@ t2.join()
 import threading
 import time
 
+
 # CPU-bound task - GIL limits parallelism
 def cpu_bound(n):
     return sum(i * i for i in range(n))
+
 
 # With GIL, threads don't help CPU-bound tasks
 start = time.time()
@@ -176,9 +186,11 @@ print(f"Sequential: {sequential_time:.2f}s")
 import threading
 import time
 
+
 def worker(name, delay):
     time.sleep(delay)
     print(f"{name} done")
+
 
 t1 = threading.Thread(target=worker, args=("T1", 0.2))
 t2 = threading.Thread(target=worker, args=("T2", 0.1))
@@ -210,11 +222,13 @@ import threading
 counter = 0
 lock = threading.Lock()
 
+
 def increment():
     global counter
     for _ in range(1000):
         with lock:  # Only one thread at a time
             counter += 1
+
 
 threads = [threading.Thread(target=increment) for _ in range(10)]
 for t in threads:
@@ -242,10 +256,12 @@ print(f"Counter: {counter}")  # Always 10000
 from queue import Queue
 import threading
 
+
 def producer(queue):
     for i in range(5):
         queue.put(f"item-{i}")
     queue.put(None)  # Sentinel
+
 
 def consumer(queue):
     while True:
@@ -254,6 +270,7 @@ def consumer(queue):
             break
         print(f"Processed: {item}")
         queue.task_done()
+
 
 queue = Queue()
 t1 = threading.Thread(target=producer, args=(queue,))
@@ -286,10 +303,12 @@ import threading
 # WITHOUT LOCK - Race condition
 counter = 0
 
+
 def unsafe_increment():
     global counter
     for _ in range(1000):
         counter += 1  # Not atomic!
+
 
 threads = [threading.Thread(target=unsafe_increment) for _ in range(10)]
 for t in threads:
@@ -301,6 +320,7 @@ print(f"Expected: 10000, Actual: {counter}")  # Unpredictable!
 
 # WITH LOCK - Safe
 lock = threading.Lock()
+
 
 def safe_increment():
     global counter
@@ -321,19 +341,21 @@ def safe_increment():
 ```python
 import threading
 
+
 class BankAccount:
     def __init__(self, balance):
         self._balance = balance
         self._lock = threading.RLock()
-    
+
     def deposit(self, amount):
         with self._lock:
             self._balance += amount
-    
+
     def transfer(self, other, amount):
         with self._lock:  # Acquire lock
             self._balance -= amount
             other.deposit(amount)  # Can acquire same lock again
+
 
 # Regular Lock would deadlock here!
 ```
@@ -352,16 +374,18 @@ import threading
 
 semaphore = threading.Semaphore(3)  # Max 3 concurrent
 
+
 def limited_task(name):
     with semaphore:
         print(f"{name} started")
         # Only 3 tasks run at a time
         import time
+
         time.sleep(0.1)
         print(f"{name} finished")
 
-threads = [threading.Thread(target=limited_task, args=(f"T-{i}",)) 
-           for i in range(10)]
+
+threads = [threading.Thread(target=limited_task, args=(f"T-{i}",)) for i in range(10)]
 for t in threads:
     t.start()
 for t in threads:
@@ -380,12 +404,14 @@ for t in threads:
 ```python
 import threading
 
+
 def worker():
     print("Working in thread")
 
+
 t = threading.Thread(target=worker)
 t.start()  # Begins execution
-t.join()   # Wait for completion
+t.join()  # Wait for completion
 ```
 
 **Related Terms**: join, run, lifecycle
@@ -400,13 +426,15 @@ t.join()   # Wait for completion
 ```python
 import threading
 
+
 class MyThread(threading.Thread):
     def __init__(self, name):
         super().__init__()
         self.name = name
-    
+
     def run(self):
         print(f"{self.name} running")
+
 
 t = MyThread("Worker")
 t.start()
@@ -425,15 +453,17 @@ t.join()
 ```python
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+
 def process(item):
     return item * 2
+
 
 items = [1, 2, 3, 4, 5]
 
 with ThreadPoolExecutor(max_workers=3) as executor:
     # Method 1: map
     results = list(executor.map(process, items))
-    
+
     # Method 2: submit
     futures = [executor.submit(process, item) for item in items]
     results = [f.result() for f in futures]
@@ -453,15 +483,16 @@ print(f"Results: {results}")
 ```python
 import threading
 
+
 class ThreadSafeCounter:
     def __init__(self):
         self._count = 0
         self._lock = threading.Lock()
-    
+
     def increment(self):
         with self._lock:
             self._count += 1
-    
+
     @property
     def count(self):
         with self._lock:
@@ -532,10 +563,12 @@ from queue import Queue
 
 queue = Queue()
 
+
 def producer():
     for item in items:
         queue.put(item)
     queue.put(None)
+
 
 def consumer():
     while True:
@@ -561,12 +594,15 @@ class SafeCounter:
 ```python
 event = threading.Event()
 
+
 def waiter():
     event.wait()
     print("Event received")
 
+
 def setter():
     event.set()
+
 
 # Start setter after waiter
 ```

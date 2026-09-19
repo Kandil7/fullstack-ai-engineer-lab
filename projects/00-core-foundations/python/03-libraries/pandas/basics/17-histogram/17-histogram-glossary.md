@@ -25,8 +25,8 @@
 **Bin (Class Interval)**
 A range of values into which data points are grouped. The number and width of bins affect the histogram's appearance.
 ```python
-ax.hist(data, bins=30)           # 30 equal-width bins
-ax.hist(data, bins=[0,10,20,30]) # Custom bin edges
+ax.hist(data, bins=30)  # 30 equal-width bins
+ax.hist(data, bins=[0, 10, 20, 30])  # Custom bin edges
 ```
 
 **Bin Width**
@@ -43,7 +43,7 @@ ax.hist(data, bins=bins)
 **Cumulative Histogram**
 Shows running totals — each bar includes all values below it. Useful for percentiles.
 ```python
-ax.hist(data, bins=30, cumulative=True, histtype='step')
+ax.hist(data, bins=30, cumulative=True, histtype="step")
 ```
 
 ### D
@@ -59,7 +59,7 @@ ax.hist(data, bins=30, density=True)
 **edgecolor**
 Sets the border color of histogram bars. White edges improve readability when bars are close.
 ```python
-ax.hist(data, edgecolor='white', linewidth=0.5)
+ax.hist(data, edgecolor="white", linewidth=0.5)
 ```
 
 ### F
@@ -78,8 +78,8 @@ Automatic bin width selection: `2 * IQR * n^(-1/3)`. More robust than Sturges fo
 **hist2d()**
 Creates a 2D histogram for visualizing the joint distribution of two continuous variables.
 ```python
-plt.hist2d(x, y, bins=30, cmap='Blues')
-plt.colorbar(label='Count')
+plt.hist2d(x, y, bins=30, cmap="Blues")
+plt.colorbar(label="Count")
 ```
 
 **Histogram vs Bar Chart**
@@ -108,13 +108,14 @@ ax.hist(data, bins=30, density=True)
 Asymmetry of a distribution. Right-skewed (positive) has a longer right tail. Left-skewed (negative) has a longer left tail.
 ```python
 from scipy.stats import skew
+
 print(f"Skewness: {skew(data):.2f}")
 ```
 
 **Stacked Histogram**
 Overlays multiple histograms on top of each other. Shows both individual and total contributions.
 ```python
-ax.hist([data1, data2], stacked=True, label=['Group A', 'Group B'])
+ax.hist([data1, data2], stacked=True, label=["Group A", "Group B"])
 ```
 
 **Sturges' Rule**
@@ -135,24 +136,32 @@ data = np.random.normal(70, 15, 500)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 
-counts, bins, patches = ax.hist(data, bins=30, color='steelblue',
-                                  edgecolor='white', alpha=0.8, density=True)
+counts, bins, patches = ax.hist(
+    data, bins=30, color="steelblue", edgecolor="white", alpha=0.8, density=True
+)
 
 # Add mean and median lines
-ax.axvline(data.mean(), color='red', linestyle='--', linewidth=2, label=f'Mean: {data.mean():.1f}')
-ax.axvline(np.median(data), color='green', linestyle='-', linewidth=2, label=f'Median: {np.median(data):.1f}')
+ax.axvline(data.mean(), color="red", linestyle="--", linewidth=2, label=f"Mean: {data.mean():.1f}")
+ax.axvline(
+    np.median(data),
+    color="green",
+    linestyle="-",
+    linewidth=2,
+    label=f"Median: {np.median(data):.1f}",
+)
 
 # Add KDE
 from scipy.stats import gaussian_kde
+
 kde = gaussian_kde(data)
 x_kde = np.linspace(data.min(), data.max(), 200)
-ax.plot(x_kde, kde(x_kde), color='purple', linewidth=2, label='KDE')
+ax.plot(x_kde, kde(x_kde), color="purple", linewidth=2, label="KDE")
 
-ax.set_title('Score Distribution', fontsize=14)
-ax.set_xlabel('Score', fontsize=12)
-ax.set_ylabel('Density', fontsize=12)
+ax.set_title("Score Distribution", fontsize=14)
+ax.set_xlabel("Score", fontsize=12)
+ax.set_ylabel("Density", fontsize=12)
 ax.legend(fontsize=10)
-ax.grid(axis='y', alpha=0.3)
+ax.grid(axis="y", alpha=0.3)
 
 plt.tight_layout()
 plt.show()
@@ -163,21 +172,23 @@ plt.show()
 ```python
 import seaborn as sns
 
-df = sns.load_dataset('titanic')
+df = sns.load_dataset("titanic")
 
 fig, ax = plt.subplots(figsize=(10, 6))
 
-for pclass, color, label in [(1, '#e74c3c', '1st Class'),
-                               (2, '#3498db', '2nd Class'),
-                               (3, '#2ecc71', '3rd Class')]:
-    data = df[df['pclass'] == pclass]['age'].dropna()
+for pclass, color, label in [
+    (1, "#e74c3c", "1st Class"),
+    (2, "#3498db", "2nd Class"),
+    (3, "#2ecc71", "3rd Class"),
+]:
+    data = df[df["pclass"] == pclass]["age"].dropna()
     ax.hist(data, bins=20, alpha=0.5, color=color, label=label, density=True)
 
-ax.set_title('Age Distribution by Passenger Class')
-ax.set_xlabel('Age')
-ax.set_ylabel('Density')
-ax.legend(title='Class')
-ax.grid(axis='y', alpha=0.3)
+ax.set_title("Age Distribution by Passenger Class")
+ax.set_xlabel("Age")
+ax.set_ylabel("Density")
+ax.legend(title="Class")
+ax.grid(axis="y", alpha=0.3)
 
 plt.tight_layout()
 plt.show()
@@ -188,16 +199,16 @@ plt.show()
 ```python
 # Custom bins with specific edges
 bins = [0, 18, 25, 35, 45, 55, 65, 75, 100]
-labels = ['<18', '18-24', '25-34', '35-44', '45-54', '55-64', '65-74', '75+']
+labels = ["<18", "18-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75+"]
 
 fig, ax = plt.subplots(figsize=(10, 6))
-ax.hist(df['age'].dropna(), bins=bins, color='steelblue', edgecolor='white', alpha=0.8)
+ax.hist(df["age"].dropna(), bins=bins, color="steelblue", edgecolor="white", alpha=0.8)
 ax.set_xticks(bins)
 ax.set_xticklabels(labels, rotation=45)
-ax.set_title('Age Distribution (Custom Bins)')
-ax.set_xlabel('Age Group')
-ax.set_ylabel('Count')
-ax.grid(axis='y', alpha=0.3)
+ax.set_title("Age Distribution (Custom Bins)")
+ax.set_xlabel("Age Group")
+ax.set_ylabel("Count")
+ax.grid(axis="y", alpha=0.3)
 
 plt.tight_layout()
 plt.show()

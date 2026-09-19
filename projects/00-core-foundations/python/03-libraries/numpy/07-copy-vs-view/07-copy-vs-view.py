@@ -16,21 +16,21 @@ import numpy as np
 arr = np.array([1, 2, 3, 4, 5])
 view = arr.view()
 
-print("Original:", arr)      # [1 2 3 4 5]
-print("View:", view)         # [1 2 3 4 5]
+print("Original:", arr)  # [1 2 3 4 5]
+print("View:", view)  # [1 2 3 4 5]
 print("Same data?", arr.ctypes.data == view.ctypes.data)  # True
 
 # Modify the view
 view[0] = 100
 print("\nAfter view[0]=100:")
-print("Original:", arr)      # [100   2   3   4   5]  (CHANGED!)
-print("View:", view)         # [100   2   3   4   5]
+print("Original:", arr)  # [100   2   3   4   5]  (CHANGED!)
+print("View:", view)  # [100   2   3   4   5]
 
 # Modify the original
 arr[1] = 200
 print("\nAfter arr[1]=200:")
-print("Original:", arr)      # [100 200   3   4   5]
-print("View:", view)         # [100 200   3   4   5]  (CHANGED!)
+print("Original:", arr)  # [100 200   3   4   5]
+print("View:", view)  # [100 200   3   4   5]  (CHANGED!)
 # Output:
 # Original: [1 2 3 4 5]
 # View: [1 2 3 4 5]
@@ -53,21 +53,21 @@ print("View:", view)         # [100 200   3   4   5]  (CHANGED!)
 arr = np.array([1, 2, 3, 4, 5])
 copy_arr = arr.copy()
 
-print("\nOriginal:", arr)      # [1 2 3 4 5]
-print("Copy:", copy_arr)      # [1 2 3 4 5]
+print("\nOriginal:", arr)  # [1 2 3 4 5]
+print("Copy:", copy_arr)  # [1 2 3 4 5]
 print("Same data?", arr.ctypes.data == copy_arr.ctypes.data)  # False
 
 # Modify the copy
 copy_arr[0] = 100
 print("\nAfter copy_arr[0]=100:")
-print("Original:", arr)      # [1 2 3 4 5]  (UNCHANGED!)
-print("Copy:", copy_arr)     # [100   2   3   4   5]
+print("Original:", arr)  # [1 2 3 4 5]  (UNCHANGED!)
+print("Copy:", copy_arr)  # [100   2   3   4   5]
 
 # Modify the original
 arr[1] = 200
 print("\nAfter arr[1]=200:")
-print("Original:", arr)      # [100 200   3   4   5]
-print("Copy:", copy_arr)     # [100   2   3   4   5]  (UNCHANGED!)
+print("Original:", arr)  # [100 200   3   4   5]
+print("Copy:", copy_arr)  # [100   2   3   4   5]  (UNCHANGED!)
 # Output:
 # Original: [1 2 3 4 5]
 # Copy: [1 2 3 4 5]
@@ -90,7 +90,7 @@ arr = np.array([1, 2, 3, 4, 5, 6, 7, 8])
 
 # Slice creates a view
 slice_view = arr[2:6]
-print("\nOriginal:", arr)          # [1 2 3 4 5 6 7 8]
+print("\nOriginal:", arr)  # [1 2 3 4 5 6 7 8]
 print("Slice view:", slice_view)  # [3 4 5 6]
 
 # Check if it's a view
@@ -99,7 +99,7 @@ print("Is view?", slice_view.base is arr)  # True
 # Modify the slice
 slice_view[0] = 999
 print("\nAfter slice_view[0]=999:")
-print("Original:", arr)          # [  1   2 999   4   5   6   7   8]
+print("Original:", arr)  # [  1   2 999   4   5   6   7   8]
 print("Slice view:", slice_view)  # [999   4   5   6]
 # Output:
 # Original: [1 2 3 4 5 6 7 8]

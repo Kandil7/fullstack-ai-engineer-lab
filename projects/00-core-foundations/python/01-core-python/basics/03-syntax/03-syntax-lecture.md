@@ -62,10 +62,10 @@ if x > 5:
 **Expression**: A combination of values and operators that produces a result
 ```python
 # Expressions
-2 + 3          # Arithmetic expression
-"Hello" * 3    # String expression
-x > 5          # Comparison expression
-True and False # Boolean expression
+2 + 3  # Arithmetic expression
+"Hello" * 3  # String expression
+x > 5  # Comparison expression
+True and False  # Boolean expression
 ```
 
 ### 3.3 Line Structure
@@ -81,7 +81,9 @@ print(x + y)
 **Multiple statements per line (use semicolons):**
 ```python
 # Allowed but not recommended
-x = 10; y = 20; print(x + y)
+x = 10
+y = 20
+print(x + y)
 ```
 
 ### 3.4 Line Continuation
@@ -89,30 +91,20 @@ x = 10; y = 20; print(x + y)
 **Implicit continuation (inside brackets):**
 ```python
 # Inside parentheses, brackets, or braces
-total = (10 +
-         20 +
-         30)
+total = 10 + 20 + 30
 
-numbers = [1,
-           2,
-           3,
-           4]
+numbers = [1, 2, 3, 4]
 
-person = {"name": "Alice",
-          "age": 25}
+person = {"name": "Alice", "age": 25}
 ```
 
 **Explicit continuation (backslash):**
 ```python
 # Using backslash
-total = 10 + \
-        20 + \
-        30
+total = 10 + 20 + 30
 
 # Better to use parentheses instead
-total = (10 +
-         20 +
-         30)
+total = 10 + 20 + 30
 ```
 
 ### 3.5 Comments
@@ -129,6 +121,7 @@ x = 10  # Inline comment
 This is a multi-line
 comment block
 """
+
 x = 10
 ```
 
@@ -138,6 +131,8 @@ x = 10
 ```python
 # Use snake_case
 user_name = "Alice"
+
+
 def calculate_total():
     pass
 ```
@@ -166,16 +161,17 @@ def main():
     # Variable assignment
     name = "Alice"
     age = 25
-    
+
     # Conditional
     if age >= 18:
         print(f"{name} is an adult")
     else:
         print(f"{name} is a minor")
-    
+
     # Loop
     for i in range(3):
         print(f"Count: {i}")
+
 
 # Entry point
 if __name__ == "__main__":
@@ -202,22 +198,13 @@ def process_data(data):
 ### Example 3: Line Continuation
 ```python
 # Multiple ways to continue lines
-result = (10 + 20 + 30 + 
-          40 + 50)
+result = 10 + 20 + 30 + 40 + 50
 
 # Function call continuation
-very_long_function_name(
-    argument1,
-    argument2,
-    argument3
-)
+very_long_function_name(argument1, argument2, argument3)
 
 # Dictionary continuation
-config = {
-    "host": "localhost",
-    "port": 8080,
-    "debug": True
-}
+config = {"host": "localhost", "port": 8080, "debug": True}
 ```
 
 ### Example 4: Naming Conventions
@@ -226,14 +213,17 @@ config = {
 user_name = "Alice"
 is_active = True
 
+
 # Functions (snake_case)
 def calculate_average(numbers):
     return sum(numbers) / len(numbers)
+
 
 # Classes (PascalCase)
 class UserAccount:
     def __init__(self, name):
         self.name = name
+
 
 # Constants (UPPER_SNAKE_CASE)
 MAX_RETRY_ATTEMPTS = 3

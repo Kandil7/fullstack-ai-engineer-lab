@@ -17,14 +17,16 @@ from typing import Callable
 # Bronze: Token Bucket
 # ============================================================
 
+
 class TokenBucket:
     """Rate limiter: capacity tokens, refilled at rate/second.
 
     now: injectable clock (defaults to time.monotonic).
     """
 
-    def __init__(self, capacity: int, rate: float,
-                 now: Callable[[], float] = time.monotonic) -> None:
+    def __init__(
+        self, capacity: int, rate: float, now: Callable[[], float] = time.monotonic
+    ) -> None:
         self.capacity = capacity
         self.rate = rate
         self._now = now
@@ -49,6 +51,7 @@ class TokenBucket:
 # ============================================================
 # Silver: Bounded Producer-Consumer Pipeline
 # ============================================================
+
 
 class BoundedPipeline:
     """Bounded queue with backpressure: produce never hangs, never
@@ -94,13 +97,18 @@ class BoundedPipeline:
 # Gold: Circuit Breaker + Retry with Jitter
 # ============================================================
 
+
 class CircuitBreaker:
     """Fail-fast wrapper: closed -> (threshold failures) -> open ->
     (cooldown) -> half_open -> success closes / failure reopens."""
 
-    def __init__(self, fn: Callable[[], int], threshold: int = 3,
-                 cooldown: float = 1.0,
-                 now: Callable[[], float] = time.monotonic) -> None:
+    def __init__(
+        self,
+        fn: Callable[[], int],
+        threshold: int = 3,
+        cooldown: float = 1.0,
+        now: Callable[[], float] = time.monotonic,
+    ) -> None:
         self.fn = fn
         self.threshold = threshold
         self.cooldown = cooldown
@@ -147,10 +155,13 @@ class CircuitBreaker:
         return result
 
 
-def retry_with_jitter(fn: Callable[[], int], attempts: int = 4,
-                      base_delay: float = 0.1,
-                      sleep: Callable[[float], None] = time.sleep,
-                      rng: random.Random | None = None) -> int:
+def retry_with_jitter(
+    fn: Callable[[], int],
+    attempts: int = 4,
+    base_delay: float = 0.1,
+    sleep: Callable[[float], None] = time.sleep,
+    rng: random.Random | None = None,
+) -> int:
     """Retry with exponential backoff + full jitter: delay in
     [0, base_delay * 2 ** attempt]. Raises RuntimeError when exhausted."""
     rng = rng or random.Random(0)
@@ -158,9 +169,9 @@ def retry_with_jitter(fn: Callable[[], int], attempts: int = 4,
     for attempt in range(attempts):
         try:
             return fn()
-        except Exception as exc:          # noqa: BLE001 - retry is the point
+        except Exception as exc:  # noqa: BLE001 - retry is the point
             last_error = exc
             if attempt + 1 < attempts:
-                delay = rng.uniform(0.0, base_delay * (2 ** attempt))
+                delay = rng.uniform(0.0, base_delay * (2**attempt))
                 sleep(delay)
     raise RuntimeError(f"failed after {attempts} attempts: {last_error}")

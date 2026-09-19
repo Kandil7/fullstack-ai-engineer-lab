@@ -55,9 +55,11 @@ trivially unit-testable and reusable by any caller.
 ```python
 PROMOTE_THRESHOLD = 0.9
 
+
 def should_promote(score: float) -> bool:
     """Pure domain rule: is this run good enough to promote?"""
     return score >= PROMOTE_THRESHOLD
+
 
 def best_model_name(experiments: list[Experiment]) -> str | None:
     """Pure domain query: name of the highest-scoring run, or None."""
@@ -77,6 +79,7 @@ never on `Session` or `Experiment` details. `@runtime_checkable` lets
 
 ```python
 from typing import Protocol, runtime_checkable
+
 
 @runtime_checkable
 class ExperimentRepository(Protocol):
@@ -103,6 +106,7 @@ session/transaction.
 ```python
 from sqlalchemy import select
 
+
 class SqlExperimentRepository:
     """Repository backed by SQLAlchemy. Session = injected Unit of Work."""
 
@@ -111,13 +115,11 @@ class SqlExperimentRepository:
 
     def add(self, experiment: Experiment) -> int:
         self.session.add(experiment)
-        self.session.flush()   # assign the PK; commit stays with the caller
+        self.session.flush()  # assign the PK; commit stays with the caller
         return experiment.id
 
     def get(self, name: str) -> Experiment | None:
-        return self.session.scalars(
-            select(Experiment).where(Experiment.name == name)
-        ).first()
+        return self.session.scalars(select(Experiment).where(Experiment.name == name)).first()
 
     def list_all(self) -> list[Experiment]:
         return list(self.session.scalars(select(Experiment).order_by(Experiment.id)))
@@ -182,13 +184,11 @@ add every experiment, flush, commit once; on any duplicate, roll back and
 raise — no partial rows survive.
 
 ```python
-def register_batch_with_transaction(
-    session: Session, experiments: list[Experiment]
-) -> list[int]:
+def register_batch_with_transaction(session: Session, experiments: list[Experiment]) -> list[int]:
     """All-or-nothing batch registration; raise ValueError on duplicates."""
     try:
         session.add_all(experiments)
-        session.flush()   # duplicates surface here as IntegrityError
+        session.flush()  # duplicates surface here as IntegrityError
     except Exception:
         session.rollback()
         raise ValueError("duplicate experiment name in batch") from None
@@ -208,7 +208,7 @@ same five methods.
 
 ```python
 repo: ExperimentRepository = (
-    InMemoryExperimentRepository()        # in unit tests
+    InMemoryExperimentRepository()  # in unit tests
     # SqlExperimentRepository(session)    # in production
 )
 repo.add(Experiment(name="run-1", model="bert", score=0.95))

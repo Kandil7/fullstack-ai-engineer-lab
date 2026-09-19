@@ -35,11 +35,13 @@ By the end of this lecture, you will be able to:
 ## 1. `pivot` — Long to Wide, No Aggregation
 
 ```python
-df = pd.DataFrame({
-    "user": ["u1", "u1", "u2", "u2"],
-    "day": [1, 2, 1, 2],
-    "score": [0.5, 0.6, 0.7, 0.8],
-})
+df = pd.DataFrame(
+    {
+        "user": ["u1", "u1", "u2", "u2"],
+        "day": [1, 2, 1, 2],
+        "score": [0.5, 0.6, 0.7, 0.8],
+    }
+)
 
 df.pivot(index="user", columns="day", values="score")
 # day   1    2
@@ -56,9 +58,10 @@ aggregation.
 
 ```python
 df.pivot_table(index="user", columns="day", values="score", aggfunc="mean")
-df.pivot_table(..., aggfunc="sum", fill_value=0)     # densify empty cells
-df.pivot_table(index="user", columns="day", values="score",
-               aggfunc={"score": "mean", "latency": "median"})
+df.pivot_table(..., aggfunc="sum", fill_value=0)  # densify empty cells
+df.pivot_table(
+    index="user", columns="day", values="score", aggfunc={"score": "mean", "latency": "median"}
+)
 ```
 
 `pivot_table` handles duplicates by aggregating and can fill empty cells —
@@ -67,11 +70,13 @@ the realistic production form (e.g. sparse events densified to 0).
 ## 3. `melt` — Wide to Long (Tidy)
 
 ```python
-wide = pd.DataFrame({
-    "user": ["u1", "u2"],
-    "day1": [0.5, 0.7],
-    "day2": [0.6, 0.8],
-})
+wide = pd.DataFrame(
+    {
+        "user": ["u1", "u2"],
+        "day1": [0.5, 0.7],
+        "day2": [0.6, 0.8],
+    }
+)
 
 wide.melt(id_vars=["user"], var_name="day", value_name="score")
 #   user   day  score
@@ -87,8 +92,8 @@ wide.melt(id_vars=["user"], var_name="day", value_name="score")
 ## 4. `stack` / `unstack` — Index to Columns
 
 ```python
-df.set_index(["user", "day"]).stack()      # columns -> index level
-df.set_index(["user", "day"]).unstack()    # index level -> columns
+df.set_index(["user", "day"]).stack()  # columns -> index level
+df.set_index(["user", "day"]).unstack()  # index level -> columns
 ```
 
 `stack`/`unstack` move levels between the index and the columns. They are the
@@ -142,7 +147,7 @@ wide.melt(id_vars=["user"])
 
 ```python
 # WRONG — expecting columns -> rows
-df.stack()    # actually moves COLUMNS into the INDEX
+df.stack()  # actually moves COLUMNS into the INDEX
 # CORRECT — melt for named columns; stack for index levels
 ```
 

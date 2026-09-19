@@ -52,6 +52,7 @@ USER appuser
 CMD ["python", "app.py"]
 """
 
+
 class ContainerSecurity:
     """Container security configurations."""
 
@@ -60,26 +61,30 @@ class ContainerSecurity:
         """Scan container image for vulnerabilities."""
         # Using trivy or similar scanner
         import subprocess
+
         result = subprocess.run(
             ["trivy", "image", "--format", "json", image_name],
             capture_output=True,
-            text=True
+            text=True,
         )
 
         # Parse results
         import json
+
         scan_results = json.loads(result.stdout)
 
         vulnerabilities = []
         for result in scan_results.get("Results", []):
             for vuln in result.get("Vulnerabilities", []):
-                vulnerabilities.append({
-                    "id": vuln.get("VulnerabilityID"),
-                    "severity": vuln.get("Severity"),
-                    "package": vuln.get("PkgName"),
-                    "installed": vuln.get("InstalledVersion"),
-                    "fixed": vuln.get("FixedVersion"),
-                })
+                vulnerabilities.append(
+                    {
+                        "id": vuln.get("VulnerabilityID"),
+                        "severity": vuln.get("Severity"),
+                        "package": vuln.get("PkgName"),
+                        "installed": vuln.get("InstalledVersion"),
+                        "fixed": vuln.get("FixedVersion"),
+                    }
+                )
 
         return {
             "image": image_name,
@@ -97,9 +102,7 @@ class ContainerSecurity:
                 "runAsUser": 1000,
                 "readOnlyRootFilesystem": True,
                 "allowPrivilegeEscalation": False,
-                "capabilities": {
-                    "drop": ["ALL"]
-                }
+                "capabilities": {"drop": ["ALL"]},
             },
             "resources": {
                 "limits": {
@@ -109,12 +112,12 @@ class ContainerSecurity:
                 "requests": {
                     "cpu": "0.5",
                     "memory": "256Mi",
-                }
+                },
             },
             "networkPolicy": {
                 "ingress": [{"from": [{"podSelector": {}}]}],
                 "egress": [{"to": [{"podSelector": {}}]}],
-            }
+            },
         }
 ```
 
@@ -127,6 +130,7 @@ import base64
 from typing import Dict, Optional
 from datetime import datetime, timedelta
 
+
 class SecretsManager:
     """Secure secrets management."""
 
@@ -134,8 +138,7 @@ class SecretsManager:
         self.secrets: Dict[str, dict] = {}
         self.access_log: list = []
 
-    def store_secret(self, name: str, value: str,
-                     description: str = "") -> bool:
+    def store_secret(self, name: str, value: str, description: str = "") -> bool:
         """Store a secret securely."""
         # In practice: encrypt at rest using KMS
         # Here: simplified hash-based storage
@@ -195,21 +198,26 @@ class SecretsManager:
         for name, info in self.secrets.items():
             if not include_expired and datetime.utcnow() > info["expires_at"]:
                 continue
-            secrets_list.append({
-                "name": name,
-                "description": info["description"],
-                "expires_at": info["expires_at"].isoformat(),
-                "version": info["version"],
-            })
+            secrets_list.append(
+                {
+                    "name": name,
+                    "description": info["description"],
+                    "expires_at": info["expires_at"].isoformat(),
+                    "version": info["version"],
+                }
+            )
         return secrets_list
 
     def _log_access(self, secret_name: str, action: str):
         """Log secret access for audit."""
-        self.access_log.append({
-            "timestamp": datetime.utcnow().isoformat(),
-            "secret": secret_name,
-            "action": action,
-        })
+        self.access_log.append(
+            {
+                "timestamp": datetime.utcnow().isoformat(),
+                "secret": secret_name,
+                "action": action,
+            }
+        )
+
 
 class EnvironmentSecrets:
     """Manage secrets from environment variables."""
@@ -220,7 +228,7 @@ class EnvironmentSecrets:
         secrets = {}
         for key, value in os.environ.items():
             if key.startswith(prefix):
-                secret_name = key[len(prefix):].lower()
+                secret_name = key[len(prefix) :].lower()
                 secrets[secret_name] = value
         return secrets
 
@@ -324,16 +332,20 @@ class NetworkSecurityConfig:
 
         for endpoint in endpoints:
             if endpoint.get("public") and not endpoint.get("https"):
-                issues.append({
-                    "endpoint": endpoint["name"],
-                    "issue": "Public endpoint without HTTPS",
-                })
+                issues.append(
+                    {
+                        "endpoint": endpoint["name"],
+                        "issue": "Public endpoint without HTTPS",
+                    }
+                )
 
             if endpoint.get("port") == 22 and endpoint.get("source") == "0.0.0.0/0":
-                issues.append({
-                    "endpoint": endpoint["name"],
-                    "issue": "SSH exposed to internet",
-                })
+                issues.append(
+                    {
+                        "endpoint": endpoint["name"],
+                        "issue": "SSH exposed to internet",
+                    }
+                )
 
         return issues
 ```
@@ -353,29 +365,35 @@ class CloudSecurityChecker:
 
         # Check for root account usage
         if iam_config.get("root_access"):
-            issues.append({
-                "severity": "critical",
-                "issue": "Root account has access keys",
-                "recommendation": "Remove root access keys",
-            })
+            issues.append(
+                {
+                    "severity": "critical",
+                    "issue": "Root account has access keys",
+                    "recommendation": "Remove root access keys",
+                }
+            )
 
         # Check for overly permissive policies
         for policy in iam_config.get("policies", []):
             if policy.get("effect") == "Allow" and policy.get("resource") == "*":
-                issues.append({
-                    "severity": "high",
-                    "issue": f"Overly permissive policy: {policy['name']}",
-                    "recommendation": "Apply principle of least privilege",
-                })
+                issues.append(
+                    {
+                        "severity": "high",
+                        "issue": f"Overly permissive policy: {policy['name']}",
+                        "recommendation": "Apply principle of least privilege",
+                    }
+                )
 
         # Check for unused credentials
         for credential in iam_config.get("credentials", []):
             if credential.get("last_used") is None:
-                issues.append({
-                    "severity": "medium",
-                    "issue": f"Unused credential: {credential['id']}",
-                    "recommendation": "Remove unused credentials",
-                })
+                issues.append(
+                    {
+                        "severity": "medium",
+                        "issue": f"Unused credential: {credential['id']}",
+                        "recommendation": "Remove unused credentials",
+                    }
+                )
 
         return {
             "compliant": len(issues) == 0,
@@ -388,25 +406,31 @@ class CloudSecurityChecker:
 
         for bucket in s3_config.get("buckets", []):
             if bucket.get("public_access"):
-                issues.append({
-                    "severity": "critical",
-                    "bucket": bucket["name"],
-                    "issue": "Bucket has public access",
-                })
+                issues.append(
+                    {
+                        "severity": "critical",
+                        "bucket": bucket["name"],
+                        "issue": "Bucket has public access",
+                    }
+                )
 
             if not bucket.get("encryption"):
-                issues.append({
-                    "severity": "high",
-                    "bucket": bucket["name"],
-                    "issue": "Bucket encryption not enabled",
-                })
+                issues.append(
+                    {
+                        "severity": "high",
+                        "bucket": bucket["name"],
+                        "issue": "Bucket encryption not enabled",
+                    }
+                )
 
             if not bucket.get("versioning"):
-                issues.append({
-                    "severity": "medium",
-                    "bucket": bucket["name"],
-                    "issue": "Bucket versioning not enabled",
-                })
+                issues.append(
+                    {
+                        "severity": "medium",
+                        "bucket": bucket["name"],
+                        "issue": "Bucket versioning not enabled",
+                    }
+                )
 
         return {
             "compliant": len(issues) == 0,
@@ -421,11 +445,13 @@ class CloudSecurityChecker:
             for rule in sg.get("ingress_rules", []):
                 if rule.get("cidr") == "0.0.0.0/0":
                     if rule.get("port") in [22, 3389, 3306, 5432]:
-                        issues.append({
-                            "severity": "critical",
-                            "security_group": sg["name"],
-                            "issue": f"Management port {rule['port']} open to internet",
-                        })
+                        issues.append(
+                            {
+                                "severity": "critical",
+                                "security_group": sg["name"],
+                                "issue": f"Management port {rule['port']} open to internet",
+                            }
+                        )
 
         return {
             "compliant": len(issues) == 0,
@@ -448,36 +474,46 @@ class CICDSecurityChecker:
 
         # Check for secrets in code
         if pipeline_config.get("secrets_in_code"):
-            issues.append({
-                "severity": "critical",
-                "issue": "Secrets found in code",
-                "recommendation": "Use secret management",
-            })
+            issues.append(
+                {
+                    "severity": "critical",
+                    "issue": "Secrets found in code",
+                    "recommendation": "Use secret management",
+                }
+            )
 
         # Check for unpinned dependencies
         for stage in pipeline_config.get("stages", []):
             if stage.get("unpinned_deps"):
-                issues.append({
-                    "severity": "high",
-                    "stage": stage["name"],
-                    "issue": "Unpinned dependencies",
-                })
+                issues.append(
+                    {
+                        "severity": "high",
+                        "stage": stage["name"],
+                        "issue": "Unpinned dependencies",
+                    }
+                )
 
         # Check for missing security scans
         if not pipeline_config.get("security_scans"):
-            issues.append({
-                "severity": "high",
-                "issue": "No security scans configured",
-                "recommendation": "Add SAST, DAST, and dependency scanning",
-            })
+            issues.append(
+                {
+                    "severity": "high",
+                    "issue": "No security scans configured",
+                    "recommendation": "Add SAST, DAST, and dependency scanning",
+                }
+            )
 
         # Check for missing image scanning
-        if pipeline_config.get("container_build") and not pipeline_config.get("image_scan"):
-            issues.append({
-                "severity": "high",
-                "issue": "Container images not scanned",
-                "recommendation": "Add container image scanning",
-            })
+        if pipeline_config.get("container_build") and not pipeline_config.get(
+            "image_scan"
+        ):
+            issues.append(
+                {
+                    "severity": "high",
+                    "issue": "Container images not scanned",
+                    "recommendation": "Add container image scanning",
+                }
+            )
 
         return {
             "secure": len(issues) == 0,

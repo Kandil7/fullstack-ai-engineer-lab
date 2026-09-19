@@ -236,6 +236,7 @@ def divide(a, b):
         raise ZeroDivisionError("Cannot divide by zero!")
     return a / b
 
+
 try:
     result = divide(10, 0)
 except ZeroDivisionError as e:
@@ -276,22 +277,26 @@ def process_age(age):
 ```python
 class InsufficientFundsError(Exception):
     """Raised when account has insufficient funds."""
-    
+
     def __init__(self, balance, amount):
         self.balance = balance
         self.amount = amount
         message = f"Cannot withdraw ${amount}. Balance: ${balance}"
         super().__init__(message)
 
+
 class InvalidEmailError(Exception):
     """Raised when email format is invalid."""
+
     pass
+
 
 # Using custom exceptions
 def withdraw(balance, amount):
     if amount > balance:
         raise InsufficientFundsError(balance, amount)
     return balance - amount
+
 
 try:
     new_balance = withdraw(100, 150)
@@ -304,18 +309,25 @@ except InsufficientFundsError as e:
 ```python
 class AppError(Exception):
     """Base exception for application."""
+
     pass
+
 
 class ValidationError(AppError):
     """Validation specific errors."""
+
     pass
+
 
 class DatabaseError(AppError):
     """Database related errors."""
+
     pass
+
 
 class ConnectionError(DatabaseError):
     """Connection failures."""
+
     pass
 ```
 
@@ -329,12 +341,15 @@ class ConnectionError(DatabaseError):
 class DatabaseError(Exception):
     pass
 
+
 def connect_db():
     try:
         import psycopg2
+
         return psycopg2.connect("dbname=test")
     except ImportError as e:
         raise DatabaseError("Database driver not installed") from e
+
 
 try:
     connect_db()
@@ -364,6 +379,7 @@ except FileNotFoundError:
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def managed_resource():
     print("Acquiring resource")
@@ -374,6 +390,7 @@ def managed_resource():
         raise
     finally:
         print("Releasing resource")
+
 
 with managed_resource() as res:
     print(f"Using {res}")
@@ -486,10 +503,11 @@ def safe_divide(a, b):
     else:
         return result
 
+
 # Test
-print(safe_divide(10, 2))      # 5.0
-print(safe_divide(10, 0))      # Error: Division by zero
-print(safe_divide("10", 2))    # Error: Invalid types
+print(safe_divide(10, 2))  # 5.0
+print(safe_divide(10, 0))  # Error: Division by zero
+print(safe_divide("10", 2))  # Error: Invalid types
 ```
 
 ### Exercise 2: Safe File Reader
@@ -498,7 +516,7 @@ print(safe_divide("10", 2))    # Error: Invalid types
 def safe_read_file(filename):
     """Read file contents safely."""
     try:
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             content = f.read()
     except FileNotFoundError:
         return f"Error: {filename} not found"
@@ -508,6 +526,7 @@ def safe_read_file(filename):
         return f"Error: {e}"
     else:
         return content
+
 
 # Test
 print(safe_read_file("existing.txt"))
@@ -519,7 +538,9 @@ print(safe_read_file("nonexistent.txt"))
 ```python
 class AppError(Exception):
     """Base application exception."""
+
     pass
+
 
 class ValidationError(AppError):
     def __init__(self, field, message):
@@ -527,18 +548,21 @@ class ValidationError(AppError):
         self.message = message
         super().__init__(f"{field}: {message}")
 
+
 class NotFoundError(AppError):
     def __init__(self, resource_type, resource_id):
         self.resource_type = resource_type
         self.resource_id = resource_id
         super().__init__(f"{resource_type} {resource_id} not found")
 
+
 def validate_user(data):
-    if 'email' not in data:
-        raise ValidationError('email', 'Required')
-    if '@' not in data.get('email', ''):
-        raise ValidationError('email', 'Invalid format')
+    if "email" not in data:
+        raise ValidationError("email", "Required")
+    if "@" not in data.get("email", ""):
+        raise ValidationError("email", "Invalid format")
     return True
+
 
 try:
     validate_user({})

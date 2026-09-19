@@ -241,20 +241,20 @@ import torch.nn.functional as F
 
 # A tiny 1-channel "image": a vertical light/dark boundary.
 image = torch.tensor(
-    [[0.0, 0.0, 10.0, 10.0, 10.0],
-     [0.0, 0.0, 10.0, 10.0, 10.0],
-     [0.0, 0.0, 10.0, 10.0, 10.0],
-     [0.0, 0.0, 10.0, 10.0, 10.0],
-     [0.0, 0.0, 10.0, 10.0, 10.0]]
+    [
+        [0.0, 0.0, 10.0, 10.0, 10.0],
+        [0.0, 0.0, 10.0, 10.0, 10.0],
+        [0.0, 0.0, 10.0, 10.0, 10.0],
+        [0.0, 0.0, 10.0, 10.0, 10.0],
+        [0.0, 0.0, 10.0, 10.0, 10.0],
+    ]
 )
 # conv2d expects (N, C, H, W)
 image = image.reshape(1, 1, 5, 5)
 
 # Vertical-edge kernel, shape (out_ch=1, in_ch=1, 3, 3)
 vertical_edge = torch.tensor(
-    [[-1.0, 0.0, 1.0],
-     [-2.0, 0.0, 2.0],
-     [-1.0, 0.0, 1.0]]
+    [[-1.0, 0.0, 1.0], [-2.0, 0.0, 2.0], [-1.0, 0.0, 1.0]]
 ).reshape(1, 1, 3, 3)
 
 feature_map = F.conv2d(image, vertical_edge)  # 'valid', s=1 -> 3x3
@@ -271,6 +271,7 @@ print(feature_map[0, 0])
 import torch
 import torch.nn as nn
 
+
 def conv_block(in_ch: int, out_ch: int) -> nn.Sequential:
     """Standard block: stride-2 conv downsamples, then BN, then ReLU."""
     return nn.Sequential(
@@ -279,19 +280,20 @@ def conv_block(in_ch: int, out_ch: int) -> nn.Sequential:
         nn.ReLU(inplace=True),
     )
 
+
 # Input: (N, 1, 28, 28). Grow channels, shrink spatial size.
 model = nn.Sequential(
-    conv_block(1, 16),               # 28 -> 14
-    conv_block(16, 32),              # 14 -> 7
-    conv_block(32, 64),              # 7  -> 4
-    nn.AdaptiveAvgPool2d(1),         # 4  -> 1  (any size -> 1x1)
-    nn.Flatten(),                    # (N, 64, 1, 1) -> (N, 64)
-    nn.Linear(64, 10),               # 10-class head
+    conv_block(1, 16),  # 28 -> 14
+    conv_block(16, 32),  # 14 -> 7
+    conv_block(32, 64),  # 7  -> 4
+    nn.AdaptiveAvgPool2d(1),  # 4  -> 1  (any size -> 1x1)
+    nn.Flatten(),  # (N, 64, 1, 1) -> (N, 64)
+    nn.Linear(64, 10),  # 10-class head
 )
 
-x = torch.randn(8, 1, 28, 28)        # a fake batch of 8 digits
+x = torch.randn(8, 1, 28, 28)  # a fake batch of 8 digits
 logits = model(x)
-print(logits.shape)                  # torch.Size([8, 10])
+print(logits.shape)  # torch.Size([8, 10])
 ```
 
 ### Example 3: A ResNet-style block with a skip connection
@@ -299,6 +301,7 @@ print(logits.shape)                  # torch.Size([8, 10])
 ```python
 import torch
 import torch.nn as nn
+
 
 class ResBlock(nn.Module):
     """out = ReLU(x + F(x)); the identity path lets gradients flow."""
@@ -312,11 +315,12 @@ class ResBlock(nn.Module):
         self.relu = nn.ReLU(inplace=True)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        identity = x                          # the "skip"
+        identity = x  # the "skip"
         out = self.relu(self.bn1(self.conv1(x)))
         out = self.bn2(self.conv2(out))
-        out = out + identity                  # add input back in
+        out = out + identity  # add input back in
         return self.relu(out)
+
 
 # Deep plain nets get *harder* to train; the skip connection makes each
 # block only need to learn a residual (the change), so very deep nets
@@ -334,28 +338,28 @@ print(block(torch.randn(4, 32, 14, 14)).shape)  # torch.Size([4, 32, 14, 14])
 ```python
 # BAD: passing a bare 2-D image to a conv
 img = torch.randn(28, 28)
-F.conv2d(img, kernel)          # RuntimeError: expected 4D input
+F.conv2d(img, kernel)  # RuntimeError: expected 4D input
 
 # GOOD: add batch and channel dims
 img = torch.randn(28, 28).reshape(1, 1, 28, 28)
-F.conv2d(img, kernel)          # works
+F.conv2d(img, kernel)  # works
 ```
 
 **2. Mismatching padding when you want `'same'` output**
 
 ```python
 # BAD: 3x3 conv with no padding silently shrinks every layer
-nn.Conv2d(16, 16, kernel_size=3)              # 28 -> 26 -> 24 -> ...
+nn.Conv2d(16, 16, kernel_size=3)  # 28 -> 26 -> 24 -> ...
 
 # GOOD: p = (k-1)//2 keeps spatial size for stride-1
-nn.Conv2d(16, 16, kernel_size=3, padding=1)   # 28 -> 28
+nn.Conv2d(16, 16, kernel_size=3, padding=1)  # 28 -> 28
 ```
 
 **3. Wrong `in_features` into the linear head**
 
 ```python
 # BAD: hard-guessing the flattened size (brittle, resolution-dependent)
-nn.Linear(32 * 7 * 7, 10)      # breaks if input size changes
+nn.Linear(32 * 7 * 7, 10)  # breaks if input size changes
 
 # GOOD: collapse spatial dims first so the head only sees channels
 nn.Sequential(nn.AdaptiveAvgPool2d(1), nn.Flatten(), nn.Linear(32, 10))

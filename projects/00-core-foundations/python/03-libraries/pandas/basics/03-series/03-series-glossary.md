@@ -39,8 +39,8 @@ result = s1 + s2
 Reducing a Series to a single summary value (sum, mean, etc.).
 
 ```python
-s.sum()    # 360
-s.mean()   # 72.0
+s.sum()  # 360
+s.mean()  # 72.0
 ```
 
 ### B
@@ -135,6 +135,7 @@ Not a Number — represents absent data in Pandas.
 
 ```python
 import numpy as np
+
 s = pd.Series([1, np.nan, 3])
 ```
 
@@ -218,18 +219,15 @@ print(s * 2)
 ```python
 import pandas as pd
 
-s = pd.Series(
-    [72, 68, 75, 80, 65],
-    index=["Mon", "Tue", "Wed", "Thu", "Fri"]
-)
+s = pd.Series([72, 68, 75, 80, 65], index=["Mon", "Tue", "Wed", "Thu", "Fri"])
 
 # Label-based
-print(s.loc["Wed"])           # 75
-print(s.loc["Mon":"Wed"])     # Slice
+print(s.loc["Wed"])  # 75
+print(s.loc["Mon":"Wed"])  # Slice
 
 # Position-based
-print(s.iloc[0])              # 72
-print(s.iloc[1:3])            # Slice
+print(s.iloc[0])  # 72
+print(s.iloc[1:3])  # Slice
 
 # Boolean
 print(s[s > 70])
@@ -243,9 +241,9 @@ import numpy as np
 
 s = pd.Series([1, 2, np.nan, 4, np.nan, 6])
 
-print(s.isnull().sum())    # 2
-print(s.dropna())          # Remove NaN
-print(s.fillna(0))         # Replace with 0
+print(s.isnull().sum())  # 2
+print(s.dropna())  # Remove NaN
+print(s.fillna(0))  # Replace with 0
 print(s.fillna(s.mean()))  # Replace with mean
 ```
 
@@ -256,13 +254,13 @@ import pandas as pd
 
 s = pd.Series([72, 68, 75, 80, 65])
 
-print(s.sum())     # 360
-print(s.mean())    # 72.0
-print(s.std())     # 5.52
-print(s.min())     # 65
-print(s.max())     # 80
+print(s.sum())  # 360
+print(s.mean())  # 72.0
+print(s.std())  # 5.52
+print(s.min())  # 65
+print(s.max())  # 80
 print(s.median())  # 72.0
-print(s.count())   # 5
+print(s.count())  # 5
 ```
 
 ---

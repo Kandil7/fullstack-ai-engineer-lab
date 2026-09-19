@@ -61,10 +61,10 @@ print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
 from sklearn.tree import DecisionTreeClassifier
 
 # Gini (default)
-clf_gini = DecisionTreeClassifier(criterion='gini', random_state=42)
+clf_gini = DecisionTreeClassifier(criterion="gini", random_state=42)
 
 # Entropy
-clf_entropy = DecisionTreeClassifier(criterion='entropy', random_state=42)
+clf_entropy = DecisionTreeClassifier(criterion="entropy", random_state=42)
 ```
 
 **Related Terms:** Gini Impurity, Entropy, Information Gain
@@ -92,7 +92,7 @@ print(f"Pure node entropy: {entropy_pure:.4f}")  # 0.0
 
 # Impure node (50/50 split)
 p = 0.5
-entropy_impure = -(p * np.log2(p) + (1-p) * np.log2(1-p))
+entropy_impure = -(p * np.log2(p) + (1 - p) * np.log2(1 - p))
 print(f"Impure node entropy: {entropy_impure:.4f}")  # 1.0
 ```
 
@@ -142,7 +142,7 @@ print(f"Pure node Gini: {gini_pure:.4f}")  # 0.0
 
 # Impure node (50/50 split)
 p = 0.5
-gini_impure = 1 - (p**2 + (1-p)**2)
+gini_impure = 1 - (p**2 + (1 - p) ** 2)
 print(f"Impure node Gini: {gini_impure:.4f}")  # 0.5
 ```
 
@@ -169,21 +169,24 @@ Information Gain = Entropy(parent) - Σ(weighted entropy of children)
 ```python
 import numpy as np
 
+
 def entropy(labels):
     probs = np.bincount(labels) / len(labels)
     return -np.sum([p * np.log2(p) for p in probs if p > 0])
+
 
 # Parent entropy
 parent = np.array([0, 0, 0, 1, 1])
 parent_entropy = entropy(parent)
 
 # Split on feature
-left = np.array([0, 0, 0])    # All class 0
-right = np.array([1, 1])       # All class 1
+left = np.array([0, 0, 0])  # All class 0
+right = np.array([1, 1])  # All class 1
 
 # Weighted child entropy
-child_entropy = (len(left)/len(parent)) * entropy(left) + \
-                (len(right)/len(parent)) * entropy(right)
+child_entropy = (len(left) / len(parent)) * entropy(left) + (len(right) / len(parent)) * entropy(
+    right
+)
 
 info_gain = parent_entropy - child_entropy
 print(f"Information Gain: {info_gain:.4f}")
@@ -264,10 +267,7 @@ print(f"Accuracy: {accuracy_score(y_test, clf.predict(X_test)):.4f}")
 ```python
 # Pre-pruning with max_depth
 clf_pruned = DecisionTreeClassifier(
-    max_depth=5,
-    min_samples_split=10,
-    min_samples_leaf=5,
-    random_state=42
+    max_depth=5, min_samples_split=10, min_samples_leaf=5, random_state=42
 )
 clf_pruned.fit(X_train, y_train)
 ```
@@ -340,11 +340,7 @@ from sklearn.metrics import accuracy_score, classification_report
 
 # Workflow
 clf = DecisionTreeClassifier(
-    max_depth=5,
-    min_samples_split=10,
-    min_samples_leaf=5,
-    criterion='gini',
-    random_state=42
+    max_depth=5, min_samples_split=10, min_samples_leaf=5, criterion="gini", random_state=42
 )
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)

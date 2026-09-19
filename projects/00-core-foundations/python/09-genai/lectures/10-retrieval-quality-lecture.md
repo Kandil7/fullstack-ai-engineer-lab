@@ -56,8 +56,8 @@ EVAL_SET = [
     # (query, [gold chunk ids that must be in the top-k])
     ("how do I reset my password?", ["chunk_0412", "chunk_0413"]),
     ("refund policy for annual plans", ["chunk_1102"]),
-    ("", []),                                    # edge: empty query
-    ("billing billing billing", []),             # edge: degenerate
+    ("", []),  # edge: empty query
+    ("billing billing billing", []),  # edge: degenerate
 ]
 ```
 
@@ -82,9 +82,12 @@ def retrieval_metrics(results: list[list[str]], gold: list[list[str]], k: int = 
         mrr = next((1 / (i + 1) for i, c in enumerate(top) if c in rel), 0.0)
         mrrs.append(mrr)
     n = len(results)
-    return {"recall@k": round(sum(recalls) / n, 3),
-            "precision@k": round(sum(precisions) / n, 3),
-            "mrr": round(sum(mrrs) / n, 3)}
+    return {
+        "recall@k": round(sum(recalls) / n, 3),
+        "precision@k": round(sum(precisions) / n, 3),
+        "mrr": round(sum(mrrs) / n, 3),
+    }
+
 
 print(retrieval_metrics([["a", "b", "c"]], [["b"]]))
 ```
@@ -113,6 +116,7 @@ def compare_retrievers(configs: dict, eval_set, search_fn) -> dict:
         table[name] = retrieval_metrics(results, gold)
     return table
 
+
 print(compare_retrievers({"v1-fixed": {}, "v2-heading": {}}, EVAL_SET, mock_search))
 ```
 
@@ -140,10 +144,10 @@ A retrieval miss needs a root cause. The four suspects:
 def attribute_miss(query: str, gold_id: str, results: list[str]) -> str:
     """Classify a retrieval failure from evidence."""
     if not results:
-        return "index/query"          # nothing found at all
+        return "index/query"  # nothing found at all
     if gold_id in results:
-        return "generation"           # retrieval fine — L9 attribution
-    return "retrieval"                # found wrong things
+        return "generation"  # retrieval fine — L9 attribution
+    return "retrieval"  # found wrong things
 ```
 
 Output:
@@ -160,10 +164,12 @@ Retrieval quality is a regression risk — a chunking or embedding change can
 silently drop recall. Gate it in CI (Phase 8 L12 pattern):
 
 ```python
-def retrieval_ci_gate(new_metrics: dict, baseline: dict,
-                      key: str = "recall@k", tol: float = 0.02) -> tuple[bool, str]:
+def retrieval_ci_gate(
+    new_metrics: dict, baseline: dict, key: str = "recall@k", tol: float = 0.02
+) -> tuple[bool, str]:
     ok = new_metrics[key] >= baseline[key] - tol
     return (ok, f"{key}: {new_metrics[key]:.3f} vs baseline {baseline[key]:.3f}")
+
 
 print(retrieval_ci_gate({"recall@k": 0.80}, {"recall@k": 0.84}))
 ```

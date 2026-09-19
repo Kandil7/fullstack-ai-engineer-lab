@@ -33,6 +33,7 @@ random.seed(42)
 # The standard pattern: on read, check cache; on miss, load from the
 # source of truth, store, return. TTL bounds staleness.
 
+
 def cache_aside_get(key: str, load: callable, ttl: float = 60) -> str:
     hit = cache.get(key)
     if hit is not None:
@@ -69,14 +70,15 @@ print(f"underlying loads: {db_calls}")
 # write-behind: write cache first, flush to DB asynchronously — fast
 #   writes, but a crash can lose the queued flush.
 
+
 def write_through(db: dict, key: str, value: str) -> None:
-    db[key] = value                      # system of record first
-    cache.set(key, value)                # then cache
+    db[key] = value  # system of record first
+    cache.set(key, value)  # then cache
     cache.set(f"write-queue:{key}", value, ex=5)  # (write-behind demo below)
 
 
 def write_behind(db: dict, key: str, value: str) -> None:
-    cache.set(key, value)                # serve reads immediately
+    cache.set(key, value)  # serve reads immediately
     cache.rpush("flush-queue", f"{key}:{value}")  # async flush pending
 
 
@@ -97,6 +99,7 @@ print(f"db has profile:2? {db_store.get('profile:2')} (write-behind not flushed 
 #   b) early recompute — refresh before expiry, not after
 #   c) lock (single-flight) — one recomputes, rest wait (topic 06)
 
+
 def set_with_jitter(key: str, value: str, ttl: float, jitter: float = 0.1) -> None:
     """a) Jitter: expiry = ttl * (1 - random.uniform(0, jitter))."""
     cache.set(key, value, ex=ttl * (1 - random.uniform(0, jitter)))
@@ -114,11 +117,13 @@ print(f"jittered TTLs: {expiry_after_jitter}  (all < 60, spread out)")
 # Output:
 # jittered TTLs: [54, 51, 59, 55, 52]  (all < 60, spread out)
 
+
 class EarlyRecomputeCache:
     """b) Refresh the value BEFORE it expires: reads stay warm forever."""
 
-    def __init__(self, client: RedisClient, load: callable, ttl: float = 60.0,
-                 refresh_before: float = 5.0) -> None:
+    def __init__(
+        self, client: RedisClient, load: callable, ttl: float = 60.0, refresh_before: float = 5.0
+    ) -> None:
         self._c = client
         self._load = load
         self._ttl = ttl
@@ -127,7 +132,7 @@ class EarlyRecomputeCache:
     def get(self, key: str) -> str:
         ttl = self._c.ttl(key)
         if ttl < self._refresh_before:
-            value = self._load(key)          # early recompute, still serving
+            value = self._load(key)  # early recompute, still serving
             self._c.set(key, value, ex=self._ttl)
             return value
         return self._c.get(key) or self._load(key)
@@ -136,8 +141,8 @@ class EarlyRecomputeCache:
 erc = EarlyRecomputeCache(cc, lambda k: f"fresh({k})", ttl=60, refresh_before=5)
 cc.set("erc:1", "fresh(erc:1)", ex=60)
 print(erc.get("erc:1"))
-clock.advance(56)                            # TTL now 4 < refresh_before
-print(erc.get("erc:1"))                      # recomputed early, TTL back to 60
+clock.advance(56)  # TTL now 4 < refresh_before
+print(erc.get("erc:1"))  # recomputed early, TTL back to 60
 print(f"TTL after early recompute: {cc.ttl('erc:1')}")
 
 # Output:
@@ -154,8 +159,9 @@ print(f"TTL after early recompute: {cc.ttl('erc:1')}")
 # where Redis meets vector similarity (full treatment in vector-stores/).
 # Here we use a tiny deterministic hashed embedding.
 
+
 def embed(text: str, dim: int = 8) -> list[float]:
-    h = int(hashlib.md5(text.encode()).hexdigest(), 16)   # stable across runs
+    h = int(hashlib.md5(text.encode()).hexdigest(), 16)  # stable across runs
     vec = [0.0] * dim
     vec[h % dim] = 1.0 if (h >> 8) % 2 == 0 else -1.0
     return vec
@@ -163,7 +169,8 @@ def embed(text: str, dim: int = 8) -> list[float]:
 
 def cosine(a: list[float], b: list[float]) -> float:
     return sum(x * y for x, y in zip(a, b)) / (
-        (sum(x * x for x in a) ** 0.5) * (sum(y * y for y in b) ** 0.5) or 1.0)
+        (sum(x * x for x in a) ** 0.5) * (sum(y * y for y in b) ** 0.5) or 1.0
+    )
 
 
 class SemanticCache:
@@ -211,9 +218,10 @@ print(f"near miss   -> {sc.get('What is RAG')} (may or may not hit: hash embed)"
 # bounded by TTL) or active invalidation (DELETE on write). Never mix
 # unbounded caches with mutable data.
 
+
 def invalidate_on_write(db: dict, key: str, value: str) -> None:
     db[key] = value
-    cache.delete(f"cache:{key}")        # kill stale entry synchronously
+    cache.delete(f"cache:{key}")  # kill stale entry synchronously
 
 
 db_store["profile:1"] = "alice-v2"
@@ -239,6 +247,7 @@ print(f"cache after invalidation: {cache.get('cache:profile:1')}")
 # MISTAKE: exact-key semantic cache -> paraphrases always miss.
 # CORRECT: embed + threshold (or a vector store) for LLM prompts.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
@@ -247,36 +256,36 @@ def _verify() -> None:
     assert db_calls == 1, "Cache-aside must load the expensive value once"
 
     # write-behind: cache serves the value before the DB has it
-    assert cache.get("profile:2") == "bob", \
-        "Write-behind must serve reads from cache immediately"
-    assert db_store.get("profile:2") is None, \
+    assert cache.get("profile:2") == "bob", "Write-behind must serve reads from cache immediately"
+    assert db_store.get("profile:2") is None, (
         "Write-behind must NOT have flushed to the DB synchronously"
+    )
 
     # jitter: every TTL is strictly under the nominal 60s and varies
-    assert all(t < 60 for t in expiry_after_jitter), \
-        "Jitter must shorten every TTL below nominal"
-    assert len(set(expiry_after_jitter)) > 1, \
-        "Jitter must spread expiries (not all identical)"
+    assert all(t < 60 for t in expiry_after_jitter), "Jitter must shorten every TTL below nominal"
+    assert len(set(expiry_after_jitter)) > 1, "Jitter must spread expiries (not all identical)"
 
     # early recompute: TTL is restored to full after refresh
-    assert cc.ttl("erc:1") == 60, \
-        "Early recompute must reset the TTL to the full window"
+    assert cc.ttl("erc:1") == 60, "Early recompute must reset the TTL to the full window"
 
     # semantic cache: exact prompt round-trips
-    assert sc.get("What is RAG?") == "Retrieval-Augmented Generation", \
+    assert sc.get("What is RAG?") == "Retrieval-Augmented Generation", (
         "Semantic cache must serve the stored answer for the same prompt"
+    )
 
     # invalidation: DELETE on write removes the stale entry
-    assert cache.get("cache:profile:1") is None, \
+    assert cache.get("cache:profile:1") is None, (
         "Active invalidation must remove the cache entry on write"
+    )
 
     # jitter stays deterministic under a fixed seed
     random.seed(42)
     cc2: RedisClient = RedisClient(clock=ManualClock(start=0.0))
     cc2.set("a", "v", ex=60 * (1 - random.uniform(0, 0.2)))
     cc2.set("b", "v", ex=60 * (1 - random.uniform(0, 0.2)))
-    assert cc2.ttl("a") == expiry_after_jitter[0] and cc2.ttl("b") == expiry_after_jitter[1], \
+    assert cc2.ttl("a") == expiry_after_jitter[0] and cc2.ttl("b") == expiry_after_jitter[1], (
         "Jitter must reproduce exactly under the same seed"
+    )
 
     print("[OK] 03-caching-patterns: all checks passed")
 

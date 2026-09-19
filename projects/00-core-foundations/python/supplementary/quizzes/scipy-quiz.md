@@ -177,8 +177,10 @@ D) Optimizing curve parameters
 ```python
 from scipy.optimize import curve_fit
 
+
 def model(x, a, b):
     return a * np.exp(b * x)
+
 
 popt, pcov = curve_fit(model, xdata, ydata)
 ```

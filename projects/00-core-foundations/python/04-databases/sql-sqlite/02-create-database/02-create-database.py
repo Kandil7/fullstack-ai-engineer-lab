@@ -90,10 +90,7 @@ employees = [
     (5, "Charlie", "Brown", 40, 55000.25, "HR", "2019-11-30", 0),
 ]
 
-cursor.executemany(
-    "INSERT INTO employees VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-    employees
-)
+cursor.executemany("INSERT INTO employees VALUES (?, ?, ?, ?, ?, ?, ?, ?)", employees)
 conn.commit()
 print(f"Inserted {len(employees)} employees.")
 print()

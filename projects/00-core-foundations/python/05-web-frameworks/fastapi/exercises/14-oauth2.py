@@ -33,7 +33,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
 USERS_DB = {
-    "alice": {"password": "password123", "role": "admin", "scopes": ["users:read", "users:write", "posts:read", "posts:write"]},
+    "alice": {
+        "password": "password123",
+        "role": "admin",
+        "scopes": ["users:read", "users:write", "posts:read", "posts:write"],
+    },
     "bob": {"password": "password456", "role": "user", "scopes": ["posts:read"]},
 }
 
@@ -41,6 +45,7 @@ USERS_DB = {
 # =============================================================================
 # Exercise 1: OAuth2 Password Flow
 # =============================================================================
+
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -53,7 +58,9 @@ def create_jwt_token(data: dict, expires_delta: Optional[timedelta] = None):
     payload = {
         **data,
         "iat": datetime.utcnow().timestamp(),
-        "exp": (datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))).timestamp(),
+        "exp": (
+            datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+        ).timestamp(),
     }
     header_b64 = base64.urlsafe_b64encode(json.dumps(header).encode()).rstrip(b"=").decode()
     payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(b"=").decode()
@@ -102,11 +109,13 @@ def authenticate_user(username: str, password: str) -> Optional[str]:
 def create_token_with_role(username: str) -> str:
     """Create JWT token with user role."""
     user = get_user_from_db(username)
-    return create_jwt_token({
-        "sub": username,
-        "role": user["role"] if user else "user",
-        "scopes": user["scopes"] if user else [],
-    })
+    return create_jwt_token(
+        {
+            "sub": username,
+            "role": user["role"] if user else "user",
+            "scopes": user["scopes"] if user else [],
+        }
+    )
 
 
 @app.post("/token", response_model=TokenResponse)
@@ -122,6 +131,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
 # =============================================================================
 # Exercise 2: Protected Routes with OAuth2
 # =============================================================================
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     """Dependency that validates token and returns current user."""
@@ -141,6 +151,7 @@ async def read_users_me(current_user: dict = Depends(get_current_user)):
 # =============================================================================
 # Exercise 3: Scoped Access Control
 # =============================================================================
+
 
 async def verify_scopes(security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)):
     """Dependency that validates token and checks required scopes."""

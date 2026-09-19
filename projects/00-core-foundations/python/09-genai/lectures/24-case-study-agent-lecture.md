@@ -70,17 +70,29 @@ The agent's capabilities are a registered, schema'd, allowlisted set:
 ```python
 TOOL_REGISTRY = {
     "search_docs": {
-        "fn": rag_search, "level": "read",
-        "schema": SearchArgs, "desc": "Search the knowledge base."},
+        "fn": rag_search,
+        "level": "read",
+        "schema": SearchArgs,
+        "desc": "Search the knowledge base.",
+    },
     "lookup_account": {
-        "fn": lookup_account, "level": "read",
-        "schema": AccountArgs, "desc": "Look up an account by id."},
+        "fn": lookup_account,
+        "level": "read",
+        "schema": AccountArgs,
+        "desc": "Look up an account by id.",
+    },
     "issue_refund": {
-        "fn": issue_refund, "level": "write",
-        "schema": RefundArgs, "desc": "Issue a refund (requires approval)."},
+        "fn": issue_refund,
+        "level": "write",
+        "schema": RefundArgs,
+        "desc": "Issue a refund (requires approval).",
+    },
     "escalate": {
-        "fn": create_escalation, "level": "write",
-        "schema": EscalationArgs, "desc": "Escalate to a human agent."},
+        "fn": create_escalation,
+        "level": "write",
+        "schema": EscalationArgs,
+        "desc": "Escalate to a human agent.",
+    },
 }
 ```
 
@@ -99,28 +111,27 @@ The agent runs a ReAct loop (or plan-execute for predictable tickets) with
 hard budgets:
 
 ```python
-def run_agent(ticket: Ticket, *, llm_client, max_steps=8, max_tokens=20_000,
-              max_cost=0.50) -> AgentResult:
+def run_agent(
+    ticket: Ticket, *, llm_client, max_steps=8, max_tokens=20_000, max_cost=0.50
+) -> AgentResult:
     trace = [{"role": "user", "content": ticket.render()}]
-    budget = AgentBudget(max_steps, max_tokens, max_cost)     # L14
+    budget = AgentBudget(max_steps, max_tokens, max_cost)  # L14
     for _ in range(max_steps):
         resp = llm_client.complete(trace)
         trace.append(resp.message)
         if not resp.tool_calls:
             return AgentResult(resolved=resp.content, trace=trace)
         for call in resp.tool_calls:
-            if not budget.ok(resp.usage):          # L14/L18: budgets
-                return AgentResult(resolved="budget exceeded; escalated",
-                                   trace=trace)
-            decision = authorize(call, actor="support_bot")   # L19 gate
+            if not budget.ok(resp.usage):  # L14/L18: budgets
+                return AgentResult(resolved="budget exceeded; escalated", trace=trace)
+            decision = authorize(call, actor="support_bot")  # L19 gate
             if decision == "approve":
-                result = execute_tool(call, TOOL_REGISTRY)    # L13
+                result = execute_tool(call, TOOL_REGISTRY)  # L13
             elif decision == "pending":
-                result = "waiting for human approval"         # L24 pattern
+                result = "waiting for human approval"  # L24 pattern
             else:
                 result = f"denied: {decision}"
-            trace.append({"role": "tool", "tool_call_id": call.id,
-                          "content": result})
+            trace.append({"role": "tool", "tool_call_id": call.id, "content": result})
     return AgentResult(resolved="max steps; escalated to human", trace=trace)
 ```
 
@@ -143,8 +154,9 @@ def authorize(call, *, actor: str) -> str:
     if level == "read":
         return "approve"
     if level == "write":
-        return "pending"          # queued for human approval (async)
-    return "deny"                 # unknown tool — default deny
+        return "pending"  # queued for human approval (async)
+    return "deny"  # unknown tool — default deny
+
 
 def approve_action(action_id: str, approver: str, decision: bool) -> None:
     # recorded in the trace + approval log (audit evidence)
@@ -168,10 +180,10 @@ restarting:
 
 ```python
 def run_with_resume(ticket_id: str, ticket: Ticket, *, llm_client):
-    saved = load_state(ticket_id)          # L16: persisted trace
+    saved = load_state(ticket_id)  # L16: persisted trace
     trace = saved or [{"role": "user", "content": ticket.render()}]
     # ... loop continues from the persisted trace ...
-    save_state(ticket_id, trace)           # persist every step
+    save_state(ticket_id, trace)  # persist every step
 ```
 
 Output:
@@ -189,12 +201,15 @@ a ticket resolution can be reconstructed end to end:
 
 ```python
 def audit_ticket(ticket_id: str) -> dict:
-    trace = load_state(ticket_id)                     # L16
-    logs = load_trace_log(ticket_id)                  # L17
-    return {"ticket": ticket_id, "steps": len(trace),
-            "tool_calls": [t for t in logs if t["kind"] == "tool"],
-            "approvals": [t for t in logs if t["kind"] == "approval"],
-            "total_cost_usd": sum(t["cost_usd"] for t in logs)}
+    trace = load_state(ticket_id)  # L16
+    logs = load_trace_log(ticket_id)  # L17
+    return {
+        "ticket": ticket_id,
+        "steps": len(trace),
+        "tool_calls": [t for t in logs if t["kind"] == "tool"],
+        "approvals": [t for t in logs if t["kind"] == "approval"],
+        "total_cost_usd": sum(t["cost_usd"] for t in logs),
+    }
 ```
 
 Output:
@@ -210,9 +225,11 @@ and efficiency:
 
 ```python
 def agent_release_gate(candidate_agent, suite) -> tuple[bool, dict]:
-    report = run_suite(suite, candidate_agent, AGENT_EVALUATORS)   # L20
-    ok = (report.scores["completion"] >= 0.80 and          # resolves correctly
-          report.scores["efficiency"] >= BASELINE["efficiency"] - 0.1)
+    report = run_suite(suite, candidate_agent, AGENT_EVALUATORS)  # L20
+    ok = (
+        report.scores["completion"] >= 0.80  # resolves correctly
+        and report.scores["efficiency"] >= BASELINE["efficiency"] - 0.1
+    )
     return ok, report.scores
 ```
 

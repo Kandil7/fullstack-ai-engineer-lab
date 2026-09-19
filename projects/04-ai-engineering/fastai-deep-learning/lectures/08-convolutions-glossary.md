@@ -37,9 +37,9 @@ overlapping input patch and sums it into a single output value.
 import torch
 import torch.nn.functional as F
 
-image = torch.arange(25.0).reshape(1, 1, 5, 5)   # (N, C, H, W)
-kernel = torch.ones(1, 1, 3, 3)                  # simple box filter
-out = F.conv2d(image, kernel)                    # 'valid' -> (1, 1, 3, 3)
+image = torch.arange(25.0).reshape(1, 1, 5, 5)  # (N, C, H, W)
+kernel = torch.ones(1, 1, 3, 3)  # simple box filter
+out = F.conv2d(image, kernel)  # 'valid' -> (1, 1, 3, 3)
 print(out.shape)  # torch.Size([1, 1, 3, 3])
 ```
 
@@ -210,7 +210,7 @@ spatial size while keeping channels fixed.
 ```python
 import torch, torch.nn as nn
 
-pool = nn.MaxPool2d(kernel_size=2)       # 2x2 windows
+pool = nn.MaxPool2d(kernel_size=2)  # 2x2 windows
 print(pool(torch.randn(1, 8, 28, 28)).shape)  # (1, 8, 14, 14)
 ```
 
@@ -316,8 +316,12 @@ exploiting locality and weight sharing.
 import torch.nn as nn
 
 cnn = nn.Sequential(
-    nn.Conv2d(1, 16, 3, stride=2, padding=1), nn.BatchNorm2d(16), nn.ReLU(),
-    nn.AdaptiveAvgPool2d(1), nn.Flatten(), nn.Linear(16, 10),
+    nn.Conv2d(1, 16, 3, stride=2, padding=1),
+    nn.BatchNorm2d(16),
+    nn.ReLU(),
+    nn.AdaptiveAvgPool2d(1),
+    nn.Flatten(),
+    nn.Linear(16, 10),
 )
 ```
 

@@ -22,7 +22,7 @@ Reference: https://www.w3schools.com/python/python_datatypes.asp
 # Example 1: Text Type - str
 # ============================================================
 name = "Alice"
-greeting = 'Hello, World!'
+greeting = "Hello, World!"
 multi_line = """This is a
 multi-line string"""
 
@@ -100,11 +100,7 @@ print(f"List from range: {list(numbers)}")
 # Example 4: Mapping Type - dict
 # ============================================================
 # Dictionary - key-value pairs, ordered (Python 3.7+), mutable
-person = {
-    "name": "Alice",
-    "age": 30,
-    "city": "New York"
-}
+person = {"name": "Alice", "age": 30, "city": "New York"}
 
 print(f"\nDict: {person}")
 print(f"Type: {type(person)}")
@@ -144,8 +140,8 @@ print(f"Type: {type(is_active)}")
 # Type: <class 'bool'>
 
 # Note: bool is a subclass of int!
-print(f"True + 1 = {True + 1}")   # Output: True + 1 = 2
-print(f"False * 5 = {False * 5}") # Output: False * 5 = 0
+print(f"True + 1 = {True + 1}")  # Output: True + 1 = 2
+print(f"False * 5 = {False * 5}")  # Output: False * 5 = 0
 
 # ============================================================
 # Example 7: Binary Types
@@ -177,10 +173,7 @@ print(f"Type: {type(mv)}")
 # Example 8: Getting the type with type()
 # ============================================================
 print("\n--- Type Checking ---")
-test_values = [
-    42, 3.14, "hello", True, None,
-    [1, 2], (1, 2), {1, 2}, {"a": 1}
-]
+test_values = [42, 3.14, "hello", True, None, [1, 2], (1, 2), {1, 2}, {"a": 1}]
 
 for val in test_values:
     print(f"{str(val):20s} -> {type(val).__name__}")
@@ -200,9 +193,9 @@ for val in test_values:
 # ============================================================
 print("\n--- isinstance() ---")
 x = 42
-print(f"Is {x} an int? {isinstance(x, int)}")          # True
-print(f"Is {x} a float? {isinstance(x, float)}")        # False
-print(f"Is {x} a number? {isinstance(x, (int, float))}") # True
+print(f"Is {x} an int? {isinstance(x, int)}")  # True
+print(f"Is {x} a float? {isinstance(x, float)}")  # False
+print(f"Is {x} a number? {isinstance(x, (int, float))}")  # True
 
 # ============================================================
 # Summary

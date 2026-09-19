@@ -40,8 +40,8 @@ try:
 except ValueError:
     tb = traceback.format_exc()
 lines = tb.strip().splitlines()
-print(lines[0])    # Traceback (most recent call last):
-print(lines[-1])   # ValueError: chunk index out of range
+print(lines[0])  # Traceback (most recent call last):
+print(lines[-1])  # ValueError: chunk index out of range
 ```
 
 **Related Terms:** Innermost frame, `traceback.format_exc`
@@ -60,10 +60,11 @@ discards the frames that make the bug findable.
 
 ```python
 import traceback
+
 try:
     1 / 0
 except ZeroDivisionError:
-    log_text = traceback.format_exc()   # full stack for the log
+    log_text = traceback.format_exc()  # full stack for the log
 ```
 
 **Related Terms:** Traceback, `format_exception`
@@ -127,7 +128,8 @@ for hangs: dump the stack and see exactly where every thread blocks.
 
 ```python
 import faulthandler
-faulthandler.enable()          # dump on crash signals
+
+faulthandler.enable()  # dump on crash signals
 faulthandler.dump_traceback()  # manual dump: "where am I?"
 ```
 

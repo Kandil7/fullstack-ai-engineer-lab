@@ -36,6 +36,7 @@ from typing import Optional
 # Readiness: "can it serve traffic?"   -> no => stop routing, keep process
 # Startup  : "is it still warming up?" -> yes => delay other probes
 
+
 class HealthState:
     def __init__(self) -> None:
         self.alive = True
@@ -93,6 +94,7 @@ print()
 # in-flight requests to finish (drain), THEN exit. Killing mid-request
 # drops generations; draining lets them complete within a timeout.
 
+
 class GracefulServer:
     def __init__(self) -> None:
         self.in_flight = 0
@@ -102,7 +104,7 @@ class GracefulServer:
     def start_request(self) -> bool:
         with self._lock:
             if self.draining:
-                return False            # new work refused during drain
+                return False  # new work refused during drain
             self.in_flight += 1
             return True
 
@@ -124,13 +126,13 @@ class GracefulServer:
                 if self.in_flight == 0:
                     return True
             time.sleep(0.005)
-        return False                    # timeout: force-exit remaining
+        return False  # timeout: force-exit remaining
 
 
 server = GracefulServer()
 print("=== 3. Graceful shutdown ===")
-assert server.start_request()           # request A in flight
-assert server.start_request()           # request B in flight
+assert server.start_request()  # request A in flight
+assert server.start_request()  # request B in flight
 pending = server.begin_shutdown()
 print(f"SIGTERM received; {pending} in-flight request(s) must drain")
 print(f"new work during drain accepted: {server.start_request()} (refused)")
@@ -145,10 +147,12 @@ print()
 # Production: signal handler flips draining; the event loop keeps
 # serving in-flight work until empty or the grace period expires.
 
+
 def install_shutdown_handler(server: GracefulServer) -> None:
     def _on_sigterm(signum, frame):
         pending = server.begin_shutdown()
         print(f"[signal] SIGTERM: draining {pending} in-flight requests")
+
     signal.signal(signal.SIGTERM, _on_sigterm)
 
 
@@ -163,6 +167,7 @@ print()
 # Startup probe delays traffic until the model is loaded (cold start).
 # Readiness routes traffic only to warmed pods. Liveness restarts
 # crashed processes. Graceful shutdown makes deploys zero-loss.
+
 
 def deploy_sequence(hs: HealthState) -> list[str]:
     events = []
@@ -199,6 +204,7 @@ print()
 #   pod that is still loading a 2GB model
 # CORRECT: startup probe gates traffic until warm
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -227,7 +233,8 @@ def _verify() -> None:
     assert s.start_request() and s.start_request()
     assert s.begin_shutdown() == 2, "two requests must drain"
     assert s.start_request() is False, "new work refused while draining"
-    s.finish_request(); s.finish_request()
+    s.finish_request()
+    s.finish_request()
     assert s.drain(0.5) is True, "drain completes when empty"
 
     # 5. Drain times out gracefully if requests hang
@@ -248,4 +255,4 @@ if __name__ == "__main__":
         print("2. Dependency checks gate readiness, never liveness")
         print("3. SIGTERM -> stop accepting -> drain -> exit")
         print("4. Probes wire the deploy: startup delays, readiness routes")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

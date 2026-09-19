@@ -93,9 +93,7 @@ def read_jsonl(path: Path) -> list[dict]:
 def create_schema(conn: sqlite3.Connection) -> None:
     """Create table runs (id INTEGER PRIMARY KEY, name TEXT NOT NULL,
     score REAL)."""
-    conn.execute(
-        "CREATE TABLE runs (id INTEGER PRIMARY KEY, name TEXT NOT NULL, score REAL)"
-    )
+    conn.execute("CREATE TABLE runs (id INTEGER PRIMARY KEY, name TEXT NOT NULL, score REAL)")
 
 
 def insert_runs(conn: sqlite3.Connection, rows: list[tuple[str, float]]) -> int:

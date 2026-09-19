@@ -29,6 +29,7 @@ import sys
 # Text -> fixed-size vector. Similar text -> nearby vectors.
 # Dimensionality is a model property: 384 (small), 768, 1536, 3072.
 
+
 def cosine_similarity(a: list[float], b: list[float]) -> float:
     """Cosine of the angle between two vectors (ignores magnitude)."""
     dot = sum(x * y for x, y in zip(a, b))
@@ -60,8 +61,9 @@ e_rocket = toy_embed("rocket engine")
 print("Example 1: cosine similarity")
 print(f"  cat vs kitten:  {cosine_similarity(e_cat, e_kitten):.3f}")
 print(f"  cat vs rocket:  {cosine_similarity(e_cat, e_rocket):.3f}")
-assert cosine_similarity(e_cat, e_kitten) > cosine_similarity(e_cat, e_rocket), \
+assert cosine_similarity(e_cat, e_kitten) > cosine_similarity(e_cat, e_rocket), (
     "related text is more similar"
+)
 
 # ============================================================
 # 2. Normalization
@@ -83,6 +85,7 @@ assert abs(dot - cos) < 1e-9, "normalized dot equals cosine"
 # ============================================================
 # Embedding calls are billed per token and per call. Batch them and
 # cache by text hash - repeated content should cost nothing.
+
 
 class EmbeddingCache:
     def __init__(self) -> None:
@@ -108,7 +111,7 @@ class BatchedEmbedder:
         """Embed in batches; dedupe identical texts via the cache."""
         out: list[list[float]] = []
         for i in range(0, len(texts), self.batch_size):
-            batch = texts[i:i + self.batch_size]
+            batch = texts[i : i + self.batch_size]
             self.calls += 1  # one API call per batch
             out.extend(self.cache.embed(t) for t in batch)
         return out
@@ -128,8 +131,10 @@ assert embedder.calls == 3, "40/16 = 3 calls"
 # Changing embedding models changes EVERY vector - all indexes must be
 # rebuilt. That is the real migration cost, not the API price.
 
-def migration_estimate(documents: int, old_dim: int, new_dim: int,
-                       embed_cost_per_1k: float) -> float:
+
+def migration_estimate(
+    documents: int, old_dim: int, new_dim: int, embed_cost_per_1k: float
+) -> float:
     """Cost to re-embed a corpus when switching models."""
     tokens = documents * 300  # assume ~300 tokens/doc
     return tokens / 1000 * embed_cost_per_1k
@@ -141,6 +146,7 @@ print("\nExample 4: embedding migration cost")
 print(f"  re-embedding 1M docs: ${cost:.0f} + index rebuild time")
 assert cost > 0
 
+
 # ============================================================
 # Production Pattern
 # ============================================================
@@ -149,8 +155,9 @@ def build_index(docs: list[str], embedder: BatchedEmbedder) -> list[list[float]]
     return [normalize(v) for v in embedder.embed_many(docs)]
 
 
-def search(query: str, index: list[list[float]],
-           embedder: BatchedEmbedder, k: int = 3) -> list[int]:
+def search(
+    query: str, index: list[list[float]], embedder: BatchedEmbedder, k: int = 3
+) -> list[int]:
     """Top-k nearest neighbors by dot product (normalized == cosine)."""
     qv = normalize(embedder.cache.embed(query))
     scored = [(i, sum(x * y for x, y in zip(qv, index[i]))) for i in range(len(index))]
@@ -174,7 +181,7 @@ def _verify() -> None:
     v1, v2 = [1.0, 0.0], [0.0, 1.0]
     assert abs(cosine_similarity(v1, v2)) < 1e-9, "orthogonal -> 0"
     assert abs(cosine_similarity([1.0], [2.0]) - 1.0) < 1e-9, "parallel -> 1"
-    assert abs(cosine_similarity([], []) ) < 1e-9, "zero vector -> 0"
+    assert abs(cosine_similarity([], [])) < 1e-9, "zero vector -> 0"
 
     n = normalize([3.0, 4.0])
     assert abs(math.sqrt(n[0] ** 2 + n[1] ** 2) - 1.0) < 1e-9, "unit length"

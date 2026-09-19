@@ -14,8 +14,9 @@ def chrono_split(df: pd.DataFrame, frac: float) -> tuple[pd.DataFrame, pd.DataFr
     raise NotImplementedError
 
 
-def fit_scale_train_test(X_train: pd.DataFrame, X_test: pd.DataFrame,
-                         scaler) -> tuple[pd.DataFrame, pd.DataFrame, object]:
+def fit_scale_train_test(
+    X_train: pd.DataFrame, X_test: pd.DataFrame, scaler
+) -> tuple[pd.DataFrame, pd.DataFrame, object]:
     """Fit scaler on train ONLY, transform both. Return scaled + fitted scaler."""
     raise NotImplementedError
 

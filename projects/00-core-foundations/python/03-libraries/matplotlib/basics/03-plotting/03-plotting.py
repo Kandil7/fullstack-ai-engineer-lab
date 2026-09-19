@@ -3,14 +3,17 @@ Matplotlib Plotting Markers & Line Styles - W3Schools Exercises
 ================================================================
 Comprehensive exercises on line and marker customization.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -42,8 +45,9 @@ def exercise_02():
 
     plt.figure(figsize=(8, 5))
     for style, label in zip(styles, labels):
-        plt.plot(x, np.sin(x * (styles.index(style) + 1)), linestyle=style,
-                 linewidth=2, label=label)
+        plt.plot(
+            x, np.sin(x * (styles.index(style) + 1)), linestyle=style, linewidth=2, label=label
+        )
     plt.legend()
     plt.title("Exercise 2: Line Styles")
     plt.xlabel("x")
@@ -82,8 +86,17 @@ def exercise_04():
 
     plt.figure(figsize=(10, 6))
     for cat, d, m, c in zip(categories, data, markers, colors):
-        plt.plot(x, d, marker=m, color=c, markersize=8, linewidth=2,
-                 markerfacecolor="white", markeredgewidth=2, label=cat)
+        plt.plot(
+            x,
+            d,
+            marker=m,
+            color=c,
+            markersize=8,
+            linewidth=2,
+            markerfacecolor="white",
+            markeredgewidth=2,
+            label=cat,
+        )
     plt.legend()
     plt.title("Exercise 4: Publication-Quality Plot")
     plt.xlabel("Time Point")

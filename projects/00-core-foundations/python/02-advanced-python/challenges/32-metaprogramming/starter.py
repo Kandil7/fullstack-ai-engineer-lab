@@ -13,6 +13,7 @@ from typing import Any, Callable
 # Bronze: Auto-Registering Tools
 # ============================================================
 
+
 class Tool:
     """Base class: every subclass registers itself by class name."""
 
@@ -30,6 +31,7 @@ class Tool:
 # ============================================================
 # Silver: Signature -> JSON Schema
 # ============================================================
+
 
 def schema_for(fn: Callable[..., object]) -> dict[str, object]:
     """Build an LLM function-calling schema from the signature.

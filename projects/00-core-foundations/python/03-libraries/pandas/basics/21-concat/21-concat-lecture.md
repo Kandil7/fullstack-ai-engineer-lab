@@ -25,23 +25,25 @@ import pandas as pd
 import numpy as np
 
 # Monthly sales data
-jan = pd.DataFrame({
-    'date': ['2024-01-01', '2024-01-02', '2024-01-03'],
-    'product': ['A', 'B', 'A'],
-    'sales': [100, 150, 120]
-})
+jan = pd.DataFrame(
+    {
+        "date": ["2024-01-01", "2024-01-02", "2024-01-03"],
+        "product": ["A", "B", "A"],
+        "sales": [100, 150, 120],
+    }
+)
 
-feb = pd.DataFrame({
-    'date': ['2024-02-01', '2024-02-02', '2024-02-03'],
-    'product': ['B', 'A', 'C'],
-    'sales': [200, 180, 90]
-})
+feb = pd.DataFrame(
+    {
+        "date": ["2024-02-01", "2024-02-02", "2024-02-03"],
+        "product": ["B", "A", "C"],
+        "sales": [200, 180, 90],
+    }
+)
 
-mar = pd.DataFrame({
-    'date': ['2024-03-01', '2024-03-02'],
-    'product': ['A', 'B'],
-    'sales': [210, 170]
-})
+mar = pd.DataFrame(
+    {"date": ["2024-03-01", "2024-03-02"], "product": ["A", "B"], "sales": [210, 170]}
+)
 
 # Stack vertically (along rows)
 quarter = pd.concat([jan, feb, mar], ignore_index=True)
@@ -63,8 +65,8 @@ print(quarter)
 
 ```python
 # Side by side (along columns)
-df1 = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-df2 = pd.DataFrame({'C': [7, 8, 9], 'D': [10, 11, 12]})
+df1 = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
+df2 = pd.DataFrame({"C": [7, 8, 9], "D": [10, 11, 12]})
 
 horizontal = pd.concat([df1, df2], axis=1)
 print(horizontal)
@@ -106,10 +108,10 @@ pd.concat([df1, df2], axis=1)
 
 ```python
 # join='outer' (default): Keep all columns, fill NaN where missing
-df3 = pd.DataFrame({'A': [1, 2], 'B': [3, 4], 'E': [5, 6]})
-df4 = pd.DataFrame({'A': [7, 8], 'C': [9, 10]})
+df3 = pd.DataFrame({"A": [1, 2], "B": [3, 4], "E": [5, 6]})
+df4 = pd.DataFrame({"A": [7, 8], "C": [9, 10]})
 
-result = pd.concat([df3, df4], join='outer')
+result = pd.concat([df3, df4], join="outer")
 print(result)
 #     A    B    C    E
 # 0  1.0  3.0  NaN  5.0
@@ -118,7 +120,7 @@ print(result)
 # 3  8.0  NaN  10.0 NaN
 
 # join='inner': Only keep common columns
-result = pd.concat([df3, df4], join='inner')
+result = pd.concat([df3, df4], join="inner")
 print(result)
 #    A
 # 0  1
@@ -137,7 +139,7 @@ print(result)
 # Read and concatenate multiple CSV files
 import glob
 
-files = glob.glob('data/sales_*.monthly_*.csv')
+files = glob.glob("data/sales_*.monthly_*.csv")
 all_data = []
 
 for file in files:
@@ -150,14 +152,10 @@ combined = pd.concat(all_data, ignore_index=True)
 ### 5.2 Dictionary of DataFrames
 
 ```python
-data = {
-    'January': jan,
-    'February': feb,
-    'March': mar
-}
+data = {"January": jan, "February": feb, "March": mar}
 
 # Concat with keys to identify source
-quarter = pd.concat(data, names=['month', 'quarter_index'])
+quarter = pd.concat(data, names=["month", "quarter_index"])
 print(quarter.head())
 #                  date product  sales
 # month    quarter_index
@@ -171,8 +169,8 @@ print(quarter.head())
 ## 6. Handling Misaligned Columns
 
 ```python
-df_a = pd.DataFrame({'A': [1, 2], 'B': [3, 4], 'C': [5, 6]})
-df_b = pd.DataFrame({'B': [7, 8], 'C': [9, 10], 'D': [11, 12]})
+df_a = pd.DataFrame({"A": [1, 2], "B": [3, 4], "C": [5, 6]})
+df_b = pd.DataFrame({"B": [7, 8], "C": [9, 10], "D": [11, 12]})
 
 # Outer concat (all columns)
 result = pd.concat([df_a, df_b], ignore_index=True)
@@ -184,7 +182,7 @@ print(result)
 # 3  NaN  8  10  12.0
 
 # Inner concat (common columns only)
-result = pd.concat([df_a, df_b], join='inner', ignore_index=True)
+result = pd.concat([df_a, df_b], join="inner", ignore_index=True)
 print(result)
 #    B   C
 # 0  3   5
@@ -209,7 +207,7 @@ print(result)
 pd.concat([df1, df2, df3], ignore_index=True)
 
 # merge: Different structure, join on keys
-pd.merge(df_customers, df_orders, on='customer_id')
+pd.merge(df_customers, df_orders, on="customer_id")
 ```
 
 ---

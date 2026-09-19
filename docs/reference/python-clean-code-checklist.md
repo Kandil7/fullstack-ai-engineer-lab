@@ -15,12 +15,18 @@ from another language. A formatter cannot enforce that; review can.
 ### Naming
 
 ```python
-user_name = "Ahmed"        # snake_case — variables, functions
+user_name = "Ahmed"  # snake_case — variables, functions
+
+
 def calculate_score(): ...  # snake_case
-class ModelTrainer: ...     # PascalCase — classes
-MAX_EPOCHS = 100            # UPPER_CASE — constants
-_internal = 1               # single underscore — private by convention
-__mangled = 2               # double underscore — name mangling
+
+
+class ModelTrainer: ...  # PascalCase — classes
+
+
+MAX_EPOCHS = 100  # UPPER_CASE — constants
+_internal = 1  # single underscore — private by convention
+__mangled = 2  # double underscore — name mangling
 ```
 
 Avoid: `camelCase` variables, `snake_case` class names.
@@ -62,7 +68,7 @@ Run these in CI so style stops being a review topic. This repo:
 
 ```python
 # comprehensions
-squares = [i ** 2 for i in range(10)]
+squares = [i**2 for i in range(10)]
 labels = {i: f"class_{i}" for i in range(5)}
 
 # partial unpacking
@@ -82,6 +88,7 @@ with open("in.txt") as fin, open("out.txt", "w") as fout:
 def add_item(item, items=[]):
     items.append(item)
     return items
+
 
 # RIGHT
 def add_item(item, items=None):
@@ -106,12 +113,12 @@ Use one wherever setup and teardown must happen together, guaranteed, including 
 class DatabaseConnection:
     def __enter__(self):
         self.conn = connect()
-        return self.conn              # bound by `as`
+        return self.conn  # bound by `as`
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.conn.close()             # always runs
-        return False                  # False/None → exception propagates
-                                      # True       → exception is swallowed
+        self.conn.close()  # always runs
+        return False  # False/None → exception propagates
+        # True       → exception is swallowed
 ```
 
 ### Generator form
@@ -119,13 +126,14 @@ class DatabaseConnection:
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def database_connection():
     conn = connect()
     try:
-        yield conn                    # everything before = __enter__
+        yield conn  # everything before = __enter__
     finally:
-        conn.close()                  # everything after  = __exit__
+        conn.close()  # everything after  = __exit__
 ```
 
 ### AI/ML uses
@@ -140,9 +148,11 @@ def timer(name):
     finally:
         print(f"{name}: {time.perf_counter() - start:.2f}s")
 
+
 # gradient suppression
 with torch.no_grad():
     predictions = model(X_test)
+
 
 # temporary state, restored even on error
 @contextmanager
@@ -170,11 +180,10 @@ def train_model(
     X_train: np.ndarray,
     y_train: np.ndarray,
     epochs: int = 10,
-) -> Model:
-    ...
+) -> Model: ...
 
-def chunk(text: str, size: int, overlap: int = 0) -> list[str]:
-    ...
+
+def chunk(text: str, size: int, overlap: int = 0) -> list[str]: ...
 ```
 
 Modern syntax: `list[str]` not `List[str]`; `str | None` not `Optional[str]` (3.10+).
@@ -193,6 +202,7 @@ def process(D):
             if D[i] > 0:
                 R.append(D[i] * 2)
     return R
+
 
 # after
 def double_positive_values(data: list[float]) -> list[float]:

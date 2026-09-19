@@ -100,17 +100,22 @@ amazing on validation and collapses in production.
 ```python
 import pandas as pd
 
+
 def point_in_time_join(events: pd.DataFrame, features: pd.DataFrame) -> pd.DataFrame:
     """Join each event to features AS OF the event time — no future leakage."""
     events = events.sort_values("event_ts")
     features = features.sort_values("feature_ts")
     # for each event row, take the latest feature row with feature_ts <= event_ts
     joined = pd.merge_asof(
-        events, features,
-        left_on="event_ts", right_on="feature_ts",
-        by="user_id", direction="backward",
+        events,
+        features,
+        left_on="event_ts",
+        right_on="feature_ts",
+        by="user_id",
+        direction="backward",
     )
     return joined
+
 
 # event at 10:00 gets features from ≤10:00, never from 11:00
 ```
@@ -129,7 +134,7 @@ Lecture 10's validation: the discipline is *what the row knew at that moment*.
 ```python
 # OFFLINE — training: bulk historical features
 train_df = store.get_historical_features(
-    entity_df=training_entities,       # user_id + event_ts per row
+    entity_df=training_entities,  # user_id + event_ts per row
     features=["user_activity:days_since_last_purchase", ...],
 )
 
@@ -171,7 +176,7 @@ must explicitly opt in — never silently overwrite history that trained models.
 
 ```python
 # correcting a buggy feature = new version, not overwrite
-store.register_feature_view(v2_definition)   # old models keep v1 features
+store.register_feature_view(v2_definition)  # old models keep v1 features
 # backfill: recompute history for v2 only
 store.backfill(feature_views=["user_activity:v2"], start="2026-01-01")
 ```

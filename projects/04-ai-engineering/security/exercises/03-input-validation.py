@@ -39,8 +39,7 @@ from typing import Optional, Any, Callable
 from urllib.parse import urlparse, unquote
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 logger = logging.getLogger("input_validation")
 
@@ -49,8 +48,10 @@ logger = logging.getLogger("input_validation")
 # Section 1: Validation Severity & Results
 # =============================================================================
 
+
 class ThreatLevel(Enum):
     """Threat levels for validation failures."""
+
     SAFE = 0
     SUSPICIOUS = 1
     MALICIOUS = 2
@@ -60,6 +61,7 @@ class ThreatLevel(Enum):
 @dataclass
 class ValidationResult:
     """Result of an input validation check."""
+
     is_valid: bool
     threat_level: ThreatLevel
     validator_name: str
@@ -70,7 +72,9 @@ class ValidationResult:
 
     @property
     def should_reject(self) -> bool:
-        return not self.is_valid and self.threat_level.value >= ThreatLevel.MALICIOUS.value
+        return (
+            not self.is_valid and self.threat_level.value >= ThreatLevel.MALICIOUS.value
+        )
 
     @property
     def should_log(self) -> bool:
@@ -80,6 +84,7 @@ class ValidationResult:
 # =============================================================================
 # Section 2: SQL Injection Prevention
 # =============================================================================
+
 
 class SQLInjectionValidator:
     """
@@ -129,26 +134,41 @@ class SQLInjectionValidator:
         ],
         "encoding_tricks": [
             r"(?i)(0x[0-9a-fA-F]{4,})",  # Hex-encoded strings
-            r"(?i)(CHAR\s*\(\s*\d+)",      # CHAR() encoding
-            r"(?i)(CONCAT\s*\()",            # String concatenation
-            r"(?i)(EXEC\s*\(|EXECUTE\s*\()", # Dynamic execution
+            r"(?i)(CHAR\s*\(\s*\d+)",  # CHAR() encoding
+            r"(?i)(CONCAT\s*\()",  # String concatenation
+            r"(?i)(EXEC\s*\(|EXECUTE\s*\()",  # Dynamic execution
         ],
     }
 
     # SQL keywords that are suspicious in user input
     DANGEROUS_KEYWORDS = [
-        "SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "CREATE", "ALTER",
-        "EXEC", "EXECUTE", "UNION", "WHERE", "FROM", "TABLE", "DATABASE",
-        "GRANT", "REVOKE", "TRUNCATE", "MERGE", "DECLARE", "CURSOR",
+        "SELECT",
+        "INSERT",
+        "UPDATE",
+        "DELETE",
+        "DROP",
+        "CREATE",
+        "ALTER",
+        "EXEC",
+        "EXECUTE",
+        "UNION",
+        "WHERE",
+        "FROM",
+        "TABLE",
+        "DATABASE",
+        "GRANT",
+        "REVOKE",
+        "TRUNCATE",
+        "MERGE",
+        "DECLARE",
+        "CURSOR",
     ]
 
     def __init__(self, strict_mode: bool = True):
         self.strict_mode = strict_mode
         self.compiled_patterns: dict[str, list[re.Pattern]] = {}
         for category, patterns in self.INJECTION_PATTERNS.items():
-            self.compiled_patterns[category] = [
-                re.compile(pat) for pat in patterns
-            ]
+            self.compiled_patterns[category] = [re.compile(pat) for pat in patterns]
 
     def validate(self, user_input: str) -> ValidationResult:
         """Validate input for SQL injection attempts."""
@@ -234,6 +254,7 @@ class SQLInjectionValidator:
             Tuple of (safe_query, param_values)
         """
         import re as _re
+
         param_names = _re.findall(r":(\w+)", template)
         safe_template = _re.sub(r":(\w+)", "?", template)
         param_values = [params[name] for name in param_names]
@@ -243,6 +264,7 @@ class SQLInjectionValidator:
 # =============================================================================
 # Section 3: XSS Prevention
 # =============================================================================
+
 
 class XSSValidator:
     """
@@ -264,7 +286,7 @@ class XSSValidator:
         ],
         "event_handlers": [
             r"(?i)\bon\w+\s*=\s*['\"].*?['\"]",  # onclick=, onerror=, etc.
-            r"(?i)\bon\w+\s*=\s*\w+",               # onclick=functionName
+            r"(?i)\bon\w+\s*=\s*\w+",  # onclick=functionName
         ],
         "javascript_uri": [
             r"(?i)javascript\s*:",
@@ -280,11 +302,11 @@ class XSSValidator:
             r"(?i)element\.(setAttribute|setAttributeNode)",
         ],
         "encoding_bypass": [
-            r"(?i)&#\d+;",          # HTML entity encoding
-            r"(?i)&#[xX][0-9a-f]+;", # Hex entity encoding
-            r"(?i)%3[Cc]script",     # URL encoded <
-            r"(?i)%3[Ee]",           # URL encoded >
-            r"(?i)\\u[0-9a-fA-F]{4}", # Unicode escape
+            r"(?i)&#\d+;",  # HTML entity encoding
+            r"(?i)&#[xX][0-9a-f]+;",  # Hex entity encoding
+            r"(?i)%3[Cc]script",  # URL encoded <
+            r"(?i)%3[Ee]",  # URL encoded >
+            r"(?i)\\u[0-9a-fA-F]{4}",  # Unicode escape
         ],
         "css_injection": [
             r"(?i)expression\s*\(",
@@ -296,17 +318,26 @@ class XSSValidator:
 
     # Tags that should never appear in user content
     FORBIDDEN_TAGS = [
-        "script", "iframe", "object", "embed", "applet",
-        "form", "input", "button", "link", "meta", "base",
+        "script",
+        "iframe",
+        "object",
+        "embed",
+        "applet",
+        "form",
+        "input",
+        "button",
+        "link",
+        "meta",
+        "base",
     ]
 
     def __init__(self, allowed_tags: Optional[list[str]] = None):
-        self.allowed_tags = set(allowed_tags or ["b", "i", "u", "em", "strong", "p", "br"])
+        self.allowed_tags = set(
+            allowed_tags or ["b", "i", "u", "em", "strong", "p", "br"]
+        )
         self.compiled_patterns: dict[str, list[re.Pattern]] = {}
         for category, patterns in self.XSS_PATTERNS.items():
-            self.compiled_patterns[category] = [
-                re.compile(pat) for pat in patterns
-            ]
+            self.compiled_patterns[category] = [re.compile(pat) for pat in patterns]
 
     def validate(self, user_input: str) -> ValidationResult:
         """Validate input for XSS attacks."""
@@ -379,6 +410,7 @@ class XSSValidator:
 # Section 4: Command Injection Prevention
 # =============================================================================
 
+
 class CommandInjectionValidator:
     """
     Detects and prevents command injection attacks.
@@ -389,11 +421,11 @@ class CommandInjectionValidator:
 
     COMMAND_INJECTION_PATTERNS = {
         "shell_metacharacters": [
-            r"[;&|`$]",                    # Shell metacharacters
-            r"\$\(",                        # Command substitution
-            r"\$\{",                        # Variable expansion
-            r">[>&]",                       # Redirect/duplicate
-            r"\\n|\\r",                     # Newline injection
+            r"[;&|`$]",  # Shell metacharacters
+            r"\$\(",  # Command substitution
+            r"\$\{",  # Variable expansion
+            r">[>&]",  # Redirect/duplicate
+            r"\\n|\\r",  # Newline injection
         ],
         "dangerous_commands": [
             r"(?i)^(\s*)(rm|del|format|mkfs|dd|wget|curl|nc|ncat|netcat)\b",
@@ -417,7 +449,7 @@ class CommandInjectionValidator:
             r"\.\.\\",
             r"(?i)/etc/(passwd|shadow|hosts)",
             r"(?i)/proc/(self|environ|cmdline)",
-            r"(?i)\\\\[^\\]+\\",            # UNC path
+            r"(?i)\\\\[^\\]+\\",  # UNC path
         ],
     }
 
@@ -434,9 +466,7 @@ class CommandInjectionValidator:
         self.allowed_commands = set(allowed_commands or [])
         self.compiled_patterns: dict[str, list[re.Pattern]] = {}
         for category, patterns in self.COMMAND_INJECTION_PATTERNS.items():
-            self.compiled_patterns[category] = [
-                re.compile(pat) for pat in patterns
-            ]
+            self.compiled_patterns[category] = [re.compile(pat) for pat in patterns]
 
     def validate(self, command: str) -> ValidationResult:
         """Validate a command for injection attempts."""
@@ -510,6 +540,7 @@ class CommandInjectionValidator:
 # =============================================================================
 # Section 5: Path Traversal Prevention
 # =============================================================================
+
 
 class PathTraversalValidator:
     """
@@ -619,9 +650,11 @@ class PathTraversalValidator:
 # Section 6: Input Length & Encoding Validation
 # =============================================================================
 
+
 @dataclass
 class InputConstraints:
     """Configuration for input validation constraints."""
+
     max_length: int = 10000
     min_length: int = 1
     allowed_encodings: list[str] = field(default_factory=lambda: ["utf-8"])
@@ -648,11 +681,15 @@ class ConstraintValidator:
 
         # Length check
         if len(text) > self.constraints.max_length:
-            violations.append(f"Exceeds max length ({len(text)} > {self.constraints.max_length})")
+            violations.append(
+                f"Exceeds max length ({len(text)} > {self.constraints.max_length})"
+            )
             details["length"] = len(text)
 
         if len(text) < self.constraints.min_length:
-            violations.append(f"Below min length ({len(text)} < {self.constraints.min_length})")
+            violations.append(
+                f"Below min length ({len(text)} < {self.constraints.min_length})"
+            )
             details["length"] = len(text)
 
         # Null byte check
@@ -670,13 +707,17 @@ class ConstraintValidator:
         # Line count check
         line_count = text.count("\n") + 1
         if line_count > self.constraints.max_line_count:
-            violations.append(f"Too many lines ({line_count} > {self.constraints.max_line_count})")
+            violations.append(
+                f"Too many lines ({line_count} > {self.constraints.max_line_count})"
+            )
             details["line_count"] = line_count
 
         # Word count check
         words = text.split()
         if len(words) > self.constraints.max_word_count:
-            violations.append(f"Too many words ({len(words)} > {self.constraints.max_word_count})")
+            violations.append(
+                f"Too many words ({len(words)} > {self.constraints.max_word_count})"
+            )
             details["word_count"] = len(words)
 
         # Encoding validation
@@ -689,7 +730,9 @@ class ConstraintValidator:
         # Pattern validation
         if self.constraints.required_pattern:
             if not re.match(self.constraints.required_pattern, text):
-                violations.append(f"Does not match required pattern: {self.constraints.required_pattern}")
+                violations.append(
+                    f"Does not match required pattern: {self.constraints.required_pattern}"
+                )
 
         # Calculate threat level
         if not violations:
@@ -721,9 +764,9 @@ class ConstraintValidator:
         if not self.constraints.allow_null_bytes:
             sanitized = sanitized.replace("\x00", "")
         # Truncate to max length
-        sanitized = sanitized[:self.constraints.max_length]
+        sanitized = sanitized[: self.constraints.max_length]
         # Limit lines
-        lines = sanitized.split("\n")[:self.constraints.max_line_count]
+        lines = sanitized.split("\n")[: self.constraints.max_line_count]
         sanitized = "\n".join(lines)
         return sanitized
 
@@ -731,6 +774,7 @@ class ConstraintValidator:
 # =============================================================================
 # Section 7: Validation Pipeline
 # =============================================================================
+
 
 class ValidationPipeline:
     """
@@ -753,9 +797,7 @@ class ValidationPipeline:
             "sql_injection": SQLInjectionValidator(
                 strict_mode=config.get("sql_strict", True)
             ),
-            "xss": XSSValidator(
-                allowed_tags=config.get("allowed_html_tags", [])
-            ),
+            "xss": XSSValidator(allowed_tags=config.get("allowed_html_tags", [])),
             "command_injection": CommandInjectionValidator(
                 allowed_commands=config.get("allowed_commands", [])
             ),
@@ -812,13 +854,15 @@ class ValidationPipeline:
             default=ThreatLevel.SAFE,
             key=lambda x: x.value,
         )
-        self.validation_log.append({
-            "input_hash": hashlib.sha256(text.encode()).hexdigest()[:16],
-            "valid": overall_valid,
-            "max_threat": max_threat.name,
-            "validators_run": list(results.keys()),
-            "timestamp": time.time(),
-        })
+        self.validation_log.append(
+            {
+                "input_hash": hashlib.sha256(text.encode()).hexdigest()[:16],
+                "valid": overall_valid,
+                "max_threat": max_threat.name,
+                "validators_run": list(results.keys()),
+                "timestamp": time.time(),
+            }
+        )
 
         return results
 
@@ -839,7 +883,13 @@ class ValidationPipeline:
     def get_safe_output(self, results: dict[str, ValidationResult]) -> str:
         """Get the safest sanitized output from all validators."""
         # Priority: constraint > xss > sql > command > path
-        priority_order = ["constraint", "xss", "sql_injection", "command_injection", "path_traversal"]
+        priority_order = [
+            "constraint",
+            "xss",
+            "sql_injection",
+            "command_injection",
+            "path_traversal",
+        ]
         for name in priority_order:
             if name in results and results[name].sanitized_output:
                 return results[name].sanitized_output
@@ -849,6 +899,7 @@ class ValidationPipeline:
 # =============================================================================
 # Section 8: Demonstration & Testing
 # =============================================================================
+
 
 def demo_sql_injection():
     """Demonstrate SQL injection detection and prevention."""
@@ -869,9 +920,13 @@ def demo_sql_injection():
 
     for text, description in test_cases:
         result = validator.validate(text)
-        status = "BLOCKED" if result.should_reject else ("WARN" if result.threat_level != ThreatLevel.SAFE else "SAFE")
+        status = (
+            "BLOCKED"
+            if result.should_reject
+            else ("WARN" if result.threat_level != ThreatLevel.SAFE else "SAFE")
+        )
         print(f"\n  [{status}] {description}")
-        print(f"  Input: \"{text[:60]}{'...' if len(text) > 60 else ''}\"")
+        print(f'  Input: "{text[:60]}{"..." if len(text) > 60 else ""}"')
         print(f"  Threat: {result.threat_level.name} | Valid: {result.is_valid}")
         if result.details.get("threats"):
             print(f"  Threats: {', '.join(result.details['threats'])}")
@@ -880,7 +935,9 @@ def demo_sql_injection():
     print("\n  Parameterized Query Example:")
     template = "SELECT * FROM users WHERE name = :name AND age = :age"
     params = {"name": "John'; DROP TABLE users; --", "age": 25}
-    safe_query, values = SQLInjectionValidator.create_parameterized_query(template, params)
+    safe_query, values = SQLInjectionValidator.create_parameterized_query(
+        template, params
+    )
     print(f"  Template: {template}")
     print(f"  Safe query: {safe_query}")
     print(f"  Values: {values}")
@@ -896,21 +953,27 @@ def demo_xss_prevention():
     test_cases = [
         ('<script>alert("XSS")</script>', "Script tag injection"),
         ('<img src=x onerror="alert(1)">', "Event handler injection"),
-        ('javascript:alert(document.cookie)', "JavaScript URI"),
+        ("javascript:alert(document.cookie)", "JavaScript URI"),
         ('<div style="background:url(javascript:alert(1))">', "CSS injection"),
-        ('<b>Bold text</b> and <i>italic</i>', "Safe HTML"),
-        ('Hello, this is plain text.', "Safe plain text"),
-        ('&#60;script&#62;alert(1)&#60;/script&#62;', "HTML entity encoded XSS"),
+        ("<b>Bold text</b> and <i>italic</i>", "Safe HTML"),
+        ("Hello, this is plain text.", "Safe plain text"),
+        ("&#60;script&#62;alert(1)&#60;/script&#62;", "HTML entity encoded XSS"),
     ]
 
     for text, description in test_cases:
         result = validator.validate(text)
-        status = "BLOCKED" if result.should_reject else ("WARN" if result.threat_level != ThreatLevel.SAFE else "SAFE")
+        status = (
+            "BLOCKED"
+            if result.should_reject
+            else ("WARN" if result.threat_level != ThreatLevel.SAFE else "SAFE")
+        )
         print(f"\n  [{status}] {description}")
-        print(f"  Input: \"{text[:60]}{'...' if len(text) > 60 else ''}\"")
+        print(f'  Input: "{text[:60]}{"..." if len(text) > 60 else ""}"')
         print(f"  Threat: {result.threat_level.name} | Valid: {result.is_valid}")
         if result.sanitized_output:
-            print(f"  Sanitized: \"{result.sanitized_output[:60]}{'...' if len(result.sanitized_output) > 60 else ''}\"")
+            print(
+                f'  Sanitized: "{result.sanitized_output[:60]}{"..." if len(result.sanitized_output) > 60 else ""}"'
+            )
 
 
 def demo_command_injection():
@@ -933,16 +996,22 @@ def demo_command_injection():
 
     for text, description in test_cases:
         result = validator.validate(text)
-        status = "BLOCKED" if result.should_reject else ("WARN" if result.threat_level != ThreatLevel.SAFE else "SAFE")
+        status = (
+            "BLOCKED"
+            if result.should_reject
+            else ("WARN" if result.threat_level != ThreatLevel.SAFE else "SAFE")
+        )
         print(f"\n  [{status}] {description}")
-        print(f"  Input: \"{text}\"")
+        print(f'  Input: "{text}"')
         print(f"  Threat: {result.threat_level.name} | Valid: {result.is_valid}")
         if result.details.get("threats"):
             print(f"  Threats: {', '.join(result.details['threats'])}")
 
     # Show safe command building
     print("\n  Safe Command Building:")
-    safe_cmd = CommandInjectionValidator.build_safe_command("python", ["script.py", "arg with spaces", "arg'with'quotes"])
+    safe_cmd = CommandInjectionValidator.build_safe_command(
+        "python", ["script.py", "arg with spaces", "arg'with'quotes"]
+    )
     print(f"  Safe command: {safe_cmd}")
 
 
@@ -966,9 +1035,13 @@ def demo_path_traversal():
 
     for text, description in test_cases:
         result = validator.validate(text)
-        status = "BLOCKED" if result.should_reject else ("WARN" if result.threat_level != ThreatLevel.SAFE else "SAFE")
+        status = (
+            "BLOCKED"
+            if result.should_reject
+            else ("WARN" if result.threat_level != ThreatLevel.SAFE else "SAFE")
+        )
         print(f"\n  [{status}] {description}")
-        print(f"  Input: \"{text}\"")
+        print(f'  Input: "{text}"')
         print(f"  Threat: {result.threat_level.name} | Valid: {result.is_valid}")
 
 
@@ -1015,10 +1088,12 @@ def demo_pipeline():
     print("DEMO 6: Complete Validation Pipeline")
     print("=" * 72)
 
-    pipeline = ValidationPipeline({
-        "constraints": InputConstraints(max_length=5000),
-        "allowed_dirs": ["/tmp/uploads"],
-    })
+    pipeline = ValidationPipeline(
+        {
+            "constraints": InputConstraints(max_length=5000),
+            "allowed_dirs": ["/tmp/uploads"],
+        }
+    )
 
     test_cases = [
         ("Hello, how can I help you?", None, "Normal user message"),
@@ -1042,7 +1117,9 @@ def demo_pipeline():
     # Show validation log
     print(f"\n  Validation Log ({len(pipeline.validation_log)} entries):")
     for entry in pipeline.validation_log[-3:]:
-        print(f"    Hash: {entry['input_hash']} | Valid: {entry['valid']} | Max Threat: {entry['max_threat']}")
+        print(
+            f"    Hash: {entry['input_hash']} | Valid: {entry['valid']} | Max Threat: {entry['max_threat']}"
+        )
 
 
 # =============================================================================

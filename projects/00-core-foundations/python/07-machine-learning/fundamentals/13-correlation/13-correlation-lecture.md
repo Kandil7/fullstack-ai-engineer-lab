@@ -86,7 +86,7 @@ y_mean = np.mean(y)
 
 # Calculate correlation manually
 numerator = np.sum((x - x_mean) * (y - y_mean))
-denominator = np.sqrt(np.sum((x - x_mean)**2) * np.sum((y - y_mean)**2))
+denominator = np.sqrt(np.sum((x - x_mean) ** 2) * np.sum((y - y_mean) ** 2))
 correlation = numerator / denominator
 
 print(f"Manual correlation: {correlation:.4f}")
@@ -143,7 +143,7 @@ X2 = X1 * 0.8 + np.random.randn(n_samples) * 0.2  # Correlated with X1
 X3 = np.random.randn(n_samples)  # Independent
 X4 = -X1 * 0.6 + np.random.randn(n_samples) * 0.4  # Negatively correlated
 
-df = pd.DataFrame({'X1': X1, 'X2': X2, 'X3': X3, 'X4': X4})
+df = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3, "X4": X4})
 
 # Calculate correlation matrix
 corr_matrix = df.corr()
@@ -171,12 +171,12 @@ from sklearn.datasets import make_regression
 np.random.seed(42)
 X, y = make_regression(n_samples=200, n_features=5, noise=0.5, random_state=42)
 
-feature_names = [f'Feature_{i}' for i in range(X.shape[1])]
+feature_names = [f"Feature_{i}" for i in range(X.shape[1])]
 df = pd.DataFrame(X, columns=feature_names)
-df['target'] = y
+df["target"] = y
 
 # Calculate correlations with target
-target_corr = df.corr()['target'].drop('target')
+target_corr = df.corr()["target"].drop("target")
 print("Feature correlations with target:")
 print(target_corr.sort_values(ascending=False))
 ```
@@ -192,19 +192,17 @@ X1 = np.random.randn(100)
 X2 = X1 * 0.95 + np.random.randn(100) * 0.05  # Very high correlation
 X3 = np.random.randn(100)
 
-df = pd.DataFrame({'X1': X1, 'X2': X2, 'X3': X3})
+df = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
 corr_matrix = df.corr()
 
 # Find pairs with correlation > 0.8
 high_corr_pairs = []
 for i in range(len(corr_matrix.columns)):
-    for j in range(i+1, len(corr_matrix.columns)):
+    for j in range(i + 1, len(corr_matrix.columns)):
         if abs(corr_matrix.iloc[i, j]) > 0.8:
-            high_corr_pairs.append((
-                corr_matrix.columns[i],
-                corr_matrix.columns[j],
-                corr_matrix.iloc[i, j]
-            ))
+            high_corr_pairs.append(
+                (corr_matrix.columns[i], corr_matrix.columns[j], corr_matrix.iloc[i, j])
+            )
 
 print("Highly correlated pairs (|corr| > 0.8):")
 for feat1, feat2, corr in high_corr_pairs:
@@ -234,16 +232,17 @@ X2 = X1 * 0.8 + np.random.randn(n_samples) * 0.2
 X3 = np.random.randn(n_samples)
 X4 = -X1 * 0.6 + np.random.randn(n_samples) * 0.4
 
-df = pd.DataFrame({'X1': X1, 'X2': X2, 'X3': X3, 'X4': X4})
+df = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3, "X4": X4})
 corr_matrix = df.corr()
 
 # Create heatmap
 plt.figure(figsize=(8, 6))
-sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0,
-            square=True, fmt='.2f', linewidths=0.5)
-plt.title('Correlation Matrix Heatmap')
+sns.heatmap(
+    corr_matrix, annot=True, cmap="coolwarm", center=0, square=True, fmt=".2f", linewidths=0.5
+)
+plt.title("Correlation Matrix Heatmap")
 plt.tight_layout()
-plt.savefig('correlation_heatmap.png', dpi=100)
+plt.savefig("correlation_heatmap.png", dpi=100)
 plt.show()
 ```
 
@@ -272,7 +271,7 @@ import numpy as np
 
 # Pearson correlation only measures LINEAR relationships
 x = np.linspace(-3, 3, 100)
-y = x ** 2  # Perfect quadratic relationship
+y = x**2  # Perfect quadratic relationship
 
 # Pearson correlation will be close to 0!
 print(f"Pearson correlation: {np.corrcoef(x, y)[0, 1]:.4f}")
@@ -280,6 +279,7 @@ print(f"Pearson correlation: {np.corrcoef(x, y)[0, 1]:.4f}")
 
 # SOLUTION: Use Spearman correlation for monotonic relationships
 from scipy.stats import spearmanr
+
 corr, p_value = spearmanr(x, y)
 print(f"Spearman correlation: {corr:.4f}")
 ```
@@ -296,12 +296,13 @@ print(f"Spearman correlation: {corr:.4f}")
 # Check for VIF (Variance Inflation Factor)
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
+
 def calculate_vif(X):
     vif_data = pd.DataFrame()
     vif_data["feature"] = X.columns
-    vif_data["VIF"] = [variance_inflation_factor(X.values, i) 
-                       for i in range(X.shape[1])]
+    vif_data["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
     return vif_data
+
 
 # VIF > 5-10 indicates problematic multicollinearity
 ```
@@ -327,7 +328,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Create pairplot to see relationships
-sns.pairplot(df, diag_kind='kde')
+sns.pairplot(df, diag_kind="kde")
 plt.show()
 
 # This helps identify non-linear relationships
@@ -359,14 +360,16 @@ print(f"Kendall: {kendall_corr:.4f}")
 import pandas as pd
 import numpy as np
 
+
 def select_features_by_correlation(df, target_col, threshold=0.1):
     """Select features with correlation above threshold with target."""
     corr_with_target = df.corr()[target_col].drop(target_col).abs()
     selected = corr_with_target[corr_with_target > threshold].index.tolist()
     return selected
 
+
 # Usage
-selected_features = select_features_by_correlation(df, 'target', threshold=0.2)
+selected_features = select_features_by_correlation(df, "target", threshold=0.2)
 print(f"Selected features: {selected_features}")
 ```
 
@@ -377,9 +380,10 @@ def remove_highly_correlated(df, threshold=0.9):
     """Remove one feature from each highly correlated pair."""
     corr_matrix = df.corr().abs()
     upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-    
+
     to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
     return df.drop(columns=to_drop)
+
 
 # Usage
 df_reduced = remove_highly_correlated(df, threshold=0.9)
@@ -402,6 +406,7 @@ Exam scores: [65, 70, 75, 85, 95]
 2. Interpret the result
 3. Predict what the score might be for 7 hours of study
 """
+
 import numpy as np
 
 # Your code here
@@ -421,6 +426,7 @@ print("Interpretation: Strong positive correlation")
 Create a correlation matrix for a dataset with 5 features.
 Identify which features are highly correlated (|r| > 0.7).
 """
+
 import numpy as np
 import pandas as pd
 
@@ -434,7 +440,7 @@ f3 = np.random.randn(n)  # Independent
 f4 = -f1 * 0.7 + np.random.randn(n) * 0.3  # Negatively correlated with f1
 f5 = f3 * 0.9 + np.random.randn(n) * 0.1  # Correlated with f3
 
-df = pd.DataFrame({'F1': f1, 'F2': f2, 'F3': f3, 'F4': f4, 'F5': f5})
+df = pd.DataFrame({"F1": f1, "F2": f2, "F3": f3, "F4": f4, "F5": f5})
 
 # Your code here
 corr_matrix = df.corr()
@@ -444,10 +450,11 @@ print(corr_matrix)
 # Find highly correlated pairs
 high_corr = []
 for i in range(len(corr_matrix.columns)):
-    for j in range(i+1, len(corr_matrix.columns)):
+    for j in range(i + 1, len(corr_matrix.columns)):
         if abs(corr_matrix.iloc[i, j]) > 0.7:
-            high_corr.append((corr_matrix.columns[i], corr_matrix.columns[j], 
-                            corr_matrix.iloc[i, j]))
+            high_corr.append(
+                (corr_matrix.columns[i], corr_matrix.columns[j], corr_matrix.iloc[i, j])
+            )
 
 print("\nHighly correlated pairs:")
 for f1, f2, corr in high_corr:
@@ -461,21 +468,21 @@ for f1, f2, corr in high_corr:
 Given a dataset with features and a target variable,
 select the most important features based on correlation.
 """
+
 import numpy as np
 import pandas as pd
 from sklearn.datasets import make_regression
 
 np.random.seed(42)
-X, y = make_regression(n_samples=200, n_features=10, n_informative=3, 
-                       noise=0.5, random_state=42)
+X, y = make_regression(n_samples=200, n_features=10, n_informative=3, noise=0.5, random_state=42)
 
-feature_names = [f'Feature_{i}' for i in range(10)]
+feature_names = [f"Feature_{i}" for i in range(10)]
 df = pd.DataFrame(X, columns=feature_names)
-df['target'] = y
+df["target"] = y
 
 # Your code here
 # 1. Calculate correlation of each feature with target
-target_corr = df.corr()['target'].drop('target').abs()
+target_corr = df.corr()["target"].drop("target").abs()
 
 # 2. Select features with |correlation| > 0.2
 selected = target_corr[target_corr > 0.2].index.tolist()

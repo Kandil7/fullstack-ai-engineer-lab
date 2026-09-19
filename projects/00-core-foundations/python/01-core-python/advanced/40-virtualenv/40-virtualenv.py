@@ -148,8 +148,8 @@ print("Platform:", sys.platform)
 print()
 
 # Example 21: Check if we're in a virtual environment
-in_venv = hasattr(sys, 'real_prefix') or (
-    hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix
+in_venv = hasattr(sys, "real_prefix") or (
+    hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix
 )
 
 if in_venv:
@@ -173,9 +173,9 @@ print()
 
 # Example 23: Check for common venv directories
 print("Checking for virtual environments in current directory:")
-for item in os.listdir('.'):
-    if os.path.isdir(item) and item in ['venv', '.venv', 'env', 'myenv']:
+for item in os.listdir("."):
+    if os.path.isdir(item) and item in ["venv", ".venv", "env", "myenv"]:
         print(f"  Found: {item}/")
-        
+
 print()
 print("Tip: Always use virtual environments to isolate project dependencies!")

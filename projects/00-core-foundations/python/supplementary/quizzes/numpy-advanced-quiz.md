@@ -56,9 +56,9 @@ D) Element-wise sum
 **Explanation:** `np.einsum()` implements Einstein summation notation, allowing you to express complex array operations (dot products, outer products, transposes, traces) in a compact string notation.
 
 ```python
-np.einsum('ij,jk->ik', A, B)  # Matrix multiplication
-np.einsum('ii', A)             # Trace
-np.einsum('ij->ji', A)         # Transpose
+np.einsum("ij,jk->ik", A, B)  # Matrix multiplication
+np.einsum("ii", A)  # Trace
+np.einsum("ij->ji", A)  # Transpose
 ```
 
 ---

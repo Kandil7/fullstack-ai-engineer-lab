@@ -28,11 +28,7 @@ By the end of this lecture, you will be able to:
 
 ```python
 # Using curly braces
-person = {
-    "name": "Alice",
-    "age": 30,
-    "city": "New York"
-}
+person = {"name": "Alice", "age": 30, "city": "New York"}
 print(person)  # {'name': 'Alice', 'age': 30, 'city': 'New York'}
 
 # Using the dict() constructor
@@ -57,8 +53,8 @@ person = {"name": "Alice", "age": 30, "city": "New York"}
 print(person["name"])  # Alice
 
 # Using get() — returns None (or default) if key doesn't exist
-print(person.get("name"))       # Alice
-print(person.get("phone"))      # None
+print(person.get("name"))  # Alice
+print(person.get("phone"))  # None
 print(person.get("phone", "N/A"))  # N/A
 
 # Using square brackets with missing key raises KeyError
@@ -96,7 +92,7 @@ person = {"name": "Alice", "age": 30, "email": "alice@example.com"}
 
 # pop() — remove and return value
 age = person.pop("age")
-print(age)     # 30
+print(age)  # 30
 print(person)  # {'name': 'Alice', 'email': 'alice@example.com'}
 
 # pop() with default — no error if key missing
@@ -105,7 +101,7 @@ print(phone)  # N/A
 
 # popitem() — remove and return last inserted pair
 last = person.popitem()
-print(last)   # ('email', 'alice@example.com')
+print(last)  # ('email', 'alice@example.com')
 
 # del statement
 del person["name"]
@@ -146,12 +142,12 @@ company = {
     "employees": {
         "alice": {"age": 30, "department": "Engineering"},
         "bob": {"age": 25, "department": "Marketing"},
-        "charlie": {"age": 35, "department": "Engineering"}
+        "charlie": {"age": 35, "department": "Engineering"},
     },
     "departments": {
         "engineering": {"budget": 500000, "headcount": 2},
-        "marketing": {"budget": 200000, "headcount": 1}
-    }
+        "marketing": {"budget": 200000, "headcount": 1},
+    },
 }
 
 # Accessing nested values
@@ -177,8 +173,9 @@ print(passed)  # {'Alice': 85, 'Charlie': 91, 'Diana': 78}
 
 # Transform values
 scores = {"Alice": 85, "Bob": 62, "Charlie": 91}
-grades = {name: "A" if score >= 90 else "B" if score >= 80 else "C" 
-          for name, score in scores.items()}
+grades = {
+    name: "A" if score >= 90 else "B" if score >= 80 else "C" for name, score in scores.items()
+}
 print(grades)  # {'Alice': 'B', 'Bob': 'C', 'Charlie': 'A'}
 ```
 
@@ -225,6 +222,7 @@ def word_frequency(text):
         freq[word] = freq.get(word, 0) + 1
     return freq
 
+
 text = "the cat sat on the mat the cat ate the rat"
 result = word_frequency(text)
 # {'the': 4, 'cat': 2, 'sat': 1, 'on': 1, 'mat': 1, 'ate': 1, 'rat': 1}
@@ -241,9 +239,11 @@ def merge_dicts(dict1, dict2):
     """Merge two dictionaries, with dict2 values taking precedence."""
     return {**dict1, **dict2}
 
+
 # Or using | operator (Python 3.9+)
 def merge_dicts(dict1, dict2):
     return dict1 | dict2
+
 
 a = {"x": 1, "y": 2}
 b = {"y": 3, "z": 4}
@@ -256,6 +256,7 @@ print(merge_dicts(a, b))  # {'x': 1, 'y': 3, 'z': 4}
 def invert_dict(d):
     """Swap keys and values."""
     return {v: k for k, v in d.items()}
+
 
 original = {"a": 1, "b": 2, "c": 3}
 inverted = invert_dict(original)
@@ -272,6 +273,7 @@ def group_by_category(items, key_func):
         category = key_func(item)
         groups.setdefault(category, []).append(item)
     return groups
+
 
 words = ["apple", "banana", "avocado", "blueberry", "cherry", "apricot"]
 result = group_by_category(words, key_func=lambda w: w[0])
@@ -349,6 +351,7 @@ def char_frequency(text):
     # Your code here
     pass
 
+
 # Expected: {'h': 2, 'e': 1, 'l': 3, 'o': 2}
 print(char_frequency("hello hello"))
 ```
@@ -360,6 +363,7 @@ Write a function that deeply merges two nested dictionaries.
 def deep_merge(dict1, dict2):
     # Your code here — recursive merge
     pass
+
 
 a = {"x": {"a": 1}, "y": 2}
 b = {"x": {"b": 3}, "z": 4}
@@ -375,6 +379,7 @@ def sort_by_value(d, reverse=False):
     # Your code here
     pass
 
+
 data = {"alice": 85, "bob": 62, "charlie": 91}
 # Expected: {'charlie': 91, 'alice': 85, 'bob': 62}
 print(sort_by_value(data, reverse=True))
@@ -387,6 +392,7 @@ Write a function that flattens a nested dictionary with dot notation keys.
 def flatten_dict(d, parent_key="", sep="."):
     # Your code here
     pass
+
 
 data = {"a": 1, "b": {"c": 2, "d": {"e": 3}}}
 # Expected: {"a": 1, "b.c": 2, "b.d.e": 3}

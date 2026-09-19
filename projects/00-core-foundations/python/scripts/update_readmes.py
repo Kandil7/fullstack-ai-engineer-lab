@@ -10,6 +10,7 @@ Usage:
     python scripts/update_readmes.py --dir 01-core-python  # Single directory
     python scripts/update_readmes.py --index             # Generate INDEX.md files
 """
+
 import argparse
 import os
 import re
@@ -50,25 +51,25 @@ def extract_toc_info(dirpath: str, filename: str) -> tuple:
             content = f.read(500)  # Read first 500 chars
     except (UnicodeDecodeError, OSError):
         return None
-    
+
     # Extract number from filename
     match = re.match(r"(\d{2})[- ](.+)\.py", filename)
     if not match:
         return None
-    
+
     num = match.group(1)
-    
+
     # Extract topic from docstring first line
     doc_match = re.search(r'""".*?\n(.*?)(?:\n|$)', content, re.DOTALL)
     if doc_match:
         topic = doc_match.group(1).strip().rstrip("=").strip()
     else:
         topic = match.group(2).replace("-", " ").title()
-    
+
     # Extract description from second line
-    desc_match = re.search(r'(?:Topics:|About:|Description:)\s*(.*?)$', content, re.MULTILINE)
+    desc_match = re.search(r"(?:Topics:|About:|Description:)\s*(.*?)$", content, re.MULTILINE)
     description = desc_match.group(1).strip() if desc_match else ""
-    
+
     return (num, topic, description[:80])
 
 
@@ -77,59 +78,56 @@ def generate_toc(dirpath: str) -> str | None:
     files = sorted(f for f in os.listdir(dirpath) if re.match(r"\d{2}", f) and f.endswith(".py"))
     if not files:
         return None
-    
+
     rows = []
     for filename in files:
         info = extract_toc_info(dirpath, filename)
         if info:
             num, topic, desc = info
             rows.append(f"| {num} | `{filename}` | {topic} | {desc} |")
-    
+
     if not rows:
         return None
-    
+
     return TOC_TEMPLATE % "\n".join(rows)
 
 
 def update_readme(dirpath: str, write: bool = False) -> bool:
     """Update the README.md in the given directory with generated TOC."""
     readme = os.path.join(dirpath, "README.md")
-    
+
     toc = generate_toc(dirpath)
     if not toc:
         return False
-    
+
     # Read existing README
     if os.path.isfile(readme):
         with open(readme, "r", encoding="utf-8") as f:
             content = f.read()
     else:
         content = f"# {os.path.basename(dirpath)}\n\n"
-    
+
     # Replace existing TOC section or append
     toc_section = f"{TOC_HEADER}\n\n{toc}"
-    
+
     if TOC_HEADER in content:
         # Replace existing TOC
-        pattern = re.compile(
-            rf"{re.escape(TOC_HEADER)}.*?AUTO-GENERATED.*?-->",
-            re.DOTALL
-        )
+        pattern = re.compile(rf"{re.escape(TOC_HEADER)}.*?AUTO-GENERATED.*?-->", re.DOTALL)
         new_content = pattern.sub(toc_section, content)
     else:
         # Append before any final section
         new_content = content.rstrip() + "\n\n" + toc_section + "\n"
-    
+
     if new_content == content:
         return False
-    
+
     if write:
         with open(readme, "w", encoding="utf-8") as f:
             f.write(new_content)
         print(f"  Updated: {os.path.relpath(readme, HERE)}")
     else:
         print(f"  Would update: {os.path.relpath(readme, HERE)}")
-    
+
     return True
 
 
@@ -137,38 +135,38 @@ def generate_index(dirpath: str, write: bool = False) -> bool:
     """Generate an INDEX.md file in the given directory and its subdirectories."""
     # First generate for the directory itself
     index_file = os.path.join(dirpath, "INDEX.md")
-    
+
     toc = generate_toc(dirpath)
     if toc:
         title = os.path.basename(dirpath).replace("-", " ").title()
         index_content = INDEX_TEMPLATE % toc
         index_content = index_content.replace("{title}", title)
-        
+
         if write:
             with open(index_file, "w", encoding="utf-8") as f:
                 f.write(index_content)
             print(f"  Generated: {os.path.relpath(index_file, HERE)}")
         else:
             print(f"  Would generate: {os.path.relpath(index_file, HERE)}")
-    
+
     # Also check subdirectories
     for item in os.listdir(dirpath):
         item_path = os.path.join(dirpath, item)
-        if os.path.isdir(item_path) and not item.startswith('.'):
+        if os.path.isdir(item_path) and not item.startswith("."):
             sub_toc = generate_toc(item_path)
             if sub_toc:
                 sub_index = os.path.join(item_path, "INDEX.md")
                 title = os.path.basename(item_path).replace("-", " ").title()
                 sub_content = INDEX_TEMPLATE % sub_toc
                 sub_content = sub_content.replace("{title}", title)
-                
+
                 if write:
                     with open(sub_index, "w", encoding="utf-8") as f:
                         f.write(sub_content)
                     print(f"  Generated: {os.path.relpath(sub_index, HERE)}")
                 else:
                     print(f"  Would generate: {os.path.relpath(sub_index, HERE)}")
-    
+
     return True
 
 
@@ -176,14 +174,17 @@ def main():
     parser = argparse.ArgumentParser(
         description="Auto-generate README table of contents and INDEX.md files"
     )
-    parser.add_argument("--write", action="store_true",
-                        help="Actually write changes (default: preview)")
-    parser.add_argument("--dir", type=str, default=None,
-                        help="Process a single directory (relative to python root)")
-    parser.add_argument("--index", action="store_true",
-                        help="Generate INDEX.md files instead of updating READMEs")
+    parser.add_argument(
+        "--write", action="store_true", help="Actually write changes (default: preview)"
+    )
+    parser.add_argument(
+        "--dir", type=str, default=None, help="Process a single directory (relative to python root)"
+    )
+    parser.add_argument(
+        "--index", action="store_true", help="Generate INDEX.md files instead of updating READMEs"
+    )
     args = parser.parse_args()
-    
+
     if args.dir:
         dirs = [os.path.join(HERE, args.dir)]
     else:
@@ -193,7 +194,7 @@ def main():
             item_path = os.path.join(HERE, item)
             if os.path.isdir(item_path) and re.match(r"\d{2}-", item):
                 dirs.append(item_path)
-    
+
     updated = 0
     for d in dirs:
         if args.index:
@@ -202,12 +203,12 @@ def main():
         else:
             if update_readme(d, write=args.write):
                 updated += 1
-    
+
     action = "generated" if args.index else "updated"
     print(f"\n{'ok' if args.write else 'preview'} {updated} {action}.")
     if not args.write:
         print("Run with --write to apply changes.")
-    
+
     return 0
 
 

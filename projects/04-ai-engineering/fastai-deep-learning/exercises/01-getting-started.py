@@ -45,11 +45,11 @@ from fastai.vision.all import (
 class TrainConfig:
     """Immutable knobs for the Lesson 1 pipeline."""
 
-    valid_pct: float = 0.2      # fraction held out for validation
-    seed: int = 42              # reproducible train/valid split
-    img_size: int = 224         # square resize applied to every image
-    batch_size: int = 64        # images per training step
-    epochs: int = 1             # fine_tune unfrozen epochs
+    valid_pct: float = 0.2  # fraction held out for validation
+    seed: int = 42  # reproducible train/valid split
+    img_size: int = 224  # square resize applied to every image
+    batch_size: int = 64  # images per training step
+    epochs: int = 1  # fine_tune unfrozen epochs
     metrics: tuple = field(default_factory=lambda: (error_rate, accuracy))
 
 

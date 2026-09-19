@@ -59,9 +59,7 @@ print(indices)
 Dimension along which to sort.
 
 ```python
-matrix = np.array([[3, 1, 4],
-                   [1, 5, 9],
-                   [2, 6, 5]])
+matrix = np.array([[3, 1, 4], [1, 5, 9], [2, 6, 5]])
 
 # Sort along axis 0 (columns)
 print(np.sort(matrix, axis=0))
@@ -114,16 +112,16 @@ Sorting algorithm parameter: 'quicksort', 'mergesort', 'heapsort', 'stable'.
 arr = np.random.rand(1000000)
 
 # QuickSort (default)
-sorted_arr = np.sort(arr, kind='quicksort')
+sorted_arr = np.sort(arr, kind="quicksort")
 
 # MergeSort (stable)
-sorted_arr = np.sort(arr, kind='mergesort')
+sorted_arr = np.sort(arr, kind="mergesort")
 
 # HeapSort
-sorted_arr = np.sort(arr, kind='heapsort')
+sorted_arr = np.sort(arr, kind="heapsort")
 
 # Stable sort
-sorted_arr = np.sort(arr, kind='stable')
+sorted_arr = np.sort(arr, kind="stable")
 ```
 
 **Related:** sort, stable, performance
@@ -136,7 +134,7 @@ sorted_arr = np.sort(arr, kind='stable')
 Sort by multiple keys (lexicographic sorting).
 
 ```python
-names = np.array(['Alice', 'Bob', 'Charlie', 'David'])
+names = np.array(["Alice", "Bob", "Charlie", "David"])
 ages = np.array([30, 25, 35, 25])
 
 # Sort by age (primary), then name (secondary)
@@ -191,7 +189,7 @@ arr = np.array([30, 10, 50, 20, 40])
 # Returns new array (out-of-place)
 sorted_arr = np.sort(arr)
 print(sorted_arr)  # [10 20 30 40 50]
-print(arr)         # [30 10 50 20 40] — unchanged
+print(arr)  # [30 10 50 20 40] — unchanged
 
 # In-place sort
 arr.sort()
@@ -209,17 +207,17 @@ Sorting algorithm that preserves order of equal elements.
 arr = np.array([3, 1, 2, 1, 3])
 
 # Unstable sort (may change order of 1s and 3s)
-sorted_unstable = np.sort(arr, kind='quicksort')
+sorted_unstable = np.sort(arr, kind="quicksort")
 
 # Stable sort (preserves order of 1s and 3s)
-sorted_stable = np.sort(arr, kind='stable')
+sorted_stable = np.sort(arr, kind="stable")
 
 # For structured arrays
-dt = np.dtype([('name', 'U10'), ('age', 'i4')])
-data = np.array([('Alice', 30), ('Bob', 25), ('Charlie', 30)], dtype=dt)
+dt = np.dtype([("name", "U10"), ("age", "i4")])
+data = np.array([("Alice", 30), ("Bob", 25), ("Charlie", 30)], dtype=dt)
 
 # Stable sort by age preserves original order of equal ages
-sorted_data = np.sort(data, order='age', kind='stable')
+sorted_data = np.sort(data, order="age", kind="stable")
 print(sorted_data)
 # [('Bob', 25) ('Alice', 30) ('Charlie', 30)]
 ```
@@ -247,8 +245,7 @@ print(indices)  # [1 3 0 4 2]
 Gather elements along axis using indices.
 
 ```python
-matrix = np.array([[3, 1, 4],
-                   [1, 5, 9]])
+matrix = np.array([[3, 1, 4], [1, 5, 9]])
 
 # Sort each row
 indices = np.argsort(matrix, axis=1)

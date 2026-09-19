@@ -20,12 +20,14 @@ By the end of this lecture, you will be able to:
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31],
-    "City": ["New York", "London", "Paris", "Tokyo"],
-    "Salary": [75000, 82000, 95000, 68000]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, 35, 42, 31],
+        "City": ["New York", "London", "Paris", "Tokyo"],
+        "Salary": [75000, 82000, 95000, 68000],
+    }
+)
 
 # Bracket notation (recommended)
 print(df["Name"])
@@ -74,10 +76,10 @@ print(df.loc[:, ["Name", "Salary"]])
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31]
-}, index=["emp1", "emp2", "emp3", "emp4"])
+df = pd.DataFrame(
+    {"Name": ["Alice", "Bob", "Charlie", "Diana"], "Age": [28, 35, 42, 31]},
+    index=["emp1", "emp2", "emp3", "emp4"],
+)
 
 # Single row by label
 print(df.loc["emp2"])
@@ -120,7 +122,7 @@ print(df.iloc[0:2])
 
 # Negative indexing
 print(df.iloc[-1])  # Last row
-print(df.iloc[-2:]) # Last 2 rows
+print(df.iloc[-2:])  # Last 2 rows
 ```
 
 ---
@@ -132,11 +134,13 @@ print(df.iloc[-2:]) # Last 2 rows
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
-    "Age": [28, 35, 42, 31, 29],
-    "Salary": [75000, 82000, 95000, 68000, 71000]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
+        "Age": [28, 35, 42, 31, 29],
+        "Salary": [75000, 82000, 95000, 68000, 71000],
+    }
+)
 
 # Create boolean mask
 mask = df["Age"] > 30
@@ -209,11 +213,14 @@ print(df[df["Age"].between(30, 40)])
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42],
-    "City": ["New York", "London", "Paris"]
-}, index=["emp1", "emp2", "emp3"])
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie"],
+        "Age": [28, 35, 42],
+        "City": ["New York", "London", "Paris"],
+    },
+    index=["emp1", "emp2", "emp3"],
+)
 
 # Single cell
 print(df.loc["emp2", "Name"])  # Bob
@@ -247,11 +254,13 @@ print(df.iloc[0:2, 0:2])
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31],
-    "Department": ["Eng", "Mkt", "Eng", "Sales"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, 35, 42, 31],
+        "Department": ["Eng", "Mkt", "Eng", "Sales"],
+    }
+)
 
 # Using query method
 print(df.query("Age > 30"))
@@ -312,10 +321,7 @@ print(df.sample(axis=1, n=2))
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Product": ["A", "B", "C", "D", "E"],
-    "Sales": [100, 250, 150, 300, 200]
-})
+df = pd.DataFrame({"Product": ["A", "B", "C", "D", "E"], "Sales": [100, 250, 150, 300, 200]})
 
 # Top 3 by sales
 print(df.nlargest(3, "Sales"))

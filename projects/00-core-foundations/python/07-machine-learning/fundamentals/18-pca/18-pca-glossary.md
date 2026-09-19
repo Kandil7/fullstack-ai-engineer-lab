@@ -69,7 +69,7 @@ pca.fit(X_scaled)
 
 print("Principal Components:")
 for i, component in enumerate(pca.components_):
-    print(f"  PC{i+1}: {component}")
+    print(f"  PC{i + 1}: {component}")
 
 print(f"\nExplained variance: {pca.explained_variance_ratio_}")
 ```
@@ -98,7 +98,7 @@ pca.fit(X_scaled)
 # Individual explained variance
 print("Explained variance by component:")
 for i, var in enumerate(pca.explained_variance_ratio_):
-    print(f"  PC{i+1}: {var:.4f} ({var:.1%})")
+    print(f"  PC{i + 1}: {var:.4f} ({var:.1%})")
 
 # Cumulative explained variance
 cumvar = np.cumsum(pca.explained_variance_ratio_)
@@ -132,10 +132,10 @@ pca.fit(X_scaled)
 
 print("Eigenvalues (explained variance):")
 for i, eigenval in enumerate(pca.explained_variance_):
-    print(f"  λ{i+1} = {eigenval:.4f}")
+    print(f"  λ{i + 1} = {eigenval:.4f}")
 
 # Eigenvalue ratio
-print(f"\nRatio: λ1/λ2 = {pca.explained_variance_[0]/pca.explained_variance_[1]:.2f}")
+print(f"\nRatio: λ1/λ2 = {pca.explained_variance_[0] / pca.explained_variance_[1]:.2f}")
 ```
 
 **Related Terms:** Explained Variance, Eigenvector, Variance Ratio
@@ -240,22 +240,19 @@ pca = PCA(n_components=2)
 pca.fit(X_scaled)
 
 # Create loadings DataFrame
-loadings = pd.DataFrame(
-    pca.components_.T,
-    columns=['PC1', 'PC2'],
-    index=iris.feature_names
-)
+loadings = pd.DataFrame(pca.components_.T, columns=["PC1", "PC2"], index=iris.feature_names)
 
 print("Loadings:")
 print(loadings.round(3))
 
 # Visualize
 import matplotlib.pyplot as plt
-loadings.plot(kind='bar', figsize=(8, 4))
-plt.title('PCA Loadings')
-plt.ylabel('Loading')
+
+loadings.plot(kind="bar", figsize=(8, 4))
+plt.title("PCA Loadings")
+plt.ylabel("Loading")
 plt.tight_layout()
-plt.savefig('pca_loadings.png', dpi=100)
+plt.savefig("pca_loadings.png", dpi=100)
 plt.show()
 ```
 
@@ -350,23 +347,22 @@ pca.fit(X_scaled)
 # Create scree plot
 plt.figure(figsize=(8, 4))
 plt.subplot(1, 2, 1)
-plt.bar(range(1, len(pca.explained_variance_) + 1),
-        pca.explained_variance_, alpha=0.6)
-plt.xlabel('Component')
-plt.ylabel('Eigenvalue')
-plt.title('Scree Plot')
+plt.bar(range(1, len(pca.explained_variance_) + 1), pca.explained_variance_, alpha=0.6)
+plt.xlabel("Component")
+plt.ylabel("Eigenvalue")
+plt.title("Scree Plot")
 
 plt.subplot(1, 2, 2)
 cumvar = np.cumsum(pca.explained_variance_ratio_)
-plt.plot(range(1, len(cumvar) + 1), cumvar, 'bo-')
-plt.axhline(y=0.95, color='r', linestyle='--', label='95%')
-plt.xlabel('Component')
-plt.ylabel('Cumulative Variance')
-plt.title('Cumulative Variance')
+plt.plot(range(1, len(cumvar) + 1), cumvar, "bo-")
+plt.axhline(y=0.95, color="r", linestyle="--", label="95%")
+plt.xlabel("Component")
+plt.ylabel("Cumulative Variance")
+plt.title("Cumulative Variance")
 plt.legend()
 
 plt.tight_layout()
-plt.savefig('scree_plot.png', dpi=100)
+plt.savefig("scree_plot.png", dpi=100)
 plt.show()
 ```
 
@@ -395,7 +391,7 @@ cumvar = np.cumsum(pca.explained_variance_ratio_)
 
 print("Cumulative variance:")
 for i, var in enumerate(cumvar):
-    print(f"  {i+1} components: {var:.2%}")
+    print(f"  {i + 1} components: {var:.2%}")
 
 # Find components for target variance
 for target in [0.90, 0.95, 0.99]:
@@ -517,6 +513,7 @@ print(f"Explained variance: {eigenvalues / eigenvalues.sum()}")
 ```python
 # Basic PCA
 from sklearn.decomposition import PCA
+
 pca = PCA(n_components=2)
 X_pca = pca.fit_transform(X_scaled)
 
@@ -542,7 +539,8 @@ pca = PCA(n_components=2, whiten=True)
 
 # In pipeline
 from sklearn.pipeline import Pipeline
-pipe = Pipeline([('scaler', StandardScaler()), ('pca', PCA(n_components=2))])
+
+pipe = Pipeline([("scaler", StandardScaler()), ("pca", PCA(n_components=2))])
 ```
 
 ---

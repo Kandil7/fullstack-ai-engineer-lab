@@ -12,8 +12,9 @@
 **Definition:** The `|` operator matches either the expression before or after it.
 ```python
 import re
+
 # Matches "cat" OR "dog"
-re.findall(r'cat|dog', 'I have a cat and a dog')  # ['cat', 'dog']
+re.findall(r"cat|dog", "I have a cat and a dog")  # ['cat', 'dog']
 ```
 **Related:** OR operator, grouping
 
@@ -21,9 +22,10 @@ re.findall(r'cat|dog', 'I have a cat and a dog')  # ['cat', 'dog']
 **Definition:** Characters that match positions rather than characters in the string.
 ```python
 import re
+
 # ^ matches start, $ matches end
-re.findall(r'^Hello', 'Hello World')  # ['Hello']
-re.findall(r'World$', 'Hello World')  # ['World']
+re.findall(r"^Hello", "Hello World")  # ['Hello']
+re.findall(r"World$", "Hello World")  # ['World']
 ```
 **Related:** `^`, `$`, word boundary
 
@@ -35,8 +37,9 @@ re.findall(r'World$', 'Hello World')  # ['World']
 **Definition:** A reference to a previously captured group using `\1`, `\2`, etc.
 ```python
 import re
+
 # Find repeated words
-re.findall(r'(\w+)\s+\1', 'the the quick brown fox fox')  # ['the', 'fox']
+re.findall(r"(\w+)\s+\1", "the the quick brown fox fox")  # ['the', 'fox']
 ```
 **Related:** Groups, capturing, capture groups
 
@@ -44,9 +47,10 @@ re.findall(r'(\w+)\s+\1', 'the the quick brown fox fox')  # ['the', 'fox']
 **Definition:** Position between words (letters, digits, underscore) and non-word characters.
 ```python
 import re
+
 # \b matches word boundary
-re.findall(r'\bcat\b', 'the cat sat')  # ['cat']
-re.findall(r'\bcat\b', 'concatenate')  # [] (no match - inside word)
+re.findall(r"\bcat\b", "the cat sat")  # ['cat']
+re.findall(r"\bcat\b", "concatenate")  # [] (no match - inside word)
 ```
 **Related:** `\b`, `\B`, word boundary
 
@@ -58,7 +62,8 @@ re.findall(r'\bcat\b', 'concatenate')  # [] (no match - inside word)
 **Definition:** A group enclosed in `()` that captures the matched text.
 ```python
 import re
-match = re.search(r'(\d+)-(\w+)', '123-abc')
+
+match = re.search(r"(\d+)-(\w+)", "123-abc")
 print(match.group(1))  # 123
 print(match.group(2))  # abc
 ```
@@ -68,11 +73,12 @@ print(match.group(2))  # abc
 **Definition:** A set of characters enclosed in `[]` that matches any one character in the set.
 ```python
 import re
+
 # Match any vowel
-re.findall(r'[aeiou]', 'Hello World')  # ['e', 'o', 'o']
+re.findall(r"[aeiou]", "Hello World")  # ['e', 'o', 'o']
 
 # Match any digit
-re.findall(r'[0-9]', 'abc123')  # ['1', '2', '3']
+re.findall(r"[0-9]", "abc123")  # ['1', '2', '3']
 ```
 **Related:** Ranges, negated classes, `\d`, `\w`, `\s`
 
@@ -84,9 +90,10 @@ re.findall(r'[0-9]', 'abc123')  # ['1', '2', '3']
 **Definition:** Makes `.` match any character including newline.
 ```python
 import re
+
 text = "Line 1\nLine 2"
-re.findall(r'Line.1', text)  # [] (without flag)
-re.findall(r'Line.1', text, re.DOTALL)  # ['Line 1']
+re.findall(r"Line.1", text)  # [] (without flag)
+re.findall(r"Line.1", text, re.DOTALL)  # ['Line 1']
 ```
 **Related:** Flags, `re.S`, metacharacters
 
@@ -98,10 +105,11 @@ re.findall(r'Line.1', text, re.DOTALL)  # ['Line 1']
 **Definition:** Returns all non-overlapping matches as a list of strings or tuples.
 ```python
 import re
-re.findall(r'\d+', 'a1 b2 c3')  # ['1', '2', '3']
+
+re.findall(r"\d+", "a1 b2 c3")  # ['1', '2', '3']
 
 # With groups, returns list of tuples
-re.findall(r'(\d+)-(\w+)', '1-a 2-b')  # [('1', 'a'), ('2', 'b')]
+re.findall(r"(\d+)-(\w+)", "1-a 2-b")  # [('1', 'a'), ('2', 'b')]
 ```
 **Related:** `search()`, `match()`, `finditer()`
 
@@ -109,8 +117,9 @@ re.findall(r'(\d+)-(\w+)', '1-a 2-b')  # [('1', 'a'), ('2', 'b')]
 **Definition:** Optional parameters that modify regex behavior.
 ```python
 import re
+
 # re.IGNORECASE - case insensitive
-re.findall(r'hello', 'Hello HELLO', re.IGNORECASE)  # ['Hello', 'HELLO']
+re.findall(r"hello", "Hello HELLO", re.IGNORECASE)  # ['Hello', 'HELLO']
 
 # re.MULTILINE - ^ and $ match line boundaries
 # re.DOTALL - . matches newlines
@@ -127,8 +136,9 @@ re.findall(r'hello', 'Hello HELLO', re.IGNORECASE)  # ['Hello', 'HELLO']
 **Definition:** Matches as many characters as possible (default behavior).
 ```python
 import re
-text = '<div>content</div>'
-re.findall(r'<.*>', text)  # ['<div>content</div>'] (greedy)
+
+text = "<div>content</div>"
+re.findall(r"<.*>", text)  # ['<div>content</div>'] (greedy)
 ```
 **Related:** Lazy quantifier, quantifiers, `*`, `+`
 
@@ -140,7 +150,8 @@ re.findall(r'<.*>', text)  # ['<div>content</div>'] (greedy)
 **Definition:** Makes matching case-insensitive.
 ```python
 import re
-re.findall(r'python', 'Python PYTHON', re.IGNORECASE)  # ['Python', 'PYTHON']
+
+re.findall(r"python", "Python PYTHON", re.IGNORECASE)  # ['Python', 'PYTHON']
 ```
 **Related:** Flags, case sensitivity
 
@@ -152,8 +163,9 @@ re.findall(r'python', 'Python PYTHON', re.IGNORECASE)  # ['Python', 'PYTHON']
 **Definition:** Matches as few characters as possible (add `?` after quantifier).
 ```python
 import re
-text = '<div>content</div>'
-re.findall(r'<.*?>', text)  # ['<div>', '</div>'] (lazy)
+
+text = "<div>content</div>"
+re.findall(r"<.*?>", text)  # ['<div>', '</div>'] (lazy)
 ```
 **Related:** Greedy quantifier, `*?`, `+?`, `??`
 
@@ -165,13 +177,14 @@ re.findall(r'<.*?>', text)  # ['<div>', '</div>'] (lazy)
 **Definition:** Object returned by `search()` or `match()` containing match details.
 ```python
 import re
-match = re.search(r'(\d+)', 'abc123def')
+
+match = re.search(r"(\d+)", "abc123def")
 if match:
-    print(match.group())   # 123 (full match)
+    print(match.group())  # 123 (full match)
     print(match.group(0))  # 123 (same as above)
-    print(match.start())   # 3 (start index)
-    print(match.end())     # 6 (end index)
-    print(match.span())    # (3, 6)
+    print(match.start())  # 3 (start index)
+    print(match.end())  # 6 (end index)
+    print(match.span())  # (3, 6)
 ```
 **Related:** `group()`, `start()`, `end()`, `span()`
 
@@ -181,8 +194,9 @@ if match:
 # . * + ? ^ $ ( ) [ ] { } | \
 # Each has a special purpose
 import re
-re.findall(r'.', 'abc')  # ['a', 'b', 'c']
-re.findall(r'\.', 'a.b')  # ['.']
+
+re.findall(r".", "abc")  # ['a', 'b', 'c']
+re.findall(r"\.", "a.b")  # ['.']
 ```
 **Related:** Escape, special characters, patterns
 
@@ -190,8 +204,9 @@ re.findall(r'\.', 'a.b')  # ['.']
 **Definition:** Makes `^` and `$` match at line boundaries instead of string boundaries.
 ```python
 import re
+
 text = "Line 1\nLine 2"
-re.findall(r'^\w+', text, re.MULTILINE)  # ['Line', 'Line']
+re.findall(r"^\w+", text, re.MULTILINE)  # ['Line', 'Line']
 ```
 **Related:** Flags, anchors, `re.M`
 
@@ -203,9 +218,10 @@ re.findall(r'^\w+', text, re.MULTILINE)  # ['Line', 'Line']
 **Definition:** A capturing group with a name using `(?P<name>...)`.
 ```python
 import re
-match = re.search(r'(?P<year>\d{4})-(?P<month>\d{2})', '2024-01')
-print(match.group('year'))   # 2024
-print(match.group('month'))  # 01
+
+match = re.search(r"(?P<year>\d{4})-(?P<month>\d{2})", "2024-01")
+print(match.group("year"))  # 2024
+print(match.group("month"))  # 01
 ```
 **Related:** Groups, capturing, `groupdict()`
 
@@ -217,8 +233,9 @@ print(match.group('month'))  # 01
 **Definition:** The regular expression string that defines what to search for.
 ```python
 import re
-pattern = r'\d{3}-\d{4}'  # Matches phone numbers like 555-1234
-match = re.search(pattern, 'Call 555-1234')
+
+pattern = r"\d{3}-\d{4}"  # Matches phone numbers like 555-1234
+match = re.search(pattern, "Call 555-1234")
 ```
 **Related:** Compile, raw strings, regex
 
@@ -226,8 +243,9 @@ match = re.search(pattern, 'Call 555-1234')
 **Definition:** `(?=...)` asserts what follows matches, without consuming text.
 ```python
 import re
+
 # Find numbers followed by "px"
-re.findall(r'\d+(?=px)', '10px 20em 30px')  # ['10', '30']
+re.findall(r"\d+(?=px)", "10px 20em 30px")  # ['10', '30']
 ```
 **Related:** Lookbehind, lookahead, assertions
 
@@ -235,8 +253,9 @@ re.findall(r'\d+(?=px)', '10px 20em 30px')  # ['10', '30']
 **Definition:** `(?<=...)` asserts what precedes matches, without consuming text.
 ```python
 import re
+
 # Find numbers preceded by "$"
-re.findall(r'(?<=\$)\d+', '$100 $200')  # ['100', '200']
+re.findall(r"(?<=\$)\d+", "$100 $200")  # ['100', '200']
 ```
 **Related:** Lookahead, lookbehind, assertions
 
@@ -248,14 +267,15 @@ re.findall(r'(?<=\$)\d+', '$100 $200')  # ['100', '200']
 **Definition:** Specifies how many times the preceding element can occur.
 ```python
 import re
+
 # {n} - exactly n times
-re.findall(r'a{3}', 'aa aaa aaaa')  # ['aaa', 'aaa']
+re.findall(r"a{3}", "aa aaa aaaa")  # ['aaa', 'aaa']
 
 # {n,} - at least n times
-re.findall(r'a{2,}', 'a aa aaa')  # ['aa', 'aaa']
+re.findall(r"a{2,}", "a aa aaa")  # ['aa', 'aaa']
 
 # {n,m} - between n and m times
-re.findall(r'a{1,3}', 'aaaa')  # ['aaa', 'a']
+re.findall(r"a{1,3}", "aaaa")  # ['aaa', 'a']
 ```
 **Related:** Greedy, lazy, `*`, `+`, `?`
 
@@ -278,9 +298,10 @@ pattern2 = r"\d+"  # Clean syntax
 **Definition:** Compiles a regex pattern for reuse and performance.
 ```python
 import re
-pattern = re.compile(r'\d+')
-pattern.findall('a1 b2')  # ['1', '2']
-pattern.findall('c3 d4')  # ['3', '4']
+
+pattern = re.compile(r"\d+")
+pattern.findall("a1 b2")  # ['1', '2']
+pattern.findall("c3 d4")  # ['3', '4']
 ```
 **Related:** Pattern, performance, reuse
 
@@ -288,7 +309,8 @@ pattern.findall('c3 d4')  # ['3', '4']
 **Definition:** Returns all matches as a list.
 ```python
 import re
-re.findall(r'\b\w{4}\b', 'the cat dog fish')  # ['fish']
+
+re.findall(r"\b\w{4}\b", "the cat dog fish")  # ['fish']
 ```
 **Related:** `search()`, `match()`, `finditer()`
 
@@ -296,8 +318,9 @@ re.findall(r'\b\w{4}\b', 'the cat dog fish')  # ['fish']
 **Definition:** Matches pattern only at the start of the string.
 ```python
 import re
-re.match(r'\d+', '123abc')  # Match
-re.match(r'\d+', 'abc123')  # None
+
+re.match(r"\d+", "123abc")  # Match
+re.match(r"\d+", "abc123")  # None
 ```
 **Related:** `search()`, `findall()`
 
@@ -305,7 +328,8 @@ re.match(r'\d+', 'abc123')  # None
 **Definition:** Searches anywhere in the string for a match.
 ```python
 import re
-re.search(r'\d+', 'abc123')  # Match at position 3
+
+re.search(r"\d+", "abc123")  # Match at position 3
 ```
 **Related:** `match()`, `findall()`, `finditer()`
 
@@ -313,7 +337,8 @@ re.search(r'\d+', 'abc123')  # Match at position 3
 **Definition:** Splits string by regex pattern.
 ```python
 import re
-re.split(r'[;,]', 'one;two,three')  # ['one', 'two', 'three']
+
+re.split(r"[;,]", "one;two,three")  # ['one', 'two', 'three']
 ```
 **Related:** `str.split()`, `re.findall()`
 
@@ -321,7 +346,8 @@ re.split(r'[;,]', 'one;two,three')  # ['one', 'two', 'three']
 **Definition:** Replaces matches with replacement string.
 ```python
 import re
-re.sub(r'\d+', 'X', 'a1b2c3')  # 'aXbXcX'
+
+re.sub(r"\d+", "X", "a1b2c3")  # 'aXbXcX'
 ```
 **Related:** `str.replace()`, `re.subn()`
 
@@ -333,7 +359,8 @@ re.sub(r'\d+', 'X', 'a1b2c3')  # 'aXbXcX'
 **Definition:** Finding the first occurrence of a pattern in a string.
 ```python
 import re
-match = re.search(r'pattern', 'text with pattern here')
+
+match = re.search(r"pattern", "text with pattern here")
 ```
 **Related:** `match()`, `findall()`, `finditer()`
 
@@ -345,7 +372,9 @@ match = re.search(r'pattern', 'text with pattern here')
 **Definition:** Allows whitespace and comments in regex patterns.
 ```python
 import re
-pattern = re.compile(r"""
+
+pattern = re.compile(
+    r"""
     ^           # Start of string
     \d{4}       # Year
     -           # Separator
@@ -353,7 +382,9 @@ pattern = re.compile(r"""
     -           # Separator
     \d{2}       # Day
     $           # End of string
-""", re.VERBOSE)
+""",
+    re.VERBOSE,
+)
 ```
 **Related:** Flags, comments, readability
 
@@ -365,8 +396,9 @@ pattern = re.compile(r"""
 **Definition:** `\b` matches position between word and non-word characters.
 ```python
 import re
+
 # Match whole word "cat"
-re.findall(r'\bcat\b', 'cat concatenate cat')  # ['cat', 'cat']
+re.findall(r"\bcat\b", "cat concatenate cat")  # ['cat', 'cat']
 ```
 **Related:** `\b`, `\B`, anchors
 
@@ -415,25 +447,25 @@ re.findall(r'\bcat\b', 'cat concatenate cat')  # ['cat', 'cat']
 
 ### Email Validation
 ```python
-r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
 ```
 
 ### Phone Number (US)
 ```python
-r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}'
+r"\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}"
 ```
 
 ### Date (YYYY-MM-DD)
 ```python
-r'\d{4}-\d{2}-\d{2}'
+r"\d{4}-\d{2}-\d{2}"
 ```
 
 ### URL
 ```python
-r'https?://(?:www\.)?[^\s]+'
+r"https?://(?:www\.)?[^\s]+"
 ```
 
 ### IP Address
 ```python
-r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b'
+r"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b"
 ```

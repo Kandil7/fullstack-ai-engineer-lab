@@ -19,8 +19,7 @@ def build_features(series: pd.Series, window: int) -> pd.DataFrame:
     raise NotImplementedError
 
 
-def features_without_future(series: pd.Series, cutoff: pd.Timestamp,
-                            window: int) -> pd.DataFrame:
+def features_without_future(series: pd.Series, cutoff: pd.Timestamp, window: int) -> pd.DataFrame:
     """Feature table restricted to rows strictly before cutoff."""
     raise NotImplementedError
 

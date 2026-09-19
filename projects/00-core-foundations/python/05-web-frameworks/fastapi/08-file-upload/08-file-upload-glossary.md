@@ -53,10 +53,12 @@ async def upload(file: UploadFile = File(...)):
 ```python
 from fastapi import File
 
+
 @app.post("/upload-raw/")
 async def upload_raw(file: bytes = File(...)):
     # Entire file in memory as bytes
     return {"size": len(file), "type": "bytes"}
+
 
 # vs UploadFile (recommended)
 @app.post("/upload-file/")
@@ -144,6 +146,7 @@ async def upload(file: UploadFile = File(...)):
 ```python
 import hashlib
 
+
 @app.post("/upload/")
 async def upload(file: UploadFile = File(...)):
     content = await file.read()
@@ -176,16 +179,19 @@ async def upload(file: UploadFile = File(...)):
 ```python
 from fastapi import File, UploadFile
 
+
 # With UploadFile (recommended)
 @app.post("/upload/")
 async def upload(file: UploadFile = File(...)):
     content = await file.read()
     return {"size": len(content)}
 
+
 # With bytes (simple but loads all into memory)
 @app.post("/upload-raw/")
 async def upload_raw(file: bytes = File(...)):
     return {"size": len(file)}
+
 
 # With description
 @app.post("/upload/")
@@ -208,10 +214,10 @@ async def upload(
 @app.post("/upload/")
 async def upload(file: UploadFile = File(...)):
     # file is a file-like object
-    content = await file.read()      # Read
-    await file.seek(0)                # Seek to beginning
-    content2 = await file.read()     # Read again
-    await file.close()                # Close
+    content = await file.read()  # Read
+    await file.seek(0)  # Seek to beginning
+    content2 = await file.read()  # Read again
+    await file.close()  # Close
     return {"size": len(content)}
 ```
 
@@ -261,15 +267,17 @@ import os
 file_path = os.path.join(UPLOAD_DIR, file.filename)
 # If filename = "../../../etc/passwd", this accesses system files!
 
+
 # SAFE: Sanitize filename
 def sanitize_filename(name: str) -> str:
     # Remove path components
     name = os.path.basename(name)
     # Remove special characters
-    name = re.sub(r'[^\w\-_\. ]', '', name)
+    name = re.sub(r"[^\w\-_\. ]", "", name)
     # Limit length
     name = name[:255]
     return name
+
 
 safe_name = sanitize_filename(file.filename)
 file_path = os.path.join(UPLOAD_DIR, safe_name)
@@ -288,16 +296,18 @@ file_path = os.path.join(UPLOAD_DIR, safe_name)
 import re
 import uuid
 
+
 def sanitize_filename(filename: str) -> str:
     """Clean filename for safe storage."""
     # Get extension
     ext = os.path.splitext(filename)[1].lower()
     # Clean name
     name = os.path.splitext(filename)[0]
-    name = re.sub(r'[^\w\-]', '', name)  # Keep only word chars
+    name = re.sub(r"[^\w\-]", "", name)  # Keep only word chars
     name = name[:100]  # Limit length
     # Use UUID to prevent overwrites
     return f"{uuid.uuid4().hex}_{name}{ext}"
+
 
 # "My Photo!.jpg" → "a1b2c3d4_MyPhoto.jpg"
 ```
@@ -377,6 +387,7 @@ import os
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+
 @app.post("/upload/")
 async def upload(file: UploadFile = File(...)):
     content = await file.read()
@@ -405,11 +416,12 @@ async def upload(file: UploadFile = File(...)):
 ```python
 from fastapi import UploadFile, File
 
+
 @app.post("/upload/")
 async def upload(file: UploadFile = File(...)):
     return {
-        "filename": file.filename,        # Original filename
-        "content_type": file.content_type, # MIME type
+        "filename": file.filename,  # Original filename
+        "content_type": file.content_type,  # MIME type
         "file": type(file.file).__name__,  # SpooledTemporaryFile
     }
 ```
@@ -442,6 +454,7 @@ async def upload(file: UploadFile = File(...)):
 ```python
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/gif"}
 MAX_SIZE = 5 * 1024 * 1024  # 5MB
+
 
 @app.post("/upload/image/")
 async def upload_image(file: UploadFile = File(...)):

@@ -16,12 +16,54 @@ Reference: https://www.w3schools.com/python/python_mongodb_query.asp
 # ============================================================
 
 users = [
-    {"_id": 1, "name": "Alice", "age": 25, "email": "alice@mail.com", "city": "New York", "status": "active"},
-    {"_id": 2, "name": "Bob", "age": 30, "email": "bob@mail.com", "city": "Boston", "status": "active"},
-    {"_id": 3, "name": "Charlie", "age": 35, "email": "charlie@mail.com", "city": "New York", "status": "inactive"},
-    {"_id": 4, "name": "Diana", "age": 28, "email": "diana@mail.com", "city": "Chicago", "status": "active"},
-    {"_id": 5, "name": "Eve", "age": 32, "email": "eve@mail.com", "city": "Boston", "status": "active"},
-    {"_id": 6, "name": "Frank", "age": 45, "email": "frank@mail.com", "city": "Chicago", "status": "inactive"}
+    {
+        "_id": 1,
+        "name": "Alice",
+        "age": 25,
+        "email": "alice@mail.com",
+        "city": "New York",
+        "status": "active",
+    },
+    {
+        "_id": 2,
+        "name": "Bob",
+        "age": 30,
+        "email": "bob@mail.com",
+        "city": "Boston",
+        "status": "active",
+    },
+    {
+        "_id": 3,
+        "name": "Charlie",
+        "age": 35,
+        "email": "charlie@mail.com",
+        "city": "New York",
+        "status": "inactive",
+    },
+    {
+        "_id": 4,
+        "name": "Diana",
+        "age": 28,
+        "email": "diana@mail.com",
+        "city": "Chicago",
+        "status": "active",
+    },
+    {
+        "_id": 5,
+        "name": "Eve",
+        "age": 32,
+        "email": "eve@mail.com",
+        "city": "Boston",
+        "status": "active",
+    },
+    {
+        "_id": 6,
+        "name": "Frank",
+        "age": 45,
+        "email": "frank@mail.com",
+        "city": "Chicago",
+        "status": "inactive",
+    },
 ]
 
 # ============================================================
@@ -31,9 +73,11 @@ users = [
 # Example 1: $eq - Equal to
 # MongoDB equivalent: db.users.find({"age": {"$eq": 25}})
 
+
 def query_eq(collection, field, value):
     """Find documents where field == value"""
     return [doc for doc in collection if doc.get(field) == value]
+
 
 print("Users with age $eq 25:")
 for user in query_eq(users, "age", 25):
@@ -42,9 +86,11 @@ for user in query_eq(users, "age", 25):
 # Example 2: $ne - Not equal to
 # MongoDB equivalent: db.users.find({"status": {"$ne": "active"}})
 
+
 def query_ne(collection, field, value):
     """Find documents where field != value"""
     return [doc for doc in collection if doc.get(field) != value]
+
 
 print("\nInactive users ($ne active):")
 for user in query_ne(users, "status", "active"):
@@ -53,9 +99,11 @@ for user in query_ne(users, "status", "active"):
 # Example 3: $gt - Greater than
 # MongoDB equivalent: db.users.find({"age": {"$gt": 30}})
 
+
 def query_gt(collection, field, value):
     """Find documents where field > value"""
     return [doc for doc in collection if doc.get(field, 0) > value]
+
 
 print("\nUsers older than 30 ($gt):")
 for user in query_gt(users, "age", 30):
@@ -64,9 +112,11 @@ for user in query_gt(users, "age", 30):
 # Example 4: $gte - Greater than or equal
 # MongoDB equivalent: db.users.find({"age": {"$gte": 30}})
 
+
 def query_gte(collection, field, value):
     """Find documents where field >= value"""
     return [doc for doc in collection if doc.get(field, 0) >= value]
+
 
 print("\nUsers age >= 30 ($gte):")
 for user in query_gte(users, "age", 30):
@@ -75,9 +125,11 @@ for user in query_gte(users, "age", 30):
 # Example 5: $lt - Less than
 # MongoDB equivalent: db.users.find({"age": {"$lt": 30}})
 
+
 def query_lt(collection, field, value):
     """Find documents where field < value"""
     return [doc for doc in collection if doc.get(field, 0) < value]
+
 
 print("\nUsers younger than 30 ($lt):")
 for user in query_lt(users, "age", 30):
@@ -86,9 +138,11 @@ for user in query_lt(users, "age", 30):
 # Example 6: $lte - Less than or equal
 # MongoDB equivalent: db.users.find({"age": {"$lte": 25}})
 
+
 def query_lte(collection, field, value):
     """Find documents where field <= value"""
     return [doc for doc in collection if doc.get(field, 0) <= value]
+
 
 print("\nUsers age <= 25 ($lte):")
 for user in query_lte(users, "age", 25):
@@ -100,6 +154,7 @@ for user in query_lte(users, "age", 25):
 
 # Example 7: $and - Both conditions must be true
 # MongoDB equivalent: db.users.find({"$and": [{"age": {"$gt": 25}}, {"city": "Boston"}]})
+
 
 def query_and(collection, conditions):
     """Find documents matching ALL conditions"""
@@ -132,22 +187,21 @@ def query_and(collection, conditions):
                 match = False
             elif op == "$ne" and not (doc.get(field) != value):
                 match = False
-        
+
         if match:
             results.append(doc)
     return results
 
+
 # Users older than 25 AND in Boston
-and_result = query_and(users, [
-    {"age": {"$gt": 25}},
-    {"city": "Boston"}
-])
+and_result = query_and(users, [{"age": {"$gt": 25}}, {"city": "Boston"}])
 print("\n$and (age > 25 AND city = Boston):")
 for user in and_result:
     print(f"  {user['name']}: age {user['age']}, {user['city']}")
 
 # Example 8: $or - At least one condition must be true
 # MongoDB equivalent: db.users.find({"$or": [{"city": "New York"}, {"city": "Boston"}]})
+
 
 def query_or(collection, conditions):
     """Find documents matching ANY condition"""
@@ -161,11 +215,9 @@ def query_or(collection, conditions):
                 break
     return results
 
+
 # Users in New York OR Boston
-or_result = query_or(users, [
-    {"city": "New York"},
-    {"city": "Boston"}
-])
+or_result = query_or(users, [{"city": "New York"}, {"city": "Boston"}])
 print("\n$or (city = NY OR city = Boston):")
 for user in or_result:
     print(f"  {user['name']}: {user['city']}")
@@ -177,9 +229,11 @@ for user in or_result:
 # Example 9: $in - Match any value in array
 # MongoDB equivalent: db.users.find({"city": {"$in": ["New York", "Chicago"]}})
 
+
 def query_in(collection, field, values):
     """Find documents where field is in values list"""
     return [doc for doc in collection if doc.get(field) in values]
+
 
 # Users in New York or Chicago
 in_result = query_in(users, "city", ["New York", "Chicago"])
@@ -190,9 +244,11 @@ for user in in_result:
 # Example 10: $nin - Not in array
 # MongoDB equivalent: db.users.find({"city": {"$nin": ["New York"]}})
 
+
 def query_nin(collection, field, values):
     """Find documents where field is NOT in values list"""
     return [doc for doc in collection if doc.get(field) not in values]
+
 
 # Users NOT in New York
 nin_result = query_nin(users, "city", ["New York"])
@@ -209,9 +265,11 @@ for user in nin_result:
 
 import re
 
+
 def query_regex(collection, field, pattern):
     """Find documents matching regex pattern"""
     return [doc for doc in collection if re.search(pattern, str(doc.get(field, "")))]
+
 
 # Users with email matching pattern
 regex_result = query_regex(users, "email", r"@mail\.com")
@@ -239,6 +297,7 @@ for user in name_regex:
 #     ]
 # })
 
+
 def complex_query(collection, query):
     """Execute a complex query with multiple conditions"""
     results = []
@@ -250,7 +309,7 @@ def complex_query(collection, query):
                     field = list(cond.keys())[0]
                     op = list(cond[field].keys())[0]
                     value = cond[field][op]
-                    
+
                     doc_val = doc.get(field)
                     if op == "$gte" and not (doc_val >= value):
                         match = False
@@ -278,19 +337,16 @@ def complex_query(collection, query):
                         match = False
             elif doc[key] != condition:
                 match = False
-        
+
         if match:
             results.append(doc)
     return results
 
+
 # Active users aged 28-35
-complex_result = complex_query(users, {
-    "$and": [
-        {"age": {"$gte": 28}},
-        {"age": {"$lte": 35}}
-    ],
-    "status": "active"
-})
+complex_result = complex_query(
+    users, {"$and": [{"age": {"$gte": 28}}, {"age": {"$lte": 35}}], "status": "active"}
+)
 
 print("\nComplex query (active, age 28-35):")
 for user in complex_result:
@@ -318,6 +374,7 @@ print("""
 12. Queries can be combined for complex filters
 """)
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
@@ -332,26 +389,51 @@ def _verify() -> None:
     assert [d["name"] for d in query_lte(users, "age", 25)] == ["Alice"]
 
     # logical operators
-    assert [d["name"] for d in query_and(users, [{"age": {"$gt": 25}}, {"city": "Boston"}])] == ["Bob", "Eve"]
-    assert [d["name"] for d in query_or(users, [{"city": "New York"}, {"city": "Boston"}])] == ["Alice", "Bob", "Charlie", "Eve"]
+    assert [d["name"] for d in query_and(users, [{"age": {"$gt": 25}}, {"city": "Boston"}])] == [
+        "Bob",
+        "Eve",
+    ]
+    assert [d["name"] for d in query_or(users, [{"city": "New York"}, {"city": "Boston"}])] == [
+        "Alice",
+        "Bob",
+        "Charlie",
+        "Eve",
+    ]
 
     # regression (R6): $gte/$lte inside $and must filter, not be ignored
-    assert [d["name"] for d in query_and(users, [{"age": {"$gte": 30}}])] == ["Bob", "Charlie", "Eve", "Frank"]
+    assert [d["name"] for d in query_and(users, [{"age": {"$gte": 30}}])] == [
+        "Bob",
+        "Charlie",
+        "Eve",
+        "Frank",
+    ]
     assert [d["name"] for d in query_and(users, [{"age": {"$lte": 28}}])] == ["Alice", "Diana"]
 
     # $in / $nin
-    assert [d["name"] for d in query_in(users, "city", ["New York", "Chicago"])] == ["Alice", "Charlie", "Diana", "Frank"]
-    assert [d["name"] for d in query_nin(users, "city", ["New York"])] == ["Bob", "Diana", "Eve", "Frank"]
+    assert [d["name"] for d in query_in(users, "city", ["New York", "Chicago"])] == [
+        "Alice",
+        "Charlie",
+        "Diana",
+        "Frank",
+    ]
+    assert [d["name"] for d in query_nin(users, "city", ["New York"])] == [
+        "Bob",
+        "Diana",
+        "Eve",
+        "Frank",
+    ]
 
     # $regex
     assert len(query_regex(users, "email", r"@mail\.com")) == 6
     assert [d["name"] for d in query_regex(users, "name", r"^[AB]")] == ["Alice", "Bob"]
 
     # complex combined query
-    assert [d["name"] for d in complex_query(users, {
-        "$and": [{"age": {"$gte": 28}}, {"age": {"$lte": 35}}],
-        "status": "active"
-    })] == ["Bob", "Diana", "Eve"]
+    assert [
+        d["name"]
+        for d in complex_query(
+            users, {"$and": [{"age": {"$gte": 28}}, {"age": {"$lte": 35}}], "status": "active"}
+        )
+    ] == ["Bob", "Diana", "Eve"]
 
     print("[OK] 06-query: all checks passed")
 

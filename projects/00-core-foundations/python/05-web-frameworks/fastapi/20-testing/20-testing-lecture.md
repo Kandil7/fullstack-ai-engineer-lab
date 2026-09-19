@@ -53,14 +53,11 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}  # SQLite specific
+    connect_args={"check_same_thread": False},  # SQLite specific
 )
 
-TestingSessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine
-)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 # Create test tables
 def override_get_db():
@@ -70,8 +67,10 @@ def override_get_db():
     finally:
         db.close()
 
+
 # Override database dependency
 app.dependency_overrides[get_db] = override_get_db
+
 
 @pytest.fixture
 def session():
@@ -83,6 +82,7 @@ def session():
         db.close()
         Base.metadata.drop_all(bind=engine)
 
+
 @pytest.fixture
 def client(session):
     def override_get_db():
@@ -90,7 +90,7 @@ def client(session):
             yield session
         finally:
             pass
-    
+
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as client:
         yield client
@@ -110,19 +110,17 @@ from app.main import app
 
 client = TestClient(app)
 
+
 def test_read_root():
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "Hello World"}
 
+
 def test_create_user():
     response = client.post(
         "/users/",
-        json={
-            "email": "test@example.com",
-            "username": "testuser",
-            "password": "secret123"
-        }
+        json={"email": "test@example.com", "username": "testuser", "password": "secret123"},
     )
     assert response.status_code == 201
     data = response.json()
@@ -130,33 +128,27 @@ def test_create_user():
     assert data["username"] == "testuser"
     assert "id" in data
 
+
 def test_create_user_invalid_email():
     response = client.post(
-        "/users/",
-        json={
-            "email": "invalid-email",
-            "username": "testuser",
-            "password": "secret123"
-        }
+        "/users/", json={"email": "invalid-email", "username": "testuser", "password": "secret123"}
     )
     assert response.status_code == 422  # Validation error
+
 
 def test_read_user():
     # First create a user
     response = client.post(
         "/users/",
-        json={
-            "email": "test@example.com",
-            "username": "testuser",
-            "password": "secret123"
-        }
+        json={"email": "test@example.com", "username": "testuser", "password": "secret123"},
     )
     user_id = response.json()["id"]
-    
+
     # Then read it
     response = client.get(f"/users/{user_id}")
     assert response.status_code == 200
     assert response.json()["email"] == "test@example.com"
+
 
 def test_read_user_not_found():
     response = client.get("/users/999")
@@ -180,16 +172,10 @@ from fastapi.testclient import TestClient
 # Test database setup
 TEST_DATABASE_URL = "sqlite:///./test.db"
 
-test_engine = create_engine(
-    TEST_DATABASE_URL,
-    connect_args={"check_same_thread": False}
-)
+test_engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
 
-TestingSessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=test_engine
-)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+
 
 @pytest.fixture(scope="function")
 def db_session():
@@ -202,50 +188,46 @@ def db_session():
         db.close()
         Base.metadata.drop_all(bind=test_engine)
 
+
 @pytest.fixture(scope="function")
 def client(db_session):
     """Create a test client with database override"""
+
     def override_get_db():
         try:
             yield db_session
         finally:
             pass
-    
+
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as client:
         yield client
     app.dependency_overrides.clear()
 
+
 def test_create_and_read_user(client, db_session):
     # Create user
-    user_data = {
-        "email": "test@example.com",
-        "username": "testuser",
-        "password": "secret123"
-    }
+    user_data = {"email": "test@example.com", "username": "testuser", "password": "secret123"}
     response = client.post("/users/", json=user_data)
     assert response.status_code == 201
-    
+
     # Verify in database
     user_id = response.json()["id"]
     db_user = db_session.query(models.User).filter(models.User.id == user_id).first()
     assert db_user is not None
     assert db_user.email == "test@example.com"
 
+
 def test_database_rollback_on_error(client, db_session):
     # Try to create duplicate user
-    user_data = {
-        "email": "test@example.com",
-        "username": "testuser",
-        "password": "secret123"
-    }
-    
+    user_data = {"email": "test@example.com", "username": "testuser", "password": "secret123"}
+
     client.post("/users/", json=user_data)
     response = client.post("/users/", json=user_data)
-    
+
     # Second request should fail
     assert response.status_code == 400
-    
+
     # Verify only one user exists
     count = db_session.query(models.User).count()
     assert count == 1
@@ -265,16 +247,10 @@ from app.database import get_async_db, Base
 # Async test database
 TEST_DATABASE_URL = "sqlite+aiosqlite:///./test_async.db"
 
-test_engine = create_async_engine(
-    TEST_DATABASE_URL,
-    echo=True
-)
+test_engine = create_async_engine(TEST_DATABASE_URL, echo=True)
 
-async_test_session = async_sessionmaker(
-    test_engine,
-    class_=AsyncSession,
-    expire_on_commit=False
-)
+async_test_session = async_sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
+
 
 @pytest_asyncio.fixture
 async def setup_database():
@@ -285,9 +261,11 @@ async def setup_database():
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
+
 @pytest_asyncio.fixture
 async def async_client(setup_database):
     """Create async test client"""
+
     async def override_get_async_db():
         async with async_test_session() as session:
             try:
@@ -296,27 +274,25 @@ async def async_client(setup_database):
             except Exception:
                 await session.rollback()
                 raise
-    
+
     app.dependency_overrides[get_async_db] = override_get_async_db
-    
+
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
-    
+
     app.dependency_overrides.clear()
+
 
 @pytest.mark.asyncio
 async def test_async_create_user(async_client):
     response = await async_client.post(
         "/users/",
-        json={
-            "email": "async@example.com",
-            "username": "asyncuser",
-            "password": "secret123"
-        }
+        json={"email": "async@example.com", "username": "asyncuser", "password": "secret123"},
     )
     assert response.status_code == 201
     assert response.json()["email"] == "async@example.com"
+
 
 @pytest.mark.asyncio
 async def test_async_read_users(async_client):
@@ -324,13 +300,9 @@ async def test_async_read_users(async_client):
     for i in range(3):
         await async_client.post(
             "/users/",
-            json={
-                "email": f"user{i}@example.com",
-                "username": f"user{i}",
-                "password": "secret123"
-            }
+            json={"email": f"user{i}@example.com", "username": f"user{i}", "password": "secret123"},
         )
-    
+
     # Read all users
     response = await async_client.get("/users/")
     assert response.status_code == 200
@@ -346,55 +318,50 @@ from unittest.mock import Mock, patch, AsyncMock
 from app.services.email import send_email
 from app.services.payment import process_payment
 
+
 def test_send_welcome_email():
     with patch("app.services.email.send_email") as mock_send:
         mock_send.return_value = {"status": "sent"}
-        
+
         result = send_email(
-            to="user@example.com",
-            subject="Welcome!",
-            body="Welcome to our platform!"
+            to="user@example.com", subject="Welcome!", body="Welcome to our platform!"
         )
-        
+
         assert result["status"] == "sent"
         mock_send.assert_called_once()
+
 
 @pytest.mark.asyncio
 async def test_process_payment_success():
     with patch("app.services.payment.process_payment") as mock_payment:
-        mock_payment.return_value = {
-            "status": "success",
-            "transaction_id": "txn_123"
-        }
-        
-        result = await process_payment(
-            amount=99.99,
-            currency="USD",
-            card_token="tok_visa"
-        )
-        
+        mock_payment.return_value = {"status": "success", "transaction_id": "txn_123"}
+
+        result = await process_payment(amount=99.99, currency="USD", card_token="tok_visa")
+
         assert result["status"] == "success"
         assert result["transaction_id"] == "txn_123"
+
 
 def test_payment_failure_handling():
     with patch("app.services.payment.process_payment") as mock_payment:
         mock_payment.side_effect = Exception("Payment gateway error")
-        
+
         with pytest.raises(Exception) as exc_info:
             process_payment(amount=99.99)
-        
+
         assert "Payment gateway error" in str(exc_info.value)
+
 
 # Mocking FastAPI dependencies
 def test_with_mocked_auth():
     def override_get_current_user():
         return {"id": 1, "email": "mock@example.com", "is_superuser": True}
-    
+
     app.dependency_overrides[get_current_user] = override_get_current_user
-    
+
     response = client.get("/admin/users")
     assert response.status_code == 200
-    
+
     app.dependency_overrides.clear()
 ```
 
@@ -404,40 +371,55 @@ def test_with_mocked_auth():
 # test_parameterized.py
 import pytest
 
-@pytest.mark.parametrize("email,expected", [
-    ("test@example.com", True),
-    ("invalid-email", False),
-    ("@example.com", False),
-    ("user@", False),
-    ("user.name@example.com", True),
-    ("user+tag@example.com", True),
-])
+
+@pytest.mark.parametrize(
+    "email,expected",
+    [
+        ("test@example.com", True),
+        ("invalid-email", False),
+        ("@example.com", False),
+        ("user@", False),
+        ("user.name@example.com", True),
+        ("user+tag@example.com", True),
+    ],
+)
 def test_validate_email(email, expected):
     from app.utils import validate_email
+
     assert validate_email(email) == expected
 
-@pytest.mark.parametrize("password,expected", [
-    ("short", False),
-    ("alllowercase123", False),
-    ("ALLUPPERCASE123", False),
-    ("NoNumbers!", False),
-    ("NoSpecialChars123", False),
-    ("ValidPass123!", True),
-    ("AnotherValid@456", True),
-])
+
+@pytest.mark.parametrize(
+    "password,expected",
+    [
+        ("short", False),
+        ("alllowercase123", False),
+        ("ALLUPPERCASE123", False),
+        ("NoNumbers!", False),
+        ("NoSpecialChars123", False),
+        ("ValidPass123!", True),
+        ("AnotherValid@456", True),
+    ],
+)
 def test_validate_password_strength(password, expected):
     from app.utils import validate_password_strength
+
     assert validate_password_strength(password) == expected
 
-@pytest.mark.parametrize("age", [
-    -1,
-    0,
-    150,
-    151,
-])
+
+@pytest.mark.parametrize(
+    "age",
+    [
+        -1,
+        0,
+        150,
+        151,
+    ],
+)
 def test_invalid_age(age):
     with pytest.raises(ValueError):
         create_user(age=age)
+
 
 # Fixture with parameters
 @pytest.fixture(params=["sqlite", "postgresql"])
@@ -446,6 +428,7 @@ def db_engine(request):
         return create_engine("sqlite:///./test.db")
     else:
         return create_engine("postgresql://test:test@localhost/testdb")
+
 
 def test_with_multiple_databases(db_engine):
     # Test runs twice - once for each database
@@ -471,66 +454,59 @@ INTEGRATION_DATABASE_URL = "postgresql://test:test@localhost/testdb"
 integration_engine = create_engine(INTEGRATION_DATABASE_URL)
 IntegrationSession = sessionmaker(bind=integration_engine)
 
+
 @pytest.fixture(scope="module")
 def integration_client():
     """Integration test client"""
     Base.metadata.create_all(bind=integration_engine)
-    
+
     def override_get_db():
         db = IntegrationSession()
         try:
             yield db
         finally:
             db.close()
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     with TestClient(app) as client:
         yield client
-    
+
     app.dependency_overrides.clear()
     Base.metadata.drop_all(bind=integration_engine)
 
+
 def test_complete_user_workflow(integration_client):
     """Test complete user registration and profile update"""
-    
+
     # 1. Register user
     response = integration_client.post(
         "/users/",
         json={
             "email": "integration@example.com",
             "username": "integrationuser",
-            "password": "securepass123"
-        }
+            "password": "securepass123",
+        },
     )
     assert response.status_code == 201
     user_id = response.json()["id"]
-    
+
     # 2. Login
     response = integration_client.post(
-        "/auth/login",
-        data={
-            "username": "integration@example.com",
-            "password": "securepass123"
-        }
+        "/auth/login", data={"username": "integration@example.com", "password": "securepass123"}
     )
     assert response.status_code == 200
     token = response.json()["access_token"]
-    
+
     # 3. Update profile with auth
     headers = {"Authorization": f"Bearer {token}"}
     response = integration_client.put(
-        f"/users/{user_id}/profile",
-        headers=headers,
-        json={"bio": "Integration test user"}
+        f"/users/{user_id}/profile", headers=headers, json={"bio": "Integration test user"}
     )
     assert response.status_code == 200
-    
+
     # 4. Verify update
-    response = integration_client.get(
-        f"/users/{user_id}",
-        headers=headers
-    )
+    response = integration_client.get(f"/users/{user_id}", headers=headers)
     assert response.status_code == 200
     assert response.json()["profile"]["bio"] == "Integration test user"
 ```
@@ -547,10 +523,12 @@ def test_create_user():
     response = client.post("/users/", json={...})
     assert response.status_code == 201
 
+
 def test_read_user():
     # This depends on test_create_user running first!
     response = client.get("/users/1")
     assert response.status_code == 200
+
 
 # GOOD: Each test is independent
 def test_read_user_not_found():
@@ -567,6 +545,7 @@ def db():
     db = SessionLocal()
     yield db
     # No cleanup!
+
 
 # GOOD: Proper cleanup
 @pytest.fixture
@@ -587,6 +566,7 @@ def test_user_creation_implementation():
         mock_create.return_value = {"id": 1}
         response = client.post("/users/", json={...})
         mock_create.assert_called_once()  # Implementation detail
+
 
 # GOOD: Testing behavior
 def test_user_creation_success():

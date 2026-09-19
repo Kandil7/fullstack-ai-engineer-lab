@@ -26,8 +26,9 @@ import sys
 # Model size (GB) = params x bits / 8. Plus overhead for KV cache
 # and activations. Quantization (GGUF) is the size lever.
 
+
 def model_gb(params_billions: float, bits: int) -> float:
-    return params_billions * 1e9 * bits / 8 / (1024 ** 3)
+    return params_billions * 1e9 * bits / 8 / (1024**3)
 
 
 # Example 1: quantization shrinks models
@@ -40,8 +41,8 @@ assert model_gb(7.0, 4) < model_gb(7.0, 16), "q4 much smaller"
 # 2. Does It Fit? VRAM Budget
 # ============================================================
 
-def fits_in_vram(model_size_gb: float, kv_cache_gb: float,
-                 vram_gb: float) -> tuple[bool, float]:
+
+def fits_in_vram(model_size_gb: float, kv_cache_gb: float, vram_gb: float) -> tuple[bool, float]:
     total = model_size_gb + kv_cache_gb
     return total <= vram_gb, total
 
@@ -59,6 +60,7 @@ assert not ok2, "fp16 does not fit 8GB"
 # 3. Throughput
 # ============================================================
 
+
 def throughput_tokens_per_sec(gpu_tflops: float, model_flops_per_token: float) -> float:
     return gpu_tflops * 1e12 / model_flops_per_token
 
@@ -73,6 +75,7 @@ print(f"  ~{tps:.0f} tokens/s on a 20 TFLOPS GPU for a 7B model")
 # ============================================================
 # Lower quantization = faster, but quality drops. The curve is
 # measured, not guessed: run your eval at each quantization level.
+
 
 def quality_at_quant(bits: int, base_quality: float) -> float:
     """Simple quality model: 16-bit is reference; 4-bit loses a bit."""
@@ -89,9 +92,14 @@ assert quality_at_quant(4, 0.95) < quality_at_quant(16, 0.95)
 # 5. Local vs API: The Decision
 # ============================================================
 
-def local_vs_api(monthly_api_cost: float, privacy_required: bool,
-                 offline_required: bool, vram_available_gb: float,
-                 model_size_gb: float) -> str:
+
+def local_vs_api(
+    monthly_api_cost: float,
+    privacy_required: bool,
+    offline_required: bool,
+    vram_available_gb: float,
+    model_size_gb: float,
+) -> str:
     if privacy_required or offline_required:
         if vram_available_gb >= model_size_gb:
             return "LOCAL: privacy/offline needs + hardware fits"
@@ -115,9 +123,15 @@ assert local_vs_api(50, False, False, 8.0, model_gb(70.0, 4)).startswith("API")
 # The production checklist: pick quant by eval, confirm VRAM, measure
 # throughput against SLO, then deploy.
 
-def local_deploy_checklist(quant_bits: int, eval_score: float,
-                           min_score: float, vram_free: float,
-                           model_size: float, kv_size: float) -> list[str]:
+
+def local_deploy_checklist(
+    quant_bits: int,
+    eval_score: float,
+    min_score: float,
+    vram_free: float,
+    model_size: float,
+    kv_size: float,
+) -> list[str]:
     issues = []
     if eval_score < min_score:
         issues.append(f"quant {quant_bits}-bit scores {eval_score:.2f} < {min_score}")

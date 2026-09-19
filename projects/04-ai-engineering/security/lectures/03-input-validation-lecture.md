@@ -30,21 +30,26 @@ from dataclasses import dataclass
 from typing import Any, Optional, List, Callable
 import re
 
+
 class ValidationLayer(Enum):
     """Different layers of input validation."""
-    SYNTACTIC = "syntactic"      # Basic format checking
-    SEMANTIC = "semantic"        # Meaning and context checking
-    SECURITY = "security"        # Security-focused validation
-    BUSINESS = "business"        # Business rule validation
+
+    SYNTACTIC = "syntactic"  # Basic format checking
+    SEMANTIC = "semantic"  # Meaning and context checking
+    SECURITY = "security"  # Security-focused validation
+    BUSINESS = "business"  # Business rule validation
+
 
 @dataclass
 class ValidationResult:
     """Result of input validation."""
+
     valid: bool
     layer: ValidationLayer
     errors: List[str]
     sanitized_value: Any = None
     risk_score: float = 0.0
+
 
 class InputValidator:
     """Multi-layer input validation system."""
@@ -57,7 +62,9 @@ class InputValidator:
         """Add a validation layer."""
         self.layers.append((layer, validator))
 
-    def validate(self, value: Any, context: Optional[dict] = None) -> List[ValidationResult]:
+    def validate(
+        self, value: Any, context: Optional[dict] = None
+    ) -> List[ValidationResult]:
         """Validate input through all layers."""
         results = []
 
@@ -68,11 +75,13 @@ class InputValidator:
                 if not result.valid:
                     break  # Stop on first failure
             except Exception as e:
-                results.append(ValidationResult(
-                    valid=False,
-                    layer=layer,
-                    errors=[f"Validator error: {str(e)}"],
-                ))
+                results.append(
+                    ValidationResult(
+                        valid=False,
+                        layer=layer,
+                        errors=[f"Validator error: {str(e)}"],
+                    )
+                )
                 break
 
         return results
@@ -85,17 +94,19 @@ from pydantic import BaseModel, Field, validator
 from typing import Optional, List
 from datetime import datetime
 
+
 class ChatMessage(BaseModel):
     """Schema for chat messages."""
+
     role: str = Field(..., pattern="^(user|assistant|system)$")
     content: str = Field(..., min_length=1, max_length=10000)
     timestamp: Optional[datetime] = None
 
-    @validator('content')
+    @validator("content")
     def validate_content(cls, v):
         """Validate message content."""
         # Check for null bytes
-        if '\x00' in v:
+        if "\x00" in v:
             raise ValueError("Content contains null bytes")
 
         # Check for excessive whitespace
@@ -104,8 +115,10 @@ class ChatMessage(BaseModel):
 
         return v
 
+
 class AIRequest(BaseModel):
     """Schema for AI service requests."""
+
     prompt: str = Field(..., min_length=1, max_length=4096)
     model: str = Field(default="gpt-4", pattern="^(gpt-3.5-turbo|gpt-4|claude-3)$")
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
@@ -113,18 +126,18 @@ class AIRequest(BaseModel):
     system_prompt: Optional[str] = Field(None, max_length=2000)
     user_id: str = Field(..., min_length=1, max_length=100)
 
-    @validator('prompt')
+    @validator("prompt")
     def validate_prompt(cls, v):
         """Validate prompt content."""
         # Remove control characters
-        v = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', v)
+        v = re.sub(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]", "", v)
 
         # Check for injection patterns
         injection_patterns = [
-            r'ignore\s+(all\s+)?previous',
-            r'you\s+are\s+now\s+',
-            r'\[SYSTEM\]',
-            r'<\|im_start\|>',
+            r"ignore\s+(all\s+)?previous",
+            r"you\s+are\s+now\s+",
+            r"\[SYSTEM\]",
+            r"<\|im_start\|>",
         ]
         for pattern in injection_patterns:
             if re.search(pattern, v, re.IGNORECASE):
@@ -132,14 +145,14 @@ class AIRequest(BaseModel):
 
         return v
 
-    @validator('system_prompt')
+    @validator("system_prompt")
     def validate_system_prompt(cls, v):
         """Validate system prompt if provided."""
         if v is None:
             return v
 
         # System prompts shouldn't contain user-controlled content
-        if '{' in v and '}' in v:
+        if "{" in v and "}" in v:
             raise ValueError("System prompt contains template variables")
 
         return v
@@ -153,11 +166,12 @@ import html
 import unicodedata
 from typing import Optional
 
+
 class StringSanitizer:
     """Comprehensive string sanitization."""
 
     # Characters that are dangerous in various contexts
-    CONTROL_CHARS = re.compile(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]')
+    CONTROL_CHARS = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]")
 
     # SQL injection patterns
     SQL_PATTERNS = [
@@ -168,22 +182,22 @@ class StringSanitizer:
 
     # XSS patterns
     XSS_PATTERNS = [
-        r'<script[^>]*>.*?</script>',
-        r'javascript:',
-        r'on\w+\s*=',
-        r'<iframe',
+        r"<script[^>]*>.*?</script>",
+        r"javascript:",
+        r"on\w+\s*=",
+        r"<iframe",
     ]
 
     def sanitize_for_ai(self, text: str) -> str:
         """Sanitize text for AI processing."""
         # Normalize unicode
-        text = unicodedata.normalize('NFKC', text)
+        text = unicodedata.normalize("NFKC", text)
 
         # Remove control characters
-        text = self.CONTROL_CHARS.sub('', text)
+        text = self.CONTROL_CHARS.sub("", text)
 
         # Normalize whitespace
-        text = re.sub(r'\s+', ' ', text).strip()
+        text = re.sub(r"\s+", " ", text).strip()
 
         # Escape HTML entities
         text = html.escape(text)
@@ -201,27 +215,29 @@ class StringSanitizer:
     def sanitize_for_display(self, text: str) -> str:
         """Sanitize text for HTML display."""
         text = html.escape(text)
-        text = self.CONTROL_CHARS.sub('', text)
+        text = self.CONTROL_CHARS.sub("", text)
         return text
 
     def detect_encoding_tricks(self, text: str) -> dict:
         """Detect various encoding tricks."""
         tricks = {
-            "has_null_bytes": '\x00' in text,
-            "has_rtl_override": '\u202e' in text or '\u202d' in text,
-            "has_zero_width_chars": bool(re.search(r'[\u200b-\u200f\u2028-\u202f\u2060-\u2064\ufeff]', text)),
+            "has_null_bytes": "\x00" in text,
+            "has_rtl_override": "\u202e" in text or "\u202d" in text,
+            "has_zero_width_chars": bool(
+                re.search(r"[\u200b-\u200f\u2028-\u202f\u2060-\u2064\ufeff]", text)
+            ),
             "has_homoglyphs": self._detect_homoglyphs(text),
-            "has_excessive_combining": bool(re.search(r'[\u0300-\u036f]{3,}', text)),
+            "has_excessive_combining": bool(re.search(r"[\u0300-\u036f]{3,}", text)),
         }
         return tricks
 
     def _detect_homoglyphs(self, text: str) -> bool:
         """Detect visually similar but different characters."""
         homoglyphs = {
-            'a': ['а', 'ɑ', 'α'],  # Cyrillic, Latin, Greek
-            'e': ['е', 'ε'],
-            'o': ['о', 'ο'],
-            'p': ['р', 'ρ'],
+            "a": ["а", "ɑ", "α"],  # Cyrillic, Latin, Greek
+            "e": ["е", "ε"],
+            "o": ["о", "ο"],
+            "p": ["р", "ρ"],
         }
         for char in text:
             for group in homoglyphs.values():
@@ -239,26 +255,26 @@ class AdversarialInputDetector:
     def __init__(self):
         self.patterns = {
             "prompt_injection": [
-                r'ignore\s+(all\s+)?previous',
-                r'you\s+are\s+now\s+',
-                r'new\s+instructions?\s*:',
-                r'\[SYSTEM\]',
-                r'<\|im_start\|>',
-                r'###\s*System',
+                r"ignore\s+(all\s+)?previous",
+                r"you\s+are\s+now\s+",
+                r"new\s+instructions?\s*:",
+                r"\[SYSTEM\]",
+                r"<\|im_start\|>",
+                r"###\s*System",
             ],
             "encoding_bypass": [
-                r'decode\s+(this\s+)?base64',
-                r'apply\s+rot13',
-                r'convert\s+from\s+hex',
+                r"decode\s+(this\s+)?base64",
+                r"apply\s+rot13",
+                r"convert\s+from\s+hex",
             ],
             "context_manipulation": [
-                r'let\'?s\s+(play|pretend)',
-                r'hypothetically\s+(speaking|if)',
-                r'for\s+(educational|research)\s+purposes',
+                r"let\'?s\s+(play|pretend)",
+                r"hypothetically\s+(speaking|if)",
+                r"for\s+(educational|research)\s+purposes",
             ],
             "token_overflow": [
-                r'.{5000,}',  # Very long input
-                r'(.)\1{100,}',  # Repeated characters
+                r".{5000,}",  # Very long input
+                r"(.)\1{100,}",  # Repeated characters
             ],
         }
 
@@ -269,11 +285,13 @@ class AdversarialInputDetector:
         for attack_type, patterns in self.patterns.items():
             for pattern in patterns:
                 if re.search(pattern, text, re.IGNORECASE):
-                    findings.append({
-                        "type": attack_type,
-                        "pattern": pattern,
-                        "severity": self._get_severity(attack_type),
-                    })
+                    findings.append(
+                        {
+                            "type": attack_type,
+                            "pattern": pattern,
+                            "severity": self._get_severity(attack_type),
+                        }
+                    )
 
         return {
             "is_adversarial": len(findings) > 0,
@@ -311,14 +329,17 @@ import time
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class ValidationConfig:
     """Configuration for the validation pipeline."""
+
     max_input_length: int = 10000
     enable_adversarial_detection: bool = True
     enable_sanitization: bool = True
     block_on_adversarial: bool = True
     log_all_inputs: bool = False
+
 
 class InputValidationPipeline:
     """Complete input validation pipeline."""
@@ -357,7 +378,9 @@ class InputValidationPipeline:
             return {
                 "valid": False,
                 "sanitized_text": "",
-                "errors": [f"Input exceeds maximum length ({len(text)} > {self.config.max_input_length})"],
+                "errors": [
+                    f"Input exceeds maximum length ({len(text)} > {self.config.max_input_length})"
+                ],
                 "risk_score": 1.0,
                 "processing_time": time.time() - start_time,
             }
@@ -375,7 +398,9 @@ class InputValidationPipeline:
                     return {
                         "valid": False,
                         "sanitized_text": text,
-                        "errors": [f"Adversarial input detected: {adversarial_result['findings']}"],
+                        "errors": [
+                            f"Adversarial input detected: {adversarial_result['findings']}"
+                        ],
                         "risk_score": risk_score,
                         "processing_time": time.time() - start_time,
                     }
@@ -425,9 +450,11 @@ class InputValidationPipeline:
             # Length check
             if isinstance(value, str):
                 min_len = rules.get("min_length", 0)
-                max_len = rules.get("max_length", float('inf'))
+                max_len = rules.get("max_length", float("inf"))
                 if len(value) < min_len or len(value) > max_len:
-                    errors.append(f"Field '{field}' length must be between {min_len} and {max_len}")
+                    errors.append(
+                        f"Field '{field}' length must be between {min_len} and {max_len}"
+                    )
 
             # Pattern check
             pattern = rules.get("pattern")
@@ -458,19 +485,19 @@ class UnicodeValidator:
 
     # Dangerous Unicode categories
     DANGEROUS_CATEGORIES = {
-        'Cf',  # Format characters (includes zero-width spaces)
-        'Cc',  # Control characters
-        'Cn',  # Unassigned characters
+        "Cf",  # Format characters (includes zero-width spaces)
+        "Cc",  # Control characters
+        "Cn",  # Unassigned characters
     }
 
     # Homoglyph mapping (visually similar characters)
     HOMOGLYPHS = {
-        'a': 'а',  # Cyrillic а
-        'e': 'е',  # Cyrillic е
-        'o': 'о',  # Cyrillic о
-        'p': 'р',  # Cyrillic р
-        'c': 'с',  # Cyrillic с
-        'x': 'х',  # Cyrillic х
+        "a": "а",  # Cyrillic а
+        "e": "е",  # Cyrillic е
+        "o": "о",  # Cyrillic о
+        "p": "р",  # Cyrillic р
+        "c": "с",  # Cyrillic с
+        "x": "х",  # Cyrillic х
     }
 
     def validate_unicode(self, text: str) -> dict:
@@ -482,39 +509,49 @@ class UnicodeValidator:
 
             # Check for dangerous categories
             if category in self.DANGEROUS_CATEGORIES:
-                issues.append({
-                    "position": i,
-                    "char": repr(char),
-                    "category": category,
-                    "issue": "dangerous_category",
-                })
+                issues.append(
+                    {
+                        "position": i,
+                        "char": repr(char),
+                        "category": category,
+                        "issue": "dangerous_category",
+                    }
+                )
 
             # Check for RTL override
-            if char in ('\u202e', '\u202d', '\u202a', '\u202b', '\u202c'):
-                issues.append({
-                    "position": i,
-                    "char": repr(char),
-                    "issue": "direction_override",
-                })
+            if char in ("\u202e", "\u202d", "\u202a", "\u202b", "\u202c"):
+                issues.append(
+                    {
+                        "position": i,
+                        "char": repr(char),
+                        "issue": "direction_override",
+                    }
+                )
 
         # Check for mixed scripts (potential homoglyph attack)
         scripts = set()
         for char in text:
             if char.isalpha():
-                script = unicodedata.script(char) if hasattr(unicodedata, 'script') else 'Unknown'
+                script = (
+                    unicodedata.script(char)
+                    if hasattr(unicodedata, "script")
+                    else "Unknown"
+                )
                 scripts.add(script)
 
         if len(scripts) > 2:
-            issues.append({
-                "issue": "mixed_scripts",
-                "scripts": list(scripts),
-            })
+            issues.append(
+                {
+                    "issue": "mixed_scripts",
+                    "scripts": list(scripts),
+                }
+            )
 
         return {
             "valid": len(issues) == 0,
             "issues": issues,
             "char_count": len(text),
-            "unique_scripts": len(scripts) if 'scripts' in dir() else 0,
+            "unique_scripts": len(scripts) if "scripts" in dir() else 0,
         }
 
     def normalize_unicode(self, text: str) -> str:
@@ -522,7 +559,7 @@ class UnicodeValidator:
         # NFKC normalization: compatibility decomposition + canonical composition
         # This converts fullwidth characters to ASCII equivalents
         # and normalizes combining characters
-        return unicodedata.normalize('NFKC', text)
+        return unicodedata.normalize("NFKC", text)
 
     def detect_confusables(self, text: str) -> list:
         """Detect confusable characters."""
@@ -530,11 +567,13 @@ class UnicodeValidator:
         for i, char in enumerate(text):
             for ascii_char, confusable in self.HOMOGLYPHS.items():
                 if char == confusable:
-                    confusables.append({
-                        "position": i,
-                        "confusable": char,
-                        "looks_like": ascii_char,
-                    })
+                    confusables.append(
+                        {
+                            "position": i,
+                            "confusable": char,
+                            "looks_like": ascii_char,
+                        }
+                    )
         return confusables
 ```
 

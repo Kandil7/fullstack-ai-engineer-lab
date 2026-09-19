@@ -52,7 +52,7 @@ new_tuple = (99,) + my_tuple[1:]
 ```python
 # Indexing
 fruits = ("apple", "banana", "cherry")
-print(fruits[0])   # apple (first)
+print(fruits[0])  # apple (first)
 print(fruits[-1])  # cherry (last)
 ```
 
@@ -63,8 +63,8 @@ print(fruits[-1])  # cherry (last)
 ```python
 # Indexing examples
 numbers = (10, 20, 30, 40, 50)
-print(numbers[0])   # 10
-print(numbers[2])   # 30
+print(numbers[0])  # 10
+print(numbers[2])  # 30
 print(numbers[-1])  # 50
 ```
 
@@ -78,15 +78,15 @@ print(numbers[-1])  # 50
 from collections import namedtuple
 
 # Define named tuple
-Point = namedtuple('Point', ['x', 'y'])
+Point = namedtuple("Point", ["x", "y"])
 
 # Create instance
 p = Point(10, 20)
 print(p.x, p.y)  # 10 20
 
 # Access by name or index
-print(p[0])      # 10
-print(p.x)       # 10
+print(p[0])  # 10
+print(p.x)  # 10
 ```
 
 ### P
@@ -128,10 +128,10 @@ print(pattern)  # (1, 2, 1, 2, 1, 2)
 ```python
 # Slicing
 numbers = (0, 1, 2, 3, 4, 5)
-print(numbers[1:3])   # (1, 2)
-print(numbers[:3])    # (0, 1, 2)
-print(numbers[3:])    # (3, 4, 5)
-print(numbers[::2])   # (0, 2, 4)
+print(numbers[1:3])  # (1, 2)
+print(numbers[:3])  # (0, 1, 2)
+print(numbers[3:])  # (3, 4, 5)
+print(numbers[::2])  # (0, 2, 4)
 ```
 
 **Star Unpacking**
@@ -142,14 +142,14 @@ print(numbers[::2])   # (0, 2, 4)
 # Star unpacking
 numbers = (1, 2, 3, 4, 5)
 first, *middle, last = numbers
-print(first)   # 1
+print(first)  # 1
 print(middle)  # [2, 3, 4]
-print(last)    # 5
+print(last)  # 5
 
 # Only first and rest
 first, *rest = numbers
 print(first)  # 1
-print(rest)   # [2, 3, 4, 5]
+print(rest)  # [2, 3, 4, 5]
 ```
 
 ### T
@@ -239,8 +239,8 @@ print(x, y)  # 10 5
 from collections import namedtuple
 
 # Define
-Point = namedtuple('Point', ['x', 'y'])
-Student = namedtuple('Student', 'name age grade')
+Point = namedtuple("Point", ["x", "y"])
+Student = namedtuple("Student", "name age grade")
 
 # Create
 p = Point(10, 20)

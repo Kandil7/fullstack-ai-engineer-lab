@@ -26,6 +26,7 @@ from typing import Generator
 # EASY PROBLEMS (20 XP)
 # ============================================================
 
+
 # Problem 1: Basic OpenAI Chat
 # Write a function that sends a simple prompt to OpenAI's gpt-4o-mini
 # and returns the response text. Use the openai library.
@@ -72,6 +73,7 @@ def problem_05():
 # ============================================================
 # MEDIUM PROBLEMS (50 XP)
 # ============================================================
+
 
 # Problem 6: Streaming Response
 # Write a generator function that streams an OpenAI response token-by-token.
@@ -125,6 +127,7 @@ def problem_10():
 # ============================================================
 # HARD PROBLEMS (100 XP)
 # ============================================================
+
 
 # Problem 11: Function Calling Pipeline
 # Write a complete function-calling pipeline:

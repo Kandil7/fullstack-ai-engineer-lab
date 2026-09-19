@@ -31,6 +31,7 @@ logger = logging.getLogger("events")
 # Exercise 25.1: Startup and Shutdown Events
 # ============================================================
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Modern lifespan context manager for startup/shutdown."""
@@ -48,7 +49,9 @@ async def lifespan(app: FastAPI):
     app.state.ready = False
     app.state.db = {"connected": False}
     uptime = time.time() - app.state.start_time
-    logger.info(f"Application shutting down. Uptime: {uptime:.1f}s, Requests handled: {app.state.request_count}")
+    logger.info(
+        f"Application shutting down. Uptime: {uptime:.1f}s, Requests handled: {app.state.request_count}"
+    )
 
 
 app = FastAPI(title="Events & Lifespan Exercises", lifespan=lifespan)
@@ -80,7 +83,10 @@ async def application_status(request: Request):
 async def get_uptime(request: Request):
     """Application uptime."""
     uptime = time.time() - request.app.state.start_time
-    return {"uptime_seconds": round(uptime, 1), "started_at": datetime.fromtimestamp(request.app.state.start_time).isoformat()}
+    return {
+        "uptime_seconds": round(uptime, 1),
+        "started_at": datetime.fromtimestamp(request.app.state.start_time).isoformat(),
+    }
 
 
 # ============================================================
@@ -109,10 +115,7 @@ async def create_order(order: OrderCreate, background_tasks: BackgroundTasks):
     orders_for_background.append({"id": order_id, **order.model_dump()})
 
     background_tasks.add_task(
-        send_confirmation_email,
-        email=order.email,
-        order_id=order_id,
-        item=order.item
+        send_confirmation_email, email=order.email, order_id=order_id, item=order.item
     )
 
     return {"id": order_id, "item": order.item, "status": "created"}
@@ -177,6 +180,7 @@ async def track_event(event: AnalyticsEvent, background_tasks: BackgroundTasks):
 # ============================================================
 # Exercise 25.3: Application State Management
 # ============================================================
+
 
 class AppState:
     """Robust application state management system."""
@@ -289,6 +293,7 @@ async def track_metrics(request: Request, call_next):
 # Exercise 25.4: Health Check System
 # ============================================================
 
+
 async def check_database() -> dict:
     """Check database connectivity."""
     try:
@@ -314,9 +319,10 @@ async def check_cache() -> dict:
 async def check_disk_space() -> dict:
     """Check available disk space."""
     import shutil
+
     try:
         total, used, free = shutil.disk_usage(".")
-        free_gb = free / (1024 ** 3)
+        free_gb = free / (1024**3)
         status = "healthy" if free_gb > 1.0 else "degraded" if free_gb > 0.1 else "unhealthy"
         return {"status": status, "free_gb": round(free_gb, 1)}
     except Exception as e:
@@ -376,6 +382,7 @@ async def detailed_health():
 # Exercise 25.5: Event-Driven Architecture (Advanced)
 # ============================================================
 
+
 class EventBus:
     """Simple in-process publish/subscribe event system."""
 
@@ -411,7 +418,9 @@ class EventBus:
                 try:
                     await handler(data)
                 except Exception as e:
-                    logger.error(f"Handler '{handler.__name__}' failed for event '{event_type}': {e}")
+                    logger.error(
+                        f"Handler '{handler.__name__}' failed for event '{event_type}': {e}"
+                    )
 
         return event_id
 

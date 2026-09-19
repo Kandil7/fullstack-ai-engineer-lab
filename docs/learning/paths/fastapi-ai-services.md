@@ -58,14 +58,17 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+
 class PredictionRequest(BaseModel):
     text: str
     max_length: int = 100
+
 
 class PredictionResponse(BaseModel):
     text: str
     label: str
     confidence: float
+
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(request: PredictionRequest) -> PredictionResponse:
@@ -90,12 +93,14 @@ the code and the documented contract.
 ```python
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.model = joblib.load("model.pkl")     # startup — once
+    app.state.model = joblib.load("model.pkl")  # startup — once
     app.state.qdrant = QdrantClient(...)
     yield
-    app.state.qdrant.close()                        # shutdown
+    app.state.qdrant.close()  # shutdown
+
 
 app = FastAPI(lifespan=lifespan)
 ```
@@ -145,9 +150,11 @@ matters a great deal**, since those calls take seconds.
 ```python
 from fastapi.responses import StreamingResponse
 
+
 async def generate_tokens(prompt: str):
     async for token in llm_stream(prompt):
         yield f"data: {token}\n\n"
+
 
 @app.post("/ask")
 async def ask(prompt: str):
@@ -162,14 +169,15 @@ latency metric users actually perceive.
 ```python
 from fastapi import Depends, Header, HTTPException
 
+
 def verify_api_key(x_api_key: str = Header(...)) -> str:
     if not is_valid(x_api_key):
         raise HTTPException(status_code=401, detail="Invalid API key")
     return x_api_key
 
+
 @app.post("/ask")
-def ask(request: AskRequest, api_key: str = Depends(verify_api_key)):
-    ...
+def ask(request: AskRequest, api_key: str = Depends(verify_api_key)): ...
 ```
 
 Auth, rate limiting, database sessions, and tracing all belong here rather than repeated in
@@ -197,6 +205,7 @@ Routers keep `main.py` small and make each surface independently testable:
 ```python
 # routers/ask.py
 from fastapi import APIRouter
+
 router = APIRouter(prefix="/ask", tags=["qa"])
 
 # main.py

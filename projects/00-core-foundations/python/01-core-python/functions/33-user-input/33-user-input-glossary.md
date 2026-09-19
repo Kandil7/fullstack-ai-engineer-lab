@@ -12,8 +12,9 @@
 **Definition:** Python module for parsing command-line arguments.
 ```python
 import argparse
+
 parser = argparse.ArgumentParser()
-parser.add_argument('--name', type=str, required=True)
+parser.add_argument("--name", type=str, required=True)
 args = parser.parse_args()
 ```
 **Related:** sys.argv, CLI, argument parsing
@@ -34,7 +35,7 @@ python script.py --name Alice --age 30
 **Definition:** Getting yes/no response from user.
 ```python
 response = input("Continue? (y/n): ").lower()
-confirmed = response in ['y', 'yes']
+confirmed = response in ["y", "yes"]
 ```
 **Related:** User validation, prompts
 
@@ -46,6 +47,7 @@ confirmed = response in ['y', 'yes']
 **Definition:** Module for secure password input (no echo).
 ```python
 import getpass
+
 password = getpass.getpass("Password: ")
 ```
 **Related:** Password input, security, hidden input
@@ -90,6 +92,7 @@ import sys
 **Definition:** Standard input stream (keyboard by default).
 ```python
 import sys
+
 line = sys.stdin.readline()
 ```
 **Related:** input(), stdout, streams
@@ -142,8 +145,10 @@ choice = input("Select: ")
 def confirm(prompt):
     while True:
         resp = input(f"{prompt} (y/n): ").lower()
-        if resp in ['y', 'yes']: return True
-        if resp in ['n', 'no']: return False
+        if resp in ["y", "yes"]:
+            return True
+        if resp in ["n", "no"]:
+            return False
 ```
 
 ---

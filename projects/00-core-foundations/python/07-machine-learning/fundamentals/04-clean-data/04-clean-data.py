@@ -27,9 +27,9 @@ print("Common issues: missing values, duplicates, outliers, scaling")
 # Example 2: Creating data with missing values
 print("\nExample 2: Data with Missing Values")
 data = {
-    'age': [25, 30, np.nan, 45, 50],
-    'salary': [50000, 60000, 75000, np.nan, 90000],
-    'experience': [2, 5, 8, 12, np.nan]
+    "age": [25, 30, np.nan, 45, 50],
+    "salary": [50000, 60000, 75000, np.nan, 90000],
+    "experience": [2, 5, 8, 12, np.nan],
 }
 df = pd.DataFrame(data)
 print(df)
@@ -64,9 +64,9 @@ print(df_zero)
 # Example 6: Duplicate data
 print("\nExample 6: Duplicate Data")
 data = {
-    'name': ['Alice', 'Bob', 'Alice', 'Charlie', 'Bob'],
-    'age': [25, 30, 25, 35, 30],
-    'salary': [50000, 60000, 50000, 70000, 60000]
+    "name": ["Alice", "Bob", "Alice", "Charlie", "Bob"],
+    "age": [25, 30, 25, 35, 30],
+    "salary": [50000, 60000, 50000, 70000, 60000],
 }
 df = pd.DataFrame(data)
 print("Original data:")
@@ -164,11 +164,13 @@ print("Log-transformed:", log_data)
 print("\nExample 15: Complete Cleaning Pipeline")
 # Create dirty data
 np.random.seed(42)
-df_dirty = pd.DataFrame({
-    'age': [25, 30, np.nan, 45, 50, 25, 30],
-    'salary': [50000, 60000, 75000, np.nan, 90000, 50000, 60000],
-    'experience': [2, 5, 8, 12, np.nan, 2, 5]
-})
+df_dirty = pd.DataFrame(
+    {
+        "age": [25, 30, np.nan, 45, 50, 25, 30],
+        "salary": [50000, 60000, 75000, np.nan, 90000, 50000, 60000],
+        "experience": [2, 5, 8, 12, np.nan, 2, 5],
+    }
+)
 
 print("Original dirty data:")
 print(df_dirty)
@@ -192,11 +194,11 @@ print(features_scaled)
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Always handle missing values before modeling")
 print("- Remove duplicate rows to avoid bias")
 print("- Normalize or standardize features for better performance")
 print("- Use appropriate scaling method based on data distribution")
 print("- Consider outlier detection and treatment")
-print("="*60)
+print("=" * 60)

@@ -39,11 +39,13 @@ By the end of this lecture, you will be able to:
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "doc": ["a", "b", "c", "d"],
-    "score": [0.2, 0.8, 0.6, 0.9],
-    "split": ["train", "train", "val", "test"],
-})
+df = pd.DataFrame(
+    {
+        "doc": ["a", "b", "c", "d"],
+        "score": [0.2, 0.8, 0.6, 0.9],
+        "split": ["train", "train", "val", "test"],
+    }
+)
 
 # AND, OR, NOT — each comparison parenthesized
 df[(df["score"] > 0.5) & (df["split"] != "test")]
@@ -67,7 +69,7 @@ df.query("split in ['val', 'test']")
 
 ```python
 threshold = 0.6
-df.query("score > @threshold")     # @ pulls the Python variable in
+df.query("score > @threshold")  # @ pulls the Python variable in
 ```
 
 Use `.query()` when a filter is long or will be read by others; use raw masks
@@ -76,10 +78,10 @@ when you need the mask Series itself later (e.g. to reuse or to set values).
 ## 3. Set and Range Membership
 
 ```python
-df[df["doc"].isin(["a", "c"])]                 # set membership
+df[df["doc"].isin(["a", "c"])]  # set membership
 df[df["score"].between(0.5, 0.8, inclusive="both")]
 df[df["doc"].str.contains("^[ab]", regex=True)]  # regex on strings
-df[df["doc"].str.startswith("a")]              # prefix filter
+df[df["doc"].str.startswith("a")]  # prefix filter
 ```
 
 `.str` methods are vectorized string ops (see topic 06). Note `.str.contains`
@@ -88,9 +90,9 @@ defaults to regex — pass `regex=False` for literal substring search.
 ## 4. Filtering by Name — `df.filter`
 
 ```python
-df.filter(items=["score", "split"])            # by exact names
-df.filter(like="sco")                           # substring match
-df.filter(regex="^s")                           # regex on names
+df.filter(items=["score", "split"])  # by exact names
+df.filter(like="sco")  # substring match
+df.filter(regex="^s")  # regex on names
 ```
 
 This is *name* filtering (columns/rows by label), not value filtering — the
@@ -99,7 +101,7 @@ two families solve different problems and are easy to confuse.
 ## 5. `drop_duplicates` — Dedup with Rules
 
 ```python
-df.drop_duplicates(subset=["doc"])              # keep first per doc
+df.drop_duplicates(subset=["doc"])  # keep first per doc
 df.drop_duplicates(subset=["doc"], keep="last")
 df.drop_duplicates(subset=["doc"], keep=False)  # drop ALL duplicates
 ```
@@ -119,10 +121,7 @@ def select_inference_subset(
     max_rows: int = 10_000,
 ) -> pd.DataFrame:
     """Deterministic, reusable subsetting for evaluation runs."""
-    mask = (
-        (df["score"] >= min_score)
-        & (df["split"].isin(allowed_splits))
-    )
+    mask = (df["score"] >= min_score) & (df["split"].isin(allowed_splits))
     return df.loc[mask].head(max_rows).copy()
 ```
 

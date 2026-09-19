@@ -75,6 +75,7 @@ class Prediction(Base):
 # "async with engine.connect()". The statement API is identical —
 # only the await boundary changed.
 
+
 async def demo_core_roundtrip() -> int:
     """SELECT 1 through the async engine; returns the scalar."""
     async with async_engine.connect() as conn:
@@ -88,12 +89,11 @@ async def demo_core_roundtrip() -> int:
 # now coroutines. The one rule: never share an AsyncSession across
 # tasks, and never call sync Session methods on it.
 
+
 async def demo_async_session() -> None:
     """Insert rows via AsyncSession and read them back."""
     async with AsyncSession(async_engine) as session:
-        session.add(
-            Prediction(model="bert", input_hash="hash-0001", latency_ms=42)
-        )
+        session.add(Prediction(model="bert", input_hash="hash-0001", latency_ms=42))
         await session.commit()
 
         rows = await session.scalars(select(Prediction))
@@ -116,15 +116,11 @@ AsyncSessionLocal = async_sessionmaker(async_engine, expire_on_commit=False)
 async def demo_sessionmaker() -> list[str]:
     """Two independent async sessions write and read the same rows."""
     async with AsyncSessionLocal() as session:
-        session.add(
-            Prediction(model="gpt2", input_hash="hash-0002", latency_ms=88)
-        )
+        session.add(Prediction(model="gpt2", input_hash="hash-0002", latency_ms=88))
         await session.commit()
 
     async with AsyncSessionLocal() as session:
-        names = await session.scalars(
-            select(Prediction.model).order_by(Prediction.model)
-        )
+        names = await session.scalars(select(Prediction.model).order_by(Prediction.model))
         return list(names)
 
 
@@ -135,6 +131,7 @@ async def demo_sessionmaker() -> list[str]:
 # helpers). session.run_sync() hands a sync function the AsyncSession
 # and executes it inside a greenlet — the bridge that lets sync
 # ORM internals run on the async loop without deadlocking it.
+
 
 def _count_models_sync(session: AsyncSession) -> int:
     """Sync-style helper; run inside run_sync."""
@@ -164,12 +161,11 @@ async def demo_greenlet_bridge() -> int:
 # the lifecycle is simulated by simulate_async_request below, which
 # mirrors exactly what an endpoint body does.
 
+
 async def simulate_async_request(model: str, input_hash: str) -> str:
     """Simulated endpoint body: write one prediction row."""
     async with AsyncSessionLocal() as session:
-        session.add(
-            Prediction(model=model, input_hash=input_hash, latency_ms=7)
-        )
+        session.add(Prediction(model=model, input_hash=input_hash, latency_ms=7))
         await session.commit()
         return f"stored {input_hash}"
 
@@ -181,6 +177,7 @@ async def simulate_async_request(model: str, input_hash: str) -> str:
 # temptation to fire N sessions. The right shape: ONE session, ONE
 # transaction, all rows buffered — batching beats concurrency for
 # writes because the commit is the expensive part.
+
 
 async def ingest_predictions(rows: list[dict]) -> int:
     """Insert rows in one async transaction; return stored count."""
@@ -264,9 +261,7 @@ async def _verify_async() -> None:
 
         # 2. AsyncSession insert + read back
         async with AsyncSession(async_engine) as session:
-            session.add(
-                Prediction(model="verify-model", input_hash="v-hash-1", latency_ms=5)
-            )
+            session.add(Prediction(model="verify-model", input_hash="v-hash-1", latency_ms=5))
             await session.commit()
             found = await session.scalars(
                 select(Prediction).where(Prediction.input_hash == "v-hash-1")
@@ -276,8 +271,9 @@ async def _verify_async() -> None:
         # 3. async_sessionmaker: the SECOND session sees the FIRST session's
         #    commit — sessions are independent, the database is shared
         models = await demo_sessionmaker()
-        assert "gpt2" in models and "verify-model" in models, \
+        assert "gpt2" in models and "verify-model" in models, (
             "sessionmaker must share the DB across sessions"
+        )
 
         # 4. Greenlet bridge returns sync-helper results
         #    (rows so far: verify-model + gpt2 = 2)
@@ -298,13 +294,12 @@ async def _verify_async() -> None:
 
         # 7. Unique constraint on input_hash is enforced (dedupe guard)
         try:
-            await ingest_predictions(
-                [{"model": "bert", "input_hash": "v-hash-3", "latency_ms": 9}]
-            )
+            await ingest_predictions([{"model": "bert", "input_hash": "v-hash-3", "latency_ms": 9}])
             raise AssertionError("duplicate input_hash must raise IntegrityError")
         except Exception as exc:
-            assert "UNIQUE" in str(exc) or "Integrity" in type(exc).__name__, \
+            assert "UNIQUE" in str(exc) or "Integrity" in type(exc).__name__, (
                 "duplicate input_hash must be rejected by the DB"
+            )
 
         print("[OK] 07-async-sqlalchemy: all checks passed")
     finally:

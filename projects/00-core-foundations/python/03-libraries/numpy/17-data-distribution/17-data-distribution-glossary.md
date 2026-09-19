@@ -31,7 +31,7 @@ import numpy as np
 beta_data = np.random.beta(2, 5, size=1000)
 print(f"Beta(2,5):")
 print(f"  Mean: {beta_data.mean():.4f}")  # ~0.286
-print(f"  Std: {beta_data.std():.4f}")    # ~0.152
+print(f"  Std: {beta_data.std():.4f}")  # ~0.152
 ```
 
 **Related Terms:** Uniform, Probability, Proportion
@@ -54,7 +54,7 @@ experiments = 1000
 binomial = np.random.binomial(n_trials, prob_success, size=experiments)
 print(f"Binomial(n={n_trials}, p={prob_success}):")
 print(f"  Mean: {binomial.mean():.2f}")  # ~5.0
-print(f"  Std: {binomial.std():.2f}")    # ~1.58
+print(f"  Std: {binomial.std():.2f}")  # ~1.58
 
 # Distribution of results
 unique, counts = np.unique(binomial, return_counts=True)
@@ -78,7 +78,7 @@ import numpy as np
 chi2 = np.random.chisquare(5, size=10000)
 print(f"Chi-square(df=5):")
 print(f"  Mean: {chi2.mean():.2f}")  # ~5.0
-print(f"  Std: {chi2.std():.2f}")    # ~3.16
+print(f"  Std: {chi2.std():.2f}")  # ~3.16
 ```
 
 **Related Terms:** Normal Distribution, Hypothesis Testing
@@ -142,7 +142,7 @@ scale = 5
 wait_times = np.random.exponential(scale, size=1000)
 print(f"Exponential(scale={scale}):")
 print(f"  Mean: {wait_times.mean():.2f}")  # ~5.0
-print(f"  Std: {wait_times.std():.2f}")    # ~5.0
+print(f"  Std: {wait_times.std():.2f}")  # ~5.0
 print(f"  P(wait < 5): {np.mean(wait_times < 5):.2%}")  # ~63.2%
 ```
 
@@ -162,7 +162,7 @@ import numpy as np
 gamma = np.random.gamma(2, 2, size=10000)
 print(f"Gamma(shape=2, scale=2):")
 print(f"  Mean: {gamma.mean():.2f}")  # ~4.0
-print(f"  Std: {gamma.std():.2f}")    # ~2.83
+print(f"  Std: {gamma.std():.2f}")  # ~2.83
 ```
 
 **Related Terms:** Exponential Distribution, Shape Parameter
@@ -201,7 +201,7 @@ import numpy as np
 lognormal = np.random.lognormal(0, 1, size=10000)
 print(f"LogNormal(μ=0, σ=1):")
 print(f"  Mean: {lognormal.mean():.2f}")  # ~1.65
-print(f"  Std: {lognormal.std():.2f}")    # ~2.16
+print(f"  Std: {lognormal.std():.2f}")  # ~2.16
 ```
 
 **Related Terms:** Normal Distribution, Exponential Distribution
@@ -219,9 +219,9 @@ import numpy as np
 arr = np.array([1, 2, 3, 4, 5])
 
 # Different ways to calculate mean
-print(f"np.mean(): {np.mean(arr)}")      # 3.0
+print(f"np.mean(): {np.mean(arr)}")  # 3.0
 print(f"np.average(): {np.average(arr)}")  # 3.0
-print(f"arr.mean(): {arr.mean()}")        # 3.0
+print(f"arr.mean(): {arr.mean()}")  # 3.0
 
 # Weighted mean
 weights = np.array([1, 2, 3, 4, 5])
@@ -247,7 +247,7 @@ print(f"Median: {np.median(arr)}")  # 5.5
 # Median is robust to outliers
 arr_with_outlier = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 100])
 print(f"Median with outlier: {np.median(arr_with_outlier)}")  # 5.5
-print(f"Mean with outlier: {np.mean(arr_with_outlier)}")       # 14.5
+print(f"Mean with outlier: {np.mean(arr_with_outlier)}")  # 14.5
 ```
 
 **Related Terms:** Mean, Mode, Percentile
@@ -266,13 +266,13 @@ import numpy as np
 standard = np.random.standard_normal(10000)
 print(f"Standard Normal:")
 print(f"  Mean: {standard.mean():.4f}")  # ~0
-print(f"  Std: {standard.std():.4f}")    # ~1
+print(f"  Std: {standard.std():.4f}")  # ~1
 
 # Custom normal
 custom = np.random.normal(100, 15, 10000)
 print(f"\nCustom Normal (μ=100, σ=15):")
 print(f"  Mean: {custom.mean():.4f}")  # ~100
-print(f"  Std: {custom.std():.4f}")    # ~15
+print(f"  Std: {custom.std():.4f}")  # ~15
 ```
 
 **Related Terms:** Standard Normal, Empirical Rule, Z-Score
@@ -292,7 +292,7 @@ lam = 4
 events = np.random.poisson(lam, size=1000)
 print(f"Poisson(λ={lam}):")
 print(f"  Mean: {events.mean():.2f}")  # ~4.0
-print(f"  Std: {events.std():.2f}")    # ~2.0
+print(f"  Std: {events.std():.2f}")  # ~2.0
 print(f"  P(0 events): {np.mean(events == 0):.4f}")
 print(f"  P(>6 events): {np.mean(events > 6):.4f}")
 ```
@@ -340,7 +340,7 @@ print(f"75th percentile (Q3): {np.percentile(data, 75):.1f}")
 # Specific quantiles
 quantiles = [0.1, 0.25, 0.5, 0.75, 0.9]
 for q in quantiles:
-    print(f"{q*100:.0f}th: {np.quantile(data, q):.1f}")
+    print(f"{q * 100:.0f}th: {np.quantile(data, q):.1f}")
 ```
 
 **Related Terms:** Percentile, Quartile, Median
@@ -359,7 +359,7 @@ from scipy import stats
 normal = np.random.normal(0, 1, 10000)
 right_skewed = np.random.exponential(1, 10000)
 
-print(f"Normal skewness: {stats.skew(normal):.2f}")      # ~0
+print(f"Normal skewness: {stats.skew(normal):.2f}")  # ~0
 print(f"Exponential skewness: {stats.skew(right_skewed):.2f}")  # ~2
 ```
 
@@ -426,7 +426,7 @@ data = np.random.normal(100, 15, 1000)
 z_scores = (data - data.mean()) / data.std()
 
 print(f"Data point 115 z-score: {(115 - 100) / 15:.2f}")  # 1.0
-print(f"Data point 70 z-score: {(70 - 100) / 15:.2f}")   # -2.0
+print(f"Data point 70 z-score: {(70 - 100) / 15:.2f}")  # -2.0
 
 # Count by z-score ranges
 within_1 = np.mean(np.abs(z_scores) < 1) * 100

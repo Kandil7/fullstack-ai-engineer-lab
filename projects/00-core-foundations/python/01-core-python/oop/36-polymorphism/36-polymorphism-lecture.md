@@ -30,13 +30,16 @@ class Dog:
     def speak(self):
         return "Woof!"
 
+
 class Cat:
     def speak(self):
         return "Meow!"
 
+
 class Duck:
     def speak(self):
         return "Quack!"
+
 
 # Polymorphism in action
 animals = [Dog(), Cat(), Duck()]
@@ -60,24 +63,27 @@ Child classes provide their own implementation of parent methods.
 class Shape:
     def area(self):
         raise NotImplementedError("Subclass must implement area()")
-    
+
     def describe(self):
         return f"{self.__class__.__name__} with area {self.area():.2f}"
+
 
 class Circle(Shape):
     def __init__(self, radius):
         self.radius = radius
-    
+
     def area(self):  # Override parent method
-        return 3.14159 * self.radius ** 2
+        return 3.14159 * self.radius**2
+
 
 class Rectangle(Shape):
     def __init__(self, width, height):
         self.width = width
         self.height = height
-    
+
     def area(self):  # Override parent method
         return self.width * self.height
+
 
 # Same code works for all shapes
 shapes = [Circle(5), Rectangle(4, 6)]
@@ -98,25 +104,30 @@ class Dog:
     def speak(self):
         return "Woof!"
 
+
 class Cat:
     def speak(self):
         return "Meow!"
+
 
 class Duck:
     def speak(self):
         return "Quack!"
 
+
 class NonAnimal:
     def speak(self):
         return "I'm not an animal but I can speak!"
+
 
 # Python doesn't care about the class type
 def make_it_speak(thing):
     print(thing.speak())  # Just needs a speak() method
 
-make_it_speak(Dog())      # Woof!
-make_it_speak(Cat())      # Meow!
-make_it_speak(Duck())     # Quack!
+
+make_it_speak(Dog())  # Woof!
+make_it_speak(Cat())  # Meow!
+make_it_speak(Duck())  # Quack!
 make_it_speak(NonAnimal())  # I'm not an animal but I can speak!
 ```
 
@@ -125,15 +136,19 @@ make_it_speak(NonAnimal())  # I'm not an animal but I can speak!
 ```python
 from typing import Protocol
 
+
 class Speakable(Protocol):
     def speak(self) -> str: ...
+
 
 class Dog:
     def speak(self) -> str:
         return "Woof!"
 
+
 def announce(animal: Speakable) -> None:
     print(animal.speak())
+
 
 announce(Dog())  # Works because Dog has speak()
 ```
@@ -151,25 +166,26 @@ class Vector:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-    
+
     def __add__(self, other):
         return Vector(self.x + other.x, self.y + other.y)
-    
+
     def __sub__(self, other):
         return Vector(self.x - other.x, self.y - other.y)
-    
+
     def __mul__(self, scalar):
         return Vector(self.x * scalar, self.y * scalar)
-    
+
     def __repr__(self):
         return f"Vector({self.x}, {self.y})"
+
 
 v1 = Vector(1, 2)
 v2 = Vector(3, 4)
 
-print(v1 + v2)    # Vector(4, 6)
-print(v1 - v2)    # Vector(-2, -2)
-print(v1 * 3)     # Vector(3, 6)
+print(v1 + v2)  # Vector(4, 6)
+print(v1 - v2)  # Vector(-2, -2)
+print(v1 * 3)  # Vector(3, 6)
 ```
 
 ### Comparison Operators
@@ -179,28 +195,29 @@ class Student:
     def __init__(self, name, grade):
         self.name = name
         self.grade = grade
-    
+
     def __eq__(self, other):
         return self.grade == other.grade
-    
+
     def __lt__(self, other):
         return self.grade < other.grade
-    
+
     def __le__(self, other):
         return self.grade <= other.grade
-    
+
     def __gt__(self, other):
         return self.grade > other.grade
-    
+
     def __repr__(self):
         return f"{self.name}: {self.grade}"
+
 
 alice = Student("Alice", 95)
 bob = Student("Bob", 85)
 
-print(alice == bob)   # False
-print(alice > bob)    # True
-print(alice >= bob)   # True
+print(alice == bob)  # False
+print(alice > bob)  # True
+print(alice >= bob)  # True
 
 # Can now sort!
 students = [bob, alice]
@@ -213,25 +230,26 @@ print(sorted(students))  # [Bob: 85, Alice: 95]
 class Text:
     def __init__(self, content):
         self.content = content
-    
+
     def __str__(self):
         return self.content
-    
+
     def __add__(self, other):
         return Text(self.content + " " + other.content)
-    
+
     def __mul__(self, times):
         return Text(self.content * times)
-    
+
     def __contains__(self, item):
         return item in self.content
+
 
 t1 = Text("Hello")
 t2 = Text("World")
 
-print(t1 + t2)        # Hello World
-print(t1 * 3)         # HelloHelloHello
-print("ell" in t1)    # True
+print(t1 + t2)  # Hello World
+print(t1 * 3)  # HelloHelloHello
+print("ell" in t1)  # True
 ```
 
 ---
@@ -244,6 +262,7 @@ Functions that work with multiple types.
 def total_length(items):
     """Calculate total length of items."""
     return sum(len(item) for item in items)
+
 
 # Works with strings
 print(total_length(["hello", "world"]))  # 10
@@ -258,14 +277,14 @@ print(total_length([[1, 2], [3, 4, 5]]))  # 5
 
 ```python
 # len() works with any object that implements __len__
-print(len("hello"))      # 5 (string)
-print(len([1, 2, 3]))    # 3 (list)
-print(len({"a": 1}))     # 1 (dict)
+print(len("hello"))  # 5 (string)
+print(len([1, 2, 3]))  # 3 (list)
+print(len({"a": 1}))  # 1 (dict)
 
 # + operator is polymorphic
-print(1 + 2)             # 3 (addition)
-print("a" + "b")         # ab (concatenation)
-print([1] + [2])         # [1, 2] (list concatenation)
+print(1 + 2)  # 3 (addition)
+print("a" + "b")  # ab (concatenation)
+print([1] + [2])  # [1, 2] (list concatenation)
 ```
 
 ---
@@ -277,58 +296,63 @@ Define contracts that all implementations must follow.
 ```python
 from abc import ABC, abstractmethod
 
+
 class PaymentProcessor(ABC):
     @abstractmethod
     def charge(self, amount):
         pass
-    
+
     @abstractmethod
     def refund(self, amount):
         pass
-    
+
     @abstractmethod
     def get_balance(self):
         pass
+
 
 class CreditCardProcessor(PaymentProcessor):
     def __init__(self):
         self.balance = 0
-    
+
     def charge(self, amount):
         self.balance += amount
         return f"Charged ${amount} to credit card"
-    
+
     def refund(self, amount):
         self.balance -= amount
         return f"Refunded ${amount} to credit card"
-    
+
     def get_balance(self):
         return self.balance
+
 
 class PayPalProcessor(PaymentProcessor):
     def __init__(self):
         self.balance = 0
-    
+
     def charge(self, amount):
         self.balance += amount
         return f"Charged ${amount} via PayPal"
-    
+
     def refund(self, amount):
         self.balance -= amount
         return f"Refunded ${amount} via PayPal"
-    
+
     def get_balance(self):
         return self.balance
+
 
 # Polymorphic function
 def process_payment(processor: PaymentProcessor, amount: float):
     print(processor.charge(amount))
 
+
 # Works with any PaymentProcessor
 cc = CreditCardProcessor()
 paypal = PayPalProcessor()
 
-process_payment(cc, 100)     # Charged $100 to credit card
+process_payment(cc, 100)  # Charged $100 to credit card
 process_payment(paypal, 50)  # Charged $50 via PayPal
 ```
 
@@ -348,6 +372,7 @@ def make_speak(animal):
     else:
         raise TypeError("Not an animal")
 
+
 # GOOD - duck typing
 def make_speak(animal):
     return animal.speak()
@@ -359,6 +384,7 @@ def make_speak(animal):
 # BAD - missing method
 class Incomplete(Shape):
     pass  # area() not implemented!
+
 
 # GOOD - implement all abstract methods
 class Complete(Shape):
@@ -387,37 +413,38 @@ class Complete(Shape):
 ```python
 class UniqueList:
     """List that only allows unique elements."""
-    
+
     def __init__(self):
         self._items = []
-    
+
     def append(self, item):
         if item not in self._items:
             self._items.append(item)
-    
+
     def __len__(self):
         return len(self._items)
-    
+
     def __getitem__(self, index):
         return self._items[index]
-    
+
     def __contains__(self, item):
         return item in self._items
-    
+
     def __iter__(self):
         return iter(self._items)
-    
+
     def __repr__(self):
         return f"UniqueList({self._items})"
+
 
 # Test
 ul = UniqueList()
 ul.append(1)
 ul.append(2)
 ul.append(1)  # Ignored (duplicate)
-print(ul)        # UniqueList([1, 2])
-print(len(ul))   # 2
-print(1 in ul)   # True
+print(ul)  # UniqueList([1, 2])
+print(len(ul))  # 2
+print(1 in ul)  # True
 ```
 
 ---

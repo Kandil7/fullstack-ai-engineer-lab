@@ -25,7 +25,8 @@
 ```python
 # Python automatically compiles to bytecode
 import py_compile
-py_compile.compile('my_script.py')  # Creates my_script.pyc
+
+py_compile.compile("my_script.py")  # Creates my_script.pyc
 ```
 
 ### C
@@ -52,6 +53,7 @@ int main() {
 ```python
 # Check your Python implementation
 import sys
+
 print(sys.implementation.name)  # Output: cpython
 ```
 
@@ -63,10 +65,10 @@ print(sys.implementation.name)  # Output: cpython
 - **Related terms**: Static Typing, Type Inference, Duck Typing
 ```python
 # Dynamic typing in action
-x = 10          # x is an integer
+x = 10  # x is an integer
 print(type(x))  # <class 'int'>
 
-x = "hello"     # Now x is a string
+x = "hello"  # Now x is a string
 print(type(x))  # <class 'str'>
 ```
 
@@ -118,9 +120,11 @@ Hello
 ```python
 # Using standard library modules
 import math
+
 print(math.sqrt(16))  # 4.0
 
 import datetime
+
 print(datetime.date.today())
 ```
 
@@ -188,6 +192,7 @@ pip list  # Show installed packages
 ```python
 # Different Python implementations
 import platform
+
 print(platform.python_implementation())  # CPython
 ```
 
@@ -215,6 +220,7 @@ print(platform.python_implementation())  # CPython
 # script.py
 def greet(name):
     return f"Hello, {name}!"
+
 
 if __name__ == "__main__":
     print(greet("World"))
@@ -270,9 +276,9 @@ pip install pandas
 - **Related terms**: Dynamic Typing, Type System
 ```python
 # Python infers types automatically
-x = 10          # int
-y = 3.14        # float
-z = "hello"     # str
+x = 10  # int
+y = 3.14  # float
+z = "hello"  # str
 print(type(x))  # <class 'int'>
 ```
 

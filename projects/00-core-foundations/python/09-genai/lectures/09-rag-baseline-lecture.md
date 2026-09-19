@@ -55,9 +55,9 @@ fails — and measure which one it is.
 ```python
 def rag_answer(query: str, index, embed_fn, llm_client, k: int = 4) -> dict:
     """Baseline RAG: retrieve top-k chunks, generate a grounded answer."""
-    q_vec = embed_fn(query)                       # 1. embed the query
-    hits = index.search(q_vec, k=k)               # 2. vector search top-k
-    context = "\n\n".join(h.text for h in hits)   # 3. assemble context
+    q_vec = embed_fn(query)  # 1. embed the query
+    hits = index.search(q_vec, k=k)  # 2. vector search top-k
+    context = "\n\n".join(h.text for h in hits)  # 3. assemble context
 
     prompt = f"""Answer using ONLY the context below. If the context lacks
 the answer, say "I don't have that information." Cite each claim's source
@@ -69,10 +69,9 @@ in brackets, e.g. [1].
 
 Question: {query}
 Answer:"""
-    answer = llm_client.complete(prompt)          # 4. generate
+    answer = llm_client.complete(prompt)  # 4. generate
 
-    return {"answer": answer, "sources": [h.source for h in hits],
-            "context": context}
+    return {"answer": answer, "sources": [h.source for h in hits], "context": context}
 ```
 
 Output:
@@ -141,9 +140,12 @@ def evaluate_rag(questions: list[tuple[str, str]], rag_fn) -> dict:
     for q, gold in questions:
         result = rag_fn(q)
         hits_at_k.append(gold in result["sources"])
-        grounded.append(has_citation(result["answer"]))   # L20-style check
-    return {"recall@k": round(sum(hits_at_k) / len(hits_at_k), 3),
-            "citation_rate": round(sum(grounded) / len(grounded), 3)}
+        grounded.append(has_citation(result["answer"]))  # L20-style check
+    return {
+        "recall@k": round(sum(hits_at_k) / len(hits_at_k), 3),
+        "citation_rate": round(sum(grounded) / len(grounded), 3),
+    }
+
 
 print(evaluate_rag([("refund policy", "refunds.pdf")], rag_answer_slow))
 ```

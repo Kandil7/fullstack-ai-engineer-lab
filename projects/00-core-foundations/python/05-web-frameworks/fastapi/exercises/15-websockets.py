@@ -26,6 +26,7 @@ app = FastAPI(title="WebSocket Exercise")
 # Exercise 1: Echo WebSocket
 # =============================================================================
 
+
 @app.websocket("/echo")
 async def echo_websocket(websocket: WebSocket):
     """Echo WebSocket - receives messages and sends them back."""
@@ -41,6 +42,7 @@ async def echo_websocket(websocket: WebSocket):
 # =============================================================================
 # Exercise 2: Chat Room
 # =============================================================================
+
 
 class ConnectionManager:
     """Manages WebSocket connections for chat rooms."""
@@ -97,7 +99,9 @@ async def notification_websocket(websocket: WebSocket):
     await websocket.accept()
     notification_connections.append(websocket)
     try:
-        await websocket.send_text(json.dumps({"type": "connected", "message": "You are subscribed to notifications"}))
+        await websocket.send_text(
+            json.dumps({"type": "connected", "message": "You are subscribed to notifications"})
+        )
         while True:
             # Keep connection alive and listen for any client messages
             await websocket.receive_text()

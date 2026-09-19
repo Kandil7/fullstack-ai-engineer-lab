@@ -13,9 +13,14 @@ Topics:
 """
 
 import numpy as np
+
 # Ensure output directory exists (Tier 0 fix: Windows + CI)
 import os
-os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
+os.makedirs(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy",
+    exist_ok=True,
+)
 
 import os
 import tempfile
@@ -33,7 +38,7 @@ from scipy.io import loadmat, savemat
 data_dict = {
     "array_1d": np.array([1.0, 2.0, 3.0, 4.0, 5.0]),
     "array_2d": np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], dtype=float),
-    "complex_array": np.array([1+2j, 3+4j, 5+6j]),
+    "complex_array": np.array([1 + 2j, 3 + 4j, 5 + 6j]),
     "text_string": "Hello from SciPy",
 }
 
@@ -111,7 +116,7 @@ from scipy.io import wavfile
 # Generate a test audio signal
 fs = 44100  # Sample rate
 duration = 2.0  # seconds
-t = np.arange(0, duration, 1/fs)
+t = np.arange(0, duration, 1 / fs)
 
 # Create a chord: C major (C4, E4, G4)
 freqs = [261.63, 329.63, 392.00]  # C4, E4, G4
@@ -148,6 +153,7 @@ print(f"  Max amplitude: {np.max(np.abs(data_read))}")
 
 # Plot waveform
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -160,7 +166,7 @@ axes[0].grid(True, alpha=0.3)
 
 # Spectrum
 fft_audio = np.fft.fft(signal_int16)
-freqs_audio = np.fft.fftfreq(len(signal_int16), 1/fs)
+freqs_audio = np.fft.fftfreq(len(signal_int16), 1 / fs)
 pos = freqs_audio > 0
 axes[1].plot(freqs_audio[pos], np.abs(fft_audio[pos]), "r-", linewidth=0.8)
 axes[1].set_title("Frequency Spectrum")
@@ -169,8 +175,13 @@ axes[1].set_ylabel("Magnitude")
 axes[1].set_xlim(0, 1000)
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_12_wav.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_12_wav.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_12_wav.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_12_wav.png"
+)
 
 # ============================================================
 # Example 4: NumPy Binary Format (.npy, .npz)
@@ -223,11 +234,13 @@ print("Example 5: Text and Structured Data I/O")
 print("=" * 60)
 
 # Save data as structured text (CSV-like)
-data_to_save = np.column_stack([
-    np.linspace(0, 10, 50),
-    np.sin(np.linspace(0, 10, 50)),
-    np.cos(np.linspace(0, 10, 50)),
-])
+data_to_save = np.column_stack(
+    [
+        np.linspace(0, 10, 50),
+        np.sin(np.linspace(0, 10, 50)),
+        np.cos(np.linspace(0, 10, 50)),
+    ]
+)
 
 # Save as CSV
 csv_file = os.path.join(tmp_dir, "data.csv")
@@ -240,10 +253,13 @@ print(f"Loaded CSV shape: {data_csv.shape}")
 
 # Save with formatting control
 fmt_file = os.path.join(tmp_dir, "formatted.txt")
-np.savetxt(fmt_file, data_to_save[:5],
-           fmt=["%8.4f", "%12.8f", "%12.8f"],
-           header="x        sin_x        cos_x",
-           comments="# ")
+np.savetxt(
+    fmt_file,
+    data_to_save[:5],
+    fmt=["%8.4f", "%12.8f", "%12.8f"],
+    header="x        sin_x        cos_x",
+    comments="# ",
+)
 print(f"\nFormatted output:")
 with open(fmt_file, "r") as f:
     print(f.read())
@@ -259,16 +275,15 @@ print("\n" + "=" * 60)
 print("I/O Format Summary")
 print("=" * 60)
 formats = {
-    ".mat":    "MATLAB format (scipy.io.savemat/loadmat)",
-    ".mtx":    "Matrix Market (scipy.io.mmwrite/mmread)",
-    ".wav":    "Wave audio (scipy.io.wavfile)",
-    ".npy":    "NumPy binary (np.save/load)",
-    ".npz":    "NumPy archive (np.savez/load)",
-    ".csv":    "Text CSV (np.savetxt/loadtxt)",
+    ".mat": "MATLAB format (scipy.io.savemat/loadmat)",
+    ".mtx": "Matrix Market (scipy.io.mmwrite/mmread)",
+    ".wav": "Wave audio (scipy.io.wavfile)",
+    ".npy": "NumPy binary (np.save/load)",
+    ".npz": "NumPy archive (np.savez/load)",
+    ".csv": "Text CSV (np.savetxt/loadtxt)",
 }
 for fmt, desc in formats.items():
     print(f"  {fmt:<8s}: {desc}")
 
 print("\n[OK] SciPy I/O module covered!")
 print("   All 12 SciPy tutorial modules complete! *")
-

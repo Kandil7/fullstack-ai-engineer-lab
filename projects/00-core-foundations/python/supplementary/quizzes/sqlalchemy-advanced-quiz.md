@@ -45,6 +45,7 @@ D) 11
 class StrictProject(Base):
     experiments: Mapped[list["Experiment"]] = relationship(lazy="raise")
 
+
 p = session.get(StrictProject, 1)
 try:
     _ = p.experiments
@@ -105,9 +106,7 @@ D) UI rendering
 **Without `.unique()`, how many times does a project with 3 experiments appear in this result?**
 
 ```python
-projects = session.scalars(
-    select(Project).options(joinedload(Project.experiments))
-).all()
+projects = session.scalars(select(Project).options(joinedload(Project.experiments))).all()
 ```
 
 A) 1
@@ -138,6 +137,7 @@ D) Commits each statement immediately
 
 ```python
 from sqlalchemy.ext.asyncio import create_async_engine
+
 engine = create_async_engine("sqlite+aiosqlite://", poolclass=StaticPool)
 ```
 
@@ -204,9 +204,11 @@ D) In SQL expressions — `where()`, `order_by()`, `group_by()` compile it to SQ
 def is_leader(self) -> bool:
     return self.score >= 0.90
 
+
 @is_leader.expression
 def is_leader(cls):
     return cls.score >= 0.90
+
 
 stmt = select(Experiment).where(Experiment.is_leader)
 ```
@@ -256,7 +258,7 @@ AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 async with AsyncSessionLocal() as session:
     row = await session.get(Prediction, 1)
     await session.commit()
-    print(row.latency_ms)   # loaded before commit
+    print(row.latency_ms)  # loaded before commit
 ```
 
 A) A new SELECT is triggered to refresh the attribute
@@ -273,9 +275,7 @@ D) It prints the cached value with no SQL
 **What rank does the 0.84 experiment get?**
 
 ```python
-rank = func.row_number().over(
-    partition_by=Experiment.model,
-    order_by=Experiment.score.desc())
+rank = func.row_number().over(partition_by=Experiment.model, order_by=Experiment.score.desc())
 
 # For model "bert": scores 0.91, 0.84, 0.97
 ```
@@ -310,6 +310,7 @@ D) `flush()` invalidates the session, so commit is unsafe
 def _count_sync(session):
     return len(list(session.scalars(select(Prediction.id)).all()))
 
+
 count = await session.run_sync(_count_sync)
 ```
 
@@ -330,6 +331,7 @@ D) Committing from synchronous code
 @event.listens_for(Experiment, "before_update")
 def _bump(mapper, connection, target):
     target.version += 1
+
 
 # UPDATE ... SET score=..., version=3 WHERE id=1 AND version=2
 ```

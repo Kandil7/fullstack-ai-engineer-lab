@@ -39,7 +39,7 @@ pixels *at export time*. `figsize=(6, 4)` at `dpi=150` →
 
 ```python
 fig, ax = plt.subplots(figsize=(6, 4))
-fig.savefig(path, dpi=150)      # -> 900 x 600 pixels
+fig.savefig(path, dpi=150)  # -> 900 x 600 pixels
 ```
 
 Prove it by parsing the PNG header — the file itself is the source of
@@ -48,10 +48,10 @@ truth (no image library needed):
 ```python
 def png_dimensions(path):
     with open(path, "rb") as fh:
-        data = fh.read(33)                    # signature + IHDR
+        data = fh.read(33)  # signature + IHDR
     assert data[:8] == b"\x89PNG\r\n\x1a\n", "file must be a PNG"
     assert data[12:16] == b"IHDR", "first chunk must be IHDR"
-    width, height = struct.unpack(">II", data[16:24])   # big-endian
+    width, height = struct.unpack(">II", data[16:24])  # big-endian
     return width, height
 ```
 
@@ -67,8 +67,8 @@ exactly the kind of artifact assertion CI should run.
   zoom, and labels remain selectable text (searchable in PDFs).
 
 ```python
-fig.savefig("fig.svg")          # vector: sharp, editable text
-fig.savefig("fig.png", dpi=120) # raster: for previews/thumbnails
+fig.savefig("fig.svg")  # vector: sharp, editable text
+fig.savefig("fig.png", dpi=120)  # raster: for previews/thumbnails
 ```
 
 Papers and dashboards use vector; thumbnails and web previews use
@@ -121,7 +121,8 @@ why CI can run on a bare container. The rule: call
 
 ```python
 import matplotlib
-matplotlib.use("Agg")   # MUST precede pyplot import
+
+matplotlib.use("Agg")  # MUST precede pyplot import
 import matplotlib.pyplot as plt
 ```
 

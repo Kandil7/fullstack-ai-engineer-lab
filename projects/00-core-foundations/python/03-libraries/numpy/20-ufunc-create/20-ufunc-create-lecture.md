@@ -34,9 +34,11 @@ By the end of this lecture, you will be able to:
 ```python
 import numpy as np
 
+
 # Simple function
 def add_ten(x):
     return x + 10
+
 
 # Create ufunc
 add_ten_ufunc = np.frompyfunc(add_ten, 1, 1)
@@ -57,8 +59,10 @@ print("Type:", result.dtype)  # object
 ```python
 import numpy as np
 
+
 def add_multiply(x, y, multiplier):
     return (x + y) * multiplier
+
 
 # Create ufunc (3 inputs, 1 output)
 add_mult = np.frompyfunc(add_multiply, 3, 1)
@@ -74,17 +78,21 @@ print("add_multiply:", result.astype(int))  # [10 14 18]
 ```python
 import numpy as np
 
+
 # Custom square
 def square(x):
-    return x ** 2
+    return x**2
+
 
 square_ufunc = np.frompyfunc(square, 1, 1)
 arr = np.array([1, 2, 3, 4, 5])
 print("Square:", square_ufunc(arr).astype(int))  # [ 1  4  9 16 25]
 
+
 # Custom percentage
 def percentage(x, total):
     return (x / total) * 100
+
 
 pct_ufunc = np.frompyfunc(percentage, 2, 1)
 scores = np.array([85, 92, 78, 95, 88])
@@ -92,9 +100,11 @@ total = 100
 print("Percentages:", pct_ufunc(scores, total).astype(float))
 # Output: [85. 92. 78. 95. 88.]
 
+
 # Custom clamp
 def clamp(x, min_val, max_val):
     return max(min_val, min(x, max_val))
+
 
 clamp_ufunc = np.frompyfunc(clamp, 3, 1)
 arr = np.array([-5, 10, 25, 50, 100])
@@ -115,9 +125,11 @@ print("Lower:", np.char.lower(arr))
 print("Title:", np.char.title(arr))
 print("Strip:", np.char.strip(arr))
 
+
 # String operations with custom function
 def add_prefix(x):
     return "num_" + x
+
 
 prefix_ufunc = np.frompyfunc(add_prefix, 1, 1)
 print("\nWith prefix:", prefix_ufunc(arr))
@@ -129,9 +141,11 @@ print("\nWith prefix:", prefix_ufunc(arr))
 ```python
 import numpy as np
 
+
 # Temperature conversion
 def celsius_to_fahrenheit(c):
-    return (c * 9/5) + 32
+    return (c * 9 / 5) + 32
+
 
 temp_convert = np.frompyfunc(celsius_to_fahrenheit, 1, 1)
 
@@ -140,18 +154,20 @@ temps_f = temp_convert(temps_c).astype(float)
 print("\nCelsius:", temps_c)
 print("Fahrenheit:", temps_f.round(2))
 
+
 # Grade calculator
 def calculate_grade(score):
     if score >= 90:
-        return 'A'
+        return "A"
     elif score >= 80:
-        return 'B'
+        return "B"
     elif score >= 70:
-        return 'C'
+        return "C"
     elif score >= 60:
-        return 'D'
+        return "D"
     else:
-        return 'F'
+        return "F"
+
 
 grade_ufunc = np.frompyfunc(calculate_grade, 1, 1)
 scores = np.array([95, 82, 74, 66, 55])
@@ -159,18 +175,25 @@ grades = grade_ufunc(scores)
 print("\nScores:", scores)
 print("Grades:", grades)
 
+
 # BMI calculator
 def calculate_bmi(weight_kg, height_m):
-    return weight_kg / (height_m ** 2)
+    return weight_kg / (height_m**2)
+
 
 bmi_ufunc = np.frompyfunc(calculate_bmi, 2, 1)
 weights = np.array([70, 85, 60])
 heights = np.array([1.75, 1.80, 1.65])
 bmi = bmi_ufunc(weights, heights).astype(float)
 print("\nBMI:", bmi.round(2))
-print("BMI categories:", np.where(bmi < 18.5, "Underweight",
-       np.where(bmi < 25, "Normal",
-       np.where(bmi < 30, "Overweight", "Obese"))))
+print(
+    "BMI categories:",
+    np.where(
+        bmi < 18.5,
+        "Underweight",
+        np.where(bmi < 25, "Normal", np.where(bmi < 30, "Overweight", "Obese")),
+    ),
+)
 ```
 
 ---
@@ -182,9 +205,11 @@ print("BMI categories:", np.where(bmi < 18.5, "Underweight",
 ```python
 import numpy as np
 
+
 # Define custom function
 def circle_area(radius):
-    return np.pi * radius ** 2
+    return np.pi * radius**2
+
 
 # Create ufunc
 area_ufunc = np.frompyfunc(circle_area, 1, 1)
@@ -205,9 +230,11 @@ print("Areas:", areas.round(2))
 ```python
 import numpy as np
 
+
 # Calculate distance between two points
 def distance(x1, y1, x2, y2):
-    return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    return np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+
 
 # Create ufunc
 distance_ufunc = np.frompyfunc(distance, 4, 1)
@@ -228,6 +255,7 @@ print("Distances:", distances.round(2))
 ```python
 import numpy as np
 
+
 # Custom function with complex logic
 def categorize(score):
     if score >= 90:
@@ -238,6 +266,7 @@ def categorize(score):
         return "Average"
     else:
         return "Poor"
+
 
 # Create ufunc
 categorize_ufunc = np.frompyfunc(categorize, 1, 1)
@@ -258,9 +287,11 @@ print("Categories:", categories)
 ```python
 import numpy as np
 
+
 # Custom string transformation
 def format_name(first, last):
     return f"{last.upper()}, {first.title()}"
+
 
 # Create ufunc
 format_ufunc = np.frompyfunc(format_name, 2, 1)
@@ -279,6 +310,7 @@ print("Formatted names:", formatted)
 ```python
 import numpy as np
 
+
 # Tax calculator with brackets
 def calculate_tax(income):
     if income <= 10000:
@@ -289,6 +321,7 @@ def calculate_tax(income):
         return 10000 * 0.10 + 30000 * 0.12 + (income - 40000) * 0.22
     else:
         return 10000 * 0.10 + 30000 * 0.12 + 45000 * 0.22 + (income - 85000) * 0.24
+
 
 # Create ufunc
 tax_ufunc = np.frompyfunc(calculate_tax, 1, 1)
@@ -311,8 +344,10 @@ print("Effective rates:", (taxes / incomes * 100).round(1))
 ```python
 import numpy as np
 
+
 def add_one(x):
     return x + 1
+
 
 # WRONG - Result is object dtype
 ufunc = np.frompyfunc(add_one, 1, 1)
@@ -329,10 +364,12 @@ print(result.dtype)  # int64
 ```python
 import numpy as np
 
+
 def safe_divide(x, y):
     if y == 0:
         return np.nan
     return x / y
+
 
 # Handle edge cases in your function
 ufunc = np.frompyfunc(safe_divide, 2, 1)
@@ -345,13 +382,16 @@ print(result.astype(float))
 ```python
 import numpy as np
 
+
 # WRONG - This won't work element-wise
 def bad_function(x):
     return x.sum()  # Fails on scalars
 
+
 # CORRECT - Use scalar operations
 def good_function(x):
     return x * 2  # Works element-wise
+
 
 ufunc = np.frompyfunc(good_function, 1, 1)
 print(ufunc(np.array([1, 2, 3])).astype(int))
@@ -366,12 +406,15 @@ print(ufunc(np.array([1, 2, 3])).astype(int))
 ```python
 import numpy as np
 
+
 # Simple, single-purpose functions
 def double(x):
     return x * 2
 
+
 def is_positive(x):
     return x > 0
+
 
 # Create ufuncs
 double_ufunc = np.frompyfunc(double, 1, 1)
@@ -383,8 +426,10 @@ positive_ufunc = np.frompyfunc(is_positive, 1, 1)
 ```python
 import numpy as np
 
+
 def calculate(x):
-    return x ** 2 + 1
+    return x**2 + 1
+
 
 ufunc = np.frompyfunc(calculate, 1, 1)
 arr = np.array([1, 2, 3, 4, 5])
@@ -399,10 +444,12 @@ print(result)
 ```python
 import numpy as np
 
+
 def safe_log(x):
     if x <= 0:
         return np.nan
     return np.log(x)
+
 
 ufunc = np.frompyfunc(safe_log, 1, 1)
 test_arr = np.array([1, 2, 0, -1, 10])
@@ -415,23 +462,25 @@ print("Result:", result)
 ```python
 import numpy as np
 
+
 def calculate_bmi(weight, height):
     """
     Calculate BMI from weight (kg) and height (m).
-    
+
     Parameters:
     -----------
     weight : float
         Weight in kilograms
     height : float
         Height in meters
-    
+
     Returns:
     --------
     float
         BMI value
     """
-    return weight / (height ** 2)
+    return weight / (height**2)
+
 
 # Create ufunc
 bmi_ufunc = np.frompyfunc(calculate_bmi, 2, 1)
@@ -446,9 +495,11 @@ bmi_ufunc = np.frompyfunc(calculate_bmi, 2, 1)
 ```python
 import numpy as np
 
+
 # TODO: Create ufunc for absolute percentage change
 def pct_change(old, new):
     return ((new - old) / old) * 100
+
 
 pct_ufunc = np.frompyfunc(pct_change, 2, 1)
 
@@ -464,9 +515,11 @@ print("Price changes:", changes.round(2))
 ```python
 import numpy as np
 
+
 # TODO: Create ufunc to extract domain from email
 def get_domain(email):
-    return email.split('@')[1]
+    return email.split("@")[1]
+
 
 domain_ufunc = np.frompyfunc(get_domain, 1, 1)
 
@@ -480,6 +533,7 @@ print("Domains:", domains)
 ```python
 import numpy as np
 
+
 # TODO: Create shipping cost calculator
 def shipping_cost(weight, express):
     base = 5.00
@@ -488,6 +542,7 @@ def shipping_cost(weight, express):
     if express:
         base *= 2
     return base
+
 
 shipping_ufunc = np.frompyfunc(shipping_cost, 2, 1)
 
@@ -519,9 +574,11 @@ print("Shipping costs:", costs)
 ```python
 import numpy as np
 
+
 # Create custom ufunc
 def my_function(x, y):
     return x + y
+
 
 my_ufunc = np.frompyfunc(my_function, 2, 1)
 
@@ -530,9 +587,11 @@ arr1 = np.array([1, 2, 3])
 arr2 = np.array([4, 5, 6])
 result = my_ufunc(arr1, arr2).astype(int)
 
+
 # String ufunc
 def format_str(s):
     return s.upper()
+
 
 format_ufunc = np.frompyfunc(format_str, 1, 1)
 str_arr = np.array(["hello", "world"])

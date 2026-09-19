@@ -23,9 +23,19 @@ from sklearn.datasets import make_classification, make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.metrics import (
-    precision_score, recall_score, f1_score, fbeta_score, roc_auc_score,
-    average_precision_score, log_loss, roc_curve, precision_recall_curve,
-    confusion_matrix, r2_score, mean_squared_error, mean_absolute_error,
+    precision_score,
+    recall_score,
+    f1_score,
+    fbeta_score,
+    roc_auc_score,
+    average_precision_score,
+    log_loss,
+    roc_curve,
+    precision_recall_curve,
+    confusion_matrix,
+    r2_score,
+    mean_squared_error,
+    mean_absolute_error,
 )
 
 rng = np.random.RandomState(0)
@@ -33,8 +43,14 @@ rng = np.random.RandomState(0)
 # ============================================================
 # 1. Accuracy lies on imbalance
 # ============================================================
-X, y = make_classification(n_samples=5000, n_features=15, n_informative=6,
-                           n_redundant=3, weights=[0.98, 0.02], random_state=0)
+X, y = make_classification(
+    n_samples=5000,
+    n_features=15,
+    n_informative=6,
+    n_redundant=3,
+    weights=[0.98, 0.02],
+    random_state=0,
+)
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, stratify=y, random_state=0)
 m = LogisticRegression(max_iter=500).fit(Xtr, ytr)
 pred = m.predict(Xte)
@@ -100,8 +116,9 @@ print(f"  MAE     : {mean_absolute_error(yr_te, yp):.2f}  (robust to outliers)")
 # ============================================================
 from sklearn.datasets import make_classification as mk  # noqa: E402
 
-Xm, ym = mk(n_samples=3000, n_features=10, n_classes=3, n_informative=5,
-            n_redundant=2, random_state=0)
+Xm, ym = mk(
+    n_samples=3000, n_features=10, n_classes=3, n_informative=5, n_redundant=2, random_state=0
+)
 Xm_tr, Xm_te, ym_tr, ym_te = train_test_split(Xm, ym, test_size=0.3, random_state=0)
 mm = LogisticRegression(max_iter=500).fit(Xm_tr, ym_tr)
 pm = mm.predict(Xm_te)

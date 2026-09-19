@@ -60,18 +60,19 @@ Explicit syntax is clearer and less error-prone:
 col = client.mydb.users
 
 # Better - explicit
-col = client['mydb']['users']
+col = client["mydb"]["users"]
 ```
 
 ### Not handling connection errors
 Always handle connection failures:
 ```python
 from pymongo.errors import ConnectionFailure
+
 try:
-    client = MongoClient('localhost', 27017)
-    client.admin.command('ping')
+    client = MongoClient("localhost", 27017)
+    client.admin.command("ping")
 except ConnectionFailure:
-    print('Server not available')
+    print("Server not available")
 ```
 
 ---

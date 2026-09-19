@@ -32,11 +32,13 @@
 ## Example
 ```python
 # Traditional programming: you write the rules.
-def is_even(n): return n % 2 == 0
+def is_even(n):
+    return n % 2 == 0
+
 
 # Machine learning: you provide examples; training discovers the weights.
 learn = vision_learner(dls, resnet34, metrics=error_rate)
-learn.fine_tune(1)   # weights are learned from labelled images
+learn.fine_tune(1)  # weights are learned from labelled images
 ```
 
 **Related Terms:** Weights, Neural Network, Loss
@@ -74,7 +76,7 @@ print(f"resnet34 has {n_params:,} weights to tune")
 ## Example
 ```python
 learn = vision_learner(dls, resnet34, metrics=error_rate)
-print(learn.model)   # inspect the layered architecture
+print(learn.model)  # inspect the layered architecture
 ```
 
 **Related Terms:** ResNet, Weights, Transfer Learning
@@ -147,9 +149,12 @@ learn50 = vision_learner(dls, resnet50, metrics=error_rate)  # slower, stronger
 ## Example
 ```python
 dls = ImageDataLoaders.from_name_func(
-    path, get_image_files(path),
-    valid_pct=0.2, seed=42,
-    label_func=is_cat, item_tfms=Resize(224),
+    path,
+    get_image_files(path),
+    valid_pct=0.2,
+    seed=42,
+    label_func=is_cat,
+    item_tfms=Resize(224),
 )
 dls.show_batch(max_n=6)
 ```
@@ -205,8 +210,8 @@ learn = vision_learner(dls, resnet34, metrics=error_rate)
 
 ## Example
 ```python
-learn.fine_tune(2)                 # 1 frozen epoch + 2 unfrozen epochs
-learn.fine_tune(4, base_lr=1e-3)   # control the learning rate
+learn.fine_tune(2)  # 1 frozen epoch + 2 unfrozen epochs
+learn.fine_tune(4, base_lr=1e-3)  # control the learning rate
 ```
 
 **Related Terms:** Epoch, Learning Rate, Transfer Learning
@@ -223,7 +228,7 @@ learn.fine_tune(4, base_lr=1e-3)   # control the learning rate
 
 ## Example
 ```python
-learn.fine_tune(3)   # 3 fine-tuning epochs (plus 1 frozen)
+learn.fine_tune(3)  # 3 fine-tuning epochs (plus 1 frozen)
 ```
 
 **Related Terms:** fine_tune, Overfitting, Learning Rate
@@ -240,7 +245,7 @@ learn.fine_tune(3)   # 3 fine-tuning epochs (plus 1 frozen)
 
 ## Example
 ```python
-learn.lr_find()               # suggest a good learning rate
+learn.lr_find()  # suggest a good learning rate
 learn.fine_tune(2, base_lr=2e-3)
 ```
 
@@ -277,9 +282,12 @@ learn = vision_learner(dls, resnet34, metrics=[error_rate, accuracy])
 ## Example
 ```python
 dls = ImageDataLoaders.from_name_func(
-    path, get_image_files(path),
-    valid_pct=0.2, seed=42,          # 20% held out, reproducibly
-    label_func=is_cat, item_tfms=Resize(224),
+    path,
+    get_image_files(path),
+    valid_pct=0.2,
+    seed=42,  # 20% held out, reproducibly
+    label_func=is_cat,
+    item_tfms=Resize(224),
 )
 ```
 
@@ -299,7 +307,7 @@ dls = ImageDataLoaders.from_name_func(
 ```python
 # Symptom across epochs: train_loss keeps dropping,
 # valid_loss / error_rate start increasing -> overfitting.
-learn.fine_tune(1)   # start small to avoid it
+learn.fine_tune(1)  # start small to avoid it
 ```
 
 **Related Terms:** Validation Set, Epoch, error_rate

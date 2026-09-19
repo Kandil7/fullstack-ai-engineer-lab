@@ -61,10 +61,10 @@ Element-wise operations on arrays: addition, subtraction, multiplication, divisi
 a = np.array([1, 2, 3])
 b = np.array([4, 5, 6])
 
-print(a + b)    # [5 7 9]
-print(a * b)    # [4 10 18]
-print(a ** b)   # [1 32 729]
-print(a / b)    # [0.25 0.4  0.5]
+print(a + b)  # [5 7 9]
+print(a * b)  # [4 10 18]
+print(a**b)  # [1 32 729]
+print(a / b)  # [0.25 0.4  0.5]
 ```
 
 **Related:** broadcasting, ufunc, vectorization
@@ -94,7 +94,7 @@ The type of data stored in array elements. Can be specified at creation time.
 arr_int = np.zeros(5, dtype=np.int32)
 arr_float = np.ones(5, dtype=np.float32)
 
-print(arr_int.dtype)    # int32
+print(arr_int.dtype)  # int32
 print(arr_float.dtype)  # float32
 ```
 
@@ -247,6 +247,7 @@ Numerical Python — the fundamental library for scientific computing.
 
 ```python
 import numpy as np
+
 print(np.__version__)  # e.g., 1.26.4
 ```
 
@@ -424,27 +425,27 @@ print(arr_int.dtype)  # int64
 import numpy as np
 
 # All zeros
-np.zeros(5)              # 1D: 5 zeros
-np.zeros((3, 4))         # 2D: 3×4 zeros
-np.zeros((2, 3, 4))      # 3D: 2×3×4 zeros
+np.zeros(5)  # 1D: 5 zeros
+np.zeros((3, 4))  # 2D: 3×4 zeros
+np.zeros((2, 3, 4))  # 3D: 2×3×4 zeros
 
 # All ones
-np.ones(5)               # 1D: 5 ones
-np.ones((3, 4))          # 2D: 3×4 ones
+np.ones(5)  # 1D: 5 ones
+np.ones((3, 4))  # 2D: 3×4 ones
 
 # Filled with value
-np.full((3, 3), 7)       # 3×3 filled with 7
+np.full((3, 3), 7)  # 3×3 filled with 7
 
 # Identity matrix
-np.eye(3)                # 3×3 identity
-np.eye(4, k=1)           # 4×4 with ones on first superdiagonal
+np.eye(3)  # 3×3 identity
+np.eye(4, k=1)  # 4×4 with ones on first superdiagonal
 
 # Sequences
-np.arange(0, 10, 2)      # [0, 2, 4, 6, 8]
-np.linspace(0, 1, 5)     # [0, 0.25, 0.5, 0.75, 1]
+np.arange(0, 10, 2)  # [0, 2, 4, 6, 8]
+np.linspace(0, 1, 5)  # [0, 0.25, 0.5, 0.75, 1]
 
 # Random
-np.random.rand(3, 3)     # Uniform [0, 1)
-np.random.randn(3, 3)    # Standard normal
+np.random.rand(3, 3)  # Uniform [0, 1)
+np.random.randn(3, 3)  # Standard normal
 np.random.randint(0, 10, (3, 3))  # Random ints
 ```

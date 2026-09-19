@@ -286,7 +286,7 @@ D) O(n²)
 **What is the output of this code?**
 ```python
 my_list = [1, 2, 3, 4, 5]
-result = list(map(lambda x: x ** 2, my_list))
+result = list(map(lambda x: x**2, my_list))
 print(result)
 ```
 

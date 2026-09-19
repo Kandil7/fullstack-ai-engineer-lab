@@ -42,11 +42,13 @@ By the end of this lecture, you will be able to:
 ```python
 import asyncio
 
+
 async def fetch(name: str, delay: float, fail: bool = False) -> str:
     await asyncio.sleep(delay)
     if fail:
         raise ValueError(f"{name} failed")
     return f"{name}:ok"
+
 
 async def demo_task_group() -> None:
     cancelled: list[str] = []
@@ -58,6 +60,7 @@ async def demo_task_group() -> None:
     except ExceptionGroup as eg:
         print(type(eg).__name__, [e.__class__.__name__ for e in eg.exceptions])
     print("cancelled by group:", cancelled)
+
 
 async def _watch(name: str, delay: float, cancelled: list[str]) -> None:
     try:
@@ -108,10 +111,10 @@ async def demo_shield() -> str:
     task = asyncio.create_task(fetch("shielded", 0.1))
     try:
         async with asyncio.timeout(0.02):
-            await asyncio.shield(task)      # timeout fires, shield absorbs it
+            await asyncio.shield(task)  # timeout fires, shield absorbs it
     except TimeoutError:
         print("outer wait timed out")
-    result = await task                     # shielded work finished anyway
+    result = await task  # shielded work finished anyway
     print("shielded completed:", result)
     return result
 ```
@@ -167,6 +170,7 @@ class TokenStream:
         self._i += 1
         return token
 
+
 async def demo_iter() -> None:
     out: list[str] = []
     async for token in TokenStream(["token", "by", "token"]):
@@ -193,9 +197,9 @@ async def demo_queue() -> int:
 
     async def producer() -> None:
         for i in range(8):
-            await queue.put(f"item-{i}")     # parks when full
-        await queue.put(None)                # sentinel: no more work
-        await queue.put(None)                # one per consumer
+            await queue.put(f"item-{i}")  # parks when full
+        await queue.put(None)  # sentinel: no more work
+        await queue.put(None)  # one per consumer
 
     async def consumer(name: str) -> None:
         while True:
@@ -258,9 +262,11 @@ Some blocking code cannot be rewritten: a sync driver, a legacy library, a CPU-b
 ```python
 import time
 
+
 def _blocking_db_query(query: str) -> str:
-    time.sleep(0.05)          # a sync driver we cannot change
+    time.sleep(0.05)  # a sync driver we cannot change
     return f"result-of-{query}"
+
 
 async def demo_to_thread() -> str:
     result = await asyncio.to_thread(_blocking_db_query, "SELECT 1")
@@ -281,7 +287,8 @@ The bridge is for *occasional* blocking calls, not for the hot path: each `to_th
 
 ```python
 async def _direct_block() -> None:
-    time.sleep(0.15)                      # blocks ALL tasks on the loop
+    time.sleep(0.15)  # blocks ALL tasks on the loop
+
 
 async def demo_blocking() -> tuple[float, float]:
     start = time.perf_counter()

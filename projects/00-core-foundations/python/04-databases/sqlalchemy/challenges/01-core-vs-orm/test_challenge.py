@@ -27,9 +27,7 @@ def _load(name: str):
     """
     parent = Path(__file__).parent.name.replace("-", "_")
     modname = f"{name}_{parent}"
-    spec = importlib.util.spec_from_file_location(
-        modname, Path(__file__).parent / f"{name}.py"
-    )
+    spec = importlib.util.spec_from_file_location(modname, Path(__file__).parent / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[modname] = module
     spec.loader.exec_module(module)
@@ -114,6 +112,7 @@ class TestQueryAbove:
 
     def test_bound_parameter_not_literal(self, conn):
         import inspect
+
         source = inspect.getsource(solution.query_above)
         assert ":threshold" in source, "must use a named bound parameter"
 

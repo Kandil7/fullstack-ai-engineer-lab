@@ -71,7 +71,7 @@ that abstraction is trivial — and usually worth it.
 ```python
 from openai import OpenAI
 
-client = OpenAI(api_key="sk-...")   # or env OPENAI_API_KEY
+client = OpenAI(api_key="sk-...")  # or env OPENAI_API_KEY
 
 resp = client.chat.completions.create(
     model="gpt-4o-mini",
@@ -83,7 +83,7 @@ resp = client.chat.completions.create(
     max_tokens=200,
 )
 print(resp.choices[0].message.content)
-print("usage:", resp.usage)   # prompt + completion tokens
+print("usage:", resp.usage)  # prompt + completion tokens
 ```
 
 Output:
@@ -101,7 +101,7 @@ count for cost logging, and the response object is structured (`choices[0]`).
 ```python
 from anthropic import Anthropic
 
-client = Anthropic()   # ANTHROPIC_API_KEY from env
+client = Anthropic()  # ANTHROPIC_API_KEY from env
 
 resp = client.messages.create(
     model="claude-3-5-sonnet-latest",
@@ -134,10 +134,12 @@ implement it per provider, and inject it everywhere. The app never imports
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+
 @dataclass
 class ChatMessage:
-    role: str      # system | user | assistant
+    role: str  # system | user | assistant
     content: str
+
 
 @dataclass
 class LLMResponse:
@@ -146,26 +148,30 @@ class LLMResponse:
     completion_tokens: int
     model: str
 
+
 class LLMClient(ABC):
     @abstractmethod
     def complete(self, messages: list[ChatMessage], **kwargs) -> LLMResponse:
         """Send messages, return a completion."""
 
+
 class OpenAIAdapter(LLMClient):
     def __init__(self, model: str = "gpt-4o-mini", api_key: str = ""):
         from openai import OpenAI
+
         self._client = OpenAI(api_key=api_key)
         self.model = model
 
     def complete(self, messages, **kwargs) -> LLMResponse:
         resp = self._client.chat.completions.create(
-            model=self.model,
-            messages=[m.__dict__ for m in messages], **kwargs)
+            model=self.model, messages=[m.__dict__ for m in messages], **kwargs
+        )
         return LLMResponse(
             content=resp.choices[0].message.content,
             prompt_tokens=resp.usage.prompt_tokens,
             completion_tokens=resp.usage.completion_tokens,
-            model=self.model)
+            model=self.model,
+        )
 ```
 
 Output:
@@ -186,22 +192,22 @@ LLM calls fail. The standard playbook: exponential backoff with jitter on
 ```python
 import time, random
 
-def complete_with_retries(client, messages, *, max_retries=4, base_delay=1.0,
-                          timeout_s=60):
+
+def complete_with_retries(client, messages, *, max_retries=4, base_delay=1.0, timeout_s=60):
     """Retry 429/5xx with exponential backoff + jitter."""
     for attempt in range(max_retries):
         try:
             return client.complete(messages, timeout=timeout_s)
-        except RateLimitError as e:      # 429
+        except RateLimitError as e:  # 429
             if attempt == max_retries - 1:
                 raise
-        except ServerError as e:         # 5xx
+        except ServerError as e:  # 5xx
             if attempt == max_retries - 1:
                 raise
-        except TimeoutError as e:        # network/timeout
+        except TimeoutError as e:  # network/timeout
             if attempt == max_retries - 1:
                 raise
-        delay = base_delay * (2 ** attempt) + random.uniform(0, 0.5)
+        delay = base_delay * (2**attempt) + random.uniform(0, 0.5)
         time.sleep(delay)
     raise RuntimeError("unreachable")
 ```
@@ -224,12 +230,11 @@ delay.
 ```python
 def stream_chat(client, messages, on_token):
     """Stream a completion, calling on_token per token."""
-    stream = client.chat.completions.create(
-        model="gpt-4o-mini", messages=messages, stream=True)
+    stream = client.chat.completions.create(model="gpt-4o-mini", messages=messages, stream=True)
     for chunk in stream:
         delta = chunk.choices[0].delta.content
         if delta:
-            on_token(delta)   # e.g. push to an SSE/WebSocket client
+            on_token(delta)  # e.g. push to an SSE/WebSocket client
 ```
 
 Output:

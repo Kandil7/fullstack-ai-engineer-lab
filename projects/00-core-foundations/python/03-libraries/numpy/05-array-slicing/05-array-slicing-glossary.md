@@ -34,11 +34,11 @@ arr = np.arange(20).reshape(4, 5)
 
 # Contiguous slice
 slice1 = arr[0:2]
-print(slice1.flags['C_CONTIGUOUS'])  # True
+print(slice1.flags["C_CONTIGUOUS"])  # True
 
 # Non-contiguous slice (every other row)
 slice2 = arr[::2]
-print(slice2.flags['C_CONTIGUOUS'])  # False (if original was C-contiguous)
+print(slice2.flags["C_CONTIGUOUS"])  # False (if original was C-contiguous)
 ```
 
 **Related:** strides, memory layout, view
@@ -54,7 +54,7 @@ arr = np.array([1, 2, 3, 4, 5])
 # Explicit copy
 copy = arr[1:3].copy()
 copy[0] = 99
-print(arr)   # [1 2 3 4 5] — unchanged
+print(arr)  # [1 2 3 4 5] — unchanged
 
 # Check if copy shares memory
 print(np.shares_memory(arr, copy))  # False
@@ -74,11 +74,11 @@ arr_3d = np.random.rand(2, 3, 4)
 
 # Select along last axis
 print(arr_3d[:, :, 0].shape)  # (2, 3)
-print(arr_3d[..., 0].shape)   # (2, 3) — equivalent
+print(arr_3d[..., 0].shape)  # (2, 3) — equivalent
 
 # Select along first axis
 print(arr_3d[0, :, :].shape)  # (3, 4)
-print(arr_3d[0, ...].shape)   # (3, 4) — equivalent
+print(arr_3d[0, ...].shape)  # (3, 4) — equivalent
 
 # Select along middle axis
 print(arr_3d[:, 0, :].shape)  # (2, 4)
@@ -111,12 +111,12 @@ print(col)
 # Add axis at position 0 (row vector)
 row = arr[np.newaxis, :]
 print(row.shape)  # (1, 5)
-print(row)        # [[1 2 3 4 5]]
+print(row)  # [[1 2 3 4 5]]
 
 # For broadcasting
-a = np.array([1, 2, 3])      # shape (3,)
-b = np.array([10, 20])       # shape (2,)
-c = a[:, np.newaxis] + b     # shape (3, 2)
+a = np.array([1, 2, 3])  # shape (3,)
+b = np.array([10, 20])  # shape (2,)
+c = a[:, np.newaxis] + b  # shape (3, 2)
 print(c)
 # [[11 21]
 #  [12 22]
@@ -143,8 +143,8 @@ print(arr[::-2])  # [5 3 1]
 
 # 2D reversal
 matrix = np.array([[1, 2], [3, 4], [5, 6]])
-print(matrix[::-1])      # Reverse rows
-print(matrix[:, ::-1])   # Reverse columns
+print(matrix[::-1])  # Reverse rows
+print(matrix[:, ::-1])  # Reverse columns
 print(matrix[::-1, ::-1])  # Reverse both
 ```
 
@@ -161,13 +161,13 @@ Select a range of elements from an array.
 arr = np.array([10, 20, 30, 40, 50])
 
 # Basic slice
-print(arr[1:4])    # [20 30 40]
+print(arr[1:4])  # [20 30 40]
 
 # Slice with step
-print(arr[::2])    # [10 30 50]
+print(arr[::2])  # [10 30 50]
 
 # Reverse slice
-print(arr[::-1])   # [50 40 30 20 10]
+print(arr[::-1])  # [50 40 30 20 10]
 
 # 2D slice
 matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
@@ -186,8 +186,8 @@ The beginning index of a slice (inclusive).
 ```python
 arr = np.array([10, 20, 30, 40, 50])
 
-print(arr[2:])     # [30 40 50] — from index 2 to end
-print(arr[0:3])    # [10 20 30] — from index 0 to 2
+print(arr[2:])  # [30 40 50] — from index 2 to end
+print(arr[0:3])  # [10 20 30] — from index 0 to 2
 ```
 
 **Related:** stop, step, slice
@@ -200,10 +200,10 @@ The interval between elements in a slice.
 ```python
 arr = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
 
-print(arr[::2])    # [10 30 50 70 90] — every 2nd element
-print(arr[::3])    # [10 40 70 100] — every 3rd element
+print(arr[::2])  # [10 30 50 70 90] — every 2nd element
+print(arr[::3])  # [10 40 70 100] — every 3rd element
 print(arr[1:8:2])  # [20 40 60 80] — from 1 to 7, every 2nd
-print(arr[::-1])   # [100 90 80 70 60 50 40 30 20 10] — reversed
+print(arr[::-1])  # [100 90 80 70 60 50 40 30 20 10] — reversed
 ```
 
 **Related:** start, stop, slice
@@ -216,8 +216,8 @@ The ending index of a slice (exclusive).
 ```python
 arr = np.array([10, 20, 30, 40, 50])
 
-print(arr[:3])     # [10 20 30] — up to but not including index 3
-print(arr[1:4])    # [20 30 40] — from 1 to 3
+print(arr[:3])  # [10 20 30] — up to but not including index 3
+print(arr[1:4])  # [20 30 40] — from 1 to 3
 ```
 
 **Related:** start, step, slice
@@ -251,7 +251,7 @@ arr = np.array([1, 2, 3, 4, 5])
 # Slicing creates a view
 view = arr[1:3]
 view[0] = 99
-print(arr)   # [ 1 99  3  4  5] — original modified!
+print(arr)  # [ 1 99  3  4  5] — original modified!
 
 # Check if shares memory
 print(np.shares_memory(arr, view))  # True
@@ -271,22 +271,22 @@ import numpy as np
 arr = np.arange(10)
 
 # All elements
-print(arr[:])           # [0 1 2 3 4 5 6 7 8 9]
+print(arr[:])  # [0 1 2 3 4 5 6 7 8 9]
 
 # From start
-print(arr[:5])          # [0 1 2 3 4]
+print(arr[:5])  # [0 1 2 3 4]
 
 # To end
-print(arr[5:])          # [5 6 7 8 9]
+print(arr[5:])  # [5 6 7 8 9]
 
 # Every other
-print(arr[::2])         # [0 2 4 6 8]
+print(arr[::2])  # [0 2 4 6 8]
 
 # Reversed
-print(arr[::-1])        # [9 8 7 6 5 4 3 2 1 0]
+print(arr[::-1])  # [9 8 7 6 5 4 3 2 1 0]
 
 # Reversed every other
-print(arr[::-2])        # [9 7 5 3 1]
+print(arr[::-2])  # [9 7 5 3 1]
 ```
 
 ### 2D Patterns
@@ -316,8 +316,8 @@ print(matrix[np.arange(4), np.arange(4)])
 arr_3d = np.random.rand(2, 3, 4)
 
 # Using ellipsis
-print(arr_3d[..., 0].shape)   # (2, 3)
-print(arr_3d[0, ...].shape)   # (3, 4)
+print(arr_3d[..., 0].shape)  # (2, 3)
+print(arr_3d[0, ...].shape)  # (3, 4)
 
 # Using newaxis
 arr = np.array([1, 2, 3])

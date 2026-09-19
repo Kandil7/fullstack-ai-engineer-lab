@@ -31,19 +31,22 @@ Ensure only one instance of a class exists throughout the application.
 ```python
 class Singleton:
     """Singleton using metaclass."""
+
     _instances = {}
-    
+
     def __new__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super().__new__(cls)
         return cls._instances[cls]
 
+
 class DatabaseConnection(Singleton):
     def __init__(self):
         self.connected = True
-    
+
     def query(self, sql):
         return f"Executing: {sql}"
+
 
 # Only one instance is created
 db1 = DatabaseConnection()
@@ -56,10 +59,11 @@ print(f"Same instance: {db1 is db2}")  # True
 ```python
 import threading
 
+
 class ThreadSafeSingleton:
     _instances = {}
     _lock = threading.Lock()
-    
+
     def __new__(cls, *args, **kwargs):
         if cls not in cls._instances:
             with cls._lock:
@@ -77,35 +81,40 @@ Create objects without specifying their exact class, delegating instantiation to
 ```python
 from abc import ABC, abstractmethod
 
+
 class Animal(ABC):
     @abstractmethod
     def speak(self) -> str:
         pass
-    
+
     @abstractmethod
     def move(self) -> str:
         pass
 
+
 class Dog(Animal):
     def speak(self) -> str:
         return "Woof!"
-    
+
     def move(self) -> str:
         return "Runs on 4 legs"
+
 
 class Cat(Animal):
     def speak(self) -> str:
         return "Meow!"
-    
+
     def move(self) -> str:
         return "Sneaks quietly"
+
 
 class Bird(Animal):
     def speak(self) -> str:
         return "Tweet!"
-    
+
     def move(self) -> str:
         return "Flies in the sky"
+
 
 class AnimalFactory:
     _creators = {
@@ -113,17 +122,18 @@ class AnimalFactory:
         "cat": Cat,
         "bird": Bird,
     }
-    
+
     @classmethod
     def register(cls, animal_type: str, creator: type):
         cls._creators[animal_type] = creator
-    
+
     @classmethod
     def create(cls, animal_type: str) -> Animal:
         creator = cls._creators.get(animal_type.lower())
         if not creator:
             raise ValueError(f"Unknown animal type: {animal_type}")
         return creator()
+
 
 # Usage
 for animal_type in ["dog", "cat", "bird"]:
@@ -141,47 +151,53 @@ Define a one-to-many dependency between objects so that when one object changes 
 from abc import ABC, abstractmethod
 from typing import Any, List
 
+
 class Observer(ABC):
     @abstractmethod
     def update(self, event: str, data: Any):
         pass
 
+
 class Subject:
     def __init__(self):
         self._observers: List[Observer] = []
-    
+
     def attach(self, observer: Observer):
         self._observers.append(observer)
-    
+
     def detach(self, observer: Observer):
         self._observers.remove(observer)
-    
+
     def notify(self, event: str, data: Any = None):
         for observer in self._observers:
             observer.update(event, data)
+
 
 class EventSystem(Subject):
     def __init__(self):
         super().__init__()
         self.events = {}
-    
+
     def emit(self, event: str, data: Any = None):
         if event not in self.events:
             self.events[event] = []
         self.events[event].append({"data": data})
         self.notify(event, data)
 
+
 class LogObserver(Observer):
     def update(self, event: str, data: Any):
         print(f"[LOG] Event: {event}, Data: {data}")
 
+
 class AlertObserver(Observer):
     def __init__(self, alert_events):
         self.alert_events = alert_events
-    
+
     def update(self, event: str, data: Any):
         if event in self.alert_events:
             print(f"[ALERT] {event} occurred!")
+
 
 # Usage
 event_system = EventSystem()
@@ -206,10 +222,12 @@ Define a family of algorithms, encapsulate each one, and make them interchangeab
 from abc import ABC, abstractmethod
 from typing import List
 
+
 class SortStrategy(ABC):
     @abstractmethod
     def sort(self, data: List[int]) -> List[int]:
         pass
+
 
 class BubbleSort(SortStrategy):
     def sort(self, data: List[int]) -> List[int]:
@@ -221,6 +239,7 @@ class BubbleSort(SortStrategy):
                     arr[j], arr[j + 1] = arr[j + 1], arr[j]
         return arr
 
+
 class QuickSort(SortStrategy):
     def sort(self, data: List[int]) -> List[int]:
         if len(data) <= 1:
@@ -230,6 +249,7 @@ class QuickSort(SortStrategy):
         middle = [x for x in data if x == pivot]
         right = [x for x in data if x > pivot]
         return self.sort(left) + middle + self.sort(right)
+
 
 class InsertionSort(SortStrategy):
     def sort(self, data: List[int]) -> List[int]:
@@ -243,20 +263,22 @@ class InsertionSort(SortStrategy):
             arr[j + 1] = key
         return arr
 
+
 class Sorter:
     def __init__(self, strategy: SortStrategy):
         self._strategy = strategy
-    
+
     @property
     def strategy(self) -> SortStrategy:
         return self._strategy
-    
+
     @strategy.setter
     def strategy(self, strategy: SortStrategy):
         self._strategy = strategy
-    
+
     def sort(self, data: List[int]) -> List[int]:
         return self._strategy.sort(data)
+
 
 # Usage
 data = [64, 34, 25, 12, 22, 11, 90]
@@ -282,48 +304,52 @@ Convert the interface of a class into another interface clients expect.
 class EuropeanSocket:
     def voltage(self) -> int:
         return 230
-    
+
     def live(self) -> int:
         return 1
-    
+
     def neutral(self) -> int:
         return -1
-    
+
     def earth(self) -> int:
         return 0
+
 
 class AmericanSocket:
     def voltage(self) -> int:
         return 120
-    
+
     def live(self) -> int:
         return 1
-    
+
     def neutral(self) -> int:
         return -1
+
 
 class USAdapter:
     def __init__(self, socket: AmericanSocket):
         self._socket = socket
-    
+
     def voltage(self) -> int:
         return self._socket.voltage()
-    
+
     def live(self) -> int:
         return self._socket.live()
-    
+
     def neutral(self) -> int:
         return self._socket.neutral()
-    
+
     def earth(self) -> int:
         return 0  # No earth in American socket
+
 
 class Laptop:
     def __init__(self, socket):
         self._socket = socket
-    
+
     def charge(self) -> str:
         return f"Charging at {self._socket.voltage()}V"
+
 
 # Usage
 european = EuropeanSocket()
@@ -346,33 +372,40 @@ Dynamically add responsibilities to objects without modifying their class.
 ```python
 from abc import ABC, abstractmethod
 
+
 class TextProcessor(ABC):
     @abstractmethod
     def process(self, text: str) -> str:
         pass
 
+
 class PlainText(TextProcessor):
     def process(self, text: str) -> str:
         return text
 
+
 class TextDecorator(TextProcessor):
     def __init__(self, processor: TextProcessor):
         self._processor = processor
-    
+
     def process(self, text: str) -> str:
         return self._processor.process(text)
+
 
 class UpperCase(TextDecorator):
     def process(self, text: str) -> str:
         return self._processor.process(text).upper()
 
+
 class TrimSpaces(TextDecorator):
     def process(self, text: str) -> str:
         return self._processor.process(text).strip()
 
+
 class AddExclamation(TextDecorator):
     def process(self, text: str) -> str:
         return self._processor.process(text) + "!"
+
 
 # Usage
 text = "  Hello World  "
@@ -402,6 +435,7 @@ print(f"Trim+Upper+Excl: '{processor.process(text)}'")
 class UserService(Singleton):
     pass
 
+
 # GOOD - only when truly needed
 class DatabaseConnection(Singleton):
     pass
@@ -415,11 +449,13 @@ class Dog:
     def speak(self):
         return "Woof"
 
+
 # GOOD - use ABC
 class Animal(ABC):
     @abstractmethod
     def speak(self) -> str:
         pass
+
 
 class Dog(Animal):
     def speak(self) -> str:
@@ -433,6 +469,7 @@ class Dog(Animal):
 class ConcreteObserver:
     def update(self, data):
         print(data)
+
 
 # GOOD - use abstract base class
 class Observer(ABC):
@@ -453,11 +490,12 @@ class SmartList(list):
     def custom_method(self):
         pass
 
+
 # GOOD - composition
 class SmartList:
     def __init__(self):
         self._list = []
-    
+
     def append(self, item):
         self._list.append(item)
 ```
@@ -467,27 +505,30 @@ class SmartList:
 ```python
 from abc import ABC, abstractmethod
 
+
 class Repository(ABC):
     @abstractmethod
     def get(self, id):
         pass
-    
+
     @abstractmethod
     def save(self, entity):
         pass
+
 
 # Can swap implementations
 class SQLRepository(Repository):
     def get(self, id):
         pass
-    
+
     def save(self, entity):
         pass
+
 
 class MongoRepository(Repository):
     def get(self, id):
         pass
-    
+
     def save(self, entity):
         pass
 ```
@@ -504,14 +545,15 @@ class ComplexFactory:
             return B(*args, **kwargs)
         # ... 50 more elifs
 
+
 # GOOD - simple factory with registry
 class Factory:
     _creators = {}
-    
+
     @classmethod
     def register(cls, type, creator):
         cls._creators[type] = creator
-    
+
     @classmethod
     def create(cls, type):
         return cls._creators[type]()

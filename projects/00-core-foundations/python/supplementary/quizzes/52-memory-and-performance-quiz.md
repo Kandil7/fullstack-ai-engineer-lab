@@ -18,6 +18,7 @@ are at the end.
 
 ```python
 import sys
+
 print(sys.getsizeof({}))
 ```
 
@@ -93,6 +94,7 @@ print(s1 == s2, s1 is s2)
 
 ```python
 import tracemalloc
+
 tracemalloc.start()
 big = [0] * 1_000_000
 _, peak = tracemalloc.get_traced_memory()
@@ -129,8 +131,10 @@ print(peak > sys.getsizeof(big))
 ```python
 import gc
 
+
 class Node:
     __slots__ = ("next",)
+
 
 n1, n2 = Node(), Node()
 n1.next, n2.next = n2, n1
@@ -158,6 +162,7 @@ print(gc.collect())
 def embedding_ram_bytes(rows, dim, dtype_bits=32):
     return rows * dim * (dtype_bits // 8)
 
+
 print(embedding_ram_bytes(1_000_000, 768, 32) / 1e9)
 ```
 
@@ -180,18 +185,23 @@ print(embedding_ram_bytes(1_000_000, 768, 32) / 1e9)
 ```python
 import timeit
 
+
 def concat(n):
     s = ""
     for _ in range(n):
         s += "x"
     return s
 
+
 def join_build(n):
     return "".join(["x"] * n)
 
+
 print(concat(100) == join_build(100))
-print(timeit.timeit(lambda: concat(500_000), number=5) >
-      timeit.timeit(lambda: join_build(500_000), number=5))
+print(
+    timeit.timeit(lambda: concat(500_000), number=5)
+    > timeit.timeit(lambda: join_build(500_000), number=5)
+)
 ```
 
 - (A) `True` then `True`
@@ -214,14 +224,17 @@ print(timeit.timeit(lambda: concat(500_000), number=5) >
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import time
 
+
 def spin(n):
     return sum(range(n))
+
 
 def time_pool(cls):
     t0 = time.perf_counter()
     with cls(max_workers=4) as pool:
         list(pool.map(spin, [300_000] * 4))
     return time.perf_counter() - t0
+
 
 a = time_pool(ThreadPoolExecutor)
 b = time_pool(ProcessPoolExecutor)

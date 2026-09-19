@@ -40,11 +40,13 @@
 ```python
 from dataclasses import dataclass
 
+
 @dataclass
 class User:
     name: str
     age: int
     email: str
+
 
 # Auto-generated __init__
 user = User("Alice", 30, "alice@example.com")
@@ -69,10 +71,12 @@ print(user == user2)  # True
 ```python
 from dataclasses import dataclass
 
+
 @dataclass
 class Point:
     x: float
     y: float
+
 
 p1 = Point(1.0, 2.0)
 p2 = Point(1.0, 2.0)
@@ -82,16 +86,18 @@ print(p1 == p2)  # True - same field values
 print(p1 == p3)  # False - different field values
 print(p1 != p3)  # True
 
+
 # Disable eq
 @dataclass(eq=False)
 class NoEquality:
     value: int
 
+
 # Custom eq
 @dataclass(eq=False)
 class CustomEq:
     value: int
-    
+
     def __eq__(self, other):
         return self.value % 2 == other.value % 2
 ```
@@ -108,21 +114,25 @@ class CustomEq:
 ```python
 from dataclasses import dataclass
 
+
 # Frozen dataclass is hashable
 @dataclass(frozen=True)
 class Point:
     x: float
     y: float
 
+
 p = Point(1.0, 2.0)
 point_set = {p, Point(1.0, 2.0)}  # Works
 point_dict = {p: "origin"}  # Works
+
 
 # Mutable dataclass is NOT hashable
 @dataclass
 class MutablePoint:
     x: float
     y: float
+
 
 mp = MutablePoint(1.0, 2.0)
 # hash(mp)  # TypeError: unhashable type
@@ -140,6 +150,7 @@ mp = MutablePoint(1.0, 2.0)
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Config:
     host: str
@@ -147,17 +158,13 @@ class Config:
     debug: bool = False
     tags: list[str] = field(default_factory=list)
 
+
 # All parameters in __init__
 config = Config(host="localhost", port=8080)
 print(config)  # Config(host='localhost', port=8080, debug=False, tags=[])
 
 # With all parameters
-config = Config(
-    host="localhost",
-    port=8080,
-    debug=True,
-    tags=["web", "api"]
-)
+config = Config(host="localhost", port=8080, debug=True, tags=["web", "api"])
 ```
 
 **Related**: `field()`, `default`, `default_factory`, `__post_init__`
@@ -172,16 +179,18 @@ config = Config(
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Rectangle:
     width: float
     height: float
     area: float = field(init=False)
-    
+
     def __post_init__(self):
         if self.width <= 0 or self.height <= 0:
             raise ValueError("Dimensions must be positive")
         self.area = self.width * self.height
+
 
 r = Rectangle(5.0, 3.0)
 print(r.area)  # 15.0 (computed in __post_init__)
@@ -189,14 +198,16 @@ print(r.area)  # 15.0 (computed in __post_init__)
 # With InitVar
 from dataclasses import InitVar
 
+
 @dataclass
 class User:
     name: str
     password_hash: str = field(init=False)
     password: InitVar[str]
-    
+
     def __post_init__(self, password: str):
         self.password_hash = hash_password(password)
+
 
 user = User("Alice", "secret123")
 ```
@@ -213,29 +224,34 @@ user = User("Alice", "secret123")
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Product:
     name: str
     price: float
     quantity: int
 
+
 product = Product("Widget", 9.99, 100)
 print(repr(product))
 # Product(name='Widget', price=9.99, quantity=100)
+
 
 # Disable repr
 @dataclass(repr=False)
 class Hidden:
     secret: str
 
+
 h = Hidden("password")
 print(h)  # <__main__.Hidden object at 0x...>
+
 
 # Custom repr
 @dataclass(repr=False)
 class CustomRepr:
     value: int
-    
+
     def __repr__(self):
         return f"CustomRepr({self.value})"
 ```
@@ -252,16 +268,19 @@ class CustomRepr:
 ```python
 from dataclasses import dataclass, asdict
 
+
 @dataclass
 class Address:
     street: str
     city: str
+
 
 @dataclass
 class User:
     name: str
     age: int
     address: Address
+
 
 user = User("Alice", 30, Address("123 Main St", "Springfield"))
 user_dict = asdict(user)
@@ -274,6 +293,7 @@ print(user_dict)
 
 # JSON serialization
 import json
+
 json_str = json.dumps(asdict(user), indent=2)
 ```
 
@@ -289,15 +309,18 @@ json_str = json.dumps(asdict(user), indent=2)
 ```python
 from dataclasses import dataclass, astuple
 
+
 @dataclass
 class Point:
     x: float
     y: float
 
+
 @dataclass
 class Line:
     start: Point
     end: Point
+
 
 line = Line(Point(0, 0), Point(1, 1))
 line_tuple = astuple(line)
@@ -320,18 +343,20 @@ print(flat_tuple)  # ((0.0, 0.0), (1.0, 1.0))
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class ShoppingCart:
     items: list[str] = field(default_factory=list)
     quantities: dict[str, int] = field(default_factory=dict)
     applied_coupons: set[str] = field(default_factory=set)
-    
+
     # Custom factory function
     @staticmethod
     def create_default_metadata():
         return {"created_at": "2024-01-01"}
-    
+
     metadata: dict = field(default_factory=create_default_metadata)
+
 
 cart1 = ShoppingCart()
 cart2 = ShoppingCart()
@@ -360,6 +385,7 @@ print(cart2.items)  # [] - separate instances
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class User:
     name: str
@@ -367,6 +393,7 @@ class User:
     email: str = field(repr=False)  # Hidden from repr
     _id: int = field(init=False, default=0)  # Not in __init__
     score: float = field(default=0.0, hash=False)
+
 
 user = User("Alice", 30, "alice@example.com")
 print(repr(user))  # User(name='Alice', age=30, score=0.0)
@@ -385,11 +412,13 @@ print(repr(user))  # User(name='Alice', age=30, score=0.0)
 ```python
 from dataclasses import dataclass, fields, field
 
+
 @dataclass
 class User:
     name: str
     age: int
     email: str = field(metadata={"description": "User email"})
+
 
 # Iterate fields
 for f in fields(User):
@@ -416,10 +445,12 @@ for f in fields(User):
 ```python
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class ImmutablePoint:
     x: float
     y: float
+
 
 p = ImmutablePoint(3.0, 4.0)
 # p.x = 5.0  # AttributeError: cannot assign to field
@@ -430,6 +461,7 @@ print(len(point_set))  # 2
 
 # Can be dict keys
 point_dict = {ImmutablePoint(0, 0): "origin"}
+
 
 # Can be in another frozen dataclass
 @dataclass(frozen=True)
@@ -450,14 +482,16 @@ class Line:
 ```python
 from dataclasses import dataclass, field, InitVar
 
+
 @dataclass
 class User:
     name: str
     password_hash: str = field(init=False)
     password: InitVar[str]  # Passed to __init__ and __post_init__
-    
+
     def __post_init__(self, password: str):
         self.password_hash = hash_password(password)
+
 
 user = User("Alice", "secret123")
 # password is not stored
@@ -476,19 +510,23 @@ print(user.__dict__)  # {'name': 'Alice', 'password_hash': '...'}
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Base:
     id: int
     name: str
+
 
 @dataclass
 class Extended(Base):
     value: float
     tags: list[str] = field(default_factory=list)
 
+
 # __init__ includes all fields
 obj = Extended(id=1, name="test", value=3.14)
 print(obj)  # Extended(id=1, name='test', value=3.14, tags=[])
+
 
 # Multiple inheritance
 @dataclass
@@ -496,9 +534,11 @@ class Timestamped:
     created_at: str = "2024-01-01"
     updated_at: str = "2024-01-01"
 
+
 @dataclass
 class FullModel(Base, Timestamped):
     data: dict = field(default_factory=dict)
+
 
 model = FullModel(id=1, name="model", data={"key": "value"})
 ```
@@ -515,11 +555,13 @@ model = FullModel(id=1, name="model", data={"key": "value"})
 ```python
 from dataclasses import dataclass
 
+
 # Python 3.10+
 @dataclass(slots=True)
 class Point:
     x: float
     y: float
+
 
 p = Point(1.0, 2.0)
 # Uses __slots__ for memory efficiency
@@ -527,15 +569,19 @@ p = Point(1.0, 2.0)
 
 # Memory savings
 import sys
+
+
 @dataclass
 class Regular:
     x: int
     y: int
 
+
 @dataclass(slots=True)
 class Slotted:
     x: int
     y: int
+
 
 regular = Regular(1, 2)
 slotted = Slotted(1, 2)
@@ -556,22 +602,25 @@ print(sys.getsizeof(regular.__dict__))  # ~104 bytes
 from dataclasses import dataclass
 import re
 
+
 @dataclass
 class Email:
     address: str
-    
+
     def __post_init__(self):
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         if not re.match(pattern, self.address):
             raise ValueError(f"Invalid email: {self.address}")
+
 
 @dataclass
 class PositiveInt:
     value: int
-    
+
     def __post_init__(self):
         if self.value <= 0:
             raise ValueError(f"Must be positive: {self.value}")
+
 
 # Usage
 email = Email("user@example.com")  # OK
@@ -593,6 +642,7 @@ value = PositiveInt(5)  # OK
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Config:
     host: str = "localhost"
@@ -600,6 +650,7 @@ class Config:
     debug: bool = False
     workers: int = field(default=4)
     timeout: float = field(default=30.0)
+
 
 # All defaults
 config = Config()
@@ -622,15 +673,18 @@ print(config)  # Config(host='0.0.0.0', port=8080, debug=True, workers=4, timeou
 ```python
 from typing import dataclass_transform
 
+
 @dataclass_transform()
 def my_dataclass(cls):
     # Custom implementation
     return cls
 
+
 @my_dataclass
 class User:
     name: str
     age: int
+
 
 # Type checkers understand this as dataclass-like
 ```

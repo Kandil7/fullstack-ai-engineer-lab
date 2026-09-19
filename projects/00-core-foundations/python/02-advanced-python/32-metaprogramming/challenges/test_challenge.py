@@ -28,6 +28,7 @@ import pytest  # noqa: E402
 # Bronze: Auto-Registering Tools
 # ============================================================
 
+
 class SearchTool(solution.Tool):
     def run(self) -> str:
         return "search results"
@@ -60,6 +61,7 @@ def test_registry_values_are_classes():
 # ============================================================
 # Silver: Signature -> JSON Schema
 # ============================================================
+
 
 def _sample(docs: list[str], top_k: int = 5) -> None:
     """Sample tool with typed params."""
@@ -98,8 +100,7 @@ def test_schema_skips_self():
 
     schema = solution.schema_for(C.method)
     assert "self" not in schema["parameters"]["properties"]
-    assert schema["parameters"]["properties"]["value"] == \
-        {"type": "string", "default": "a"}
+    assert schema["parameters"]["properties"]["value"] == {"type": "string", "default": "a"}
 
 
 def test_schema_handles_string_annotations():
@@ -132,6 +133,7 @@ def test_schema_multiple_types():
 # ============================================================
 # Gold: @tool Registry + Dynamic Plugin Load
 # ============================================================
+
 
 @solution.tool
 def search(query: str, top_k: int = 5) -> list[str]:

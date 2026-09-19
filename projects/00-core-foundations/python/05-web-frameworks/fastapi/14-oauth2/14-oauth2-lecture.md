@@ -117,13 +117,16 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 # OAuth2 scheme for password flow
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 class User(BaseModel):
     username: str
     email: Optional[str] = None
     disabled: bool = False
 
+
 class UserInDB(User):
     hashed_password: str
+
 
 # Fake user database
 fake_users_db = {
@@ -135,10 +138,12 @@ fake_users_db = {
     }
 }
 
+
 def get_user(db, username: str):
     if username in db:
         user_dict = db[username]
         return UserInDB(**user_dict)
+
 
 def authenticate_user(fake_db, username: str, password: str):
     user = get_user(fake_db, username)
@@ -148,6 +153,7 @@ def authenticate_user(fake_db, username: str, password: str):
         return False
     return user
 
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     if expires_delta:
@@ -156,6 +162,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
@@ -175,6 +182,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return user
 
+
 @app.post("/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(fake_users_db, form_data.username, form_data.password)
@@ -189,6 +197,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 @app.get("/users/me")
 async def read_users_me(current_user: User = Depends(get_current_user)):
@@ -211,56 +220,61 @@ oauth2_scheme = OAuth2PasswordBearer(
     scopes={
         "read": "Read access to resources",
         "write": "Write access to resources",
-        "admin": "Admin access"
-    }
+        "admin": "Admin access",
+    },
 )
+
 
 class User(BaseModel):
     username: str
     scopes: List[str] = []
 
+
 async def get_current_user(
-    security_scopes: SecurityScopes = Depends(),
-    token: str = Depends(oauth2_scheme)
+    security_scopes: SecurityScopes = Depends(), token: str = Depends(oauth2_scheme)
 ):
     # Decode token and get user
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     username = payload.get("sub")
     user_scopes = payload.get("scopes", [])
-    
+
     # Check required scopes
     for scope in security_scopes.scopes:
         if scope not in user_scopes:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Permission denied: requires scope '{scope}'"
+                detail=f"Permission denied: requires scope '{scope}'",
             )
-    
+
     return User(username=username, scopes=user_scopes)
+
 
 @app.get("/read-only/")
 async def read_only(user: User = Security(get_current_user, scopes=["read"])):
     return {"message": "Read access granted"}
 
+
 @app.get("/write-only/")
 async def write_only(user: User = Security(get_current_user, scopes=["write"])):
     return {"message": "Write access granted"}
 
+
 @app.get("/admin-only/")
 async def admin_only(user: User = Security(get_current_user, scopes=["admin"])):
     return {"message": "Admin access granted"}
+
 
 @app.post("/token")
 async def login(username: str, password: str):
     # Validate credentials
     if not authenticate_user(username, password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     # Create token with scopes
     access_token = create_access_token(
         data={
             "sub": username,
-            "scopes": ["read", "write"]  # User's scopes
+            "scopes": ["read", "write"],  # User's scopes
         }
     )
     return {"access_token": access_token, "token_type": "bearer"}
@@ -285,21 +299,23 @@ GITHUB_REDIRECT_URI = "http://localhost:8000/callback"
 # Store state for CSRF protection
 oauth_states = {}
 
+
 @app.get("/login/github")
 async def login_github():
     """Redirect to GitHub authorization page"""
     state = secrets.token_urlsafe(32)
     oauth_states[state] = True  # Store state
-    
+
     params = {
         "client_id": GITHUB_CLIENT_ID,
         "redirect_uri": GITHUB_REDIRECT_URI,
         "state": state,
-        "scope": "user:email"
+        "scope": "user:email",
     }
-    
+
     github_auth_url = f"https://github.com/login/oauth/authorize?{urlencode(params)}"
     return RedirectResponse(url=github_auth_url)
+
 
 @app.get("/callback")
 async def github_callback(code: str, state: str):
@@ -308,7 +324,7 @@ async def github_callback(code: str, state: str):
     if state not in oauth_states:
         raise HTTPException(400, "Invalid state parameter")
     del oauth_states[state]
-    
+
     # Exchange code for access token
     async with httpx.AsyncClient() as client:
         token_response = await client.post(
@@ -317,39 +333,37 @@ async def github_callback(code: str, state: str):
                 "client_id": GITHUB_CLIENT_ID,
                 "client_secret": GITHUB_CLIENT_SECRET,
                 "code": code,
-                "redirect_uri": GITHUB_REDIRECT_URI
+                "redirect_uri": GITHUB_REDIRECT_URI,
             },
-            headers={"Accept": "application/json"}
+            headers={"Accept": "application/json"},
         )
-        
+
         if token_response.status_code != 200:
             raise HTTPException(400, "Failed to get access token")
-        
+
         token_data = token_response.json()
         access_token = token_data["access_token"]
-    
+
     # Get user info
     async with httpx.AsyncClient() as client:
         user_response = await client.get(
             "https://api.github.com/user",
-            headers={
-                "Authorization": f"Bearer {access_token}",
-                "Accept": "application/json"
-            }
+            headers={"Authorization": f"Bearer {access_token}", "Accept": "application/json"},
         )
-        
+
         user_data = user_response.json()
-    
+
     # Create JWT for your application
     app_token = create_access_token(
         data={
             "sub": str(user_data["id"]),
             "username": user_data["login"],
-            "github_token": access_token
+            "github_token": access_token,
         }
     )
-    
+
     return {"access_token": app_token, "token_type": "bearer"}
+
 
 @app.get("/users/me")
 async def get_current_user(request: Request):
@@ -357,18 +371,18 @@ async def get_current_user(request: Request):
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         raise HTTPException(401, "Missing token")
-    
+
     token = auth_header.split(" ")[1]
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    
+
     # Get user from GitHub using stored token
     async with httpx.AsyncClient() as client:
         user_response = await client.get(
             "https://api.github.com/user",
             headers={
                 "Authorization": f"Bearer {payload['github_token']}",
-                "Accept": "application/json"
-            }
+                "Accept": "application/json",
+            },
         )
         return user_response.json()
 ```
@@ -387,53 +401,47 @@ security = HTTPBasic()
 
 # Service accounts
 SERVICE_ACCOUNTS = {
-    "service-a": {
-        "secret": "hashed-secret-a",
-        "scopes": ["read", "write"]
-    },
-    "service-b": {
-        "secret": "hashed-secret-b",
-        "scopes": ["read"]
-    }
+    "service-a": {"secret": "hashed-secret-a", "scopes": ["read", "write"]},
+    "service-b": {"secret": "hashed-secret-b", "scopes": ["read"]},
 }
+
 
 def verify_client_credentials(credentials: HTTPBasicCredentials = Depends(security)):
     """Verify client credentials for machine-to-machine auth"""
     client_id = credentials.username
     client_secret = credentials.password
-    
+
     if client_id not in SERVICE_ACCOUNTS:
         raise HTTPException(status_code=401, detail="Invalid client")
-    
+
     stored_secret = SERVICE_ACCOUNTS[client_id]["secret"]
     if not secrets.compare_digest(client_secret, stored_secret):
         raise HTTPException(status_code=401, detail="Invalid secret")
-    
-    return {
-        "client_id": client_id,
-        "scopes": SERVICE_ACCOUNTS[client_id]["scopes"]
-    }
+
+    return {"client_id": client_id, "scopes": SERVICE_ACCOUNTS[client_id]["scopes"]}
+
 
 @app.post("/token")
-async def get_client_token(client = Depends(verify_client_credentials)):
+async def get_client_token(client=Depends(verify_client_credentials)):
     """Issue token for client credentials grant"""
     access_token = create_access_token(
         data={
             "sub": client["client_id"],
             "grant_type": "client_credentials",
-            "scopes": client["scopes"]
+            "scopes": client["scopes"],
         }
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 @app.get("/api/data")
 async def get_data(token: str = Depends(oauth2_scheme)):
     """Protected endpoint requiring client credentials"""
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    
+
     if payload.get("grant_type") != "client_credentials":
         raise HTTPException(403, "Invalid grant type")
-    
+
     return {"data": "sensitive data"}
 ```
 
@@ -455,6 +463,7 @@ SECRET_KEY = secrets.token_urlsafe(32)
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+
 # Models
 class Client(BaseModel):
     client_id: str
@@ -462,10 +471,12 @@ class Client(BaseModel):
     redirect_uris: List[str]
     scopes: List[str]
 
+
 class User(BaseModel):
     id: str
     username: str
     email: str
+
 
 class AuthorizationCode(BaseModel):
     code: str
@@ -475,10 +486,12 @@ class AuthorizationCode(BaseModel):
     user_id: str
     expires_at: datetime
 
+
 # Storage (use database in production)
 clients_db = {}
 auth_codes_db = {}
 users_db = {}
+
 
 # OAuth2 endpoints
 @app.post("/oauth/authorize")
@@ -487,21 +500,21 @@ async def authorize(
     client_id: str,
     redirect_uri: str,
     scope: str = "read",
-    state: Optional[str] = None
+    state: Optional[str] = None,
 ):
     """Authorization endpoint"""
     # Validate client
     client = clients_db.get(client_id)
     if not client:
         raise HTTPException(400, "Invalid client_id")
-    
+
     if redirect_uri not in client.redirect_uris:
         raise HTTPException(400, "Invalid redirect_uri")
-    
+
     # In real app, show consent screen and authenticate user
     # For demo, assume user is authenticated
     user_id = "user123"
-    
+
     # Generate authorization code
     code = secrets.token_urlsafe(32)
     auth_codes_db[code] = AuthorizationCode(
@@ -510,15 +523,16 @@ async def authorize(
         redirect_uri=redirect_uri,
         scope=scope,
         user_id=user_id,
-        expires_at=datetime.utcnow() + timedelta(minutes=10)
+        expires_at=datetime.utcnow() + timedelta(minutes=10),
     )
-    
+
     # Redirect with code
     redirect_url = f"{redirect_uri}?code={code}"
     if state:
         redirect_url += f"&state={state}"
-    
+
     return RedirectResponse(url=redirect_url)
+
 
 @app.post("/oauth/token")
 async def token(
@@ -527,7 +541,7 @@ async def token(
     redirect_uri: Optional[str] = None,
     client_id: Optional[str] = None,
     client_secret: Optional[str] = None,
-    refresh_token: Optional[str] = None
+    refresh_token: Optional[str] = None,
 ):
     """Token endpoint"""
     if grant_type == "authorization_code":
@@ -535,34 +549,35 @@ async def token(
         auth_code = auth_codes_db.get(code)
         if not auth_code:
             raise HTTPException(400, "Invalid code")
-        
+
         if auth_code.expires_at < datetime.utcnow():
             raise HTTPException(400, "Code expired")
-        
+
         if auth_code.redirect_uri != redirect_uri:
             raise HTTPException(400, "Invalid redirect_uri")
-        
+
         # Create tokens
         access_token = create_access_token(
             data={"sub": auth_code.user_id, "scope": auth_code.scope}
         )
-        
+
         # Delete used code
         del auth_codes_db[code]
-        
+
         return {
             "access_token": access_token,
             "token_type": "bearer",
             "expires_in": 1800,
-            "scope": auth_code.scope
+            "scope": auth_code.scope,
         }
-    
+
     elif grant_type == "refresh_token":
         # Refresh token logic
         pass
-    
+
     else:
         raise HTTPException(400, "Unsupported grant_type")
+
 
 @app.get("/api/userinfo")
 async def userinfo(token: str = Depends(oauth2_scheme)):
@@ -591,8 +606,10 @@ async def authorize(redirect_uri: str):
     # Attacker could set redirect_uri to malicious site
     return RedirectResponse(f"{redirect_uri}?code=abc")
 
+
 # ✅ CORRECT - Validate against whitelist
 ALLOWED_REDIRECTS = ["https://yourapp.com/callback"]
+
 
 @app.get("/authorize")
 async def authorize(redirect_uri: str):
@@ -608,6 +625,7 @@ async def authorize(redirect_uri: str):
 @app.get("/authorize")
 async def authorize(client_id: str, redirect_uri: str):
     return RedirectResponse(f"{redirect_uri}?code=abc")
+
 
 # ✅ CORRECT - Generate and validate state
 @app.get("/authorize")

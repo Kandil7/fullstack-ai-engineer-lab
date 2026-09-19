@@ -61,8 +61,8 @@ if value == None:
 print("\n--- None in Boolean Context ---")
 
 x = None
-print(f"bool(None) = {bool(None)}")       # False
-print(f"if None: {bool(None)}")            # False
+print(f"bool(None) = {bool(None)}")  # False
+print(f"if None: {bool(None)}")  # False
 
 # None vs False vs 0 vs "" vs []
 print(f"None is falsy: {not None}")
@@ -73,8 +73,8 @@ print(f"[] is falsy: {not []}")
 
 # All of these are falsy, but they're different!
 print(f"\nNone == False: {None == False}")  # False
-print(f"None == 0: {None == 0}")           # False
-print(f"None == '': {None == ''}")         # False
+print(f"None == 0: {None == 0}")  # False
+print(f"None == '': {None == ''}")  # False
 
 # ============================================================
 # None as Default Parameter
@@ -82,13 +82,16 @@ print(f"None == '': {None == ''}")         # False
 # Example 4: Using None as default
 print("\n--- None as Default ---")
 
+
 def greet(name=None):
     if name is None:
         return "Hello, Stranger!"
     return f"Hello, {name}!"
 
-print(greet())         # Hello, Stranger!
+
+print(greet())  # Hello, Stranger!
 print(greet("Alice"))  # Hello, Alice!
+
 
 # ⚠️ Common mistake: mutable default arguments
 # WRONG:
@@ -96,8 +99,10 @@ def append_to_list(value, my_list=[]):
     my_list.append(value)
     return my_list
 
+
 print(append_to_list(1))  # [1]
 print(append_to_list(2))  # [1, 2] - OOPS! Same list!
+
 
 # CORRECT:
 def append_to_list_fixed(value, my_list=None):
@@ -105,6 +110,7 @@ def append_to_list_fixed(value, my_list=None):
         my_list = []
     my_list.append(value)
     return my_list
+
 
 print(append_to_list_fixed(1))  # [1]
 print(append_to_list_fixed(2))  # [2] - Correct!
@@ -115,9 +121,11 @@ print(append_to_list_fixed(2))  # [2] - Correct!
 # Example 5: Functions returning None
 print("\n--- None in Functions ---")
 
+
 # Functions without return statement return None
 def say_hello():
     print("Hello!")
+
 
 result = say_hello()
 print(f"Return value: {result}")
@@ -139,12 +147,14 @@ print(f"List: {my_list}")
 # Example 6: Using None for optional values
 print("\n--- Optional Values Pattern ---")
 
+
 def create_user(name, email, phone=None):
     """Create a user with optional phone number."""
     user = {"name": name, "email": email}
     if phone is not None:
         user["phone"] = phone
     return user
+
 
 user1 = create_user("Alice", "alice@example.com", "555-0123")
 user2 = create_user("Bob", "bob@example.com")
@@ -196,15 +206,15 @@ empty_list = []
 empty_dict = {}
 none_value = None
 
-print(f"empty_string: {bool(empty_string)}")    # False
-print(f"empty_list: {bool(empty_list)}")        # False
-print(f"empty_dict: {bool(empty_dict)}")        # False
-print(f"none_value: {bool(none_value)}")        # False
+print(f"empty_string: {bool(empty_string)}")  # False
+print(f"empty_list: {bool(empty_list)}")  # False
+print(f"empty_dict: {bool(empty_dict)}")  # False
+print(f"none_value: {bool(none_value)}")  # False
 
 # But they're different!
 print(f"\nempty_string is None: {empty_string is None}")  # False
-print(f"empty_list is None: {empty_list is None}")        # False
-print(f"empty_dict is None: {empty_dict is None}")        # False
+print(f"empty_list is None: {empty_list is None}")  # False
+print(f"empty_dict is None: {empty_dict is None}")  # False
 
 # None means "no value", empty means "value exists but is empty"
 
@@ -214,6 +224,7 @@ print(f"empty_dict is None: {empty_dict is None}")        # False
 # Example 9: Real-world None usage
 print("\n--- Practical Examples ---")
 
+
 # Find function
 def find_first(numbers, target):
     """Find first occurrence of target, return None if not found."""
@@ -221,6 +232,7 @@ def find_first(numbers, target):
         if num == target:
             return num
     return None
+
 
 result = find_first([1, 2, 3, 4, 5], 3)
 print(f"Found 3: {result}")
@@ -233,12 +245,14 @@ config = {"host": "localhost", "port": 5432}
 debug_mode = config.get("debug")  # Returns None if key doesn't exist
 print(f"Debug mode: {debug_mode}")
 
+
 # Chain of operations
 def get_user_email(user):
     """Safely get user email."""
     if user is None:
         return None
     return user.get("email")
+
 
 user = {"name": "Alice", "email": "alice@example.com"}
 email = get_user_email(user)

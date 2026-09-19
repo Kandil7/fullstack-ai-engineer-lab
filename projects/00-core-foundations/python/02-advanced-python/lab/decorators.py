@@ -1,4 +1,3 @@
-
 # ### Exercise 1: Basic Decorator
 # Write a `@debug` decorator that prints the function name, arguments, and return value:
 
@@ -38,21 +37,25 @@
 #         return result
 #     return wrapper
 
-import time 
+import time
 import functools
+
 
 def debug(func):
     """debug decorator that prints the function name , arguments and return value"""
+
     @functools.wraps(func)
-    def wrapper(*args,**kwargs):
-        args_str=", ".join([repr(a) for a in args])
-        kwargs_str =", ".join([f"{k}={v!r}" for k , v in kwargs.items()])
-        all_args=", ".join(filter(None,[args_str,kwargs_str]))
+    def wrapper(*args, **kwargs):
+        args_str = ", ".join([repr(a) for a in args])
+        kwargs_str = ", ".join([f"{k}={v!r}" for k, v in kwargs.items()])
+        all_args = ", ".join(filter(None, [args_str, kwargs_str]))
         print(f"Calling {func.__name__}({all_args})")
-        result=func(*args,**kwargs)
+        result = func(*args, **kwargs)
         print(f"{func.__name__} returned {result}")
         return result
+
     return wrapper
+
 
 # @debug
 # def add(a, b):

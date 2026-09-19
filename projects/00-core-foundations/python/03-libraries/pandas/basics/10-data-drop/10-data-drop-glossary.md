@@ -25,29 +25,29 @@
 Removes specified rows or columns from a DataFrame.
 
 ```python
-df.drop(columns=["A"])       # Drop column
-df.drop(index=["row1"])      # Drop row by label
-df.drop(df.index[[0, 2]])    # Drop rows by position
+df.drop(columns=["A"])  # Drop column
+df.drop(index=["row1"])  # Drop row by label
+df.drop(df.index[[0, 2]])  # Drop rows by position
 ```
 
 **Drop Duplicates**
 Removes duplicate rows from a DataFrame.
 
 ```python
-df.drop_duplicates()                    # Exact duplicates
-df.drop_duplicates(subset=["Name"])     # By specific column
-df.drop_duplicates(keep="last")         # Keep last occurrence
+df.drop_duplicates()  # Exact duplicates
+df.drop_duplicates(subset=["Name"])  # By specific column
+df.drop_duplicates(keep="last")  # Keep last occurrence
 ```
 
 **Drop NA**
 Removes rows or columns with missing values.
 
 ```python
-df.dropna()                           # Any NaN in row
-df.dropna(how="all")                  # All values NaN
-df.dropna(subset=["Age"])             # Check specific column
-df.dropna(thresh=3)                   # At least 3 non-null
-df.dropna(axis=1)                     # Drop columns with NaN
+df.dropna()  # Any NaN in row
+df.dropna(how="all")  # All values NaN
+df.dropna(subset=["Age"])  # Check specific column
+df.dropna(thresh=3)  # At least 3 non-null
+df.dropna(axis=1)  # Drop columns with NaN
 ```
 
 ### H
@@ -56,8 +56,8 @@ df.dropna(axis=1)                     # Drop columns with NaN
 Parameter for dropna — determines when to drop.
 
 ```python
-df.dropna(how="any")    # Drop if ANY value is NaN (default)
-df.dropna(how="all")    # Drop if ALL values are NaN
+df.dropna(how="any")  # Drop if ANY value is NaN (default)
+df.dropna(how="all")  # Drop if ALL values are NaN
 ```
 
 ### I
@@ -75,9 +75,9 @@ df.drop(columns=["A"], inplace=True)  # Modifies df directly
 Parameter for drop_duplicates — which duplicates to keep.
 
 ```python
-df.drop_duplicates(keep="first")   # Keep first occurrence
-df.drop_duplicates(keep="last")    # Keep last occurrence
-df.drop_duplicates(keep=False)     # Remove all duplicates
+df.drop_duplicates(keep="first")  # Keep first occurrence
+df.drop_duplicates(keep="last")  # Keep last occurrence
+df.drop_duplicates(keep=False)  # Remove all duplicates
 ```
 
 ### R
@@ -117,11 +117,7 @@ df.dropna(thresh=3)  # Keep rows with at least 3 non-null values
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Age": [28, 35],
-    "City": ["NYC", "London"]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob"], "Age": [28, 35], "City": ["NYC", "London"]})
 
 # Drop one column
 df1 = df.drop(columns=["City"])
@@ -138,10 +134,9 @@ df3 = df.drop("City", axis=1)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42]
-}, index=["emp1", "emp2", "emp3"])
+df = pd.DataFrame(
+    {"Name": ["Alice", "Bob", "Charlie"], "Age": [28, 35, 42]}, index=["emp1", "emp2", "emp3"]
+)
 
 # Drop by label
 df1 = df.drop(index=["emp2"])
@@ -159,10 +154,7 @@ df3 = df[df["Age"] > 30]
 import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Alice", "Charlie"],
-    "Age": [28, np.nan, 28, 42]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob", "Alice", "Charlie"], "Age": [28, np.nan, 28, 42]})
 
 # Drop NaN
 print(df.dropna())

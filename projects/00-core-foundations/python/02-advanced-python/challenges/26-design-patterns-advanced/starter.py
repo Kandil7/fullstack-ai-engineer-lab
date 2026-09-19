@@ -49,8 +49,7 @@ class Editor:
 
 @runtime_checkable
 class LLMClient(Protocol):
-    def complete(self, prompt: str, temperature: float = 0.0) -> str:
-        ...
+    def complete(self, prompt: str, temperature: float = 0.0) -> str: ...
 
 
 class RealLLMClient:

@@ -30,6 +30,7 @@ from typing import Callable
 # Answer relevance: does the answer address the question?
 # Context relevance: did retrieval return useful context?
 
+
 def faithfulness(claims: list[str], context: str) -> float:
     """Fraction of answer claims supported by the context."""
     if not claims:
@@ -58,8 +59,9 @@ print(f"  supported claims: {f_good:.0%}")
 print(f"  hallucinated claims: {f_bad:.0%}")
 assert f_good == 1.0 and f_bad == 0.5
 
-rel = answer_relevance(["api", "key", "environment"],
-                       "The API key is stored in the environment file.")
+rel = answer_relevance(
+    ["api", "key", "environment"], "The API key is stored in the environment file."
+)
 print(f"\n  answer relevance: {rel:.0%}")
 assert rel == 1.0
 
@@ -68,6 +70,7 @@ assert rel == 1.0
 # ============================================================
 # Domain metrics: "does the answer include a citation?", "does it refuse
 # out-of-scope questions?" - write them like unit tests.
+
 
 @dataclass
 class Evaluator:
@@ -79,14 +82,17 @@ class Evaluator:
 
 
 def citation_present(sample: dict) -> float:
-    return 1.0 if "Source" in sample.get("answer", "") or \
-        "[" in sample.get("answer", "") else 0.0
+    return 1.0 if "Source" in sample.get("answer", "") or "[" in sample.get("answer", "") else 0.0
 
 
 def refuses_ood(sample: dict) -> float:
     if sample.get("out_of_scope"):
-        return 1.0 if "can't" in sample.get("answer", "").lower() or \
-            "cannot" in sample.get("answer", "").lower() else 0.0
+        return (
+            1.0
+            if "can't" in sample.get("answer", "").lower()
+            or "cannot" in sample.get("answer", "").lower()
+            else 0.0
+        )
     return 1.0
 
 
@@ -111,6 +117,7 @@ assert refuses_ood(samples[1]) == 0.0
 # ============================================================
 # Run a fixed set of samples through the whole system on every change.
 # Scores below baseline fail the build.
+
 
 @dataclass
 class EvalSuite:
@@ -141,11 +148,15 @@ def stub_system(question: str) -> str:
 # Example 3: the suite gates the build. The out-of-scope sample scores
 # 1.0 on refusal but 0.0 on citation (correctly - it refused), so the
 # composed score is 0.75. The baseline is set to that known composition.
-suite = EvalSuite("rag-quality", [
-    {"question": "where is the key?", "out_of_scope": False},
-    {"question": "what is 2+2?", "out_of_scope": True},
-], [Evaluator("has_citation", citation_present),
-    Evaluator("refuses_ood", refuses_ood)], baseline=0.75)
+suite = EvalSuite(
+    "rag-quality",
+    [
+        {"question": "where is the key?", "out_of_scope": False},
+        {"question": "what is 2+2?", "out_of_scope": True},
+    ],
+    [Evaluator("has_citation", citation_present), Evaluator("refuses_ood", refuses_ood)],
+    baseline=0.75,
+)
 result = suite.run(stub_system)
 print("\nExample 3: regression suite")
 print(f"  score={result['score']} pass={result['pass']}")
@@ -156,6 +167,7 @@ assert result["pass"]
 # ============================================================
 # Models catch patterns; humans catch meaning. Sample low-confidence
 # outputs for human review and feed labels back into the eval set.
+
 
 def sample_for_review(confidence: float, rate: float = 0.1) -> bool:
     """Low-confidence outputs are reviewed more often."""
@@ -176,6 +188,7 @@ assert not sample_for_review(0.99, 0.0)
 # ============================================================
 # The CI eval job: suite of RAGAS + custom metrics, gate on baseline,
 # sample failures for human review.
+
 
 def ci_eval(suite: EvalSuite, system_fn) -> tuple[bool, dict]:
     result = suite.run(system_fn)
@@ -206,8 +219,12 @@ def _verify() -> None:
     assert citation_present({"answer": "a"}) == 0.0
     assert refuses_ood({"answer": "I cannot", "out_of_scope": True}) == 1.0
 
-    s = EvalSuite("s", [{"question": "q", "out_of_scope": False}],
-                  [Evaluator("c", citation_present)], baseline=0.75)
+    s = EvalSuite(
+        "s",
+        [{"question": "q", "out_of_scope": False}],
+        [Evaluator("c", citation_present)],
+        baseline=0.75,
+    )
     res = s.run(lambda q: "Answer. Source: [x]")
     assert res["pass"] and res["score"] == 1.0
     res2 = s.run(lambda q: "no citation here")

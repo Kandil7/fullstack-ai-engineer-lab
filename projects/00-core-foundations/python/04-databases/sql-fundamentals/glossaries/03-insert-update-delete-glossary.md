@@ -33,6 +33,7 @@ delete the whole table — almost never what you want.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
 conn.executemany("INSERT INTO t (v) VALUES (?)", [("a",), ("b",), ("c",)])

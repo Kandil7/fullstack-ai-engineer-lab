@@ -86,7 +86,8 @@ Flags gate unfinished or risky features:
 
 ```python
 flags = FeatureFlags({"hybrid_search": True})
-if flags.enabled("hybrid_search"): ...
+if flags.enabled("hybrid_search"):
+    ...
 ```
 
 - Flipped without a deploy (config change, not code change).

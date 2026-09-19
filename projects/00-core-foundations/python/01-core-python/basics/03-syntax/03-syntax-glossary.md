@@ -39,6 +39,7 @@ if True:
 def function1():
     pass
 
+
 # Blank line separates functions
 def function2():
     pass
@@ -56,8 +57,9 @@ class MyClass:
 - **Example**: After `if`, `for`, `while`, `def`, `class`
 - **Related terms**: Indentation, Block, Suite
 ```python
-if condition:    # Colon required
+if condition:  # Colon required
     do_something()
+
 
 def function():  # Colon required
     do_something()
@@ -102,9 +104,12 @@ def my_function():
     """This is a docstring."""
     pass
 
+
 class MyClass:
     """Class documentation."""
+
     pass
+
 
 module = """
 Module documentation.
@@ -119,10 +124,10 @@ Module documentation.
 - **Related terms**: Statement, Operator, Value
 ```python
 # Expressions
-2 + 3          # Arithmetic
-"hello" * 3    # String repetition
-x > 5          # Comparison
-True and False # Boolean
+2 + 3  # Arithmetic
+"hello" * 3  # String repetition
+x > 5  # Comparison
+True and False  # Boolean
 ```
 
 ### I
@@ -134,8 +139,12 @@ True and False # Boolean
 ```python
 # Valid identifiers
 user_name = "Alice"
+
+
 def calculate_total():
     pass
+
+
 class UserAccount:
     pass
 ```
@@ -162,6 +171,7 @@ print("No indentation")  # Outside block
 ```python
 # Python keywords
 import keyword
+
 print(keyword.kwlist)
 # ['False', 'None', 'True', 'and', 'as', 'assert', ...]
 ```
@@ -174,14 +184,10 @@ print(keyword.kwlist)
 - **Related terms**: Implicit Continuation, Explicit Continuation
 ```python
 # Implicit continuation (recommended)
-total = (10 +
-         20 +
-         30)
+total = 10 + 20 + 30
 
 # Explicit continuation (backslash)
-total = 10 + \
-        20 + \
-        30
+total = 10 + 20 + 30
 ```
 
 ### N
@@ -193,12 +199,16 @@ total = 10 + \
 ```python
 # Variables and functions: snake_case
 user_name = "Alice"
+
+
 def calculate_total():
     pass
+
 
 # Classes: PascalCase
 class UserAccount:
     pass
+
 
 # Constants: UPPER_SNAKE_CASE
 MAX_SIZE = 100
@@ -321,8 +331,9 @@ is_active = True
 - **Related terms**: Indentation, Readability, PEP 8
 ```python
 # Whitespace for readability
-x = 10 + 5      # Spaces around operators
-y = x * 2       # Consistent indentation
+x = 10 + 5  # Spaces around operators
+y = x * 2  # Consistent indentation
+
 
 # Function with proper whitespace
 def calculate(a, b):

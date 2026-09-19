@@ -35,7 +35,7 @@ import numpy as np
 
 x = np.random.default_rng(2).normal(size=100_000)
 k = 5
-idx = np.argpartition(x, -k)[-k:]          # k largest, unsorted
+idx = np.argpartition(x, -k)[-k:]  # k largest, unsorted
 print(np.array_equal(np.sort(x[idx]), np.sort(x)[-k:]))  # True
 ```
 
@@ -54,8 +54,8 @@ when the full order is needed.
 import numpy as np
 
 x = np.array([3.0, 1.0, 2.0])
-print(np.argsort(x))            # [1 2 0]
-print(x[np.argsort(x)])         # [1. 2. 3.]
+print(np.argsort(x))  # [1 2 0]
+print(x[np.argsort(x)])  # [1. 2. 3.]
 ```
 
 **Complexity**: O(n log n), O(n) index buffer.
@@ -73,8 +73,8 @@ entries, as a copy.
 import numpy as np
 
 x = np.array([1.0, -2.0, 3.0])
-print(x[x > 0.0])               # [1. 3.]
-print((x > 0.0).sum())          # 2
+print(x[x > 0.0])  # [1. 3.]
+print((x > 0.0).sum())  # 2
 ```
 
 **Complexity**: O(n) mask build, O(kept) copy.
@@ -92,7 +92,7 @@ be sorted.
 import numpy as np
 
 bins = np.array([0.0, 0.5, 1.0])
-print(np.digitize([0.0, 0.5, 0.75], bins))   # [1 2 2]
+print(np.digitize([0.0, 0.5, 0.75], bins))  # [1 2 2]
 ```
 
 **Complexity**: O(k log n).
@@ -111,8 +111,8 @@ import numpy as np
 
 a = np.arange(6.0)
 b = a[[3, 0, 3]]
-print(b)                          # [3. 0. 3.]
-print(np.shares_memory(a, b))     # False
+print(b)  # [3. 0. 3.]
+print(np.shares_memory(a, b))  # False
 ```
 
 **Complexity**: O(selected).
@@ -131,7 +131,7 @@ import numpy as np
 
 M = np.arange(20.0).reshape(4, 5)
 grid = M[np.ix_([0, 3], [1, 2, 4])]
-print(grid.shape)                 # (2, 3)
+print(grid.shape)  # (2, 3)
 ```
 
 **Complexity**: O(rows·cols) copy.
@@ -149,7 +149,7 @@ import numpy as np
 
 x = np.array([-3.0, 1.0, -2.0])
 x[x < -1.0] = -1.0
-print(x)                          # [-1.  1. -1.]
+print(x)  # [-1.  1. -1.]
 ```
 
 **Complexity**: O(n) write.
@@ -168,7 +168,7 @@ import numpy as np
 
 dst = np.zeros(6)
 np.put(dst, [0, 2], [9.0, -9.0])
-print(dst)                        # [ 9.  0. -9.  0.  0.  0.]
+print(dst)  # [ 9.  0. -9.  0.  0.  0.]
 ```
 
 **Complexity**: O(k).
@@ -186,7 +186,7 @@ decides edge ownership.
 import numpy as np
 
 bins = np.array([0.0, 0.5, 1.0])
-print(np.searchsorted(bins, [0.0, 0.5, 0.75], side="left"))   # [0 1 2]
+print(np.searchsorted(bins, [0.0, 0.5, 0.75], side="left"))  # [0 1 2]
 print(np.searchsorted(bins, [0.0, 0.5, 0.75], side="right"))  # [1 2 2]
 ```
 
@@ -205,7 +205,7 @@ check.
 import numpy as np
 
 base = np.arange(8.0)
-print(np.shares_memory(base, base[::2]))    # True -- view
+print(np.shares_memory(base, base[::2]))  # True -- view
 print(np.shares_memory(base, base[[0, 2]]))  # False -- copy
 ```
 
@@ -224,7 +224,7 @@ Equal values go to the following bucket with `"right"`.
 import numpy as np
 
 bins = np.array([0.0, 0.5, 1.0])
-print(np.searchsorted(bins, 0.5, side="left"))   # 1
+print(np.searchsorted(bins, 0.5, side="left"))  # 1
 print(np.searchsorted(bins, 0.5, side="right"))  # 2
 ```
 
@@ -243,8 +243,8 @@ elements along an axis with an explicit boundary policy:
 import numpy as np
 
 x = np.arange(6)
-print(np.take(x, [7, 8], mode="wrap"))    # [1 2]
-print(np.take(x, [-3, 9], mode="clip"))   # [0 5]
+print(np.take(x, [7, 8], mode="wrap"))  # [1 2]
+print(np.take(x, [-3, 9], mode="clip"))  # [0 5]
 ```
 
 **Complexity**: O(k).
@@ -263,7 +263,7 @@ import numpy as np
 
 x = np.array([5.0, 1.0, 9.0, 2.0, 7.0])
 idx = np.argpartition(x, -2)[-2:]
-print(np.sort(x[idx]))              # [7. 9.]
+print(np.sort(x[idx]))  # [7. 9.]
 ```
 
 **Complexity**: O(n) average.
@@ -283,7 +283,7 @@ import numpy as np
 base = np.arange(10.0)
 v = base[::2]
 v[:] = -1.0
-print(base[0])                      # -1.0 -- wrote through
+print(base[0])  # -1.0 -- wrote through
 ```
 
 **Complexity**: O(1) to create.
@@ -302,8 +302,8 @@ import numpy as np
 
 lab = np.array([1, 0, 1, 2, 1])
 uniq, counts = np.unique(lab, return_counts=True)
-print(uniq)                         # [0 1 2]
-print(counts)                       # [1 3 1]
+print(uniq)  # [0 1 2]
+print(counts)  # [1 3 1]
 ```
 
 **Complexity**: O(n log n) via sort.
@@ -320,7 +320,7 @@ first occurrences.
 ```python
 import numpy as np
 
-print(np.unique([3, 1, 3, 2, 1]))   # [1 2 3]
+print(np.unique([3, 1, 3, 2, 1]))  # [1 2 3]
 ```
 
 **Complexity**: O(n log n).
@@ -340,7 +340,7 @@ import numpy as np
 rng = np.random.default_rng(0)
 X = rng.normal(size=(6, 4))
 S = X[rng.permutation(X.shape[0])]
-print(np.shares_memory(X, S))       # False
+print(np.shares_memory(X, S))  # False
 ```
 
 **Complexity**: O(n).

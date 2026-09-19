@@ -35,12 +35,12 @@ These operators return boolean values:
 x = 10
 y = 20
 
-print(x == y)   # Equal: False
-print(x != y)   # Not equal: True
-print(x > y)    # Greater than: False
-print(x < y)    # Less than: True
+print(x == y)  # Equal: False
+print(x != y)  # Not equal: True
+print(x > y)  # Greater than: False
+print(x < y)  # Less than: True
 print(x >= 10)  # Greater or equal: True
-print(x <= 5)   # Less or equal: False
+print(x <= 5)  # Less or equal: False
 ```
 
 ### 3.3 Logical Operators
@@ -62,7 +62,7 @@ print(x > 20 or x > 30)  # False (both False)
 **not** - Reverses the boolean value:
 ```python
 x = 10
-print(not (x > 5))   # False (not True)
+print(not (x > 5))  # False (not True)
 print(not (x > 15))  # True (not False)
 ```
 
@@ -72,21 +72,21 @@ In Python, many values can be treated as booleans:
 **Falsy values:**
 ```python
 # All these evaluate to False
-print(bool(0))      # False
-print(bool(0.0))    # False
-print(bool(""))     # False
-print(bool([]))     # False
-print(bool({}))     # False
-print(bool(None))   # False
+print(bool(0))  # False
+print(bool(0.0))  # False
+print(bool(""))  # False
+print(bool([]))  # False
+print(bool({}))  # False
+print(bool(None))  # False
 ```
 
 **Truthy values:**
 ```python
 # All these evaluate to True
-print(bool(1))      # True
-print(bool(-1))     # True
-print(bool("hi"))   # True
-print(bool([1, 2])) # True
+print(bool(1))  # True
+print(bool(-1))  # True
+print(bool("hi"))  # True
+print(bool([1, 2]))  # True
 print(bool({"a": 1}))  # True
 ```
 
@@ -105,6 +105,7 @@ if is_active:
 # While loop
 while not done:
     process()
+
 
 # Function return
 def is_valid(data):
@@ -171,13 +172,15 @@ def is_even(number):
     """Check if number is even."""
     return number % 2 == 0
 
+
 def is_adult(age):
     """Check if person is adult."""
     return age >= 18
 
+
 # Using boolean functions
-print(is_even(4))    # True
-print(is_even(7))    # False
+print(is_even(4))  # True
+print(is_even(7))  # False
 print(is_adult(25))  # True
 print(is_adult(15))  # False
 ```
@@ -223,6 +226,7 @@ if is_active:
 def check():
     print("Checking...")
     return True
+
 
 # This won't print "Checking..." if x is False
 if x and check():

@@ -41,6 +41,7 @@ crash mid-way rolls back the whole unit.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT UNIQUE)")
 try:
@@ -113,6 +114,7 @@ never block, one writer proceeds.
 **Example**:
 ```python
 import tempfile, os
+
 tmp = tempfile.NamedTemporaryFile(delete=False)
 db_path = tmp.name
 tmp.close()

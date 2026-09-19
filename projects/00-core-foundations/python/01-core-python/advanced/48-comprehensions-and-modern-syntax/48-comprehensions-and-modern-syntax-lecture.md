@@ -101,11 +101,14 @@ consumed, it is gone.
 ```python
 import sys
 
+
 def squares_upto(n: int) -> list[int]:
-    return [i * i for i in range(n)]          # materializes n ints
+    return [i * i for i in range(n)]  # materializes n ints
+
 
 def squares_lazy(n: int):
-    return (i * i for i in range(n))          # streams, O(1) memory
+    return (i * i for i in range(n))  # streams, O(1) memory
+
 
 big_list = squares_upto(1_000_000)
 gen = squares_lazy(1_000_000)
@@ -148,8 +151,8 @@ The loop equivalent of the second one is:
 
 ```python
 pairs = []
-for i in range(2):        # outermost clause first
-    for j in range(2):    # then the inner clause
+for i in range(2):  # outermost clause first
+    for j in range(2):  # then the inner clause
         if i != j:
             pairs.append((i, j))
 ```
@@ -310,11 +313,7 @@ shape of a data-cleaning step in a training-prep service:
 ```python
 def clean_batch(rows: list[tuple[str, str]]) -> list[tuple[str, str]]:
     """Return (question, answer) pairs, trimmed, deduped, non-empty."""
-    cleaned = {
-        (q.strip(), a.strip())
-        for q, a in rows
-        if q.strip() and a.strip()
-    }
+    cleaned = {(q.strip(), a.strip()) for q, a in rows if q.strip() and a.strip()}
     return sorted(cleaned)
 
 

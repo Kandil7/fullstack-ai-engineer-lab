@@ -38,6 +38,8 @@ and registers it for LLM calling.
 def search(query: str, top_k: int = 5) -> list[str]:
     """Search the knowledge base."""
     return []
+
+
 # decorator runs AT DEFINITION TIME: registers schema + callable
 ```
 
@@ -56,8 +58,10 @@ class Registry:
         super().__init_subclass__(**kwargs)
         Registry._registry[cls.__name__] = cls
 
+
 class ToolA(Registry):
     pass
+
 
 print(sorted(Registry._registry))
 ```
@@ -77,10 +81,12 @@ a descriptor cannot know which attribute it is bound to.
 ```python
 class Column:
     def __set_name__(self, owner, name):
-        self.name = name          # learned automatically
+        self.name = name  # learned automatically
+
 
 class Row:
     id = Column(int)
+
 
 print(Row.id.name)
 ```
@@ -101,6 +107,7 @@ enough — prefer it over a metaclass.
 def with_repr(cls):
     cls.__repr__ = lambda self: f"{type(self).__name__}(...)"
     return cls
+
 
 @with_repr
 class Chunk:
@@ -131,9 +138,10 @@ for static definitions.
 def make_point(name):
     return type(name, (), {"x": 0, "y": 0})
 
+
 PointA = make_point("PointA")
 PointB = make_point("PointB")
-print(PointA is PointB)      # distinct classes
+print(PointA is PointB)  # distinct classes
 ```
 
 ```text
@@ -150,8 +158,10 @@ annotations, defaults, kinds. The raw material of schema generation.
 ```python
 import inspect
 
+
 def f(x: int, y: str = "a") -> bool:
     pass
+
 
 sig = inspect.signature(f)
 print(list(sig.parameters), sig.parameters["y"].default)
@@ -172,8 +182,10 @@ as strings). Required before mapping to JSON types.
 ```python
 from typing import get_type_hints
 
+
 def f(docs: list[str]) -> None:
     pass
+
 
 print(get_type_hints(f)["docs"])
 ```
@@ -204,6 +216,7 @@ mechanism behind agent frameworks' tool calling.
 ```python
 TOOL_SCHEMAS = {}
 TOOL_FUNCS = {}
+
 
 def tool(fn):
     TOOL_SCHEMAS[fn.__name__] = describe(fn)
@@ -241,6 +254,7 @@ static call would do.
 ```python
 class C:
     pass
+
 
 c = C()
 setattr(c, "model", "base")
@@ -281,6 +295,7 @@ the table.
 def op_a():
     return 1
 
+
 table = {"op_a": op_a}
 print(table["op_a"]())
 ```
@@ -301,8 +316,7 @@ inspection).
 import ast
 
 tree = ast.parse("def a():\n    pass")
-print(sum(1 for n in ast.walk(tree)
-          if isinstance(n, ast.FunctionDef)))
+print(sum(1 for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)))
 ```
 
 ```text
@@ -318,9 +332,9 @@ print(sum(1 for n in ast.walk(tree)
 breaks on upgrade). Restore after use, or prefer dependency injection.
 
 ```python
-client.predict = fake_predict    # patch
+client.predict = fake_predict  # patch
 ...
-client.predict = original        # restore
+client.predict = original  # restore
 ```
 
 **Related Terms:** Dependency injection, `unittest.mock`

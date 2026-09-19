@@ -90,11 +90,11 @@ Memory layout where elements are stored in a single continuous block.
 
 ```python
 arr = np.array([[1, 2, 3], [4, 5, 6]])
-print(arr.flags['C_CONTIGUOUS'])  # True (row-major)
+print(arr.flags["C_CONTIGUOUS"])  # True (row-major)
 
 # Fortran-contiguous
 arr_f = np.asfortranarray(arr)
-print(arr_f.flags['F_CONTIGUOUS'])  # True
+print(arr_f.flags["F_CONTIGUOUS"])  # True
 ```
 
 **Related:** order, strides, memory layout
@@ -151,11 +151,11 @@ print(arr.dtype)  # float32
 
 # Common types:
 np.int8, np.int16, np.int32, np.int64  # Integers
-np.float16, np.float32, np.float64     # Floats
-np.complex64, np.complex128            # Complex
-np.bool_                               # Boolean
-np.str_                                # String
-np.object_                             # Python objects
+np.float16, np.float32, np.float64  # Floats
+np.complex64, np.complex128  # Complex
+np.bool_  # Boolean
+np.str_  # String
+np.object_  # Python objects
 ```
 
 **Related:** type promotion, casting, astype
@@ -354,7 +354,7 @@ print(Y)
 #  [5 5 5]]
 
 # With indexing='ij' (matrix indexing)
-X, Y = np.meshgrid(x, y, indexing='ij')
+X, Y = np.meshgrid(x, y, indexing="ij")
 ```
 
 **Related:** linspace, arange
@@ -368,10 +368,10 @@ Memory layout of array: 'C' (row-major) or 'F' (column-major).
 
 ```python
 # C order (row-major, default)
-arr_c = np.array([[1, 2, 3], [4, 5, 6]], order='C')
+arr_c = np.array([[1, 2, 3], [4, 5, 6]], order="C")
 
 # F order (column-major)
-arr_f = np.array([[1, 2, 3], [4, 5, 6]], order='F')
+arr_f = np.array([[1, 2, 3], [4, 5, 6]], order="F")
 
 # Convert
 arr_f = np.asfortranarray(arr_c)

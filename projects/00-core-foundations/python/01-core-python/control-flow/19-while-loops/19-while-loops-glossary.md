@@ -53,9 +53,9 @@ print(f"Sum: {total}")  # Sum: 5050
 ```python
 # This is the body:
 while x > 0:
-    print(x)    # body line 1
-    x -= 1      # body line 2
-    x *= 2      # body line 3
+    print(x)  # body line 1
+    x -= 1  # body line 2
+    x *= 2  # body line 3
 ```
 
 **Related**: indentation, loop, block
@@ -238,10 +238,10 @@ while True:
 
 **Example**:
 ```python
-i = 0           # initialized
-while i < 10:   # checked
+i = 0  # initialized
+while i < 10:  # checked
     print(i)
-    i += 1      # modified
+    i += 1  # modified
 ```
 
 **Related**: counter, condition, increment
@@ -381,6 +381,7 @@ def reverse_number(n):
         n //= 10
     return reversed_num
 
+
 print(reverse_number(12345))  # 54321
 ```
 
@@ -390,6 +391,7 @@ def gcd(a, b):
     while b != 0:
         a, b = b, a % b
     return a
+
 
 print(gcd(48, 18))  # 6
 ```
@@ -402,6 +404,7 @@ def power(base, exponent):
         result *= base
         exponent -= 1
     return result
+
 
 print(power(2, 10))  # 1024
 ```

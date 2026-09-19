@@ -28,33 +28,32 @@ from django.db.models import Q
 
 class PostListView(ListView):
     """Display a paginated list of published posts."""
+
     model = Post  # Replace with your actual model
-    template_name = 'blog/post_list.html'
-    context_object_name = 'posts'
+    template_name = "blog/post_list.html"
+    context_object_name = "posts"
     paginate_by = 10
-    ordering = ['-created_at']
+    ordering = ["-created_at"]
 
     # Filter queryset
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.filter(status='published')
+        queryset = queryset.filter(status="published")
 
         # Search functionality
-        query = self.request.GET.get('q')
+        query = self.request.GET.get("q")
         if query:
-            queryset = queryset.filter(
-                Q(title__icontains=query) |
-                Q(content__icontains=query)
-            )
+            queryset = queryset.filter(Q(title__icontains=query) | Q(content__icontains=query))
 
         return queryset
 
     # Add extra context
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['search_query'] = self.request.GET.get('q', '')
-        context['total_posts'] = self.get_queryset().count()
+        context["search_query"] = self.request.GET.get("q", "")
+        context["total_posts"] = self.get_queryset().count()
         return context
+
 
 # URL config:
 # urlpatterns = [
@@ -70,17 +69,19 @@ from django.views.generic import DetailView
 
 class PostDetailView(DetailView):
     """Display a single blog post."""
+
     model = Post
-    template_name = 'blog/post_detail.html'
-    context_object_name = 'post'
-    slug_url_kwarg = 'slug'  # URL parameter name
+    template_name = "blog/post_detail.html"
+    context_object_name = "post"
+    slug_url_kwarg = "slug"  # URL parameter name
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['related_posts'] = Post.objects.filter(
-            category=self.object.category
-        ).exclude(pk=self.object.pk)[:5]
+        context["related_posts"] = Post.objects.filter(category=self.object.category).exclude(
+            pk=self.object.pk
+        )[:5]
         return context
+
 
 # URL config:
 # urlpatterns = [
@@ -97,15 +98,17 @@ from django.urls import reverse_lazy
 
 class PostCreateView(CreateView):
     """Create a new blog post."""
+
     model = Post
-    template_name = 'blog/post_form.html'
-    fields = ['title', 'content', 'category', 'status']
-    success_url = reverse_lazy('post_list')
+    template_name = "blog/post_form.html"
+    fields = ["title", "content", "category", "status"]
+    success_url = reverse_lazy("post_list")
 
     def form_valid(self, form):
         """Set the author to the current user."""
         form.instance.author = self.request.user
         return super().form_valid(form)
+
 
 # URL config:
 # urlpatterns = [
@@ -122,17 +125,20 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 class PostUpdateView(LoginRequiredMixin, UpdateView):
     """Update an existing blog post."""
+
     model = Post
-    template_name = 'blog/post_form.html'
-    fields = ['title', 'content', 'category', 'status']
-    success_url = reverse_lazy('post_list')
+    template_name = "blog/post_form.html"
+    fields = ["title", "content", "category", "status"]
+    success_url = reverse_lazy("post_list")
 
     def form_valid(self, form):
         """Only allow the author to edit."""
         if form.instance.author != self.request.user:
             from django.http import HttpResponseForbidden
+
             return HttpResponseForbidden("You can't edit this post.")
         return super().form_valid(form)
+
 
 # URL config:
 # urlpatterns = [
@@ -148,17 +154,20 @@ from django.views.generic import DeleteView
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):
     """Delete a blog post."""
+
     model = Post
-    template_name = 'blog/post_confirm_delete.html'
-    success_url = reverse_lazy('post_list')
+    template_name = "blog/post_confirm_delete.html"
+    success_url = reverse_lazy("post_list")
 
     def delete(self, request, *args, **kwargs):
         """Only allow the author to delete."""
         self.object = self.get_object()
         if self.object.author != request.user:
             from django.http import HttpResponseForbidden
+
             return HttpResponseForbidden("You can't delete this post.")
         return super().delete(request, *args, **kwargs)
+
 
 # URL config:
 # urlpatterns = [
@@ -174,18 +183,22 @@ from django.views.generic import YearArchiveView, MonthArchiveView
 
 class PostYearArchiveView(YearArchiveView):
     """Display posts for a specific year."""
+
     model = Post
-    template_name = 'blog/archive/year.html'
-    date_field = 'published_at'
+    template_name = "blog/archive/year.html"
+    date_field = "published_at"
     make_object_list = True
     allow_future = False
 
+
 class PostMonthArchiveView(MonthArchiveView):
     """Display posts for a specific month."""
+
     model = Post
-    template_name = 'blog/archive/month.html'
-    date_field = 'published_at'
-    month_format = '%m'
+    template_name = "blog/archive/month.html"
+    date_field = "published_at"
+    month_format = "%m"
+
 
 # URL config:
 # urlpatterns = [
@@ -204,17 +217,18 @@ from django.views.generic import TemplateView
 
 class HomePageView(TemplateView):
     """Render a simple template."""
-    template_name = 'home.html'
+
+    template_name = "home.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['featured_posts'] = Post.objects.filter(
-            is_featured=True, status='published'
-        )[:5]
+        context["featured_posts"] = Post.objects.filter(is_featured=True, status="published")[:5]
         return context
 
+
 class AboutView(TemplateView):
-    template_name = 'about.html'
+    template_name = "about.html"
+
 
 # URL config:
 # urlpatterns = [
@@ -231,14 +245,16 @@ from django.views.generic import RedirectView
 
 class PostRedirectView(RedirectView):
     """Redirect to latest post."""
+
     permanent = False  # Use 302, not 301
     query_string = True
 
     def get_redirect_url(self, *args, **kwargs):
-        post = Post.objects.filter(status='published').first()
+        post = Post.objects.filter(status="published").first()
         if post:
             return post.get_absolute_url()
-        return '/blog/'
+        return "/blog/"
+
 
 # URL config:
 # urlpatterns = [
@@ -257,8 +273,9 @@ from .forms import CommentForm
 
 class PostDetailViewWithComments(LoginRequiredMixin, DetailView, FormMixin):
     """DetailView with a comment form."""
+
     model = Post
-    template_name = 'blog/post_detail.html'
+    template_name = "blog/post_detail.html"
     form_class = CommentForm
 
     def get_success_url(self):
@@ -271,7 +288,8 @@ class PostDetailViewWithComments(LoginRequiredMixin, DetailView, FormMixin):
         comment.author = self.request.user
         comment.save()
         from django.contrib import messages
-        messages.success(self.request, 'Comment added!')
+
+        messages.success(self.request, "Comment added!")
         return super().form_valid(form)
 
     def post(self, request, *args, **kwargs):
@@ -283,9 +301,10 @@ class PostDetailViewWithComments(LoginRequiredMixin, DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = self.get_form()
-        context['comments'] = self.object.comments.filter(is_approved=True)
+        context["form"] = self.get_form()
+        context["comments"] = self.object.comments.filter(is_approved=True)
         return context
+
 
 # ---------------------------------------------------------------------------
 # 11. Generic Views Reference Table

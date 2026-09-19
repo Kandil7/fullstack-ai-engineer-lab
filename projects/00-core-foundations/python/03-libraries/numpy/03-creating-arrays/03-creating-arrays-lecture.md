@@ -30,17 +30,14 @@ arr = np.array([1, 2, 3, 4, 5])
 print(arr)  # [1 2 3 4 5]
 
 # 2D array — nested lists
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 print(matrix)
 # [[1 2 3]
 #  [4 5 6]
 #  [7 8 9]]
 
 # 3D array
-tensor = np.array([[[1, 2], [3, 4]],
-                   [[5, 6], [7, 8]]])
+tensor = np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
 print(tensor.shape)  # (2, 2, 2)
 
 # Explicit dtype
@@ -93,7 +90,7 @@ arr = np.array([True, False, True])
 print(arr.dtype)  # bool
 
 # Complex numbers
-arr = np.array([1+2j, 3+4j])
+arr = np.array([1 + 2j, 3 + 4j])
 print(arr.dtype)  # complex128
 ```
 
@@ -105,20 +102,20 @@ print(arr.dtype)  # complex128
 
 ```python
 # Zeros — all elements = 0
-z1 = np.zeros(5)           # [0. 0. 0. 0. 0.]
-z2 = np.zeros((3, 4))      # 3×4 matrix of zeros
-z3 = np.zeros(5, dtype=int) # Integer zeros
+z1 = np.zeros(5)  # [0. 0. 0. 0. 0.]
+z2 = np.zeros((3, 4))  # 3×4 matrix of zeros
+z3 = np.zeros(5, dtype=int)  # Integer zeros
 
 # Ones — all elements = 1
-o1 = np.ones(5)            # [1. 1. 1. 1. 1.]
-o2 = np.ones((3, 4))       # 3×4 matrix of ones
-o3 = np.ones(5, dtype=bool) # Boolean True
+o1 = np.ones(5)  # [1. 1. 1. 1. 1.]
+o2 = np.ones((3, 4))  # 3×4 matrix of ones
+o3 = np.ones(5, dtype=bool)  # Boolean True
 
 # Empty — uninitialized (garbage values)
-e = np.empty(5)            # Undefined values!
+e = np.empty(5)  # Undefined values!
 
 # Full — fill with a specific value
-f1 = np.full(5, 7)          # [7 7 7 7 7]
+f1 = np.full(5, 7)  # [7 7 7 7 7]
 f2 = np.full((3, 3), 3.14)  # 3×3 matrix of π
 f3 = np.full((2, 3), "hi", dtype=object)
 ```
@@ -127,14 +124,14 @@ f3 = np.full((2, 3), "hi", dtype=object)
 
 ```python
 # Basic arange
-arr = np.arange(10)         # [0 1 2 3 4 5 6 7 8 9]
+arr = np.arange(10)  # [0 1 2 3 4 5 6 7 8 9]
 
 # With start, stop, step
-arr = np.arange(0, 10, 2)   # [0 2 4 6 8]
+arr = np.arange(0, 10, 2)  # [0 2 4 6 8]
 arr = np.arange(10, 0, -1)  # [10 9 8 7 6 5 4 3 2 1]
 
 # With float step
-arr = np.arange(0, 1, 0.25) # [0.   0.25 0.5  0.75]
+arr = np.arange(0, 1, 0.25)  # [0.   0.25 0.5  0.75]
 
 # WARNING: Float step can cause precision issues
 arr = np.arange(0, 1, 0.1)
@@ -178,7 +175,7 @@ print(I_rect)
 #  [0. 0. 1. 0. 0.]]
 
 # With offset k
-I_upper = np.eye(4, k=1)   # Upper diagonal
+I_upper = np.eye(4, k=1)  # Upper diagonal
 I_lower = np.eye(4, k=-1)  # Lower diagonal
 
 # Diagonal from vector
@@ -255,8 +252,8 @@ print(arr)  # e.g., [-0.204  1.437 -0.716  0.872 -1.297]
 
 # Custom mean and std
 arr = np.random.normal(loc=100, scale=15, size=1000)
-print(f"Mean: {arr.mean():.1f}")   # ~100
-print(f"Std: {arr.std():.1f}")     # ~15
+print(f"Mean: {arr.mean():.1f}")  # ~100
+print(f"Std: {arr.std():.1f}")  # ~15
 ```
 
 ### 3.3 Integer Random
@@ -319,7 +316,7 @@ print(arr)  # [0 1 2 3 4 5 6 7 8 9]
 ```python
 # Parse string data
 data = "1.5 2.5 3.5 4.5"
-arr = np.fromstring(data, sep=' ')
+arr = np.fromstring(data, sep=" ")
 print(arr)  # [1.5 2.5 3.5 4.5]
 ```
 
@@ -355,12 +352,12 @@ Z = X**2 + Y**2
 
 ```python
 # C-contiguous (row-major, default)
-arr_c = np.array([[1, 2, 3], [4, 5, 6]], order='C')
-print(arr_c.flags['C_CONTIGUOUS'])  # True
+arr_c = np.array([[1, 2, 3], [4, 5, 6]], order="C")
+print(arr_c.flags["C_CONTIGUOUS"])  # True
 
 # Fortran-contiguous (column-major)
-arr_f = np.array([[1, 2, 3], [4, 5, 6]], order='F')
-print(arr_f.flags['F_CONTIGUOUS'])  # True
+arr_f = np.array([[1, 2, 3], [4, 5, 6]], order="F")
+print(arr_f.flags["F_CONTIGUOUS"])  # True
 
 # Convert between layouts
 arr_f = np.asfortranarray(arr_c)
@@ -392,7 +389,7 @@ row_f = arr_f[500, :]  # Slower with Fortran layout
 # SLOW — Python loop
 arr = np.zeros(1000000)
 for i in range(1000000):
-    arr[i] = i ** 2
+    arr[i] = i**2
 
 # FAST — Vectorized
 arr = np.arange(1000000) ** 2
@@ -406,11 +403,12 @@ arr[:] = np.arange(1000000) ** 2
 
 ```python
 # Use appropriate dtypes
-small_int = np.zeros(1000000, dtype=np.int8)    # 1 MB
-large_int = np.zeros(1000000, dtype=np.int64)   # 8 MB
+small_int = np.zeros(1000000, dtype=np.int8)  # 1 MB
+large_int = np.zeros(1000000, dtype=np.int64)  # 8 MB
 
 # Use sparse arrays for mostly-zero data
 from scipy import sparse
+
 sparse_arr = sparse.csr_matrix((10000, 10000))  # Much less memory
 ```
 

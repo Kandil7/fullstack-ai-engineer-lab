@@ -30,6 +30,7 @@ from redis_client import ManualClock, RedisClient, get_client
 # One command pair, O(1). Weakness: two bursts at the window boundary
 # (23:59:59 and 00:00:00) can double the effective rate.
 
+
 class FixedWindowLimiter:
     def __init__(self, client: RedisClient, limit: int, window_s: float) -> None:
         self._c = client
@@ -73,6 +74,7 @@ print(f"at 60s  -> {fw.allow('alice', clock())} (fresh window, allowed)")
 # score = timestamp). Allow when ZCARD < limit; else drop old timestamps
 # and reject. Memory: O(limit) per user. No boundary burst.
 
+
 class SlidingWindowLimiter:
     def __init__(self, client: RedisClient, limit: int, window_s: float) -> None:
         self._c = client
@@ -90,7 +92,7 @@ class SlidingWindowLimiter:
         if self._c.zcard(key) >= self._limit:
             return False
         self._seq += 1
-        self._c.zadd(key, {f"r{self._seq}": now})             # record request
+        self._c.zadd(key, {f"r{self._seq}": now})  # record request
         self._c.expire(key, self._window)
         return True
 
@@ -105,7 +107,7 @@ print(f"sliding window: t=0 x3 then t=30 -> {res}")
 # Output:
 # sliding window: t=0 x3 then t=30 -> [True, True, True, True]
 
-clock.advance(30)   # t=60: requests at t=0 expired, only t=30 remains
+clock.advance(30)  # t=60: requests at t=0 expired, only t=30 remains
 res.append(sw.allow("bob", clock()))
 res.append(sw.allow("bob", clock()))
 print(f"at t=60: two more -> {res[-2:]} (t=0 window dropped)")
@@ -118,6 +120,7 @@ print(f"at t=60: two more -> {res[-2:]} (t=0 window dropped)")
 # ============================================================
 # Bucket holds up to capacity tokens; refills at rate/sec. Each request
 # takes 1 token. Allows bursts up to capacity, then exactly rate.
+
 
 class TokenBucketLimiter:
     def __init__(self, client: RedisClient, capacity: float, refill_rate: float) -> None:
@@ -144,7 +147,7 @@ print(f"token bucket burst (cap 2) -> {[tb.allow('carol', 100.0) for _ in range(
 # Output:
 # token bucket burst (cap 2) -> [True, True, False, False]
 
-clock.advance(2)    # 2 seconds -> 2 tokens refilled
+clock.advance(2)  # 2 seconds -> 2 tokens refilled
 print(f"after 2s refill            -> {[tb.allow('carol', clock()) for _ in range(3)]}")
 
 # Output:
@@ -157,6 +160,7 @@ print(f"after 2s refill            -> {[tb.allow('carol', clock()) for _ in rang
 # here, but check-then-act sequences (peek tokens, then spend) MUST be
 # atomic or you over-admit under load. Real Redis: Lua script or WATCH.
 # Stand-in: register_script() executes one Python callable "atomically".
+
 
 def _lua_token_bucket(client: RedisClient, keys: list[str], args: list) -> str:
     """One-shot token spend, atomic in the sim (and in real Lua EVAL)."""
@@ -203,18 +207,17 @@ print(f"Lua-scripted spend (cap 2) -> {verdicts}")
 # MISTAKE: forgetting EXPIRE — counters grow forever and keys accumulate.
 # CORRECT: every rate-limit key carries a TTL.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # fixed window: 4th rapid call rejected
-    assert hits == [True, True, True, False], \
-        "Fixed window must reject the call beyond the limit"
+    assert hits == [True, True, True, False], "Fixed window must reject the call beyond the limit"
 
     # sliding window: t=0 burst expires by t=60
-    assert res[-1] is True, \
-        "Sliding window must free slots after the window elapses"
+    assert res[-1] is True, "Sliding window must free slots after the window elapses"
     # window correctness: only requests within the last 60s count
     vclock = ManualClock(start=0.0)
     v_sw: SlidingWindowLimiter = SlidingWindowLimiter(RedisClient(clock=vclock), 2, 60)
@@ -223,18 +226,21 @@ def _verify() -> None:
     assert v_sw.allow("x", 62.0), "t=0 and t=1 requests expired, slot freed"
 
     # token bucket: capacity limits the burst, refill restores tokens
-    assert [tb.allow("carol", 200.0) for _ in range(4)] == [True, True, False, False], \
+    assert [tb.allow("carol", 200.0) for _ in range(4)] == [True, True, False, False], (
         "Burst is capped by bucket capacity"
+    )
 
     # Lua script: same semantics, one atomic call
-    assert verdicts == ["1", "1", "0"], \
+    assert verdicts == ["1", "1", "0"], (
         "Lua token bucket must behave identically to the Python version"
+    )
 
     # INCR+EXPIRE pairing: key must carry a TTL after the first call
     probe = FixedWindowLimiter(RedisClient(clock=ManualClock(0.0)), 5, 60)
     probe.allow("z", 0.0)
-    assert probe._c.ttl("rl:fw:z:0") > 0, \
+    assert probe._c.ttl("rl:fw:z:0") > 0, (
         "First INCR must attach an EXPIRE so the window self-clears"
+    )
 
     print("[OK] 04-rate-limiting: all checks passed")
 

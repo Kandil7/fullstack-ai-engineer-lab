@@ -28,8 +28,7 @@ can be scalars, Series, or callables; callables receive the frame *as it
 exists at that point in the chain* — after earlier filters and assigns.
 **Example**:
 ```python
-df.assign(total=df["price"] * df["qty"],
-          rank=lambda d: d["total"].rank())
+df.assign(total=df["price"] * df["qty"], rank=lambda d: d["total"].rank())
 ```
 **Complexity**: O(n) per new column.
 **Related**: chain, callable
@@ -66,7 +65,7 @@ never affects the original.
 **Example**:
 ```python
 safe = df.copy()
-safe.iloc[0, 0] = 999   # df untouched
+safe.iloc[0, 0] = 999  # df untouched
 ```
 **Complexity**: O(n) time and space.
 **Related**: copy (shallow), view
@@ -78,7 +77,7 @@ safe for read-only reuse.
 **Example**:
 ```python
 tmp = df.copy(deep=False)
-tmp.iloc[0, 0] = 999    # df changes too
+tmp.iloc[0, 0] = 999  # df changes too
 ```
 **Related**: copy (deep), view
 
@@ -89,7 +88,7 @@ allocates internally — an anti-pattern.
 **Example**:
 ```python
 # WRONG
-df.query("x > 0").dropna(inplace=True).assign(y=1)   # NoneType error
+df.query("x > 0").dropna(inplace=True).assign(y=1)  # NoneType error
 # CORRECT
 df.query("x > 0").dropna().assign(y=1)
 ```

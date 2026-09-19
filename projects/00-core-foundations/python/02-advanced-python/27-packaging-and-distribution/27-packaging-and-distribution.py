@@ -30,7 +30,7 @@ import tomllib
 from pathlib import Path
 
 random.seed(42)
-os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
+os.environ.setdefault("MPLBACKEND", "Agg")  # never open a GUI window
 
 # ============================================================
 # 1. pyproject.toml Anatomy
@@ -105,18 +105,19 @@ def demo_pyproject() -> dict[str, object]:
 # is defined, in which case it imports exactly that list. __all__ is the
 # public API contract of a module -- including for star imports.
 
+
 def demo_all_control() -> tuple[dict[str, object], dict[str, object]]:
     """Star-import a temp package with and without __all__."""
     with tempfile.TemporaryDirectory() as tmp:
         pkg_dir = Path(tmp) / "demo_pkg"
         pkg_dir.mkdir()
         (pkg_dir / "__init__.py").write_text(
-            "public = 1\nhelper = 2\n_private = 3\n"
-            "__all__ = ['public', 'helper']\n",
+            "public = 1\nhelper = 2\n_private = 3\n__all__ = ['public', 'helper']\n",
             encoding="utf-8",
         )
         (pkg_dir / "no_all.py").write_text(
-            "visible = 10\n_hidden = 20\n", encoding="utf-8",
+            "visible = 10\n_hidden = 20\n",
+            encoding="utf-8",
         )
         sys.path.insert(0, tmp)
         try:
@@ -140,6 +141,7 @@ def demo_all_control() -> tuple[dict[str, object], dict[str, object]]:
 # MAJOR.MINOR.PATCH: breaking / feature / fix. A pre-release sorts
 # BEFORE its release: 1.2.0rc1 < 1.2.0. Dependencies use ranges, and
 # semver is what makes ">=1.2,<2.0" mean "compatible with 1.x".
+
 
 def _normalize(nums: tuple[int, ...]) -> tuple[int, ...]:
     """Zero-pad to (major, minor, patch): 1.26 == 1.26.0 (PEP 440)."""
@@ -183,6 +185,7 @@ def demo_semver() -> None:
 # install with `pip install rag_utils[qdrant]`. Extras are a contract,
 # not a comment.
 
+
 def demo_extras(data: dict[str, object]) -> None:
     """Read optional-dependencies from the parsed pyproject."""
     project = data["project"]
@@ -202,6 +205,7 @@ def demo_extras(data: dict[str, object]) -> None:
 # Ranges (numpy>=1.26,<3) let the resolver pick; pins (numpy==1.26.4)
 # make builds reproducible but rot. Production practice: ranges in
 # pyproject.toml, exact pins in the lockfile.
+
 
 def matches_requirement(requirement: str, version: str) -> bool:
     """True if `version` satisfies a comma-separated spec like '>=1.2,<2.0'."""
@@ -261,6 +265,7 @@ def demo_ranges() -> None:
 # lockfile= exact versions for every transitive dep: reproducible builds.
 # entry point ([project.scripts]) = the CLI your users run.
 
+
 def demo_build_commands() -> None:
     """The commands, printed -- no actual build (needs network/tooling)."""
     print("  build:    python -m build                    # sdist + wheel")
@@ -310,46 +315,36 @@ def _verify() -> None:
     assert isinstance(project, dict)
     assert project["name"] == "rag_utils", "pyproject must carry the name"
     assert project["version"] == "1.2.0", "pyproject must carry the version"
-    assert str(project["requires-python"]).startswith(">="), \
+    assert str(project["requires-python"]).startswith(">="), (
         "requires-python must be a range, not a pin"
-    assert data["build-system"]["build-backend"], \
-        "build-system must declare a backend"
+    )
+    assert data["build-system"]["build-backend"], "build-system must declare a backend"
 
     # 2. Semver ordering, including pre-releases before releases.
     assert compare_versions("1.0.0", "1.0.1") == -1, "patch bump must sort up"
     assert compare_versions("1.0.1", "1.1.0") == -1, "minor bump must sort up"
     assert compare_versions("1.1.0", "2.0.0") == -1, "major bump must sort up"
-    assert compare_versions("1.0.0rc1", "1.0.0") == -1, \
-        "pre-release must sort before its release"
+    assert compare_versions("1.0.0rc1", "1.0.0") == -1, "pre-release must sort before its release"
     assert compare_versions("1.2.0", "1.2.0") == 0, "equal versions compare equal"
 
     # 3. Dependency ranges: >=1.26,<3 excludes both edges.
-    assert matches_requirement(">=1.26,<3", "1.26.0"), \
-        "lower bound must be inclusive"
-    assert matches_requirement(">=1.26,<3", "2.5.0"), \
-        "middle versions must match"
-    assert not matches_requirement(">=1.26,<3", "1.25.9"), \
-        "below the lower bound must fail"
-    assert not matches_requirement(">=1.26,<3", "3.0.0"), \
-        "the upper bound must be exclusive"
+    assert matches_requirement(">=1.26,<3", "1.26.0"), "lower bound must be inclusive"
+    assert matches_requirement(">=1.26,<3", "2.5.0"), "middle versions must match"
+    assert not matches_requirement(">=1.26,<3", "1.25.9"), "below the lower bound must fail"
+    assert not matches_requirement(">=1.26,<3", "3.0.0"), "the upper bound must be exclusive"
 
     # 4. Extras are parsed from the pyproject.
     extras = project["optional-dependencies"]
     assert isinstance(extras, dict)
-    assert "dev" in extras and "qdrant" in extras, \
-        "extras must be discoverable from the pyproject"
+    assert "dev" in extras and "qdrant" in extras, "extras must be discoverable from the pyproject"
     assert "pytest>=8" in extras["dev"], "dev extras must list pytest"
 
     # 5. __all__ controls star import (both directions).
     ns_with_all, ns_no_all = demo_all_control()
-    assert "public" in ns_with_all and "helper" in ns_with_all, \
-        "__all__ names must be imported"
-    assert "_private" not in ns_with_all, \
-        "__all__ must exclude names it does not list"
-    assert "visible" in ns_no_all, \
-        "without __all__, public names must be imported"
-    assert "_hidden" not in ns_no_all, \
-        "underscore names must never be star-imported"
+    assert "public" in ns_with_all and "helper" in ns_with_all, "__all__ names must be imported"
+    assert "_private" not in ns_with_all, "__all__ must exclude names it does not list"
+    assert "visible" in ns_no_all, "without __all__, public names must be imported"
+    assert "_hidden" not in ns_no_all, "underscore names must never be star-imported"
 
     # 6. The demo package actually imports by its name.
     assert "demo_pkg" not in sys.modules or True, "no import pollution"

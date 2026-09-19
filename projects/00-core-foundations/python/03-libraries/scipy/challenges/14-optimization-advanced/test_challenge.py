@@ -30,17 +30,15 @@ starter = _load("starter_14", os.path.join(HERE, "starter.py"))
 
 # ---------------------------------------------------------------- helpers
 
+
 def _assert_no_python_loops(mod):
     for name in ("starter", "solution"):
-        tree = ast.parse(
-            open(os.path.join(HERE, name + ".py"), encoding="utf-8").read()
-        )
+        tree = ast.parse(open(os.path.join(HERE, name + ".py"), encoding="utf-8").read())
         banned = [
             n
             for n in ast.walk(tree)
             if isinstance(
-                n, (ast.For, ast.While, ast.ListComp, ast.DictComp,
-                    ast.SetComp, ast.GeneratorExp)
+                n, (ast.For, ast.While, ast.ListComp, ast.DictComp, ast.SetComp, ast.GeneratorExp)
             )
         ]
         assert not banned, f"{name}.py contains Python loops/comprehensions"
@@ -56,6 +54,7 @@ def _outlier_line(seed=42):
 
 # ---------------------------------------------------------------- bronze
 
+
 def test_bronze_clamped_at_upper_bound():
     x = solution.minimize_box(lambda z: (z - 5.0) ** 2, 0.0, 0.0, 2.0)
     assert np.isclose(x, 2.0, atol=1e-4)
@@ -67,7 +66,7 @@ def test_bronze_interior_optimum():
 
 
 def test_bronze_zero_at_bounds():
-    x = solution.minimize_box(lambda z: z ** 2, 1.0, -1.0, 1.0)
+    x = solution.minimize_box(lambda z: z**2, 1.0, -1.0, 1.0)
     assert np.isclose(x, 0.0, atol=1e-4)
 
 
@@ -80,8 +79,7 @@ def test_bronze_result_inside_box_always():
     rng = np.random.default_rng(0)
     for _ in range(10):
         lo, hi = sorted(rng.uniform(-5.0, 5.0, size=2))
-        x = solution.minimize_box(
-            lambda z: np.sin(3.0 * z) + z ** 2, (lo + hi) / 2, lo, hi)
+        x = solution.minimize_box(lambda z: np.sin(3.0 * z) + z**2, (lo + hi) / 2, lo, hi)
         assert lo - 1e-4 <= x <= hi + 1e-4
 
 
@@ -90,6 +88,7 @@ def test_bronze_no_python_loops():
 
 
 # ---------------------------------------------------------------- silver
+
 
 def test_silver_clean_line_linear_loss():
     x = np.linspace(0.0, 10.0, 25)
@@ -135,6 +134,7 @@ def test_silver_no_python_loops():
 
 
 # ---------------------------------------------------------------- gold
+
 
 def test_gold_two_assets_high_mu_wins():
     """Tangency portfolio: w ~ (mu - rf)/sum(mu - rf) = [0.727, 0.273].
@@ -183,12 +183,11 @@ def test_gold_no_python_loops():
 
 # ---------------------------------------------------------------- starter
 
+
 def test_starter_raises_not_implemented():
     with pytest.raises(NotImplementedError):
-        starter.minimize_box(lambda z: z ** 2, 0.0, -1.0, 1.0)
+        starter.minimize_box(lambda z: z**2, 0.0, -1.0, 1.0)
     with pytest.raises(NotImplementedError):
-        starter.fit_robust_line(np.array([0.0, 1.0]), np.array([0.0, 1.0]),
-                                "cauchy")
+        starter.fit_robust_line(np.array([0.0, 1.0]), np.array([0.0, 1.0]), "cauchy")
     with pytest.raises(NotImplementedError):
-        starter.allocate_weights(np.array([0.1, 0.05]),
-                                 np.eye(2) * 0.04, 0.02)
+        starter.allocate_weights(np.array([0.1, 0.05]), np.eye(2) * 0.04, 0.02)

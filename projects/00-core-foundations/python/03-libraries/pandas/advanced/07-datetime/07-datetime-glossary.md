@@ -28,7 +28,7 @@
 and full datetime arithmetic.
 **Example**:
 ```python
-pd.Timestamp("2026-08-06 09:30").year   # 2026
+pd.Timestamp("2026-08-06 09:30").year  # 2026
 ```
 **Related**: `pd.Timedelta`
 

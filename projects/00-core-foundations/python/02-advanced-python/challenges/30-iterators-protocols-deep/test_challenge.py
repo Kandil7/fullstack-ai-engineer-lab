@@ -4,6 +4,7 @@ Challenge 30: Iterators and Protocols Deep — Hidden Tests
 Dict semantics, ABC mixin behavior, hash/eq contract, one-pass hash
 guard, and memory guard for the snapshot.
 """
+
 from __future__ import annotations
 
 import importlib.util
@@ -30,6 +31,7 @@ starter = _load("starter")
 
 
 # --- Bronze: KeyValueStore core ---------------------------------------------
+
 
 def test_bronze_getitem():
     s = solution.KeyValueStore({"a": 1})
@@ -58,6 +60,7 @@ def test_bronze_keyerror_on_missing():
 
 
 # --- Silver: Mapping ABC semantics ------------------------------------------
+
 
 def test_silver_is_mapping():
     assert issubclass(solution.KeyValueStore, Mapping)
@@ -89,6 +92,7 @@ def test_silver_iteration():
 
 
 # --- Gold: SnapshotDict -----------------------------------------------------
+
 
 def _store():
     return solution.KeyValueStore({"a": 1, "b": 2})
@@ -148,6 +152,7 @@ def test_gold_snapshot_memory_guard():
 
 
 # --- Starter must be unimplemented -----------------------------------------
+
 
 def test_starter_not_implemented():
     with pytest.raises(NotImplementedError):

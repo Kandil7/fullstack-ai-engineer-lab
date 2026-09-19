@@ -56,12 +56,14 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+
 # Flask equivalent requires manual validation
 # FastAPI does it automatically with type hints
 class User(BaseModel):
     name: str
     email: str
     age: int  # Will reject strings automatically
+
 
 @app.post("/users/")
 async def create_user(user: User):
@@ -84,20 +86,24 @@ async def get_user(user_id: int):
     """GET: Retrieve data, idempotent, no side effects"""
     return {"user_id": user_id}
 
+
 @app.post("/users/")
 async def create_user(user: User):
     """POST: Create new resource, not idempotent"""
     return {"user": user, "status": "created"}
+
 
 @app.put("/users/{user_id}")
 async def update_user(user_id: int, user: User):
     """PUT: Replace entire resource, idempotent"""
     return {"user_id": user_id, "user": user}
 
+
 @app.patch("/users/{user_id}")
 async def partial_update(user_id: int, user: User):
     """PATCH: Partial update"""
     return {"user_id": user_id, "user": user}
+
 
 @app.delete("/users/{user_id}")
 async def delete_user(user_id: int):
@@ -155,16 +161,19 @@ The `tags`, `summary`, `description`, and docstrings all appear in the generated
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
+
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str  # Client sends this
+
 
 class UserResponse(BaseModel):
     id: int
     name: str
     email: EmailStr
     # password is NOT included
+
 
 @app.post("/users/", response_model=UserResponse)
 async def create_user(user: UserCreate):
@@ -191,16 +200,16 @@ Use `Path` function with validation parameters:
 ```python
 from fastapi import Path, Query
 
+
 @app.get("/items/{item_id}")
-async def get_item(
-    item_id: int = Path(..., gt=0, description="Item ID must be positive")
-):
+async def get_item(item_id: int = Path(..., gt=0, description="Item ID must be positive")):
     return {"item_id": item_id}
+
 
 @app.get("/items/")
 async def list_items(
     skip: int = Query(0, ge=0, description="Items to skip"),
-    limit: int = Query(10, gt=0, le=100, description="Max items")
+    limit: int = Query(10, gt=0, le=100, description="Max items"),
 ):
     return {"items": [], "skip": skip, "limit": limit}
 ```
@@ -222,12 +231,13 @@ Validation constraints:
 from typing import Optional
 from fastapi import Query
 
+
 @app.get("/search/")
 async def search(
     q: str,
     category: Optional[str] = None,  # Optional parameter
     sort_by: str = Query(default="created_at", description="Sort field"),
-    order: str = Query(default="desc", regex="^(asc|desc)$")
+    order: str = Query(default="desc", regex="^(asc|desc)$"),
 ):
     filters = {"q": q}
     if category:
@@ -245,9 +255,11 @@ async def search(
 async def get_item(item_id: int):
     return {"item_id": item_id}
 
+
 @app.put("/items/{item_id}")
 async def update_item(item_id: int, item: Item):
     return {"item_id": item_id, "item": item}
+
 
 @app.delete("/items/{item_id}")
 async def delete_item(item_id: int):
@@ -267,13 +279,16 @@ Each method is a separate function with its own route decorator.
 from pydantic import BaseModel, Field, validator
 from typing import Optional, List
 
+
 class BaseUser(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     email: EmailStr
 
+
 class UserCreate(BaseUser):
     password: str = Field(..., min_length=8)
     age: Optional[int] = Field(None, ge=0, le=150)
+
 
 class UserResponse(BaseUser):
     id: int
@@ -282,14 +297,15 @@ class UserResponse(BaseUser):
     class Config:
         orm_mode = True  # Allow ORM model conversion
 
+
 class UserUpdate(BaseModel):
     name: Optional[str] = None
     email: Optional[EmailStr] = None
 
-    @validator('name')
+    @validator("name")
     def name_must_not_be_empty(cls, v):
         if v and len(v.strip()) == 0:
-            raise ValueError('Name cannot be empty')
+            raise ValueError("Name cannot be empty")
         return v.strip() if v else v
 ```
 
@@ -302,14 +318,12 @@ class UserUpdate(BaseModel):
 from fastapi import File, UploadFile
 from typing import List
 
+
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
     contents = await file.read()
-    return {
-        "filename": file.filename,
-        "size": len(contents),
-        "content_type": file.content_type
-    }
+    return {"filename": file.filename, "size": len(contents), "content_type": file.content_type}
+
 
 @app.post("/upload-multiple/")
 async def upload_files(files: List[UploadFile] = File(...)):
@@ -323,6 +337,7 @@ async def upload_files(files: List[UploadFile] = File(...)):
 **Answer:**
 ```python
 from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
+
 
 @app.get("/item/{item_id}")
 async def get_item(item_id: int, format: str = "json"):
@@ -352,6 +367,7 @@ Dependency injection (DI) allows you to:
 from fastapi import Depends, HTTPException, status
 from typing import Optional
 
+
 # Simple dependency
 async def get_db():
     db = DatabaseSession()
@@ -360,29 +376,23 @@ async def get_db():
     finally:
         await db.close()
 
+
 # Authentication dependency
-async def get_current_user(
-    token: str = Header(...),
-    db: Session = Depends(get_db)
-) -> User:
+async def get_current_user(token: str = Header(...), db: Session = Depends(get_db)) -> User:
     user = db.query(User).filter(User.token == token).first()
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     return user
+
 
 # Use in endpoints
 @app.get("/profile/")
 async def get_profile(user: User = Depends(get_current_user)):
     return {"user": user}
 
+
 @app.get("/orders/")
-async def get_orders(
-    user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
+async def get_orders(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     return {"orders": db.query(Order).filter(Order.user_id == user.id).all()}
 ```
 
@@ -394,19 +404,22 @@ async def get_orders(
 ```python
 from typing import List
 
+
 def require_role(allowed_roles: List[str]):
     async def role_checker(user: User = Depends(get_current_user)):
         if user.role not in allowed_roles:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Insufficient permissions"
+                status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
             )
         return user
+
     return role_checker
+
 
 @app.get("/admin/dashboard/")
 async def admin_dashboard(user: User = Depends(require_role(["admin"]))):
     return {"message": "Welcome, admin"}
+
 
 @app.get("/moderator/tools/")
 async def moderator_tools(user: User = Depends(require_role(["admin", "moderator"]))):
@@ -423,6 +436,7 @@ async def moderator_tools(user: User = Depends(require_role(["admin", "moderator
 async def get_user(user_id: int):
     return fetch_user_from_db(user_id)
 
+
 # Yield dependency (has setup and teardown)
 async def get_db_connection():
     # Setup: runs before endpoint
@@ -433,8 +447,9 @@ async def get_db_connection():
         # Teardown: runs after endpoint (even if endpoint fails)
         await conn.close()
 
+
 @app.get("/data/")
-async def get_data(db = Depends(get_db_connection)):
+async def get_data(db=Depends(get_db_connection)):
     return await db.fetch("SELECT * FROM items")
 ```
 
@@ -462,11 +477,14 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
+
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
+
 
 def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
     to_encode = data.copy()
@@ -474,11 +492,13 @@ def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+
 async def authenticate_user(db, username: str, password: str):
     user = db.query(User).filter(User.username == username).first()
     if not user or not verify_password(password, user.hashed_password):
         return None
     return user
+
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -486,8 +506,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     access_token = create_access_token(
-        data={"sub": user.username},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        data={"sub": user.username}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     return {"access_token": access_token, "token_type": "bearer"}
 ```
@@ -506,11 +525,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 # - File I/O operations
 # - Any I/O-bound operation
 
+
 @app.get("/users/")
 async def get_users():
     # Async database query
     users = await db.execute(select(User))
     return users.all()
+
 
 @app.get("/external/")
 async def call_external_api():
@@ -519,10 +540,12 @@ async def call_external_api():
         response = await client.get("https://api.example.com/data")
     return response.json()
 
+
 # Use regular def for:
 # - CPU-bound operations
 # - Synchronous libraries that don't support async
 # - Simple data transformation
+
 
 @app.get("/compute/")
 def heavy_computation():
@@ -546,24 +569,19 @@ import pytest
 
 client = TestClient(app)
 
+
 def test_create_user():
-    response = client.post("/users/", json={
-        "name": "John",
-        "email": "john@example.com",
-        "age": 30
-    })
+    response = client.post("/users/", json={"name": "John", "email": "john@example.com", "age": 30})
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == "John"
     assert "id" in data
 
+
 def test_create_user_invalid_email():
-    response = client.post("/users/", json={
-        "name": "John",
-        "email": "not-an-email",
-        "age": 30
-    })
+    response = client.post("/users/", json={"name": "John", "email": "not-an-email", "age": 30})
     assert response.status_code == 422  # Validation error
+
 
 def test_get_user_not_found():
     response = client.get("/users/99999")
@@ -576,13 +594,11 @@ For async testing:
 import pytest
 from httpx import AsyncClient
 
+
 @pytest.mark.asyncio
 async def test_create_user_async():
     async with AsyncClient(app=app, base_url="http://test") as ac:
-        response = await ac.post("/users/", json={
-            "name": "John",
-            "email": "john@example.com"
-        })
+        response = await ac.post("/users/", json={"name": "John", "email": "john@example.com"})
     assert response.status_code == 200
 ```
 
@@ -603,14 +619,17 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
 
+
 # Create tables
 Base.metadata.create_all(bind=engine)
+
 
 def get_db():
     db = SessionLocal()
@@ -619,6 +638,7 @@ def get_db():
     finally:
         await db.close()
 
+
 @app.post("/users/")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db_user = User(name=user.name, email=user.email)
@@ -626,6 +646,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
     return db_user
+
 
 @app.get("/users/")
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
@@ -648,6 +669,7 @@ Build a URL shortener API with:
 2. GET /{code} - Redirects to original URL
 3. GET /stats/{code} - Returns click count and creation date
 """
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, HttpUrl
 from typing import Optional
@@ -659,14 +681,17 @@ app = FastAPI(title="URL Shortener")
 # In-memory storage
 url_db = {}
 
+
 class URLCreate(BaseModel):
     url: HttpUrl
     custom_code: Optional[str] = None
+
 
 class URLResponse(BaseModel):
     short_url: str
     original_url: str
     created_at: datetime
+
 
 # Solution
 @app.post("/shorten", response_model=URLResponse)
@@ -678,16 +703,13 @@ async def shorten_url(url_data: URLCreate):
     else:
         code = hashlib.md5(str(url_data.url).encode()).hexdigest()[:6]
 
-    url_db[code] = {
-        "url": str(url_data.url),
-        "clicks": 0,
-        "created_at": datetime.now()
-    }
+    url_db[code] = {"url": str(url_data.url), "clicks": 0, "created_at": datetime.now()}
     return URLResponse(
         short_url=f"http://localhost:8000/{code}",
         original_url=str(url_data.url),
-        created_at=datetime.now()
+        created_at=datetime.now(),
     )
+
 
 @app.get("/{code}")
 async def redirect_url(code: str):
@@ -695,6 +717,7 @@ async def redirect_url(code: str):
         raise HTTPException(404, "URL not found")
     url_db[code]["clicks"] += 1
     return RedirectResponse(url=url_db[code]["url"])
+
 
 @app.get("/stats/{code}")
 async def get_stats(code: str):
@@ -711,6 +734,7 @@ def test_shorten_url():
     assert response.status_code == 200
     data = response.json()
     assert "short_url" in data
+
 
 def test_redirect():
     # First create
@@ -736,6 +760,7 @@ Build authentication system with:
 3. GET /protected - Requires valid JWT token
 4. GET /admin - Requires admin role
 """
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
@@ -746,9 +771,11 @@ ALGORITHM = "HS256"
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
+
 class TokenData(BaseModel):
     username: Optional[str] = None
     role: Optional[str] = None
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     credentials_exception = HTTPException(
@@ -766,15 +793,17 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     except JWTError:
         raise credentials_exception
 
+
 def require_role(role: str):
     async def role_checker(user: TokenData = Depends(get_current_user)):
         if user.role != role:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Insufficient permissions"
+                status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
             )
         return user
+
     return role_checker
+
 
 @app.post("/login")
 async def login(username: str, password: str):
@@ -786,13 +815,15 @@ async def login(username: str, password: str):
     access_token = jwt.encode(
         {"sub": username, "role": user.role, "exp": datetime.utcnow() + timedelta(hours=1)},
         SECRET_KEY,
-        algorithm=ALGORITHM
+        algorithm=ALGORITHM,
     )
     return {"access_token": access_token}
+
 
 @app.get("/protected")
 async def protected_route(user: TokenData = Depends(get_current_user)):
     return {"message": f"Hello {user.username}"}
+
 
 @app.get("/admin")
 async def admin_route(user: TokenData = Depends(require_role("admin"))):
@@ -812,9 +843,11 @@ Build a chat application with:
 2. Broadcast messages to all connected clients
 3. Handle user join/leave notifications
 """
+
 from fastapi import WebSocket, WebSocketDisconnect
 from typing import Dict, List
 import json
+
 
 class ConnectionManager:
     def __init__(self):
@@ -836,7 +869,9 @@ class ConnectionManager:
             for connection in self.active_connections[room]:
                 await connection.send_text(message)
 
+
 manager = ConnectionManager()
+
 
 @app.websocket("/ws/{room}")
 async def websocket_endpoint(websocket: WebSocket, room: str):
@@ -849,8 +884,7 @@ async def websocket_endpoint(websocket: WebSocket, room: str):
             data = await websocket.receive_text()
             message = json.loads(data)
             await manager.broadcast(
-                json.dumps({"user": message["user"], "text": message["text"]}),
-                room
+                json.dumps({"user": message["user"], "text": message["text"]}), room
             )
     except WebSocketDisconnect:
         manager.disconnect(websocket, room)
@@ -870,10 +904,12 @@ Build a rate limiter that:
 2. Returns 429 Too Many Requests when exceeded
 3. Includes rate limit headers in responses
 """
+
 from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 from collections import defaultdict
 import time
+
 
 class RateLimiter:
     def __init__(self, max_requests: int = 100, window_seconds: int = 60):
@@ -886,9 +922,7 @@ class RateLimiter:
         window_start = now - self.window_seconds
 
         # Remove old requests
-        self.requests[key] = [
-            t for t in self.requests[key] if t > window_start
-        ]
+        self.requests[key] = [t for t in self.requests[key] if t > window_start]
 
         remaining = self.max_requests - len(self.requests[key])
         allowed = remaining > 0
@@ -900,11 +934,13 @@ class RateLimiter:
         headers = {
             "X-RateLimit-Limit": str(self.max_requests),
             "X-RateLimit-Remaining": str(max(0, remaining)),
-            "X-RateLimit-Reset": str(int(window_start + self.window_seconds))
+            "X-RateLimit-Reset": str(int(window_start + self.window_seconds)),
         }
         return allowed, headers
 
+
 limiter = RateLimiter(max_requests=100, window_seconds=60)
+
 
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
@@ -913,9 +949,7 @@ async def rate_limit_middleware(request: Request, call_next):
 
     if not allowed:
         return JSONResponse(
-            status_code=429,
-            content={"detail": "Too many requests"},
-            headers=headers
+            status_code=429, content={"detail": "Too many requests"}, headers=headers
         )
 
     response = await call_next(request)
@@ -937,17 +971,19 @@ Build an endpoint that:
 2. Validates the file
 3. Returns basic statistics
 """
+
 from fastapi import File, UploadFile, HTTPException
 import io
 import csv
 
+
 @app.post("/analyze-csv")
 async def analyze_csv(file: UploadFile = File(...)):
-    if not file.filename.endswith('.csv'):
+    if not file.filename.endswith(".csv"):
         raise HTTPException(400, "File must be CSV")
 
     contents = await file.read()
-    text = contents.decode('utf-8')
+    text = contents.decode("utf-8")
 
     reader = csv.DictReader(io.StringIO(text))
     rows = list(reader)
@@ -965,7 +1001,7 @@ async def analyze_csv(file: UploadFile = File(...)):
                 "mean": sum(values) / len(values),
                 "min": min(values),
                 "max": max(values),
-                "sum": sum(values)
+                "sum": sum(values),
             }
         except (ValueError, KeyError):
             continue
@@ -975,7 +1011,7 @@ async def analyze_csv(file: UploadFile = File(...)):
         "total_rows": len(rows),
         "columns": list(rows[0].keys()),
         "numeric_stats": numeric_stats,
-        "sample_rows": rows[:5]
+        "sample_rows": rows[:5],
     }
 ```
 
@@ -993,14 +1029,17 @@ Build a Todo API with:
 3. Filtering by status
 4. Sorting by created_at
 """
+
 from fastapi import Query
 from typing import Optional, List
 from datetime import datetime
+
 
 class TodoCreate(BaseModel):
     title: str
     description: Optional[str] = None
     completed: bool = False
+
 
 class TodoResponse(TodoCreate):
     id: int
@@ -1010,6 +1049,7 @@ class TodoResponse(TodoCreate):
     class Config:
         orm_mode = True
 
+
 @app.post("/todos/", response_model=TodoResponse)
 async def create_todo(todo: TodoCreate, db: Session = Depends(get_db)):
     db_todo = Todo(**todo.dict(), created_at=datetime.now(), updated_at=datetime.now())
@@ -1018,6 +1058,7 @@ async def create_todo(todo: TodoCreate, db: Session = Depends(get_db)):
     db.refresh(db_todo)
     return db_todo
 
+
 @app.get("/todos/", response_model=List[TodoResponse])
 async def list_todos(
     skip: int = Query(0, ge=0),
@@ -1025,7 +1066,7 @@ async def list_todos(
     completed: Optional[bool] = None,
     sort_by: str = Query("created_at", regex="^(created_at|title)$"),
     order: str = Query("desc", regex="^(asc|desc)$"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     query = db.query(Todo)
 
@@ -1042,6 +1083,7 @@ async def list_todos(
     todos = query.offset(skip).limit(limit).all()
     return todos
 
+
 @app.get("/todos/{todo_id}", response_model=TodoResponse)
 async def get_todo(todo_id: int, db: Session = Depends(get_db)):
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
@@ -1049,12 +1091,9 @@ async def get_todo(todo_id: int, db: Session = Depends(get_db)):
         raise HTTPException(404, "Todo not found")
     return todo
 
+
 @app.put("/todos/{todo_id}", response_model=TodoResponse)
-async def update_todo(
-    todo_id: int,
-    todo_update: TodoCreate,
-    db: Session = Depends(get_db)
-):
+async def update_todo(todo_id: int, todo_update: TodoCreate, db: Session = Depends(get_db)):
     todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if not todo:
         raise HTTPException(404, "Todo not found")
@@ -1066,6 +1105,7 @@ async def update_todo(
     db.commit()
     db.refresh(todo)
     return todo
+
 
 @app.delete("/todos/{todo_id}")
 async def delete_todo(todo_id: int, db: Session = Depends(get_db)):
@@ -1090,11 +1130,13 @@ Build an endpoint that:
 2. Processes it in the background
 3. Provides a status endpoint to check progress
 """
+
 from fastapi import BackgroundTasks
 import uuid
 import time
 
 task_store = {}
+
 
 def process_task(task_id: str, data: dict):
     """Simulate long-running task"""
@@ -1103,12 +1145,14 @@ def process_task(task_id: str, data: dict):
     task_store[task_id]["status"] = "completed"
     task_store[task_id]["result"] = {"processed": True}
 
+
 @app.post("/tasks/")
 async def create_task(data: dict, background_tasks: BackgroundTasks):
     task_id = str(uuid.uuid4())
     task_store[task_id] = {"status": "pending", "data": data}
     background_tasks.add_task(process_task, task_id, data)
     return {"task_id": task_id, "status": "pending"}
+
 
 @app.get("/tasks/{task_id}")
 async def get_task_status(task_id: str):
@@ -1130,27 +1174,33 @@ Build versioned API with:
 2. /api/v2/items/ - New version with additional fields
 3. Backward compatibility
 """
+
 from fastapi import APIRouter
 
 # Version 1
 v1_router = APIRouter(prefix="/api/v1")
 
+
 class ItemV1(BaseModel):
     name: str
     price: float
+
 
 @v1_router.get("/items/{item_id}")
 async def get_item_v1(item_id: int):
     return {"id": item_id, "name": "Item", "price": 9.99}
 
+
 # Version 2
 v2_router = APIRouter(prefix="/api/v2")
+
 
 class ItemV2(BaseModel):
     name: str
     price: float
     category: str
     tags: List[str]
+
 
 @v2_router.get("/items/{item_id}")
 async def get_item_v2(item_id: int):
@@ -1159,8 +1209,9 @@ async def get_item_v2(item_id: int):
         "name": "Item",
         "price": 9.99,
         "category": "electronics",
-        "tags": ["sale", "new"]
+        "tags": ["sale", "new"],
     }
+
 
 # Register routers
 app.include_router(v1_router)
@@ -1248,6 +1299,7 @@ app.include_router(v2_router)
        result = requests.get("https://api.example.com")  # Blocks!
        return result.json()
 
+
    # Correct: use async client
    @app.get("/data/")
    async def get_data():
@@ -1262,6 +1314,7 @@ app.include_router(v2_router)
    @app.get("/users/{user_id}")
    async def get_user(user_id: int):
        return db.query(User).filter(User.id == user_id).first()
+
 
    # Correct: handle not found
    @app.get("/users/{user_id}")
@@ -1279,6 +1332,7 @@ app.include_router(v2_router)
    async def create_user(user: UserCreate):
        return user  # Includes password!
 
+
    # Correct: use response model
    @app.post("/users/", response_model=UserResponse)
    async def create_user(user: UserCreate):
@@ -1293,10 +1347,21 @@ app.include_router(v2_router)
 
 ```python
 from fastapi import (
-    FastAPI, Depends, HTTPException, status,
-    Path, Query, Header, File, UploadFile,
-    BackgroundTasks, WebSocket, WebSocketDisconnect,
-    APIRouter, Request, Response
+    FastAPI,
+    Depends,
+    HTTPException,
+    status,
+    Path,
+    Query,
+    Header,
+    File,
+    UploadFile,
+    BackgroundTasks,
+    WebSocket,
+    WebSocketDisconnect,
+    APIRouter,
+    Request,
+    Response,
 )
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordBearer

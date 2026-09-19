@@ -26,6 +26,7 @@ from typing import Callable
 # 1. The Pipeline Building Blocks (compact, from earlier topics)
 # ============================================================
 
+
 def cosine_similarity(a: list[float], b: list[float]) -> float:
     dot = sum(x * y for x, y in zip(a, b))
     na = math.sqrt(sum(x * x for x in a))
@@ -52,12 +53,13 @@ def fixed_chunks(text: str, size: int = 120, overlap: int = 20) -> list[str]:
     if not text:
         return []
     step = size - overlap
-    return [text[i:i + size] for i in range(0, len(text), step)]
+    return [text[i : i + size] for i in range(0, len(text), step)]
 
 
 # ============================================================
 # 2. The Vector Store
 # ============================================================
+
 
 class VectorStore:
     def __init__(self) -> None:
@@ -69,8 +71,10 @@ class VectorStore:
         self._vectors.append(vector)
 
     def search(self, query_vec: list[float], k: int = 3) -> list[tuple[Chunk, float]]:
-        scored = [(self._chunks[i], cosine_similarity(query_vec, self._vectors[i]))
-                  for i in range(len(self._chunks))]
+        scored = [
+            (self._chunks[i], cosine_similarity(query_vec, self._vectors[i]))
+            for i in range(len(self._chunks))
+        ]
         scored.sort(key=lambda t: t[1], reverse=True)
         return scored[:k]
 
@@ -78,6 +82,7 @@ class VectorStore:
 # ============================================================
 # 3. Ingestion + Retrieval
 # ============================================================
+
 
 def ingest(documents: dict[str, str]) -> VectorStore:
     """chunk -> embed -> store, the whole ingestion side."""
@@ -94,12 +99,13 @@ def retrieve(store: VectorStore, query: str, k: int = 2) -> list[tuple[Chunk, fl
 
 # Example 1: a working baseline
 docs = {
-    "manual.md": ("The API key lives in your environment file. "
-                  "Rotate it every 90 days. Never commit it."),
-    "pricing.md": ("Plans start at $10 per month. "
-                   "Enterprise includes SSO and audit logs."),
-    "faq.md": ("To reset your password, click the link in the email. "
-               "Support responds within 24 hours."),
+    "manual.md": (
+        "The API key lives in your environment file. Rotate it every 90 days. Never commit it."
+    ),
+    "pricing.md": ("Plans start at $10 per month. Enterprise includes SSO and audit logs."),
+    "faq.md": (
+        "To reset your password, click the link in the email. Support responds within 24 hours."
+    ),
 }
 store = ingest(docs)
 hits = retrieve(store, "where does the API key live?", k=2)
@@ -114,11 +120,11 @@ assert any("API key" in c.text for c, _ in hits), "retrieves the right chunk"
 # The generator gets the retrieved chunks AND must cite their sources.
 # Citations are what make RAG outputs trustworthy and debuggable.
 
-def generate_with_citations(query: str, hits: list[tuple[Chunk, float]],
-                            model: Callable[[str], str]) -> str:
-    context = "\n".join(
-        f"[{i + 1}] {chunk.text}" for i, (chunk, _) in enumerate(hits)
-    )
+
+def generate_with_citations(
+    query: str, hits: list[tuple[Chunk, float]], model: Callable[[str], str]
+) -> str:
+    context = "\n".join(f"[{i + 1}] {chunk.text}" for i, (chunk, _) in enumerate(hits))
     sources = ", ".join(f"[{i + 1}]({chunk.source})" for i, (chunk, _) in enumerate(hits))
     answer = model(context)
     return f"{answer}\n\nSources: {sources}"
@@ -139,6 +145,7 @@ assert "Sources:" in answer and "manual.md" in answer, "citations attached"
 # ============================================================
 # Before optimizing anything, lock the baseline score. Every technique
 # (hybrid, rerank, chunk tuning) must beat THIS number.
+
 
 @dataclass
 class RAGSystem:
@@ -166,10 +173,13 @@ def baseline_accuracy(system: RAGSystem, cases: list[tuple[str, str]]) -> float:
 
 # Example 3: measure the baseline
 system = RAGSystem(store, stub_model)
-acc = baseline_accuracy(system, [
-    ("where is the api key?", "manual.md"),
-    ("how much is enterprise?", "pricing.md"),
-])
+acc = baseline_accuracy(
+    system,
+    [
+        ("where is the api key?", "manual.md"),
+        ("how much is enterprise?", "pricing.md"),
+    ],
+)
 print("\nExample 3: baseline score")
 print(f"  baseline answer-recall: {acc:.0%}")
 assert acc >= 0.5, "baseline answers at least one case"
@@ -179,6 +189,7 @@ assert acc >= 0.5, "baseline answers at least one case"
 # ============================================================
 # The production shape: ingest once at startup, retrieve per query,
 # generate with citations, and measure continuously.
+
 
 def build_rag(documents: dict[str, str]) -> RAGSystem:
     return RAGSystem(ingest(documents), stub_model)
@@ -197,8 +208,7 @@ def build_rag(documents: dict[str, str]) -> RAGSystem:
 # Self-Verification
 # ============================================================
 def _verify() -> None:
-    store = ingest({"a.md": "Apples are red fruits. " * 30,
-                    "b.md": "Bananas are yellow. " * 30})
+    store = ingest({"a.md": "Apples are red fruits. " * 30, "b.md": "Bananas are yellow. " * 30})
     hits = retrieve(store, "banana yellow", k=1)
     assert any("Bananas" in c.text for c, _ in hits), "banana query finds bananas"
 
@@ -212,8 +222,9 @@ def _verify() -> None:
 
     assert baseline_accuracy(sys2, [("banana", "b.md")]) == 1.0, "easy case answered"
     # a source that is never retrieved can never be cited
-    assert baseline_accuracy(sys2, [("banana", "missing.md")]) == 0.0, \
+    assert baseline_accuracy(sys2, [("banana", "missing.md")]) == 0.0, (
         "an unretrieved source is never claimed"
+    )
     print("[OK] 09-rag-baseline: all checks passed")
 
 

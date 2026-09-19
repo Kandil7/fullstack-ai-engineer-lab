@@ -54,8 +54,10 @@ objects, zero string SQL.
 from sqlalchemy import ForeignKey, String, and_, func, or_, select, tuple_
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, aliased, mapped_column
 
+
 class Base(DeclarativeBase):
     pass
+
 
 class Experiment(Base):
     __tablename__ = "experiments"
@@ -64,12 +66,14 @@ class Experiment(Base):
     model: Mapped[str] = mapped_column(String(40), nullable=False)
     status: Mapped[str] = mapped_column(String(12), default="running")
 
+
 class EvalMetric(Base):
     __tablename__ = "eval_metrics"
     id: Mapped[int] = mapped_column(primary_key=True)
     experiment_id: Mapped[int] = mapped_column(ForeignKey("experiments.id"), nullable=False)
     metric: Mapped[str] = mapped_column(String(30), nullable=False)
     value: Mapped[float] = mapped_column(nullable=False)
+
 
 with Session(bind=engine) as session:
     stmt = select(Experiment).order_by(Experiment.name)
@@ -103,9 +107,7 @@ with Session(bind=engine) as session:
 # ['bert-finetune-1', 'bert-finetune-2']
 
 with Session(bind=engine) as session:
-    stmt = select(Experiment).where(
-        or_(Experiment.status == "running", Experiment.model == "gpt2")
-    )
+    stmt = select(Experiment).where(or_(Experiment.status == "running", Experiment.model == "gpt2"))
     print([e.name for e in session.scalars(stmt).all()])
 # Output:
 # ['bert-finetune-2', 'gpt-finetune-1']
@@ -189,6 +191,7 @@ class PromptTemplate(Base):
     name: Mapped[str] = mapped_column(String(60), nullable=False)
     parent_id: Mapped[int | None] = mapped_column(ForeignKey("prompt_templates.id"))
 
+
 with Session(bind=engine) as session:
     parent = aliased(PromptTemplate)
     stmt = (
@@ -224,9 +227,11 @@ comparison extends the same idea:
 
 ```python
 cursor = (last_id, last_name)
-stmt = select(Experiment).where(
-    tuple_(Experiment.id, Experiment.name) > cursor
-).order_by(Experiment.id, Experiment.name)
+stmt = (
+    select(Experiment)
+    .where(tuple_(Experiment.id, Experiment.name) > cursor)
+    .order_by(Experiment.id, Experiment.name)
+)
 ```
 
 ## 8. Production Pattern: Registry Listing + Leaderboard
@@ -235,8 +240,9 @@ The shipping shape for a registry endpoint: keyset-paginated listing (seek,
 not offset) plus a join-then-filter leaderboard.
 
 ```python
-def metric_leaders(session: Session, metric: str, min_value: float, limit: int
-                   ) -> list[tuple[str, float]]:
+def metric_leaders(
+    session: Session, metric: str, min_value: float, limit: int
+) -> list[tuple[str, float]]:
     stmt = (
         select(Experiment.name, EvalMetric.value)
         .join(EvalMetric, EvalMetric.experiment_id == Experiment.id)

@@ -51,49 +51,50 @@ class BSTNode:
         self.left = None
         self.right = None
 
+
 class BinarySearchTree:
     def __init__(self):
         self.root = None
-    
+
     def insert(self, val):
         """Insert a value. O(h) time, O(h) space (recursive)."""
         self.root = self._insert(self.root, val)
-    
+
     def _insert(self, node, val):
         if not node:
             return BSTNode(val)
-        
+
         if val < node.val:
             node.left = self._insert(node.left, val)
         elif val > node.val:
             node.right = self._insert(node.right, val)
         # Duplicate values are ignored
-        
+
         return node
-    
+
     def search(self, val):
         """Search for a value. O(h) time."""
         return self._search(self.root, val)
-    
+
     def _search(self, node, val):
         if not node:
             return False
-        
+
         if val == node.val:
             return True
         elif val < node.val:
             return self._search(node.left, val)
         else:
             return self._search(node.right, val)
-    
+
     def delete(self, val):
         """Delete a value. O(h) time."""
         self.root = self._delete(self.root, val)
-    
+
     def _delete(self, node, val):
         if not node:
             return None
-        
+
         if val < node.val:
             node.left = self._delete(node.left, val)
         elif val > node.val:
@@ -114,40 +115,40 @@ class BinarySearchTree:
                 successor = self._find_min(node.right)
                 node.val = successor.val
                 node.right = self._delete(node.right, successor.val)
-        
+
         return node
-    
+
     def _find_min(self, node):
         """Find the minimum value node in subtree."""
         while node.left:
             node = node.left
         return node
-    
+
     def _find_max(self, node):
         """Find the maximum value node in subtree."""
         while node.right:
             node = node.right
         return node
-    
+
     def inorder(self):
         """Return sorted list of values."""
         result = []
         self._inorder(self.root, result)
         return result
-    
+
     def _inorder(self, node, result):
         if node:
             self._inorder(node.left, result)
             result.append(node.val)
             self._inorder(node.right, result)
-    
+
     def kth_smallest(self, k):
         """Find kth smallest element. O(h + k)"""
         self.count = 0
         self.result = None
         self._kth_smallest(self.root, k)
         return self.result
-    
+
     def _kth_smallest(self, node, k):
         if not node or self.count >= k:
             return
@@ -195,15 +196,15 @@ Check if a binary tree is a valid BST.
 Time: O(n), Space: O(h)
 """
 
+
 def is_valid_bst(root):
-    def validate(node, low=float('-inf'), high=float('inf')):
+    def validate(node, low=float("-inf"), high=float("inf")):
         if not node:
             return True
         if node.val <= low or node.val >= high:
             return False
-        return (validate(node.left, low, node.val) and 
-                validate(node.right, node.val, high))
-    
+        return validate(node.left, low, node.val) and validate(node.right, node.val, high)
+
     return validate(root)
 ```
 
@@ -215,22 +216,21 @@ Sum all nodes with values between low and high (inclusive).
 Time: O(n), Space: O(h)
 """
 
+
 def range_sum_bst(root, low, high):
     if not root:
         return 0
-    
+
     # Prune: if current value > high, only check left
     if root.val > high:
         return range_sum_bst(root.left, low, high)
-    
+
     # Prune: if current value < low, only check right
     if root.val < low:
         return range_sum_bst(root.right, low, high)
-    
+
     # Current node is in range, check both subtrees
-    return (root.val + 
-            range_sum_bst(root.left, low, high) + 
-            range_sum_bst(root.right, low, high))
+    return root.val + range_sum_bst(root.left, low, high) + range_sum_bst(root.right, low, high)
 ```
 
 ### Example 3: Lowest Common Ancestor in BST
@@ -242,15 +242,16 @@ Use BST property to navigate.
 Time: O(h), Space: O(h)
 """
 
+
 def lca_bst(root, p, q):
     # Both in left subtree
     if p.val < root.val and q.val < root.val:
         return lca_bst(root.left, p, q)
-    
+
     # Both in right subtree
     if p.val > root.val and q.val > root.val:
         return lca_bst(root.right, p, q)
-    
+
     # Split point — this is the LCA
     return root
 ```
@@ -264,22 +265,23 @@ Use reverse inorder traversal (Right → Root → Left).
 Time: O(h + k), Space: O(h)
 """
 
+
 def kth_largest(root, k):
     count = 0
     result = None
-    
+
     def reverse_inorder(node):
         nonlocal count, result
         if not node or count >= k:
             return
-        
+
         reverse_inorder(node.right)  # Visit largest first
         count += 1
         if count == k:
             result = node.val
             return
         reverse_inorder(node.left)
-    
+
     reverse_inorder(root)
     return result
 ```
@@ -292,16 +294,18 @@ Convert sorted array to height-balanced BST.
 Time: O(n), Space: O(n)
 """
 
+
 def sorted_array_to_bst(nums):
     if not nums:
         return None
-    
+
     mid = len(nums) // 2
     root = BSTNode(nums[mid])
     root.left = sorted_array_to_bst(nums[:mid])
-    root.right = sorted_array_to_bst(nums[mid + 1:])
-    
+    root.right = sorted_array_to_bst(nums[mid + 1 :])
+
     return root
+
 
 # This creates a balanced BST — height = log(n)
 ```
@@ -315,16 +319,17 @@ The successor is the node with the next largest value.
 Time: O(h), Space: O(1) iterative
 """
 
+
 def inorder_successor(root, p):
     successor = None
-    
+
     while root:
         if p.val < root.val:
             successor = root  # Candidate
             root = root.left  # Go left for smaller
         else:
             root = root.right  # Go right for larger
-    
+
     return successor
 ```
 
@@ -344,16 +349,17 @@ def is_valid_bst_wrong(root):
         return False
     return is_valid_bst_wrong(root.left) and is_valid_bst_wrong(root.right)
 
+
 # This misses: left subtree's right child could be > root!
 
+
 # RIGHT: Pass range constraints
-def is_valid_bst(root, low=float('-inf'), high=float('inf')):
+def is_valid_bst(root, low=float("-inf"), high=float("inf")):
     if not root:
         return True
     if root.val <= low or root.val >= high:
         return False
-    return (is_valid_bst(root.left, low, root.val) and
-            is_valid_bst(root.right, root.val, high))
+    return is_valid_bst(root.left, low, root.val) and is_valid_bst(root.right, root.val, high)
 ```
 
 ### Mistake 2: Confusing BST with Binary Tree

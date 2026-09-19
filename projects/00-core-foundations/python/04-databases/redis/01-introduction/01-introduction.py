@@ -75,6 +75,7 @@ print(f"TTL after 61s       -> {ttl_client.ttl('session:user-7')} (key gone)")
 # object per process), never a new connection per request. Our stand-in
 # models the client API; the pool lesson is about process hygiene.
 
+
 def cached_get(key: str, miss: callable) -> str:
     """Cache-aside read: hit returns fast, miss computes and stores."""
     hit = ttl_client.get(key)
@@ -141,37 +142,36 @@ Choose a database when:
 # MISTAKE: using Redis as the system of record for money.
 # CORRECT: Redis speeds up reads; the database stays authoritative.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
-    assert client.get("stats:requests") == "3", \
-        "INCR must produce 3 after three increments"
+    assert client.get("stats:requests") == "3", "INCR must produce 3 after three increments"
 
-    assert ttl_client.ttl("session:user-7") == -2, \
+    assert ttl_client.ttl("session:user-7") == -2, (
         "Key must be gone after its TTL elapses (expired -> -2)"
+    )
 
     # cache-aside: second read must not re-run the expensive call
-    assert len(calls) == 1, \
-        "Cache-aside must serve the second read from cache"
+    assert len(calls) == 1, "Cache-aside must serve the second read from cache"
 
     # SET with nx=True must not overwrite an existing key
-    assert ttl_client.set("nx:demo", "a", nx=True) is True, \
-        "SET NX on a fresh key must succeed"
-    assert ttl_client.set("nx:demo", "b", nx=True) is False, \
+    assert ttl_client.set("nx:demo", "a", nx=True) is True, "SET NX on a fresh key must succeed"
+    assert ttl_client.set("nx:demo", "b", nx=True) is False, (
         "SET NX on an existing key must be rejected"
-    assert ttl_client.get("nx:demo") == "a", \
-        "SET NX must not overwrite the original value"
+    )
+    assert ttl_client.get("nx:demo") == "a", "SET NX must not overwrite the original value"
 
     # TTL semantics: -1 means no expiry, positive means remaining seconds
     ttl_client.set("ttl:demo", "v")
-    assert ttl_client.ttl("ttl:demo") == -1, \
-        "Keys set without EX must report TTL -1 (no expiry)"
+    assert ttl_client.ttl("ttl:demo") == -1, "Keys set without EX must report TTL -1 (no expiry)"
 
     # value round-trip preserves strings
-    assert client.get("cache:llm:prompt") == "What is a vector database?", \
+    assert client.get("cache:llm:prompt") == "What is a vector database?", (
         "GET must return exactly what SET stored"
+    )
 
     print("[OK] 01-introduction: all checks passed")
 

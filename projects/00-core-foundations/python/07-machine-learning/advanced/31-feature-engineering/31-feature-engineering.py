@@ -23,7 +23,10 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import (
-    StandardScaler, OneHotEncoder, OrdinalEncoder, PolynomialFeatures,
+    StandardScaler,
+    OneHotEncoder,
+    OrdinalEncoder,
+    PolynomialFeatures,
     KBinsDiscretizer,
 )
 from sklearn.compose import ColumnTransformer
@@ -33,15 +36,21 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 rng = np.random.RandomState(0)
 n = 2000
 
-df = pd.DataFrame({
-    "age": rng.randint(18, 80, n),
-    "salary": np.exp(rng.randn(n) * 0.6 + 10.5),  # log-normal
-    "plan": rng.choice(["free", "pro", "enterprise"], n, p=[0.6, 0.3, 0.1]),
-    "city": rng.choice(["NYC", "SF", "CHI", "ATL"], n),
-    "signup_ts": pd.date_range("2024-01-01", periods=n, freq="4h"),
-    "bio": [" ".join(rng.choice(["python", "ml", "data", "backend", "cloud", "ai"],
-                                 rng.randint(1, 5))) for _ in range(n)],
-})
+df = pd.DataFrame(
+    {
+        "age": rng.randint(18, 80, n),
+        "salary": np.exp(rng.randn(n) * 0.6 + 10.5),  # log-normal
+        "plan": rng.choice(["free", "pro", "enterprise"], n, p=[0.6, 0.3, 0.1]),
+        "city": rng.choice(["NYC", "SF", "CHI", "ATL"], n),
+        "signup_ts": pd.date_range("2024-01-01", periods=n, freq="4h"),
+        "bio": [
+            " ".join(
+                rng.choice(["python", "ml", "data", "backend", "cloud", "ai"], rng.randint(1, 5))
+            )
+            for _ in range(n)
+        ],
+    }
+)
 y = ((df["age"] > 45) & (df["plan"] != "free") | (df["salary"] > 40000)).astype(int)
 
 Xtr, Xte, ytr, yte = train_test_split(df, y, test_size=0.3, random_state=0)
@@ -84,15 +93,22 @@ print(f"  target-encoded city (train means): {target_enc.round(3).to_dict()}")
 # Apply with smoothing: (count*mean + prior) / (count + m)
 prior = ytr.mean()
 smooth = 10.0
+
+
 def smooth_target(row_city, df_tr, df_te):
     counts = df_tr["city"].value_counts()
     means = df_tr.groupby("city")["y"].mean()
     out = df_te["city"].map(
-        lambda c: (counts.get(c, 0) * means.get(c, prior) + smooth * prior)
-                  / (counts.get(c, 0) + smooth)
+        lambda c: (
+            (counts.get(c, 0) * means.get(c, prior) + smooth * prior) / (counts.get(c, 0) + smooth)
+        )
     )
     return out
-print(f"  smoothed target encoding sample: {smooth_target(None, Xtr, Xte).head(3).round(3).tolist()}")
+
+
+print(
+    f"  smoothed target encoding sample: {smooth_target(None, Xtr, Xte).head(3).round(3).tolist()}"
+)
 
 # ============================================================
 # 4. Interactions & polynomials
@@ -109,7 +125,9 @@ Xtr["hour"] = Xtr["signup_ts"].dt.hour
 Xtr["dow"] = Xtr["signup_ts"].dt.dayofweek
 Xtr["month"] = Xtr["signup_ts"].dt.month
 print("\nExample 5: date features")
-print(f"  hour range {Xtr['hour'].min()}-{Xtr['hour'].max()}, dow 0-{Xtr['dow'].max()}, month 1-{Xtr['month'].max()}")
+print(
+    f"  hour range {Xtr['hour'].min()}-{Xtr['hour'].max()}, dow 0-{Xtr['dow'].max()}, month 1-{Xtr['month'].max()}"
+)
 
 # ============================================================
 # 6. Text features — TF-IDF for short bios
@@ -125,13 +143,20 @@ print(f"  vocabulary: {list(tfidf.get_feature_names_out())}")
 # ============================================================
 from sklearn.pipeline import Pipeline  # noqa: E402
 
-prep = ColumnTransformer([
-    ("num", Pipeline([("poly", PolynomialFeatures(2, include_bias=False)),
-                      ("scale", StandardScaler())]), ["age", "salary"]),
-    ("cat", OneHotEncoder(handle_unknown="ignore"), ["city"]),
-    ("ord", OrdinalEncoder(categories=[["free", "pro", "enterprise"]]), ["plan"]),
-    ("txt", TfidfVectorizer(max_features=20), "bio"),
-])
+prep = ColumnTransformer(
+    [
+        (
+            "num",
+            Pipeline(
+                [("poly", PolynomialFeatures(2, include_bias=False)), ("scale", StandardScaler())]
+            ),
+            ["age", "salary"],
+        ),
+        ("cat", OneHotEncoder(handle_unknown="ignore"), ["city"]),
+        ("ord", OrdinalEncoder(categories=[["free", "pro", "enterprise"]]), ["plan"]),
+        ("txt", TfidfVectorizer(max_features=20), "bio"),
+    ]
+)
 full = Pipeline([("prep", prep), ("clf", LogisticRegression(max_iter=500))])
 full.fit(Xtr.drop(columns=["signup_ts", "y"]), ytr)
 auc_full = roc_auc_score(yte, full.predict_proba(Xte.drop(columns=["signup_ts", "y"]))[:, 1])
@@ -140,9 +165,11 @@ print(f"  AUC: {auc_full:.3f}")
 
 # Baseline: no engineering
 baseline = LogisticRegression(max_iter=500).fit(
-    Xtr[["age", "salary"]].assign(salary=np.log1p(Xtr["salary"])), ytr)
+    Xtr[["age", "salary"]].assign(salary=np.log1p(Xtr["salary"])), ytr
+)
 auc_base = roc_auc_score(
-    yte, baseline.predict_proba(Xte[["age", "salary"]].assign(salary=np.log1p(Xte["salary"])))[:, 1])
+    yte, baseline.predict_proba(Xte[["age", "salary"]].assign(salary=np.log1p(Xte["salary"])))[:, 1]
+)
 print(f"  baseline AUC (2 numeric cols): {auc_base:.3f}")
 
 # ============================================================

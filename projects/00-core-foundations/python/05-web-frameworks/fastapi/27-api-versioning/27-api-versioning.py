@@ -37,7 +37,7 @@ class UserV1(BaseModel):
 
 
 class UserV2(UserV1):
-    email: str | None = None    # additive change: v2 adds a field
+    email: str | None = None  # additive change: v2 adds a field
 
 
 USERS = {1: {"id": 1, "name": "ada", "email": "ada@example.com"}}
@@ -73,8 +73,10 @@ SUNSET_DATE = "Sun, 31 Dec 2026 23:59:59 GMT"
 
 
 @app.get("/api/items", response_model=list[dict])
-def get_items(api_version: str = Header(default="1", alias="X-API-Version"),
-              response_headers: dict = Depends(lambda: {})):
+def get_items(
+    api_version: str = Header(default="1", alias="X-API-Version"),
+    response_headers: dict = Depends(lambda: {}),
+):
     """Header-based versioning: the URL stays stable, the header picks v."""
     if api_version not in SUPPORTED_VERSIONS:
         raise HTTPException(status_code=400, detail=f"Unsupported version: {api_version}")
@@ -165,6 +167,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("27-api-versioning:app", host="127.0.0.1", port=8000)
     else:
         _verify()

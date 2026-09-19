@@ -23,9 +23,9 @@
 **autopct**
 A format string or function that controls percentage labels on slices. `'%1.1f%%'` shows one decimal place.
 ```python
-ax.pie(sizes, autopct='%1.1f%%')
+ax.pie(sizes, autopct="%1.1f%%")
 # With callable for custom format
-ax.pie(sizes, autopct=lambda p: f'{p:.1f}%')
+ax.pie(sizes, autopct=lambda p: f"{p:.1f}%")
 ```
 
 ### C
@@ -33,7 +33,7 @@ ax.pie(sizes, autopct=lambda p: f'{p:.1f}%')
 **colors**
 A list of color values assigned to each slice. Can be hex codes, named colors, or colormap values.
 ```python
-colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12']
+colors = ["#3498db", "#e74c3c", "#2ecc71", "#f39c12"]
 ax.pie(sizes, colors=colors)
 ```
 
@@ -43,7 +43,7 @@ ax.pie(sizes, colors=colors)
 A pie chart with a hole in the center, created by setting `wedgeprops={'width': 0.4}`. Often used with center text showing totals.
 ```python
 ax.pie(sizes, wedgeprops=dict(width=0.4))
-ax.text(0, 0, 'Total', ha='center', va='center', fontsize=16)
+ax.text(0, 0, "Total", ha="center", va="center", fontsize=16)
 ```
 
 ### E
@@ -68,7 +68,7 @@ ax.pie(sizes, labels=labels, labeldistance=1.2)
 **pctdistance**
 Distance of percentage labels from the center. Default is 0.6. Values > 1 place labels outside the pie.
 ```python
-ax.pie(sizes, autopct='%1.1f%%', pctdistance=0.85)
+ax.pie(sizes, autopct="%1.1f%%", pctdistance=0.85)
 ```
 
 **Proportion**
@@ -96,14 +96,14 @@ ax.pie(sizes, shadow=True)
 **wedges**
 The slice objects returned by `ax.pie()`. Can be passed to `ax.legend()` for custom legends.
 ```python
-wedges, texts, autotexts = ax.pie(sizes, autopct='%1.1f%%')
-ax.legend(wedges, labels, title='Categories')
+wedges, texts, autotexts = ax.pie(sizes, autopct="%1.1f%%")
+ax.legend(wedges, labels, title="Categories")
 ```
 
 **wedgeprops**
 Dictionary of properties for each wedge (slice). Used to create donut charts or customize appearance.
 ```python
-ax.pie(sizes, wedgeprops=dict(width=0.3, edgecolor='white', linewidth=2))
+ax.pie(sizes, wedgeprops=dict(width=0.3, edgecolor="white", linewidth=2))
 ```
 
 ---
@@ -116,9 +116,9 @@ ax.pie(sizes, wedgeprops=dict(width=0.3, edgecolor='white', linewidth=2))
 import matplotlib.pyplot as plt
 import numpy as np
 
-labels = ['Python', 'JavaScript', 'Java', 'C++', 'Other']
+labels = ["Python", "JavaScript", "Java", "C++", "Other"]
 sizes = [35, 25, 20, 12, 8]
-colors = ['#3776ab', '#f7df1e', '#f89820', '#00599c', '#cccccc']
+colors = ["#3776ab", "#f7df1e", "#f89820", "#00599c", "#cccccc"]
 explode = (0.05, 0, 0, 0, 0)
 
 fig, ax = plt.subplots(figsize=(8, 8))
@@ -126,18 +126,18 @@ wedges, texts, autotexts = ax.pie(
     sizes,
     explode=explode,
     labels=labels,
-    autopct='%1.1f%%',
+    autopct="%1.1f%%",
     startangle=90,
     colors=colors,
     shadow=False,
-    textprops={'fontsize': 12}
+    textprops={"fontsize": 12},
 )
 
 # Make percentage text bold
 for autotext in autotexts:
-    autotext.set_fontweight('bold')
+    autotext.set_fontweight("bold")
 
-ax.set_title('Programming Language Popularity', fontsize=14, fontweight='bold', pad=20)
+ax.set_title("Programming Language Popularity", fontsize=14, fontweight="bold", pad=20)
 plt.tight_layout()
 plt.show()
 ```
@@ -148,25 +148,25 @@ plt.show()
 fig, ax = plt.subplots(figsize=(8, 8))
 
 sizes = [40, 30, 20, 10]
-labels = ['Product A', 'Product B', 'Product C', 'Product D']
-colors = ['#2ecc71', '#3498db', '#e74c3c', '#f39c12']
+labels = ["Product A", "Product B", "Product C", "Product D"]
+colors = ["#2ecc71", "#3498db", "#e74c3c", "#f39c12"]
 
 wedges, texts, autotexts = ax.pie(
     sizes,
     labels=labels,
-    autopct='%1.0f%%',
+    autopct="%1.0f%%",
     colors=colors,
     startangle=90,
     pctdistance=0.78,
-    wedgeprops=dict(width=0.4, edgecolor='white', linewidth=2)
+    wedgeprops=dict(width=0.4, edgecolor="white", linewidth=2),
 )
 
 # Center text
 total = sum(sizes)
-ax.text(0, 0.05, f'${total}K', ha='center', va='center', fontsize=20, fontweight='bold')
-ax.text(0, -0.1, 'Total Revenue', ha='center', va='center', fontsize=11, color='gray')
+ax.text(0, 0.05, f"${total}K", ha="center", va="center", fontsize=20, fontweight="bold")
+ax.text(0, -0.1, "Total Revenue", ha="center", va="center", fontsize=11, color="gray")
 
-ax.set_title('Revenue by Product Line', fontsize=14, fontweight='bold')
+ax.set_title("Revenue by Product Line", fontsize=14, fontweight="bold")
 plt.tight_layout()
 plt.show()
 ```
@@ -177,25 +177,33 @@ plt.show()
 # When pie charts fail, use a waffle-style visualization
 fig, ax = plt.subplots(figsize=(10, 6))
 
-categories = ['Electronics', 'Clothing', 'Food', 'Books']
+categories = ["Electronics", "Clothing", "Food", "Books"]
 values = [35, 25, 25, 15]
-colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12']
+colors = ["#3498db", "#e74c3c", "#2ecc71", "#f39c12"]
 
 # Create horizontal stacked bar (waffle-like)
 bottom = 0
 for val, color, cat in zip(values, colors, categories):
-    ax.barh(0, val, left=bottom, color=color, height=0.5, label=f'{cat} ({val}%)')
+    ax.barh(0, val, left=bottom, color=color, height=0.5, label=f"{cat} ({val}%)")
     if val > 5:
-        ax.text(bottom + val/2, 0, f'{cat}\n{val}%', ha='center', va='center',
-                fontsize=10, fontweight='bold', color='white')
+        ax.text(
+            bottom + val / 2,
+            0,
+            f"{cat}\n{val}%",
+            ha="center",
+            va="center",
+            fontsize=10,
+            fontweight="bold",
+            color="white",
+        )
     bottom += val
 
 ax.set_xlim(0, 100)
 ax.set_ylim(-0.5, 0.5)
 ax.set_yticks([])
-ax.set_xlabel('Percentage')
-ax.set_title('Market Share (Waffle Style)')
-ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=4)
+ax.set_xlabel("Percentage")
+ax.set_title("Market Share (Waffle Style)")
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.1), ncol=4)
 
 plt.tight_layout()
 plt.show()

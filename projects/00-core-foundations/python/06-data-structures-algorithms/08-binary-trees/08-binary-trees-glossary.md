@@ -20,6 +20,7 @@ def is_balanced(root):
         if left == -1 or right == -1 or abs(left - right) > 1:
             return -1
         return 1 + max(left, right)
+
     return check(root) != -1
 ```
 
@@ -107,6 +108,7 @@ def inorder(root):
         return []
     return inorder(root.left) + [root.val] + inorder(root.right)
 
+
 # For BST, this gives sorted output!
 ```
 
@@ -145,6 +147,7 @@ def is_leaf(node):
 ```python
 from collections import deque
 
+
 def level_order(root):
     if not root:
         return []
@@ -154,8 +157,10 @@ def level_order(root):
         for _ in range(len(queue)):
             node = queue.popleft()
             level.append(node.val)
-            if node.left: queue.append(node.left)
-            if node.right: queue.append(node.right)
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
         result.append(level)
     return result
 ```
@@ -224,8 +229,7 @@ def has_path_sum(root, target):
         return False
     if not root.left and not root.right:
         return root.val == target
-    return (has_path_sum(root.left, target - root.val) or
-            has_path_sum(root.right, target - root.val))
+    return has_path_sum(root.left, target - root.val) or has_path_sum(root.right, target - root.val)
 ```
 
 ### Perfect Binary Tree
@@ -292,7 +296,8 @@ def is_symmetric(root):
             return True
         if not a or not b:
             return False
-        return (a.val == b.val and mirror(a.left, b.right) and mirror(a.right, b.left))
+        return a.val == b.val and mirror(a.left, b.right) and mirror(a.right, b.left)
+
     return mirror(root.left, root.right) if root else True
 ```
 

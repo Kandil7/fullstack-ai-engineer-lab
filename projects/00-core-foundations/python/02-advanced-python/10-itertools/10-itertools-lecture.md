@@ -113,6 +113,7 @@ print(stepped)  # [0, 3, 6, 9, 12, 15, 18]
 
 # Limit infinite iterator
 from itertools import count
+
 limited = list(islice(count(1), 10))
 print(limited)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ```
@@ -142,9 +143,11 @@ pairs = [(1, 2), (3, 4), (5, 6)]
 products = list(starmap(pow, pairs))
 print(products)  # [1, 81, 15625]
 
+
 # With custom function
 def add(a, b):
     return a + b
+
 
 sums = list(starmap(add, pairs))
 print(sums)  # [3, 7, 11]
@@ -255,20 +258,22 @@ print(combs_r)
 ```python
 from itertools import tee
 
+
 # Create multiple independent iterators
 def expensive_generator():
     print("Generating...")
     for i in range(5):
         yield i * 2
 
+
 # Without tee: second pass gets empty generator
 gen = expensive_generator()
-first_pass = list(gen)   # "Generating..." -> [0, 2, 4, 6, 8]
+first_pass = list(gen)  # "Generating..." -> [0, 2, 4, 6, 8]
 second_pass = list(gen)  # [] — exhausted
 
 # With tee: independent iterators
 gen1, gen2 = tee(expensive_generator())
-first_pass = list(gen1)   # "Generating..." -> [0, 2, 4, 6, 8]
+first_pass = list(gen1)  # "Generating..." -> [0, 2, 4, 6, 8]
 second_pass = list(gen2)  # [0, 2, 4, 6, 8] — same data
 ```
 
@@ -327,6 +332,7 @@ print(running_sum)  # [1, 3, 6, 10, 15]
 
 # Running product
 from operator import mul
+
 running_prod = list(accumulate(numbers, mul))
 print(running_prod)  # [1, 2, 6, 24, 120]
 
@@ -336,6 +342,7 @@ print(running_max)  # [1, 2, 3, 4, 5]
 
 # With initial value
 from operator import add
+
 running_sum = list(accumulate(numbers, add, initial=100))
 print(running_sum)  # [100, 101, 103, 106, 110, 115]
 ```
@@ -347,10 +354,12 @@ print(running_sum)  # [100, 101, 103, 106, 110, 115]
 ```python
 from itertools import chain, filterfalse, starmap
 
+
 def read_chunks(source):
     """Simulate reading data in chunks."""
     for chunk in source:
         yield chunk
+
 
 def filter_valid(data):
     """Filter out invalid entries."""
@@ -358,14 +367,12 @@ def filter_valid(data):
         if item.get("valid", False):
             yield item
 
+
 def transform(data):
     """Transform data."""
     for item in data:
-        yield {
-            "id": item["id"],
-            "name": item["name"].upper(),
-            "score": item["score"] * 100
-        }
+        yield {"id": item["id"], "name": item["name"].upper(), "score": item["score"] * 100}
+
 
 def aggregate(data):
     """Aggregate results."""
@@ -375,6 +382,7 @@ def aggregate(data):
         total += item["score"]
         count += 1
     return {"total": total, "count": count, "average": total / count if count else 0}
+
 
 # Compose pipeline
 raw_data = [
@@ -397,6 +405,7 @@ print(result)  # {'total': 175.0, 'count': 2, 'average': 87.5}
 ```python
 from itertools import islice, chain
 
+
 def batched(iterable, batch_size):
     """Batch data into chunks."""
     iterator = iter(iterable)
@@ -405,6 +414,7 @@ def batched(iterable, batch_size):
         if not batch:
             break
         yield batch
+
 
 # Usage
 data = range(1000)
@@ -418,9 +428,11 @@ for batch in batched(data, 32):
 from itertools import islice
 import multiprocessing
 
+
 def process_item(item):
     """Process a single item."""
-    return item ** 2
+    return item**2
+
 
 def parallel_process(data, num_workers=4):
     """Prepare data for parallel processing."""
@@ -428,13 +440,11 @@ def parallel_process(data, num_workers=4):
         results = pool.map(process_item, data)
     return results
 
+
 # Chunk data for parallel processing
 data = range(1000)
 chunk_size = len(data) // 4
-chunks = [
-    list(islice(data, i * chunk_size, (i + 1) * chunk_size))
-    for i in range(4)
-]
+chunks = [list(islice(data, i * chunk_size, (i + 1) * chunk_size)) for i in range(4)]
 ```
 
 ### Feature Engineering
@@ -442,20 +452,23 @@ chunks = [
 ```python
 from itertools import combinations, product
 
+
 def generate_features(data):
     """Generate feature combinations."""
     # Feature pairs
     features = list(combinations(data.columns, 2))
-    
+
     # Feature interactions
     interactions = list(product(data.columns, repeat=2))
-    
+
     return features, interactions
+
 
 # Generate polynomial features
 def polynomial_features(degree, n_features):
     """Generate polynomial feature indices."""
     from itertools import combinations_with_replacement
+
     features = []
     for d in range(1, degree + 1):
         features.extend(combinations_with_replacement(range(n_features), d))
@@ -489,6 +502,7 @@ def sliding_window(iterable, size):
     # Use itertools to create windows
     pass
 
+
 list(sliding_window([1, 2, 3, 4, 5], 3))
 # [(1, 2, 3), (2, 3, 4), (3, 4, 5)]
 ```
@@ -500,6 +514,7 @@ Implement round-robin scheduling:
 def round_robin(*iterables):
     # Cycle through iterables evenly
     pass
+
 
 list(round_robin("ABC", "123", "xyz"))
 # ["A", "1", "x", "B", "2", "y", "C", "3", "z"]

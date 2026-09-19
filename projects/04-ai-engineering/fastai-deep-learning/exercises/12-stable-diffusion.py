@@ -55,7 +55,9 @@ def ddpm_step(
         x_{t-1}: Less noisy latent.
     """
     # Predicted x_0 from current x_t and noise prediction
-    x_0_pred = (x_t - torch.sqrt(1 - alpha_bar[t]) * noise_pred) / torch.sqrt(alpha_bar[t])
+    x_0_pred = (x_t - torch.sqrt(1 - alpha_bar[t]) * noise_pred) / torch.sqrt(
+        alpha_bar[t]
+    )
 
     # Compute coefficients for mean of q(x_{t-1} | x_t, x_0)
     alpha_bar_prev = alpha_bar[t - 1] if t > 0 else torch.tensor(1.0)
@@ -86,7 +88,9 @@ class VAEEncoder(nn.Module):
         super().__init__()
         self.fc = nn.Linear(in_dim, latent_dim * 2)  # 2x: mean + log_var
 
-    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def forward(
+        self, x: torch.Tensor
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """Encode input and sample from the latent distribution.
 
         Returns:
@@ -211,7 +215,9 @@ def _safe(x: str) -> str:
     return x.replace("\u2192", "->").replace("\u03b2", "beta").replace("\u03b5", "eps")
 
 
-def make_linear_noise_schedule(T: int = 1000, beta_start: float = 1e-4, beta_end: float = 0.02) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+def make_linear_noise_schedule(
+    T: int = 1000, beta_start: float = 1e-4, beta_end: float = 0.02
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """Create a linear noise schedule (as used in original DDPM)."""
     beta = torch.linspace(beta_start, beta_end, T)
     alpha = 1.0 - beta
@@ -238,7 +244,9 @@ def main() -> None:
     print(f"Output shape: {tuple(x_prev.shape)}")
     print(f"Input mean:   {x_t.mean().item():.4f}, std: {x_t.std().item():.4f}")
     print(f"Output mean:  {x_prev.mean().item():.4f}, std: {x_prev.std().item():.4f}")
-    print(f"Step reduces noise (std decreases): {x_prev.std().item() < x_t.std().item()}")
+    print(
+        f"Step reduces noise (std decreases): {x_prev.std().item() < x_t.std().item()}"
+    )
     print()
 
     print("=" * 60)

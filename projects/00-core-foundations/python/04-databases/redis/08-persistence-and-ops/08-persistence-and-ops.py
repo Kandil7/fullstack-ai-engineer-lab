@@ -34,8 +34,10 @@ from redis_client import ManualClock, RedisClient, get_client
 # Modern Redis: both (AOF + RDB for fast restart). The tradeoff is
 # durability vs. write cost — the RPO/RTO story from databases applies.
 
-def simulate_rdb_restore(snapshot_interval: int, crash: float,
-                         writes: list[tuple[float, str]]) -> int:
+
+def simulate_rdb_restore(
+    snapshot_interval: int, crash: float, writes: list[tuple[float, str]]
+) -> int:
     """Snapshot every `snapshot_interval` seconds; a crash at `crash`
     restores the last snapshot. Returns the number of writes lost
     (writes after the last snapshot, before the crash)."""
@@ -43,9 +45,8 @@ def simulate_rdb_restore(snapshot_interval: int, crash: float,
     return sum(1 for t, _ in writes if last_snapshot < t <= crash)
 
 
-writes = [(i * 10.0, f"w{i}") for i in range(10)]   # one write per 10s
-rdb_loss = simulate_rdb_restore(snapshot_interval=30, crash=85.0,
-                                writes=writes)
+writes = [(i * 10.0, f"w{i}") for i in range(10)]  # one write per 10s
+rdb_loss = simulate_rdb_restore(snapshot_interval=30, crash=85.0, writes=writes)
 print(f"RDB (snapshot every 30s): lose {rdb_loss} write(s) after a crash at t=85")
 print(f"AOF (fsync every write):  lose 0 writes after a crash")
 
@@ -63,6 +64,7 @@ print(f"AOF (fsync every write):  lose 0 writes after a crash")
 #   allkeys-random -> evict anything
 # For caches, allkeys-lru is the classic choice. For rate-limit keys,
 # noeviction is safer (evicting a limit means letting traffic through).
+
 
 def fill_then_evict(policy: str) -> tuple[bool, list[str]]:
     c = RedisClient(clock=ManualClock(0.0))
@@ -91,11 +93,12 @@ print(f"allkeys-lru: all writes accepted? {ok} | surviving keys: {keys}")
 vc = RedisClient(clock=ManualClock(0.0))
 vc.set_maxmemory(150, policy="volatile-ttl")
 for i in range(8):
-    vc.set(f"v:{i}", "y" * 20, ex=1000 - i * 100)   # v:0 expires latest
-vc.set("no-ttl:1", "z" * 20)                        # never expires
-vc.set("no-ttl:2", "z" * 20)                        # must survive eviction
-print(f"volatile-ttl: no-ttl keys survived? "
-      f"{bool(vc.exists('no-ttl:1') and vc.exists('no-ttl:2'))}")
+    vc.set(f"v:{i}", "y" * 20, ex=1000 - i * 100)  # v:0 expires latest
+vc.set("no-ttl:1", "z" * 20)  # never expires
+vc.set("no-ttl:2", "z" * 20)  # must survive eviction
+print(
+    f"volatile-ttl: no-ttl keys survived? {bool(vc.exists('no-ttl:1') and vc.exists('no-ttl:2'))}"
+)
 
 # Output:
 # volatile-ttl: no-ttl keys survived? True
@@ -106,6 +109,7 @@ print(f"volatile-ttl: no-ttl keys survived? "
 # INFO memory / MEMORY USAGE report per-key size. Knowing your footprint
 # is how you size maxmemory before an incident, not after.
 
+
 def memory_usage(c: RedisClient, key: str) -> int:
     return c._key_size(key)
 
@@ -114,8 +118,10 @@ c = RedisClient(clock=ManualClock(0.0))
 c.set("tiny", "a")
 c.set("big", "x" * 500)
 c.rpush("list:many", *range(50))
-print(f"\nmemory: tiny={memory_usage(c, 'tiny')}B big={memory_usage(c, 'big')}B "
-      f"list:many={memory_usage(c, 'list:many')}B")
+print(
+    f"\nmemory: tiny={memory_usage(c, 'tiny')}B big={memory_usage(c, 'big')}B "
+    f"list:many={memory_usage(c, 'list:many')}B"
+)
 
 # Output:
 # memory: tiny=17B big=516B list:many=1616B
@@ -151,6 +157,7 @@ print(f"\nSCAN batches over 50 keys with count=10: {seen} keys found (cursor loo
 # ({user:1}.profile) force related keys into the same slot so multi-key
 # ops work. Stand-in: compute the slot a key would land on.
 
+
 def hash_slot(key: str) -> int:
     """CRC16 % 16384, honoring hash tags: only the text inside the FIRST
     pair of braces is hashed, so {user:1}:profile and {user:1}:settings
@@ -169,8 +176,7 @@ def hash_slot(key: str) -> int:
 
 print(f"\nslot('user:1:profile') = {hash_slot('user:1:profile')}")
 print(f"slot('user:2:profile') = {hash_slot('user:2:profile')}")
-print(f"slot('{'{user:1}'}:profile') = {hash_slot('{user:1}:profile')} "
-      f"(hash tag forces same slot)")
+print(f"slot('{'{user:1}'}:profile') = {hash_slot('{user:1}:profile')} (hash tag forces same slot)")
 
 # Output:
 # slot('user:1:profile') = 15985
@@ -196,14 +202,14 @@ print(f"slot('{'{user:1}'}:profile') = {hash_slot('{user:1}:profile')} "
 # CORRECT: volatile policies for "must keep" keys, or size maxmemory
 #   above the working set.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # RDB loses writes since the last snapshot; AOF loses none
-    assert rdb_loss == 2, \
-        "RDB must lose exactly the writes since the last snapshot"
+    assert rdb_loss == 2, "RDB must lose exactly the writes since the last snapshot"
 
     # noeviction rejects writes when full
     ok, _ = fill_then_evict("noeviction")
@@ -216,19 +222,22 @@ def _verify() -> None:
     assert "k:9" in keys, "the newest key must survive LRU eviction"
 
     # volatile-ttl spares keys without TTL
-    assert vc.exists("no-ttl:1") and vc.exists("no-ttl:2"), \
+    assert vc.exists("no-ttl:1") and vc.exists("no-ttl:2"), (
         "volatile-ttl must never evict keys without a TTL"
+    )
 
     # memory sizing is proportional to value length
-    assert memory_usage(c, "big") > memory_usage(c, "tiny"), \
+    assert memory_usage(c, "big") > memory_usage(c, "tiny"), (
         "longer values must report larger memory footprints"
+    )
 
     # SCAN returns every matching key across batches
     assert seen == 50, "SCAN must visit all 50 keys across cursor batches"
 
     # hash tags: keys inside {braces} share the slot of the braced part
-    assert hash_slot("{user:1}:profile") == hash_slot("{user:1}:settings"), \
+    assert hash_slot("{user:1}:profile") == hash_slot("{user:1}:settings"), (
         "hash tags must route related keys to the same slot"
+    )
 
     # eviction frees memory: after eviction the store fits under maxmemory
     c3 = RedisClient(clock=ManualClock(0.0))

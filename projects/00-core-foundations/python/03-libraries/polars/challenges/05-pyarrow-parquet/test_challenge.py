@@ -30,14 +30,17 @@ starter = _load("starter_05", os.path.join(HERE, "starter.py"))
 
 def _frame(n: int = 50_000) -> pl.DataFrame:
     rng = np.random.default_rng(42)
-    return pl.DataFrame({
-        "id": range(n),
-        "score": rng.uniform(0.0, 1.0, n),
-        "label": ["neg" if i % 3 else "pos" for i in range(n)],
-    })
+    return pl.DataFrame(
+        {
+            "id": range(n),
+            "score": rng.uniform(0.0, 1.0, n),
+            "label": ["neg" if i % 3 else "pos" for i in range(n)],
+        }
+    )
 
 
 # ---------------------------------------------------------------- bronze
+
 
 def test_bronze_writes_somewhere(tmp_path):
     df = _frame()
@@ -69,6 +72,7 @@ def test_bronze_starter_raises(tmp_path):
 
 # ---------------------------------------------------------------- silver
 
+
 def test_silver_parquet_smaller(tmp_path):
     df = _frame()
     report = solution.compression_compare(
@@ -76,8 +80,9 @@ def test_silver_parquet_smaller(tmp_path):
     )
     assert report["csv_bytes"] > 0
     assert report["parquet_bytes"] > 0
-    assert report["parquet_bytes"] < report["csv_bytes"], \
+    assert report["parquet_bytes"] < report["csv_bytes"], (
         "zstd parquet must beat csv on a repetitive string column"
+    )
 
 
 def test_silver_sizes_repeatable(tmp_path):
@@ -94,6 +99,7 @@ def test_silver_starter_raises(tmp_path):
 
 # ---------------------------------------------------------------- gold
 
+
 def test_gold_roundtrip_match(tmp_path):
     df = _frame(100_000)
     report = solution.roundtrip_zero_copy(df, str(tmp_path / "rt.parquet"))
@@ -109,8 +115,9 @@ def test_gold_zero_copy_flag(tmp_path):
 def test_gold_uses_allow_copy_kwarg():
     with open(os.path.join(HERE, "solution.py"), encoding="utf-8") as fh:
         source = fh.read()
-    assert "allow_copy=False" in source, \
+    assert "allow_copy=False" in source, (
         "must use the modern allow_copy=False (zero_copy_only is deprecated)"
+    )
 
 
 def test_gold_starter_raises(tmp_path):

@@ -64,6 +64,7 @@ def quick_sort_inplace(arr, low, high):
         quick_sort_inplace(arr, low, pivot_idx - 1)
         quick_sort_inplace(arr, pivot_idx + 1, high)
 
+
 def partition(arr, low, high):
     pivot = arr[high]
     i = low - 1
@@ -90,6 +91,7 @@ def merge_sort(arr):
     right = merge_sort(arr[mid:])
 
     return merge(left, right)
+
 
 def merge(left, right):
     result = []
@@ -158,6 +160,7 @@ def heap_sort(arr):
         arr[0], arr[i] = arr[i], arr[0]
         heapify(arr, i, 0)
 
+
 def heapify(arr, n, i):
     largest = i
     left = 2 * i + 1
@@ -212,6 +215,7 @@ def counting_sort(arr, k):
 
     return result
 
+
 # With negative numbers
 def counting_sort_negatives(arr):
     min_val = min(arr)
@@ -245,6 +249,7 @@ def radix_sort(arr):
     while max_val // exp > 0:
         counting_sort_by_digit(arr, exp)
         exp *= 10
+
 
 def counting_sort_by_digit(arr, exp):
     n = len(arr)
@@ -317,6 +322,7 @@ def sort_list(head):
 
     return merge(left, right)
 
+
 def merge(l1, l2):
     dummy = ListNode(0)
     curr = dummy
@@ -347,6 +353,7 @@ def find_kth_largest_sort(nums, k):
 ```python
 import heapq
 
+
 def find_kth_largest_heap(nums, k):
     heap = nums[:k]
     heapq.heapify(heap)
@@ -361,6 +368,7 @@ def find_kth_largest_heap(nums, k):
 **Approach 3 — Quickselect (O(n) average):**
 ```python
 import random
+
 
 def find_kth_largest_quickselect(nums, k):
     target = len(nums) - k
@@ -407,6 +415,7 @@ def sort_colors(nums):
             nums[mid], nums[high] = nums[high], nums[mid]
             high -= 1
 
+
 # Test
 nums = [2, 0, 2, 1, 1, 0]
 sort_colors(nums)
@@ -437,6 +446,7 @@ def merge_sorted_arrays(nums1, m, nums2, n):
         nums1[k] = nums2[j]
         j -= 1
         k -= 1
+
 
 # Test
 nums1 = [1, 2, 3, 0, 0, 0]
@@ -501,6 +511,7 @@ def sort_array(nums):
 
     return merge(left, right)
 
+
 def merge(left, right):
     result = []
     i = j = 0
@@ -515,6 +526,7 @@ def merge(left, right):
     result.extend(right[j:])
     return result
 
+
 # Test
 assert sort_array([5, 2, 3, 1]) == [1, 2, 3, 5]
 assert sort_array([5, 1, 1, 2, 0, 0]) == [0, 0, 1, 1, 2, 5]
@@ -526,6 +538,7 @@ assert sort_array([5, 1, 1, 2, 0, 0]) == [0, 0, 1, 1, 2, 5]
 ### Challenge 2: Kth Largest Element in an Array
 ```python
 import random
+
 
 def find_kth_largest(nums, k):
     target = len(nums) - k
@@ -551,6 +564,7 @@ def find_kth_largest(nums, k):
 
     return quickselect(0, len(nums) - 1)
 
+
 # Test
 assert find_kth_largest([3, 2, 1, 5, 6, 4], 2) == 5
 assert find_kth_largest([3, 2, 3, 1, 2, 4, 5, 5, 6], 4) == 4
@@ -575,6 +589,7 @@ def sort_colors(nums):
             nums[mid], nums[high] = nums[high], nums[mid]
             high -= 1
 
+
 # Test
 nums = [2, 0, 2, 1, 1, 0]
 sort_colors(nums)
@@ -598,9 +613,10 @@ def merge_intervals(intervals):
 
     return merged
 
+
 # Test
-assert merge_intervals([[1,3],[2,6],[8,10],[15,18]]) == [[1,6],[8,10],[15,18]]
-assert merge_intervals([[1,4],[4,5]]) == [[1,5]]
+assert merge_intervals([[1, 3], [2, 6], [8, 10], [15, 18]]) == [[1, 6], [8, 10], [15, 18]]
+assert merge_intervals([[1, 4], [4, 5]]) == [[1, 5]]
 ```
 **Time: O(n log n), Space: O(n)**
 
@@ -609,6 +625,7 @@ assert merge_intervals([[1,4],[4,5]]) == [[1,5]]
 ### Challenge 5: Meeting Rooms II (Minimum conference rooms)
 ```python
 import heapq
+
 
 def min_meeting_rooms(intervals):
     if not intervals:
@@ -625,9 +642,10 @@ def min_meeting_rooms(intervals):
 
     return len(heap)
 
+
 # Test
-assert min_meeting_rooms([[0,30],[5,10],[15,20]]) == 2
-assert min_meeting_rooms([[1,2],[2,3],[3,4]]) == 1
+assert min_meeting_rooms([[0, 30], [5, 10], [15, 20]]) == 2
+assert min_meeting_rooms([[1, 2], [2, 3], [3, 4]]) == 1
 ```
 **Time: O(n log n), Space: O(n)**
 
@@ -638,12 +656,14 @@ assert min_meeting_rooms([[1,2],[2,3],[3,4]]) == 1
 from collections import Counter
 import heapq
 
+
 def top_k_frequent(nums, k):
     count = Counter(nums)
     return heapq.nlargest(k, count.keys(), key=count.get)
 
+
 # Test
-assert top_k_frequent([1,1,1,2,2,3], 2) == [1, 2]
+assert top_k_frequent([1, 1, 1, 2, 2, 3], 2) == [1, 2]
 assert top_k_frequent([1], 1) == [1]
 ```
 **Time: O(n log k), Space: O(n)**
@@ -664,6 +684,7 @@ def sort_array_by_parity(nums):
             left += 1
             right -= 1
     return nums
+
 
 # Test
 assert sort_array_by_parity([3, 1, 2, 4]) == [4, 2, 1, 3]  # or any valid order
@@ -686,8 +707,21 @@ def relative_sort_array(arr1, arr2):
 
     return sorted(arr1, key=custom_sort)
 
+
 # Test
-assert relative_sort_array([2,3,1,3,2,4,6,7,9,2,19], [2,1,4,3,9,6]) == [2,2,2,1,4,3,3,9,6,7,19]
+assert relative_sort_array([2, 3, 1, 3, 2, 4, 6, 7, 9, 2, 19], [2, 1, 4, 3, 9, 6]) == [
+    2,
+    2,
+    2,
+    1,
+    4,
+    3,
+    3,
+    9,
+    6,
+    7,
+    19,
+]
 ```
 **Time: O(n log n), Space: O(n)**
 
@@ -698,6 +732,7 @@ Given a list of non-negative integers, arrange them to form the largest number.
 
 ```python
 from functools import cmp_to_key
+
 
 def largest_number(nums):
     nums = list(map(str, nums))
@@ -711,8 +746,9 @@ def largest_number(nums):
             return 0
 
     nums.sort(key=cmp_to_key(compare))
-    result = ''.join(nums)
-    return '0' if result[0] == '0' else result
+    result = "".join(nums)
+    return "0" if result[0] == "0" else result
+
 
 # Test
 assert largest_number([3, 30, 34, 5, 9]) == "9534330"
@@ -728,7 +764,7 @@ Find all pairs with the minimum absolute difference.
 ```python
 def minimum_abs_difference(arr):
     arr.sort()
-    min_diff = float('inf')
+    min_diff = float("inf")
     result = []
 
     for i in range(1, len(arr)):
@@ -740,6 +776,7 @@ def minimum_abs_difference(arr):
             result.append([arr[i - 1], arr[i]])
 
     return result
+
 
 # Test
 assert minimum_abs_difference([4, 2, 1, 3]) == [[1, 2], [2, 3], [3, 4]]

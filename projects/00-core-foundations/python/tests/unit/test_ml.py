@@ -16,6 +16,4 @@ ML_FILES = discover_phase_files("07-machine-learning")
 def test_ml_example_runs(filepath):
     """Every ML example must execute without errors."""
     result = run_py_file(filepath, timeout=180)
-    assert result.returncode == 0, (
-        f"{filepath.name} failed:\n{result.stderr[-500:]}"
-    )
+    assert result.returncode == 0, f"{filepath.name} failed:\n{result.stderr[-500:]}"

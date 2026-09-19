@@ -30,9 +30,9 @@ parameterized queries only:
 
 ```python
 class SafeStore:
-    def __init__(self): ...                      # CREATE TABLE users(id TEXT, name TEXT)
+    def __init__(self): ...  # CREATE TABLE users(id TEXT, name TEXT)
     def add(self, user_id: str, name: str) -> None: ...
-    def find(self, user_id: str) -> list[tuple]: ...   # parameterized
+    def find(self, user_id: str) -> list[tuple]: ...  # parameterized
 ```
 
 | Input | Expected |
@@ -58,6 +58,7 @@ verifies containment.
 **API:**
 ```python
 ALLOWED = {"model", "batch_size", "retries"}
+
 
 def load_config(path: Path) -> dict: ...
 def is_safe_path(root: Path, filename: str) -> Path: ...  # raises ValueError

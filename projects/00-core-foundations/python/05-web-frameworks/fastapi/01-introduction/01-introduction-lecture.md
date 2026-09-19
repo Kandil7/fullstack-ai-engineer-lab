@@ -124,6 +124,7 @@ You can define multiple HTTP methods on the same path by stacking decorators or 
 def submit_get():
     return {"method": "GET"}
 
+
 @app.post("/submit")
 def submit_post():
     return {"method": "POST"}
@@ -171,6 +172,7 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+
 @app.get("/")
 def root():
     return {"message": "Hello, World!"}
@@ -194,13 +196,16 @@ from fastapi import FastAPI
 
 app = FastAPI(title="My First API")
 
+
 @app.get("/")
 def root():
     return {"message": "Welcome to my API"}
 
+
 @app.get("/users/{name}")
 def greet_user(name: str):
     return {"greeting": f"Hello, {name}!"}
+
 
 @app.post("/data")
 def receive_data():
@@ -213,6 +218,7 @@ def receive_data():
 from fastapi import FastAPI
 
 app = FastAPI()
+
 
 @app.get("/server-info")
 def server_info():
@@ -238,9 +244,11 @@ import uvicorn
 
 app = FastAPI()
 
+
 @app.get("/")
 def root():
     return {"message": "Hello"}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
@@ -282,6 +290,7 @@ uvicorn main:app --reload  # Always use this in dev
 @app.get("/users/{user_id}")
 def get_user(user_id: int): ...
 
+
 # Query parameter (after ?):
 @app.get("/users/")
 def list_users(limit: int = 10): ...
@@ -294,8 +303,11 @@ def list_users(limit: int = 10): ...
 def get_time():
     return {"time": datetime.now()}  # Error!
 
+
 # Fix: Convert to string
 from datetime import datetime
+
+
 @app.get("/time")
 def get_time():
     return {"time": datetime.now().isoformat()}

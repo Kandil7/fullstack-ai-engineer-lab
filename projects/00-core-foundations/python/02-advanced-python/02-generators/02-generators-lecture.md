@@ -34,19 +34,20 @@ An **iterator** is an object that implements two methods:
 ```python
 class CountDown:
     """A manual iterator that counts down from n to 0."""
-    
+
     def __init__(self, start):
         self.current = start
-    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         if self.current < 0:
             raise StopIteration
         value = self.current
         self.current -= 1
         return value
+
 
 # Usage
 for num in CountDown(5):
@@ -104,6 +105,7 @@ def count_up(start, end):
         yield current
         current += 1
 
+
 # Usage
 for num in count_up(1, 5):
     print(num)  # 1, 2, 3, 4, 5
@@ -127,6 +129,7 @@ def simple_generator():
     yield 3
     print("Step 4: Done")
 
+
 gen = simple_generator()
 print(next(gen))  # Step 1: Before first yield -> 1
 print(next(gen))  # Step 2: After first yield -> 2
@@ -140,12 +143,12 @@ print(next(gen))  # Step 3: After second yield -> 3
 import sys
 
 # List: stores all values in memory
-squares_list = [x ** 2 for x in range(1000000)]
+squares_list = [x**2 for x in range(1000000)]
 print(f"List memory: {sys.getsizeof(squares_list):,} bytes")
 # ~8 MB
 
 # Generator: produces values on demand
-squares_gen = (x ** 2 for x in range(1000000))
+squares_gen = (x**2 for x in range(1000000))
 print(f"Generator memory: {sys.getsizeof(squares_gen):,} bytes")
 # ~200 bytes
 ```
@@ -158,10 +161,10 @@ Concise syntax for creating generators, similar to list comprehensions:
 
 ```python
 # List comprehension (eager evaluation)
-squares_list = [x ** 2 for x in range(10)]
+squares_list = [x**2 for x in range(10)]
 
 # Generator expression (lazy evaluation)
-squares_gen = (x ** 2 for x in range(10))
+squares_gen = (x**2 for x in range(10))
 
 # Using in a for loop
 for sq in squares_gen:
@@ -169,8 +172,8 @@ for sq in squares_gen:
 # 0 1 4 9 16 25 36 49 64 81
 
 # Passing to functions that accept iterables
-total = sum(x ** 2 for x in range(100))
-max_val = max(x ** 2 for x in range(100))
+total = sum(x**2 for x in range(100))
+max_val = max(x**2 for x in range(100))
 ```
 
 ### Complex Generator Expressions
@@ -200,10 +203,12 @@ def inner_generator():
     yield 2
     yield 3
 
+
 def outer_generator():
     yield "A"
     yield from inner_generator()  # Delegates to inner
     yield "B"
+
 
 list(outer_generator())  # ["A", 1, 2, 3, "B"]
 ```
@@ -218,6 +223,7 @@ def flatten(nested):
             yield from flatten(item)
         else:
             yield item
+
 
 nested = [1, [2, 3, [4, 5]], [6, [7, [8, [9]]]]]
 print(list(flatten(nested)))
@@ -236,16 +242,18 @@ def accumulator():
         total += value
     return total  # Final result
 
+
 def delegator():
     result = yield from accumulator()
     print(f"Final total: {result}")
 
+
 gen = delegator()
-next(gen)        # Initialize
-gen.send(10)     # total=10
-gen.send(20)     # total=30
-gen.send(30)     # total=60
-gen.send(None)   # StopIteration, prints "Final total: 60"
+next(gen)  # Initialize
+gen.send(10)  # total=10
+gen.send(20)  # total=30
+gen.send(30)  # total=60
+gen.send(None)  # StopIteration, prints "Final total: 60"
 ```
 
 ---
@@ -264,11 +272,12 @@ def chatbot():
             return
         response = yield f"You said: {response}. Tell me more."
 
+
 bot = chatbot()
-print(next(bot))        # "Hello! How can I help?"
-print(bot.send("Hi"))   # "You said: Hi. Tell me more."
-print(bot.send("Python")) # "You said: Python. Tell me more."
-print(bot.send("quit")) # "Goodbye!"
+print(next(bot))  # "Hello! How can I help?"
+print(bot.send("Hi"))  # "You said: Hi. Tell me more."
+print(bot.send("Python"))  # "You said: Python. Tell me more."
+print(bot.send("quit"))  # "Goodbye!"
 ```
 
 ### `throw()` — Raising Exceptions Inside Generators
@@ -284,9 +293,10 @@ def safe_generator():
     finally:
         print("Generator cleaned up")
 
+
 gen = safe_generator()
-next(gen)              # Initialize
-gen.send("hello")     # Received: hello
+next(gen)  # Initialize
+gen.send("hello")  # Received: hello
 gen.throw(ValueError)  # Caught ValueError! -> Generator cleaned up
 ```
 
@@ -301,8 +311,9 @@ def resource_generator():
     finally:
         print("Closing resource")
 
+
 gen = resource_generator()
-next(gen)    # "Opening resource"
+next(gen)  # "Opening resource"
 gen.close()  # "Closing resource"
 ```
 
@@ -318,6 +329,7 @@ def count_from(start=0, step=1):
         yield current
         current += step
 
+
 def fibonacci():
     """Infinite Fibonacci sequence."""
     a, b = 0, 1
@@ -325,10 +337,12 @@ def fibonacci():
         yield a
         a, b = b, a + b
 
+
 def cycle(iterable):
     """Infinite cycling through an iterable."""
     while True:
         yield from iterable
+
 
 # Usage with itertools.islice
 from itertools import islice
@@ -350,11 +364,13 @@ def read_data(source):
     for item in source:
         yield item
 
+
 def filter_valid(data):
     """Stage 2: Filter invalid entries."""
     for item in data:
         if item.get("valid", False):
             yield item
+
 
 def transform(data):
     """Stage 3: Transform data."""
@@ -362,6 +378,7 @@ def transform(data):
         item["name"] = item["name"].upper()
         item["score"] *= 100
         yield item
+
 
 def aggregate(data):
     """Stage 4: Aggregate results."""
@@ -371,6 +388,7 @@ def aggregate(data):
         total += item["score"]
         count += 1
     yield {"total": total, "count": count, "average": total / count if count else 0}
+
 
 # Compose the pipeline
 raw_data = [
@@ -389,11 +407,12 @@ print(result)  # {'total': 175.0, 'count': 2, 'average': 87.5}
 ```python
 import itertools
 
+
 def pipeline_with_itertools(data):
     """Use itertools for common pipeline operations."""
     return itertools.starmap(
         lambda x: {"name": x["name"].upper(), "score": x["score"] * 100},
-        filter(lambda x: x["valid"], data)
+        filter(lambda x: x["valid"], data),
     )
 ```
 
@@ -412,6 +431,7 @@ def load_chunks(file_path, chunk_size=1024):
             if not chunk:
                 break
             yield chunk
+
 
 def process_large_file(file_path):
     """Process a large file without loading it all into memory."""
@@ -434,6 +454,7 @@ def tokenize_stream(text_stream):
     if buffer:
         yield buffer
 
+
 # Usage
 text_chunks = ["Hello world", " this is", " a test"]
 tokens = tokenize_stream(text_chunks)
@@ -446,14 +467,16 @@ print(list(tokens))  # ["Hello", "world", "this", "is", "a", "test"]
 def batch_generator(data, batch_size=32):
     """Generate batches for model training."""
     import random
+
     shuffled = list(data)
     random.shuffle(shuffled)
-    
+
     for i in range(0, len(shuffled), batch_size):
-        batch = shuffled[i:i + batch_size]
+        batch = shuffled[i : i + batch_size]
         inputs = [item["input"] for item in batch]
         targets = [item["target"] for item in batch]
         yield inputs, targets
+
 
 def infinite_batches(data, batch_size=32):
     """Infinite batch generator for training loops."""
@@ -473,6 +496,7 @@ def generate_numbers():
     yield 1
     yield 2
     yield 3
+
 
 gen = generate_numbers()
 print(list(gen))  # [1, 2, 3]
@@ -495,6 +519,7 @@ def process():
         print(f"Processing {i}")
         yield i
 
+
 # Nothing prints here!
 gen = process()
 
@@ -510,6 +535,7 @@ def bad_generator(data):
     for item in data:
         yield transform(item)
     # 'data' reference held until generator is garbage collected
+
 
 # BETTER: Process and release
 def good_generator(data):
@@ -567,10 +593,10 @@ Create a `running_average()` generator that computes the running average:
 
 ```python
 avg = running_average()
-next(avg)          # Initialize
-avg.send(10)       # -> 10.0
-avg.send(20)       # -> 15.0
-avg.send(30)       # -> 20.0
+next(avg)  # Initialize
+avg.send(10)  # -> 10.0
+avg.send(20)  # -> 15.0
+avg.send(30)  # -> 20.0
 ```
 
 ---

@@ -60,14 +60,17 @@ print(f"Tuple became: {type(decoded['pair']).__name__}")
 Two failure modes to memorize:
 
 ```python
-json.dumps({"tags": {"rag", "eval"}})          # TypeError: Object of type set is not JSON serializable
-json.dumps({"created": datetime(2026, 8, 6)})  # TypeError: Object of type datetime is not JSON serializable
+json.dumps({"tags": {"rag", "eval"}})  # TypeError: Object of type set is not JSON serializable
+json.dumps(
+    {"created": datetime(2026, 8, 6)}
+)  # TypeError: Object of type datetime is not JSON serializable
 ```
 
 **Extending JSON** — encode with `default=`, decode with `object_hook`:
 
 ```python
 from datetime import datetime
+
 
 def default_encoder(obj):
     if isinstance(obj, datetime):
@@ -76,12 +79,14 @@ def default_encoder(obj):
         return {"$set": sorted(obj)}
     raise TypeError(f"cannot serialize {type(obj)}")
 
+
 def object_decoder(d):
     if "$iso" in d:
         return datetime.fromisoformat(d["$iso"])
     if "$set" in d:
         return set(d["$set"])
     return d
+
 
 blob = {"created": datetime(2026, 8, 6, 9, 0), "tags": {"rag", "eval"}}
 rt = json.loads(json.dumps(blob, default=default_encoder), object_hook=object_decoder)
@@ -179,7 +184,7 @@ def stream_jsonl(path: Path):
     with path.open(encoding="utf-8") as f:
         for line in f:
             line = line.strip()
-            if line:                      # skip blank/trailing lines
+            if line:  # skip blank/trailing lines
                 yield json.loads(line)
 ```
 
@@ -197,6 +202,7 @@ pickle stream can execute arbitrary code on `loads`.
 ```python
 import pickle
 
+
 class ModelCard:
     def __init__(self, name: str, params_m: int) -> None:
         self.name = name
@@ -204,6 +210,7 @@ class ModelCard:
 
     def __repr__(self) -> str:
         return f"ModelCard({self.name}, {self.params_m}M)"
+
 
 card = ModelCard("qwen2.5-7b", 7600)
 data = pickle.dumps(card)
@@ -292,9 +299,9 @@ your job:
 
 ```python
 conn = sqlite3.connect(":memory:")
-with conn:                      # commits the transaction
+with conn:  # commits the transaction
     conn.execute("INSERT INTO t VALUES (?)", (1,))
-conn.execute("SELECT COUNT(*) FROM t")   # still works - connection is OPEN
+conn.execute("SELECT COUNT(*) FROM t")  # still works - connection is OPEN
 conn.close()
 ```
 
@@ -311,7 +318,7 @@ shelve is a dict-like wrapper over a dbm file: assign, close, reopen.
 ```python
 import shelve
 
-with shelve.open("cache.shlv") as db:    # the with-block also closes the shelf
+with shelve.open("cache.shlv") as db:  # the with-block also closes the shelf
     db["embeddings_2026-08"] = {"count": 1_000_000, "dim": 768}
     db["meta"] = {"version": "v2"}
 print("shelf closed and flushed on exit")
@@ -401,8 +408,8 @@ Why this is production-shaped:
 model = pickle.load(open(downloaded_from_hub, "rb"))
 
 # CORRECT - safe formats for untrusted input
-state = json.loads(text_from_user)              # JSON: safe
-weights = safetensors.torch.load_file(hub_file) # safetensors: safe
+state = json.loads(text_from_user)  # JSON: safe
+weights = safetensors.torch.load_file(hub_file)  # safetensors: safe
 ```
 
 ### Mistake 2: Building SQL with f-strings
@@ -554,9 +561,9 @@ import csv, json, pickle, sqlite3, shelve
 from pathlib import Path
 
 # JSON with extensions
-json.dumps(obj, default=default_encoder)          # encode
-json.loads(text, object_hook=object_decoder)      # decode
-json.dumps(obj, allow_nan=False)                  # strict JSON
+json.dumps(obj, default=default_encoder)  # encode
+json.loads(text, object_hook=object_decoder)  # decode
+json.dumps(obj, allow_nan=False)  # strict JSON
 
 # CSV
 with Path("f.csv").open("w", newline="") as f:
@@ -568,18 +575,18 @@ with path.open("a", encoding="utf-8") as f:
     f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
 # pickle - TRUSTED DATA ONLY
-data = pickle.dumps(obj)          # DEFAULT_PROTOCOL (4 on 3.13)
-obj = pickle.loads(data)          # never with untrusted input
+data = pickle.dumps(obj)  # DEFAULT_PROTOCOL (4 on 3.13)
+obj = pickle.loads(data)  # never with untrusted input
 
 # sqlite3 - parameterized only
 conn = sqlite3.connect(db)
 conn.execute("INSERT INTO t (name) VALUES (?)", (name,))
-conn.commit()                      # with conn: commits too, but no close
+conn.commit()  # with conn: commits too, but no close
 conn.close()
 
 # shelve - small single-process caches
 with shelve.open("c.shlv") as db:
-    db["key"] = value             # values are pickled
+    db["key"] = value  # values are pickled
 ```
 
 ## Next Steps

@@ -36,11 +36,12 @@ from urllib.parse import urlparse
 # one bad actor must not starve everyone, and abuse must be charged to
 # the right identity. In-memory here; Redis in production (same logic).
 
+
 class TokenBucketLimiter:
     def __init__(self, capacity: int, refill_per_sec: float) -> None:
         self.capacity = capacity
         self.refill = refill_per_sec
-        self._buckets: dict[str, tuple[float, float]] = {}   # key -> (tokens, last_refill)
+        self._buckets: dict[str, tuple[float, float]] = {}  # key -> (tokens, last_refill)
 
     def allow(self, key: str) -> bool:
         now = time.monotonic()
@@ -56,7 +57,7 @@ class TokenBucketLimiter:
 limiter = TokenBucketLimiter(capacity=3, refill_per_sec=1.0)
 print("=== 1. Rate limiting per identity ===")
 for i in range(5):
-    print(f"  request {i+1} for user-1: allowed={limiter.allow('user-1')}")
+    print(f"  request {i + 1} for user-1: allowed={limiter.allow('user-1')}")
 print(f"  burst for user-2 is independent: allowed={limiter.allow('user-2')}")
 print()
 
@@ -69,13 +70,14 @@ print()
 
 ALLOWED_ORIGINS = {"https://app.example.com", "https://admin.example.com"}
 
+
 def cors_allow(origin: str | None) -> str | None:
     """Return the header value, or None to deny."""
     if origin is None:
-        return None                      # same-origin / non-browser
+        return None  # same-origin / non-browser
     if origin in ALLOWED_ORIGINS:
         return origin
-    return None                          # reflect nothing; deny
+    return None  # reflect nothing; deny
 
 
 print("=== 2. CORS — explicit allowlist ===")
@@ -98,6 +100,7 @@ SECURITY_HEADERS = {
     "Referrer-Policy": "no-referrer",
     "Content-Security-Policy": "default-src 'none'",
 }
+
 
 def build_headers() -> dict[str, str]:
     return dict(SECURITY_HEADERS)
@@ -122,8 +125,9 @@ print()
 # too). Validate inputs with typed schemas — a 10 MB "prompt" is both a
 # DoS and a prompt-injection vector; a string length cap is free.
 
-MAX_BODY_BYTES = 1024 * 1024   # 1 MB
+MAX_BODY_BYTES = 1024 * 1024  # 1 MB
 MAX_PROMPT_CHARS = 4000
+
 
 def check_body_size(raw: bytes) -> bool:
     return len(raw) <= MAX_BODY_BYTES
@@ -148,8 +152,8 @@ print()
 # to reach internal services. Guard: resolve the host, reject private/
 # link-local/literal-IP targets, and pin allowed schemes.
 
-PRIVATE_HOSTS = {"127.0.0.1", "::1", "localhost", "169.254.169.254",
-                 "10.0.0.1", "192.168.1.1"}
+PRIVATE_HOSTS = {"127.0.0.1", "::1", "localhost", "169.254.169.254", "10.0.0.1", "192.168.1.1"}
+
 
 def safe_fetch_url(url: str) -> bool:
     parsed = urlparse(url)
@@ -175,6 +179,7 @@ print()
 # ============================================================
 # Secrets belong in environment variables / a secret manager, not in
 # source control, not in config files committed to the repo.
+
 
 def get_secret(name: str, default: str = "") -> str:
     """Read from env; production uses a secret manager at startup."""
@@ -210,6 +215,7 @@ print()
 #
 # MISTAKE: secrets in code/repo
 # CORRECT: env / secret manager; fail fast when missing
+
 
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
@@ -273,4 +279,4 @@ if __name__ == "__main__":
         print("4. Size caps at the boundary")
         print("5. SSRF guard for URL-fetching features")
         print("6. Secrets from env only, fail fast")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

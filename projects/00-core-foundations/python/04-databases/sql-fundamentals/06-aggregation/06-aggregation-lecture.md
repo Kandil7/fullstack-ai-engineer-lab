@@ -51,8 +51,11 @@ rows; `COUNT(col)` counts non-NULL values of that column.
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
-conn.execute("CREATE TABLE predictions (id INTEGER PRIMARY KEY, model TEXT, correct INTEGER, latency_ms REAL, confidence REAL)")
+conn.execute(
+    "CREATE TABLE predictions (id INTEGER PRIMARY KEY, model TEXT, correct INTEGER, latency_ms REAL, confidence REAL)"
+)
 conn.executemany(
     "INSERT INTO predictions (model, correct, latency_ms, confidence) VALUES (?, ?, ?, ?)",
     [
@@ -112,14 +115,17 @@ aggregation. You cannot put per-group conditions in WHERE — the group
 does not exist yet.
 
 ```python
-rows = conn.execute("""
+rows = conn.execute(
+    """
     SELECT model, COUNT(*) AS n
     FROM predictions
     WHERE latency_ms < ?      -- filters rows FIRST
     GROUP BY model
     HAVING COUNT(*) >= ?      -- filters groups AFTER
     ORDER BY model
-""", (32.0, 2)).fetchall()
+""",
+    (32.0, 2),
+).fetchall()
 print(rows)
 ```
 
@@ -137,7 +143,7 @@ raises an error. Write portable SQL: keys + aggregates only.
 row = conn.execute(
     "SELECT model, latency_ms FROM predictions GROUP BY model ORDER BY model"
 ).fetchall()
-print(row)   # latency_ms is ARBITRARY here
+print(row)  # latency_ms is ARBITRARY here
 ```
 
 ```

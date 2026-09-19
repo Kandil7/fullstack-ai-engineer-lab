@@ -4,6 +4,7 @@ W3Schools: https://www.w3schools.com/python/pandas_dataframe_add_column.asp
 
 There are several ways to add a new column to a DataFrame.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -11,12 +12,14 @@ import numpy as np
 # Sample data
 # ---------------------------------------------------------------------------
 
-df = pd.DataFrame({
-    "Product": ["Laptop", "Phone", "Tablet", "Monitor", "Keyboard"],
-    "Price": [999.99, 699.99, 449.99, 299.99, 129.99],
-    "Quantity": [10, 25, 40, 15, 50],
-    "Category": ["Electronics", "Electronics", "Electronics", "Peripherals", "Peripherals"],
-})
+df = pd.DataFrame(
+    {
+        "Product": ["Laptop", "Phone", "Tablet", "Monitor", "Keyboard"],
+        "Price": [999.99, 699.99, 449.99, 299.99, 129.99],
+        "Quantity": [10, 25, 40, 15, 50],
+        "Category": ["Electronics", "Electronics", "Electronics", "Peripherals", "Peripherals"],
+    }
+)
 
 print("Original DataFrame:")
 print(df)
@@ -59,6 +62,7 @@ print("=" * 60)
 print("Example 3: Column using apply()")
 print("=" * 60)
 
+
 def price_tier(price):
     """Assign a tier based on price."""
     if price >= 800:
@@ -67,6 +71,7 @@ def price_tier(price):
         return "Mid-Range"
     else:
         return "Budget"
+
 
 df["Tier"] = df["Price"].apply(price_tier)
 print("Added 'Tier' column via apply():")
@@ -82,9 +87,7 @@ print("Example 4: np.where() for Conditional Column")
 print("=" * 60)
 
 df["Volume_Label"] = np.where(
-    df["Quantity"] >= 30,
-    "High",
-    np.where(df["Quantity"] >= 20, "Medium", "Low")
+    df["Quantity"] >= 30, "High", np.where(df["Quantity"] >= 20, "Medium", "Low")
 )
 print("Volume labels:")
 print(df[["Product", "Quantity", "Volume_Label"]])
@@ -112,12 +115,9 @@ print("=" * 60)
 print("Example 6: assign() Method (Chainable)")
 print("=" * 60)
 
-df_assigned = (
-    df[["Product", "Price", "Quantity"]]
-    .assign(
-        Discount=lambda x: x["Price"] * 0.10,
-        Final_Price=lambda x: x["Price"] * 0.90,
-    )
+df_assigned = df[["Product", "Price", "Quantity"]].assign(
+    Discount=lambda x: x["Price"] * 0.10,
+    Final_Price=lambda x: x["Price"] * 0.90,
 )
 print("Using assign() (chainable, non-mutating):")
 print(df_assigned)

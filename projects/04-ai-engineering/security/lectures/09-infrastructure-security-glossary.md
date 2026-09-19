@@ -140,10 +140,16 @@ class ContainerSecurityBestPractices:
         if "USER root" in dockerfile_content:
             issues.append("Running as root user")
 
-        if "COPY . ." in dockerfile_content and ".dockerignore" not in dockerfile_content:
+        if (
+            "COPY . ." in dockerfile_content
+            and ".dockerignore" not in dockerfile_content
+        ):
             issues.append("No .dockerignore file")
 
-        if "--no-cache" not in dockerfile_content and "apt-get install" in dockerfile_content:
+        if (
+            "--no-cache" not in dockerfile_content
+            and "apt-get install" in dockerfile_content
+        ):
             issues.append("Package cache not cleaned")
 
         return issues
@@ -162,6 +168,7 @@ class ContainerSecurityBestPractices:
 from cryptography.fernet import Fernet
 import json
 
+
 class EncryptionAtRest:
     """Encrypt data at rest."""
 
@@ -171,20 +178,20 @@ class EncryptionAtRest:
 
     def encrypt_file(self, file_path: str) -> str:
         """Encrypt a file."""
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             data = f.read()
 
         encrypted = self.cipher.encrypt(data)
 
         encrypted_path = file_path + ".encrypted"
-        with open(encrypted_path, 'wb') as f:
+        with open(encrypted_path, "wb") as f:
             f.write(encrypted)
 
         return encrypted_path
 
     def decrypt_file(self, encrypted_path: str) -> bytes:
         """Decrypt a file."""
-        with open(encrypted_path, 'rb') as f:
+        with open(encrypted_path, "rb") as f:
             encrypted = f.read()
 
         return self.cipher.decrypt(encrypted)
@@ -196,6 +203,7 @@ class EncryptionAtRest:
     def decrypt_database_field(self, encrypted_value: str) -> str:
         """Decrypt a database field."""
         return self.cipher.decrypt(encrypted_value.encode()).decode()
+
 
 # Usage
 encryption = EncryptionAtRest()
@@ -215,6 +223,7 @@ decrypted = encryption.decrypt_database_field(encrypted)
 ```python
 import ssl
 import httpx
+
 
 class EncryptionInTransit:
     """Ensure data is encrypted in transit."""
@@ -258,8 +267,16 @@ class EncryptionInTransit:
 class FirewallRule:
     """Firewall rule definition."""
 
-    def __init__(self, name: str, direction: str, action: str,
-                 protocol: str, port: int, source: str, destination: str):
+    def __init__(
+        self,
+        name: str,
+        direction: str,
+        action: str,
+        protocol: str,
+        port: int,
+        source: str,
+        destination: str,
+    ):
         self.name = name
         self.direction = direction  # inbound or outbound
         self.action = action  # allow or deny
@@ -267,6 +284,7 @@ class FirewallRule:
         self.port = port
         self.source = source
         self.destination = destination
+
 
 class FirewallConfig:
     """Firewall configuration."""
@@ -280,10 +298,12 @@ class FirewallConfig:
     def check_traffic(self, traffic: dict) -> dict:
         """Check if traffic is allowed by rules."""
         for rule in self.rules:
-            if (rule.direction == traffic["direction"] and
-                rule.protocol == traffic["protocol"] and
-                rule.port == traffic["port"] and
-                self._match_cidr(traffic["source"], rule.source)):
+            if (
+                rule.direction == traffic["direction"]
+                and rule.protocol == traffic["protocol"]
+                and rule.port == traffic["port"]
+                and self._match_cidr(traffic["source"], rule.source)
+            ):
                 return {"allowed": rule.action == "allow"}
 
         return {"allowed": False}  # Default deny
@@ -291,22 +311,26 @@ class FirewallConfig:
     def _match_cidr(self, ip: str, cidr: str) -> bool:
         """Check if IP matches CIDR range."""
         import ipaddress
+
         try:
             return ipaddress.ip_address(ip) in ipaddress.ip_network(cidr)
         except ValueError:
             return False
 
+
 # Usage
 firewall = FirewallConfig()
-firewall.add_rule(FirewallRule(
-    name="allow-https",
-    direction="inbound",
-    action="allow",
-    protocol="tcp",
-    port=443,
-    source="0.0.0.0/0",
-    destination="10.0.1.0/24"
-))
+firewall.add_rule(
+    FirewallRule(
+        name="allow-https",
+        direction="inbound",
+        action="allow",
+        protocol="tcp",
+        port=443,
+        source="0.0.0.0/0",
+        destination="10.0.1.0/24",
+    )
+)
 ```
 
 **Related Terms**: Network Security, Security Group, Access Control List
@@ -325,17 +349,20 @@ class IAMPolicy:
     def __init__(self):
         self.policies = []
 
-    def create_policy(self, name: str, effect: str,
-                      actions: list, resources: list) -> dict:
+    def create_policy(
+        self, name: str, effect: str, actions: list, resources: list
+    ) -> dict:
         """Create an IAM policy."""
         policy = {
             "version": "2012-10-17",
-            "statement": [{
-                "sid": name,
-                "effect": effect,
-                "action": actions,
-                "resource": resources,
-            }]
+            "statement": [
+                {
+                    "sid": name,
+                    "effect": effect,
+                    "action": actions,
+                    "resource": resources,
+                }
+            ],
         }
         self.policies.append(policy)
         return policy
@@ -347,17 +374,22 @@ class IAMPolicy:
         for statement in policy.get("statement", []):
             if statement.get("effect") == "Allow":
                 if "*" in statement.get("action", []):
-                    issues.append({
-                        "severity": "high",
-                        "issue": "Wildcard action in Allow policy",
-                    })
+                    issues.append(
+                        {
+                            "severity": "high",
+                            "issue": "Wildcard action in Allow policy",
+                        }
+                    )
                 if "*" in statement.get("resource", []):
-                    issues.append({
-                        "severity": "high",
-                        "issue": "Wildcard resource in Allow policy",
-                    })
+                    issues.append(
+                        {
+                            "severity": "high",
+                            "issue": "Wildcard resource in Allow policy",
+                        }
+                    )
 
         return issues
+
 
 # Usage
 iam = IAMPolicy()
@@ -365,7 +397,7 @@ policy = iam.create_policy(
     name="s3-read",
     effect="Allow",
     actions=["s3:GetObject"],
-    resources=["arn:aws:s3:::my-bucket/*"]
+    resources=["arn:aws:s3:::my-bucket/*"],
 )
 ```
 
@@ -395,9 +427,7 @@ class KubernetesSecurityConfig:
             "containerSecurityContext": {
                 "allowPrivilegeEscalation": False,
                 "readOnlyRootFilesystem": True,
-                "capabilities": {
-                    "drop": ["ALL"]
-                },
+                "capabilities": {"drop": ["ALL"]},
             },
             "resources": {
                 "limits": {
@@ -407,7 +437,7 @@ class KubernetesSecurityConfig:
                 "requests": {
                     "cpu": "500m",
                     "memory": "256Mi",
-                }
+                },
             },
         }
 
@@ -417,13 +447,8 @@ class KubernetesSecurityConfig:
         return {
             "apiVersion": "networking.k8s.io/v1",
             "kind": "NetworkPolicy",
-            "metadata": {
-                "name": "default-deny-ingress"
-            },
-            "spec": {
-                "podSelector": {},
-                "policyTypes": ["Ingress"]
-            }
+            "metadata": {"name": "default-deny-ingress"},
+            "spec": {"podSelector": {}, "policyTypes": ["Ingress"]},
         }
 ```
 
@@ -443,8 +468,7 @@ class NetworkSegmentation:
     def __init__(self):
         self.segments = {}
 
-    def create_segment(self, name: str, cidr: str,
-                       description: str = ""):
+    def create_segment(self, name: str, cidr: str, description: str = ""):
         """Create a network segment."""
         self.segments[name] = {
             "cidr": cidr,
@@ -452,17 +476,17 @@ class NetworkSegmentation:
             "allowed_communications": [],
         }
 
-    def allow_communication(self, segment1: str, segment2: str,
-                           ports: list):
+    def allow_communication(self, segment1: str, segment2: str, ports: list):
         """Allow communication between segments."""
         if segment1 in self.segments:
-            self.segments[segment1]["allowed_communications"].append({
-                "target": segment2,
-                "ports": ports,
-            })
+            self.segments[segment1]["allowed_communications"].append(
+                {
+                    "target": segment2,
+                    "ports": ports,
+                }
+            )
 
-    def check_communication(self, source: str, destination: str,
-                           port: int) -> bool:
+    def check_communication(self, source: str, destination: str, port: int) -> bool:
         """Check if communication is allowed."""
         if source not in self.segments:
             return False
@@ -472,6 +496,7 @@ class NetworkSegmentation:
                 return True
 
         return False
+
 
 # Usage
 network = NetworkSegmentation()
@@ -499,16 +524,17 @@ class SBOMGenerator:
     def __init__(self):
         self.components = []
 
-    def add_component(self, name: str, version: str,
-                      supplier: str, license: str):
+    def add_component(self, name: str, version: str, supplier: str, license: str):
         """Add a component to SBOM."""
-        self.components.append({
-            "name": name,
-            "version": version,
-            "supplier": supplier,
-            "license": license,
-            "hash": self._compute_hash(name, version),
-        })
+        self.components.append(
+            {
+                "name": name,
+                "version": version,
+                "supplier": supplier,
+                "license": license,
+                "hash": self._compute_hash(name, version),
+            }
+        )
 
     def generate_sbom(self) -> dict:
         """Generate SBOM document."""
@@ -526,6 +552,7 @@ class SBOMGenerator:
     def _compute_hash(self, name: str, version: str) -> str:
         """Compute component hash."""
         import hashlib
+
         return hashlib.sha256(f"{name}:{version}".encode()).hexdigest()
 
     def _generate_relationships(self) -> list:
@@ -553,8 +580,7 @@ class SecretsManager:
         self.secrets = {}
         self.access_log = []
 
-    def store_secret(self, name: str, value: str,
-                     metadata: dict = None) -> bool:
+    def store_secret(self, name: str, value: str, metadata: dict = None) -> bool:
         """Store a secret securely."""
         import hashlib
         from datetime import datetime
@@ -587,11 +613,14 @@ class SecretsManager:
     def _log_access(self, name: str, action: str):
         """Log secret access."""
         from datetime import datetime
-        self.access_log.append({
-            "timestamp": datetime.utcnow().isoformat(),
-            "secret": name,
-            "action": action,
-        })
+
+        self.access_log.append(
+            {
+                "timestamp": datetime.utcnow().isoformat(),
+                "secret": name,
+                "action": action,
+            }
+        )
 ```
 
 **Related Terms**: Key Management, Vault, Credential Rotation
@@ -612,34 +641,42 @@ class SecurityGroup:
         self.ingress_rules = []
         self.egress_rules = []
 
-    def add_ingress_rule(self, port: int, protocol: str,
-                         source: str, description: str = ""):
+    def add_ingress_rule(
+        self, port: int, protocol: str, source: str, description: str = ""
+    ):
         """Add an ingress rule."""
-        self.ingress_rules.append({
-            "port": port,
-            "protocol": protocol,
-            "source": source,
-            "description": description,
-        })
+        self.ingress_rules.append(
+            {
+                "port": port,
+                "protocol": protocol,
+                "source": source,
+                "description": description,
+            }
+        )
 
-    def add_egress_rule(self, port: int, protocol: str,
-                        destination: str, description: str = ""):
+    def add_egress_rule(
+        self, port: int, protocol: str, destination: str, description: str = ""
+    ):
         """Add an egress rule."""
-        self.egress_rules.append({
-            "port": port,
-            "protocol": protocol,
-            "destination": destination,
-            "description": description,
-        })
+        self.egress_rules.append(
+            {
+                "port": port,
+                "protocol": protocol,
+                "destination": destination,
+                "description": description,
+            }
+        )
 
-    def check_access(self, direction: str, port: int,
-                     source_or_dest: str) -> bool:
+    def check_access(self, direction: str, port: int, source_or_dest: str) -> bool:
         """Check if access is allowed."""
         rules = self.ingress_rules if direction == "inbound" else self.egress_rules
 
         for rule in rules:
             if rule["port"] == port or rule["port"] == -1:  # -1 = all ports
-                if self._match_cidr(source_or_dest, rule["source" if direction == "inbound" else "destination"]):
+                if self._match_cidr(
+                    source_or_dest,
+                    rule["source" if direction == "inbound" else "destination"],
+                ):
                     return True
 
         return False
@@ -647,6 +684,7 @@ class SecurityGroup:
     def _match_cidr(self, ip: str, cidr: str) -> bool:
         """Check if IP matches CIDR."""
         import ipaddress
+
         try:
             return ipaddress.ip_address(ip) in ipaddress.ip_network(cidr)
         except ValueError:
@@ -725,8 +763,7 @@ class ZeroTrustArchitecture:
             "antivirus": True,
         }
 
-    def evaluate_access(self, user_id: str, resource: str,
-                        context: dict) -> dict:
+    def evaluate_access(self, user_id: str, resource: str, context: dict) -> dict:
         """Evaluate access request with zero trust."""
         # Verify identity
         if not self.verify_identity(user_id, context.get("mfa_verified", False)):

@@ -182,7 +182,10 @@ async def rate_limited_endpoint():
     """
     async with semaphore:
         await asyncio.sleep(1)
-        return {"message": "Processed within concurrency limit", "timestamp": datetime.now().isoformat()}
+        return {
+            "message": "Processed within concurrency limit",
+            "timestamp": datetime.now().isoformat(),
+        }
 
 
 """
@@ -202,6 +205,7 @@ Testing with curl:
     # Load test concurrency:
     for i in $(seq 1 10); do curl http://127.0.0.1:8000/rate-limited/ & done; wait
 """
+
 
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server).
@@ -236,6 +240,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

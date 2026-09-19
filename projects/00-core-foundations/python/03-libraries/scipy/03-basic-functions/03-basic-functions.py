@@ -12,11 +12,17 @@ Topics:
 """
 
 import numpy as np
+
 # Ensure output directory exists (Tier 0 fix: Windows + CI)
 import os
-os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
+os.makedirs(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy",
+    exist_ok=True,
+)
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -29,10 +35,12 @@ print("=" * 60)
 
 from scipy.optimize import brentq, fsolve
 
+
 # brentq finds a root of f(x) = 0 in interval [a, b]
 # Example: Find where x^3 - 2x - 5 = 0
 def f(x):
-    return x**3 - 2*x - 5
+    return x**3 - 2 * x - 5
+
 
 # Plot to see where the root is
 x_vals = np.linspace(-2, 3, 500)
@@ -55,20 +63,27 @@ print(f"Verification: f({root:.6f}) = {f(root):.2e}")
 ax.plot(root, f(root), "ro", markersize=10, label=f"Root â‰ˆ {root:.4f}")
 ax.legend()
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_roots.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_roots.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_roots.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_roots.png"
+)
+
 
 # System of nonlinear equations with fsolve
 def system(vars):
     x, y = vars
-    eq1 = x**2 + y**2 - 4    # Circle radius 2
-    eq2 = x - y - 1           # Line
+    eq1 = x**2 + y**2 - 4  # Circle radius 2
+    eq2 = x - y - 1  # Line
     return [eq1, eq2]
+
 
 solution = fsolve(system, [1, 0])
 print(f"\nIntersection of x^2+y^2=4 and x-y=1:")
 print(f"  Solution: x={solution[0]:.4f}, y={solution[1]:.4f}")
-print(f"  Verify eq1: {solution[0]**2 + solution[1]**2:.4f} (should be 4)")
+print(f"  Verify eq1: {solution[0] ** 2 + solution[1] ** 2:.4f} (should be 4)")
 print(f"  Verify eq2: {solution[0] - solution[1]:.4f} (should be 1)")
 
 # ============================================================
@@ -80,6 +95,7 @@ print("=" * 60)
 
 from scipy.optimize import approx_fprime
 
+
 # Custom numerical derivative using finite differences (replaces deprecated scipy.misc.derivative)
 def numerical_derivative(func, x0, dx=1e-5, n=1):
     """Compute nth derivative using central finite differences."""
@@ -90,9 +106,11 @@ def numerical_derivative(func, x0, dx=1e-5, n=1):
     else:
         raise ValueError(f"Only n=1,2 supported, got n={n}")
 
+
 # Compute derivatives of f(x) = sin(x)
 def g(x):
     return np.sin(x)
+
 
 x0 = np.pi / 4  # 45 degrees
 
@@ -109,7 +127,7 @@ print(f"  Numerical:  {d2:.6f}")
 print(f"  Analytical: {-np.sin(x0):.6f}")
 
 # Compare derivatives at multiple points
-x_pts = np.linspace(0, 2*np.pi, 200)
+x_pts = np.linspace(0, 2 * np.pi, 200)
 numerical_d1 = [numerical_derivative(g, x, dx=1e-6, n=1) for x in x_pts]
 
 fig, ax = plt.subplots(figsize=(8, 4))
@@ -121,8 +139,13 @@ ax.set_xlabel("x")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_derivative.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_derivative.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_derivative.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_derivative.png"
+)
 
 # ============================================================
 # Example 3: Spatial Distance Calculations
@@ -148,7 +171,7 @@ metrics = ["euclidean", "cityblock", "cosine", "correlation"]
 print("\nDistance from A[0]=[0,0] to A[3]=[1,1] using different metrics:")
 for m in metrics:
     d = cdist(points_A[:1], points_A[3:], metric=m)
-    print(f"  {m:<15s}: {d[0,0]:.4f}")
+    print(f"  {m:<15s}: {d[0, 0]:.4f}")
 
 # Pairwise distances within a set
 pairwise = pdist(points_A, metric="euclidean")
@@ -168,7 +191,7 @@ from scipy.ndimage import gaussian_filter1d, gaussian_filter
 
 # Create noisy 1D signal
 np.random.seed(42)
-x = np.linspace(0, 4*np.pi, 200)
+x = np.linspace(0, 4 * np.pi, 200)
 signal_clean = np.sin(x) * np.exp(-0.2 * x)
 signal_noisy = signal_clean + np.random.normal(0, 0.2, len(x))
 
@@ -186,8 +209,13 @@ ax.set_xlabel("x")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_smoothing.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_smoothing.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_smoothing.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_smoothing.png"
+)
 
 # 2D Gaussian filter example
 image = np.random.rand(100, 100)
@@ -202,8 +230,13 @@ im1 = axes[1].imshow(image_smooth, cmap="viridis")
 axes[1].set_title("After Gaussian Filter (Ïƒ=5)")
 plt.colorbar(im1, ax=axes[1], shrink=0.8)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_2d_filter.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_2d_filter.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_2d_filter.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_03_2d_filter.png"
+)
 
 # ============================================================
 # Example 5: Quick Optimization (minimize a function)
@@ -214,20 +247,23 @@ print("=" * 60)
 
 from scipy.optimize import minimize
 
+
 # Minimize the Rosenbrock function (classic optimization test)
 # f(x,y) = (1-x)^2 + 100*(y-x^2)^2
 def rosenbrock(xy):
     x, y = xy
-    return (1 - x)**2 + 100 * (y - x**2)**2
+    return (1 - x) ** 2 + 100 * (y - x**2) ** 2
+
 
 # Start from different initial guesses
 starts = [(-1, 1), (2, -1), (0.5, 0.5)]
 print("Rosenbrock function minimum (true min at x=1, y=1):")
 for start in starts:
     result = minimize(rosenbrock, start, method="L-BFGS-B")
-    print(f"  Start {start} -> x={result.x[0]:.6f}, y={result.x[1]:.6f}, "
-          f"f={result.fun:.2e}, iters={result.nit}")
+    print(
+        f"  Start {start} -> x={result.x[0]:.6f}, y={result.x[1]:.6f}, "
+        f"f={result.fun:.2e}, iters={result.nit}"
+    )
 
 print("\n[OK] Basic SciPy functions covered!")
 print("   Next: 04-statistics.py for statistical analysis.")
-

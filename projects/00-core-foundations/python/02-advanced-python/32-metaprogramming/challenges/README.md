@@ -57,8 +57,10 @@ imports a module dynamically and returns it.
 TOOLS: dict[str, Callable] = {}
 TOOL_SCHEMAS: dict[str, dict] = {}
 
-def tool(fn) -> Callable: ...              # register + schema
-def load_plugin(module_name: str): ...     # importlib
+
+def tool(fn) -> Callable: ...  # register + schema
+def load_plugin(module_name: str): ...  # importlib
+
 
 @tool
 def search(query: str, top_k: int = 5) -> list[str]:

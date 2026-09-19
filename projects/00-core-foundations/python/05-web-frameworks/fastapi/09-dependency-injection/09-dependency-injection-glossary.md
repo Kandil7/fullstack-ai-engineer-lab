@@ -40,19 +40,22 @@ def get_db_session():
     finally:
         session.close()
 
-def get_current_user(db = Depends(get_db_session)):
+
+def get_current_user(db=Depends(get_db_session)):
     """Level 2: Depends on get_db_session."""
     user = db.query(User).first()
     if not user:
         raise HTTPException(401, "Not authenticated")
     return user
 
-def get_permissions(user = Depends(get_current_user)):
+
+def get_permissions(user=Depends(get_current_user)):
     """Level 3: Depends on get_current_user."""
     return get_user_permissions(user.id)
 
+
 @app.get("/admin/")
-def admin(perms = Depends(get_permissions)):
+def admin(perms=Depends(get_permissions)):
     """Resolution: get_db_session → get_current_user → get_permissions"""
     if "admin" not in perms:
         raise HTTPException(403, "Not admin")
@@ -77,11 +80,13 @@ def admin(perms = Depends(get_permissions)):
 ```python
 class PaginationParams:
     """Class-based dependency for pagination."""
+
     def __init__(self, page: int = 1, page_size: int = 20):
         self.page = max(1, page)
         self.page_size = min(max(1, page_size), 100)
         self.offset = (self.page - 1) * self.page_size
         self.limit = self.page_size
+
 
 @app.get("/items/")
 def list_items(params: PaginationParams = Depends()):
@@ -91,6 +96,7 @@ def list_items(params: PaginationParams = Depends()):
         "offset": params.offset,
         "limit": params.limit,
     }
+
 
 # GET /items/?page=2&page_size=10
 # params.page = 2, params.offset = 10, params.limit = 10
@@ -119,8 +125,9 @@ def get_db():
     finally:
         session.close()  # Cleanup — always runs
 
+
 @app.get("/users/")
-def list_users(db = Depends(get_db)):
+def list_users(db=Depends(get_db)):
     return db.query(User).all()
     # After response: session.close() is called
 ```
@@ -142,17 +149,21 @@ def list_users(db = Depends(get_db)):
 ```python
 from fastapi import Depends
 
+
 # Simple dependency
 def get_settings():
     return {"debug": True}
+
 
 @app.get("/settings/")
 def read_settings(settings: dict = Depends(get_settings)):
     return settings
 
+
 # Dependency with parameters
 def get_pagination(skip: int = 0, limit: int = 10):
     return {"skip": skip, "limit": limit}
+
 
 @app.get("/items/")
 def list_items(pagination: dict = Depends(get_pagination)):
@@ -180,6 +191,7 @@ Depends(dependency=None, use_cache=True)
 def get_db():
     return create_database_connection()
 
+
 # Yield dependency with cleanup
 def get_db_session():
     session = Session()
@@ -188,6 +200,7 @@ def get_db_session():
     finally:
         session.close()
 
+
 # Auth dependency
 def verify_token(authorization: str = Header(...)):
     token = authorization.replace("Bearer ", "")
@@ -195,10 +208,11 @@ def verify_token(authorization: str = Header(...)):
         raise HTTPException(401, "Invalid token")
     return token
 
+
 # Using dependencies
 @app.get("/users/")
 def list_users(
-    db = Depends(get_db),
+    db=Depends(get_db),
     token: str = Depends(verify_token),
 ):
     return db.query(User).all()
@@ -230,8 +244,9 @@ def list_users():
 def get_db():
     return create_database_connection()
 
+
 @app.get("/users/")
-def list_users(db = Depends(get_db)):  # Injected from outside
+def list_users(db=Depends(get_db)):  # Injected from outside
     return db.query(User).all()
 ```
 
@@ -259,9 +274,11 @@ def get_db():
     finally:
         session.close()
 
+
 # Fake dependency for testing
 def fake_get_db():
     return {"connected": True, "test": True, "users": []}
+
 
 # In test
 def test_get_users():
@@ -300,23 +317,33 @@ client = TestClient(app, dependencies=[Depends(fake_get_db)])
 # WITHOUT DRY: Repeated pagination logic
 @app.get("/products/")
 def list_products(skip: int = 0, limit: int = 10):
-    return {"skip": skip, "limit": limit, "items": products[skip:skip+limit]}
+    return {"skip": skip, "limit": limit, "items": products[skip : skip + limit]}
+
 
 @app.get("/categories/")
 def list_categories(skip: int = 0, limit: int = 10):
-    return {"skip": skip, "limit": limit, "items": categories[skip:skip+limit]}
+    return {"skip": skip, "limit": limit, "items": categories[skip : skip + limit]}
+
 
 # WITH DRY: Reusable dependency
 def get_pagination(skip: int = 0, limit: int = 10):
     return {"skip": skip, "limit": limit}
 
+
 @app.get("/products/")
 def list_products(pagination: dict = Depends(get_pagination)):
-    return {"pagination": pagination, "items": products[pagination["skip"]:pagination["skip"]+pagination["limit"]]}
+    return {
+        "pagination": pagination,
+        "items": products[pagination["skip"] : pagination["skip"] + pagination["limit"]],
+    }
+
 
 @app.get("/categories/")
 def list_categories(pagination: dict = Depends(get_pagination)):
-    return {"pagination": pagination, "items": categories[pagination["skip"]:pagination["skip"]+pagination["limit"]]}
+    return {
+        "pagination": pagination,
+        "items": categories[pagination["skip"] : pagination["skip"] + pagination["limit"]],
+    }
 ```
 
 **Related terms:** Dependency, Reuse, Code Quality
@@ -337,6 +364,7 @@ def get_db():
     finally:
         db.close()
 
+
 def verify_auth(authorization: str = Header(...)):
     """Function dependency with parameter extraction."""
     token = authorization.replace("Bearer ", "")
@@ -344,10 +372,11 @@ def verify_auth(authorization: str = Header(...)):
         raise HTTPException(401, "Invalid token")
     return decode_token(token)
 
+
 @app.get("/users/")
 def list_users(
-    db = Depends(get_db),
-    user = Depends(verify_auth),
+    db=Depends(get_db),
+    user=Depends(verify_auth),
 ):
     return db.query(User).all()
 ```
@@ -370,6 +399,7 @@ def list_users(
 ```python
 from fastapi import Header, HTTPException
 
+
 def verify_token(authorization: str = Header(...)):
     """Extract and validate Authorization header."""
     if not authorization.startswith("Bearer "):
@@ -379,15 +409,18 @@ def verify_token(authorization: str = Header(...)):
         raise HTTPException(status_code=401, detail="Invalid token")
     return token
 
+
 def verify_api_key(x_api_key: str = Header(...)):
     """Extract and validate X-Api-Key header."""
     if x_api_key != "my-secret-key":
         raise HTTPException(status_code=403, detail="Invalid API key")
     return x_api_key
 
+
 @app.get("/protected/")
 def protected(token: str = Depends(verify_token)):
     return {"message": "Access granted"}
+
 
 @app.get("/admin/")
 def admin(
@@ -395,6 +428,7 @@ def admin(
     api_key: str = Depends(verify_api_key),
 ):
     return {"admin": True}
+
 
 # curl -H "Authorization: Bearer valid-token-123" http://localhost:8000/protected/
 # curl -H "Authorization: Bearer valid-token-123" -H "X-Api-Key: my-secret-key" http://localhost:8000/admin/
@@ -461,6 +495,7 @@ def get_db():
         # CLEANUP: Release resource
         session.disconnect()
 
+
 def get_cache():
     # SETUP: Initialize cache
     cache = RedisCache()
@@ -485,6 +520,7 @@ def get_cache():
 ```python
 from fastapi import Depends
 
+
 def get_db():
     """Database session with automatic cleanup."""
     session = create_session()
@@ -492,6 +528,7 @@ def get_db():
         yield session  # Value passed to endpoint
     finally:
         session.close()  # Cleanup runs automatically
+
 
 def get_cache():
     """Cache with lifecycle management."""
@@ -503,8 +540,9 @@ def get_cache():
         cache.clear()  # Cache cleared after request
         print("Cache cleared")
 
+
 @app.get("/users/")
-def list_users(db = Depends(get_db), cache = Depends(get_cache)):
+def list_users(db=Depends(get_db), cache=Depends(get_cache)):
     if "users" not in cache:
         cache["users"] = db.query(User).all()
     return cache["users"]
@@ -515,6 +553,7 @@ def list_users(db = Depends(get_db), cache = Depends(get_cache)):
 # Return dependency: No cleanup
 def get_config():
     return {"debug": True}
+
 
 # Yield dependency: With cleanup
 def get_db():
@@ -544,6 +583,7 @@ def get_db():
 def get_settings():
     return {"debug": True}
 
+
 @app.get("/settings/")
 def read_settings(settings: dict = Depends(get_settings)):
     return settings
@@ -558,8 +598,9 @@ def get_db():
     finally:
         db.close()
 
+
 @app.get("/users/")
-def list_users(db = Depends(get_db)):
+def list_users(db=Depends(get_db)):
     return db.query(User).all()
 ```
 
@@ -571,8 +612,9 @@ def verify_token(authorization: str = Header(...)):
         raise HTTPException(401, "Invalid token")
     return decode_token(token)
 
+
 @app.get("/protected/")
-def protected(user = Depends(verify_token)):
+def protected(user=Depends(verify_token)):
     return {"user": user}
 ```
 
@@ -580,6 +622,7 @@ def protected(user = Depends(verify_token)):
 ```python
 def get_pagination(skip: int = 0, limit: int = 10):
     return {"skip": skip, "limit": limit}
+
 
 @app.get("/items/")
 def list_items(pagination: dict = Depends(get_pagination)):
@@ -591,11 +634,13 @@ def list_items(pagination: dict = Depends(get_pagination)):
 def get_db():
     yield create_session()
 
-def get_user(db = Depends(get_db)):
+
+def get_user(db=Depends(get_db)):
     return db.query(User).first()
 
+
 @app.get("/profile/")
-def profile(user = Depends(get_user)):
+def profile(user=Depends(get_user)):
     return {"username": user.username}
 ```
 
@@ -605,7 +650,7 @@ def profile(user = Depends(get_user)):
 def admin(
     token: str = Depends(verify_token),
     api_key: str = Depends(verify_api_key),
-    db = Depends(get_db),
+    db=Depends(get_db),
 ):
     return {"admin": True}
 ```
@@ -614,6 +659,7 @@ def admin(
 ```python
 def fake_get_db():
     return {"test": True}
+
 
 def test_get_users():
     app.dependency_overrides[get_db] = fake_get_db

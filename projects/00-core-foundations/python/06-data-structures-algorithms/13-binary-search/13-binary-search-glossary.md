@@ -97,6 +97,7 @@ def binary_search(arr, target):
             right = mid - 1
     return -1
 
+
 # First Occurrence (Lower Bound)
 def find_first(arr, target):
     left, right = 0, len(arr) - 1
@@ -111,6 +112,7 @@ def find_first(arr, target):
         else:
             right = mid - 1
     return result
+
 
 # Last Occurrence (Upper Bound)
 def find_last(arr, target):
@@ -127,10 +129,12 @@ def find_last(arr, target):
             right = mid - 1
     return result
 
+
 # Python bisect Module
 import bisect
+
 arr = [1, 3, 3, 3, 5, 7]
-bisect.bisect_left(arr, 3)   # Returns 1 (first 3)
+bisect.bisect_left(arr, 3)  # Returns 1 (first 3)
 bisect.bisect_right(arr, 3)  # Returns 4 (after last 3)
 ```
 

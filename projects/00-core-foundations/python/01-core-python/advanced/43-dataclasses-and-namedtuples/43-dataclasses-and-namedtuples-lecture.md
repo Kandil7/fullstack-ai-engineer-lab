@@ -61,16 +61,18 @@ annotations:
 ```python
 from dataclasses import dataclass
 
+
 @dataclass
 class Config:
     lr: float
     batch: int
     seed: int = 0
 
+
 c1 = Config(1e-3, 32)
 c2 = Config(1e-3, 32)
-print(c1)            # Config(lr=0.001, batch=32, seed=0)
-print(c1 == c2)      # True — __eq__ compares fields
+print(c1)  # Config(lr=0.001, batch=32, seed=0)
+print(c1 == c2)  # True — __eq__ compares fields
 ```
 
 ## 2. Mutable Defaults — `field(default_factory=...)`
@@ -81,9 +83,10 @@ exists in dataclasses too — but the compiler refuses the naive form:
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Batch:
-    items: list[str] = field(default_factory=list)   # fresh list per instance
+    items: list[str] = field(default_factory=list)  # fresh list per instance
     scores: dict[str, float] = field(default_factory=dict)
 ```
 
@@ -103,13 +106,14 @@ class RetrievedChunk:
     score: float
     source: str
 
+
 chunk = RetrievedChunk("RAG stands for...", 0.92, "docs/rag.md")
 try:
     chunk.score = 0.99
 except Exception as e:
-    print(type(e).__name__)   # FrozenInstanceError
+    print(type(e).__name__)  # FrozenInstanceError
 
-chunks = {chunk, RetrievedChunk("x", 0.1, "y")}   # works — hashable
+chunks = {chunk, RetrievedChunk("x", 0.1, "y")}  # works — hashable
 ```
 
 This is the natural shape for cache keys and deduplication.
@@ -124,6 +128,7 @@ With `order=True` the dataclass implements the full comparison family
 class Hit:
     score: float
     doc_id: str
+
 
 hits = [Hit(0.5, "b"), Hit(0.9, "a"), Hit(0.5, "c")]
 print(sorted(hits))  # sorts by score, then doc_id
@@ -176,14 +181,16 @@ has zero overhead beyond the tuple itself. Perfect for small, frequent records:
 ```python
 from typing import NamedTuple
 
+
 class Token(NamedTuple):
     text: str
     id: int
     pos: int
 
+
 t = Token("the", 1, 0)
-text, tid, pos = t          # tuple unpacking works
-print(t.text, t[0])         # both attribute and index access
+text, tid, pos = t  # tuple unpacking works
+print(t.text, t[0])  # both attribute and index access
 ```
 
 **When to choose which:** NamedTuple when the record is small, immutable, and
@@ -197,6 +204,7 @@ contract for dicts that carry a fixed shape, exactly like JSON records:
 
 ```python
 from typing import TypedDict, NotRequired
+
 
 class LLMResponse(TypedDict):
     id: str
@@ -221,6 +229,7 @@ class ModelConfig:
         if self.batch_size < 1:
             raise ValueError("batch_size must be positive")
 
+
 cfg = ModelConfig("qwen2.5-7b", lr=3e-4)
 # Frozen + typed + validated at construction — safe to pass anywhere.
 ```
@@ -233,7 +242,9 @@ cfg = ModelConfig("qwen2.5-7b", lr=3e-4)
 # WRONG — compiler error, and correct: fields with defaults must come last
 @dataclass
 class A:
-    items: list = []          # ValueError: mutable default
+    items: list = []  # ValueError: mutable default
+
+
 # CORRECT
 @dataclass
 class A:
@@ -244,12 +255,16 @@ class A:
 
 ```python
 # WRONG — positional args invite silent mis-ordering
-Config(32, 1e-3)             # batch=32, lr=1e-3? or reversed?
+Config(32, 1e-3)  # batch=32, lr=1e-3? or reversed?
+
+
 # CORRECT
 @dataclass(kw_only=True)
 class Config:
     batch: int
     lr: float
+
+
 Config(batch=32, lr=1e-3)
 ```
 
@@ -267,7 +282,9 @@ chunk1 == chunk2
 # WRONG — frozen + mutable field (list) is still mutable inside
 @dataclass(frozen=True)
 class B:
-    items: list          # hash() will raise TypeError
+    items: list  # hash() will raise TypeError
+
+
 # CORRECT — use tuple, or keep it non-frozen
 ```
 

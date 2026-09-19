@@ -33,6 +33,7 @@ one value (sum, mean, count, first).
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"k": ["a", "a", "b"], "v": [1, 2, 3]})
 print(df.group_by("k").agg(pl.col("v").sum().alias("total")).sort("k").rows())
 ```
@@ -49,6 +50,7 @@ before aliasing.
 **Example**:
 ```python
 import polars as pl
+
 e = (pl.col("a") * 2).alias("double")
 print(e.meta.output_name())
 ```
@@ -63,6 +65,7 @@ is or, `~` is not. Python's `and`/`or` cannot be used on expressions.
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3]})
 print(df.filter((pl.col("a") > 1) & (pl.col("a") < 3)).rows())
 ```
@@ -77,6 +80,7 @@ expression evaluates True. Equivalent to pandas boolean masking.
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3, 4]})
 print(df.filter(pl.col("a") % 2 == 0).rows())
 ```
@@ -98,6 +102,7 @@ result back onto every row of the group — pandas `transform` equivalent.
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"k": ["a", "a", "b"], "v": [10, 20, 30]})
 out = df.with_columns((pl.col("v") / pl.col("v").sum().over("k")).alias("share"))
 print(out.rows())
@@ -114,6 +119,7 @@ The standard way to write expressions instead of using strings.
 **Example**:
 ```python
 import polars as pl
+
 e = pl.col("score") > 0.5
 print(type(e).__name__)
 ```
@@ -128,6 +134,7 @@ Expr
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"k": ["a", "a", "b"]})
 print(df.group_by("k").agg(pl.len()).sort("k").rows())
 ```
@@ -142,6 +149,7 @@ inside when/then or arithmetic.
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2]})
 print(df.with_columns(pl.lit("fixed").alias("tag")).rows())
 ```
@@ -162,6 +170,7 @@ evaluates the predicate elementwise and picks per row.
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"score": [0.9, 0.4, 0.7]})
 band = df.with_columns(
     pl.when(pl.col("score") >= 0.5).then(pl.lit("high")).otherwise(pl.lit("low")).alias("band")
@@ -179,6 +188,7 @@ named expressions, in order — computed or existing columns.
 **Example**:
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2], "b": [10, 20]})
 print(df.select((pl.col("b") / pl.col("a")).alias("ratio")).rows())
 ```
@@ -193,6 +203,7 @@ print(df.select((pl.col("b") / pl.col("a")).alias("ratio")).rows())
 **Example**:
 ```python
 import polars as pl
+
 s = pl.Series("v", [0.9, 0.4, 0.7])
 print(s.rank().to_list())
 ```
@@ -235,6 +246,7 @@ strategy expression.
 **Example**:
 ```python
 import polars as pl
+
 s = pl.Series("x", [1.0, None, 3.0])
 print(s.fill_null(0.0).to_list())
 ```

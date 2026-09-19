@@ -88,7 +88,7 @@ print(X[:5])
 print("\nStandardized (first 5 rows):")
 print(X_standardized[:5])
 print(f"\nStandardized mean: {X_standardized.mean(axis=0)}")  # ≈ [0, 0]
-print(f"Standardized std: {X_standardized.std(axis=0)}")       # ≈ [1, 1]
+print(f"Standardized std: {X_standardized.std(axis=0)}")  # ≈ [1, 1]
 ```
 
 ### Example 3: MinMaxScaler
@@ -102,7 +102,7 @@ X_normalized = scaler.fit_transform(X)
 print("Normalized (first 5 rows):")
 print(X_normalized[:5])
 print(f"\nNormalized min: {X_normalized.min(axis=0)}")  # [0, 0]
-print(f"Normalized max: {X_normalized.max(axis=0)}")     # [1, 1]
+print(f"Normalized max: {X_normalized.max(axis=0)}")  # [1, 1]
 ```
 
 ### Example 4: RobustScaler
@@ -162,10 +162,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
 
-pipe = Pipeline([
-    ('scaler', StandardScaler()),
-    ('model', LinearRegression())
-])
+pipe = Pipeline([("scaler", StandardScaler()), ("model", LinearRegression())])
 
 pipe.fit(X_train, y_train)
 r2 = r2_score(y_test, pipe.predict(X_test))

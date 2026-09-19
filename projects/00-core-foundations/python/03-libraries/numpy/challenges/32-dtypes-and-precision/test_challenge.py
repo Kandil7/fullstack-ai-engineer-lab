@@ -31,18 +31,16 @@ starter = _load("starter_32", os.path.join(HERE, "starter.py"))
 
 # ---------------------------------------------------------------- helpers
 
+
 def _assert_no_python_loops(mod):
     """Reject for/while loops and comprehensions in either module."""
     for name in ("starter", "solution"):
-        tree = ast.parse(
-            open(os.path.join(HERE, name + ".py"), encoding="utf-8").read()
-        )
+        tree = ast.parse(open(os.path.join(HERE, name + ".py"), encoding="utf-8").read())
         banned = [
             n
             for n in ast.walk(tree)
             if isinstance(
-                n, (ast.For, ast.While, ast.ListComp, ast.DictComp,
-                    ast.SetComp, ast.GeneratorExp)
+                n, (ast.For, ast.While, ast.ListComp, ast.DictComp, ast.SetComp, ast.GeneratorExp)
             )
         ]
         assert not banned, f"{name}.py contains Python loops/comprehensions"
@@ -75,12 +73,15 @@ def test_bronze_smallest_safe_dtype(values, dtype):
     assert np.array_equal(out.astype(np.int64), values.astype(np.int64))
 
 
-@pytest.mark.parametrize("low,high,dtype", [
-    (-128, 128, np.int8),
-    (-32768, 32768, np.int16),
-    (-(2**31), 2**31, np.int32),
-    (-(2**63), 2**63 - 1, np.int64),
-])
+@pytest.mark.parametrize(
+    "low,high,dtype",
+    [
+        (-128, 128, np.int8),
+        (-32768, 32768, np.int16),
+        (-(2**31), 2**31, np.int32),
+        (-(2**63), 2**63 - 1, np.int64),
+    ],
+)
 def test_bronze_random_ranges(low, high, dtype):
     rng = np.random.default_rng(42)
     values = rng.integers(low, high, size=50, dtype=np.int64)
@@ -98,6 +99,7 @@ def test_bronze_no_python_loops():
 
 
 # ---------------------------------------------------------------- silver
+
 
 def test_silver_basic_mixed_non_finite():
     X = np.array([1.0, np.nan, np.inf, -np.inf, 2.0])
@@ -146,6 +148,7 @@ def test_silver_no_python_loops():
 
 
 # ---------------------------------------------------------------- gold
+
 
 def _gold_weights(seed=42):
     """Normal weights shifted away from zero: avoids float16 subnormals,
@@ -204,6 +207,7 @@ def test_gold_no_python_loops():
 
 
 # ---------------------------------------------------------------- starter
+
 
 def test_starter_raises_not_implemented():
     with pytest.raises(NotImplementedError):

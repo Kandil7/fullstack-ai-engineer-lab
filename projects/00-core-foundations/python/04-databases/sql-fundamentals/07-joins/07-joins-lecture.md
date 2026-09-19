@@ -43,12 +43,15 @@ side disappear.
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)")
 conn.execute("CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER, amount REAL)")
 conn.executemany("INSERT INTO users (id, name) VALUES (?, ?)", [(1, "ada"), (2, "bob"), (3, "cyn")])
-conn.executemany("INSERT INTO orders (id, user_id, amount) VALUES (?, ?, ?)",
-                 [(1, 1, 100.0), (2, 1, 50.0), (3, 2, 75.0), (4, None, 25.0)])
+conn.executemany(
+    "INSERT INTO orders (id, user_id, amount) VALUES (?, ?, ?)",
+    [(1, 1, 100.0), (2, 1, 50.0), (3, 2, 75.0), (4, None, 25.0)],
+)
 rows = conn.execute("""
     SELECT u.name, o.amount
     FROM users u INNER JOIN orders o ON o.user_id = u.id
@@ -112,8 +115,10 @@ the same table appears twice with different aliases.
 
 ```python
 conn.execute("CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, manager_id INTEGER)")
-conn.executemany("INSERT INTO employees (id, name, manager_id) VALUES (?, ?, ?)",
-                 [(1, "ceo", None), (2, "eng1", 1), (3, "eng2", 1), (4, "intern", 2)])
+conn.executemany(
+    "INSERT INTO employees (id, name, manager_id) VALUES (?, ?, ?)",
+    [(1, "ceo", None), (2, "eng1", 1), (3, "eng2", 1), (4, "intern", 2)],
+)
 rows = conn.execute("""
     SELECT e.name AS employee, m.name AS manager
     FROM employees e
@@ -137,8 +142,10 @@ next; the WHERE and SELECT see the full joined row.
 
 ```python
 conn.execute("CREATE TABLE teams (id INTEGER PRIMARY KEY, name TEXT, user_id INTEGER)")
-conn.executemany("INSERT INTO teams (id, name, user_id) VALUES (?, ?, ?)",
-                 [(1, "ml", 1), (2, "backend", 1), (3, "data", 2)])
+conn.executemany(
+    "INSERT INTO teams (id, name, user_id) VALUES (?, ?, ?)",
+    [(1, "ml", 1), (2, "backend", 1), (3, "data", 2)],
+)
 rows = conn.execute("""
     SELECT u.name, t.name
     FROM users u
@@ -160,7 +167,11 @@ Joining users to teams on `user_id` where ada is in 2 teams yields 2 ada rows.
 That is correct for a 1-to-many; it is a BUG when you then SUM amounts.
 
 ```python
-print(conn.execute("SELECT COUNT(*) FROM users u INNER JOIN teams t ON t.user_id = u.id").fetchone()[0])
+print(
+    conn.execute("SELECT COUNT(*) FROM users u INNER JOIN teams t ON t.user_id = u.id").fetchone()[
+        0
+    ]
+)
 print(conn.execute("SELECT COUNT(*) FROM users CROSS JOIN teams").fetchone()[0])
 ```
 

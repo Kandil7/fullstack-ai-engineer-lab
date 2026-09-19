@@ -44,8 +44,7 @@ def assert_no_python_loops(func) -> None:
     tree = ast.parse(src)
     for node in ast.walk(tree):
         assert not isinstance(
-            node, (ast.For, ast.While, ast.ListComp, ast.SetComp,
-                   ast.DictComp, ast.GeneratorExp)
+            node, (ast.For, ast.While, ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)
         ), f"{func.__name__} must be vectorized: no Python loops"
 
 
@@ -106,8 +105,7 @@ class TestRowZscore:
         X = np.array([[1.0, 2.0, 3.0], [4.0, 4.0, 4.0]])
         out = solution.row_zscore(X)
         assert np.allclose(out[0], [-1.22474487, 0.0, 1.22474487])
-        assert np.array_equal(out[1], [0.0, 0.0, 0.0]), \
-            "zero-std rows must be zeroed, not nan"
+        assert np.array_equal(out[1], [0.0, 0.0, 0.0]), "zero-std rows must be zeroed, not nan"
 
     def test_random_rows_match_manual(self):
         rng = np.random.default_rng(7)
@@ -194,8 +192,7 @@ class TestPairwiseDistances:
         finally:
             tracemalloc.stop()
         assert out.shape == (2000, 2000)
-        assert peak < 200 * 1024 * 1024, \
-            f"peak memory {peak / 1e6:.0f} MB exceeds 200 MB limit"
+        assert peak < 200 * 1024 * 1024, f"peak memory {peak / 1e6:.0f} MB exceeds 200 MB limit"
 
     def test_no_python_loops(self):
         assert_no_python_loops(solution.pairwise_distances)

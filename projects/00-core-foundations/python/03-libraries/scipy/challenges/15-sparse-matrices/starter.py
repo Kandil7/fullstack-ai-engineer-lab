@@ -23,8 +23,7 @@ def sparse_dot(A, B) -> sp.csr_matrix:
     raise NotImplementedError
 
 
-def tfidf_retrieval(docs: list[str], query: str,
-                    top_k: int = 3) -> np.ndarray:
+def tfidf_retrieval(docs: list[str], query: str, top_k: int = 3) -> np.ndarray:
     """Top-k doc indices by cosine similarity over sparse TF-IDF."""
     raise NotImplementedError
 

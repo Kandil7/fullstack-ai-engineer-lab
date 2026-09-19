@@ -19,6 +19,7 @@ Representations:
 # 1. GRAPH REPRESENTATIONS
 # =============================================================================
 
+
 class Graph:
     """Graph using adjacency list"""
 
@@ -95,6 +96,7 @@ wg.display()
 # 2. ADJACENCY MATRIX
 # =============================================================================
 
+
 class AdjMatrixGraph:
     """Graph using adjacency matrix"""
 
@@ -126,7 +128,7 @@ class AdjMatrixGraph:
     def display(self):
         print(f"  {''.join(f'{v:>4}' for v in self.vertices)}")
         for i, v in enumerate(self.vertices):
-            row = ''.join(f'{self.matrix[i][j]:>4}' for j in range(self.n))
+            row = "".join(f"{self.matrix[i][j]:>4}" for j in range(self.n))
             print(f"{v}: {row}")
 
 
@@ -143,6 +145,7 @@ mg.display()
 # =============================================================================
 # 3. BFS (BREADTH-FIRST SEARCH)
 # =============================================================================
+
 
 def bfs(graph, start):
     """BFS traversal. O(V + E) time, O(V) space"""
@@ -162,6 +165,7 @@ def bfs(graph, start):
 
     return order
 
+
 print("\n=== BFS ===")
 print(f"BFS from A: {bfs(g, 'A')}")
 
@@ -169,6 +173,7 @@ print(f"BFS from A: {bfs(g, 'A')}")
 # =============================================================================
 # 4. DFS (DEPTH-FIRST SEARCH)
 # =============================================================================
+
 
 def dfs_recursive(graph, start, visited=None):
     """DFS using recursion. O(V + E) time, O(V) space"""
@@ -183,6 +188,7 @@ def dfs_recursive(graph, start, visited=None):
             order.extend(dfs_recursive(graph, neighbor, visited))
 
     return order
+
 
 def dfs_iterative(graph, start):
     """DFS using stack. O(V + E) time, O(V) space"""
@@ -201,6 +207,7 @@ def dfs_iterative(graph, start):
 
     return order
 
+
 print("\n=== DFS ===")
 print(f"DFS recursive from A: {dfs_recursive(g, 'A')}")
 print(f"DFS iterative from A: {dfs_iterative(g, 'A')}")
@@ -209,6 +216,7 @@ print(f"DFS iterative from A: {dfs_iterative(g, 'A')}")
 # =============================================================================
 # 5. CYCLE DETECTION
 # =============================================================================
+
 
 def has_cycle_undirected(graph):
     """Detect cycle in undirected graph. O(V + E)"""
@@ -229,6 +237,7 @@ def has_cycle_undirected(graph):
             if dfs(v, None):
                 return True
     return False
+
 
 def has_cycle_directed(graph):
     """Detect cycle in directed graph. O(V + E)"""
@@ -251,6 +260,7 @@ def has_cycle_directed(graph):
                 return True
     return False
 
+
 print("\n=== Cycle Detection ===")
 print(f"Undirected graph has cycle: {has_cycle_undirected(g)}")
 
@@ -265,6 +275,7 @@ print(f"Directed graph has cycle: {has_cycle_directed(cycle_graph)}")
 # =============================================================================
 # 6. SHORTEST PATH (BFS - UNWEIGHTED)
 # =============================================================================
+
 
 def shortest_path_bfs(graph, start, end):
     """Shortest path in unweighted graph. O(V + E)"""
@@ -287,6 +298,7 @@ def shortest_path_bfs(graph, start, end):
 
     return None
 
+
 print("\n=== Shortest Path (BFS) ===")
 path = shortest_path_bfs(g, "A", "E")
 print(f"Shortest path A -> E: {path}")
@@ -298,9 +310,10 @@ print(f"Shortest path A -> E: {path}")
 
 import heapq
 
+
 def dijkstra(graph, start):
     """Shortest paths from start to all vertices. O((V + E) log V)"""
-    distances = {v: float('inf') for v in graph.get_vertices()}
+    distances = {v: float("inf") for v in graph.get_vertices()}
     distances[start] = 0
     previous = {v: None for v in graph.get_vertices()}
     pq = [(0, start)]
@@ -323,6 +336,7 @@ def dijkstra(graph, start):
 
     return distances, previous
 
+
 def get_path(previous, end):
     """Reconstruct path from previous dict"""
     path = []
@@ -331,6 +345,7 @@ def get_path(previous, end):
         path.append(current)
         current = previous[current]
     return path[::-1]
+
 
 print("\n=== Dijkstra's Algorithm ===")
 distances, previous = dijkstra(wg, "A")
@@ -343,6 +358,7 @@ for vertex in wg.get_vertices():
 # =============================================================================
 # 8. TOPOLOGICAL SORT
 # =============================================================================
+
 
 def topological_sort(graph):
     """Topological sort using DFS. O(V + E)"""
@@ -362,6 +378,7 @@ def topological_sort(graph):
 
     return stack[::-1]
 
+
 print("\n=== Topological Sort ===")
 # DAG for course prerequisites
 dag = Graph(directed=True)
@@ -376,6 +393,7 @@ print(f"Topological order: {topological_sort(dag)}")
 # =============================================================================
 # 9. CONNECTED COMPONENTS
 # =============================================================================
+
 
 def connected_components(graph):
     """Find all connected components. O(V + E)"""
@@ -397,6 +415,7 @@ def connected_components(graph):
 
     return components
 
+
 print("\n=== Connected Components ===")
 disconnected = Graph()
 disconnected.add_edge("A", "B")
@@ -408,6 +427,7 @@ print(f"Components: {connected_components(disconnected)}")
 # =============================================================================
 # 10. BIPARTITE CHECK
 # =============================================================================
+
 
 def is_bipartite(graph):
     """Check if graph is bipartite. O(V + E)"""
@@ -433,6 +453,7 @@ def is_bipartite(graph):
                 return False
     return True
 
+
 print("\n=== Bipartite Check ===")
 bipartite = Graph()
 bipartite.add_edge("A", "C")
@@ -445,6 +466,7 @@ print(f"Is bipartite: {is_bipartite(bipartite)}")
 # =============================================================================
 # 11. MAJORITY ELEMENT (GRAPH APPLICATION)
 # =============================================================================
+
 
 def find_all_paths(graph, start, end):
     """Find all paths between two vertices. O(V!)"""
@@ -462,6 +484,7 @@ def find_all_paths(graph, start, end):
 
     dfs(start, [start])
     return paths
+
 
 print("\n=== All Paths ===")
 all_paths = find_all_paths(g, "A", "E")

@@ -76,9 +76,11 @@ try:
     cursor = conn.cursor()
 except sqlite3.Error as e:
     print(f"Error: {e}")
-    if conn: conn.rollback()
+    if conn:
+        conn.rollback()
 finally:
-    if conn: conn.close()
+    if conn:
+        conn.close()
 ```
 
 ---

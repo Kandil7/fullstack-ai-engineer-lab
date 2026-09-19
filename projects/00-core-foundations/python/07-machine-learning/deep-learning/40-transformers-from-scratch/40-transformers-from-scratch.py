@@ -24,11 +24,13 @@ import torch.nn as nn
 
 torch.manual_seed(0)
 
+
 # ============================================================
 # 1. Scaled Dot-Product Attention — the core equation
 # ============================================================
-def scaled_dot_product_attention(Q: torch.Tensor, K: torch.Tensor, V: torch.Tensor,
-                                 mask: torch.Tensor | None = None) -> torch.Tensor:
+def scaled_dot_product_attention(
+    Q: torch.Tensor, K: torch.Tensor, V: torch.Tensor, mask: torch.Tensor | None = None
+) -> torch.Tensor:
     """Attention(Q,K,V) = softmax(QK^T / sqrt(d_k)) V.
 
     Shapes: (batch, heads, seq, d_k) for Q/K, (batch, heads, seq, d_v) for V.
@@ -37,7 +39,7 @@ def scaled_dot_product_attention(Q: torch.Tensor, K: torch.Tensor, V: torch.Tens
     scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(d_k)  # (B,H,S,S)
     if mask is not None:
         scores = scores.masked_fill(mask == 0, float("-inf"))
-    weights = torch.softmax(scores, dim=-1)                          # normalize over keys
+    weights = torch.softmax(scores, dim=-1)  # normalize over keys
     return torch.matmul(weights, V)
 
 
@@ -58,9 +60,14 @@ d_small = 2
 d_large = 128
 scores_small = torch.randn(4, 4) * 1.0
 scores_large = torch.randn(4, 4) * math.sqrt(d_large)
-print(f"  small d: softmax entropy {torch.distributions.Categorical(probs=torch.softmax(scores_small, -1)).entropy().mean():.3f}")
-print(f"  large d: softmax entropy {torch.distributions.Categorical(probs=torch.softmax(scores_large, -1)).entropy().mean():.3f}")
+print(
+    f"  small d: softmax entropy {torch.distributions.Categorical(probs=torch.softmax(scores_small, -1)).entropy().mean():.3f}"
+)
+print(
+    f"  large d: softmax entropy {torch.distributions.Categorical(probs=torch.softmax(scores_large, -1)).entropy().mean():.3f}"
+)
 print("  -> without scaling, large d_k pushes softmax to near one-hot (dead gradients)")
+
 
 # ============================================================
 # 3. Multi-Head Attention — attend in parallel subspaces
@@ -84,16 +91,17 @@ class MultiHeadAttention(nn.Module):
         Q = self._split(self.W_q(x))
         K = self._split(self.W_k(x))
         V = self._split(self.W_v(x))
-        attn = scaled_dot_product_attention(Q, K, V)          # (B, H, S, d_k)
+        attn = scaled_dot_product_attention(Q, K, V)  # (B, H, S, d_k)
         B, H, S, _ = attn.shape
         out = attn.transpose(1, 2).contiguous().view(B, S, self.d_model)
         return self.W_o(out)
 
 
 mha = MultiHeadAttention(d_model=64, n_heads=8)
-x_seq = torch.randn(2, 10, 64)          # batch=2, 10 tokens, 64-dim
+x_seq = torch.randn(2, 10, 64)  # batch=2, 10 tokens, 64-dim
 print("\nExample 3: multi-head attention")
 print(f"  input  {tuple(x_seq.shape)} -> output {tuple(mha(x_seq).shape)}")
+
 
 # ============================================================
 # 4. Positional Encoding — inject order
@@ -110,7 +118,8 @@ def positional_encoding(seq_len: int, d_model: int) -> torch.Tensor:
 pe = positional_encoding(20, 64)
 print("\nExample 4: positional encoding")
 print(f"  shape {tuple(pe.shape)}; sin/cos pattern distinguishes token positions")
-print(f"  row 0 vs row 1 distance: {(pe[0,0]-pe[0,1]).norm().item():.3f}")
+print(f"  row 0 vs row 1 distance: {(pe[0, 0] - pe[0, 1]).norm().item():.3f}")
+
 
 # ============================================================
 # 5. The Transformer Block — attention + FFN + residuals
@@ -120,13 +129,12 @@ class TransformerBlock(nn.Module):
         super().__init__()
         self.attn = MultiHeadAttention(d_model, n_heads)
         self.norm1 = nn.LayerNorm(d_model)
-        self.ff = nn.Sequential(nn.Linear(d_model, ff_dim), nn.ReLU(),
-                                nn.Linear(ff_dim, d_model))
+        self.ff = nn.Sequential(nn.Linear(d_model, ff_dim), nn.ReLU(), nn.Linear(ff_dim, d_model))
         self.norm2 = nn.LayerNorm(d_model)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = x + self.attn(self.norm1(x))     # residual + pre-norm attention
-        x = x + self.ff(self.norm2(x))       # residual + pre-norm FFN
+        x = x + self.attn(self.norm1(x))  # residual + pre-norm attention
+        x = x + self.ff(self.norm2(x))  # residual + pre-norm FFN
         return x
 
 

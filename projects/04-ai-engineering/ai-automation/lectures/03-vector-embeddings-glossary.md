@@ -33,10 +33,16 @@ import numpy as np
 vector = np.array([0.23, -0.15, 0.89])
 
 # Higher-dimensional (typical for embeddings)
-embedding_vector = np.array([
-    0.023, -0.156, 0.089, 0.234, -0.067,
-    # ... 1536 total dimensions
-])
+embedding_vector = np.array(
+    [
+        0.023,
+        -0.156,
+        0.089,
+        0.234,
+        -0.067,
+        # ... 1536 total dimensions
+    ]
+)
 
 print(f"Dimensions: {len(embedding_vector)}")
 print(f"First 5 values: {embedding_vector[:5]}")
@@ -64,8 +70,7 @@ client = OpenAI()
 
 # Generate embedding
 response = client.embeddings.create(
-    model="text-embedding-3-small",
-    input="The cat sat on the mat"
+    model="text-embedding-3-small", input="The cat sat on the mat"
 )
 
 embedding = response.data[0].embedding
@@ -74,8 +79,7 @@ print(f"First 5 values: {embedding[:5]}")
 
 # Similar texts have similar embeddings
 response2 = client.embeddings.create(
-    model="text-embedding-3-small",
-    input="A feline rested on the rug"
+    model="text-embedding-3-small", input="A feline rested on the rug"
 )
 embedding2 = response2.data[0].embedding
 
@@ -100,9 +104,11 @@ embedding2 = response2.data[0].embedding
 ```python
 import numpy as np
 
+
 def cosine_similarity(a, b):
     """Measure angle between vectors (-1 to 1)."""
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
 
 # Example vectors
 vector_a = np.array([1, 0, 0])
@@ -130,9 +136,9 @@ print(cosine_similarity(vector_a, vector_c))  # -1.0 (opposite)
 ```python
 # Different models produce different dimensions
 models = {
-    "all-MiniLM-L6-v2": 384,      # Small, fast
-    "text-embedding-3-small": 1536, # Balanced
-    "text-embedding-3-large": 3072, # High quality
+    "all-MiniLM-L6-v2": 384,  # Small, fast
+    "text-embedding-3-small": 1536,  # Balanced
+    "text-embedding-3-large": 3072,  # High quality
 }
 
 model_name = "text-embedding-3-small"
@@ -162,12 +168,13 @@ def chunk_text(text, chunk_size=500, overlap=50):
     """Split text into overlapping chunks."""
     words = text.split()
     chunks = []
-    
+
     for i in range(0, len(words), chunk_size - overlap):
-        chunk = " ".join(words[i:i + chunk_size])
+        chunk = " ".join(words[i : i + chunk_size])
         chunks.append(chunk)
-    
+
     return chunks
+
 
 # Usage
 long_document = "..." * 10000  # Long text
@@ -198,16 +205,10 @@ client = chromadb.Client()
 collection = client.create_collection("documents")
 
 # Add vectors
-collection.add(
-    documents=["Doc 1", "Doc 2", "Doc 3"],
-    ids=["doc1", "doc2", "doc3"]
-)
+collection.add(documents=["Doc 1", "Doc 2", "Doc 3"], ids=["doc1", "doc2", "doc3"])
 
 # Query by similarity
-results = collection.query(
-    query_texts=["similar document"],
-    n_results=2
-)
+results = collection.query(query_texts=["similar document"], n_results=2)
 
 print(results["documents"])
 ```
@@ -235,7 +236,7 @@ print(results["documents"])
 # Semantic search succeeds
 from sentence_transformers import SentenceTransformer
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
 docs = ["I am happy today", "She feels joyful"]
 query = "happiness"
@@ -264,10 +265,12 @@ query_embedding = model.encode(query)
 ```python
 import numpy as np
 
+
 def normalize(vector):
     """Normalize vector to unit length."""
     norm = np.linalg.norm(vector)
     return vector / norm if norm > 0 else vector
+
 
 # Before normalization
 vector = np.array([3.0, 4.0])
@@ -337,15 +340,14 @@ collection.add(
     documents=["Python guide", "JavaScript guide"],
     metadatas=[
         {"category": "programming", "difficulty": "beginner"},
-        {"category": "web", "difficulty": "intermediate"}
+        {"category": "web", "difficulty": "intermediate"},
     ],
-    ids=["doc1", "doc2"]
+    ids=["doc1", "doc2"],
 )
 
 # Filter by metadata
 results = collection.query(
-    query_texts=["programming language"],
-    where={"category": "programming"}
+    query_texts=["programming language"], where={"category": "programming"}
 )
 ```
 
@@ -367,28 +369,24 @@ results = collection.query(
 ```python
 # OpenAI model
 from openai import OpenAI
+
 client = OpenAI()
 
-response = client.embeddings.create(
-    model="text-embedding-3-small",
-    input="Hello world"
-)
+response = client.embeddings.create(model="text-embedding-3-small", input="Hello world")
 embedding_openai = response.data[0].embedding
 
 # HuggingFace model (local)
 from sentence_transformers import SentenceTransformer
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer("all-MiniLM-L6-v2")
 embedding_hf = model.encode("Hello world")
 
 # Cohere model
 import cohere
+
 co = cohere.Client(api_key="your-key")
 
-response = co.embed(
-    texts=["Hello world"],
-    model="embed-english-v3.0"
-)
+response = co.embed(texts=["Hello world"], model="embed-english-v3.0")
 embedding_cohere = response.embeddings[0]
 ```
 
@@ -442,11 +440,13 @@ print(f"Decoded: {[encoding.decode([t]) for t in tokens]}")
 ```python
 import numpy as np
 
+
 def cosine_similarity(a, b):
     """Calculate cosine similarity between vectors."""
     a = np.array(a)
     b = np.array(b)
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
 
 # Identical vectors
 print(cosine_similarity([1, 0, 0], [1, 0, 0]))  # 1.0
@@ -484,9 +484,9 @@ collection = client.create_collection(
     "documents",
     metadata={
         "hnsw:space": "cosine",  # Similarity metric
-        "hnsw:M": 16,            # Connections per node
-        "hnsw:ef_construction": 200  # Build quality
-    }
+        "hnsw:M": 16,  # Connections per node
+        "hnsw:ef_construction": 200,  # Build quality
+    },
 )
 
 # Higher M = better quality, more memory
@@ -550,7 +550,7 @@ tsne = TSNE(n_components=2, random_state=42)
 reduced = tsne.fit_transform(embeddings)
 
 print(f"Original: {embeddings.shape}")  # (100, 1536)
-print(f"Reduced: {reduced.shape}")      # (100, 2)
+print(f"Reduced: {reduced.shape}")  # (100, 2)
 ```
 
 **Related Terms:** t-SNE, PCA, Visualization
@@ -606,17 +606,12 @@ collection = client.create_collection("docs")
 collection.upsert(
     ids=["doc1", "doc2"],
     documents=["Updated content 1", "New content 2"],
-    metadatas=[
-        {"version": 2},
-        {"version": 1}
-    ]
+    metadatas=[{"version": 2}, {"version": 1}],
 )
 
 # Second upsert updates doc1
 collection.upsert(
-    ids=["doc1"],
-    documents=["Version 3 of content"],
-    metadatas=[{"version": 3}]
+    ids=["doc1"], documents=["Version 3 of content"], metadatas=[{"version": 3}]
 )
 ```
 
@@ -643,15 +638,12 @@ client = OpenAI()
 # ❌ Slow: Individual calls
 texts = ["text1", "text2", "text3", "text4", "text5"]
 for text in texts:
-    response = client.embeddings.create(
-        model="text-embedding-3-small",
-        input=text
-    )
+    response = client.embeddings.create(model="text-embedding-3-small", input=text)
 
 # ✅ Fast: Batch call
 response = client.embeddings.create(
     model="text-embedding-3-small",
-    input=texts  # All at once
+    input=texts,  # All at once
 )
 embeddings = [item.embedding for item in response.data]
 ```
@@ -676,12 +668,13 @@ def chunk_with_overlap(text, chunk_size=100, overlap=20):
     """Create overlapping chunks."""
     words = text.split()
     chunks = []
-    
+
     for i in range(0, len(words), chunk_size - overlap):
-        chunk = " ".join(words[i:i + chunk_size])
+        chunk = " ".join(words[i : i + chunk_size])
         chunks.append(chunk)
-    
+
     return chunks
+
 
 # Example
 text = "word " * 150
@@ -713,12 +706,13 @@ def calculate_recall(retrieved_ids, relevant_ids):
     """Calculate recall@k."""
     retrieved_set = set(retrieved_ids)
     relevant_set = set(relevant_ids)
-    
+
     if not relevant_set:
         return 0.0
-    
+
     found = len(retrieved_set.intersection(relevant_set))
     return found / len(relevant_set)
+
 
 # Example
 relevant = {"doc1", "doc2", "doc3", "doc4", "doc5"}
@@ -747,12 +741,13 @@ def calculate_precision(retrieved_ids, relevant_ids):
     """Calculate precision@k."""
     retrieved_set = set(retrieved_ids)
     relevant_set = set(relevant_ids)
-    
+
     if not retrieved_set:
         return 0.0
-    
+
     found = len(retrieved_set.intersection(relevant_set))
     return found / len(retrieved_set)
+
 
 # Example
 relevant = {"doc1", "doc2", "doc3"}

@@ -10,6 +10,7 @@ Answers with full explanations and distractor analysis at the end.
 **E1 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
 print(df.shape)
 print(df.columns)
@@ -23,6 +24,7 @@ print(df.columns)
 **E2 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
 print(df["a"].to_list())
 print(df["b"][1])
@@ -43,6 +45,7 @@ print(df["b"][1])
 **E4 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
 print(df.head(2).to_dict(as_series=False))
 ```
@@ -62,6 +65,7 @@ print(df.head(2).to_dict(as_series=False))
 **E6 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
 print(df["a"].sum())
 print(df["b"].len())
@@ -90,6 +94,7 @@ df = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
 **M2 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [3, 1, 2]})
 print(df.sort("a", descending=True)["a"].to_list())
 ```
@@ -102,6 +107,7 @@ print(df.sort("a", descending=True)["a"].to_list())
 **M3 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, None, 3]})
 print(df.select(pl.col("a").sum()).item())
 ```
@@ -122,6 +128,7 @@ print(df.select(pl.col("a").sum()).item())
 **M5 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
 print(df.filter([True, False, True]).rows())
 ```
@@ -141,6 +148,7 @@ print(df.filter([True, False, True]).rows())
 **M7 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
 print(df.dtypes)
 ```
@@ -160,6 +168,7 @@ print(df.dtypes)
 **M9 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": [1, 2, 3]})
 print(df.select(pl.col("a").mean()).item())
 ```
@@ -184,6 +193,7 @@ print(df.select(pl.col("a").mean()).item())
 **H2 (code-output).** What prints?
 ```python
 import polars as pl
+
 df = pl.DataFrame({"a": ["1", "2"]})
 print(df.schema["a"])
 ```

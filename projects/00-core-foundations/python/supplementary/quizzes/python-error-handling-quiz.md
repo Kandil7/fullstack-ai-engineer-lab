@@ -125,6 +125,7 @@ D) An exception that only works in certain Python versions
 class CustomError(Exception):
     pass
 
+
 try:
     raise CustomError("Custom error occurred")
 except CustomError as e:
@@ -191,6 +192,7 @@ def divide(a, b):
     else:
         return result
 
+
 print(divide(10, 2))
 ```
 
@@ -255,10 +257,11 @@ class MyContextManager:
     def __enter__(self):
         print("Entering context")
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         print("Exiting context")
         return False
+
 
 with MyContextManager() as cm:
     print("Inside context")
@@ -310,6 +313,7 @@ D) To create the context
 ```python
 def risky_operation():
     raise ValueError("Operation failed")
+
 
 try:
     risky_operation()

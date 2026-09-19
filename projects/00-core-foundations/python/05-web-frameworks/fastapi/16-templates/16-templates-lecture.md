@@ -120,6 +120,7 @@ app = FastAPI()
 # Configure templates directory
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     # Pass variables to template
@@ -128,8 +129,8 @@ async def root(request: Request):
         {
             "request": request,  # Required by Jinja2
             "title": "My App",
-            "content": "Welcome to FastAPI Templates!"
-        }
+            "content": "Welcome to FastAPI Templates!",
+        },
     )
 ```
 
@@ -143,6 +144,7 @@ from typing import List
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/users/")
 async def list_users(request: Request):
     users = [
@@ -150,14 +152,9 @@ async def list_users(request: Request):
         {"id": 2, "name": "Bob", "email": "bob@example.com"},
         {"id": 3, "name": "Charlie", "email": "charlie@example.com"},
     ]
-    
+
     return templates.TemplateResponse(
-        "users.html",
-        {
-            "request": request,
-            "users": users,
-            "title": "User List"
-        }
+        "users.html", {"request": request, "users": users, "title": "User List"}
     )
 ```
 
@@ -263,24 +260,15 @@ async def list_users(request: Request):
 ```python
 @app.get("/dashboard/")
 async def dashboard(request: Request):
-    user = {
-        "name": "Alice",
-        "role": "admin",
-        "is_premium": True
-    }
-    
+    user = {"name": "Alice", "role": "admin", "is_premium": True}
+
     notifications = [
         {"message": "New order received", "type": "info"},
         {"message": "Low stock warning", "type": "warning"},
     ]
-    
+
     return templates.TemplateResponse(
-        "dashboard.html",
-        {
-            "request": request,
-            "user": user,
-            "notifications": notifications
-        }
+        "dashboard.html", {"request": request, "user": user, "notifications": notifications}
     )
 ```
 
@@ -332,19 +320,15 @@ from fastapi.responses import RedirectResponse
 
 app = FastAPI()
 
+
 @app.get("/contact/")
 async def contact_form(request: Request):
-    return templates.TemplateResponse(
-        "contact.html",
-        {"request": request, "errors": {}}
-    )
+    return templates.TemplateResponse("contact.html", {"request": request, "errors": {}})
+
 
 @app.post("/contact/")
 async def submit_contact(
-    request: Request,
-    name: str = Form(...),
-    email: str = Form(...),
-    message: str = Form(...)
+    request: Request, name: str = Form(...), email: str = Form(...), message: str = Form(...)
 ):
     # Validate
     errors = {}
@@ -354,17 +338,17 @@ async def submit_contact(
         errors["email"] = "Invalid email address"
     if len(message) < 10:
         errors["message"] = "Message must be at least 10 characters"
-    
+
     if errors:
         return templates.TemplateResponse(
             "contact.html",
             {
                 "request": request,
                 "errors": errors,
-                "values": {"name": name, "email": email, "message": message}
-            }
+                "values": {"name": name, "email": email, "message": message},
+            },
         )
-    
+
     # Process form (send email, save to DB, etc.)
     return RedirectResponse("/contact/success", status_code=303)
 ```
@@ -418,14 +402,9 @@ async def products(request: Request):
         {"name": "Phone", "price": 699.99, "in_stock": False},
         {"name": "Tablet", "price": 499.99, "in_stock": True},
     ]
-    
+
     return templates.TemplateResponse(
-        "products.html",
-        {
-            "request": request,
-            "products": items,
-            "current_date": datetime.now()
-        }
+        "products.html", {"request": request, "products": items, "current_date": datetime.now()}
     )
 ```
 
@@ -475,34 +454,33 @@ from markupsafe import Markup
 
 templates = Jinja2Templates(directory="templates")
 
+
 # Custom filter
 def format_currency(value: float) -> str:
     return f"${value:,.2f}"
+
 
 def truncate_text(text: str, length: int = 50) -> str:
     if len(text) > length:
         return text[:length] + "..."
     return text
 
+
 def nl2br(text: str) -> Markup:
     """Convert newlines to <br> tags"""
     return Markup(text.replace("\n", "<br>"))
+
 
 # Add filters to template
 templates.env.filters["currency"] = format_currency
 templates.env.filters["truncate"] = truncate_text
 templates.env.filters["nl2br"] = nl2br
 
+
 @app.get("/blog/{post_id}")
 async def blog_post(request: Request, post_id: int):
     post = get_post(post_id)
-    return templates.TemplateResponse(
-        "post.html",
-        {
-            "request": request,
-            "post": post
-        }
-    )
+    return templates.TemplateResponse("post.html", {"request": request, "post": post})
 ```
 
 **post.html:**
@@ -531,12 +509,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/")
 async def root(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request}
-    )
+    return templates.TemplateResponse("index.html", {"request": request})
 ```
 
 **templates/base.html:**
@@ -582,6 +558,7 @@ async def root(request: Request):
 @app.get("/")
 async def root():
     return templates.TemplateResponse("index.html", {"title": "Home"})
+
 
 # ✅ CORRECT - Include request
 @app.get("/")

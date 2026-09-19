@@ -72,8 +72,10 @@ FINE_TUNE_EXAMPLES = [
         "messages": [
             {"role": "system", "content": "You extract JSON from contracts."},
             {"role": "user", "content": "Section 4.2: Company pays $50k within 30 days."},
-            {"role": "assistant",
-             "content": '{"obligation": "payment", "amount": 50000, "term_days": 30}'},
+            {
+                "role": "assistant",
+                "content": '{"obligation": "payment", "amount": 50000, "term_days": 30}',
+            },
         ]
     },
     # 200-2,000 more, covering the format's edge cases
@@ -103,14 +105,16 @@ from peft import LoraConfig, get_peft_model, TaskType
 base = AutoModelForCausalLM.from_pretrained("microsoft/phi-2")
 lora_cfg = LoraConfig(
     task_type=TaskType.CAUSAL_LM,
-    r=16,                    # rank: adapter capacity (8-64 typical)
-    lora_alpha=32,           # scaling; rule of thumb ~2x r
+    r=16,  # rank: adapter capacity (8-64 typical)
+    lora_alpha=32,  # scaling; rule of thumb ~2x r
     lora_dropout=0.05,
-    target_modules=["q_proj", "v_proj"],   # attention projections
+    target_modules=["q_proj", "v_proj"],  # attention projections
 )
 peft_model = get_peft_model(base, lora_cfg)
-print("trainable %:", round(peft_model.num_parameters(only_trainable=True)
-      / peft_model.num_parameters() * 100, 2))
+print(
+    "trainable %:",
+    round(peft_model.num_parameters(only_trainable=True) / peft_model.num_parameters() * 100, 2),
+)
 ```
 
 Output:
@@ -128,13 +132,16 @@ Fine-tuning is training — Phase 8 Lecture 1 discipline applies: seed,
 version the data, track the run, gate with evals:
 
 ```python
-def train_lora(dataset_path: str, output_dir: str, *, seed: int = 42,
-               epochs: int = 3, lr: float = 2e-4) -> str:
+def train_lora(
+    dataset_path: str, output_dir: str, *, seed: int = 42, epochs: int = 3, lr: float = 2e-4
+) -> str:
     # Phase 8 L1: seed everything before training
-    random.seed(seed); np.random.seed(seed); torch.manual_seed(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
     # ... load tokenized dataset, TrainingArguments(lr, epochs, seed) ...
     # trainer.train() → save adapter to output_dir
-    return f"{output_dir}/adapter"     # the LoRA adapter artifact
+    return f"{output_dir}/adapter"  # the LoRA adapter artifact
 ```
 
 Output:
@@ -151,11 +158,13 @@ The iron rule: the fine-tuned model must beat the baseline on the *same*
 frozen eval suite (L20) — never assume "fine-tuned = better":
 
 ```python
-def decide_finetune(baseline: dict, finetuned: dict, keys: list[str],
-                    tol: float = 0.02) -> tuple[bool, dict]:
+def decide_finetune(
+    baseline: dict, finetuned: dict, keys: list[str], tol: float = 0.02
+) -> tuple[bool, dict]:
     deltas = {k: round(finetuned[k] - baseline[k], 3) for k in keys}
     regressions = {k: d for k, d in deltas.items() if d < -tol}
     return (not regressions, {"deltas": deltas, "regressions": regressions})
+
 
 print(decide_finetune({"acc": 0.84}, {"acc": 0.91}, ["acc"]))
 ```
@@ -185,6 +194,7 @@ merged.save_pretrained("outputs/model-merged")
 
 # adapter-only: base + adapter → hot-swappable per tenant
 from peft import PeftModel
+
 model = PeftModel.from_pretrained(base, "outputs/adapter")
 ```
 

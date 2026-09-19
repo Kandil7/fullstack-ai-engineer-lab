@@ -56,11 +56,11 @@ def predict_one(row):
     if row["Sex"] == "male":
         if row["Age"] <= 6.5:
             return 0.67  # young boys — higher survival
-        return 0.17     # adult men — low survival
+        return 0.17  # adult men — low survival
     else:
         if row["Pclass"] <= 2:
             return 0.95  # first/second class women
-        return 0.50     # third class women
+        return 0.50  # third class women
 ```
 
 ```text
@@ -84,15 +84,18 @@ standard deviation of the two sides.
 ```python
 import numpy as np
 
+
 def gini(y: np.ndarray) -> float:
     """Gini impurity: 0.0 = perfectly pure node."""
     _, counts = np.unique(y, return_counts=True)
     p = counts / counts.sum()
-    return 1.0 - np.sum(p ** 2)
+    return 1.0 - np.sum(p**2)
+
 
 def weighted_impurity(left: np.ndarray, right: np.ndarray) -> float:
     n = len(left) + len(right)
     return (len(left) / n) * gini(left) + (len(right) / n) * gini(right)
+
 
 # The tree greedily chooses the (column, threshold) that MINIMIZES this.
 ```
@@ -152,8 +155,8 @@ them out: the variance of the average shrinks while bias stays put.
 from sklearn.ensemble import RandomForestClassifier
 
 rf = RandomForestClassifier(
-    n_estimators=100,      # number of trees
-    max_features="sqrt",   # random column subset per split -> decorrelation
+    n_estimators=100,  # number of trees
+    max_features="sqrt",  # random column subset per split -> decorrelation
     min_samples_leaf=5,
     n_jobs=-1,
     random_state=42,
@@ -198,7 +201,7 @@ held-out set — set `oob_score=True`.
 rf = RandomForestClassifier(
     n_estimators=200, oob_score=True, n_jobs=-1, random_state=42
 ).fit(X_train, y_train)
-print("OOB score:", rf.oob_score_)   # ~ validation accuracy, for free
+print("OOB score:", rf.oob_score_)  # ~ validation accuracy, for free
 ```
 
 ### 8. Feature importance & partial dependence
@@ -228,11 +231,12 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
+
 def make_titanic_like(n: int = 800, seed: int = 0) -> pd.DataFrame:
     """Synthesize a small Titanic-flavored dataset (no download needed)."""
     rng = np.random.default_rng(seed)
-    sex = rng.integers(0, 2, n)              # 0 female, 1 male
-    pclass = rng.integers(1, 4, n)           # 1..3
+    sex = rng.integers(0, 2, n)  # 0 female, 1 male
+    pclass = rng.integers(1, 4, n)  # 1..3
     age = rng.normal(30, 14, n).clip(0.5, 80)
     fare = rng.gamma(2.0, 15.0, n)
     # Ground-truth survival probability (women & higher class survive more):
@@ -240,9 +244,15 @@ def make_titanic_like(n: int = 800, seed: int = 0) -> pd.DataFrame:
     prob = 1 / (1 + np.exp(-logit))
     survived = (rng.random(n) < prob).astype(int)
     return pd.DataFrame(
-        {"Sex": sex, "Pclass": pclass, "Age": age.round(1),
-         "Fare": fare.round(2), "Survived": survived}
+        {
+            "Sex": sex,
+            "Pclass": pclass,
+            "Age": age.round(1),
+            "Fare": fare.round(2),
+            "Survived": survived,
+        }
     )
+
 
 df = make_titanic_like()
 X = df.drop(columns="Survived")
@@ -266,8 +276,12 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
 rf = RandomForestClassifier(
-    n_estimators=200, min_samples_leaf=5, max_features="sqrt",
-    oob_score=True, n_jobs=-1, random_state=42,
+    n_estimators=200,
+    min_samples_leaf=5,
+    max_features="sqrt",
+    oob_score=True,
+    n_jobs=-1,
+    random_state=42,
 ).fit(X_tr, y_tr)
 
 print("valid acc:", round(rf.score(X_va, y_va), 3))
@@ -310,6 +324,7 @@ X_enc = pd.get_dummies(df, columns=["Ticket"])  # hundreds of columns
 # GOOD: use ordinal/label encoding for trees — order is arbitrary but trees
 # only care about split points, and the column stays compact.
 from sklearn.preprocessing import OrdinalEncoder
+
 df["Ticket"] = OrdinalEncoder().fit_transform(df[["Ticket"]])
 ```
 
@@ -322,7 +337,7 @@ print(rf.score(X_tr, y_tr))  # ~0.99 always -> meaningless
 
 # GOOD: use OOB score or a validation set.
 rf = RandomForestClassifier(oob_score=True, n_jobs=-1, random_state=42).fit(X_tr, y_tr)
-print(rf.oob_score_)         # honest estimate
+print(rf.oob_score_)  # honest estimate
 ```
 
 **Mistake 3: Cranking `n_estimators` to fight overfitting.**

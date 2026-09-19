@@ -28,6 +28,7 @@ from dataclasses import dataclass
 # Cross-encoder: score query+doc TOGETHER through the model (slow,
 # per-pair, but much more accurate).
 
+
 @dataclass
 class Retriever:
     name: str
@@ -35,8 +36,7 @@ class Retriever:
     quality: float  # 0..1
 
     def describe(self) -> str:
-        return (f"{self.name}: {self.latency_ms}ms per query, "
-                f"quality {self.quality:.2f}")
+        return f"{self.name}: {self.latency_ms}ms per query, quality {self.quality:.2f}"
 
 
 # Example 1: the tradeoff
@@ -54,8 +54,10 @@ assert cross.latency_ms > bi.latency_ms and cross.quality > bi.quality
 # with the cross-encoder. Total latency stays small because the slow
 # model only sees a handful of pairs.
 
-def two_stage(query: str, stage1_candidates: list[str], rerank_scores: dict[str, float],
-              rerank_k: int = 3) -> list[str]:
+
+def two_stage(
+    query: str, stage1_candidates: list[str], rerank_scores: dict[str, float], rerank_k: int = 3
+) -> list[str]:
     """Retrieve broadly, then rerank precisely."""
     top_k = stage1_candidates[:rerank_k]
     scored = sorted(top_k, key=lambda d: rerank_scores.get(d, 0.0), reverse=True)
@@ -77,8 +79,10 @@ assert final[0] == "d4", "reranker pulls d4 to the top"
 # Reranking more candidates = better recall ceiling, higher latency and
 # cost. Find the k where quality stops improving.
 
-def rerank_economics(candidates_available: int, rerank_latency_ms: float,
-                     quality_at_k: dict[int, float]) -> dict:
+
+def rerank_economics(
+    candidates_available: int, rerank_latency_ms: float, quality_at_k: dict[int, float]
+) -> dict:
     best_k = max(quality_at_k, key=quality_at_k.get)
     best = quality_at_k[best_k]
     return {
@@ -103,6 +107,7 @@ assert econ["best_k"] <= 5, "quality plateaus; don't rerank everything"
 # Reranking costs real money and latency: k pairs through a big model.
 # Budget the rerank stage explicitly.
 
+
 def cost_per_query(stage1_cost: float, rerank_k: int, rerank_pair_cost: float) -> dict:
     return {
         "stage1": stage1_cost,
@@ -114,8 +119,10 @@ def cost_per_query(stage1_cost: float, rerank_k: int, rerank_pair_cost: float) -
 # Example 4: budget math
 costs = cost_per_query(stage1_cost=0.0001, rerank_k=5, rerank_pair_cost=0.0005)
 print("\nExample 4: cost per query")
-print(f"  stage-1 ${costs['stage1']:.5f} + rerank ${costs['rerank']:.5f} "
-      f"= ${costs['total']:.5f}/query")
+print(
+    f"  stage-1 ${costs['stage1']:.5f} + rerank ${costs['rerank']:.5f} "
+    f"= ${costs['total']:.5f}/query"
+)
 assert costs["total"] == 0.0001 + 5 * 0.0005
 
 # ============================================================
@@ -124,8 +131,13 @@ assert costs["total"] == 0.0001 + 5 * 0.0005
 # Decide WHEN reranking pays: only when the baseline retrieval quality
 # is the bottleneck AND the budget allows the extra latency/cost.
 
-def should_rerank(baseline_quality: float, target_quality: float,
-                  latency_budget_ms: float, rerank_latency_ms: float) -> tuple[bool, str]:
+
+def should_rerank(
+    baseline_quality: float,
+    target_quality: float,
+    latency_budget_ms: float,
+    rerank_latency_ms: float,
+) -> tuple[bool, str]:
     if baseline_quality >= target_quality:
         return False, "baseline already meets target - skip reranking"
     if rerank_latency_ms > latency_budget_ms:

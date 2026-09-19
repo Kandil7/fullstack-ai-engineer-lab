@@ -48,12 +48,8 @@ async def get_profile(request: Request):
     """Return user profile (cors-protected)."""
     origin = request.headers.get("origin", "unknown")
     return {
-        "profile": {
-            "id": 1,
-            "name": "Alice",
-            "email": "alice@example.com"
-        },
-        "request_origin": origin
+        "profile": {"id": 1, "name": "Alice", "email": "alice@example.com"},
+        "request_origin": origin,
     }
 
 
@@ -99,6 +95,7 @@ class DynamicCORS:
                     # Also check that it's a subdomain, not the bare domain
                     # e.g., *.example.com matches https://api.example.com but not https://example.com
                     import urllib.parse
+
                     parsed = urllib.parse.urlparse(origin)
                     hostname = parsed.hostname or ""
                     if hostname.endswith(domain_suffix[1:]):
@@ -182,9 +179,10 @@ class PerRouteCORSMiddleware:
                 new_headers = list(message.get("headers", []))
 
                 if path.startswith("/public"):
-                    new_headers = list(set(new_headers) - {
-                        h for h in new_headers if h[0] == b"access-control-allow-origin"
-                    })
+                    new_headers = list(
+                        set(new_headers)
+                        - {h for h in new_headers if h[0] == b"access-control-allow-origin"}
+                    )
                     new_headers.append((b"access-control-allow-origin", b"*"))
                     new_headers.append((b"access-control-allow-methods", b"GET, POST"))
                 elif path.startswith("/api"):
@@ -253,7 +251,7 @@ async def list_items():
             "X-Rate-Limit-Remaining": "98",
             "X-API-Version": "v2.1",
             "X-Response-Time": "0.003s",
-        }
+        },
     )
 
 
@@ -263,7 +261,7 @@ async def create_item(item: dict, request: Request):
     client_id = request.headers.get("x-client-id", "unknown")
     return JSONResponse(
         content={"created": True, "item": item, "client": client_id},
-        headers={"X-Request-Id": str(uuid.uuid4())}
+        headers={"X-Request-Id": str(uuid.uuid4())},
     )
 
 
@@ -299,6 +297,7 @@ async def secure_cors_middleware(request: Request, call_next):
 
     # Validate origin
     import urllib.parse
+
     try:
         parsed = urllib.parse.urlparse(origin)
         hostname = parsed.hostname or ""
@@ -328,7 +327,9 @@ async def secure_cors_middleware(request: Request, call_next):
     response.headers["Access-Control-Allow-Origin"] = origin
     response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+    response.headers["Access-Control-Allow-Headers"] = (
+        "Content-Type, Authorization, X-Requested-With"
+    )
     response.headers["Access-Control-Max-Age"] = "3600"
     response.headers["Vary"] = "Origin"
 

@@ -29,6 +29,7 @@ from typing import Any, Callable
 # A contract states what a column MUST be: type, non-null, range.
 # Violations are caught at the boundary, not 20 steps downstream.
 
+
 @dataclass
 class ColumnRule:
     name: str
@@ -47,8 +48,10 @@ class ColumnRule:
             if not isinstance(v, self.dtype):
                 # allow int for float columns
                 if not (self.dtype is float and isinstance(v, (int, float))):
-                    errors.append(f"{self.name}[{i}] has type {type(v).__name__}, "
-                                  f"expected {self.dtype.__name__}")
+                    errors.append(
+                        f"{self.name}[{i}] has type {type(v).__name__}, "
+                        f"expected {self.dtype.__name__}"
+                    )
             if isinstance(v, (int, float)):
                 if self.min_value is not None and v < self.min_value:
                     errors.append(f"{self.name}[{i}]={v} < min {self.min_value}")
@@ -70,6 +73,7 @@ assert any("> max 120" in e for e in errors), "200 age flagged"
 # 2. Whole-DataFrame Validation
 # ============================================================
 
+
 @dataclass
 class DataContract:
     rules: list[ColumnRule] = field(default_factory=list)
@@ -88,10 +92,12 @@ class DataContract:
 
 
 # Example 2: full contract
-contract = DataContract([
-    ColumnRule("age", dtype=int, min_value=0, max_value=120),
-    ColumnRule("income", dtype=float, min_value=0.0),
-])
+contract = DataContract(
+    [
+        ColumnRule("age", dtype=int, min_value=0, max_value=120),
+        ColumnRule("income", dtype=float, min_value=0.0),
+    ]
+)
 valid_data = {"age": [30, 41, 22], "income": [50000.0, 80000.0, 30000.0]}
 bad_data = {"age": [30, -1, 22], "income": [50000.0, None, -5.0]}
 print("\nExample 2: contract validation")
@@ -105,6 +111,7 @@ assert not contract.is_valid(bad_data)
 # ============================================================
 # Schema catches types; distribution checks catch shifts. A sudden jump
 # in the mean or null-rate is the first warning a source broke.
+
 
 @dataclass
 class DistributionBaseline:
@@ -120,8 +127,9 @@ class DistributionBaseline:
         if numeric:
             mean = sum(numeric) / len(numeric)
             if abs(mean - self.mean) > self.tolerance_std * self.std:
-                errors.append(f"mean {mean:.2f} drifted > "
-                              f"{self.tolerance_std} std from {self.mean:.2f}")
+                errors.append(
+                    f"mean {mean:.2f} drifted > {self.tolerance_std} std from {self.mean:.2f}"
+                )
         null_rate = nulls / len(values) if values else 0.0
         if null_rate > self.null_rate * 2 + 0.01:
             errors.append(f"null rate {null_rate:.2%} exceeds baseline")
@@ -143,13 +151,11 @@ assert baseline.check(drifted), "drifted mean flagged"
 # ============================================================
 # Validate at the pipeline boundary and FAIL FAST with a clear message.
 
+
 def validate_or_fail(contract: DataContract, data: dict[str, list[Any]]) -> None:
     errors = contract.validate(data)
     if errors:
-        raise ValueError(
-            f"Data validation failed ({len(errors)} errors). "
-            f"First 5: {errors[:5]}"
-        )
+        raise ValueError(f"Data validation failed ({len(errors)} errors). First 5: {errors[:5]}")
 
 
 # ============================================================

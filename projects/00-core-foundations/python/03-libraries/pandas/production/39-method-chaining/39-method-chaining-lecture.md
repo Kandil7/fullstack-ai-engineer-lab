@@ -61,7 +61,7 @@ chained = (
     .sort_values("spend", ascending=False)
 )
 
-print(step3.equals(chained))   # True
+print(step3.equals(chained))  # True
 ```
 
 ```text
@@ -82,10 +82,12 @@ noise. Local variables are referenced with `@name`.
 min_spend = 150.0
 city = "SF"
 
-df_geo = pd.DataFrame({
-    "city": ["NYC", "SF", "LA", "SF", "NYC"],
-    "spend": [50.0, 120.0, 300.0, 400.0, 25.0],
-})
+df_geo = pd.DataFrame(
+    {
+        "city": ["NYC", "SF", "LA", "SF", "NYC"],
+        "spend": [50.0, 120.0, 300.0, 400.0, 25.0],
+    }
+)
 
 q1 = df_geo.query("spend > 150")
 q2 = df_geo.query("spend > @min_spend and city == @city")
@@ -93,9 +95,9 @@ q2 = df_geo.query("spend > @min_spend and city == @city")
 # Equivalent boolean indexing
 b2 = df_geo[(df_geo["spend"] > min_spend) & (df_geo["city"] == city)]
 
-print(q1["spend"].tolist())          # [300.0, 400.0]
-print(q2["spend"].tolist())          # [300.0, 400.0]
-print(q2.equals(b2))                 # True
+print(q1["spend"].tolist())  # [300.0, 400.0]
+print(q2["spend"].tolist())  # [300.0, 400.0]
+print(q2.equals(b2))  # True
 ```
 
 ```text
@@ -116,24 +118,21 @@ runs; a **callable** `lambda d: ...` receives the frame as it exists *at that
 point in the chain* — after all earlier filters and assigns.
 
 ```python
-fresh = pd.DataFrame({
-    "spend": [400.0, 350.0, 200.0, 50.0, 300.0],
-    "plan": ["pro", "pro", "free", "free", "free"],
-})
+fresh = pd.DataFrame(
+    {
+        "spend": [400.0, 350.0, 200.0, 50.0, 300.0],
+        "plan": ["pro", "pro", "free", "free", "free"],
+    }
+)
 
 # Callable: ranks the FILTERED frame (free users only)
-good = (
-    fresh.query("plan == 'free'")
-    .assign(rank=lambda d: d["spend"].rank(ascending=False))
-)
+good = fresh.query("plan == 'free'").assign(rank=lambda d: d["spend"].rank(ascending=False))
 
 # Precomputed Series: ranks the FULL frame — silently wrong
-bad = fresh.query("plan == 'free'").assign(
-    rank=fresh["spend"].rank(ascending=False)
-)
+bad = fresh.query("plan == 'free'").assign(rank=fresh["spend"].rank(ascending=False))
 
-print(good["rank"].tolist())   # [2.0, 3.0, 1.0]
-print(bad["rank"].tolist())    # [4.0, 5.0, 3.0]
+print(good["rank"].tolist())  # [2.0, 3.0, 1.0]
+print(bad["rank"].tolist())  # [4.0, 5.0, 3.0]
 ```
 
 ```text
@@ -156,15 +155,17 @@ chain, and it receives the frame as it is at that moment.
 def drop_missing_rows(frame: pd.DataFrame) -> pd.DataFrame:
     return frame.dropna()
 
+
 def add_ratio(frame: pd.DataFrame, num: str, den: str, out: str) -> pd.DataFrame:
     return frame.assign(**{out: frame[num] / frame[den]})
+
 
 def flag_high(frame: pd.DataFrame, col: str, threshold: float) -> pd.DataFrame:
     return frame.assign(**{col + "_high": frame[col] > threshold})
 
+
 result = (
-    df_geo
-    .pipe(drop_missing_rows)
+    df_geo.pipe(drop_missing_rows)
     .pipe(add_ratio, "spend", "spend", "ratio")
     .pipe(flag_high, "spend", 100.0)
 )
@@ -190,11 +191,11 @@ original = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
 
 deep = original.copy(deep=True)
 deep.iloc[0, 0] = 999
-print(original["a"].tolist())   # [1, 2, 3]  -- untouched
+print(original["a"].tolist())  # [1, 2, 3]  -- untouched
 
 shallow = original.copy(deep=False)
 shallow.iloc[0, 0] = 999
-print(original["a"].tolist())   # [999, 2, 3]  -- shares the block!
+print(original["a"].tolist())  # [999, 2, 3]  -- shares the block!
 ```
 
 ```text
@@ -225,15 +226,14 @@ with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter("always")
     sub = df[df["a"] > 1]
     sub["flag"] = 1
-    warned = any(w.category.__name__ == "SettingWithCopyWarning"
-                 for w in caught)
+    warned = any(w.category.__name__ == "SettingWithCopyWarning" for w in caught)
 
-print("warned:", warned)                  # True
-print("stuck in df:", int(df["flag"].sum()))   # 0 -- the write vanished
+print("warned:", warned)  # True
+print("stuck in df:", int(df["flag"].sum()))  # 0 -- the write vanished
 
 # The fix: ONE .loc selection
 df.loc[df["a"] > 1, "flag"] = 1
-print("after .loc:", int(df["flag"].sum()))    # 2
+print("after .loc:", int(df["flag"].sum()))  # 2
 ```
 
 ```text
@@ -259,8 +259,7 @@ def engineer_features(frame: pd.DataFrame) -> pd.DataFrame:
     the cohort the model will actually see.
     """
     return (
-        frame
-        .copy()
+        frame.copy()
         .pipe(drop_missing_rows)
         .query("spend > 0")
         .assign(
@@ -321,7 +320,7 @@ df.query("spend > @min_spend")
 ```python
 # WRONG — copy(deep=False) shares blocks; the write hits the parent
 tmp = df.copy(deep=False)
-tmp.iloc[0, 0] = 999      # df changed too
+tmp.iloc[0, 0] = 999  # df changed too
 # CORRECT — deep copy unless read-only
 tmp = df.copy()
 ```

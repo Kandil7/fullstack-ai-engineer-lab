@@ -16,10 +16,10 @@ if None:
     print("Won't run")
 
 # All falsy values
-print(bool(None))    # False
-print(bool(0))       # False
-print(bool(""))      # False
-print(bool([]))      # False
+print(bool(None))  # False
+print(bool(0))  # False
+print(bool(""))  # False
+print(bool([]))  # False
 ```
 **Related:** None, truthiness, boolean conversion
 
@@ -31,8 +31,8 @@ print(bool([]))      # False
 **Definition:** Python's singleton representing absence of a value (null).
 ```python
 x = None
-print(x)         # None
-print(type(x))   # <class 'NoneType'>
+print(x)  # None
+print(type(x))  # <class 'NoneType'>
 ```
 **Related:** NoneType, null, void
 
@@ -60,6 +60,7 @@ print(type(None))  # <class 'NoneType'>
 ```python
 from typing import Optional
 
+
 def greet(name: Optional[str]) -> str:
     if name is None:
         return "Hello, stranger!"
@@ -78,7 +79,7 @@ def greet(name: Optional[str]) -> str:
 print(bool(None))  # False
 
 # Truthy values
-print(bool(1))        # True
+print(bool(1))  # True
 print(bool("hello"))  # True
 ```
 **Related:** Falsy, truthiness, bool()
@@ -122,6 +123,7 @@ def process(value):
 ### Pattern 3: Sentinel
 ```python
 _MISSING = object()
+
 
 def get(key, default=_MISSING):
     if default is _MISSING:

@@ -24,7 +24,7 @@ data = {
     "Name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
     "Department": ["Engineering", "Marketing", "Engineering", "Sales", "Marketing"],
     "Salary": [95000, 72000, 88000, 65000, 71000],
-    "Years": [5, 3, 8, 2, 4]
+    "Years": [5, 3, 8, 2, 4],
 }
 df = pd.DataFrame(data)
 print(df)
@@ -44,7 +44,7 @@ import pandas as pd
 records = [
     {"Name": "Alice", "Score": 92},
     {"Name": "Bob", "Score": 85},
-    {"Name": "Charlie", "Score": 78}
+    {"Name": "Charlie", "Score": 78},
 ]
 df = pd.DataFrame(records)
 ```
@@ -55,11 +55,7 @@ df = pd.DataFrame(records)
 import numpy as np
 import pandas as pd
 
-arr = np.array([
-    [10, 20, 30],
-    [40, 50, 60],
-    [70, 80, 90]
-])
+arr = np.array([[10, 20, 30], [40, 50, 60], [70, 80, 90]])
 df = pd.DataFrame(arr, columns=["A", "B", "C"], index=["x", "y", "z"])
 ```
 
@@ -82,11 +78,13 @@ df = pd.read_csv("data.csv", parse_dates=["date_col"])  # Parse dates
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42],
-    "City": ["New York", "London", "Paris"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie"],
+        "Age": [28, 35, 42],
+        "City": ["New York", "London", "Paris"],
+    }
+)
 
 # Returns a Series
 print(df["Name"])
@@ -118,11 +116,14 @@ print(df[["Name", "Age"]])
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31],
-    "City": ["New York", "London", "Paris", "Tokyo"]
-}, index=["emp1", "emp2", "emp3", "emp4"])
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, 35, 42, 31],
+        "City": ["New York", "London", "Paris", "Tokyo"],
+    },
+    index=["emp1", "emp2", "emp3", "emp4"],
+)
 
 # Single row by label
 print(df.loc["emp2"])
@@ -161,10 +162,7 @@ print(df.iloc[0, 1])  # 28
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob", "Charlie", "Diana"], "Age": [28, 35, 42, 31]})
 
 # Filter rows
 adults = df[df["Age"] >= 30]
@@ -187,18 +185,13 @@ result = df[(df["Age"] >= 30) & (df["Age"] <= 40)]
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob", "Charlie"], "Age": [28, 35, 42]})
 
 # Add a constant column
 df["Country"] = "USA"
 
 # Add computed column
-df["Age_Group"] = df["Age"].apply(
-    lambda x: "Senior" if x >= 35 else "Junior"
-)
+df["Age_Group"] = df["Age"].apply(lambda x: "Senior" if x >= 35 else "Junior")
 
 # Using assign (returns new DataFrame)
 df_new = df.assign(Bonus=df["Age"] * 100)
@@ -228,20 +221,14 @@ df_dropped = df.drop("Country", axis=1)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Age": [28, 35]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob"], "Age": [28, 35]})
 
 # Add a single row
 new_row = pd.DataFrame({"Name": ["Charlie"], "Age": [42]})
 df = pd.concat([df, new_row], ignore_index=True)
 
 # Add multiple rows
-new_rows = pd.DataFrame({
-    "Name": ["Diana", "Eve"],
-    "Age": [31, 29]
-})
+new_rows = pd.DataFrame({"Name": ["Diana", "Eve"], "Age": [31, 29]})
 df = pd.concat([df, new_rows], ignore_index=True)
 ```
 
@@ -267,18 +254,14 @@ df_dropped = df[df["Age"] >= 30]
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "first name": ["Alice", "Bob"],
-    "last name": ["Smith", "Jones"],
-    "age yrs": [28, 35]
-})
+df = pd.DataFrame(
+    {"first name": ["Alice", "Bob"], "last name": ["Smith", "Jones"], "age yrs": [28, 35]}
+)
 
 # Rename specific columns
-df_renamed = df.rename(columns={
-    "first name": "first_name",
-    "last name": "last_name",
-    "age yrs": "age"
-})
+df_renamed = df.rename(
+    columns={"first name": "first_name", "last name": "last_name", "age yrs": "age"}
+)
 
 # Rename all columns
 df.columns = ["first_name", "last_name", "age"]
@@ -302,11 +285,13 @@ df_renamed = df.rename(index={0: "emp1", 1: "emp2"})
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31],
-    "Salary": [75000, 82000, 95000, 68000]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, 35, 42, 31],
+        "Salary": [75000, 82000, 95000, 68000],
+    }
+)
 
 # Sort by single column
 print(df.sort_values("Age"))
@@ -337,12 +322,14 @@ df_sorted = df.set_index("Name").sort_index()
 import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, np.nan, 42, 31],
-    "Salary": [75000, 82000, np.nan, 68000],
-    "City": ["New York", None, "Paris", "Tokyo"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, np.nan, 42, 31],
+        "Salary": [75000, 82000, np.nan, 68000],
+        "City": ["New York", None, "Paris", "Tokyo"],
+    }
+)
 
 # Check for missing values
 print(df.isnull())
@@ -386,11 +373,13 @@ print(df.fillna(method="bfill"))
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Department": ["Engineering", "Marketing", "Engineering", "Sales", "Marketing"],
-    "Employee": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
-    "Salary": [95000, 72000, 88000, 65000, 71000]
-})
+df = pd.DataFrame(
+    {
+        "Department": ["Engineering", "Marketing", "Engineering", "Sales", "Marketing"],
+        "Employee": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
+        "Salary": [95000, 72000, 88000, 65000, 71000],
+    }
+)
 
 # Group by a single column
 dept_stats = df.groupby("Department")["Salary"].agg(["mean", "sum", "count"])
@@ -403,9 +392,7 @@ print(dept_stats)
 
 # Group by multiple columns
 df.groupby(["Department"]).agg(
-    avg_salary=("Salary", "mean"),
-    total_salary=("Salary", "sum"),
-    headcount=("Employee", "count")
+    avg_salary=("Salary", "mean"), total_salary=("Salary", "sum"), headcount=("Employee", "count")
 )
 ```
 
@@ -419,13 +406,15 @@ import numpy as np
 
 # Simulated sales data
 np.random.seed(42)
-df = pd.DataFrame({
-    "Date": pd.date_range("2024-01-01", periods=100),
-    "Region": np.random.choice(["North", "South", "East", "West"], 100),
-    "Product": np.random.choice(["Laptop", "Phone", "Tablet"], 100),
-    "Sales": np.random.randint(1000, 10000, 100),
-    "Quantity": np.random.randint(1, 20, 100)
-})
+df = pd.DataFrame(
+    {
+        "Date": pd.date_range("2024-01-01", periods=100),
+        "Region": np.random.choice(["North", "South", "East", "West"], 100),
+        "Product": np.random.choice(["Laptop", "Phone", "Tablet"], 100),
+        "Sales": np.random.randint(1000, 10000, 100),
+        "Quantity": np.random.randint(1, 20, 100),
+    }
+)
 
 # Quick exploration
 print("Shape:", df.shape)

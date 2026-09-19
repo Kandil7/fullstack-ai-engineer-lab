@@ -31,13 +31,16 @@ def greet(name):
     """Greet a person by name."""
     return f"Hello, {name}!"
 
+
 # Calling the function
 message = greet("Alice")
 print(message)  # Hello, Alice!
 
+
 # Functions without return value return None
 def say_hello():
     print("Hello!")
+
 
 result = say_hello()
 print(result)  # None
@@ -50,17 +53,20 @@ print(result)  # None
 def add(a, b):
     return a + b
 
+
 print(add(3, 5))  # 8
 
 # Keyword arguments
 print(add(b=5, a=3))  # 8
 
+
 # Default arguments
 def greet(name, greeting="Hello"):
     return f"{greeting}, {name}!"
 
-print(greet("Alice"))              # Hello, Alice!
-print(greet("Alice", "Hi"))        # Hi, Alice!
+
+print(greet("Alice"))  # Hello, Alice!
+print(greet("Alice", "Hi"))  # Hi, Alice!
 ```
 
 ### 3. *args and **kwargs
@@ -73,20 +79,25 @@ def sum_all(*args):
         total += num
     return total
 
+
 print(sum_all(1, 2, 3, 4, 5))  # 15
+
 
 # **kwargs — variable keyword arguments (dict)
 def print_info(**kwargs):
     for key, value in kwargs.items():
         print(f"{key}: {value}")
 
+
 print_info(name="Alice", age=30, city="NYC")
+
 
 # Combined
 def complex_func(a, b, *args, **kwargs):
     print(f"a={a}, b={b}")
     print(f"args={args}")
     print(f"kwargs={kwargs}")
+
 
 complex_func(1, 2, 3, 4, x=5, y=6)
 ```
@@ -96,20 +107,24 @@ complex_func(1, 2, 3, 4, x=5, y=6)
 ```python
 # Single return value
 def square(x):
-    return x ** 2
+    return x**2
+
 
 # Multiple return values (returns tuple)
 def min_max(numbers):
     return min(numbers), max(numbers)
 
+
 low, high = min_max([3, 1, 4, 1, 5, 9])
 print(f"Min: {low}, Max: {high}")
+
 
 # Early return
 def divide(a, b):
     if b == 0:
         return None  # Early return
     return a / b
+
 
 # Returning different types based on condition
 def process(data, mode="summary"):
@@ -128,22 +143,28 @@ def my_func():
     x = 10  # Local variable
     print(x)
 
+
 my_func()
 # print(x)  # NameError: x is not defined
 
 # Global scope
 greeting = "Hello"  # Global variable
 
+
 def use_global():
     global greeting
     greeting = "Hi"
 
+
 # Enclosing scope (closures)
 def outer():
     x = "outer"
+
     def inner():
         print(x)  # Accesses enclosing scope
+
     inner()
+
 
 # LEGB Rule: Local → Enclosing → Global → Builtin
 ```
@@ -152,7 +173,7 @@ def outer():
 
 ```python
 # Lambda — anonymous function
-square = lambda x: x ** 2
+square = lambda x: x**2
 print(square(5))  # 25
 
 # Lambda with multiple arguments
@@ -177,22 +198,28 @@ print(evens)  # [2, 4, 6, 8, 10]
 def multiplier(factor):
     def multiply(x):
         return x * factor  # 'factor' is captured
+
     return multiply
+
 
 double = multiplier(2)
 triple = multiplier(3)
 
-print(double(5))   # 10
-print(triple(5))   # 15
+print(double(5))  # 10
+print(triple(5))  # 15
+
 
 # Practical: counter
 def make_counter():
     count = 0
+
     def counter():
         nonlocal count
         count += 1
         return count
+
     return counter
+
 
 counter = make_counter()
 print(counter())  # 1
@@ -205,6 +232,7 @@ print(counter())  # 3
 ```python
 import time
 
+
 # Basic decorator
 def timer(func):
     def wrapper(*args, **kwargs):
@@ -213,14 +241,18 @@ def timer(func):
         end = time.time()
         print(f"{func.__name__} took {end - start:.4f} seconds")
         return result
+
     return wrapper
+
 
 @timer
 def slow_function():
     time.sleep(1)
     return "Done!"
 
+
 slow_function()  # Prints timing info
+
 
 # Decorator with arguments
 def repeat(n):
@@ -229,12 +261,16 @@ def repeat(n):
             for _ in range(n):
                 result = func(*args, **kwargs)
             return result
+
         return wrapper
+
     return decorator
+
 
 @repeat(3)
 def say_hello():
     print("Hello!")
+
 
 say_hello()  # Prints "Hello!" 3 times
 ```
@@ -245,20 +281,21 @@ say_hello()  # Prints "Hello!" 3 times
 def calculate_bmi(weight_kg: float, height_m: float) -> float:
     """
     Calculate Body Mass Index (BMI).
-    
+
     Args:
         weight_kg: Weight in kilograms
         height_m: Height in meters
-    
+
     Returns:
         BMI value (weight / height^2)
-    
+
     Raises:
         ValueError: If height is zero or negative
     """
     if height_m <= 0:
         raise ValueError("Height must be positive")
-    return weight_kg / (height_m ** 2)
+    return weight_kg / (height_m**2)
+
 
 # Access docstring
 print(calculate_bmi.__doc__)
@@ -273,17 +310,20 @@ print(calculate_bmi.__doc__)
 ```python
 def compose(*functions):
     """Compose multiple functions into one."""
+
     def composed(x):
         result = x
         for f in reversed(functions):
             result = f(result)
         return result
+
     return composed
+
 
 # Usage
 double = lambda x: x * 2
 add_one = lambda x: x + 1
-square = lambda x: x ** 2
+square = lambda x: x**2
 
 transform = compose(square, double, add_one)
 print(transform(3))  # square(double(add_one(3))) = square(double(4)) = square(8) = 64
@@ -295,17 +335,21 @@ print(transform(3))  # square(double(add_one(3))) = square(double(4)) = square(8
 def memoize(func):
     """Cache function results."""
     cache = {}
+
     def wrapper(*args):
         if args not in cache:
             cache[args] = func(*args)
         return cache[args]
+
     return wrapper
+
 
 @memoize
 def fibonacci(n):
     if n < 2:
         return n
-    return fibonacci(n-1) + fibonacci(n-2)
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
 
 print(fibonacci(100))  # Computed instantly!
 ```
@@ -315,8 +359,10 @@ print(fibonacci(100))  # Computed instantly!
 ```python
 import time
 
+
 def retry(max_attempts=3, delay=1):
     """Retry a function on failure."""
+
     def decorator(func):
         def wrapper(*args, **kwargs):
             for attempt in range(max_attempts):
@@ -327,12 +373,16 @@ def retry(max_attempts=3, delay=1):
                         raise
                     print(f"Attempt {attempt + 1} failed: {e}")
                     time.sleep(delay)
+
         return wrapper
+
     return decorator
+
 
 @retry(max_attempts=3, delay=0.5)
 def unreliable_function():
     import random
+
     if random.random() < 0.7:
         raise ValueError("Random failure!")
     return "Success!"
@@ -344,6 +394,7 @@ def unreliable_function():
 def apply_operation(func, *numbers):
     """Apply a function to a list of numbers."""
     return func(*numbers)
+
 
 # Using with different operations
 result1 = apply_operation(sum, 1, 2, 3, 4, 5)
@@ -366,8 +417,10 @@ def add_item(item, items=[]):
     items.append(item)
     return items
 
+
 print(add_item("a"))  # ['a']
 print(add_item("b"))  # ['a', 'b'] — unexpected!
+
 
 # CORRECT
 def add_item(item, items=None):
@@ -381,14 +434,16 @@ def add_item(item, items=None):
 ```python
 # WRONG — forgets to return
 def square(x):
-    x ** 2  # Computed but not returned!
+    x**2  # Computed but not returned!
+
 
 result = square(5)
 print(result)  # None
 
+
 # CORRECT
 def square(x):
-    return x ** 2
+    return x**2
 ```
 
 ### Mistake 3: Shadowing Built-ins
@@ -396,6 +451,7 @@ def square(x):
 # WRONG — shadowing built-in functions
 def list(items):  # Shadows built-in list!
     return items
+
 
 # CORRECT
 def process_items(items):
@@ -406,9 +462,12 @@ def process_items(items):
 ```python
 # WRONG — modifying global without declaration
 count = 0
+
+
 def increment():
     global count
     count += 1
+
 
 # BETTER — pass and return
 def increment(count):
@@ -442,8 +501,9 @@ def pipeline(data, *functions):
     # Your code here
     pass
 
+
 # Expected: [4, 16, 36]
-print(pipeline([1, 2, 3], lambda x: x*2, lambda x: x**2))
+print(pipeline([1, 2, 3], lambda x: x * 2, lambda x: x**2))
 ```
 
 ### Exercise 2: Curry Function
@@ -453,6 +513,7 @@ Implement a curry function that transforms `f(a, b, c)` into `f(a)(b)(c)`.
 def curry(func):
     # Your code here
     pass
+
 
 add = curry(lambda a, b, c: a + b + c)
 print(add(1)(2)(3))  # 6
@@ -465,6 +526,7 @@ Create a decorator that limits function calls to N per minute.
 def rate_limit(calls_per_minute):
     # Your code here
     pass
+
 
 @rate_limit(5)
 def api_call():

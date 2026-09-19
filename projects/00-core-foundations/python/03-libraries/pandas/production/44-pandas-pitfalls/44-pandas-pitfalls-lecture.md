@@ -55,14 +55,13 @@ with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter("always")
     sub = df[df["a"] > 2]
     sub["flag"] = 1
-    warned = any(w.category.__name__ == "SettingWithCopyWarning"
-                 for w in caught)
+    warned = any(w.category.__name__ == "SettingWithCopyWarning" for w in caught)
 
-print("warned:", warned)                  # True
-print("stuck:", int(df["flag"].sum()))    # 0
+print("warned:", warned)  # True
+print("stuck:", int(df["flag"].sum()))  # 0
 
 df.loc[df["a"] > 2, "flag"] = 1
-print("after .loc:", int(df["flag"].sum()))   # 2
+print("after .loc:", int(df["flag"].sum()))  # 2
 ```
 
 ```text
@@ -80,9 +79,8 @@ error — silently.
 left = pd.Series([1.0, 2.0, 3.0], index=[0, 1, 2])
 right = pd.Series([10.0, 20.0, 30.0], index=[1, 2, 3])
 
-print((left + right).tolist())                    # [nan, 12.0, 23.0, nan]
-print((left.reset_index(drop=True)
-       + right.reset_index(drop=True)).tolist())  # [11.0, 22.0, 33.0]
+print((left + right).tolist())  # [nan, 12.0, 23.0, nan]
+print((left.reset_index(drop=True) + right.reset_index(drop=True)).tolist())  # [11.0, 22.0, 33.0]
 ```
 
 ```text
@@ -102,8 +100,8 @@ internally.
 ```python
 df_ip = pd.DataFrame({"x": [1.0, np.nan, 3.0]})
 result = df_ip.dropna(inplace=True)
-print(result)                  # None
-print(len(df_ip))              # 2 (it did mutate, but returns None)
+print(result)  # None
+print(len(df_ip))  # 2 (it did mutate, but returns None)
 ```
 
 ```text
@@ -118,8 +116,8 @@ nothing.
 
 ```python
 s = pd.Series([1.0, np.nan, 3.0, np.nan])
-print(len(s[s != np.nan]))          # 4  -- filtered nothing
-print(s[s.notna()].tolist())        # [1.0, 3.0]
+print(len(s[s != np.nan]))  # 4  -- filtered nothing
+print(s[s.notna()].tolist())  # [1.0, 3.0]
 ```
 
 ```text
@@ -140,11 +138,11 @@ s = pd.Series([10.0, np.nan, 20.0])
 
 with warnings.catch_warnings(record=True) as caught:
     warnings.simplefilter("always")
-    fabricated = s.pct_change()               # fill_method='pad' (deprecated)
+    fabricated = s.pct_change()  # fill_method='pad' (deprecated)
     honest = s.pct_change(fill_method=None)
 
-print("fabricated:", fabricated.tolist())     # [nan, 0.0, 1.0]
-print("honest:    ", honest.tolist())         # [nan, nan, nan]
+print("fabricated:", fabricated.tolist())  # [nan, 0.0, 1.0]
+print("honest:    ", honest.tolist())  # [nan, nan, nan]
 print("warned:    ", any(w.category.__name__ == "FutureWarning" for w in caught))
 ```
 
@@ -169,7 +167,7 @@ changes under you.
 ```python
 df_up = pd.DataFrame({"id": [1, 2, 3]})
 df_up.loc[2, "id"] = "oops"
-print(df_up["id"].dtype)        # object -- the int contract is gone
+print(df_up["id"].dtype)  # object -- the int contract is gone
 ```
 
 ```text
@@ -186,12 +184,14 @@ faster.
 n = 5_000
 loop_df = pd.DataFrame({"a": np.arange(n), "b": np.arange(n) * 2})
 
+
 def with_iterrows(f):
     total = 0.0
     for _, row in f.iterrows():
         if row["a"] % 2 == 0:
             total += row["b"]
     return total
+
 
 def with_itertuples(f):
     total = 0.0
@@ -200,8 +200,10 @@ def with_itertuples(f):
             total += row.b
     return total
 
+
 def vectorized(f):
     return float(f.loc[f["a"] % 2 == 0, "b"].sum())
+
 
 print(with_iterrows(loop_df) == with_itertuples(loop_df) == vectorized(loop_df))
 ```
@@ -223,7 +225,7 @@ orders = pd.DataFrame({"cust": ["a", "a", "b"], "amt": [1, 2, 3]})
 profile = pd.DataFrame({"cust": ["a", "a", "a"], "city": ["NY", "LA", "SF"]})
 
 merged = orders.merge(profile, on="cust")
-print(len(orders), len(profile), "->", len(merged))   # 3 3 -> 6
+print(len(orders), len(profile), "->", len(merged))  # 3 3 -> 6
 ```
 
 ```text
@@ -243,14 +245,15 @@ silently corrupts data today.
 
 ```python
 def slice_mutation(frame: pd.DataFrame) -> list[float]:
-    view = frame.copy(deep=False)   # shares blocks
+    view = frame.copy(deep=False)  # shares blocks
     view.iloc[0, 0] = 99
     return frame["a"].tolist()
 
+
 pd.set_option("mode.copy_on_write", False)
-print(slice_mutation(pd.DataFrame({"a": [1, 2, 3]})))   # [99, 2, 3]
+print(slice_mutation(pd.DataFrame({"a": [1, 2, 3]})))  # [99, 2, 3]
 pd.set_option("mode.copy_on_write", True)
-print(slice_mutation(pd.DataFrame({"a": [1, 2, 3]})))   # [1, 2, 3]
+print(slice_mutation(pd.DataFrame({"a": [1, 2, 3]})))  # [1, 2, 3]
 pd.set_option("mode.copy_on_write", False)
 ```
 
@@ -264,10 +267,8 @@ pd.set_option("mode.copy_on_write", False)
 Three lines turn a silent row explosion into a loud, immediate error.
 
 ```python
-def merge_with_contract(left: pd.DataFrame, right: pd.DataFrame,
-                        key: str) -> pd.DataFrame:
-    assert right[key].is_unique, \
-        f"right side key '{key}' must be unique; found duplicates"
+def merge_with_contract(left: pd.DataFrame, right: pd.DataFrame, key: str) -> pd.DataFrame:
+    assert right[key].is_unique, f"right side key '{key}' must be unique; found duplicates"
     return left.merge(right, on=key)
 ```
 
@@ -305,7 +306,7 @@ df.merge(other, on="key")
 
 ```python
 # WRONG — returns None; cannot chain; no real savings
-df.dropna(inplace=True).assign(x=1)   # AttributeError
+df.dropna(inplace=True).assign(x=1)  # AttributeError
 # CORRECT
 df = df.dropna().assign(x=1)
 ```

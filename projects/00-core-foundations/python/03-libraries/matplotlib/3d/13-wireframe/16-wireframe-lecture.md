@@ -27,12 +27,12 @@ Z = np.sin(np.sqrt(X**2 + Y**2))
 
 # Create 3D plot
 fig = plt.figure(figsize=(10, 8))
-ax = fig.add_subplot(111, projection='3d')
-wire = ax.plot_wireframe(X, Y, Z, color='steelblue', linewidth=0.5)
-ax.set_title('3D Wireframe: sin(sqrt(x² + y²))')
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
+ax = fig.add_subplot(111, projection="3d")
+wire = ax.plot_wireframe(X, Y, Z, color="steelblue", linewidth=0.5)
+ax.set_title("3D Wireframe: sin(sqrt(x² + y²))")
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
+ax.set_zlabel("Z")
 plt.show()
 ```
 
@@ -45,8 +45,16 @@ plt.show()
 ax.view_init(elev=30, azim=45)  # elevation, azimuth
 
 # Reduce wire density with stride
-ax.plot_wireframe(X, Y, Z, rstride=5, cstride=5,  # Every 5th row/col
-                 color='steelblue', linewidth=0.5, alpha=0.7)
+ax.plot_wireframe(
+    X,
+    Y,
+    Z,
+    rstride=5,
+    cstride=5,  # Every 5th row/col
+    color="steelblue",
+    linewidth=0.5,
+    alpha=0.7,
+)
 
 # Common angles:
 # - top: elev=90, azim=0
@@ -61,13 +69,13 @@ ax.plot_wireframe(X, Y, Z, rstride=5, cstride=5,  # Every 5th row/col
 
 ```python
 fig = plt.figure(figsize=(10, 8))
-ax = fig.add_subplot(111, projection='3d')
+ax = fig.add_subplot(111, projection="3d")
 
 Z1 = np.sin(np.sqrt(X**2 + Y**2))
 Z2 = np.cos(np.sqrt(X**2 + Y**2))
 
-ax.plot_wireframe(X, Y, Z1, color='steelblue', alpha=0.7, label='sin')
-ax.plot_wireframe(X, Y, Z2, color='coral', alpha=0.5, label='cos')
+ax.plot_wireframe(X, Y, Z1, color="steelblue", alpha=0.7, label="sin")
+ax.plot_wireframe(X, Y, Z2, color="coral", alpha=0.5, label="cos")
 ax.legend()
 ```
 

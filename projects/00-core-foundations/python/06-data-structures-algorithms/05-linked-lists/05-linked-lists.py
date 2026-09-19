@@ -24,14 +24,17 @@ Disadvantages:
 # 1. SINGLY LINKED LIST
 # =============================================================================
 
+
 class Node:
     """A node in a linked list"""
+
     def __init__(self, data):
         self.data = data
         self.next = None
 
     def __repr__(self):
         return f"Node({self.data})"
+
 
 class SinglyLinkedList:
     """Singly Linked List implementation"""
@@ -225,12 +228,15 @@ print(f"Reversed: {sll}")
 # 2. DOUBLY LINKED LIST
 # =============================================================================
 
+
 class DNode:
     """Node for doubly linked list"""
+
     def __init__(self, data):
         self.data = data
         self.prev = None
         self.next = None
+
 
 class DoublyLinkedList:
     """Doubly Linked List implementation"""
@@ -334,6 +340,7 @@ print(f"After deletes: {dll}")
 # 3. CIRCULAR LINKED LIST
 # =============================================================================
 
+
 class CircularLinkedList:
     """Circular Linked List - last node points to first"""
 
@@ -430,6 +437,7 @@ print(f"As list: {cll.to_list()}")
 # 4. MERGE TWO SORTED LISTS
 # =============================================================================
 
+
 def merge_sorted_lists(l1, l2):
     """Merge two sorted linked lists. O(n + m) time."""
     dummy = Node(0)
@@ -447,6 +455,7 @@ def merge_sorted_lists(l1, l2):
     current.next = l1 if l1 else l2
     return dummy.next
 
+
 def list_to_linked(lst):
     """Convert Python list to linked list"""
     if not lst:
@@ -458,6 +467,7 @@ def list_to_linked(lst):
         current = current.next
     return head
 
+
 def linked_to_list(head):
     """Convert linked list to Python list"""
     result = []
@@ -465,6 +475,7 @@ def linked_to_list(head):
         result.append(head.data)
         head = head.next
     return result
+
 
 print("\n=== Merge Sorted Lists ===")
 l1 = list_to_linked([1, 3, 5, 7])
@@ -476,6 +487,7 @@ print(f"Merged: {linked_to_list(merged)}")
 # =============================================================================
 # 5. DETECT CYCLE (FLOYD'S ALGORITHM)
 # =============================================================================
+
 
 def has_cycle(head):
     """Detect cycle using Floyd's tortoise and hare. O(n) time, O(1) space."""
@@ -489,6 +501,7 @@ def has_cycle(head):
         slow = slow.next
         fast = fast.next.next
     return True
+
 
 # Create list with cycle for testing
 cycle_node = Node(3)
@@ -507,6 +520,7 @@ print(f"Normal list has cycle: {has_cycle(list_to_linked([1, 2, 3, 4]))}")
 # 6. FIND MIDDLE ELEMENT
 # =============================================================================
 
+
 def find_middle(head):
     """Find middle using slow/fast pointers. O(n) time."""
     if not head:
@@ -516,6 +530,7 @@ def find_middle(head):
         slow = slow.next
         fast = fast.next.next
     return slow.data
+
 
 print("\n=== Find Middle ===")
 test = list_to_linked([1, 2, 3, 4, 5])
@@ -528,6 +543,7 @@ print(f"Middle of [1,2,3,4,5,6]: {find_middle(test2)}")
 # =============================================================================
 # 7. REMOVE NTH NODE FROM END
 # =============================================================================
+
 
 def remove_nth_from_end(head, n):
     """Remove nth node from end. O(n) time, one pass."""
@@ -545,6 +561,7 @@ def remove_nth_from_end(head, n):
     slow.next = slow.next.next
     return dummy.next
 
+
 print("\n=== Remove Nth from End ===")
 test = list_to_linked([1, 2, 3, 4, 5])
 result = remove_nth_from_end(test, 2)
@@ -555,12 +572,15 @@ print(f"Remove 2nd from end of [1,2,3,4,5]: {linked_to_list(result)}")
 # 8. FLATTEN A MULTI-LEVEL LIST
 # =============================================================================
 
+
 class MultiLevelNode:
     """Node with child pointer"""
+
     def __init__(self, data):
         self.data = data
         self.next = None
         self.child = None
+
 
 def flatten_list(head):
     """Flatten multi-level linked list. O(n) time."""
@@ -586,6 +606,7 @@ def flatten_list(head):
 # =============================================================================
 # 9. ROTATE LIST
 # =============================================================================
+
 
 def rotate_right(head, k):
     """Rotate list to the right by k places. O(n) time."""
@@ -616,6 +637,7 @@ def rotate_right(head, k):
 
     return new_head
 
+
 print("\n=== Rotate List ===")
 test = list_to_linked([1, 2, 3, 4, 5])
 rotated = rotate_right(test, 2)
@@ -625,6 +647,7 @@ print(f"Rotate [1,2,3,4,5] right by 2: {linked_to_list(rotated)}")
 # =============================================================================
 # 10. PALINDROME LINKED LIST
 # =============================================================================
+
 
 def is_palindrome_linked(head):
     """Check if linked list is palindrome. O(n) time, O(1) space."""
@@ -654,6 +677,7 @@ def is_palindrome_linked(head):
         right = right.next
 
     return True
+
 
 print("\n=== Palindrome Check ===")
 test1 = list_to_linked([1, 2, 3, 2, 1])

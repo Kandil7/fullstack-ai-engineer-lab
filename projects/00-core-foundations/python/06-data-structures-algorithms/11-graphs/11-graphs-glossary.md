@@ -34,17 +34,19 @@ Two vertices are adjacent if they are connected by an edge.
 ```python
 # In adjacency list representation
 graph = {
-    'A': ['B', 'C'],  # B and C are adjacent to A
-    'B': ['A', 'D'],  # A and D are adjacent to B
-    'C': ['A'],
-    'D': ['B']
+    "A": ["B", "C"],  # B and C are adjacent to A
+    "B": ["A", "D"],  # A and D are adjacent to B
+    "C": ["A"],
+    "D": ["B"],
 }
+
 
 def are_adjacent(graph, v1, v2):
     return v2 in graph.get(v1, [])
 
-print(are_adjacent(graph, 'A', 'B'))  # True
-print(are_adjacent(graph, 'A', 'D'))  # False
+
+print(are_adjacent(graph, "A", "B"))  # True
+print(are_adjacent(graph, "A", "D"))  # False
 ```
 
 **Related Terms:** Edge, Vertex, Degree
@@ -58,24 +60,25 @@ A graph representation where each vertex stores a list of its adjacent vertices.
 class AdjacencyListGraph:
     def __init__(self):
         self.graph = {}
-    
+
     def add_vertex(self, v):
         if v not in self.graph:
             self.graph[v] = []
-    
+
     def add_edge(self, v1, v2):
         self.add_vertex(v1)
         self.add_vertex(v2)
         self.graph[v1].append(v2)
         self.graph[v2].append(v1)  # For undirected
-    
+
     def get_neighbors(self, v):
         return self.graph.get(v, [])
 
+
 # Example
 g = AdjacencyListGraph()
-g.add_edge('A', 'B')
-g.add_edge('A', 'C')
+g.add_edge("A", "B")
+g.add_edge("A", "C")
 print(g.graph)  # {'A': ['B', 'C'], 'B': ['A'], 'C': ['A']}
 ```
 
@@ -96,19 +99,20 @@ class AdjacencyMatrixGraph:
         self.n = len(vertices)
         self.vertex_map = {v: i for i, v in enumerate(vertices)}
         self.matrix = [[0] * self.n for _ in range(self.n)]
-    
+
     def add_edge(self, v1, v2, weight=1):
         i, j = self.vertex_map[v1], self.vertex_map[v2]
         self.matrix[i][j] = weight
         self.matrix[j][i] = weight  # For undirected
-    
+
     def has_edge(self, v1, v2):
         i, j = self.vertex_map[v1], self.vertex_map[v2]
         return self.matrix[i][j] != 0
 
+
 # Example
-g = AdjacencyMatrixGraph(['A', 'B', 'C'])
-g.add_edge('A', 'B')
+g = AdjacencyMatrixGraph(["A", "B", "C"])
+g.add_edge("A", "B")
 print(g.matrix)  # [[0, 1, 0], [1, 0, 0], [0, 0, 0]]
 ```
 
@@ -129,7 +133,7 @@ A directed edge in a graph. Same as "directed edge."
 
 ```python
 # Arc from A to B (A -> B)
-graph.add_edge('A', 'B')  # Creates an arc
+graph.add_edge("A", "B")  # Creates an arc
 ```
 
 **Related Terms:** Directed Edge, Edge
@@ -144,34 +148,36 @@ A graph traversal algorithm that explores all vertices at the present depth befo
 ```python
 from collections import deque
 
+
 def bfs(graph, start):
     visited = set()
     queue = deque([start])
     visited.add(start)
     traversal = []
-    
+
     while queue:
         vertex = queue.popleft()
         traversal.append(vertex)
-        
+
         for neighbor in graph[vertex]:
             if neighbor not in visited:
                 visited.add(neighbor)
                 queue.append(neighbor)
-    
+
     return traversal
+
 
 # Example
 graph = {
-    'A': ['B', 'C'],
-    'B': ['A', 'D', 'E'],
-    'C': ['A', 'F'],
-    'D': ['B'],
-    'E': ['B', 'F'],
-    'F': ['C', 'E']
+    "A": ["B", "C"],
+    "B": ["A", "D", "E"],
+    "C": ["A", "F"],
+    "D": ["B"],
+    "E": ["B", "F"],
+    "F": ["C", "E"],
 }
 
-print(bfs(graph, 'A'))  # ['A', 'B', 'C', 'D', 'E', 'F']
+print(bfs(graph, "A"))  # ['A', 'B', 'C', 'D', 'E', 'F']
 ```
 
 **Time Complexity:** O(V + E)
@@ -192,11 +198,11 @@ A graph whose vertices can be divided into two disjoint sets such that every edg
 ```python
 def is_bipartite(graph):
     color = {}
-    
+
     def bfs_check(start):
         queue = [start]
         color[start] = 0
-        
+
         while queue:
             vertex = queue.pop(0)
             for neighbor in graph[vertex]:
@@ -206,20 +212,16 @@ def is_bipartite(graph):
                 elif color[neighbor] == color[vertex]:
                     return False
         return True
-    
+
     for v in graph:
         if v not in color:
             if not bfs_check(v):
                 return False
     return True
 
+
 # Bipartite example
-bipartite = {
-    'A': ['C', 'D'],
-    'B': ['C', 'D'],
-    'C': ['A', 'B'],
-    'D': ['A', 'B']
-}
+bipartite = {"A": ["C", "D"], "B": ["C", "D"], "C": ["A", "B"], "D": ["A", "B"]}
 print(is_bipartite(bipartite))  # True
 ```
 
@@ -271,30 +273,25 @@ A maximal subgraph in which any two vertices are connected to each other by path
 def connected_components(graph):
     visited = set()
     components = []
-    
+
     def dfs(vertex, component):
         visited.add(vertex)
         component.append(vertex)
         for neighbor in graph[vertex]:
             if neighbor not in visited:
                 dfs(neighbor, component)
-    
+
     for v in graph:
         if v not in visited:
             component = []
             dfs(v, component)
             components.append(component)
-    
+
     return components
 
+
 # Example with disconnected graph
-graph = {
-    'A': ['B'],
-    'B': ['A'],
-    'C': ['D'],
-    'D': ['C'],
-    'E': []
-}
+graph = {"A": ["B"], "B": ["A"], "C": ["D"], "D": ["C"], "E": []}
 
 print(connected_components(graph))
 # [['A', 'B'], ['C', 'D'], ['E']]
@@ -311,7 +308,7 @@ A path that starts and ends at the same vertex without repeating edges.
 ```python
 def has_cycle_undirected(graph):
     visited = set()
-    
+
     def dfs(vertex, parent):
         visited.add(vertex)
         for neighbor in graph[vertex]:
@@ -321,19 +318,16 @@ def has_cycle_undirected(graph):
             elif neighbor != parent:
                 return True
         return False
-    
+
     for v in graph:
         if v not in visited:
             if dfs(v, None):
                 return True
     return False
 
+
 # Graph with cycle
-cyclic = {
-    'A': ['B', 'C'],
-    'B': ['A', 'C'],
-    'C': ['A', 'B']
-}
+cyclic = {"A": ["B", "C"], "B": ["A", "C"], "C": ["A", "B"]}
 print(has_cycle_undirected(cyclic))  # True
 ```
 
@@ -351,27 +345,23 @@ def topological_sort_dag(graph):
     """Topological sort - only works on DAGs"""
     visited = set()
     stack = []
-    
+
     def dfs(vertex):
         visited.add(vertex)
         for neighbor in graph[vertex]:
             if neighbor not in visited:
                 dfs(neighbor)
         stack.append(vertex)
-    
+
     for v in graph:
         if v not in visited:
             dfs(v)
-    
+
     return stack[::-1]
 
+
 # DAG example (course prerequisites)
-dag = {
-    'CS101': ['CS201', 'CS202'],
-    'CS201': ['CS301'],
-    'CS202': ['CS301'],
-    'CS301': []
-}
+dag = {"CS101": ["CS201", "CS202"], "CS201": ["CS301"], "CS202": ["CS301"], "CS301": []}
 
 print(topological_sort_dag(dag))
 # ['CS101', 'CS201', 'CS202', 'CS301'] or similar
@@ -394,23 +384,22 @@ def get_degree(graph, vertex):
     """For undirected graph"""
     return len(graph[vertex])
 
+
 def get_in_degree(graph, vertex):
     """For directed graph - edges pointing to vertex"""
     return sum(1 for v in graph if vertex in graph[v])
+
 
 def get_out_degree(graph, vertex):
     """For directed graph - edges from vertex"""
     return len(graph[vertex])
 
+
 # Example
-directed = {
-    'A': ['B', 'C'],
-    'B': ['C'],
-    'C': []
-}
+directed = {"A": ["B", "C"], "B": ["C"], "C": []}
 
 print(f"Out-degree of A: {get_out_degree(directed, 'A')}")  # 2
-print(f"In-degree of C: {get_in_degree(directed, 'C')}")    # 2
+print(f"In-degree of C: {get_in_degree(directed, 'C')}")  # 2
 ```
 
 **Related Terms:** In-Degree, Out-Degree, Handshaking Lemma
@@ -423,10 +412,7 @@ A graph with many edges, close to the maximum possible (V²).
 ```python
 # Dense graph: O(V²) edges
 # Adjacency matrix is preferred
-dense_graph = [[0, 1, 1, 1],
-               [1, 0, 1, 1],
-               [1, 1, 0, 1],
-               [1, 1, 1, 0]]
+dense_graph = [[0, 1, 1, 1], [1, 0, 1, 1], [1, 1, 0, 1], [1, 1, 1, 0]]
 ```
 
 **Related Terms:** Sparse Graph, Adjacency Matrix
@@ -440,21 +426,22 @@ A graph traversal algorithm that explores as far as possible along each branch b
 def dfs_recursive(graph, vertex, visited=None):
     if visited is None:
         visited = set()
-    
+
     visited.add(vertex)
     traversal = [vertex]
-    
+
     for neighbor in graph[vertex]:
         if neighbor not in visited:
             traversal.extend(dfs_recursive(graph, neighbor, visited))
-    
+
     return traversal
+
 
 def dfs_iterative(graph, start):
     visited = set()
     stack = [start]
     traversal = []
-    
+
     while stack:
         vertex = stack.pop()
         if vertex not in visited:
@@ -463,20 +450,21 @@ def dfs_iterative(graph, start):
             for neighbor in graph[vertex]:
                 if neighbor not in visited:
                     stack.append(neighbor)
-    
+
     return traversal
+
 
 # Example
 graph = {
-    'A': ['B', 'C'],
-    'B': ['A', 'D', 'E'],
-    'C': ['A', 'F'],
-    'D': ['B'],
-    'E': ['B', 'F'],
-    'F': ['C', 'E']
+    "A": ["B", "C"],
+    "B": ["A", "D", "E"],
+    "C": ["A", "F"],
+    "D": ["B"],
+    "E": ["B", "F"],
+    "F": ["C", "E"],
 }
 
-print(dfs_recursive(graph, 'A'))  # ['A', 'B', 'D', 'E', 'F', 'C']
+print(dfs_recursive(graph, "A"))  # ['A', 'B', 'D', 'E', 'F', 'C']
 ```
 
 **Time Complexity:** O(V + E)
@@ -499,20 +487,21 @@ A graph where edges have a direction (from one vertex to another).
 class DirectedGraph:
     def __init__(self):
         self.graph = {}
-    
+
     def add_edge(self, v1, v2):
         if v1 not in self.graph:
             self.graph[v1] = []
         self.graph[v1].append(v2)
         # Don't add reverse edge
-    
+
     def has_edge(self, v1, v2):
         return v2 in self.graph.get(v1, [])
 
+
 g = DirectedGraph()
-g.add_edge('A', 'B')  # A -> B only
-print(g.has_edge('A', 'B'))  # True
-print(g.has_edge('B', 'A'))  # False
+g.add_edge("A", "B")  # A -> B only
+print(g.has_edge("A", "B"))  # True
+print(g.has_edge("B", "A"))  # False
 ```
 
 **Related Terms:** Undirected Graph, Arc, Directed Edge
@@ -530,15 +519,16 @@ class Edge:
         self.source = source
         self.destination = destination
         self.weight = weight
-    
+
     def __repr__(self):
         if self.weight:
             return f"{self.source} --{self.weight}--> {self.destination}"
         return f"{self.source} --> {self.destination}"
 
+
 # Creating edges
-e1 = Edge('A', 'B')
-e2 = Edge('A', 'B', weight=5)
+e1 = Edge("A", "B")
+e2 = Edge("A", "B", weight=5)
 print(e1)  # A --> B
 print(e2)  # A --5--> B
 ```
@@ -557,27 +547,28 @@ class Graph:
     def __init__(self, directed=False):
         self.adj_list = {}
         self.directed = directed
-    
+
     def add_vertex(self, vertex):
         if vertex not in self.adj_list:
             self.adj_list[vertex] = []
-    
+
     def add_edge(self, v1, v2):
         self.add_vertex(v1)
         self.add_vertex(v2)
         self.adj_list[v1].append(v2)
         if not self.directed:
             self.adj_list[v2].append(v1)
-    
+
     def display(self):
         for vertex in self.adj_list:
             print(f"{vertex}: {self.adj_list[vertex]}")
 
+
 # Creating a graph
 g = Graph(directed=False)
-g.add_edge('A', 'B')
-g.add_edge('A', 'C')
-g.add_edge('B', 'D')
+g.add_edge("A", "B")
+g.add_edge("A", "C")
+g.add_edge("B", "D")
 g.display()
 ```
 
@@ -593,19 +584,21 @@ A graph that allows multiple edges between the same pair of vertices.
 ```python
 from collections import defaultdict
 
+
 class MultiGraph:
     def __init__(self):
         self.graph = defaultdict(list)
-    
+
     def add_edge(self, v1, v2, label=""):
         self.graph[v1].append((v2, label))
         self.graph[v2].append((v1, label))
 
+
 # Multiple edges between A and B
 mg = MultiGraph()
-mg.add_edge('A', 'B', 'road1')
-mg.add_edge('A', 'B', 'road2')
-print(mg.graph['A'])  # [('B', 'road1'), ('B', 'road2')]
+mg.add_edge("A", "B", "road1")
+mg.add_edge("A", "B", "road2")
+print(mg.graph["A"])  # [('B', 'road1'), ('B', 'road2')]
 ```
 
 **Related Terms:** Simple Graph, Parallel Edges
@@ -621,7 +614,7 @@ A graph with no self-loops and no multiple edges between the same pair of vertic
 class SimpleGraph:
     def __init__(self):
         self.graph = {}
-    
+
     def add_edge(self, v1, v2):
         if v1 == v2:  # No self-loops
             return
@@ -629,15 +622,16 @@ class SimpleGraph:
             self.graph[v1] = set()
         if v2 not in self.graph:
             self.graph[v2] = set()
-        
+
         # No duplicate edges
         self.graph[v1].add(v2)
         self.graph[v2].add(v1)
 
+
 g = SimpleGraph()
-g.add_edge('A', 'B')
-g.add_edge('A', 'B')  # Ignored (duplicate)
-g.add_edge('A', 'A')  # Ignored (self-loop)
+g.add_edge("A", "B")
+g.add_edge("A", "B")  # Ignored (duplicate)
+g.add_edge("A", "A")  # Ignored (self-loop)
 ```
 
 **Related Terms:** Multi-Graph, Self-Loop
@@ -650,12 +644,7 @@ A graph with relatively few edges compared to the maximum possible.
 ```python
 # Sparse graph: O(V) edges
 # Adjacency list is preferred
-sparse_graph = {
-    'A': ['B'],
-    'B': ['A', 'C'],
-    'C': ['B', 'D'],
-    'D': ['C']
-}
+sparse_graph = {"A": ["B"], "B": ["A", "C"], "C": ["B", "D"], "D": ["C"]}
 # Only 3 edges for 4 vertices (max would be 6)
 ```
 
@@ -675,31 +664,27 @@ def topological_sort_kahn(graph):
     for v in graph:
         for neighbor in graph[v]:
             in_degree[neighbor] += 1
-    
+
     queue = [v for v in graph if in_degree[v] == 0]
     order = []
-    
+
     while queue:
         vertex = queue.pop(0)
         order.append(vertex)
-        
+
         for neighbor in graph[vertex]:
             in_degree[neighbor] -= 1
             if in_degree[neighbor] == 0:
                 queue.append(neighbor)
-    
+
     if len(order) != len(graph):
         return None  # Graph has cycle
-    
+
     return order
 
+
 # DAG
-dag = {
-    'A': ['B', 'C'],
-    'B': ['D'],
-    'C': ['D'],
-    'D': []
-}
+dag = {"A": ["B", "C"], "B": ["D"], "C": ["D"], "D": []}
 
 print(topological_sort_kahn(dag))  # ['A', 'B', 'C', 'D'] or similar
 ```
@@ -723,18 +708,19 @@ A graph where edges have no direction (bidirectional).
 class UndirectedGraph:
     def __init__(self):
         self.graph = {}
-    
+
     def add_edge(self, v1, v2):
         if v1 not in self.graph:
             self.graph[v1] = []
         if v2 not in self.graph:
             self.graph[v2] = []
-        
+
         self.graph[v1].append(v2)
         self.graph[v2].append(v1)  # Both directions
 
+
 g = UndirectedGraph()
-g.add_edge('A', 'B')
+g.add_edge("A", "B")
 print(g.graph)  # {'A': ['B'], 'B': ['A']}
 ```
 
@@ -753,13 +739,14 @@ class Vertex:
         self.key = key
         self.neighbors = []
         self.visited = False
-    
+
     def add_neighbor(self, vertex):
         self.neighbors.append(vertex)
 
+
 # Creating vertices
-v1 = Vertex('A')
-v2 = Vertex('B')
+v1 = Vertex("A")
+v2 = Vertex("B")
 v1.add_neighbor(v2)
 ```
 
@@ -776,20 +763,21 @@ A graph where edges have associated weights (costs, distances, etc.).
 class WeightedGraph:
     def __init__(self):
         self.graph = {}
-    
+
     def add_edge(self, v1, v2, weight):
         if v1 not in self.graph:
             self.graph[v1] = []
         if v2 not in self.graph:
             self.graph[v2] = []
-        
+
         self.graph[v1].append((v2, weight))
         self.graph[v2].append((v1, weight))
 
+
 g = WeightedGraph()
-g.add_edge('A', 'B', 5)
-g.add_edge('A', 'C', 3)
-print(g.graph['A'])  # [('B', 5), ('C', 3)]
+g.add_edge("A", "B", 5)
+g.add_edge("A", "C", 3)
+print(g.graph["A"])  # [('B', 5), ('C', 3)]
 ```
 
 **Related Terms:** Unweighted Graph, Dijkstra's Algorithm

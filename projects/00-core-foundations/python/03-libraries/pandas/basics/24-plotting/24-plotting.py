@@ -5,9 +5,11 @@ W3Schools: https://www.w3schools.com/python/pandas_plotting.asp
 Pandas integrates with matplotlib to provide built-in plotting.
 This covers line plots, area plots, and other visualization types.
 """
+
 import pandas as pd
 import numpy as np
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
@@ -23,12 +25,14 @@ print("=" * 60)
 
 np.random.seed(42)
 dates = pd.date_range("2024-01-01", periods=12, freq="ME")
-df_stock = pd.DataFrame({
-    "Date": dates,
-    "Stock_A": np.cumsum(np.random.randn(12)) + 100,
-    "Stock_B": np.cumsum(np.random.randn(12)) + 100,
-    "Stock_C": np.cumsum(np.random.randn(12)) + 100,
-}).set_index("Date")
+df_stock = pd.DataFrame(
+    {
+        "Date": dates,
+        "Stock_A": np.cumsum(np.random.randn(12)) + 100,
+        "Stock_B": np.cumsum(np.random.randn(12)) + 100,
+        "Stock_C": np.cumsum(np.random.randn(12)) + 100,
+    }
+).set_index("Date")
 
 print("Stock data:")
 print(df_stock.round(2))
@@ -54,13 +58,15 @@ print("=" * 60)
 print("Example 2: Area Plot (Stacked)")
 print("=" * 60)
 
-df_area = pd.DataFrame({
-    "Month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    "Electronics": [120, 130, 145, 160, 170, 180],
-    "Clothing": [80, 85, 90, 95, 100, 110],
-    "Food": [200, 210, 195, 220, 230, 240],
-    "Home": [60, 65, 70, 75, 80, 85],
-}).set_index("Month")
+df_area = pd.DataFrame(
+    {
+        "Month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        "Electronics": [120, 130, 145, 160, 170, 180],
+        "Clothing": [80, 85, 90, 95, 100, 110],
+        "Food": [200, 210, 195, 220, 230, 240],
+        "Home": [60, 65, 70, 75, 80, 85],
+    }
+).set_index("Month")
 
 print("Monthly sales:")
 print(df_area)
@@ -86,21 +92,26 @@ print("=" * 60)
 print("Example 3: Box Plot")
 print("=" * 60)
 
-df_box = pd.DataFrame({
-    "Q1": np.random.normal(70, 15, 100),
-    "Q2": np.random.normal(75, 10, 100),
-    "Q3": np.random.normal(68, 20, 100),
-    "Q4": np.random.normal(80, 12, 100),
-})
+df_box = pd.DataFrame(
+    {
+        "Q1": np.random.normal(70, 15, 100),
+        "Q2": np.random.normal(75, 10, 100),
+        "Q3": np.random.normal(68, 20, 100),
+        "Q4": np.random.normal(80, 12, 100),
+    }
+)
 
 print("Quarterly score statistics:")
 print(df_box.describe().round(1))
 print()
 
 fig, ax = plt.subplots(figsize=(8, 5))
-df_box.plot.box(ax=ax, patch_artist=True,
-                boxprops=dict(facecolor="lightblue", color="steelblue"),
-                medianprops=dict(color="red", linewidth=2))
+df_box.plot.box(
+    ax=ax,
+    patch_artist=True,
+    boxprops=dict(facecolor="lightblue", color="steelblue"),
+    medianprops=dict(color="red", linewidth=2),
+)
 ax.set_title("Score Distribution by Quarter")
 ax.set_ylabel("Score")
 ax.grid(True, alpha=0.3, axis="y")
@@ -131,8 +142,7 @@ axes[0, 1].set_title("Total Sales by Category")
 axes[0, 1].set_ylabel("Revenue ($K)")
 
 # Panel 3: Box plot
-df_box.plot.box(ax=axes[1, 0], patch_artist=True,
-                boxprops=dict(facecolor="lightyellow"))
+df_box.plot.box(ax=axes[1, 0], patch_artist=True, boxprops=dict(facecolor="lightyellow"))
 axes[1, 0].set_title("Score Distribution")
 
 # Panel 4: Histogram
@@ -159,11 +169,13 @@ print("=" * 60)
 print("Example 5: Dual-Axis Plot")
 print("=" * 60)
 
-df_dual = pd.DataFrame({
-    "Month": pd.date_range("2024-01-01", periods=6, freq="ME"),
-    "Revenue": [100, 120, 110, 140, 160, 175],
-    "Profit_Margin": [0.15, 0.18, 0.12, 0.20, 0.22, 0.25],
-}).set_index("Month")
+df_dual = pd.DataFrame(
+    {
+        "Month": pd.date_range("2024-01-01", periods=6, freq="ME"),
+        "Revenue": [100, 120, 110, 140, 160, 175],
+        "Profit_Margin": [0.15, 0.18, 0.12, 0.20, 0.22, 0.25],
+    }
+).set_index("Month")
 
 fig, ax1 = plt.subplots(figsize=(10, 5))
 ax1.bar(df_dual.index, df_dual["Revenue"], width=20, color="steelblue", alpha=0.7, label="Revenue")
@@ -171,7 +183,9 @@ ax1.set_ylabel("Revenue ($K)", color="steelblue")
 ax1.tick_params(axis="y", labelcolor="steelblue")
 
 ax2 = ax1.twinx()
-ax2.plot(df_dual.index, df_dual["Profit_Margin"], color="coral", marker="o", linewidth=2, label="Margin")
+ax2.plot(
+    df_dual.index, df_dual["Profit_Margin"], color="coral", marker="o", linewidth=2, label="Margin"
+)
 ax2.set_ylabel("Profit Margin", color="coral")
 ax2.tick_params(axis="y", labelcolor="coral")
 ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f"{x:.0%}"))

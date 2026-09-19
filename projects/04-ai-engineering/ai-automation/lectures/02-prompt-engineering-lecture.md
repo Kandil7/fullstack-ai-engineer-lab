@@ -319,6 +319,7 @@ Write a marketing email for our new AI-powered code review tool.
 """
 A flexible prompt template system for reusable prompts.
 """
+
 from dataclasses import dataclass
 from typing import Optional, Dict, Any
 import re
@@ -327,30 +328,30 @@ import re
 @dataclass
 class PromptTemplate:
     """Reusable prompt template with variable substitution."""
-    
+
     template: str
     required_vars: list[str]
     optional_vars: Dict[str, str] = None
-    
+
     def render(self, **kwargs) -> str:
         """Render template with provided variables."""
-        
+
         # Check required variables
         missing = [v for v in self.required_vars if v not in kwargs]
         if missing:
             raise ValueError(f"Missing required variables: {missing}")
-        
+
         # Apply optional defaults
         if self.optional_vars:
             for key, default in self.optional_vars.items():
                 if key not in kwargs:
                     kwargs[key] = default
-        
+
         # Replace {var} placeholders
         result = self.template
         for key, value in kwargs.items():
             result = result.replace(f"{{{key}}}", str(value))
-        
+
         return result
 
 
@@ -379,9 +380,15 @@ CONSTRAINTS:
 - Avoid speculation without data
 - Flag assumptions clearly
 """,
-    required_vars=["role", "domain", "content_type", "content", 
-                   "key_elements", "evaluation_criteria"],
-    optional_vars={"risk_level": "medium"}
+    required_vars=[
+        "role",
+        "domain",
+        "content_type",
+        "content",
+        "key_elements",
+        "evaluation_criteria",
+    ],
+    optional_vars={"risk_level": "medium"},
 )
 
 # Usage
@@ -391,7 +398,7 @@ prompt = ANALYSIS_TEMPLATE.render(
     content_type="network logs",
     content=open("network_logs.txt").read(),
     key_elements="anomalies and potential threats",
-    evaluation_criteria="severity and impact"
+    evaluation_criteria="severity and impact",
 )
 ```
 
@@ -763,7 +770,7 @@ Now extract from: [your text]
 ```python
 # ❌ BAD: Too many tasks in one prompt
 """
-Analyze the data, write a report, create charts, 
+Analyze the data, write a report, create charts,
 and email it to the team.
 """
 

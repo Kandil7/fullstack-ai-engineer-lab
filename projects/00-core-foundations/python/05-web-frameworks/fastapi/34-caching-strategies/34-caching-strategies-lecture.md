@@ -42,12 +42,16 @@ By the end of this lecture, you will be able to:
 ```python
 etag = hashlib.sha1(payload.encode()).hexdigest()[:16]
 
+
 @app.get("/catalog")
 def catalog(request: Request):
     if request.headers.get("If-None-Match") == etag:
         return Response(status_code=304)
-    return Response(content=json.dumps(body), media_type="application/json",
-                    headers={"ETag": etag, "Cache-Control": "private, max-age=60"})
+    return Response(
+        content=json.dumps(body),
+        media_type="application/json",
+        headers={"ETag": etag, "Cache-Control": "private, max-age=60"},
+    )
 ```
 
 Output:
@@ -91,7 +95,7 @@ def search(q: str):
     if cached is not None:
         return {"source": "cache", **cached}
     result = expensive_compute(q)
-    cache.set(key, result)              # TTL-bounded
+    cache.set(key, result)  # TTL-bounded
     return {"source": "compute", **result}
 ```
 
@@ -109,8 +113,8 @@ response.
 ## 4. Cache-Key Design — Encode the Full Identity
 
 ```python
-key = f"search:{q.strip().lower()}"        # normalized: "GPU" and "gpu" share
-key = f"dashboard:user:{user_id}"          # user-scoped: users never collide
+key = f"search:{q.strip().lower()}"  # normalized: "GPU" and "gpu" share
+key = f"dashboard:user:{user_id}"  # user-scoped: users never collide
 ```
 
 Output:

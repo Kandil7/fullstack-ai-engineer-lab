@@ -4,6 +4,7 @@ W3Schools: https://www.w3schools.com/python/pandas_getting_started.asp
 
 First steps with Pandas: creating Series and DataFrames from various sources.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -23,9 +24,7 @@ print()
 
 # With labels
 days = pd.Series(
-    [72.5, 68.0, 75.3, 71.8, 69.2],
-    index=["Mon", "Tue", "Wed", "Thu", "Fri"],
-    name="Temp (°F)"
+    [72.5, 68.0, 75.3, 71.8, 69.2], index=["Mon", "Tue", "Wed", "Thu", "Fri"], name="Temp (°F)"
 )
 print("Labeled Series:")
 print(days)
@@ -66,10 +65,7 @@ rows = [
     ["Milk", "Dairy", 3.00],
     ["Chicken", "Protein", 5.99],
 ]
-shopping = pd.DataFrame(
-    rows,
-    columns=["Item", "Category", "Price"]
-)
+shopping = pd.DataFrame(rows, columns=["Item", "Category", "Price"])
 print(shopping)
 print()
 
@@ -84,9 +80,7 @@ print("=" * 60)
 np.random.seed(42)
 data = np.random.randint(1, 100, size=(5, 4))
 df_rand = pd.DataFrame(
-    data,
-    columns=["A", "B", "C", "D"],
-    index=["row1", "row2", "row3", "row4", "row5"]
+    data, columns=["A", "B", "C", "D"], index=["row1", "row2", "row3", "row4", "row5"]
 )
 print("Random DataFrame:")
 print(df_rand)
@@ -100,7 +94,7 @@ print("=" * 60)
 print("Example 5: Inspecting Your DataFrame")
 print("=" * 60)
 
-print("Shape:", df.shape)         # (rows, cols)
+print("Shape:", df.shape)  # (rows, cols)
 print("Columns:", list(df.columns))
 print("Index:", list(df.index))
 print()

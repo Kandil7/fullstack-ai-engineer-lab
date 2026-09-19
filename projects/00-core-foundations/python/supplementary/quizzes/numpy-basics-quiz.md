@@ -38,6 +38,7 @@ D) `np.fromlist()`
 
 ```python
 import numpy as np
+
 arr = np.array([1, 2, 3, 4, 5])
 ```
 
@@ -94,8 +95,8 @@ D) `arange` only works with integers
 **Explanation:** `np.arange(start, stop, step)` generates values with a specified step size. `np.linspace(start, stop, num)` generates a specified number of evenly spaced points between start and stop.
 
 ```python
-np.arange(0, 10, 2)    # [0, 2, 4, 6, 8]
-np.linspace(0, 10, 5)   # [0, 2.5, 5, 7.5, 10]
+np.arange(0, 10, 2)  # [0, 2, 4, 6, 8]
+np.linspace(0, 10, 5)  # [0, 2.5, 5, 7.5, 10]
 ```
 
 ---
@@ -184,7 +185,7 @@ D) Filters the array
 
 ```python
 arr = np.array([1, 5, 3, 8, 2])
-indices = np.where(arr > 4)        # [1, 3]
+indices = np.where(arr > 4)  # [1, 3]
 result = np.where(arr > 4, arr, 0)  # [0, 5, 0, 8, 0]
 ```
 
@@ -255,7 +256,7 @@ D) Concatenate arrays of different sizes
 
 ```python
 a = np.array([[1], [2], [3]])  # Shape (3, 1)
-b = np.array([10, 20, 30])     # Shape (3,)
+b = np.array([10, 20, 30])  # Shape (3,)
 # Broadcasting works, result shape (3, 3)
 ```
 

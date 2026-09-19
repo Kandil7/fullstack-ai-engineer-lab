@@ -73,6 +73,4 @@ def build_conversations(
     The appended user message is freshly constructed per conversation, so it
     is the only object a caller can mutate without touching a neighbour.
     """
-    return [
-        [*shared_prefix, {"role": "user", "content": prompt}] for prompt in user_prompts
-    ]
+    return [[*shared_prefix, {"role": "user", "content": prompt}] for prompt in user_prompts]

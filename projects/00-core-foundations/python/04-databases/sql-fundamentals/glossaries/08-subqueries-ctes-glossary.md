@@ -31,13 +31,18 @@ materializes the CTE once at first reference.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE sales (region TEXT, amt REAL)")
-conn.executemany("INSERT INTO sales (region, amt) VALUES (?, ?)",
-                 [("east", 10), ("east", 5), ("west", 30)])
-print(conn.execute(
-    "WITH totals AS (SELECT region, SUM(amt) AS total FROM sales GROUP BY region) "
-    "SELECT * FROM totals WHERE total > 10").fetchall())
+conn.executemany(
+    "INSERT INTO sales (region, amt) VALUES (?, ?)", [("east", 10), ("east", 5), ("west", 30)]
+)
+print(
+    conn.execute(
+        "WITH totals AS (SELECT region, SUM(amt) AS total FROM sales GROUP BY region) "
+        "SELECT * FROM totals WHERE total > 10"
+    ).fetchall()
+)
 ```
 ```text
 [('west', 30.0)]
@@ -54,9 +59,11 @@ conn.execute("CREATE TABLE orders (id INTEGER PRIMARY KEY, cust TEXT)")
 conn.execute("CREATE TABLE payments (order_id INTEGER, amt REAL)")
 conn.executemany("INSERT INTO orders (cust) VALUES (?)", [("alice",), ("bob",)])
 conn.execute("INSERT INTO payments (order_id, amt) VALUES (?, ?)", (1, 9.99))
-print(conn.execute(
-    "SELECT cust FROM orders o WHERE EXISTS "
-    "(SELECT 1 FROM payments p WHERE p.order_id = o.id)").fetchall())
+print(
+    conn.execute(
+        "SELECT cust FROM orders o WHERE EXISTS (SELECT 1 FROM payments p WHERE p.order_id = o.id)"
+    ).fetchall()
+)
 ```
 ```text
 [('alice',)]
@@ -78,9 +85,12 @@ table, then references it — repeated references don't re-run the query.
 "rows without children" test (anti-join).
 **Example**:
 ```python
-print(conn.execute(
-    "SELECT cust FROM orders o WHERE NOT EXISTS "
-    "(SELECT 1 FROM payments p WHERE p.order_id = o.id)").fetchall())
+print(
+    conn.execute(
+        "SELECT cust FROM orders o WHERE NOT EXISTS "
+        "(SELECT 1 FROM payments p WHERE p.order_id = o.id)"
+    ).fetchall()
+)
 ```
 ```text
 [('bob',)]
@@ -93,9 +103,12 @@ starts from the seed and expands until no new rows appear. Tree
 traversal, date spines, graph walks.
 **Example**:
 ```python
-print(conn.execute(
-    "WITH RECURSIVE cnt(x) AS (SELECT 1 UNION ALL SELECT x + 1 FROM cnt WHERE x < 5) "
-    "SELECT x FROM cnt").fetchall())
+print(
+    conn.execute(
+        "WITH RECURSIVE cnt(x) AS (SELECT 1 UNION ALL SELECT x + 1 FROM cnt WHERE x < 5) "
+        "SELECT x FROM cnt"
+    ).fetchall()
+)
 ```
 ```text
 [(1,), (2,), (3,), (4,), (5,)]

@@ -155,7 +155,7 @@ i = 1
 while i <= 5:
     j = 1
     while j <= 5:
-        print(f"{i*j:4d}", end="")
+        print(f"{i * j:4d}", end="")
         j += 1
     print()  # New line
     i += 1
@@ -177,14 +177,15 @@ while i <= 5:
 ```python
 import random
 
+
 def guessing_game():
     target = random.randint(1, 100)
     attempts = 0
-    
+
     while True:
         guess = int(input("Guess a number (1-100): "))
         attempts += 1
-        
+
         if guess < target:
             print("Too low!")
         elif guess > target:
@@ -192,6 +193,7 @@ def guessing_game():
         else:
             print(f"Correct! You got it in {attempts} attempts!")
             break
+
 
 guessing_game()
 ```
@@ -208,6 +210,7 @@ def get_valid_age():
             print("Age must be between 0 and 150!")
         except ValueError:
             print("Please enter a valid number!")
+
 
 age = get_valid_age()
 print(f"Your age: {age}")
@@ -229,6 +232,7 @@ def fizzbuzz_while(n):
             print(i)
         i += 1
 
+
 fizzbuzz_while(15)
 ```
 
@@ -246,6 +250,7 @@ def collatz(n):
         sequence.append(n)
     return sequence
 
+
 print(collatz(6))  # [6, 3, 10, 5, 16, 8, 4, 2, 1]
 ```
 
@@ -261,6 +266,7 @@ def is_prime(n):
             return False
         i += 1
     return True
+
 
 primes = []
 n = 2
@@ -370,6 +376,7 @@ def digit_sum(n):
     # Your code here
     pass
 
+
 # Expected: 15 (1 + 2 + 3 + 4 + 5)
 print(digit_sum(12345))
 ```
@@ -382,6 +389,7 @@ def fibonacci(n):
     # Your code here — use while loop
     pass
 
+
 # Expected: [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 print(fibonacci(40))
 ```
@@ -393,6 +401,7 @@ Implement binary search using a while loop.
 def binary_search(sorted_list, target):
     # Your code here
     pass
+
 
 # Expected: 3
 print(binary_search([1, 2, 3, 4, 5, 6, 7], 4))

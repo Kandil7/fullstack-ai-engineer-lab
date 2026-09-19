@@ -162,6 +162,7 @@ each meaningful group, and comparing.
 import numpy as np
 import pandas as pd
 
+
 def disaggregated_error_rates(
     y_true: np.ndarray,
     y_pred: np.ndarray,
@@ -176,13 +177,15 @@ def disaggregated_error_rates(
         tn = int(np.sum((yt == 0) & (yp == 0)))
         fp = int(np.sum((yt == 0) & (yp == 1)))
         fn = int(np.sum((yt == 1) & (yp == 0)))
-        rows.append({
-            "group": g,
-            "n": int(m.sum()),
-            "accuracy": (tp + tn) / max(m.sum(), 1),
-            "fpr": fp / max(fp + tn, 1),   # false-positive rate
-            "fnr": fn / max(fn + tp, 1),   # false-negative rate
-        })
+        rows.append(
+            {
+                "group": g,
+                "n": int(m.sum()),
+                "accuracy": (tp + tn) / max(m.sum(), 1),
+                "fpr": fp / max(fp + tn, 1),  # false-positive rate
+                "fnr": fn / max(fn + tp, 1),  # false-negative rate
+            }
+        )
     return pd.DataFrame(rows)
 ```
 
@@ -294,13 +297,15 @@ def audit_fairness(
         tn = int(np.sum((yt == 0) & (yp == 0)))
         fp = int(np.sum((yt == 0) & (yp == 1)))
         fn = int(np.sum((yt == 1) & (yp == 0)))
-        records.append({
-            "group": g,
-            "n": int(mask.sum()),
-            "selection_rate": float(np.mean(yp == 1)),
-            "fpr": fp / max(fp + tn, 1),
-            "fnr": fn / max(fn + tp, 1),
-        })
+        records.append(
+            {
+                "group": g,
+                "n": int(mask.sum()),
+                "selection_rate": float(np.mean(yp == 1)),
+                "fpr": fp / max(fp + tn, 1),
+                "fnr": fn / max(fn + tp, 1),
+            }
+        )
 
     table = pd.DataFrame(records)
     warnings: list[str] = []

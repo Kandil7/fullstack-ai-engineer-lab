@@ -38,7 +38,7 @@ print(my_list)  # [1, 2, 2, 3, 3, 3]
 
 # Sets eliminate duplicates automatically
 my_set = {1, 2, 2, 3, 3, 3}
-print(my_set)   # {1, 2, 3}
+print(my_set)  # {1, 2, 3}
 ```
 
 ### 2. Creating Sets
@@ -57,8 +57,8 @@ chars = set("hello")
 print(chars)  # {'h', 'e', 'l', 'o'}  — duplicates removed
 
 # Empty set — MUST use set(), not {}
-empty_set = set()     # This is an empty set
-empty_dict = {}       # This is an empty dictionary!
+empty_set = set()  # This is an empty set
+empty_dict = {}  # This is an empty dictionary!
 
 # IMPORTANT: {1, 2, 3} is a set, but {} is a dictionary
 ```
@@ -104,12 +104,12 @@ print(fruits)  # {'apple', 'cherry'}
 
 # pop() — removes and returns an arbitrary element
 popped = fruits.pop()
-print(popped)   # 'apple' (or 'cherry' — order is arbitrary)
-print(fruits)   # {'cherry'}
+print(popped)  # 'apple' (or 'cherry' — order is arbitrary)
+print(fruits)  # {'cherry'}
 
 # clear() — removes all elements
 fruits.clear()
-print(fruits)   # set()
+print(fruits)  # set()
 ```
 
 ### 5. Set Operations (Mathematical)
@@ -119,20 +119,20 @@ a = {1, 2, 3, 4, 5}
 b = {4, 5, 6, 7, 8}
 
 # Union — all elements from both sets
-print(a | b)           # {1, 2, 3, 4, 5, 6, 7, 8}
-print(a.union(b))      # {1, 2, 3, 4, 5, 6, 7, 8}
+print(a | b)  # {1, 2, 3, 4, 5, 6, 7, 8}
+print(a.union(b))  # {1, 2, 3, 4, 5, 6, 7, 8}
 
 # Intersection — elements common to both sets
-print(a & b)                  # {4, 5}
-print(a.intersection(b))      # {4, 5}
+print(a & b)  # {4, 5}
+print(a.intersection(b))  # {4, 5}
 
 # Difference — elements in a but not in b
-print(a - b)                  # {1, 2, 3}
-print(a.difference(b))        # {1, 2, 3}
+print(a - b)  # {1, 2, 3}
+print(a.difference(b))  # {1, 2, 3}
 
 # Symmetric Difference — elements in either set, but not both
-print(a ^ b)                          # {1, 2, 3, 6, 7, 8}
-print(a.symmetric_difference(b))      # {1, 2, 3, 6, 7, 8}
+print(a ^ b)  # {1, 2, 3, 6, 7, 8}
+print(a.symmetric_difference(b))  # {1, 2, 3, 6, 7, 8}
 ```
 
 ### 6. Subset and Superset
@@ -143,16 +143,16 @@ b = {1, 2, 3, 4}
 c = {5, 6}
 
 # issubset — is a a subset of b?
-print(a.issubset(b))      # True — all elements of a are in b
-print(a <= b)             # True (same as issubset)
+print(a.issubset(b))  # True — all elements of a are in b
+print(a <= b)  # True (same as issubset)
 
 # issuperset — is b a superset of a?
-print(b.issuperset(a))    # True — b contains all elements of a
-print(b >= a)             # True (same as issuperset)
+print(b.issuperset(a))  # True — b contains all elements of a
+print(b >= a)  # True (same as issuperset)
 
 # isdisjoint — do sets have NO common elements?
-print(a.isdisjoint(c))    # True — no overlap
-print(a.isdisjoint(b))    # False — they share 1 and 2
+print(a.isdisjoint(c))  # True — no overlap
+print(a.isdisjoint(b))  # False — they share 1 and 2
 ```
 
 ### 7. Set Comprehensions
@@ -338,6 +338,7 @@ def unique_words(sentence):
     # Your code here
     pass
 
+
 # Expected: {"hello", "world"}
 print(unique_words("Hello hello world World"))
 ```
@@ -349,6 +350,7 @@ Write a function that takes two sets and an operation string ("union", "intersec
 def set_operation(set_a, set_b, operation):
     # Your code here
     pass
+
 
 # Expected: {1, 2, 3, 4, 5}
 print(set_operation({1, 2, 3}, {3, 4, 5}, "union"))

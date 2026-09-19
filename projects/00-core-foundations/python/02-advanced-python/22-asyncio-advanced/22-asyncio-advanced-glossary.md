@@ -28,13 +28,15 @@
 ```python
 import asyncio
 
+
 async def main() -> str:
     try:
         async with asyncio.timeout(0.05):
-            await asyncio.sleep(0.2)      # exceeds the deadline
+            await asyncio.sleep(0.2)  # exceeds the deadline
     except TimeoutError:
         return "timed out"
     return "finished"
+
 
 print(asyncio.run(main()))
 ```
@@ -49,20 +51,25 @@ timed out
 ```python
 import asyncio
 
+
 class Session:
     def __init__(self) -> None:
         self.closed = False
+
     async def __aenter__(self) -> "Session":
-        await asyncio.sleep(0.01)         # async setup
+        await asyncio.sleep(0.01)  # async setup
         return self
+
     async def __aexit__(self, *exc) -> bool:
-        self.closed = True                # async teardown
+        self.closed = True  # async teardown
         return False
+
 
 async def main() -> bool:
     async with Session() as s:
         pass
     return s.closed
+
 
 print(asyncio.run(main()))
 ```
@@ -77,12 +84,15 @@ True
 ```python
 import asyncio
 
+
 class Tokens:
     def __init__(self, words: list[str]) -> None:
         self._words = words
         self._i = 0
+
     def __aiter__(self) -> "Tokens":
         return self
+
     async def __anext__(self) -> str:
         if self._i >= len(self._words):
             raise StopAsyncIteration
@@ -91,8 +101,10 @@ class Tokens:
         await asyncio.sleep(0.01)
         return word
 
+
 async def main() -> list[str]:
     return [w async for w in Tokens(["a", "b"])]
+
 
 print(asyncio.run(main()))
 ```
@@ -107,9 +119,11 @@ print(asyncio.run(main()))
 ```python
 import asyncio
 
+
 async def main() -> str:
-    await asyncio.sleep(0.01)     # loop runs other tasks here
+    await asyncio.sleep(0.01)  # loop runs other tasks here
     return "back"
+
 
 print(asyncio.run(main()))
 ```
@@ -124,14 +138,17 @@ back
 ```python
 import asyncio
 
+
 async def main() -> tuple[int, int]:
     q: asyncio.Queue[int] = asyncio.Queue(maxsize=2)
     puts = 0
+
     async def producer() -> None:
         nonlocal puts
         for i in range(4):
-            await q.put(i)        # parks when the queue is full
+            await q.put(i)  # parks when the queue is full
             puts += 1
+
     async def consumer() -> None:
         while True:
             try:
@@ -142,8 +159,10 @@ async def main() -> tuple[int, int]:
             await asyncio.sleep(0)
             if q.empty() and puts == 4:
                 return
+
     await asyncio.gather(producer(), consumer())
     return puts, q.maxsize
+
 
 print(asyncio.run(main()))
 ```
@@ -158,12 +177,14 @@ print(asyncio.run(main()))
 ```python
 import asyncio
 
+
 async def worker() -> str:
     try:
         await asyncio.sleep(10)
     finally:
         print("cleanup ran")
     return "done"
+
 
 async def main() -> str:
     t = asyncio.create_task(worker())
@@ -173,6 +194,7 @@ async def main() -> str:
         await t
     except asyncio.CancelledError:
         return "cancelled"
+
 
 print(asyncio.run(main()))
 ```
@@ -188,14 +210,17 @@ cancelled
 ```python
 import asyncio
 
+
 async def main() -> str:
     cancelled: list[str] = []
+
     async def good(name: str) -> None:
         try:
             await asyncio.sleep(0.5)
         except asyncio.CancelledError:
             cancelled.append(name)
             raise
+
     try:
         async with asyncio.TaskGroup() as g:
             g.create_task(good("a"))
@@ -204,6 +229,7 @@ async def main() -> str:
     except ExceptionGroup:
         pass
     return ",".join(sorted(cancelled))
+
 
 print(asyncio.run(main()))
 ```
@@ -218,14 +244,17 @@ a,b
 ```python
 import asyncio
 
+
 async def maybe(n: int) -> int:
     if n == 2:
         raise ValueError("bad")
     return n
 
+
 async def main() -> list:
     results = await asyncio.gather(maybe(1), maybe(2), return_exceptions=True)
     return [type(r).__name__ if isinstance(r, BaseException) else r for r in results]
+
 
 print(asyncio.run(main()))
 ```
@@ -240,6 +269,7 @@ print(asyncio.run(main()))
 ```python
 import asyncio
 
+
 async def main() -> list[int]:
     q: asyncio.Queue[int] = asyncio.Queue(maxsize=1)
     await q.put(1)
@@ -248,6 +278,7 @@ async def main() -> list[int]:
         got.append(await q.get())
         await q.put(got[-1] + 1)
     return got
+
 
 print(asyncio.run(main()))
 ```
@@ -263,10 +294,12 @@ print(asyncio.run(main()))
 ```python
 import asyncio
 
+
 async def main() -> int:
     sem = asyncio.Semaphore(2)
     in_flight = 0
     max_seen = 0
+
     async def call(n: int) -> None:
         nonlocal in_flight, max_seen
         async with sem:
@@ -274,8 +307,10 @@ async def main() -> int:
             max_seen = max(max_seen, in_flight)
             await asyncio.sleep(0.01)
             in_flight -= 1
+
     await asyncio.gather(*(call(i) for i in range(5)))
     return max_seen
+
 
 print(asyncio.run(main()))
 ```
@@ -291,17 +326,19 @@ print(asyncio.run(main()))
 ```python
 import asyncio
 
+
 async def main() -> list[int]:
     q: asyncio.Queue[int | None] = asyncio.Queue()
     await q.put(1)
     await q.put(2)
-    await q.put(None)                # sentinel: no more work
+    await q.put(None)  # sentinel: no more work
     got: list[int] = []
     while True:
         item = await q.get()
         if item is None:
             return got
         got.append(item)
+
 
 print(asyncio.run(main()))
 ```
@@ -316,15 +353,17 @@ print(asyncio.run(main()))
 ```python
 import asyncio
 
+
 async def main() -> str:
     t = asyncio.create_task(asyncio.sleep(0.1))
     try:
         async with asyncio.timeout(0.01):
-            await asyncio.shield(t)          # outer cancels, inner survives
+            await asyncio.shield(t)  # outer cancels, inner survives
     except TimeoutError:
         pass
-    await t                                  # shielded work finished anyway
+    await t  # shielded work finished anyway
     return "shielded completed"
+
 
 print(asyncio.run(main()))
 ```
@@ -339,6 +378,7 @@ shielded completed
 ```python
 import asyncio
 
+
 async def main() -> float:
     start = asyncio.get_event_loop().time()
     t1 = asyncio.create_task(asyncio.sleep(0.05))
@@ -346,6 +386,7 @@ async def main() -> float:
     await t1
     await t2
     return round(asyncio.get_event_loop().time() - start, 2)
+
 
 print(asyncio.run(main()))
 ```
@@ -360,13 +401,15 @@ print(asyncio.run(main()))
 ```python
 import asyncio
 
+
 async def main() -> str:
     try:
         async with asyncio.TaskGroup() as g:
-            g.create_task(asyncio.sleep(0.1))       # will be cancelled
+            g.create_task(asyncio.sleep(0.1))  # will be cancelled
             raise KeyError("missing")
     except ExceptionGroup as eg:
         return eg.exceptions[0].__class__.__name__
+
 
 print(asyncio.run(main()))
 ```
@@ -381,12 +424,15 @@ KeyError
 ```python
 import asyncio, time
 
+
 def legacy_query(q: str) -> str:
-    time.sleep(0.02)                # blocking sync driver
+    time.sleep(0.02)  # blocking sync driver
     return f"result:{q}"
+
 
 async def main() -> str:
     return await asyncio.to_thread(legacy_query, "SELECT 1")
+
 
 print(asyncio.run(main()))
 ```

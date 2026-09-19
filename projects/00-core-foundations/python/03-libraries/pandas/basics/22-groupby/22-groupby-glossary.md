@@ -25,16 +25,13 @@
 **agg() / aggregate()**
 Applies one or more aggregation functions to each group. Supports named aggregations.
 ```python
-df.groupby('dept').agg(
-    avg_salary=('salary', 'mean'),
-    count=('salary', 'count')
-)
+df.groupby("dept").agg(avg_salary=("salary", "mean"), count=("salary", "count"))
 ```
 
 **apply()**
 Applies a custom function to each group. More flexible but slower than `agg()`.
 ```python
-df.groupby('dept').apply(lambda x: x.nlargest(2, 'salary'))
+df.groupby("dept").apply(lambda x: x.nlargest(2, "salary"))
 ```
 
 ### G
@@ -42,7 +39,7 @@ df.groupby('dept').apply(lambda x: x.nlargest(2, 'salary'))
 **get_group()**
 Retrieves a single group as a DataFrame by key value.
 ```python
-sales_team = df.groupby('department').get_group('Sales')
+sales_team = df.groupby("department").get_group("Sales")
 ```
 
 ### I
@@ -50,7 +47,7 @@ sales_team = df.groupby('department').get_group('Sales')
 **Iterating Over Groups**
 Use `for name, group in df.groupby('col'):` to loop through groups. Useful for custom processing.
 ```python
-for dept, group in df.groupby('department'):
+for dept, group in df.groupby("department"):
     print(f"{dept}: {len(group)} employees")
 ```
 
@@ -59,7 +56,7 @@ for dept, group in df.groupby('department'):
 **nunique()**
 Counts the number of unique values within each group.
 ```python
-df.groupby('department')['employee'].nunique()
+df.groupby("department")["employee"].nunique()
 ```
 
 ### R
@@ -67,7 +64,7 @@ df.groupby('department')['employee'].nunique()
 **rank()**
 Assigns ranks within each group. Useful for finding top performers per category.
 ```python
-df['rank'] = df.groupby('department')['salary'].rank(ascending=False)
+df["rank"] = df.groupby("department")["salary"].rank(ascending=False)
 ```
 
 ### S
@@ -75,7 +72,7 @@ df['rank'] = df.groupby('department')['salary'].rank(ascending=False)
 **size()**
 Returns the total size of each group (including NaN values). Unlike `count()`, which excludes NaN.
 ```python
-df.groupby('department').size()
+df.groupby("department").size()
 ```
 
 **split-apply-combine**
@@ -90,8 +87,8 @@ DataFrame → Groups → Functions → Result
 **transform()**
 Applies a function to each group and broadcasts the result back to the original DataFrame shape. Preserves index alignment.
 ```python
-df['dept_avg'] = df.groupby('dept')['salary'].transform('mean')
-df['dept_rank'] = df.groupby('dept')['salary'].rank()
+df["dept_avg"] = df.groupby("dept")["salary"].transform("mean")
+df["dept_rank"] = df.groupby("dept")["salary"].rank()
 ```
 
 ---
@@ -103,21 +100,27 @@ df['dept_rank'] = df.groupby('dept')['salary'].rank()
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    'store': ['A', 'A', 'B', 'B', 'A', 'B'],
-    'product': ['X', 'Y', 'X', 'Y', 'X', 'Y'],
-    'revenue': [1000, 1500, 800, 1200, 1100, 1400],
-    'quantity': [10, 15, 8, 12, 11, 14]
-})
+df = pd.DataFrame(
+    {
+        "store": ["A", "A", "B", "B", "A", "B"],
+        "product": ["X", "Y", "X", "Y", "X", "Y"],
+        "revenue": [1000, 1500, 800, 1200, 1100, 1400],
+        "quantity": [10, 15, 8, 12, 11, 14],
+    }
+)
 
 # Multiple aggregations per column
-result = df.groupby('store').agg(
-    total_revenue=('revenue', 'sum'),
-    avg_revenue=('revenue', 'mean'),
-    total_units=('quantity', 'sum'),
-    num_products=('product', 'nunique'),
-    avg_price=('revenue', lambda x: (x / df.loc[x.index, 'quantity']).mean())
-).reset_index()
+result = (
+    df.groupby("store")
+    .agg(
+        total_revenue=("revenue", "sum"),
+        avg_revenue=("revenue", "mean"),
+        total_units=("quantity", "sum"),
+        num_products=("product", "nunique"),
+        avg_price=("revenue", lambda x: (x / df.loc[x.index, "quantity"]).mean()),
+    )
+    .reset_index()
+)
 
 print(result)
 ```
@@ -128,20 +131,24 @@ print(result)
 import numpy as np
 
 np.random.seed(42)
-df = pd.DataFrame({
-    'department': np.random.choice(['Sales', 'Eng', 'HR'], 100),
-    'salary': np.random.randint(40000, 120000, 100)
-})
+df = pd.DataFrame(
+    {
+        "department": np.random.choice(["Sales", "Eng", "HR"], 100),
+        "salary": np.random.randint(40000, 120000, 100),
+    }
+)
 
 # Add group-level features
 df = df.assign(
-    dept_mean=df.groupby('department')['salary'].transform('mean'),
-    dept_std=df.groupby('department')['salary'].transform('std'),
-    dept_min=df.groupby('department')['salary'].transform('min'),
-    dept_max=df.groupby('department')['salary'].transform('max'),
-    salary_zscore=lambda x: (x['salary'] - x['dept_mean']) / x['dept_std'],
-    rank_in_dept=df.groupby('department')['salary'].rank(ascending=False),
-    pct_of_dept_total=lambda x: x['salary'] / x.groupby('department')['salary'].transform('sum') * 100
+    dept_mean=df.groupby("department")["salary"].transform("mean"),
+    dept_std=df.groupby("department")["salary"].transform("std"),
+    dept_min=df.groupby("department")["salary"].transform("min"),
+    dept_max=df.groupby("department")["salary"].transform("max"),
+    salary_zscore=lambda x: (x["salary"] - x["dept_mean"]) / x["dept_std"],
+    rank_in_dept=df.groupby("department")["salary"].rank(ascending=False),
+    pct_of_dept_total=lambda x: (
+        x["salary"] / x.groupby("department")["salary"].transform("sum") * 100
+    ),
 )
 
 print(df.head(10))
@@ -151,10 +158,10 @@ print(df.head(10))
 
 ```python
 # Filter: keep departments with avg salary > 60000
-filtered = df.groupby('department').filter(lambda g: g['salary'].mean() > 60000)
+filtered = df.groupby("department").filter(lambda g: g["salary"].mean() > 60000)
 
 # Then transform on filtered data
-filtered['adjusted_salary'] = filtered.groupby('department')['salary'].transform(
+filtered["adjusted_salary"] = filtered.groupby("department")["salary"].transform(
     lambda x: x - x.mean() + 70000  # Normalize to 70k baseline
 )
 

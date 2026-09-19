@@ -19,18 +19,14 @@ By the end of this lecture, you will be able to:
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "first name": ["Alice", "Bob"],
-    "last name": ["Smith", "Jones"],
-    "age yrs": [28, 35]
-})
+df = pd.DataFrame(
+    {"first name": ["Alice", "Bob"], "last name": ["Smith", "Jones"], "age yrs": [28, 35]}
+)
 
 # Rename using rename()
-df_renamed = df.rename(columns={
-    "first name": "first_name",
-    "last name": "last_name",
-    "age yrs": "age"
-})
+df_renamed = df.rename(
+    columns={"first name": "first_name", "last name": "last_name", "age yrs": "age"}
+)
 print(df_renamed)
 #   first_name last_name  age
 # 0      Alice     Smith   28
@@ -41,10 +37,7 @@ print(df_renamed)
 
 ```python
 # Modifies original DataFrame
-df.rename(columns={
-    "first name": "first_name",
-    "last name": "last_name"
-}, inplace=True)
+df.rename(columns={"first name": "first_name", "last name": "last_name"}, inplace=True)
 ```
 
 ---
@@ -56,11 +49,7 @@ df.rename(columns={
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Age": [28, 35],
-    "City": ["New York", "London"]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob"], "Age": [28, 35], "City": ["New York", "London"]})
 
 # Rename all columns at once
 df.columns = ["name", "age", "city"]
@@ -86,11 +75,7 @@ df.columns = ["employee_name", "employee_age", "employee_city"]
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Age": [28, 35],
-    "City": ["New York", "London"]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob"], "Age": [28, 35], "City": ["New York", "London"]})
 
 # Using str methods
 df.columns = df.columns.str.lower()
@@ -103,11 +88,9 @@ print(df)
 ### Replace Spaces with Underscores
 
 ```python
-df = pd.DataFrame({
-    "First Name": ["Alice", "Bob"],
-    "Last Name": ["Smith", "Jones"],
-    "Age Yrs": [28, 35]
-})
+df = pd.DataFrame(
+    {"First Name": ["Alice", "Bob"], "Last Name": ["Smith", "Jones"], "Age Yrs": [28, 35]}
+)
 
 df.columns = df.columns.str.replace(" ", "_").str.lower()
 print(df)
@@ -137,11 +120,7 @@ df.columns = df.columns.map(lambda x: x.strip().lower())
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "A": [1, 2],
-    "B": [3, 4],
-    "C": [5, 6]
-})
+df = pd.DataFrame({"A": [1, 2], "B": [3, 4], "C": [5, 6]})
 
 df_renamed = df.rename(columns={"A": "Alpha", "B": "Beta", "C": "Gamma"})
 print(df_renamed)
@@ -164,10 +143,7 @@ print(df_renamed)
 ### Rename Both Columns and Index
 
 ```python
-df_renamed = df.rename(
-    columns={"A": "Alpha"},
-    index={0: "row_0", 1: "row_1"}
-)
+df_renamed = df.rename(columns={"A": "Alpha"}, index={0: "row_0", 1: "row_1"})
 ```
 
 ---
@@ -179,16 +155,12 @@ df_renamed = df.rename(
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42]
-}, index=["emp_1", "emp_2", "emp_3"])
+df = pd.DataFrame(
+    {"Name": ["Alice", "Bob", "Charlie"], "Age": [28, 35, 42]}, index=["emp_1", "emp_2", "emp_3"]
+)
 
 # Rename specific index labels
-df_renamed = df.rename(index={
-    "emp_1": "employee_1",
-    "emp_2": "employee_2"
-})
+df_renamed = df.rename(index={"emp_1": "employee_1", "emp_2": "employee_2"})
 print(df_renamed)
 #              Name  Age
 # employee_1  Alice   28
@@ -216,12 +188,14 @@ print(df_renamed)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    " First Name ": ["Alice", "Bob"],
-    "Last Name": ["Smith", "Jones"],
-    "AGE (years)": [28, 35],
-    "  City  ": ["New York", "London"]
-})
+df = pd.DataFrame(
+    {
+        " First Name ": ["Alice", "Bob"],
+        "Last Name": ["Smith", "Jones"],
+        "AGE (years)": [28, 35],
+        "  City  ": ["New York", "London"],
+    }
+)
 
 # Strip whitespace
 df.columns = df.columns.str.strip()
@@ -247,13 +221,13 @@ print(df)
 def clean_column_names(df):
     """Clean all column names in a DataFrame."""
     df.columns = (
-        df.columns
-        .str.strip()
+        df.columns.str.strip()
         .str.lower()
         .str.replace(" ", "_")
         .str.replace(r"[^a-z0-9_]", "", regex=True)
     )
     return df
+
 
 df_clean = clean_column_names(df)
 ```
@@ -268,15 +242,12 @@ df_clean = clean_column_names(df)
 import pandas as pd
 
 # Create multi-level columns
-arrays = [
-    ["A", "A", "B", "B"],
-    ["one", "two", "one", "two"]
-]
+arrays = [["A", "A", "B", "B"], ["one", "two", "one", "two"]]
 columns = pd.MultiIndex.from_arrays(arrays, names=["first", "second"])
 
 df = pd.DataFrame([[1, 2, 3, 4], [5, 6, 7, 8]], columns=columns)
 print(df)
-# first   A       B      
+# first   A       B
 # second one two one two
 # 0      1   2   3   4
 # 1      5   6   7   8
@@ -293,13 +264,15 @@ df.columns = df.columns.rename("level_0", level=0)
 import pandas as pd
 
 # Messy column names from real data
-df = pd.DataFrame({
-    " Customer ID ": [1001, 1002, 1003],
-    "Customer Name": ["Alice Smith", "Bob Jones", "Charlie Brown"],
-    " Order Date": ["2024-01-15", "2024-02-20", "2024-03-10"],
-    "Total Amount ($)": [250.50, 180.75, 320.00],
-    "  Status  ": ["Shipped", "Pending", "Delivered"]
-})
+df = pd.DataFrame(
+    {
+        " Customer ID ": [1001, 1002, 1003],
+        "Customer Name": ["Alice Smith", "Bob Jones", "Charlie Brown"],
+        " Order Date": ["2024-01-15", "2024-02-20", "2024-03-10"],
+        "Total Amount ($)": [250.50, 180.75, 320.00],
+        "  Status  ": ["Shipped", "Pending", "Delivered"],
+    }
+)
 
 print("Original columns:")
 print(df.columns.tolist())
@@ -307,8 +280,7 @@ print(df.columns.tolist())
 
 # Clean column names
 df.columns = (
-    df.columns
-    .str.strip()
+    df.columns.str.strip()
     .str.lower()
     .str.replace(" ", "_")
     .str.replace(r"[^a-z0-9_]", "", regex=True)

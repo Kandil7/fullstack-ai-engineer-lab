@@ -38,11 +38,13 @@ By the end of this lecture, you will be able to:
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "model": ["a", "b", "a", "b"],
-    "split": ["train", "train", "val", "val"],
-    "f1": [0.81, 0.79, 0.83, 0.80],
-})
+df = pd.DataFrame(
+    {
+        "model": ["a", "b", "a", "b"],
+        "split": ["train", "train", "val", "val"],
+        "f1": [0.81, 0.79, 0.83, 0.80],
+    }
+)
 
 df.groupby("model")["f1"].mean()
 # model
@@ -131,9 +133,7 @@ def add_group_features(
     """Attach per-group stats as new row-aligned columns."""
     out = df.copy()
     for stat in stats:
-        out[f"{value}_{stat}_by_{key}"] = (
-            df.groupby(key)[value].transform(stat)
-        )
+        out[f"{value}_{stat}_by_{key}"] = df.groupby(key)[value].transform(stat)
     return out
 ```
 

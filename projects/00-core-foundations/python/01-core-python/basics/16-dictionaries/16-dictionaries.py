@@ -11,11 +11,7 @@ Reference: https://www.w3schools.com/python/python_dictionaries.asp
 # Creating Dictionaries
 # ============================================================
 # Example 1: Different ways to create dictionaries
-person = {
-    "name": "Alice",
-    "age": 30,
-    "city": "New York"
-}
+person = {"name": "Alice", "age": 30, "city": "New York"}
 
 # Using dict() constructor
 person2 = dict(name="Bob", age=25, city="London")
@@ -56,8 +52,8 @@ print(f"Age: {person['age']}")
 
 # Using get() - returns None (or default) if key doesn't exist
 print(f"Name: {person.get('name')}")
-print(f"Phone: {person.get('phone')}")          # None
-print(f"Phone: {person.get('phone', 'N/A')}")   # N/A
+print(f"Phone: {person.get('phone')}")  # None
+print(f"Phone: {person.get('phone', 'N/A')}")  # N/A
 
 # person['phone']  # KeyError: 'phone'
 
@@ -93,7 +89,7 @@ print(f"After update: {person}")
 
 # setdefault() - add only if key doesn't exist
 person.setdefault("name", "Bob")  # Won't change - key exists
-person.setdefault("age", 25)      # Won't change - key exists
+person.setdefault("age", 25)  # Won't change - key exists
 person.setdefault("country", "USA")  # Will add - key doesn't exist
 print(f"After setdefault: {person}")
 
@@ -106,7 +102,7 @@ person = {
     "age": 30,
     "city": "New York",
     "email": "alice@example.com",
-    "phone": "555-0123"
+    "phone": "555-0123",
 }
 print(f"\nOriginal: {person}")
 
@@ -158,21 +154,9 @@ for key, value in person.items():
 # ============================================================
 # Example 7: Dictionaries within dictionaries
 students = {
-    "student1": {
-        "name": "Alice",
-        "age": 20,
-        "grades": [90, 85, 92]
-    },
-    "student2": {
-        "name": "Bob",
-        "age": 22,
-        "grades": [80, 75, 88]
-    },
-    "student3": {
-        "name": "Charlie",
-        "age": 21,
-        "grades": [95, 92, 88]
-    }
+    "student1": {"name": "Alice", "age": 20, "grades": [90, 85, 92]},
+    "student2": {"name": "Bob", "age": 22, "grades": [80, 75, 88]},
+    "student3": {"name": "Charlie", "age": 21, "grades": [95, 92, 88]},
 }
 
 print("\n--- Nested Dictionaries ---")
@@ -211,11 +195,11 @@ print(f"'phone' in person: {'phone' in person}")
 numbers = [1, 2, 3, 4, 5]
 
 # Square each number
-squares = {x: x ** 2 for x in numbers}
+squares = {x: x**2 for x in numbers}
 print(f"\nSquares: {squares}")
 
 # Filter
-even_squares = {x: x ** 2 for x in numbers if x % 2 == 0}
+even_squares = {x: x**2 for x in numbers if x % 2 == 0}
 print(f"Even squares: {even_squares}")
 
 # From two lists
@@ -239,6 +223,7 @@ print(f"\nWord count: {word_count}")
 
 # Using collections.Counter (better way)
 from collections import Counter
+
 word_count = Counter(words)
 print(f"Counter: {dict(word_count)}")
 

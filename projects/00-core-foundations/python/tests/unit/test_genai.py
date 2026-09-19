@@ -21,9 +21,7 @@ GENAI_FILES = discover_phase_files("09-genai")
 def test_genai_example_runs(filepath):
     """Every GenAI exercise must execute without errors (self-verifying)."""
     result = run_py_file(filepath, timeout=120)
-    assert result.returncode == 0, (
-        f"{filepath.name} failed:\n{result.stderr[-500:]}"
-    )
+    assert result.returncode == 0, f"{filepath.name} failed:\n{result.stderr[-500:]}"
 
 
 @pytest.mark.unit
@@ -33,9 +31,10 @@ def test_genai_verify_mode():
     for filepath in GENAI_FILES:
         result = subprocess.run(
             [sys.executable, str(filepath), "--verify"],
-            capture_output=True, text=True, timeout=120,
-            cwd=str(PROJECT_ROOT), env=env,
+            capture_output=True,
+            text=True,
+            timeout=120,
+            cwd=str(PROJECT_ROOT),
+            env=env,
         )
-        assert result.returncode == 0, (
-            f"{filepath.name} --verify failed:\n{result.stderr[-500:]}"
-        )
+        assert result.returncode == 0, f"{filepath.name} --verify failed:\n{result.stderr[-500:]}"

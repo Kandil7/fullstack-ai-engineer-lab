@@ -53,6 +53,7 @@ column has a declared type, and the engine enforces it.
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)")
 conn.execute("INSERT INTO users (id, name, age) VALUES (?, ?, ?)", (1, "alice", 30))
@@ -107,7 +108,9 @@ referential integrity: no orphan references.
 - **N:M** — many to many, always through a **junction table** (posts ↔ tags)
 
 ```python
-conn.execute("CREATE TABLE posts (id INTEGER PRIMARY KEY, user_id INTEGER REFERENCES users(id), title TEXT)")
+conn.execute(
+    "CREATE TABLE posts (id INTEGER PRIMARY KEY, user_id INTEGER REFERENCES users(id), title TEXT)"
+)
 conn.execute("INSERT INTO posts (user_id, title) VALUES (?, ?)", (1, "hello world"))
 
 try:

@@ -44,7 +44,9 @@ By the end of this lecture, you will be able to:
 ```python
 from fastapi import BackgroundTasks
 
+
 def send_welcome_email(email: str): ...
+
 
 @app.post("/signup", status_code=202)
 def signup(email: str, background: BackgroundTasks):
@@ -115,9 +117,9 @@ processes.
 ```python
 if attempt >= max_retries:
     job["error"] = str(e)
-    self._dlq.append(job)          # human/ops inspects later
+    self._dlq.append(job)  # human/ops inspects later
 else:
-    self._queue.append(job)        # retry
+    self._queue.append(job)  # retry
 ```
 
 Output:
@@ -135,7 +137,7 @@ Long jobs need status endpoints:
 ```python
 @app.get("/jobs/{job_id}")
 def job_status(job_id: int):
-    return {"job_id": job_id, "status": store[job_id]}   # queued/running/done
+    return {"job_id": job_id, "status": store[job_id]}  # queued/running/done
 ```
 
 Output:

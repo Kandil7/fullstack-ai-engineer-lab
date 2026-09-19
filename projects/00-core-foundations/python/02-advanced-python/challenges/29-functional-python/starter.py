@@ -1,4 +1,5 @@
 """Challenge 29 starter — fill in the bodies (never return working code)."""
+
 from __future__ import annotations
 
 from typing import Callable

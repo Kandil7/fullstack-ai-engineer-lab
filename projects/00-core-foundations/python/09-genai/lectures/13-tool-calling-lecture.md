@@ -95,16 +95,16 @@ wrong. Every tool earns its place by being *discoverable and unambiguous*.
 ```python
 def run_with_tools(user_input: str, llm_client, tools: list, registry: dict) -> str:
     messages = [{"role": "user", "content": user_input}]
-    for _ in range(MAX_STEPS):                      # bound the loop
+    for _ in range(MAX_STEPS):  # bound the loop
         resp = llm_client.complete(messages, tools=tools)
         if not resp.tool_calls:
-            return resp.content                      # final answer
-        messages.append(resp.message)                # model's tool request
+            return resp.content  # final answer
+        messages.append(resp.message)  # model's tool request
         for call in resp.tool_calls:
-            result = execute_tool(call, registry)    # YOUR code runs the tool
-            messages.append({"role": "tool",
-                             "tool_call_id": call.id,
-                             "content": result})     # feed result back
+            result = execute_tool(call, registry)  # YOUR code runs the tool
+            messages.append(
+                {"role": "tool", "tool_call_id": call.id, "content": result}
+            )  # feed result back
     return "max steps exceeded"
 ```
 
@@ -127,20 +127,23 @@ effect:
 from pydantic import BaseModel, Field, ValidationError
 import json
 
+
 class WeatherArgs(BaseModel):
     city: str = Field(min_length=1, max_length=100)
 
+
 def parse_and_validate(call) -> dict:
     """Parse args JSON and validate against the tool's schema."""
-    args = json.loads(call.arguments)                # L3: structured output
+    args = json.loads(call.arguments)  # L3: structured output
     schema = {"get_weather": WeatherArgs}.get(call.function.name)
     if schema is None:
         raise ValueError(f"unknown tool: {call.function.name}")
     return schema.model_validate(args).model_dump()
 
+
 try:
     args = parse_and_validate(call)
-    result = registry[call.function.name](**args)    # execute only now
+    result = registry[call.function.name](**args)  # execute only now
 except (ValidationError, json.JSONDecodeError) as e:
     # return the error to the model as a tool result — it can self-correct
     result = f"ERROR: invalid arguments: {e}"
@@ -175,11 +178,11 @@ def execute_tool(call, registry: dict, timeout_s: float = 10.0) -> str:
     fn = registry[call.function.name]
     try:
         args = parse_and_validate(call)
-        result = fn(**args)                 # allowlisted, validated
-        return str(result)[:2000]           # bound the context back
+        result = fn(**args)  # allowlisted, validated
+        return str(result)[:2000]  # bound the context back
     except ValidationError as e:
         return f"ERROR: invalid arguments: {e}"
-    except Exception as e:                  # tool raised
+    except Exception as e:  # tool raised
         return f"ERROR: tool failed: {e}"
 ```
 

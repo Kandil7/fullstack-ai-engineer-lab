@@ -27,13 +27,13 @@
 a = 10
 b = 3
 
-print(a + b)   # Addition: 13
-print(a - b)   # Subtraction: 7
-print(a * b)   # Multiplication: 30
-print(a / b)   # Division: 3.333...
+print(a + b)  # Addition: 13
+print(a - b)  # Subtraction: 7
+print(a * b)  # Multiplication: 30
+print(a / b)  # Division: 3.333...
 print(a // b)  # Floor Division: 3
-print(a % b)   # Modulus: 1
-print(a ** b)  # Exponent: 1000
+print(a % b)  # Modulus: 1
+print(a**b)  # Exponent: 1000
 ```
 
 **Assignment Operator**
@@ -42,14 +42,14 @@ print(a ** b)  # Exponent: 1000
 - **Related terms**: Variable, Value, Compound Assignment
 ```python
 # Assignment operators
-x = 10       # Basic assignment
-x += 5       # x = x + 5 (15)
-x -= 3       # x = x - 3 (12)
-x *= 2       # x = x * 2 (24)
-x /= 4       # x = x / 4 (6.0)
-x //= 2      # x = x // 2 (3.0)
-x %= 2       # x = x % 2 (1.0)
-x **= 3      # x = x ** 3 (1.0)
+x = 10  # Basic assignment
+x += 5  # x = x + 5 (15)
+x -= 3  # x = x - 3 (12)
+x *= 2  # x = x * 2 (24)
+x /= 4  # x = x / 4 (6.0)
+x //= 2  # x = x // 2 (3.0)
+x %= 2  # x = x % 2 (1.0)
+x **= 3  # x = x ** 3 (1.0)
 ```
 
 ### B
@@ -63,10 +63,10 @@ x **= 3      # x = x ** 3 (1.0)
 a = 12  # 1100 in binary
 b = 10  # 1010 in binary
 
-print(a & b)   # Bitwise AND: 8 (1000)
-print(a | b)   # Bitwise OR: 14 (1110)
-print(a ^ b)   # Bitwise XOR: 6 (0110)
-print(~a)      # Bitwise NOT: -13
+print(a & b)  # Bitwise AND: 8 (1000)
+print(a | b)  # Bitwise OR: 14 (1110)
+print(a ^ b)  # Bitwise XOR: 6 (0110)
+print(~a)  # Bitwise NOT: -13
 print(a << 2)  # Left shift: 48 (110000)
 print(a >> 2)  # Right shift: 3 (11)
 ```
@@ -82,12 +82,12 @@ print(a >> 2)  # Right shift: 3 (11)
 x = 10
 y = 20
 
-print(x == y)   # Equal: False
-print(x != y)   # Not equal: True
-print(x > y)    # Greater than: False
-print(x < y)    # Less than: True
+print(x == y)  # Equal: False
+print(x != y)  # Not equal: True
+print(x > y)  # Greater than: False
+print(x < y)  # Less than: True
 print(x >= 10)  # Greater or equal: True
-print(x <= 5)   # Less or equal: False
+print(x <= 5)  # Less or equal: False
 ```
 
 **Compound Assignment**
@@ -97,10 +97,10 @@ print(x <= 5)   # Less or equal: False
 ```python
 # Compound assignment
 x = 10
-x += 5   # Same as x = x + 5
-x -= 3   # Same as x = x - 3
-x *= 2   # Same as x = x * 2
-x /= 4   # Same as x = x / 4
+x += 5  # Same as x = x + 5
+x -= 3  # Same as x = x - 3
+x *= 2  # Same as x = x * 2
+x /= 4  # Same as x = x / 4
 ```
 
 ### E
@@ -111,9 +111,9 @@ x /= 4   # Same as x = x / 4
 - **Related terms**: Operator, Value, Statement
 ```python
 # Expressions
-2 + 3          # Arithmetic expression
-x > 5          # Comparison expression
-True and False # Boolean expression
+2 + 3  # Arithmetic expression
+x > 5  # Comparison expression
+True and False  # Boolean expression
 ```
 
 ### I
@@ -128,8 +128,8 @@ a = [1, 2, 3]
 b = [1, 2, 3]
 c = a
 
-print(a is b)      # False (different objects)
-print(a is c)      # True (same object)
+print(a is b)  # False (different objects)
+print(a is c)  # True (same object)
 print(a is not b)  # True
 ```
 
@@ -148,11 +148,11 @@ print(x > 10 and x < 20)  # True
 print(x > 10 and x > 20)  # False
 
 # or - at least one must be True
-print(x > 10 or x > 20)   # True
-print(x > 20 or x > 30)   # False
+print(x > 10 or x > 20)  # True
+print(x > 20 or x > 30)  # False
 
 # not - reverses boolean
-print(not (x > 5))   # False
+print(not (x > 5))  # False
 print(not (x > 15))  # True
 ```
 
@@ -166,13 +166,13 @@ print(not (x > 15))  # True
 # Membership operators
 fruits = ["apple", "banana", "cherry"]
 
-print("apple" in fruits)      # True
-print("orange" in fruits)     # False
-print("orange" not in fruits) # True
+print("apple" in fruits)  # True
+print("orange" in fruits)  # False
+print("orange" not in fruits)  # True
 
 # Works with strings
 text = "Hello, World!"
-print("World" in text)        # True
+print("World" in text)  # True
 ```
 
 ### O
@@ -183,9 +183,9 @@ print("World" in text)        # True
 - **Related terms**: Operand, Expression, Calculation
 ```python
 # Operator examples
-result = 10 + 5      # + is operator
+result = 10 + 5  # + is operator
 is_greater = 10 > 5  # > is operator
-x = 10               # = is operator
+x = 10  # = is operator
 ```
 
 **Operator Precedence**
@@ -194,9 +194,9 @@ x = 10               # = is operator
 - **Related terms**: Order of Operations, PEMDAS, BODMAS
 ```python
 # Operator precedence
-result1 = 2 + 3 * 4     # 14 (not 20)
-result2 = (2 + 3) * 4   # 20
-result3 = 2 ** 3 ** 2   # 512 (right-associative)
+result1 = 2 + 3 * 4  # 14 (not 20)
+result2 = (2 + 3) * 4  # 20
+result3 = 2**3**2  # 512 (right-associative)
 ```
 
 ### P
@@ -227,8 +227,8 @@ result3 = 2 ** 3 ** 2   # 512 (right-associative)
 ```python
 # Unary operators
 x = 5
-print(+x)   # Positive: 5
-print(-x)   # Negative: -5
+print(+x)  # Positive: 5
+print(-x)  # Negative: -5
 print(not True)  # Logical not: False
 ```
 

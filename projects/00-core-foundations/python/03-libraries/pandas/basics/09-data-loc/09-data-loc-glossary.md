@@ -37,8 +37,8 @@ print(df.loc[mask])
 Selecting a specific value at the intersection of a row and column.
 
 ```python
-df.loc["emp1", "Name"]    # Label-based
-df.iloc[0, 1]             # Position-based
+df.loc["emp1", "Name"]  # Label-based
+df.iloc[0, 1]  # Position-based
 ```
 
 ### I
@@ -47,9 +47,9 @@ df.iloc[0, 1]             # Position-based
 Position-based indexer — selects by integer position (0-indexed).
 
 ```python
-df.iloc[0]           # First row
-df.iloc[0:5]         # First 5 rows (exclusive end)
-df.iloc[0, 1]        # Row 0, column 1
+df.iloc[0]  # First row
+df.iloc[0:5]  # First 5 rows (exclusive end)
+df.iloc[0, 1]  # Row 0, column 1
 ```
 
 **Index**
@@ -66,16 +66,16 @@ print(df.index)
 The index value that identifies a row.
 
 ```python
-df.loc["emp1"]   # Selects row with label "emp1"
+df.loc["emp1"]  # Selects row with label "emp1"
 ```
 
 **Loc**
 Label-based indexer — selects by index label.
 
 ```python
-df.loc["emp1"]           # Row by label
-df.loc["emp1":"emp3"]    # Slice (inclusive)
-df.loc["emp1", "Name"]   # Cell by label
+df.loc["emp1"]  # Row by label
+df.loc["emp1":"emp3"]  # Slice (inclusive)
+df.loc["emp1", "Name"]  # Cell by label
 ```
 
 ### N
@@ -84,8 +84,8 @@ df.loc["emp1", "Name"]   # Cell by label
 Position from the end (only works with iloc).
 
 ```python
-df.iloc[-1]    # Last row
-df.iloc[-2:]   # Last 2 rows
+df.iloc[-1]  # Last row
+df.iloc[-2:]  # Last 2 rows
 ```
 
 ### S
@@ -118,10 +118,9 @@ df.iloc[0, 1] = 29
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42]
-}, index=["emp1", "emp2", "emp3"])
+df = pd.DataFrame(
+    {"Name": ["Alice", "Bob", "Charlie"], "Age": [28, 35, 42]}, index=["emp1", "emp2", "emp3"]
+)
 
 # Single row
 print(df.loc["emp1"])
@@ -141,10 +140,7 @@ print(df.loc["emp2", "Name"])
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob", "Charlie"], "Age": [28, 35, 42]})
 
 # Single row
 print(df.iloc[0])
@@ -167,11 +163,13 @@ print(df.iloc[-1])
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31],
-    "Salary": [75000, 82000, 95000, 68000]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, 35, 42, 31],
+        "Salary": [75000, 82000, 95000, 68000],
+    }
+)
 
 # Filter and select columns
 print(df.loc[df["Age"] > 30, ["Name", "Salary"]])

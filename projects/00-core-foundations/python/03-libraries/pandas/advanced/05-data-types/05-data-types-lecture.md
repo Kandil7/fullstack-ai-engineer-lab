@@ -54,10 +54,10 @@ df.dtypes
 ## 2. `astype()` — Explicit Conversion
 
 ```python
-df["user_id"].astype(str)                # int -> string
-df["score"].astype("float32")            # halve numeric memory
-df["active"].astype(int)                 # bool -> 0/1
-df["split"].astype("category")           # -> category codes
+df["user_id"].astype(str)  # int -> string
+df["score"].astype("float32")  # halve numeric memory
+df["active"].astype(int)  # bool -> 0/1
+df["split"].astype("category")  # -> category codes
 ```
 
 `astype` is a promise: it converts or raises (`ValueError` on non-convertible
@@ -67,7 +67,7 @@ use `to_numeric(..., errors="coerce")` instead.
 ## 3. `to_datetime` / `to_numeric` — Parsing Real Types
 
 ```python
-df["created"] = pd.to_datetime(df["created"])          # parse ISO strings
+df["created"] = pd.to_datetime(df["created"])  # parse ISO strings
 df["score"] = pd.to_numeric(df["score"], errors="coerce")
 ```
 
@@ -79,7 +79,7 @@ the realistic choice for dirty data, followed by a missing-data decision.
 ## 4. Nullable Dtypes — Int64, boolean, string
 
 ```python
-df["user_id"] = df["user_id"].astype("Int64")     # int + pd.NA
+df["user_id"] = df["user_id"].astype("Int64")  # int + pd.NA
 df["active"] = df["active"].astype("boolean")
 df["name"] = df["name"].astype("string")
 ```
@@ -92,7 +92,7 @@ containing str). Use them when missingness is real and the type matters.
 
 ```python
 df["split"] = df["split"].astype("category")
-df["split"].cat.codes       # integer codes 0..n-1
+df["split"].cat.codes  # integer codes 0..n-1
 df["split"].cat.categories  # the label list
 ```
 
@@ -110,7 +110,7 @@ you take `.cat.codes` — category is not automatically numeric.
 ## 6. Memory — The dtype Is the Budget
 
 ```python
-df.memory_usage(deep=True)               # per-column bytes
+df.memory_usage(deep=True)  # per-column bytes
 df["score"].astype("float32").memory_usage(deep=True)  # ~half
 ```
 
@@ -128,6 +128,7 @@ TYPE_CONTRACT = {
     "created": "datetime64[ns, UTC]",
     "split": "category",
 }
+
 
 def apply_contract(df: pd.DataFrame, contract: dict) -> pd.DataFrame:
     """Cast a frame to its declared type contract; fail loudly on mismatch."""
@@ -165,7 +166,7 @@ df["split_code"] = df["split"].cat.codes
 
 ```python
 # WRONG — None forces float64
-s = pd.Series([1, 2, None])           # float64
+s = pd.Series([1, 2, None])  # float64
 # CORRECT — nullable Int64 keeps integers
 s = pd.Series([1, 2, None], dtype="Int64")
 ```
@@ -174,7 +175,7 @@ s = pd.Series([1, 2, None], dtype="Int64")
 
 ```python
 # WRONG — object columns dominate the budget and go unnoticed
-df.memory_usage()                     # misses deep object payloads
+df.memory_usage()  # misses deep object payloads
 # CORRECT
 df.memory_usage(deep=True)
 ```

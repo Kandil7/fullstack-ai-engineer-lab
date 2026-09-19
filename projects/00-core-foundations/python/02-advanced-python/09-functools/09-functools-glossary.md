@@ -37,9 +37,11 @@
 ```python
 import functools
 
+
 @functools.lru_cache(maxsize=128)
 def compute(x):
-    return x ** 2
+    return x**2
+
 
 compute(5)  # Cached
 compute.cache_clear()  # Invalidate all entries
@@ -58,10 +60,12 @@ compute(5)  # Re-computes
 ```python
 import functools
 
+
 @functools.lru_cache
 def expensive(n):
     print(f"Computing {n}")
     return sum(range(n))
+
 
 expensive(1000)  # "Computing 1000"
 expensive(1000)  # (cached, no print)
@@ -82,11 +86,13 @@ expensive(1000)  # "Computing 1000" (re-computed)
 ```python
 import functools
 
+
 @functools.lru_cache(maxsize=128)
 def fibonacci(n):
     if n < 2:
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
+
 
 fibonacci(10)
 info = fibonacci.cache_info()
@@ -108,19 +114,21 @@ print(f"Hits: {info.hits}, Misses: {info.misses}")
 ```python
 import functools
 
+
 @functools.lru_cache(maxsize=100)
 def process(x):
     return x * 2
+
 
 process(1)
 process(2)
 process(1)  # Cache hit
 
 info = process.cache_info()
-print(info.hits)     # 1
-print(info.misses)   # 2
+print(info.hits)  # 1
+print(info.misses)  # 2
 print(info.maxsize)  # 100
-print(info.currsize) # 2
+print(info.currsize)  # 2
 ```
 
 **Related**: `cache_info()`, `lru_cache`, Statistics
@@ -135,13 +143,23 @@ print(info.currsize) # 2
 ```python
 from functools import reduce
 
+
 def compose(*functions):
     """Compose functions right-to-left."""
     return reduce(lambda f, g: lambda *args, **kwargs: f(g(*args, **kwargs)), functions)
 
-def add_one(x): return x + 1
-def double(x): return x * 2
-def square(x): return x ** 2
+
+def add_one(x):
+    return x + 1
+
+
+def double(x):
+    return x * 2
+
+
+def square(x):
+    return x**2
+
 
 # square(double(add_one(x)))
 transform = compose(square, double, add_one)
@@ -160,21 +178,27 @@ print(transform(3))  # square(double(add_one(3))) = square(double(4)) = square(8
 ```python
 import functools
 
+
 def timer(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         import time
+
         start = time.perf_counter()
         result = func(*args, **kwargs)
         elapsed = time.perf_counter() - start
         print(f"{func.__name__} took {elapsed:.4f}s")
         return result
+
     return wrapper
+
 
 @timer
 def slow_function():
     import time
+
     time.sleep(0.1)
+
 
 slow_function()  # "slow_function took 0.1012s"
 ```
@@ -191,8 +215,10 @@ slow_function()  # "slow_function took 0.1012s"
 ```python
 from functools import partial
 
+
 def apply(func, value):
     return func(value)
+
 
 # partial is a higher-order function
 double = partial(lambda x: x * 2)
@@ -200,6 +226,7 @@ print(apply(double, 5))  # 10
 
 # reduce is a higher-order function
 from functools import reduce
+
 total = reduce(lambda a, b: a + b, [1, 2, 3, 4])
 print(total)  # 10
 ```
@@ -216,9 +243,11 @@ print(total)  # 10
 ```python
 import functools
 
+
 @functools.lru_cache(maxsize=3)
 def process(x):
     return x * 2
+
 
 process(1)  # Cache: {1: 2}
 process(2)  # Cache: {1: 2, 2: 4}
@@ -239,20 +268,23 @@ process(1)  # Cache miss - re-computes
 ```python
 import functools
 
+
 @functools.lru_cache(maxsize=256)
 def fibonacci(n):
     if n < 2:
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
 
+
 # Without cache: O(2^n) time
 # With cache: O(n) time
 print(fibonacci(100))  # Instant result
 
+
 # Cache with unlimited size
 @functools.lru_cache(maxsize=None)
 def unlimited_cache(x):
-    return x ** 2
+    return x**2
 ```
 
 **Related**: `cache`, Memoization, Cache Management
@@ -267,11 +299,13 @@ def unlimited_cache(x):
 ```python
 import functools
 
+
 @functools.cache
 def fibonacci(n):
     if n < 2:
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
+
 
 # No size limit
 print(fibonacci(1000))  # Works with large values
@@ -293,15 +327,19 @@ fibonacci.cache_clear()
 ```python
 import functools
 
+
 # Manual memoization
 def memoize(func):
     cache = {}
+
     @functools.wraps(func)
     def wrapper(*args):
         if args not in cache:
             cache[args] = func(*args)
         return cache[args]
+
     return wrapper
+
 
 # Built-in memoization
 @functools.lru_cache
@@ -321,19 +359,23 @@ def factorial(n):
 ```python
 from functools import partial
 
+
 def greet(greeting, name):
     return f"{greeting}, {name}!"
+
 
 # Create specialized functions
 say_hello = partial(greet, "Hello")
 say_hi = partial(greet, "Hi")
 
 print(say_hello("Alice"))  # "Hello, Alice!"
-print(say_hi("Bob"))       # "Hi, Bob!"
+print(say_hi("Bob"))  # "Hi, Bob!"
+
 
 # With keyword arguments
 def connect(host, port, database):
     return f"Connecting to {host}:{port}/{database}"
+
 
 connect_db = partial(connect, database="mydb")
 print(connect_db("localhost", 5432))  # "Connecting to localhost:5432/mydb"
@@ -351,15 +393,17 @@ print(connect_db("localhost", 5432))  # "Connecting to localhost:5432/mydb"
 ```python
 from functools import partialmethod
 
+
 class Cell:
     def __init__(self):
         self._state = False
-    
+
     def set_state(self, state):
         self._state = state
-    
+
     set_alive = partialmethod(set_state, True)
     set_dead = partialmethod(set_state, False)
+
 
 cell = Cell()
 cell.set_alive()
@@ -407,24 +451,29 @@ print(total)  # 115
 ```python
 from functools import singledispatch
 
+
 @singledispatch
 def process(value):
     raise TypeError(f"Cannot process {type(value)}")
+
 
 @process.register(int)
 def _(value):
     return value * 2
 
+
 @process.register(str)
 def _(value):
     return value.upper()
+
 
 @process.register(list)
 def _(value):
     return [process(item) for item in value]
 
-print(process(5))        # 10
-print(process("hello")) # "HELLO"
+
+print(process(5))  # 10
+print(process("hello"))  # "HELLO"
 print(process([1, "two", 3]))  # [2, "TWO", 6]
 ```
 
@@ -440,21 +489,23 @@ print(process([1, "two", 3]))  # [2, "TWO", 6]
 ```python
 from functools import singledispatchmethod
 
+
 class Processor:
     @singledispatchmethod
     def process(self, value):
         raise TypeError(f"Cannot process {type(value)}")
-    
+
     @process.register(int)
     def _(self, value):
         return value * 2
-    
+
     @process.register(str)
     def _(self, value):
         return value.upper()
 
+
 p = Processor()
-print(p.process(5))      # 10
+print(p.process(5))  # 10
 print(p.process("hello"))  # "HELLO"
 ```
 
@@ -470,26 +521,28 @@ print(p.process("hello"))  # "HELLO"
 ```python
 from functools import total_ordering
 
+
 @total_ordering
 class Student:
     def __init__(self, name, grade):
         self.name = name
         self.grade = grade
-    
+
     def __eq__(self, other):
         return self.grade == other.grade
-    
+
     def __lt__(self, other):
         return self.grade < other.grade
+
 
 alice = Student("Alice", 95)
 bob = Student("Bob", 87)
 
 # All comparisons work
-print(alice > bob)    # True
-print(alice >= bob)   # True
-print(alice <= bob)   # False
-print(alice < bob)    # False
+print(alice > bob)  # True
+print(alice >= bob)  # True
+print(alice <= bob)  # False
+print(alice < bob)  # False
 ```
 
 **Related**: Comparison Operators, `__lt__`, `__eq__`
@@ -504,21 +557,24 @@ print(alice < bob)    # False
 ```python
 import functools
 
+
 def my_decorator(func):
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
-    
+
     # Equivalent to @functools.wraps
     functools.update_wrapper(wrapper, func)
     return wrapper
+
 
 @my_decorator
 def greet(name):
     """Greet someone."""
     return f"Hello, {name}!"
 
+
 print(greet.__name__)  # "greet"
-print(greet.__doc__)   # "Greet someone."
+print(greet.__doc__)  # "Greet someone."
 ```
 
 **Related**: `functools.wraps`, Metadata Preservation
@@ -533,21 +589,25 @@ print(greet.__doc__)   # "Greet someone."
 ```python
 import functools
 
+
 def my_decorator(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         """Wrapper docstring (ignored)."""
         return func(*args, **kwargs)
+
     return wrapper
+
 
 @my_decorator
 def greet(name):
     """Greet someone by name."""
     return f"Hello, {name}!"
 
-print(greet.__name__)      # "greet" (preserved)
-print(greet.__doc__)       # "Greet someone by name." (preserved)
-print(greet.__wrapped__)   # Original unwrapped function
+
+print(greet.__name__)  # "greet" (preserved)
+print(greet.__doc__)  # "Greet someone by name." (preserved)
+print(greet.__wrapped__)  # Original unwrapped function
 ```
 
 **Related**: `update_wrapper`, Decorator, Metadata
@@ -562,21 +622,27 @@ print(greet.__wrapped__)   # Original unwrapped function
 ```python
 import functools
 
+
 def timer(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):  # <-- This is the wrapper
         import time
+
         start = time.perf_counter()
         result = func(*args, **kwargs)
         elapsed = time.perf_counter() - start
         print(f"{func.__name__} took {elapsed:.4f}s")
         return result
+
     return wrapper
+
 
 @timer
 def slow_function():
     import time
+
     time.sleep(0.1)
+
 
 slow_function()  # wrapper executes, calls func
 ```
@@ -593,10 +659,11 @@ slow_function()  # wrapper executes, calls func
 ```python
 from functools import cached_property
 
+
 class DataAnalyzer:
     def __init__(self, data):
         self.data = data
-    
+
     @cached_property
     def statistics(self):
         """Compute once, cache forever."""
@@ -606,6 +673,7 @@ class DataAnalyzer:
             "min": min(self.data),
             "max": max(self.data),
         }
+
 
 analyzer = DataAnalyzer([1, 2, 3, 4, 5])
 print(analyzer.statistics)  # "Computing statistics..." -> dict
@@ -624,19 +692,23 @@ print(analyzer.statistics)  # Cached, no computation
 ```python
 from functools import partial
 
+
 def power(base, exponent):
-    return base ** exponent
+    return base**exponent
+
 
 # Partial application
 square = partial(power, exponent=2)  # Fixes exponent
 cube = partial(power, exponent=3)
 
 print(square(5))  # 25 (5**2)
-print(cube(5))    # 125 (5**3)
+print(cube(5))  # 125 (5**3)
+
 
 # Partial with multiple arguments
 def log(level, module, message):
     print(f"[{level}] {module}: {message}")
+
 
 log_error = partial(log, level="ERROR", module="auth")
 log_error("Failed login")  # "[ERROR] auth: Failed login"
@@ -654,6 +726,7 @@ log_error("Failed login")  # "[ERROR] auth: Failed login"
 ```python
 import functools
 
+
 # Without cache: O(2^n) for naive fibonacci
 @functools.lru_cache(maxsize=None)
 def fibonacci(n):
@@ -661,11 +734,13 @@ def fibonacci(n):
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
 
+
 # Now O(n) with cache
 fibonacci(100)  # Instant
 
 # Profile impact
 import time
+
 start = time.perf_counter()
 fibonacci(200)
 elapsed = time.perf_counter() - start

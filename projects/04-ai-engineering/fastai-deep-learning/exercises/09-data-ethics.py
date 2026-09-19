@@ -98,8 +98,8 @@ def simulate_feedback_loop(
     for r in range(rounds):
         patrol_b = 1.0 - patrol_a
         # observed arrests depend super-linearly on patrol intensity
-        obs_a = true_crime_a * patrol_a ** reinforcement + abs(rng.normal(0, 0.5))
-        obs_b = true_crime_b * patrol_b ** reinforcement + abs(rng.normal(0, 0.5))
+        obs_a = true_crime_a * patrol_a**reinforcement + abs(rng.normal(0, 0.5))
+        obs_b = true_crime_b * patrol_b**reinforcement + abs(rng.normal(0, 0.5))
         history.append(
             {"round": r, "patrol_a": patrol_a, "arrests_a": obs_a, "arrests_b": obs_b}
         )

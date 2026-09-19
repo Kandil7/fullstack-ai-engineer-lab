@@ -34,13 +34,13 @@ x = int("42")
 print(f"int('42') = {x}")  # Output: 42
 
 # From string with base
-x = int("1010", 2)   # Binary
+x = int("1010", 2)  # Binary
 print(f"int('1010', 2) = {x}")  # Output: 10
 
-x = int("FF", 16)    # Hexadecimal
+x = int("FF", 16)  # Hexadecimal
 print(f"int('FF', 16) = {x}")  # Output: 255
 
-x = int("77", 8)     # Octal
+x = int("77", 8)  # Octal
 print(f"int('77', 8) = {x}")  # Output: 63
 
 # From boolean
@@ -123,8 +123,8 @@ print(f"Converted: {number} (integer)")
 print(f"Doubled: {number * 2}")
 
 # Example 5: Math with mixed types
-x = 10      # int
-y = 3.14    # float
+x = 10  # int
+y = 3.14  # float
 result = x + y
 print(f"\n{x} (int) + {y} (float) = {result} (float)")
 print(f"Type: {type(result).__name__}")
@@ -154,6 +154,7 @@ print(f"Total: ${total:.2f}")
 total_str = f"${total:.2f}"
 print(f"Total as string: {total_str}")
 
+
 # ============================================================
 # Safe Conversion with try/except
 # ============================================================
@@ -165,6 +166,7 @@ def safe_int(value, default=0):
     except (ValueError, TypeError):
         return default
 
+
 def safe_float(value, default=0.0):
     """Safely convert a value to float, returning default on failure."""
     try:
@@ -172,12 +174,13 @@ def safe_float(value, default=0.0):
     except (ValueError, TypeError):
         return default
 
+
 print("\n--- Safe Conversion ---")
-print(f"safe_int('42') = {safe_int('42')}")      # 42
-print(f"safe_int('abc') = {safe_int('abc')}")    # 0 (default)
-print(f"safe_int(None) = {safe_int(None)}")      # 0 (default)
+print(f"safe_int('42') = {safe_int('42')}")  # 42
+print(f"safe_int('abc') = {safe_int('abc')}")  # 0 (default)
+print(f"safe_int(None) = {safe_int(None)}")  # 0 (default)
 print(f"safe_float('3.14') = {safe_float('3.14')}")  # 3.14
-print(f"safe_float('abc') = {safe_float('abc')}")    # 0.0 (default)
+print(f"safe_float('abc') = {safe_float('abc')}")  # 0.0 (default)
 
 # ============================================================
 # Summary

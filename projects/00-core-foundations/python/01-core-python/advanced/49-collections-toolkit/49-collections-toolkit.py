@@ -148,6 +148,7 @@ print(f"\nChainMap lr={config['lr']} gpu={config['gpu']} seed={config['seed']}")
 # Combine the toolkit: heapq for top-k, deque for a context window, Counter
 # for query term frequency.
 
+
 def top_k_by_score(docs: dict[str, float], k: int) -> list[tuple[str, float]]:
     """Return the k highest-scoring documents, ties broken stably."""
     if k <= 0:
@@ -184,6 +185,7 @@ print(f"\nTop-2 docs: {top_k_by_score(docs, 2)}")
 # CORRECT:
 #   good = heapq.nsmallest(2, pq)
 
+
 # ============================================================
 # Self-Verification
 # ============================================================
@@ -202,8 +204,7 @@ def _verify() -> None:
     h: list[int] = []
     for x in [5, 1, 3]:
         heapq.heappush(h, x)
-    assert [heapq.heappop(h) for _ in range(3)] == [1, 3, 5], \
-        "heappop must return ascending order"
+    assert [heapq.heappop(h) for _ in range(3)] == [1, 3, 5], "heappop must return ascending order"
 
     # nlargest returns top-k
     assert heapq.nlargest(3, [0.1, 0.9, 0.4, 0.8]) == [0.9, 0.8, 0.4]

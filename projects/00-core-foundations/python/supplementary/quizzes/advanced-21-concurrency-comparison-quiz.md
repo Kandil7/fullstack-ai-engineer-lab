@@ -61,11 +61,11 @@ D) `<generator object ...>`
 ```python
 import asyncio
 
+
 async def main():
-    results = await asyncio.gather(
-        *(asyncio.sleep(0.01, result=i) for i in range(3))
-    )
+    results = await asyncio.gather(*(asyncio.sleep(0.01, result=i) for i in range(3)))
     print(results)
+
 
 asyncio.run(main())
 ```
@@ -111,10 +111,12 @@ import threading
 lock = threading.Lock()
 count = 0
 
+
 def inc():
     global count
     with lock:
         count += 1
+
 
 threads = [threading.Thread(target=inc) for _ in range(3)]
 for t in threads:
@@ -162,8 +164,10 @@ D) A method of a module-level class
 ```python
 import time
 
+
 def fetch():
     time.sleep(0.1)
+
 
 start = time.perf_counter()
 t1 = threading.Thread(target=fetch)
@@ -245,8 +249,10 @@ D) It makes the protected code run on a separate core
 ```python
 from concurrent.futures import ProcessPoolExecutor
 
+
 def cube(x):
-    return x ** 3
+    return x**3
+
 
 if __name__ == "__main__":
     with ProcessPoolExecutor(max_workers=2) as ex:
@@ -293,10 +299,12 @@ import threading
 
 counter = 0
 
+
 def bump():
     global counter
     for _ in range(50_000):
         counter += 1
+
 
 ts = [threading.Thread(target=bump) for _ in range(2)]
 for t in ts:

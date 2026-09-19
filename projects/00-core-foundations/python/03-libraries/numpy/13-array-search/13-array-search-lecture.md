@@ -52,9 +52,7 @@ print(result)  # [ 1  2  3 40 50]
 ### 1.3 where with 2D Arrays
 
 ```python
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Find indices where condition is True
 indices = np.where(matrix > 5)
@@ -89,9 +87,7 @@ print(f"Min index: {min_idx}, Min value: {arr[min_idx]}")
 ### 2.2 argmax/argmin with Axis
 
 ```python
-matrix = np.array([[1, 5, 3],
-                   [9, 2, 7],
-                   [4, 8, 6]])
+matrix = np.array([[1, 5, 3], [9, 2, 7], [4, 8, 6]])
 
 # Max along axis 0 (columns)
 max_col = np.argmax(matrix, axis=0)
@@ -122,9 +118,7 @@ values = arr[indices]
 print(values)  # [3 5 7]
 
 # 2D example
-matrix = np.array([[0, 1, 0],
-                   [2, 0, 3],
-                   [0, 4, 0]])
+matrix = np.array([[0, 1, 0], [2, 0, 3], [0, 4, 0]])
 
 # Find non-zero indices
 rows, cols = np.nonzero(matrix)
@@ -146,18 +140,18 @@ print(values)  # [1 2 3 4]
 arr = np.array([10, 20, 30, 40, 50])
 
 # Find where 35 would be inserted (left side)
-idx = np.searchsorted(arr, 35, side='left')
+idx = np.searchsorted(arr, 35, side="left")
 print(f"Insert at: {idx}")  # 2
 
 # Find where 35 would be inserted (right side)
-idx = np.searchsorted(arr, 35, side='right')
+idx = np.searchsorted(arr, 35, side="right")
 print(f"Insert at: {idx}")  # 2
 
 # Find where 30 would be inserted
-idx = np.searchsorted(arr, 30, side='left')
+idx = np.searchsorted(arr, 30, side="left")
 print(f"Insert at: {idx}")  # 2
 
-idx = np.searchsorted(arr, 30, side='right')
+idx = np.searchsorted(arr, 30, side="right")
 print(f"Insert at: {idx}")  # 3
 ```
 
@@ -249,8 +243,8 @@ arr = np.array([1, 2, 3, 2, 4, 2, 5])
 # Find all occurrences of 2
 indices = np.where(arr == 2)[0]
 print(f"All indices: {indices}")  # [1 3 5]
-print(f"First: {indices[0]}")     # 1
-print(f"Last: {indices[-1]}")     # 5
+print(f"First: {indices[0]}")  # 1
+print(f"Last: {indices[-1]}")  # 5
 ```
 
 ---
@@ -343,7 +337,7 @@ print(matrix)
 rows, cols = np.where(matrix > 50)
 print(f"Elements > 50:")
 for r, c in zip(rows, cols):
-    print(f"  [{r},{c}] = {matrix[r,c]}")
+    print(f"  [{r},{c}] = {matrix[r, c]}")
 ```
 
 ### Exercise 3: searchsorted

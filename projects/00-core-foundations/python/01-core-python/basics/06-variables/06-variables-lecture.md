@@ -19,10 +19,10 @@ A variable is a named container that stores data in memory. Think of it as a lab
 
 ```python
 # Variable assignment
-name = "Alice"      # String variable
-age = 25            # Integer variable
-height = 1.65       # Float variable
-is_student = True   # Boolean variable
+name = "Alice"  # String variable
+age = 25  # Integer variable
+height = 1.65  # Float variable
+is_student = True  # Boolean variable
 ```
 
 ### 3.2 Variable Assignment
@@ -44,13 +44,13 @@ name = "Hello"
 Python is **dynamically typed** - variables can change type during execution.
 
 ```python
-x = 10          # x is an integer
+x = 10  # x is an integer
 print(type(x))  # <class 'int'>
 
-x = "hello"     # Now x is a string
+x = "hello"  # Now x is a string
 print(type(x))  # <class 'str'>
 
-x = [1, 2, 3]   # Now x is a list
+x = [1, 2, 3]  # Now x is a list
 print(type(x))  # <class 'list'>
 ```
 
@@ -97,6 +97,7 @@ def my_function():
     x = 10  # Local variable
     print(x)  # Accessible here
 
+
 my_function()
 # print(x)  # Error! x not accessible here
 ```
@@ -105,9 +106,11 @@ my_function()
 ```python
 x = 10  # Global variable
 
+
 def my_function():
     global x  # Declare global
-    x = 20    # Modify global
+    x = 20  # Modify global
+
 
 my_function()
 print(x)  # 20
@@ -118,11 +121,11 @@ print(x)  # 20
 ### Example 1: Basic Variable Assignment
 ```python
 # Different data types
-name = "Alice"          # String
-age = 25                # Integer
-height = 1.65           # Float
-is_student = True       # Boolean
-grades = [90, 85, 92]   # List
+name = "Alice"  # String
+age = 25  # Integer
+height = 1.65  # Float
+is_student = True  # Boolean
+grades = [90, 85, 92]  # List
 
 # Print variables
 print(f"Name: {name}")
@@ -167,10 +170,12 @@ print(f"Now: {data} (type: {type(data).__name__})")
 # Global vs local scope
 global_var = "I'm global"
 
+
 def function():
     local_var = "I'm local"
     print(global_var)  # Can access global
-    print(local_var)   # Can access local
+    print(local_var)  # Can access local
+
 
 function()
 print(global_var)  # Can access global

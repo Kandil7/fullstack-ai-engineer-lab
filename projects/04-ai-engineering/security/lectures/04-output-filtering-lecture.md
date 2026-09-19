@@ -30,23 +30,28 @@ from dataclasses import dataclass
 from typing import List, Optional, Dict, Any
 import re
 
+
 class FilterLayer(Enum):
     """Different layers of output filtering."""
+
     PII_REDACTION = "pii_redaction"
     CONTENT_FILTER = "content_filter"
     POLICY_CHECK = "policy_check"
     FORMAT_VALIDATION = "format_validation"
     SECURITY_SCAN = "security_scan"
 
+
 @dataclass
 class FilterResult:
     """Result of output filtering."""
+
     original: str
     filtered: str
     layer: FilterLayer
     modifications: List[Dict[str, Any]]
     blocked: bool
     reason: Optional[str] = None
+
 
 class OutputFilterPipeline:
     """Multi-layer output filtering pipeline."""
@@ -81,14 +86,17 @@ import re
 from typing import List, Dict, Tuple
 from dataclasses import dataclass
 
+
 @dataclass
 class PIIEntity:
     """A detected PII entity."""
+
     text: str
     pii_type: str
     start: int
     end: int
     confidence: float
+
 
 class PIIDetector:
     """Detect personally identifiable information in text."""
@@ -96,35 +104,35 @@ class PIIDetector:
     def __init__(self):
         self.patterns = {
             "email": {
-                "pattern": r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
+                "pattern": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
                 "confidence": 0.95,
             },
             "phone_us": {
-                "pattern": r'\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b',
+                "pattern": r"\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b",
                 "confidence": 0.90,
             },
             "ssn": {
-                "pattern": r'\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b',
+                "pattern": r"\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b",
                 "confidence": 0.85,
             },
             "credit_card": {
-                "pattern": r'\b(?:\d{4}[-.\s]?){3}\d{4}\b',
+                "pattern": r"\b(?:\d{4}[-.\s]?){3}\d{4}\b",
                 "confidence": 0.80,
             },
             "ip_address": {
-                "pattern": r'\b(?:\d{1,3}\.){3}\d{1,3}\b',
+                "pattern": r"\b(?:\d{1,3}\.){3}\d{1,3}\b",
                 "confidence": 0.75,
             },
             "date_of_birth": {
-                "pattern": r'\b(?:0[1-9]|1[0-2])/(?:0[1-9]|[12]\d|3[01])/(?:19|20)\d{2}\b',
+                "pattern": r"\b(?:0[1-9]|1[0-2])/(?:0[1-9]|[12]\d|3[01])/(?:19|20)\d{2}\b",
                 "confidence": 0.70,
             },
             "address_us": {
-                "pattern": r'\d{1,5}\s\w+(?:\s\w+)*\s(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Drive|Dr|Lane|Ln)\b',
+                "pattern": r"\d{1,5}\s\w+(?:\s\w+)*\s(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Drive|Dr|Lane|Ln)\b",
                 "confidence": 0.65,
             },
             "name_pattern": {
-                "pattern": r'\b[A-Z][a-z]+\s[A-Z][a-z]+\b',
+                "pattern": r"\b[A-Z][a-z]+\s[A-Z][a-z]+\b",
                 "confidence": 0.40,  # Lower confidence - many false positives
             },
         }
@@ -135,13 +143,15 @@ class PIIDetector:
 
         for pii_type, config in self.patterns.items():
             for match in re.finditer(config["pattern"], text):
-                entities.append(PIIEntity(
-                    text=match.group(),
-                    pii_type=pii_type,
-                    start=match.start(),
-                    end=match.end(),
-                    confidence=config["confidence"],
-                ))
+                entities.append(
+                    PIIEntity(
+                        text=match.group(),
+                        pii_type=pii_type,
+                        start=match.start(),
+                        end=match.end(),
+                        confidence=config["confidence"],
+                    )
+                )
 
         # Sort by position and remove overlaps
         entities.sort(key=lambda x: x.start)
@@ -163,6 +173,7 @@ class PIIDetector:
 
         return filtered
 
+
 class PIIRedactor:
     """Redact detected PII from text."""
 
@@ -175,7 +186,7 @@ class PIIRedactor:
 
         # Replace from end to start to preserve positions
         for entity in reversed(entities):
-            text = text[:entity.start] + replacement + text[entity.end:]
+            text = text[: entity.start] + replacement + text[entity.end :]
 
         return text
 
@@ -187,13 +198,15 @@ class PIIRedactor:
         modifications = []
         for entity in reversed(entities):
             replacement = f"[{entity.pii_type.upper()}]"
-            redacted = redacted[:entity.start] + replacement + redacted[entity.end:]
-            modifications.append({
-                "type": entity.pii_type,
-                "original": entity.text,
-                "replacement": replacement,
-                "position": entity.start,
-            })
+            redacted = redacted[: entity.start] + replacement + redacted[entity.end :]
+            modifications.append(
+                {
+                    "type": entity.pii_type,
+                    "original": entity.text,
+                    "replacement": replacement,
+                    "position": entity.start,
+                }
+            )
 
         return {
             "redacted_text": redacted,
@@ -212,22 +225,22 @@ class ContentFilter:
         self.filters = {
             "harmful_content": {
                 "patterns": [
-                    r'(how\s+to\s+(make|build|create)\s+(bomb|explosive|weapon))',
-                    r'(step\s+by\s+step\s+(attack|hack|exploit))',
+                    r"(how\s+to\s+(make|build|create)\s+(bomb|explosive|weapon))",
+                    r"(step\s+by\s+step\s+(attack|hack|exploit))",
                 ],
                 "action": "block",
             },
             "personal_opinions": {
                 "patterns": [
-                    r'(i\s+(think|believe|feel)\s+that\s+(you|we|they)\s+should)',
-                    r'(in\s+my\s+opinion)',
+                    r"(i\s+(think|believe|feel)\s+that\s+(you|we|they)\s+should)",
+                    r"(in\s+my\s+opinion)",
                 ],
                 "action": "rewrite",
             },
             "speculative_claims": {
                 "patterns": [
-                    r'(definitely|certainly|absolutely)\s+(is|are|will)',
-                    r'(proven\s+to\s+be)',
+                    r"(definitely|certainly|absolutely)\s+(is|are|will)",
+                    r"(proven\s+to\s+be)",
                 ],
                 "action": "soften",
             },
@@ -240,11 +253,13 @@ class ContentFilter:
         for filter_name, config in self.filters.items():
             for pattern in config["patterns"]:
                 if re.search(pattern, text, re.IGNORECASE):
-                    results.append({
-                        "filter": filter_name,
-                        "pattern": pattern,
-                        "action": config["action"],
-                    })
+                    results.append(
+                        {
+                            "filter": filter_name,
+                            "pattern": pattern,
+                            "action": config["action"],
+                        }
+                    )
 
         return {
             "filtered": len(results) > 0,
@@ -270,17 +285,19 @@ class ContentFilter:
     def _rewrite_neutral(self, text: str) -> str:
         """Rewrite text in neutral tone."""
         # Simplified - would use LLM in practice
-        text = re.sub(r'i\s+think', 'the general consensus is', text, flags=re.IGNORECASE)
-        text = re.sub(r'i\s+believe', 'research suggests', text, flags=re.IGNORECASE)
+        text = re.sub(
+            r"i\s+think", "the general consensus is", text, flags=re.IGNORECASE
+        )
+        text = re.sub(r"i\s+believe", "research suggests", text, flags=re.IGNORECASE)
         return text
 
     def _soften_claims(self, text: str) -> str:
         """Soften absolute claims."""
         replacements = {
-            r'\bdefinitely\b': 'likely',
-            r'\bcertainly\b': 'probably',
-            r'\babsolutely\b': 'generally',
-            r'\bproven\b': 'suggested',
+            r"\bdefinitely\b": "likely",
+            r"\bcertainly\b": "probably",
+            r"\babsolutely\b": "generally",
+            r"\bproven\b": "suggested",
         }
         for pattern, replacement in replacements.items():
             text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
@@ -331,11 +348,11 @@ class OutputValidator:
         issues = []
 
         # Check for control characters
-        if re.search(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', text):
+        if re.search(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", text):
             issues.append("control_characters")
 
         # Check for null bytes
-        if '\x00' in text:
+        if "\x00" in text:
             issues.append("null_bytes")
 
         return {
@@ -352,12 +369,13 @@ class OutputValidator:
         if expected_format == "json":
             try:
                 import json
+
                 json.loads(text)
             except json.JSONDecodeError:
                 issues.append("invalid_json")
 
         elif expected_format == "email":
-            if not re.match(r'^[\w.-]+@[\w.-]+\.\w+$', text):
+            if not re.match(r"^[\w.-]+@[\w.-]+\.\w+$", text):
                 issues.append("invalid_email_format")
 
         return {
@@ -372,9 +390,9 @@ class OutputValidator:
 
         # Check for potential prompt injection in output
         injection_patterns = [
-            r'ignore\s+(all\s+)?previous',
-            r'you\s+are\s+now\s+',
-            r'\[SYSTEM\]',
+            r"ignore\s+(all\s+)?previous",
+            r"you\s+are\s+now\s+",
+            r"\[SYSTEM\]",
         ]
 
         for pattern in injection_patterns:
@@ -485,30 +503,34 @@ class OutputFilterPipeline:
         # Step 1: PII Redaction
         pii_result = self.pii_redactor.redact_with_log(current_text)
         current_text = pii_result["redacted_text"]
-        result["steps"].append({
-            "step": "pii_redaction",
-            "entities_found": pii_result["entities_found"],
-        })
+        result["steps"].append(
+            {
+                "step": "pii_redaction",
+                "entities_found": pii_result["entities_found"],
+            }
+        )
 
         # Step 2: Content Filtering
         filter_result = self.content_filter.filter(current_text)
         if filter_result["filtered"]:
-            current_text = self.content_filter.apply_filter(
-                current_text, filter_result
-            )
-        result["steps"].append({
-            "step": "content_filter",
-            "filtered": filter_result["filtered"],
-        })
+            current_text = self.content_filter.apply_filter(current_text, filter_result)
+        result["steps"].append(
+            {
+                "step": "content_filter",
+                "filtered": filter_result["filtered"],
+            }
+        )
 
         # Step 3: Output Validation
         validation_result = self.output_validator.validate(current_text, context)
         if not validation_result["valid"]:
             current_text = "[Output filtered due to validation failure]"
-        result["steps"].append({
-            "step": "validation",
-            "valid": validation_result["valid"],
-        })
+        result["steps"].append(
+            {
+                "step": "validation",
+                "valid": validation_result["valid"],
+            }
+        )
 
         # Step 4: Safe Completion Check
         completion_result = self.safe_completion.safe_complete(
@@ -516,10 +538,12 @@ class OutputFilterPipeline:
         )
         if not completion_result["safe"]:
             current_text = completion_result["filtered_completion"]
-        result["steps"].append({
-            "step": "safe_completion",
-            "safe": completion_result["safe"],
-        })
+        result["steps"].append(
+            {
+                "step": "safe_completion",
+                "safe": completion_result["safe"],
+            }
+        )
 
         result["filtered"] = current_text
         result["modified"] = current_text != output

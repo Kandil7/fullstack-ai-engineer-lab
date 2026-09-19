@@ -21,7 +21,10 @@ limit and fail in structured ways.
 **What is the output of this code?**
 ```python
 class ApiError(Exception): ...
+
+
 class RateLimited(ApiError): ...
+
 
 try:
     raise RateLimited("429")
@@ -76,6 +79,7 @@ def f() -> str:
         return "from try"
     finally:
         return "from finally"
+
 
 print(f())
 ```
@@ -160,6 +164,7 @@ def safe_divide(a: float, b: float) -> float:
     except ZeroDivisionError:
         return float("inf")
 
+
 print(safe_divide(1, 0))
 ```
 
@@ -200,7 +205,10 @@ D) Only user-defined exceptions
 **What is the output of this code?**
 ```python
 class Base(Exception): ...
+
+
 class Sub(Base): ...
+
 
 try:
     raise Sub()
@@ -240,6 +248,7 @@ def chain():
         int("x")
     except ValueError as e:
         raise TypeError("bad") from e
+
 
 try:
     chain()
@@ -288,6 +297,7 @@ def outer():
         raise KeyError("k")
     except KeyError:
         raise ValueError("v")
+
 
 try:
     outer()

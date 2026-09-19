@@ -53,8 +53,8 @@ from the first row), which is often the right call for short series.
 ## 2. `expanding` — Cumulative Window
 
 ```python
-s.expanding().mean()        # running mean: 1, 1.5, 2, 2.5, 3
-s.expanding().std()         # running std
+s.expanding().mean()  # running mean: 1, 1.5, 2, 2.5, 3
+s.expanding().std()  # running std
 ```
 
 `expanding` grows from the first element — cumulative statistics. Use for
@@ -64,8 +64,8 @@ distribution.
 ## 3. `ewm` — Exponential Weighting
 
 ```python
-s.ewm(span=3).mean()        # recent values weigh more
-s.ewm(alpha=0.1).mean()     # alpha controls the decay directly
+s.ewm(span=3).mean()  # recent values weigh more
+s.ewm(alpha=0.1).mean()  # alpha controls the decay directly
 ```
 
 `ewm` (exponentially weighted moving) weights recent observations more
@@ -75,8 +75,8 @@ heavily, reacting faster to change than a plain rolling mean. `span` and
 ## 4. Custom Statistics — `rolling().apply`
 
 ```python
-s.rolling(5).apply(lambda w: np.percentile(w, 95))   # rolling 95th pct
-s.rolling(5).apply(lambda w: w.max() - w.min())      # rolling range
+s.rolling(5).apply(lambda w: np.percentile(w, 95))  # rolling 95th pct
+s.rolling(5).apply(lambda w: w.max() - w.min())  # rolling range
 ```
 
 For statistics the built-ins don't cover, `apply` runs a function per window —
@@ -86,8 +86,8 @@ cannot express.
 ## 5. Window Sizing and Warm-Up
 
 ```python
-s.rolling(7, min_periods=1).mean()   # no NaN warm-up
-s.rolling(7).mean().fillna(0)        # or decide the NaN policy
+s.rolling(7, min_periods=1).mean()  # no NaN warm-up
+s.rolling(7).mean().fillna(0)  # or decide the NaN policy
 ```
 
 Window size is a modeling hyperparameter: too small is noisy, too large lags
@@ -109,8 +109,8 @@ captures recency — the standard forecasting feature set.
 ## 7. The Leakage Rule — Trailing Only
 
 ```python
-s.rolling(7, center=True).mean()   # WRONG for features: sees the future
-s.rolling(7).mean()                # CORRECT: only past + present
+s.rolling(7, center=True).mean()  # WRONG for features: sees the future
+s.rolling(7).mean()  # CORRECT: only past + present
 ```
 
 `center=True` centers the window on the current point, using future values —
@@ -157,7 +157,7 @@ df["mean_7"] = s.rolling(7).mean()
 
 ```python
 # WRONG — O(n*window) instead of O(n)
-means = [s[i-w+1:i+1].mean() for i in range(len(s))]
+means = [s[i - w + 1 : i + 1].mean() for i in range(len(s))]
 # CORRECT — vectorized
 s.rolling(w).mean()
 ```

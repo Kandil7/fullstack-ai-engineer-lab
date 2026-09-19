@@ -220,20 +220,21 @@ def shortest_path_bfs(graph, start, end):
 ```python
 import heapq
 
+
 def dijkstra(graph, start):
-    distances = {v: float('inf') for v in graph.get_vertices()}
+    distances = {v: float("inf") for v in graph.get_vertices()}
     distances[start] = 0
     previous = {v: None for v in graph.get_vertices()}
     pq = [(0, start)]
     visited = set()
-    
+
     while pq:
         dist, vertex = heapq.heappop(pq)
-        
+
         if vertex in visited:
             continue
         visited.add(vertex)
-        
+
         for neighbor, weight in graph.get_neighbors(vertex):
             if neighbor not in visited:
                 new_dist = dist + weight
@@ -241,7 +242,7 @@ def dijkstra(graph, start):
                     distances[neighbor] = new_dist
                     previous[neighbor] = vertex
                     heapq.heappush(pq, (new_dist, neighbor))
-    
+
     return distances, previous
 ```
 

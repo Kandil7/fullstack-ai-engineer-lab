@@ -54,14 +54,16 @@ A hash function converts a key into an array index.
 
 ```python
 # Python's built-in hash function
-print(hash("hello"))     # Integer hash
+print(hash("hello"))  # Integer hash
 print(hash(42))
-print(hash((1, 2, 3)))   # Tuples are hashable
+print(hash((1, 2, 3)))  # Tuples are hashable
 # print(hash([1, 2, 3])) # Lists are NOT hashable (mutable)
+
 
 # Simple hash function for integers
 def simple_hash(key, table_size):
     return key % table_size
+
 
 # Example: table_size = 10
 # hash(25) = 25 % 10 = 5
@@ -250,12 +252,12 @@ Impact:
 ```python
 # === DICTIONARY (Hash Map) ===
 student = {}
-student["alice"] = 90       # O(1) insert
+student["alice"] = 90  # O(1) insert
 student["bob"] = 85
-print(student["alice"])     # O(1) lookup → 90
-del student["bob"]          # O(1) delete
-print("alice" in student)   # O(1) membership test → True
-print(len(student))         # O(1) size → 1
+print(student["alice"])  # O(1) lookup → 90
+del student["bob"]  # O(1) delete
+print("alice" in student)  # O(1) membership test → True
+print(len(student))  # O(1) size → 1
 
 # Dict comprehension
 squares = {x: x**2 for x in range(5)}
@@ -263,19 +265,19 @@ squares = {x: x**2 for x in range(5)}
 
 # === SET (Hash Set) ===
 unique = set()
-unique.add(1)               # O(1)
+unique.add(1)  # O(1)
 unique.add(2)
-unique.add(1)               # Duplicate ignored
-print(1 in unique)          # O(1) → True
-unique.discard(2)           # O(1)
+unique.add(1)  # Duplicate ignored
+print(1 in unique)  # O(1) → True
+unique.discard(2)  # O(1)
 
 # Set operations
 a = {1, 2, 3}
 b = {3, 4, 5}
-print(a | b)   # Union: {1, 2, 3, 4, 5}
-print(a & b)   # Intersection: {3}
-print(a - b)   # Difference: {1, 2}
-print(a ^ b)   # Symmetric difference: {1, 2, 4, 5}
+print(a | b)  # Union: {1, 2, 3, 4, 5}
+print(a & b)  # Intersection: {3}
+print(a - b)  # Difference: {1, 2}
+print(a ^ b)  # Symmetric difference: {1, 2, 4, 5}
 ```
 
 ---
@@ -290,11 +292,13 @@ Count frequency of each element.
 Time: O(n), Space: O(k) where k = number of unique elements
 """
 
+
 def frequency_count(arr):
     freq = {}
     for item in arr:
         freq[item] = freq.get(item, 0) + 1
     return freq
+
 
 # Test
 words = ["apple", "banana", "apple", "cherry", "banana", "apple"]
@@ -315,6 +319,7 @@ Given an array and target, find two numbers that sum to target.
 Time: O(n), Space: O(n)
 """
 
+
 def two_sum(nums, target):
     seen = {}  # value → index
     for i, num in enumerate(nums):
@@ -323,6 +328,7 @@ def two_sum(nums, target):
             return [seen[complement], i]
         seen[num] = i
     return []
+
 
 # Test
 print(two_sum([2, 7, 11, 15], 9))  # [0, 1]
@@ -337,15 +343,17 @@ Time: O(n × k log k) where k = max string length
 Space: O(n × k)
 """
 
+
 def group_anagrams(strs):
     groups = {}
     for s in strs:
         # Sort the string to create a key
-        key = ''.join(sorted(s))
+        key = "".join(sorted(s))
         if key not in groups:
             groups[key] = []
         groups[key].append(s)
     return list(groups.values())
+
 
 # Test
 print(group_anagrams(["eat", "tea", "tan", "ate", "nat", "bat"]))
@@ -360,19 +368,21 @@ Find the first non-repeating character in a string.
 Time: O(n), Space: O(1) — at most 26 lowercase letters
 """
 
+
 def first_non_repeating(s):
     freq = {}
-    
+
     # Count frequencies
     for char in s:
         freq[char] = freq.get(char, 0) + 1
-    
+
     # Find first with frequency 1
     for char in s:
         if freq[char] == 1:
             return char
-    
+
     return None
+
 
 # Test
 print(first_non_repeating("aabxbxc"))  # "y" (if present) or None
@@ -387,11 +397,12 @@ Uses prefix sum + hash map.
 Time: O(n), Space: O(n)
 """
 
+
 def subarray_sum(nums, k):
     count = 0
     prefix_sum = 0
     seen = {0: 1}  # prefix_sum → count
-    
+
     for num in nums:
         prefix_sum += num
         # If (prefix_sum - k) was seen before,
@@ -399,12 +410,13 @@ def subarray_sum(nums, k):
         if prefix_sum - k in seen:
             count += seen[prefix_sum - k]
         seen[prefix_sum] = seen.get(prefix_sum, 0) + 1
-    
+
     return count
 
+
 # Test
-print(subarray_sum([1, 1, 1], 2))       # 2
-print(subarray_sum([1, 2, 3], 3))       # 2
+print(subarray_sum([1, 1, 1], 2))  # 2
+print(subarray_sum([1, 2, 3], 3))  # 2
 ```
 
 ---

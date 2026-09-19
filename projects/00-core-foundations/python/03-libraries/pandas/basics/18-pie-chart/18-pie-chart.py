@@ -4,9 +4,11 @@ W3Schools: https://www.w3schools.com/python/pandas_plotting_pie.asp
 
 A pie chart shows proportions of a whole. Useful for categorical data.
 """
+
 import pandas as pd
 import numpy as np
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
@@ -20,10 +22,12 @@ print("=" * 60)
 print("Example 1: Basic Pie Chart")
 print("=" * 60)
 
-df = pd.DataFrame({
-    "Language": ["Python", "JavaScript", "Java", "C#", "Go"],
-    "Popularity": [30, 25, 20, 15, 10],
-})
+df = pd.DataFrame(
+    {
+        "Language": ["Python", "JavaScript", "Java", "C#", "Go"],
+        "Popularity": [30, 25, 20, 15, 10],
+    }
+)
 print("Language Popularity:")
 print(df)
 print()
@@ -48,10 +52,12 @@ print("=" * 60)
 print("Example 2: Exploded Pie Chart")
 print("=" * 60)
 
-df2 = pd.DataFrame({
-    "OS": ["Windows", "macOS", "Linux", "Other"],
-    "Market_Share": [72, 15, 8, 5],
-})
+df2 = pd.DataFrame(
+    {
+        "OS": ["Windows", "macOS", "Linux", "Other"],
+        "Market_Share": [72, 15, 8, 5],
+    }
+)
 
 fig, ax = plt.subplots(figsize=(7, 7))
 df2.set_index("OS")["Market_Share"].plot.pie(
@@ -78,11 +84,13 @@ print("=" * 60)
 print("Example 3: Side-by-Side Pie Charts")
 print("=" * 60)
 
-df3 = pd.DataFrame({
-    "Category": ["Rent", "Food", "Transport", "Entertainment", "Savings"],
-    "Year1": [35, 25, 15, 10, 15],
-    "Year2": [30, 20, 10, 15, 25],
-})
+df3 = pd.DataFrame(
+    {
+        "Category": ["Rent", "Food", "Transport", "Entertainment", "Savings"],
+        "Year1": [35, 25, 15, 10, 15],
+        "Year2": [30, 20, 10, 15, 25],
+    }
+)
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
@@ -114,10 +122,12 @@ print("=" * 60)
 print("Example 4: Donut Chart")
 print("=" * 60)
 
-df4 = pd.DataFrame({
-    "Status": ["Completed", "In Progress", "Pending", "Cancelled"],
-    "Count": [45, 20, 25, 10],
-})
+df4 = pd.DataFrame(
+    {
+        "Status": ["Completed", "In Progress", "Pending", "Cancelled"],
+        "Count": [45, 20, 25, 10],
+    }
+)
 
 fig, ax = plt.subplots(figsize=(7, 7))
 wedges, texts, autotexts = ax.pie(
@@ -149,13 +159,15 @@ print("=" * 60)
 print("Example 5: Pie from value_counts()")
 print("=" * 60)
 
-orders = pd.DataFrame({
-    "product": np.random.choice(
-        ["Espresso", "Latte", "Cappuccino", "Americano", "Mocha"],
-        size=200,
-        p=[0.15, 0.30, 0.25, 0.20, 0.10],
-    )
-})
+orders = pd.DataFrame(
+    {
+        "product": np.random.choice(
+            ["Espresso", "Latte", "Cappuccino", "Americano", "Mocha"],
+            size=200,
+            p=[0.15, 0.30, 0.25, 0.20, 0.10],
+        )
+    }
+)
 
 vc = orders["product"].value_counts()
 print("Order counts:")

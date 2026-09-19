@@ -41,6 +41,7 @@ span closed days.
 **Example**:
 ```python
 from pandas.tseries.offsets import CustomBusinessDay
+
 pd.date_range("2024-01-11", periods=5, freq=CustomBusinessDay(holidays=[...]))
 ```
 **Related**: freq string
@@ -59,7 +60,7 @@ idx = pd.date_range("2024-01-01", periods=10, freq="D")
 the per-period absolute change.
 **Example**:
 ```python
-s.diff()   # [nan, 10.0, 10.0, 20.0] for [10, 20, 30, 50]
+s.diff()  # [nan, 10.0, 10.0, 20.0] for [10, 20, 30, 50]
 ```
 **Related**: `shift`, `pct_change`
 
@@ -103,7 +104,7 @@ Validation looks great; production silently degrades.
 `(value - shifted) / shifted`.
 **Example**:
 ```python
-s.pct_change()   # [nan, 1.0, 0.5, 0.667] for [10, 20, 30, 50]
+s.pct_change()  # [nan, 1.0, 0.5, 0.667] for [10, 20, 30, 50]
 ```
 **Related**: `diff`, `shift`
 
@@ -143,7 +144,7 @@ s.rolling(5).mean().shift(1)
 in today's row; `shift(-1)` pulls tomorrow's value back.
 **Example**:
 ```python
-s.shift(1)   # [nan, 10.0, 20.0, 30.0] for [10, 20, 30, 50]
+s.shift(1)  # [nan, 10.0, 20.0, 30.0] for [10, 20, 30, 50]
 ```
 **Complexity**: O(n).
 **Related**: `diff`, `pct_change`, leakage

@@ -33,8 +33,8 @@ the casting ladder (safe/same_kind/unsafe) governs what is allowed.
 import numpy as np
 
 x = np.array([1.9, -2.7])
-print(x.astype(np.int64, casting="unsafe"))   # [ 1 -2] truncates
-print(x.astype(np.float32).dtype)             # float32
+print(x.astype(np.int64, casting="unsafe"))  # [ 1 -2] truncates
+print(x.astype(np.float32).dtype)  # float32
 ```
 
 **Complexity**: O(n) copy.
@@ -51,7 +51,7 @@ tolerance is meaningless.
 ```python
 import numpy as np
 
-print(np.isclose(1e-12, 0.0, rtol=1e-5))            # False
+print(np.isclose(1e-12, 0.0, rtol=1e-5))  # False
 print(np.isclose(1e-12, 0.0, rtol=1e-5, atol=1e-12))  # True
 ```
 
@@ -74,7 +74,7 @@ try:
     x.astype(np.int64, casting="safe")
 except TypeError:
     print("safe rejected")
-print(x.astype(np.int64, casting="unsafe"))       # [1]
+print(x.astype(np.int64, casting="unsafe"))  # [1]
 ```
 
 **Complexity**: O(n) copy when it succeeds.
@@ -93,9 +93,9 @@ import numpy as np
 
 w = np.random.default_rng(0).normal(size=(4, 4))
 h = w.astype(np.float16)
-print(h.itemsize)                                 # 2
+print(h.itemsize)  # 2
 err = np.abs(h.astype(np.float64) - w) / (np.abs(w) + 1e-12)
-print(round(float(err.max()), 4))                 # worst-case error
+print(round(float(err.max()), 4))  # worst-case error
 ```
 
 **Complexity**: O(n) cast.
@@ -114,8 +114,8 @@ import numpy as np
 
 f64 = np.random.default_rng(1).normal(size=(500, 500))
 f32 = f64.astype(np.float32)
-print(f64.nbytes, "->", f32.nbytes)               # 2000000 -> 1000000
-print(np.allclose(f32, f64, rtol=1e-5))           # True
+print(f64.nbytes, "->", f32.nbytes)  # 2000000 -> 1000000
+print(np.allclose(f32, f64, rtol=1e-5))  # True
 ```
 
 **Complexity**: O(n) cast.
@@ -133,8 +133,8 @@ math (solves, inverses, near-cancellation sums).
 import numpy as np
 
 x = np.array([0.1, 0.2, 0.3])
-print(x.dtype)                                    # float64
-print(x.itemsize)                                 # 8
+print(x.dtype)  # float64
+print(x.itemsize)  # 8
 ```
 
 **Complexity**: —.
@@ -152,8 +152,8 @@ import numpy as np
 
 with np.errstate(over="ignore"):
     big = np.float64(1e308) * 10.0
-print(np.isinf(big))                              # True
-print(np.inf - np.inf)                            # nan
+print(np.isinf(big))  # True
+print(np.inf - np.inf)  # nan
 ```
 
 **Complexity**: —.
@@ -171,8 +171,8 @@ floats; `==` is bit-exact and fails on `0.1 + 0.2`.
 import numpy as np
 
 a = 0.1 + 0.2
-print(a == 0.3)                                   # False
-print(np.isclose(a, 0.3))                         # True
+print(a == 0.3)  # False
+print(np.isclose(a, 0.3))  # True
 print(np.allclose(np.array([a]), np.array([0.3])))  # True
 ```
 
@@ -212,9 +212,9 @@ Detect with `np.isnan`.
 import numpy as np
 
 x = np.array([1.0, np.nan, 3.0])
-print(np.nan != np.nan)                           # True
-print(np.isnan(x))                                # [False  True False]
-print(x.sum())                                    # nan
+print(np.nan != np.nan)  # True
+print(np.isnan(x))  # [False  True False]
+print(x.sum())  # nan
 ```
 
 **Complexity**: —.
@@ -232,8 +232,8 @@ is expected and counted.
 import numpy as np
 
 x = np.array([1.0, np.nan, 3.0])
-print(np.nanmean(x))                              # 2.0
-print(np.isnan(x).sum())                          # 1 -- counted
+print(np.nanmean(x))  # 2.0
+print(np.isnan(x).sum())  # 1 -- counted
 ```
 
 **Complexity**: O(n), builds a mask.
@@ -253,8 +253,8 @@ import numpy as np
 
 i = np.arange(3, dtype=np.int64)
 f = np.arange(3, dtype=np.float32)
-print((i + f).dtype)       # float64
-print((i + 1).dtype)       # int64 -- python int stays weak
+print((i + f).dtype)  # float64
+print((i + 1).dtype)  # int64 -- python int stays weak
 ```
 
 **Complexity**: —.
@@ -293,7 +293,7 @@ import numpy as np
 w = np.random.default_rng(2).normal(size=(1024, 1024))
 h = w.astype(np.float16)
 rel = np.abs(h.astype(np.float64) - w) / (np.abs(w) + 1e-12)
-print(round(float(rel.max()), 4))     # worst-case relative error
+print(round(float(rel.max()), 4))  # worst-case relative error
 ```
 
 **Complexity**: O(n) measurement.
@@ -311,8 +311,8 @@ Array dtypes dominate weak python scalars (NEP 50); the widest
 import numpy as np
 
 i = np.arange(3, dtype=np.int64)
-print((i + 0.5).dtype)     # float64
-print((i + 1).dtype)       # int64
+print((i + 0.5).dtype)  # float64
+print((i + 1).dtype)  # int64
 ```
 
 **Complexity**: —.
@@ -332,8 +332,8 @@ import numpy as np
 rec = np.zeros(3, dtype=[("score", np.float32), ("id", np.int32)])
 rec["score"] = [0.9, 0.4, 0.7]
 rec["id"] = [7, 3, 11]
-print(np.sort(rec, order="score")["id"])      # [ 3 11  7]
-print(rec.nbytes)                             # 24
+print(np.sort(rec, order="score")["id"])  # [ 3 11  7]
+print(rec.nbytes)  # 24
 ```
 
 **Complexity**: O(n log n) for `order=` sort.
@@ -350,7 +350,7 @@ print(rec.nbytes)                             # 24
 import numpy as np
 
 c = np.array([127], dtype=np.int8)
-print(int((c + np.int8(1))[0]))               # -128 -- wrapped
+print(int((c + np.int8(1))[0]))  # -128 -- wrapped
 ```
 
 **Complexity**: —.

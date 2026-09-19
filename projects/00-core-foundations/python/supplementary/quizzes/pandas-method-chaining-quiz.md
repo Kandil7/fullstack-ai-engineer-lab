@@ -192,6 +192,7 @@ changes row order.
 
 ```python
 import pandas as pd
+
 df = pd.DataFrame({"x": [1, 2, 3]})
 result = df.assign(x2=lambda d: d["x"] * 2).query("x2 > 3")
 print(result.shape)
@@ -231,6 +232,7 @@ change the frame.
 
 ```python
 import pandas as pd
+
 s = pd.Series([3, 1, 2])
 print(s.rename("v").sort_values().reset_index(drop=True).tolist())
 ```
@@ -268,6 +270,7 @@ lost?**
 
 ```python
 import warnings, pandas as pd
+
 df = pd.DataFrame({"a": [1, 2, 3, 4]})
 df["flag"] = 0
 with warnings.catch_warnings(record=True) as caught:
@@ -313,11 +316,13 @@ lesson: do not rely on warning detection; use a single `.loc[mask, col] = x`.
 
 ```python
 import pandas as pd
-df = pd.DataFrame({"plan": ["free", "pro", "free", "pro"],
-                   "spend": [5, 20, 1, 30]})
-out = (df.assign(pct=lambda d: d["spend"] / d["spend"].sum())
-         .query("plan == 'pro'")
-         .sort_values("pct", ascending=False))
+
+df = pd.DataFrame({"plan": ["free", "pro", "free", "pro"], "spend": [5, 20, 1, 30]})
+out = (
+    df.assign(pct=lambda d: d["spend"] / d["spend"].sum())
+    .query("plan == 'pro'")
+    .sort_values("pct", ascending=False)
+)
 print(out["pct"].round(2).tolist())
 ```
 

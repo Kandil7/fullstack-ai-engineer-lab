@@ -257,6 +257,7 @@ text = "hello world"
 
 ```python
 import tiktoken
+
 enc = tiktoken.get_encoding("cl100k_base")  # GPT-4 tokenizer
 tokens = enc.encode("hello world")
 ```

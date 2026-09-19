@@ -53,7 +53,7 @@ descend over a discrete value like `max_depth`; you have to search.
 from sklearn.ensemble import RandomForestClassifier
 
 rf = RandomForestClassifier(n_estimators=200, max_depth=10)  # 200, 10 = hyperparameters
-rf.fit(Xtr, ytr)                                             # weights = parameters (learned)
+rf.fit(Xtr, ytr)  # weights = parameters (learned)
 ```
 
 Output:
@@ -70,9 +70,12 @@ is 3125 fits — and each fit is itself cross-validated.
 ```python
 from sklearn.model_selection import GridSearchCV
 
-grid = GridSearchCV(RandomForestClassifier(random_state=0),
-                    {"n_estimators": [50, 100, 200], "max_depth": [5, 10, None]},
-                    cv=3, scoring="roc_auc")
+grid = GridSearchCV(
+    RandomForestClassifier(random_state=0),
+    {"n_estimators": [50, 100, 200], "max_depth": [5, 10, None]},
+    cv=3,
+    scoring="roc_auc",
+)
 grid.fit(Xtr, ytr)
 print(grid.best_params_, round(grid.best_score_, 3))
 ```
@@ -95,11 +98,19 @@ performance.
 ```python
 from sklearn.model_selection import RandomizedSearchCV
 
-param_dist = {"n_estimators": [50, 100, 200, 300],
-              "max_depth": [3, 5, 10, None],
-              "min_samples_leaf": [1, 2, 5, 10]}
-rnd = RandomizedSearchCV(RandomForestClassifier(random_state=0), param_dist,
-                         n_iter=15, cv=3, scoring="roc_auc", random_state=0)
+param_dist = {
+    "n_estimators": [50, 100, 200, 300],
+    "max_depth": [3, 5, 10, None],
+    "min_samples_leaf": [1, 2, 5, 10],
+}
+rnd = RandomizedSearchCV(
+    RandomForestClassifier(random_state=0),
+    param_dist,
+    n_iter=15,
+    cv=3,
+    scoring="roc_auc",
+    random_state=0,
+)
 rnd.fit(Xtr, ytr)
 ```
 
@@ -120,6 +131,7 @@ trials where they pay off.
 ```python
 import optuna
 
+
 def objective(trial):
     params = {
         "n_estimators": trial.suggest_int("n_estimators", 50, 300),
@@ -128,6 +140,7 @@ def objective(trial):
     }
     model = RandomForestClassifier(random_state=0, **params)
     return cross_val_score(model, Xtr, ytr, cv=3, scoring="roc_auc").mean()
+
 
 study = optuna.create_study(direction="maximize")
 study.optimize(objective, n_trials=20)
@@ -177,12 +190,13 @@ from sklearn.metrics import roc_auc_score
 
 outer_aucs = []
 for tr_o, va_o in KFold(5, shuffle=True, random_state=0).split(Xtr):
-    inner = GridSearchCV(LogisticRegression(max_iter=1000),
-                         {"C": [0.01, 0.1, 1, 10]}, cv=3, scoring="roc_auc")
-    inner.fit(Xtr[tr_o], ytr[tr_o])                       # tune on training part only
+    inner = GridSearchCV(
+        LogisticRegression(max_iter=1000), {"C": [0.01, 0.1, 1, 10]}, cv=3, scoring="roc_auc"
+    )
+    inner.fit(Xtr[tr_o], ytr[tr_o])  # tune on training part only
     outer_aucs.append(roc_auc_score(ytr[va_o], inner.predict_proba(Xtr[va_o])[:, 1]))
 
-print(f"nested mean AUC: {np.mean(outer_aucs):.3f}")      # the honest number
+print(f"nested mean AUC: {np.mean(outer_aucs):.3f}")  # the honest number
 ```
 
 Output:

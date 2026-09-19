@@ -40,6 +40,7 @@ Graphs model relationships between entities. They consist of vertices (nodes) an
 ```python
 from collections import deque
 
+
 def bfs(graph, start):
     visited = set([start])
     queue = deque([start])
@@ -77,6 +78,7 @@ def dfs(graph, start):
 
     dfs_helper(start)
     return order
+
 
 # Iterative DFS
 def dfs_iterative(graph, start):
@@ -184,22 +186,16 @@ def topological_sort_dfs(graph):
 
     return order[::-1]
 
+
 # Test
-graph = {
-    'A': ['B', 'C'],
-    'B': ['D'],
-    'C': ['D'],
-    'D': []
-}
-assert topological_sort_dfs(graph) in [
-    ['A', 'C', 'B', 'D'],
-    ['A', 'B', 'C', 'D']
-]
+graph = {"A": ["B", "C"], "B": ["D"], "C": ["D"], "D": []}
+assert topological_sort_dfs(graph) in [["A", "C", "B", "D"], ["A", "B", "C", "D"]]
 ```
 
 **Kahn's Algorithm (BFS-based, O(V + E)):**
 ```python
 from collections import deque
+
 
 def topological_sort_kahn(graph):
     in_degree = {node: 0 for node in graph}
@@ -233,8 +229,9 @@ Dijkstra's finds the shortest path from a source to all vertices in a weighted g
 ```python
 import heapq
 
+
 def dijkstra(graph, start):
-    distances = {node: float('inf') for node in graph}
+    distances = {node: float("inf") for node in graph}
     distances[start] = 0
     heap = [(0, start)]
     previous = {node: None for node in graph}
@@ -254,15 +251,16 @@ def dijkstra(graph, start):
 
     return distances, previous
 
+
 # Test
 graph = {
-    'A': [('B', 1), ('C', 4)],
-    'B': [('A', 1), ('C', 2), ('D', 5)],
-    'C': [('A', 4), ('B', 2), ('D', 1)],
-    'D': [('B', 5), ('C', 1)]
+    "A": [("B", 1), ("C", 4)],
+    "B": [("A", 1), ("C", 2), ("D", 5)],
+    "C": [("A", 4), ("B", 2), ("D", 1)],
+    "D": [("B", 5), ("C", 1)],
 }
-distances, previous = dijkstra(graph, 'A')
-assert distances == {'A': 0, 'B': 1, 'C': 3, 'D': 4}
+distances, previous = dijkstra(graph, "A")
+assert distances == {"A": 0, "B": 1, "C": 3, "D": 4}
 ```
 
 **Time: O((V + E) log V)** with binary heap, **O(V²)** with array.
@@ -292,15 +290,10 @@ def connected_components(graph):
 
     return components
 
+
 # Test
-graph = {
-    'A': ['B'],
-    'B': ['A'],
-    'C': ['D'],
-    'D': ['C'],
-    'E': []
-}
-assert connected_components(graph) == [['A', 'B'], ['C', 'D'], ['E']]
+graph = {"A": ["B"], "B": ["A"], "C": ["D"], "D": ["C"], "E": []}
+assert connected_components(graph) == [["A", "B"], ["C", "D"], ["E"]]
 ```
 
 ---
@@ -369,6 +362,7 @@ def kruskal(n, edges):
 ```python
 import heapq
 
+
 def prim(graph, start=0):
     mst = []
     visited = set()
@@ -399,6 +393,7 @@ BFS gives the shortest path:
 ```python
 from collections import deque
 
+
 def shortest_path(graph, start, end):
     queue = deque([(start, [start])])
     visited = set([start])
@@ -425,7 +420,7 @@ Finds shortest paths from source, handles negative weights (but not negative cyc
 
 ```python
 def bellman_ford(n, edges, start):
-    distances = [float('inf')] * n
+    distances = [float("inf")] * n
     distances[start] = 0
 
     for _ in range(n - 1):
@@ -452,7 +447,7 @@ Run Bellman-Ford for V iterations. If any distance still decreases in the V-th i
 
 ```python
 def has_negative_cycle(n, edges, start):
-    distances = [float('inf')] * n
+    distances = [float("inf")] * n
     distances[start] = 0
 
     for _ in range(n - 1):
@@ -489,15 +484,10 @@ def find_all_paths(graph, start, end):
     dfs(start, [start])
     return result
 
+
 # Test
-graph = {
-    'A': ['B', 'C'],
-    'B': ['D', 'E'],
-    'C': ['E'],
-    'D': [],
-    'E': []
-}
-assert find_all_paths(graph, 'A', 'E') == [['A', 'B', 'E'], ['A', 'B', 'D', 'E'], ['A', 'C', 'E']]
+graph = {"A": ["B", "C"], "B": ["D", "E"], "C": ["E"], "D": [], "E": []}
+assert find_all_paths(graph, "A", "E") == [["A", "B", "E"], ["A", "B", "D", "E"], ["A", "C", "E"]]
 ```
 
 ---
@@ -507,6 +497,7 @@ assert find_all_paths(graph, 'A', 'E') == [['A', 'B', 'E'], ['A', 'B', 'D', 'E']
 **Answer:**
 ```python
 from collections import deque
+
 
 def can_finish(num_courses, prerequisites):
     graph = [[] for _ in range(num_courses)]
@@ -528,6 +519,7 @@ def can_finish(num_courses, prerequisites):
                 queue.append(neighbor)
 
     return count == num_courses
+
 
 # Test
 assert can_finish(2, [[1, 0]]) == True
@@ -602,9 +594,9 @@ def num_islands(grid):
     count = 0
 
     def dfs(r, c):
-        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != '1':
+        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != "1":
             return
-        grid[r][c] = '0'  # Mark visited
+        grid[r][c] = "0"  # Mark visited
         dfs(r + 1, c)
         dfs(r - 1, c)
         dfs(r, c + 1)
@@ -612,18 +604,19 @@ def num_islands(grid):
 
     for r in range(rows):
         for c in range(cols):
-            if grid[r][c] == '1':
+            if grid[r][c] == "1":
                 dfs(r, c)
                 count += 1
 
     return count
 
+
 # Test
 grid = [
-    ['1','1','1','1','0'],
-    ['1','1','0','1','0'],
-    ['1','1','0','0','0'],
-    ['0','0','0','0','0']
+    ["1", "1", "1", "1", "0"],
+    ["1", "1", "0", "1", "0"],
+    ["1", "1", "0", "0", "0"],
+    ["0", "0", "0", "0", "0"],
 ]
 assert num_islands(grid) == 1
 ```
@@ -641,9 +634,9 @@ def num_islands(grid):
     count = 0
 
     def dfs(r, c):
-        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != '1':
+        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != "1":
             return
-        grid[r][c] = '0'
+        grid[r][c] = "0"
         dfs(r + 1, c)
         dfs(r - 1, c)
         dfs(r, c + 1)
@@ -651,7 +644,7 @@ def num_islands(grid):
 
     for r in range(rows):
         for c in range(cols):
-            if grid[r][c] == '1':
+            if grid[r][c] == "1":
                 dfs(r, c)
                 count += 1
     return count
@@ -666,6 +659,7 @@ class Node:
     def __init__(self, val=0, neighbors=None):
         self.val = val
         self.neighbors = neighbors if neighbors is not None else []
+
 
 def clone_graph(node):
     if not node:
@@ -694,6 +688,7 @@ def clone_graph(node):
 ### Challenge 3: Course Schedule
 ```python
 from collections import deque
+
 
 def can_finish(num_courses, prerequisites):
     graph = [[] for _ in range(num_courses)]
@@ -739,7 +734,7 @@ def pacific_atlantic(heights):
             return
 
         ocean.add((r, c))
-        for dr, dc in [(0,1), (0,-1), (1,0), (-1,0)]:
+        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
             dfs(r + dr, c + dc, heights[r][c], ocean)
 
     for r in range(rows):
@@ -760,6 +755,7 @@ def pacific_atlantic(heights):
 ```python
 from collections import deque
 
+
 def ladder_length(begin_word, end_word, word_list):
     word_set = set(word_list)
     if end_word not in word_set:
@@ -771,8 +767,8 @@ def ladder_length(begin_word, end_word, word_list):
     while queue:
         word, length = queue.popleft()
         for i in range(len(word)):
-            for c in 'abcdefghijklmnopqrstuvwxyz':
-                new_word = word[:i] + c + word[i+1:]
+            for c in "abcdefghijklmnopqrstuvwxyz":
+                new_word = word[:i] + c + word[i + 1 :]
                 if new_word == end_word:
                     return length + 1
                 if new_word in word_set and new_word not in visited:
@@ -788,6 +784,7 @@ def ladder_length(begin_word, end_word, word_list):
 ### Challenge 6: Alien Dictionary (Topological Sort)
 ```python
 from collections import defaultdict, deque
+
 
 def alien_order(words):
     adj = defaultdict(set)
@@ -820,7 +817,7 @@ def alien_order(words):
     if len(result) != len(in_degree):
         return ""
 
-    return ''.join(result)
+    return "".join(result)
 ```
 **Time: O(C)** where C = total characters in all words
 
@@ -846,8 +843,9 @@ def find_province_num(is_connected):
 
     return count
 
+
 # Test
-assert find_province_num([[1,1,0],[1,1,0],[0,0,1]]) == 2
+assert find_province_num([[1, 1, 0], [1, 1, 0], [0, 0, 1]]) == 2
 ```
 **Time: O(n²), Space: O(n)**
 
@@ -857,9 +855,10 @@ assert find_province_num([[1,1,0],[1,1,0],[0,0,1]]) == 2
 ```python
 from collections import deque
 
+
 def shortest_path_binary_matrix(grid):
     n = len(grid)
-    if grid[0][0] == 1 or grid[n-1][n-1] == 1:
+    if grid[0][0] == 1 or grid[n - 1][n - 1] == 1:
         return -1
 
     queue = deque([(0, 0, 1)])
@@ -916,12 +915,13 @@ def valid_tree(n, edges):
 ```python
 import heapq
 
+
 def network_delay(times, n, k):
     graph = [[] for _ in range(n + 1)]
     for u, v, w in times:
         graph[u].append((v, w))
 
-    distances = {i: float('inf') for i in range(1, n + 1)}
+    distances = {i: float("inf") for i in range(1, n + 1)}
     distances[k] = 0
     heap = [(0, k)]
 
@@ -936,7 +936,7 @@ def network_delay(times, n, k):
                 heapq.heappush(heap, (distance, neighbor))
 
     max_dist = max(distances.values())
-    return max_dist if max_dist < float('inf') else -1
+    return max_dist if max_dist < float("inf") else -1
 ```
 **Time: O(E log V), Space: O(V + E)**
 

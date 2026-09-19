@@ -25,6 +25,7 @@ except Exception:
 
 app = FastAPI(title="Async vs Sync Endpoints")
 
+
 # A real blocking workload: CPU-bound or I/O via blocking libraries
 def blocking_work(seconds: float) -> str:
     """Simulates a blocking call (requests, DB driver, CPU crunch)."""
@@ -55,7 +56,7 @@ async def async_correct() -> dict:
 async def async_blocking() -> dict:
     """time.sleep inside async def BLOCKS THE EVENT LOOP: while this runs,
     every other request on the process waits. This is the #1 FastAPI bug."""
-    result = blocking_work(0.05)     # BAD: blocking call in the loop
+    result = blocking_work(0.05)  # BAD: blocking call in the loop
     return {"kind": "async-but-blocking", "result": result}
 
 
@@ -85,6 +86,7 @@ async def async_threaded() -> dict:
 # ============================================================
 def demonstrate_blocking() -> None:
     """Two async handlers, one blocking: total wall time reveals the bug."""
+
     async def run_clean() -> float:
         start = time.perf_counter()
         await asyncio.gather(*[async_correct_body() for _ in range(4)])
@@ -100,7 +102,7 @@ def demonstrate_blocking() -> None:
         return time.perf_counter() - start
 
     async def blocked_body() -> None:
-        time.sleep(0.1)     # blocks the loop
+        time.sleep(0.1)  # blocks the loop
 
     clean = asyncio.run(run_clean())
     blocked = asyncio.run(run_blocking())
@@ -142,6 +144,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("32-async-endpoints-deep:app", host="127.0.0.1", port=8000)
     else:
         _verify()

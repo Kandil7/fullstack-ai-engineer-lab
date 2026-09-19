@@ -10,23 +10,27 @@ import numpy as np
 
 # Create sample data
 np.random.seed(42)
-df = pd.DataFrame({
-    'id': range(1, 101),
-    'name': [f'User_{i}' for i in range(1, 101)],
-    'age': np.random.randint(18, 80, 100),
-    'salary': np.random.normal(75000, 20000, 100).astype(int),
-    'department': np.random.choice(['Engineering', 'Sales', 'Marketing', 'HR', 'Finance'], 100),
-    'join_date': pd.date_range('2020-01-01', periods=100, freq='D'),
-    'is_manager': np.random.choice([True, False], 100, p=[0.1, 0.9]),
-    'performance_score': np.random.uniform(1, 5, 100).round(2),
-    'bonus': np.where(np.random.random(100) > 0.7, np.random.randint(1000, 10000, 100), 0),
-    'notes': np.random.choice(['', 'Top performer', 'Needs improvement', 'On leave'], 100, p=[0.7, 0.1, 0.1, 0.1])
-})
+df = pd.DataFrame(
+    {
+        "id": range(1, 101),
+        "name": [f"User_{i}" for i in range(1, 101)],
+        "age": np.random.randint(18, 80, 100),
+        "salary": np.random.normal(75000, 20000, 100).astype(int),
+        "department": np.random.choice(["Engineering", "Sales", "Marketing", "HR", "Finance"], 100),
+        "join_date": pd.date_range("2020-01-01", periods=100, freq="D"),
+        "is_manager": np.random.choice([True, False], 100, p=[0.1, 0.9]),
+        "performance_score": np.random.uniform(1, 5, 100).round(2),
+        "bonus": np.where(np.random.random(100) > 0.7, np.random.randint(1000, 10000, 100), 0),
+        "notes": np.random.choice(
+            ["", "Top performer", "Needs improvement", "On leave"], 100, p=[0.7, 0.1, 0.1, 0.1]
+        ),
+    }
+)
 
 # Introduce some missing values
-df.loc[5:10, 'salary'] = np.nan
-df.loc[15:20, 'performance_score'] = np.nan
-df.loc[30, 'department'] = np.nan
+df.loc[5:10, "salary"] = np.nan
+df.loc[15:20, "performance_score"] = np.nan
+df.loc[30, "department"] = np.nan
 
 print("=" * 60)
 print("1. HEAD & TAIL")
@@ -65,7 +69,7 @@ print(df.describe())
 print()
 
 print("df.describe(include='all') - All columns:")
-print(df.describe(include='all'))
+print(df.describe(include="all"))
 print()
 
 print("df.describe(include=[np.number]) - Only numeric:")
@@ -73,7 +77,7 @@ print(df.describe(include=[np.number]))
 print()
 
 print("df.describe(include=['object', 'bool']) - Categorical:")
-print(df.describe(include=['object', 'bool']))
+print(df.describe(include=["object", "bool"]))
 print()
 
 # Percentiles
@@ -117,13 +121,13 @@ print(f"df.index.dtype: {df.index.dtype}")
 print()
 
 # Rename columns
-df_renamed = df.rename(columns={'name': 'employee_name', 'salary': 'annual_salary'})
+df_renamed = df.rename(columns={"name": "employee_name", "salary": "annual_salary"})
 print("After rename:")
 print(df_renamed.columns.tolist())
 print()
 
 # Set index
-df_indexed = df.set_index('id')
+df_indexed = df.set_index("id")
 print("After set_index('id'):")
 print(df_indexed.head())
 print(f"New index name: {df_indexed.index.name}")
@@ -140,22 +144,22 @@ print("7. UNIQUE VALUES & VALUE COUNTS")
 print("=" * 60)
 
 print("df['department'].unique():")
-print(df['department'].unique())
+print(df["department"].unique())
 print()
 
-print("df['department'].nunique():", df['department'].nunique())
+print("df['department'].nunique():", df["department"].nunique())
 print()
 
 print("df['department'].value_counts():")
-print(df['department'].value_counts())
+print(df["department"].value_counts())
 print()
 
 print("df['department'].value_counts(normalize=True):")
-print(df['department'].value_counts(normalize=True))
+print(df["department"].value_counts(normalize=True))
 print()
 
 print("df['is_manager'].value_counts():")
-print(df['is_manager'].value_counts())
+print(df["is_manager"].value_counts())
 print()
 
 print("=" * 60)
@@ -177,7 +181,7 @@ print()
 # Rows with any missing
 missing_rows = df[df.isna().any(axis=1)]
 print(f"Rows with any missing: {len(missing_rows)}")
-print(missing_rows[['id', 'salary', 'performance_score', 'department']])
+print(missing_rows[["id", "salary", "performance_score", "department"]])
 print()
 
 print("=" * 60)

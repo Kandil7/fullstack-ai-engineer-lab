@@ -6,9 +6,22 @@ and combinatorics.
 """
 
 from itertools import (
-    chain, product, permutations, combinations, combinations_with_replacement,
-    groupby, islice, takewhile, dropwhile, count, cycle, repeat,
-    starmap, zip_longest, tee, filterfalse
+    chain,
+    product,
+    permutations,
+    combinations,
+    combinations_with_replacement,
+    groupby,
+    islice,
+    takewhile,
+    dropwhile,
+    count,
+    cycle,
+    repeat,
+    starmap,
+    zip_longest,
+    tee,
+    filterfalse,
 )
 from typing import List, Tuple
 
@@ -16,6 +29,7 @@ from typing import List, Tuple
 # =============================================================================
 # 1. Infinite Iterators
 # =============================================================================
+
 
 def demo_infinite():
     """Demonstrate infinite iterators."""
@@ -37,6 +51,7 @@ def demo_infinite():
 # =============================================================================
 # 2. Terminating Iterators
 # =============================================================================
+
 
 def demo_terminating():
     """Demonstrate terminating iterators."""
@@ -66,6 +81,7 @@ def demo_terminating():
 # 3. Combinatoric Iterators
 # =============================================================================
 
+
 def demo_combinatorics():
     """Demonstrate combinatoric iterators."""
     items = ["A", "B", "C"]
@@ -90,6 +106,7 @@ def demo_combinatorics():
 # =============================================================================
 # 4. groupby - Group Consecutive Elements
 # =============================================================================
+
 
 def demo_groupby():
     """Demonstrate groupby for grouping data."""
@@ -120,11 +137,12 @@ def demo_groupby():
 # 5. starmap and zip_longest
 # =============================================================================
 
+
 def demo_starmap_zip():
     """Demonstrate starmap and zip_longest."""
     # starmap - apply function to argument tuples
     pairs = [(2, 3), (4, 5), (6, 7)]
-    powers = list(starmap(lambda a, b: a ** b, pairs))
+    powers = list(starmap(lambda a, b: a**b, pairs))
     print(f"  starmap(power): {powers}")
 
     # zip_longest - zip with fill value
@@ -137,6 +155,7 @@ def demo_starmap_zip():
 # =============================================================================
 # 6. filterfalse and partition
 # =============================================================================
+
 
 def demo_filter_partition():
     """Demonstrate filterfalse and custom partition."""
@@ -162,6 +181,7 @@ def demo_filter_partition():
 # =============================================================================
 # 7. Practical Examples
 # =============================================================================
+
 
 def flatten(nested_list: list) -> list:
     """Flatten a nested list using chain."""

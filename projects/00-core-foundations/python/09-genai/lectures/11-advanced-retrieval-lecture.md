@@ -57,8 +57,8 @@ opposite directions — so run both and fuse.
 def bm25_scores(query_terms: list[str], doc_terms: list[list[str]]) -> list[float]:
     """Simplified BM25-ish: term frequency overlap per doc."""
     q = set(query_terms)
-    return [sum(1 for t in q if t in set(d)) / len(q) if q else 0.0
-            for d in doc_terms]
+    return [sum(1 for t in q if t in set(d)) / len(q) if q else 0.0 for d in doc_terms]
+
 
 def vector_scores(q_vec, doc_vecs, sim_fn) -> list[float]:
     return [sim_fn(q_vec, d) for d in doc_vecs]
@@ -85,6 +85,7 @@ def rrf_fuse(*ranked_lists: list[str], k: int = 60) -> list[str]:
             scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k + rank + 1)
     return [d for d, _ in sorted(scores.items(), key=lambda x: -x[1])]
 
+
 semantic_top = ["a", "b", "c"]
 lexical_top = ["b", "d", "a"]
 print("fused:", rrf_fuse(semantic_top, lexical_top)[:3])
@@ -109,11 +110,13 @@ REWRITE_PROMPT = """Rewrite this search query to use the terminology of our
 knowledge base (which is about SaaS billing). Keep it a single search query.
 Query: {q}"""
 
+
 def rewrite_query(q: str, llm_client) -> str:
     """LLM rewrite: fix spelling, map to domain terms."""
     if len(q.strip()) < 3:
         return q
     return llm_client.complete(REWRITE_PROMPT.format(q=q)).strip()
+
 
 print(rewrite_query("cant loggin to dashbord", mock_llm))
 ```
@@ -140,6 +143,7 @@ def expand_query(query: str, synonyms: dict[str, list[str]]) -> list[str]:
         expanded.update(synonyms.get(term, []))
     return list(expanded)
 
+
 print(expand_query("cancel plan", {"cancel": ["terminate", "end subscription"]}))
 ```
 
@@ -161,10 +165,13 @@ retrieve per sub-query, merge:
 DECOMPOSE_PROMPT = """Break this question into 2-3 sub-questions, each about
 ONE fact, as JSON: {"sub_questions": [...]}. Question: {q}"""
 
+
 def decompose_query(q: str, llm_client) -> list[str]:
     import json
+
     raw = llm_client.complete(DECOMPOSE_PROMPT.format(q=q))
     return json.loads(raw).get("sub_questions", [q])
+
 
 print(decompose_query("Can I refund the annual plan after 30 days?", mock_llm))
 ```
@@ -185,10 +192,11 @@ hybrid), **precision stage** (rerank — L12's cross-encoder or an LLM scores
 the 50). Recall first, then precision:
 
 ```python
-def multi_stage(query: str, recall_fn, rerank_fn, top_recall: int = 50,
-                final_k: int = 5) -> list[str]:
+def multi_stage(
+    query: str, recall_fn, rerank_fn, top_recall: int = 50, final_k: int = 5
+) -> list[str]:
     """Wide recall → precise rerank."""
-    candidates = recall_fn(query, top_recall)      # hybrid top-50
+    candidates = recall_fn(query, top_recall)  # hybrid top-50
     return rerank_fn(query, candidates)[:final_k]  # L12 cross-encoder top-5
 ```
 

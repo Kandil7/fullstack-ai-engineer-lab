@@ -71,9 +71,11 @@ print(f"Probabilities: {probability[0]}")
 ```python
 import numpy as np
 
+
 def sigmoid(z):
     """Sigmoid activation function."""
     return 1 / (1 + np.exp(-z))
+
 
 # Test values
 z_values = np.array([-10, -5, 0, 5, 10])
@@ -112,12 +114,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 # Create binary classification data
-X, y = make_classification(n_samples=200, n_features=2, 
-                           n_redundant=0, random_state=42)
+X, y = make_classification(n_samples=200, n_features=2, n_redundant=0, random_state=42)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 model = LogisticRegression(random_state=42)
 model.fit(X_train, y_train)
@@ -179,8 +178,7 @@ from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 
 # Simple 2D data
-X = np.array([[1, 1], [2, 2], [3, 3], [4, 4], [5, 5],
-              [1, 5], [2, 4], [3, 3], [4, 2], [5, 1]])
+X = np.array([[1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [1, 5], [2, 4], [3, 3], [4, 2], [5, 1]])
 y = np.array([0, 0, 0, 1, 1, 1, 1, 0, 0, 0])
 
 model = LogisticRegression(random_state=42)
@@ -190,8 +188,7 @@ model.fit(X, y)
 h = 0.1
 x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
 y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-                     np.arange(y_min, y_max, h))
+xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
 
 # Predict on mesh
 Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
@@ -200,11 +197,11 @@ Z = Z.reshape(xx.shape)
 # Plot
 plt.figure(figsize=(8, 6))
 plt.contourf(xx, yy, Z, alpha=0.4, cmap=plt.cm.RdYlBu)
-plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdYlBu, edgecolors='black')
-plt.xlabel('Feature 1')
-plt.ylabel('Feature 2')
-plt.title('Decision Boundary')
-plt.savefig('decision_boundary.png', dpi=100)
+plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdYlBu, edgecolors="black")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.title("Decision Boundary")
+plt.savefig("decision_boundary.png", dpi=100)
 plt.show()
 ```
 
@@ -256,13 +253,16 @@ print(f"Manual Log Loss: {manual_loss:.4f}")
 ```python
 import numpy as np
 
+
 def odds(p):
     """Calculate odds from probability."""
     return p / (1 - p)
 
+
 def log_odds(p):
     """Calculate log-odds (logit) from probability."""
     return np.log(odds(p))
+
 
 # Example: Disease probability
 p_disease = 0.1
@@ -275,7 +275,7 @@ print(f"Log-odds: {log_odds_disease:.4f}")
 
 # Interpretation
 print(f"\nIf probability = 0.1 (10%):")
-print(f"  Odds = {odds_disease:.4f} (1 in {1/odds_disease:.1f})")
+print(f"  Odds = {odds_disease:.4f} (1 in {1 / odds_disease:.1f})")
 ```
 
 **Related Terms:** Logit Function, Probability, Sigmoid Function
@@ -295,13 +295,16 @@ logit(p) = ln(p / (1-p))
 ```python
 import numpy as np
 
+
 def logit(p):
     """Logit function (inverse sigmoid)."""
     return np.log(p / (1 - p))
 
+
 def sigmoid(z):
     """Sigmoid function."""
     return 1 / (1 + np.exp(-z))
+
 
 # Test: logit and sigmoid are inverses
 p = 0.7
@@ -333,10 +336,12 @@ softmax(zₖ) = e^(zₖ) / Σⱼ e^(zⱼ)
 ```python
 import numpy as np
 
+
 def softmax(z):
     """Softmax function."""
     exp_z = np.exp(z - np.max(z))  # Subtract max for numerical stability
     return exp_z / exp_z.sum()
+
 
 # Raw scores (logits) for 3 classes
 logits = np.array([2.0, 1.0, 0.1])
@@ -347,9 +352,9 @@ print(f"Softmax probabilities: {probs}")
 print(f"Sum of probabilities: {probs.sum():.4f}")  # Always 1.0
 
 # Interpretation
-print(f"\nClass 0: {probs[0]*100:.1f}%")
-print(f"Class 1: {probs[1]*100:.1f}%")
-print(f"Class 2: {probs[2]*100:.1f}%")
+print(f"\nClass 0: {probs[0] * 100:.1f}%")
+print(f"Class 1: {probs[1] * 100:.1f}%")
+print(f"Class 2: {probs[2] * 100:.1f}%")
 ```
 
 **Related Terms:** Sigmoid Function, Multi-class Classification, Logits
@@ -368,8 +373,7 @@ from sklearn.metrics import classification_report
 import numpy as np
 
 # Create imbalanced dataset
-X, y = make_classification(n_samples=1000, n_features=10,
-                           weights=[0.9, 0.1], random_state=42)
+X, y = make_classification(n_samples=1000, n_features=10, weights=[0.9, 0.1], random_state=42)
 
 print(f"Class distribution: {np.bincount(y)}")
 
@@ -382,7 +386,7 @@ print("\nWithout class weighting:")
 print(classification_report(y, y_pred_unweighted))
 
 # With class weighting
-model_weighted = LogisticRegression(class_weight='balanced', random_state=42)
+model_weighted = LogisticRegression(class_weight="balanced", random_state=42)
 model_weighted.fit(X, y)
 y_pred_weighted = model_weighted.predict(X)
 
@@ -406,12 +410,9 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score, recall_score
 
-X, y = make_classification(n_samples=200, n_features=10,
-                           weights=[0.7, 0.3], random_state=42)
+X, y = make_classification(n_samples=200, n_features=10, weights=[0.7, 0.3], random_state=42)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 model = LogisticRegression(random_state=42)
 model.fit(X_train, y_train)
@@ -522,6 +523,7 @@ print(f"F1 Score: {f1:.4f}")
 
 # Manual calculation
 from sklearn.metrics import precision_score, recall_score
+
 precision = precision_score(y_true, y_pred)
 recall = recall_score(y_true, y_pred)
 f1_manual = 2 * (precision * recall) / (precision + recall)
@@ -585,13 +587,12 @@ X = np.random.randn(100, 10)
 y = (X[:, 0] + X[:, 1] > 0).astype(int)
 
 # L2 regularization (default, Ridge)
-model_l2 = LogisticRegression(penalty='l2', C=1.0, random_state=42)
+model_l2 = LogisticRegression(penalty="l2", C=1.0, random_state=42)
 model_l2.fit(X, y)
 print(f"L2 coefficients: {model_l2.coef_[0][:3]}...")
 
 # L1 regularization (Lasso, sparse solutions)
-model_l1 = LogisticRegression(penalty='l1', solver='liblinear', 
-                               C=0.1, random_state=42)
+model_l1 = LogisticRegression(penalty="l1", solver="liblinear", C=0.1, random_state=42)
 model_l1.fit(X, y)
 print(f"L1 coefficients: {model_l1.coef_[0][:3]}...")
 
@@ -627,6 +628,7 @@ print(f"\nL1 zero coefficients: {np.sum(model_l1.coef_ == 0)}")
 ```python
 # Binary Classification
 from sklearn.linear_model import LogisticRegression
+
 model = LogisticRegression(random_state=42)
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
@@ -636,14 +638,17 @@ y_prob = model.predict_proba(X_test)
 model = LogisticRegression(max_iter=200, random_state=42)
 model.fit(X_train, y_train)  # y_train has 3+ classes
 
+
 # Sigmoid Function
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
+
 
 # Softmax Function
 def softmax(z):
     exp_z = np.exp(z - np.max(z))
     return exp_z / exp_z.sum()
+
 
 # Evaluation
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
@@ -657,10 +662,10 @@ cm = confusion_matrix(y_test, y_pred)
 report = classification_report(y_test, y_pred)
 
 # Regularization
-model = LogisticRegression(penalty='l1', C=0.1, solver='liblinear')
+model = LogisticRegression(penalty="l1", C=0.1, solver="liblinear")
 
 # Class Weighting
-model = LogisticRegression(class_weight='balanced')
+model = LogisticRegression(class_weight="balanced")
 
 # Threshold Tuning
 y_prob = model.predict_proba(X_test)[:, 1]

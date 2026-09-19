@@ -59,7 +59,7 @@ descent; humans never label what each factor "means."
 **Example:**
 ```python
 # n_factors is the length of each user/movie vector
-learn = collab_learner(dls, n_factors=50)   # 50 latent factors per entity
+learn = collab_learner(dls, n_factors=50)  # 50 latent factors per entity
 ```
 
 **Related Terms:** Embedding, Dot Product, PCA
@@ -83,7 +83,7 @@ vector — but faster and differentiable.
 import torch
 
 emb = torch.nn.Embedding(num_embeddings=1000, embedding_dim=50)
-vec = emb(torch.tensor([42]))   # the vector for entity #42, shape (1, 50)
+vec = emb(torch.tensor([42]))  # the vector for entity #42, shape (1, 50)
 ```
 
 **Related Terms:** Embedding Matrix, One-Hot Vector, `nn.Embedding`
@@ -103,7 +103,7 @@ vec = emb(torch.tensor([42]))   # the vector for entity #42, shape (1, 50)
 **Example:**
 ```python
 # All movie factor vectors live in one matrix:
-factors = learn.model.movie_factors.weight   # shape (n_movies, n_factors)
+factors = learn.model.movie_factors.weight  # shape (n_movies, n_factors)
 print(factors.shape)
 ```
 
@@ -128,7 +128,7 @@ import torch
 
 user = torch.tensor([0.9, 0.1, 0.85])
 movie = torch.tensor([0.98, -0.9, 0.72])
-score = (user * movie).sum()   # 1.404
+score = (user * movie).sum()  # 1.404
 ```
 
 **Related Terms:** Latent Factor, Matrix Factorization, Bias
@@ -192,9 +192,9 @@ the mathematical definition of an embedding lookup.
 ```python
 import torch
 
-onehot = torch.tensor([0.0, 1.0, 0.0])       # selects row 1
+onehot = torch.tensor([0.0, 1.0, 0.0])  # selects row 1
 matrix = torch.tensor([[0.1, 0.4], [0.9, 0.1], [-0.3, 0.6]])
-row = onehot @ matrix                         # tensor([0.9, 0.1])
+row = onehot @ matrix  # tensor([0.9, 0.1])
 ```
 
 **Related Terms:** Embedding, Embedding Matrix
@@ -215,7 +215,7 @@ generalization.
 **Example:**
 ```python
 # loss = mse(preds, targets) + wd * (weights ** 2).sum()
-learn.fine_tune(5, wd=0.1)     # wd is the weight-decay strength
+learn.fine_tune(5, wd=0.1)  # wd is the weight-decay strength
 ```
 
 **Related Terms:** Overfitting, Latent Factor
@@ -238,7 +238,8 @@ interval.
 def sigmoid_range(x, lo, hi):
     return torch.sigmoid(x) * (hi - lo) + lo
 
-learn = collab_learner(dls, y_range=(0, 5.5))   # note 5.5, not 5.0
+
+learn = collab_learner(dls, y_range=(0, 5.5))  # note 5.5, not 5.0
 ```
 
 **Related Terms:** Bias, Dot Product
@@ -259,8 +260,11 @@ DataFrame.
 **Example:**
 ```python
 dls = CollabDataLoaders.from_df(
-    ratings, user_name="user", item_name="movie",
-    rating_name="rating", bs=64,
+    ratings,
+    user_name="user",
+    item_name="movie",
+    rating_name="rating",
+    bs=64,
 )
 dls.show_batch()
 ```
@@ -304,9 +308,10 @@ ids.
 **Example:**
 ```python
 import torch
+
 emb = torch.nn.Embedding(num_embeddings=943, embedding_dim=50)
-batch = torch.tensor([0, 5, 5, 12])   # user ids
-vectors = emb(batch)                   # shape (4, 50)
+batch = torch.tensor([0, 5, 5, 12])  # user ids
+vectors = emb(batch)  # shape (4, 50)
 ```
 
 **Related Terms:** Embedding, One-Hot Vector, Embedding Matrix
@@ -327,10 +332,11 @@ Used to interpret and visualize learned factor matrices.
 **Example:**
 ```python
 import torch
+
 factors = learn.model.movie_factors.weight
 factors = factors - factors.mean(dim=0)
 u, s, v = torch.pca_lowrank(factors, q=3)
-movie_pca = factors @ v[:, :3]        # 3 interpretable components
+movie_pca = factors @ v[:, :3]  # 3 interpretable components
 ```
 
 **Related Terms:** Latent Factor, Embedding Matrix

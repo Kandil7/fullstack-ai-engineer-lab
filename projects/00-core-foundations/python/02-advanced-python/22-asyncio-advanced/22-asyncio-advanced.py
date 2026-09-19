@@ -27,7 +27,7 @@ import sys
 import time
 
 random.seed(42)
-os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
+os.environ.setdefault("MPLBACKEND", "Agg")  # never open a GUI window
 
 # ============================================================
 # 1. TaskGroup vs gather
@@ -36,6 +36,7 @@ os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
 # A TaskGroup (3.11+) cancels its remaining tasks the moment ANY child
 # fails, then raises an ExceptionGroup -- fail-fast semantics. That is
 # what you want when one bad embedding should abort the whole batch.
+
 
 async def _fetch(name: str, delay: float, fail: bool = False) -> str:
     """Simulate one async provider call."""
@@ -47,9 +48,7 @@ async def _fetch(name: str, delay: float, fail: bool = False) -> str:
 
 async def demo_gather() -> list[str]:
     """gather: children keep running even if one fails (no auto-cancel)."""
-    results = await asyncio.gather(
-        _fetch("a", 0.02), _fetch("b", 0.01), _fetch("c", 0.03)
-    )
+    results = await asyncio.gather(_fetch("a", 0.02), _fetch("b", 0.01), _fetch("c", 0.03))
     print(f"  gather results: {results}")
     return results
 
@@ -63,8 +62,10 @@ async def demo_task_group() -> None:
             group.create_task(_fetch("boom", 0.02, fail=True))
             group.create_task(_wrap_cancel("c", 0.2, cancelled))
     except ExceptionGroup as eg:
-        print(f"  TaskGroup raised {type(eg).__name__}: "
-              f"{[e.__class__.__name__ for e in eg.exceptions]}")
+        print(
+            f"  TaskGroup raised {type(eg).__name__}: "
+            f"{[e.__class__.__name__ for e in eg.exceptions]}"
+        )
     print(f"  tasks cancelled by the group: {cancelled}")
     # Output:
     #   TaskGroup raised ExceptionGroup: ['ValueError']
@@ -86,6 +87,7 @@ async def _wrap_cancel(name: str, delay: float, cancelled: list[str]) -> None:
 # Cancelling a task raises CancelledError inside it. asyncio.shield keeps
 # a *dependency* alive while the caller itself can still be cancelled --
 # useful to finish flushing a generation buffer before acknowledging.
+
 
 async def demo_cancel() -> None:
     """Plain cancellation: the task stops at its next await."""
@@ -111,9 +113,8 @@ async def demo_shield() -> str:
             await asyncio.shield(task)
     except TimeoutError:
         timed_out = True
-    result = await task            # shielded call finished anyway
-    print(f"  outer wait timed out: {timed_out}; shielded work still "
-          f"completed: {result}")
+    result = await task  # shielded call finished anyway
+    print(f"  outer wait timed out: {timed_out}; shielded work still completed: {result}")
     return result
 
 
@@ -123,6 +124,7 @@ async def demo_shield() -> str:
 # asyncio.wait_for wraps a single awaitable; asyncio.timeout (3.11+) is a
 # context manager: the whole block shares one deadline. SLOs on a model
 # endpoint are implemented exactly like this.
+
 
 async def demo_timeout() -> None:
     """A deadline applied to a block, not a single call."""
@@ -140,6 +142,7 @@ async def demo_timeout() -> None:
 # Async iterators let you stream tokens from a model instead of buffering
 # the whole response. Complexity: O(1) memory -- one chunk at a time.
 
+
 class AsyncSession:
     """An async context manager: setup and teardown around an async block."""
 
@@ -149,15 +152,14 @@ class AsyncSession:
         self.closed = False
 
     async def __aenter__(self) -> "AsyncSession":
-        await asyncio.sleep(0.01)        # e.g. open a DB connection
+        await asyncio.sleep(0.01)  # e.g. open a DB connection
         self.opened = True
         return self
 
-    async def __aexit__(self, exc_type: object, exc: object,
-                        tb: object) -> bool:
-        await asyncio.sleep(0.01)        # e.g. close the connection
+    async def __aexit__(self, exc_type: object, exc: object, tb: object) -> bool:
+        await asyncio.sleep(0.01)  # e.g. close the connection
         self.closed = True
-        return False                     # False = do not suppress
+        return False  # False = do not suppress
 
 
 class TokenStream:
@@ -183,7 +185,7 @@ async def demo_async_context_and_iter() -> tuple[bool, bool, list[str]]:
     """Exercise async with and async for."""
     session = AsyncSession("db")
     async with session as s:
-        inside = (s.opened is True and s.closed is False)
+        inside = s.opened is True and s.closed is False
     collected: list[str] = []
     async for token in TokenStream(["token", "by", "token"]):
         collected.append(token)
@@ -199,6 +201,7 @@ async def demo_async_context_and_iter() -> tuple[bool, bool, list[str]]:
 # asyncio.Queue with maxsize gives backpressure: a full queue parks the
 # producer until a consumer frees a slot. Bounded memory, no polling.
 
+
 async def demo_queue() -> list[str]:
     """One producer, two consumers, bounded queue."""
     queue: asyncio.Queue[str] = asyncio.Queue(maxsize=3)
@@ -206,8 +209,8 @@ async def demo_queue() -> list[str]:
 
     async def producer() -> None:
         for i in range(8):
-            await queue.put(f"item-{i}")     # parks when full
-        await queue.put(None)                # sentinel: no more work
+            await queue.put(f"item-{i}")  # parks when full
+        await queue.put(None)  # sentinel: no more work
         await queue.put(None)
 
     async def consumer(name: str) -> None:
@@ -215,7 +218,7 @@ async def demo_queue() -> list[str]:
             item = await queue.get()
             if item is None:
                 return
-            await asyncio.sleep(0.005)       # simulate processing
+            await asyncio.sleep(0.005)  # simulate processing
             processed.append(f"{name}:{item}")
 
     async with asyncio.TaskGroup() as group:
@@ -232,6 +235,7 @@ async def demo_queue() -> list[str]:
 # A Semaphore caps how many coroutines are inside the guarded region.
 # This is how you respect a provider's "10 requests/second" contract.
 # Complexity: O(1) per acquire; concurrency bounded by the limit.
+
 
 async def demo_semaphore() -> tuple[int, int]:
     """Run 8 calls with at most 3 in flight; track the observed max."""
@@ -260,6 +264,7 @@ async def demo_semaphore() -> tuple[int, int]:
 # it freezes the whole loop. asyncio.to_thread (or run_in_executor) ships
 # the call to a thread so the loop stays responsive.
 
+
 def _blocking_db_query(query: str) -> str:
     """A hypothetical sync driver call that blocks for a while."""
     time.sleep(0.05)
@@ -278,6 +283,7 @@ async def demo_to_thread() -> str:
 # ============================================================
 # Measured proof: two tasks that each time.sleep(0.15) take ~0.3s (they
 # serialize, the loop is frozen). The same with asyncio.sleep takes ~0.15s.
+
 
 async def _direct_block() -> None:
     """A coroutine that blocks with time.sleep -- freezes the whole loop."""
@@ -338,13 +344,15 @@ async def _verify_async() -> None:
             group.create_task(_wrap_cancel("b", 0.3, cancelled))
     except ExceptionGroup:
         pass
-    assert cancelled == ["b"], \
+    assert cancelled == ["b"], (
         "TaskGroup must cancel remaining siblings on failure (got %s)" % cancelled
+    )
 
     # 2. gather still returns results for tasks that succeeded.
     results = await demo_gather()
-    assert results == ["a:ok", "b:ok", "c:ok"], \
+    assert results == ["a:ok", "b:ok", "c:ok"], (
         "gather must collect all successful results in order"
+    )
 
     # 3. Plain cancellation raises CancelledError; shielding preserves work.
     task = asyncio.create_task(_fetch("x", 5.0))
@@ -356,8 +364,9 @@ async def _verify_async() -> None:
     except asyncio.CancelledError:
         cancelled_raised = True
     assert cancelled_raised, "cancelling a task must raise CancelledError"
-    assert await demo_shield() == "shielded:ok", \
+    assert await demo_shield() == "shielded:ok", (
         "shielded work must survive cancellation of the waiter"
+    )
 
     # 4. asyncio.timeout raises TimeoutError past the deadline.
     timed_out = False
@@ -371,30 +380,30 @@ async def _verify_async() -> None:
     # 5. Async context manager + iterator behave like their sync twins.
     inside, closed, tokens = await demo_async_context_and_iter()
     assert inside and closed, "async context must open then close cleanly"
-    assert tokens == ["token", "by", "token"], \
-        "async iterator must yield tokens in order"
+    assert tokens == ["token", "by", "token"], "async iterator must yield tokens in order"
 
     # 6. Queue: every item processed exactly once (2 consumers, 8 items).
     processed = await demo_queue()
-    assert len(processed) == 8, \
-        "queue consumers must process all 8 items (got %d)" % len(processed)
+    assert len(processed) == 8, "queue consumers must process all 8 items (got %d)" % len(processed)
 
     # 7. Semaphore observably caps concurrency.
     done, max_seen = await demo_semaphore()
     assert done == 8, "all semaphore-limited calls must complete"
     assert max_seen <= 3, "semaphore(3) must cap in-flight work (got %d)" % max_seen
-    assert max_seen == 3, \
+    assert max_seen == 3, (
         "8 calls with a semaphore(3) must actually reach the cap (got %d)" % max_seen
+    )
 
     # 8. run_in_executor bridges blocking sync code.
-    assert await demo_to_thread() == "result-of-SELECT 1", \
+    assert await demo_to_thread() == "result-of-SELECT 1", (
         "to_thread must return the blocking call's result"
+    )
 
     # 9. Blocking sleep in threads serializes; asyncio.sleep overlaps.
     blocking, cooperative = await demo_loop_blocking()
-    assert blocking >= cooperative * 1.5, \
-        "blocking sleeps must take longer than cooperative ones: %s vs %s" % (
-            blocking, cooperative)
+    assert blocking >= cooperative * 1.5, (
+        "blocking sleeps must take longer than cooperative ones: %s vs %s" % (blocking, cooperative)
+    )
 
 
 def _verify() -> None:

@@ -6,8 +6,14 @@ for efficient data operations.
 """
 
 from collections import (
-    Counter, defaultdict, namedtuple, OrderedDict, deque,
-    ChainMap, UserDict, UserList
+    Counter,
+    defaultdict,
+    namedtuple,
+    OrderedDict,
+    deque,
+    ChainMap,
+    UserDict,
+    UserList,
 )
 from typing import List, Dict, Tuple
 
@@ -15,6 +21,7 @@ from typing import List, Dict, Tuple
 # =============================================================================
 # 1. Counter - Counting Elements
 # =============================================================================
+
 
 def demo_counter():
     """Demonstrate Counter for counting."""
@@ -44,6 +51,7 @@ def demo_counter():
 # =============================================================================
 # 2. defaultdict - Default Values
 # =============================================================================
+
 
 def demo_defaultdict():
     """Demonstrate defaultdict for grouping."""
@@ -123,6 +131,7 @@ def demo_namedtuple():
 # 4. OrderedDict - Ordered Dictionary
 # =============================================================================
 
+
 def demo_ordereddict():
     """Demonstrate OrderedDict for ordered operations."""
     # Move to end
@@ -151,6 +160,7 @@ def demo_ordereddict():
 # =============================================================================
 # 5. deque - Double-Ended Queue
 # =============================================================================
+
 
 def demo_deque():
     """Demonstrate deque for efficient operations."""
@@ -194,6 +204,7 @@ def demo_deque():
 # 6. ChainMap - Multiple Dictionaries
 # =============================================================================
 
+
 def demo_chainmap():
     """Demonstrate ChainMap for combining dicts."""
     defaults = {"color": "red", "user": "guest", "debug": False}
@@ -203,7 +214,7 @@ def demo_chainmap():
     # ChainMap searches in order
     config = ChainMap(command_line, environment, defaults)
     print(f"  Config color: {config['color']}")  # From command_line
-    print(f"  Config user: {config['user']}")    # From environment
+    print(f"  Config user: {config['user']}")  # From environment
     print(f"  Config debug: {config['debug']}")  # From environment
     print(f"  Config keys: {list(config.keys())}")
 
@@ -217,6 +228,7 @@ def demo_chainmap():
 # 7. Practical Examples
 # =============================================================================
 
+
 def demo_practical():
     """Practical collections examples."""
     # Word frequency analysis
@@ -229,8 +241,12 @@ def demo_practical():
     # Student grades with defaultdict
     grades = defaultdict(list)
     students_grades = [
-        ("Alice", 95), ("Bob", 87), ("Alice", 92),
-        ("Bob", 91), ("Charlie", 78), ("Alice", 88),
+        ("Alice", 95),
+        ("Bob", 87),
+        ("Alice", 92),
+        ("Bob", 91),
+        ("Charlie", 78),
+        ("Alice", 88),
     ]
     for name, grade in students_grades:
         grades[name].append(grade)

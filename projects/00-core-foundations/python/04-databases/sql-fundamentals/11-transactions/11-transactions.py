@@ -23,13 +23,16 @@ import sys
 
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE accounts (id INTEGER PRIMARY KEY, name TEXT, balance INTEGER)")
-conn.executemany("INSERT INTO accounts (id, name, balance) VALUES (?, ?, ?)",
-                 [(1, "ada", 100), (2, "bob", 50)])
+conn.executemany(
+    "INSERT INTO accounts (id, name, balance) VALUES (?, ?, ?)", [(1, "ada", 100), (2, "bob", 50)]
+)
 
 # ============================================================
 # 1. Atomicity — the all-or-nothing transfer
 # ============================================================
 print("=== 1. Atomic Transfer ===")
+
+
 def transfer(from_id: int, to_id: int, amount: int) -> None:
     """A transfer must debit AND credit atomically — never one alone."""
     conn.execute("UPDATE accounts SET balance = balance - ? WHERE id = ?", (amount, from_id))
@@ -38,19 +41,23 @@ def transfer(from_id: int, to_id: int, amount: int) -> None:
 
 
 transfer(1, 2, 30)
-print(f"  after transfer: {conn.execute('SELECT id, balance FROM accounts ORDER BY id').fetchall()}")
+print(
+    f"  after transfer: {conn.execute('SELECT id, balance FROM accounts ORDER BY id').fetchall()}"
+)
 print("  -> total conserved: 100 + 50 = 120 always")
 
 # ============================================================
 # 2. ROLLBACK — undo on failure
 # ============================================================
 print("\n=== 2. ROLLBACK ===")
+
+
 def risky_transfer(from_id: int, to_id: int, amount: int) -> str:
     try:
         conn.execute("BEGIN")
         conn.execute("UPDATE accounts SET balance = balance - ? WHERE id = ?", (amount, from_id))
         if amount > 100:
-            raise ValueError("amount exceeds limit")   # simulated failure
+            raise ValueError("amount exceeds limit")  # simulated failure
         conn.execute("UPDATE accounts SET balance = balance + ? WHERE id = ?", (amount, to_id))
         conn.commit()
         return "committed"
@@ -61,7 +68,9 @@ def risky_transfer(from_id: int, to_id: int, amount: int) -> str:
 
 r = risky_transfer(1, 2, 500)
 print(f"  {r}")
-print(f"  balances unchanged: {conn.execute('SELECT id, balance FROM accounts ORDER BY id').fetchall()}")
+print(
+    f"  balances unchanged: {conn.execute('SELECT id, balance FROM accounts ORDER BY id').fetchall()}"
+)
 print("  -> the debit was undone — no half-transfer")
 
 # ============================================================
@@ -72,9 +81,11 @@ conn.execute("BEGIN")
 conn.execute("UPDATE accounts SET balance = balance + 10 WHERE id = 1")
 conn.execute("SAVEPOINT after_credit")
 conn.execute("UPDATE accounts SET balance = balance - 5 WHERE id = 1")
-conn.execute("ROLLBACK TO after_credit")       # undo only the -5
+conn.execute("ROLLBACK TO after_credit")  # undo only the -5
 conn.commit()
-print(f"  after savepoint dance: {conn.execute('SELECT id, balance FROM accounts ORDER BY id').fetchall()}")
+print(
+    f"  after savepoint dance: {conn.execute('SELECT id, balance FROM accounts ORDER BY id').fetchall()}"
+)
 print("  -> +10 kept, -5 undone — granular control within a transaction")
 
 # ============================================================
@@ -116,6 +127,7 @@ print("""
 # MISTAKE: ignoring isolation level when choosing a database default
 # CORRECT: know your engine's default; pick levels by anomaly tolerance
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -132,15 +144,17 @@ def _verify() -> None:
         conn.execute("UPDATE a SET v = v + 5 WHERE id = 1")
         conn.execute("UPDATE a SET v = v + 5 WHERE id = 2")
         conn.commit()
-        assert conn.execute("SELECT SUM(v) FROM a").fetchone()[0] == 40, \
+        assert conn.execute("SELECT SUM(v) FROM a").fetchone()[0] == 40, (
             "commit must persist both statements"
+        )
 
         # 2. Rollback undoes everything in the failed transaction
         conn.execute("BEGIN")
         conn.execute("UPDATE a SET v = 999 WHERE id = 1")
         conn.rollback()
-        assert conn.execute("SELECT v FROM a WHERE id = 1").fetchone()[0] == 15, \
+        assert conn.execute("SELECT v FROM a WHERE id = 1").fetchone()[0] == 15, (
             "rollback must undo the uncommitted change"
+        )
 
         # 3. Savepoint allows partial rollback
         conn.execute("BEGIN")
@@ -149,8 +163,9 @@ def _verify() -> None:
         conn.execute("UPDATE a SET v = v + 100 WHERE id = 1")
         conn.execute("ROLLBACK TO sp")
         conn.commit()
-        assert conn.execute("SELECT v FROM a WHERE id = 1").fetchone()[0] == 16, \
+        assert conn.execute("SELECT v FROM a WHERE id = 1").fetchone()[0] == 16, (
             "savepoint rollback must keep the outer change"
+        )
 
         # 4. Failure + rollback keeps invariants
         conn.execute("BEGIN")
@@ -159,8 +174,9 @@ def _verify() -> None:
             raise RuntimeError("simulated failure")
         except RuntimeError:
             conn.rollback()
-        assert conn.execute("SELECT v FROM a WHERE id = 1").fetchone()[0] == 16, \
+        assert conn.execute("SELECT v FROM a WHERE id = 1").fetchone()[0] == 16, (
             "failed transaction must not partially apply"
+        )
 
         # 5. Isolation levels are a known tradeoff surface
         assert "SERIALIZABLE" in isolation and "READ COMMITTED" in isolation

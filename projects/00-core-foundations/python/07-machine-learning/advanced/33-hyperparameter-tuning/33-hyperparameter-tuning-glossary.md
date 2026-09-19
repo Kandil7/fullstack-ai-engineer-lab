@@ -47,7 +47,7 @@ before it starts. Everything else (sampler, pruning) is a way to spend that
 budget well.
 **Example**:
 ```python
-study.optimize(objective, n_trials=50)   # hard cap of 50 trials
+study.optimize(objective, n_trials=50)  # hard cap of 50 trials
 ```
 Output:
 ```
@@ -107,8 +107,8 @@ trial.suggest_float("C", 1e-3, 1e3, log=True)
 network, the coefficients of a linear model.
 **Example**:
 ```python
-model.fit(Xtr, ytr)   # learns model parameters
-model.coef_           # the learned values
+model.fit(Xtr, ytr)  # learns model parameters
+model.coef_  # the learned values
 ```
 **Related**: Hyperparameter
 
@@ -137,6 +137,7 @@ objects, `suggest_*` search spaces, TPE sampler, pruning.
 **Example**:
 ```python
 import optuna
+
 study = optuna.create_study(direction="maximize")
 ```
 **Related**: Bayesian search, TPE sampler

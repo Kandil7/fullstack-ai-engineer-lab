@@ -48,7 +48,8 @@ def simulate_rdb_restore(snapshot_interval, crash, writes):
     last_snapshot = (int(crash) // snapshot_interval) * snapshot_interval
     return sum(1 for t, _ in writes if last_snapshot < t <= crash)
 
-writes = [(i * 10.0, f"w{i}") for i in range(10)]   # one write per 10s
+
+writes = [(i * 10.0, f"w{i}") for i in range(10)]  # one write per 10s
 rdb_loss = simulate_rdb_restore(snapshot_interval=30, crash=85.0, writes=writes)
 print(f"RDB (snapshot every 30s): lose {rdb_loss} write(s) after a crash at t=85")
 print(f"AOF (fsync every write):  lose 0 writes after a crash")
@@ -90,6 +91,7 @@ def fill_then_evict(policy):
             ok = False
     return ok, c.keys()
 
+
 print("noeviction: all 10 writes accepted?", fill_then_evict("noeviction")[0])
 ok, keys = fill_then_evict("allkeys-lru")
 print(f"allkeys-lru: all writes accepted? {ok} | surviving keys: {keys}")
@@ -109,11 +111,12 @@ where "must keep" data is deliberately TTL-less while cache data expires.
 vc = RedisClient(clock=ManualClock(0.0))
 vc.set_maxmemory(150, policy="volatile-ttl")
 for i in range(8):
-    vc.set(f"v:{i}", "y" * 20, ex=1000 - i * 100)   # v:0 expires latest
+    vc.set(f"v:{i}", "y" * 20, ex=1000 - i * 100)  # v:0 expires latest
 vc.set("no-ttl:1", "z" * 20)
 vc.set("no-ttl:2", "z" * 20)
-print(f"volatile-ttl: no-ttl keys survived? "
-      f"{bool(vc.exists('no-ttl:1') and vc.exists('no-ttl:2'))}")
+print(
+    f"volatile-ttl: no-ttl keys survived? {bool(vc.exists('no-ttl:1') and vc.exists('no-ttl:2'))}"
+)
 
 # Output:
 # volatile-ttl: no-ttl keys survived? True
@@ -129,8 +132,10 @@ c = RedisClient(clock=ManualClock(0.0))
 c.set("tiny", "a")
 c.set("big", "x" * 500)
 c.rpush("list:many", *range(50))
-print(f"memory: tiny={c._key_size('tiny')}B big={c._key_size('big')}B "
-      f"list:many={c._key_size('list:many')}B")
+print(
+    f"memory: tiny={c._key_size('tiny')}B big={c._key_size('big')}B "
+    f"list:many={c._key_size('list:many')}B"
+)
 
 # Output:
 # memory: tiny=17B big=516B list:many=1616B
@@ -182,9 +187,9 @@ def hash_slot(key):
         crc = ((crc << 5) - crc + ch) & 0xFFFFFFFF
     return crc % 16384
 
+
 print(f"slot('user:1:profile') = {hash_slot('user:1:profile')}")
-print(f"slot('{{user:1}}:profile') = {hash_slot('{user:1}:profile')} "
-      f"(hash tag forces same slot)")
+print(f"slot('{{user:1}}:profile') = {hash_slot('{user:1}:profile')} (hash tag forces same slot)")
 
 # Output:
 # slot('user:1:profile') = 15985

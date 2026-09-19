@@ -119,25 +119,29 @@
 # --- Custom admin site branding ---
 from django.contrib import admin
 
+
 class MyAdminSite(admin.AdminSite):
-    site_header = 'My Blog Administration'
-    site_title = 'My Blog Admin'
-    index_title = 'Welcome to My Blog Admin'
+    site_header = "My Blog Administration"
+    site_title = "My Blog Admin"
+    index_title = "Welcome to My Blog Admin"
 
     # Custom URL for reports
     def get_urls(self):
         from django.urls import path
+
         custom_urls = [
-            path('reports/', self.admin_view(self.reports_view)),
+            path("reports/", self.admin_view(self.reports_view)),
         ]
         return custom_urls + super().get_urls()
 
     def reports_view(self, request):
         from django.http import HttpResponse
-        return HttpResponse('<h1>Reports</h1>')
+
+        return HttpResponse("<h1>Reports</h1>")
+
 
 # Use custom admin site:
-admin_site = MyAdminSite(name='myadmin')
+admin_site = MyAdminSite(name="myadmin")
 admin.site = admin_site
 
 # Register models with custom site:

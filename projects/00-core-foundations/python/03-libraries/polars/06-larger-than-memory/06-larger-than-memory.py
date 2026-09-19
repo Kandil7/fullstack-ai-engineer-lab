@@ -48,7 +48,7 @@ for shard in range(N_SHARDS):
     }
     pl.DataFrame(rows).write_parquet(_OUT / f"shard-{shard}.parquet")
 
-BIG_CORPUS = pl.scan_parquet(_OUT)          # 4 files, one lazy table
+BIG_CORPUS = pl.scan_parquet(_OUT)  # 4 files, one lazy table
 
 
 # ============================================================
@@ -58,6 +58,7 @@ BIG_CORPUS = pl.scan_parquet(_OUT)          # 4 files, one lazy table
 # The result is identical to a regular collect; only the memory profile
 # differs. Aggregates (sum, mean, count) are computed per batch and
 # merged — no single 2M-row intermediate is ever built.
+
 
 def streaming_aggregate() -> dict[str, int]:
     """Per-type totals computed via the streaming engine."""
@@ -94,6 +95,7 @@ print(f"chat tokens: {streamed['chat']}")
 # disk. The intermediate DataFrame that a collect()+write would build
 # never exists. This is the "ETL that touches 50GB" write path.
 
+
 def sink_reduced_corpus() -> Path:
     """Write only chat rows, only two columns, via a sink."""
     out = _OUT / "chat-only.parquet"
@@ -119,6 +121,7 @@ print(f"sink exists: {sink_path.exists()}, size: {sink_path.stat().st_size}")
 # The most robust out-of-core pattern is shard-at-a-time processing:
 # open each parquet file, reduce it to a tiny aggregate, merge. Peak
 # memory is one shard + one aggregate row, no matter the corpus size.
+
 
 def batch_aggregate() -> dict[str, int]:
     """Per-type token totals via a shard loop (bounded memory)."""
@@ -150,9 +153,8 @@ print(f"batch == streaming: {batch_aggregate() == streamed}")
 # tokenizer vocab), Polars streams the big side through and looks up the
 # small side — no full hash table for the big table.
 
-meta = pl.DataFrame(
-    {"user": [0, 1, 2, 3], "tier": ["free", "pro", "pro", "free"]}
-)
+meta = pl.DataFrame({"user": [0, 1, 2, 3], "tier": ["free", "pro", "pro", "free"]})
+
 
 def streamed_join() -> pl.DataFrame:
     """Join the 2M-row corpus with a tiny tier table, streaming."""
@@ -180,6 +182,7 @@ print(joined.filter(pl.col("user") < 4).group_by("user", "tier").len().sort("use
 # Some questions never need the data: pl.len() on a lazy scan reads
 # row-group metadata. This is the "how big is my corpus" query that must
 # not load the corpus.
+
 
 def corpus_row_count() -> int:
     """Count rows across all shards using only the lazy plan."""
@@ -216,11 +219,13 @@ print(corpus_row_count())
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     streamed_local = streaming_aggregate()
-    assert set(streamed_local) == {"chat", "code", "rag"}, \
+    assert set(streamed_local) == {"chat", "code", "rag"}, (
         "streaming group_by must cover all three prompt types"
+    )
     assert streamed_local["chat"] > 0, "aggregates must be positive"
-    assert streamed_local["chat"] == 166736154, \
+    assert streamed_local["chat"] == 166736154, (
         "seeded data must reproduce the exact chat token total"
+    )
 
     eager_local = dict(
         BIG_CORPUS.group_by("prompt_type")
@@ -229,37 +234,30 @@ def _verify() -> None:
         .collect()
         .rows()
     )
-    assert streamed_local == eager_local, \
-        "streaming and eager engines must agree exactly"
+    assert streamed_local == eager_local, "streaming and eager engines must agree exactly"
 
     sink_path = sink_reduced_corpus()
-    assert sink_path.exists() and sink_path.stat().st_size > 100_000, \
+    assert sink_path.exists() and sink_path.stat().st_size > 100_000, (
         "sink must produce a non-trivial parquet file"
+    )
     sink_rows = pl.scan_parquet(sink_path).collect().height
     total_rows = pl.read_parquet(_OUT / "chat-only.parquet").height
     assert sink_rows == total_rows, "sink file must be readable and stable"
     assert sink_rows < 2_000_000, "projection must drop non-chat rows"
 
-    assert batch_aggregate() == streamed_local, \
+    assert batch_aggregate() == streamed_local, (
         "shard-at-a-time loop must match the single streaming pass"
+    )
 
     joined = streamed_join()
-    assert joined.height == 2_000_000, \
-        "left join must keep every big-side row"
-    assert joined.columns == ["user", "token_count", "tier"], \
-        "join must bring the tier column"
-    assert joined["tier"].null_count() > 0, \
-        "users missing from metadata must get null tiers"
-    tier_counts = (
-        joined.group_by("tier").agg(pl.len()).sort("tier", nulls_last=True).rows()
-    )
-    assert tier_counts[0][0] == "free", \
-        "free must sort first when nulls are pushed to the end"
-    assert tier_counts[-1][0] is None, \
-        "most rows belong to unknown users and get a null tier"
+    assert joined.height == 2_000_000, "left join must keep every big-side row"
+    assert joined.columns == ["user", "token_count", "tier"], "join must bring the tier column"
+    assert joined["tier"].null_count() > 0, "users missing from metadata must get null tiers"
+    tier_counts = joined.group_by("tier").agg(pl.len()).sort("tier", nulls_last=True).rows()
+    assert tier_counts[0][0] == "free", "free must sort first when nulls are pushed to the end"
+    assert tier_counts[-1][0] is None, "most rows belong to unknown users and get a null tier"
 
-    assert corpus_row_count() == 2_000_000, \
-        "lazy count must equal shards x rows_per_shard"
+    assert corpus_row_count() == 2_000_000, "lazy count must equal shards x rows_per_shard"
 
     print("[OK] 06-larger-than-memory: all checks passed")
 
@@ -273,6 +271,6 @@ if __name__ == "__main__":
             print("1. collect(engine='streaming') batches; same numbers, lower peak RAM")
             print("2. sink_parquet writes plans to disk without materializing")
             print("3. Shard loops and small-side joins keep memory bounded")
-            _verify()   # always runs, so plain execution is also a test
+            _verify()  # always runs, so plain execution is also a test
     finally:
-        _TMP.cleanup()   # close handles + delete temp files (Windows-safe)
+        _TMP.cleanup()  # close handles + delete temp files (Windows-safe)

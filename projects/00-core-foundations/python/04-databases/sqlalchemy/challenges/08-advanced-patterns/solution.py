@@ -85,7 +85,7 @@ def promotable_experiments(session: Session) -> list[str]:
     """Names of experiments whose SQL-side is_leader is true, sorted."""
     stmt = (
         select(Experiment.name)
-        .where(Experiment.is_leader)          # hybrid expression in SQL
+        .where(Experiment.is_leader)  # hybrid expression in SQL
         .order_by(Experiment.name)
     )
     return list(session.scalars(stmt).all())

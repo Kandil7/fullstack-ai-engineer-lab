@@ -14,8 +14,10 @@ from typing import Any, Callable
 # 1. Basic Decorators
 # =============================================================================
 
+
 def timer(func: Callable) -> Callable:
     """Measure execution time of a function."""
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         start = time.perf_counter()
@@ -23,11 +25,13 @@ def timer(func: Callable) -> Callable:
         elapsed = time.perf_counter() - start
         print(f"  [{func.__name__}] executed in {elapsed:.6f}s")
         return result
+
     return wrapper
 
 
 def log_calls(func: Callable) -> Callable:
     """Log function calls with arguments."""
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         args_str = ", ".join([repr(a) for a in args])
@@ -37,6 +41,7 @@ def log_calls(func: Callable) -> Callable:
         result = func(*args, **kwargs)
         print(f"  {func.__name__} returned {result!r}")
         return result
+
     return wrapper
 
 
@@ -44,8 +49,10 @@ def log_calls(func: Callable) -> Callable:
 # 2. Decorators with Arguments
 # =============================================================================
 
+
 def retry(max_attempts: int = 3, delay: float = 0.1):
     """Retry a function on failure."""
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -59,12 +66,15 @@ def retry(max_attempts: int = 3, delay: float = 0.1):
                     if attempt < max_attempts:
                         time.sleep(delay)
             raise last_exception
+
         return wrapper
+
     return decorator
 
 
 def cache(max_size: int = 128):
     """Simple memoization decorator with max size."""
+
     def decorator(func: Callable) -> Callable:
         cache_dict: dict = {}
         cache_order: list = []
@@ -80,9 +90,11 @@ def cache(max_size: int = 128):
             cache_dict[args] = result
             cache_order.append(args)
             return result
+
         wrapper.cache_info = lambda: {"size": len(cache_dict), "max_size": max_size}
         wrapper.cache_clear = lambda: (cache_dict.clear(), cache_order.clear())
         return wrapper
+
     return decorator
 
 
@@ -90,22 +102,27 @@ def cache(max_size: int = 128):
 # 3. Class Decorators
 # =============================================================================
 
+
 def singleton(cls):
     """Make a class a singleton."""
     instances = {}
+
     @functools.wraps(cls, updated=[])
     def get_instance(*args, **kwargs):
         if cls not in instances:
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
+
     return get_instance
 
 
 def add_repr(cls):
     """Add __repr__ to a class."""
+
     def __repr__(self):
         attrs = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
         return f"{cls.__name__}({attrs})"
+
     cls.__repr__ = __repr__
     return cls
 
@@ -114,10 +131,12 @@ def add_repr(cls):
 # 4. Stacking Decorators
 # =============================================================================
 
+
 def bold(func: Callable) -> Callable:
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return f"**{func(*args, **kwargs)}**"
+
     return wrapper
 
 
@@ -125,6 +144,7 @@ def italic(func: Callable) -> Callable:
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return f"*{func(*args, **kwargs)}*"
+
     return wrapper
 
 

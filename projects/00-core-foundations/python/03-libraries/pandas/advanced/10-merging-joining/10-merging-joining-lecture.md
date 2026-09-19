@@ -39,9 +39,9 @@ By the end of this lecture, you will be able to:
 users = pd.DataFrame({"user_id": [1, 2, 3], "plan": ["free", "pro", "pro"]})
 events = pd.DataFrame({"user_id": [1, 1, 2], "event": ["view", "click", "view"]})
 
-users.merge(events, on="user_id", how="inner")   # only matching users
-users.merge(events, on="user_id", how="left")    # all users, NaN for none
-users.merge(events, on="user_id", how="outer")   # all keys both sides
+users.merge(events, on="user_id", how="inner")  # only matching users
+users.merge(events, on="user_id", how="left")  # all users, NaN for none
+users.merge(events, on="user_id", how="outer")  # all keys both sides
 ```
 
 `how` selects the join semantics exactly as SQL: inner (match only), left
@@ -65,9 +65,7 @@ expected` after merges with potentially duplicated keys, or dedupe first.
 ## 3. `join` — Index-Based Merging
 
 ```python
-users.set_index("user_id").join(
-    events.groupby("user_id")["event"].count(), how="left"
-)
+users.set_index("user_id").join(events.groupby("user_id")["event"].count(), how="left")
 ```
 
 `join` merges on the index by default — the convenient form when keys live in
@@ -76,9 +74,9 @@ indexes. It is `merge(left_index=True, right_index=True)` under the hood.
 ## 4. `concat` — Stacking, Not Matching
 
 ```python
-pd.concat([df_q1, df_q2], axis=0)      # stack rows (same columns)
+pd.concat([df_q1, df_q2], axis=0)  # stack rows (same columns)
 pd.concat([features, labels], axis=1)  # attach columns (same rows)
-pd.concat([a, b], ignore_index=True)   # renumber a RangeIndex
+pd.concat([a, b], ignore_index=True)  # renumber a RangeIndex
 ```
 
 `concat` stacks along an axis without key matching: rows (axis=0) or columns
@@ -88,7 +86,7 @@ index; `ignore_index=True` avoids duplicate-index surprises.
 ## 5. `combine_first` — Fill from a Sibling
 
 ```python
-df.fill_missing = df.combine_first(df_prior)   # df wins where non-null
+df.fill_missing = df.combine_first(df_prior)  # df wins where non-null
 ```
 
 `combine_first` keeps the left frame's values and fills its NaNs from the
@@ -97,7 +95,9 @@ right — the "prefer this source, fall back to that one" merge.
 ## 6. Production Pattern — Feature-Label Merge with Validation
 
 ```python
-def merge_checked(left: pd.DataFrame, right: pd.DataFrame, on: str, how: str = "left") -> pd.DataFrame:
+def merge_checked(
+    left: pd.DataFrame, right: pd.DataFrame, on: str, how: str = "left"
+) -> pd.DataFrame:
     """Merge, then assert the row count is consistent with the join type."""
     before = len(left)
     out = left.merge(right, on=on, how=how)
@@ -106,8 +106,10 @@ def merge_checked(left: pd.DataFrame, right: pd.DataFrame, on: str, how: str = "
         # fan-out check: warn when rows multiplied beyond expectation
         if len(out) > before:
             dupes = right[on].duplicated().sum()
-            print(f"[warn] fan-out: {len(out) - before} extra rows "
-                  f"(duplicated keys in right: {dupes})")
+            print(
+                f"[warn] fan-out: {len(out) - before} extra rows "
+                f"(duplicated keys in right: {dupes})"
+            )
     return out
 ```
 
@@ -137,7 +139,7 @@ users.merge(events, on="user_id")
 
 ```python
 # WRONG — KeyError or silent wrong-key join
-a.merge(b, on="id")   # when b's key is 'user_id'
+a.merge(b, on="id")  # when b's key is 'user_id'
 # CORRECT
 a.merge(b, left_on="id", right_on="user_id")
 ```

@@ -46,19 +46,22 @@ from redis_client import get_client
 
 r = get_client()
 
+
 def expensive_load(user_id: int) -> str:
-    return f"profile-{user_id}"           # stand-in for a DB query
+    return f"profile-{user_id}"  # stand-in for a DB query
+
 
 def get_profile(user_id: int) -> str:
     cached = r.get(f"profile:{user_id}")
     if cached is not None:
         return cached
-    value = expensive_load(user_id)        # miss: pay the full cost once
+    value = expensive_load(user_id)  # miss: pay the full cost once
     r.set(f"profile:{user_id}", value, ex=300)
     return value
 
-print(get_profile(7))                      # miss, then cached
-print(get_profile(7))                      # hit
+
+print(get_profile(7))  # miss, then cached
+print(get_profile(7))  # hit
 
 # Output:
 # profile-7
@@ -78,7 +81,7 @@ cost of doing two writes per update.
 ```python
 def save_profile(user_id: int, value: str) -> None:
     # source of truth (database) first
-    db_write(user_id, value)               # stand-in: no-op
+    db_write(user_id, value)  # stand-in: no-op
     # then the cache — never the other way around
     r.set(f"profile:{user_id}", value, ex=300)
 ```
@@ -96,7 +99,7 @@ cache and DB loses acknowledged writes. Use it only when you can afford loss
 
 ```python
 def save_metric(name: str, value: int) -> None:
-    r.hincrby("metrics", name, value)      # acknowledged instantly
+    r.hincrby("metrics", name, value)  # acknowledged instantly
     # background job later: read hash, batch to the warehouse
 ```
 
@@ -109,7 +112,7 @@ natural lifetime, plus explicit invalidation on write when the pattern allows it
 
 ```python
 def invalidate(user_id: int) -> None:
-    r.delete(f"profile:{user_id}")         # next read does a fresh load
+    r.delete(f"profile:{user_id}")  # next read does a fresh load
 ```
 
 Sliding TTL (refresh on hit) keeps hot entries alive forever while cold entries
@@ -141,8 +144,8 @@ def get_profile_safe(user_id: int) -> str:
         cached = r.get(f"profile:{user_id}")
         if cached is not None:
             return cached
-        r.incr("spins")                    # stand-in for a short sleep
-    return expensive_load(user_id)         # bounded fallback
+        r.incr("spins")  # stand-in for a short sleep
+    return expensive_load(user_id)  # bounded fallback
 ```
 
 The `NX` lock makes the claim atomic — without it, two "winners" can both load.
@@ -157,13 +160,13 @@ TTL.
 ```python
 def get_user_or_none(user_id: int) -> str | None:
     cached = r.get(f"user:{user_id}")
-    if cached == "NIL":                    # cached negative
+    if cached == "NIL":  # cached negative
         return None
     if cached is not None:
         return cached
-    value = db_lookup(user_id)             # stand-in: None or value
+    value = db_lookup(user_id)  # stand-in: None or value
     if value is None:
-        r.set(f"user:{user_id}", "NIL", ex=60)   # short negative TTL
+        r.set(f"user:{user_id}", "NIL", ex=60)  # short negative TTL
     else:
         r.set(f"user:{user_id}", value, ex=300)
     return value
@@ -180,6 +183,7 @@ together.
 ```python
 def avg_read_cost(h: float, db_cost: float, cache_cost: float) -> float:
     return h * cache_cost + (1 - h) * db_cost
+
 
 for h in (0.0, 0.5, 0.9, 0.99):
     print(f"h={h:.2f}: avg cost = {avg_read_cost(h, 10.0, 0.1):.2f} ms")

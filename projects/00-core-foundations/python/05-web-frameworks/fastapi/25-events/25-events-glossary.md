@@ -33,33 +33,33 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # ============ STARTUP ============
     print("Application starting...")
-    
+
     # Initialize resources
     app.state.db = await create_database()
     app.state.cache = await create_cache()
-    
+
     print("Application ready!")
-    
+
     yield  # Application runs here
-    
+
     # ============ SHUTDOWN ============
     print("Application shutting down...")
-    
+
     # Cleanup resources
     await app.state.db.close()
     await app.state.cache.close()
-    
+
     print("Cleanup complete!")
 
+
 # Use lifespan
-app = FastAPI(
-    title="My API",
-    lifespan=lifespan
-)
+app = FastAPI(title="My API", lifespan=lifespan)
+
 
 # Access resources in endpoints
 @app.get("/data/")
@@ -83,35 +83,36 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import asyncio
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # ============ STARTUP PHASE ============
-    
+
     # 1. Initialize database
     app.state.db_engine = create_async_engine(DATABASE_URL)
     print("✓ Database engine created")
-    
+
     # 2. Create tables
     async with app.state.db_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     print("✓ Database tables created")
-    
+
     # 3. Initialize cache
     app.state.redis = redis.Redis(host="localhost", port=6379)
     print("✓ Redis connected")
-    
+
     # 4. Load configuration
     app.state.config = load_config()
     print("✓ Configuration loaded")
-    
+
     # 5. Warm up caches
     await warm_up_caches(app.state.redis)
     print("✓ Caches warmed up")
-    
+
     print("🚀 Startup complete!")
-    
+
     yield  # Application runs
-    
+
     # ============ SHUTDOWN PHASE ============
     # Cleanup code here
 ```
@@ -170,6 +171,7 @@ async def lifespan(app: FastAPI):
 ```python
 from contextlib import asynccontextmanager
 
+
 # Basic context manager
 @asynccontextmanager
 async def database_connection():
@@ -179,9 +181,11 @@ async def database_connection():
     finally:
         await conn.close()  # Always cleanup
 
+
 # Usage
 async with database_connection() as conn:
     result = await conn.execute(query)
+
 
 # FastAPI lifespan is a context manager
 @asynccontextmanager
@@ -189,18 +193,19 @@ async def lifespan(app: FastAPI):
     # Setup
     resource = await acquire_resource()
     app.state.resource = resource
-    
+
     yield  # App runs
-    
+
     # Teardown
     await resource.release()
+
 
 # Multiple resources
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     db = await create_db()
     cache = await create_cache()
-    
+
     try:
         app.state.db = db
         app.state.cache = cache
@@ -223,6 +228,7 @@ async def lifespan(app: FastAPI):
 from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Store data in app.state
@@ -230,21 +236,24 @@ async def lifespan(app: FastAPI):
     app.state.cache = Redis()
     app.state.settings = load_settings()
     app.state.start_time = datetime.now()
-    
+
     yield
-    
+
     # Cleanup
     await app.state.database.close()
 
+
 app = FastAPI(lifespan=lifespan)
+
 
 # Access in endpoints
 @app.get("/status/")
 async def status(request: Request):
     return {
         "database": request.app.state.database.is_connected(),
-        "uptime": (datetime.now() - request.app.state.start_time).seconds
+        "uptime": (datetime.now() - request.app.state.start_time).seconds,
     }
+
 
 # Access in middleware
 @app.middleware("http")
@@ -271,45 +280,47 @@ class DatabaseResource:
     def __init__(self, url: str):
         self.url = url
         self.engine = None
-    
+
     async def connect(self):
         self.engine = create_async_engine(self.url)
         print(f"✓ Database connected")
-    
+
     async def disconnect(self):
         if self.engine:
             await self.engine.dispose()
             print("✓ Database disconnected")
+
 
 class CacheResource:
     def __init__(self, host: str, port: int):
         self.host = host
         self.port = port
         self.client = None
-    
+
     async def connect(self):
         self.client = redis.Redis(host=self.host, port=self.port)
         print("✓ Cache connected")
-    
+
     async def disconnect(self):
         if self.client:
             await self.client.close()
             print("✓ Cache disconnected")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize resources
     db = DatabaseResource(DATABASE_URL)
     await db.connect()
-    
+
     cache = CacheResource("localhost", 6379)
     await cache.connect()
-    
+
     app.state.db = db
     app.state.cache = cache
-    
+
     yield
-    
+
     # Cleanup in reverse order
     await cache.disconnect()
     await db.disconnect()
@@ -328,19 +339,19 @@ async def lifespan(app: FastAPI):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     resources = []
-    
+
     # Startup - collect resources
     db = await create_database()
     resources.append(("database", db))
-    
+
     cache = await create_cache()
     resources.append(("cache", cache))
-    
+
     app.state.db = db
     app.state.cache = cache
-    
+
     yield
-    
+
     # Shutdown - cleanup in reverse order
     for name, resource in reversed(resources):
         try:
@@ -348,6 +359,7 @@ async def lifespan(app: FastAPI):
             print(f"✓ {name} cleaned up")
         except Exception as e:
             print(f"✗ Error cleaning up {name}: {e}")
+
 
 # With try/finally
 @asynccontextmanager
@@ -377,24 +389,26 @@ async def lifespan(app: FastAPI):
     # Code BEFORE yield = startup
     print("Starting up...")
     app.state.db = await create_database()
-    
+
     # Yield marks the boundary
     yield
-    
+
     # Code AFTER yield = shutdown
     print("Shutting down...")
     await app.state.db.close()
+
 
 # Multiple yields (not recommended, but possible)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Phase 1: Startup")
     yield  # App runs
-    
+
     print("Phase 2: Intermediate")
     yield  # App runs again (unusual)
-    
+
     print("Phase 3: Shutdown")
+
 
 # Correct pattern - single yield
 @asynccontextmanager
@@ -419,28 +433,29 @@ from contextlib import asynccontextmanager
 
 shutdown_event = asyncio.Event()
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Handle shutdown signals
     def handle_signal():
         shutdown_event.set()
-    
+
     loop = asyncio.get_event_loop()
     for sig in (signal.SIGTERM, signal.SIGINT):
         loop.add_signal_handler(sig, handle_signal)
-    
+
     # Startup
     app.state.db = await create_database()
     app.state.tasks = []
-    
+
     yield
-    
+
     # Graceful shutdown
     print("Starting graceful shutdown...")
-    
+
     # 1. Stop accepting new requests
     shutdown_event.set()
-    
+
     # 2. Complete pending tasks
     for task in app.state.tasks:
         if not task.done():
@@ -449,13 +464,13 @@ async def lifespan(app: FastAPI):
                 await task
             except asyncio.CancelledError:
                 pass
-    
+
     # 3. Flush database
     await app.state.db.flush()
-    
+
     # 4. Close connections
     await app.state.db.close()
-    
+
     print("Graceful shutdown complete!")
 ```
 
@@ -472,20 +487,21 @@ async def lifespan(app: FastAPI):
 import asyncio
 from contextlib import asynccontextmanager
 
+
 class BackgroundTaskManager:
     def __init__(self):
         self.tasks: list[asyncio.Task] = []
         self._running = False
-    
+
     async def start(self):
         self._running = True
-    
+
     async def stop(self):
         self._running = False
         for task in self.tasks:
             task.cancel()
         await asyncio.gather(*self.tasks, return_exceptions=True)
-    
+
     async def add(self, coro):
         if self._running:
             task = asyncio.create_task(coro)
@@ -494,32 +510,35 @@ class BackgroundTaskManager:
             return task
         return None
 
+
 task_manager = BackgroundTaskManager()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Start background tasks
     await task_manager.start()
-    
+
     # Add periodic tasks
     async def periodic_cleanup():
         while True:
             await asyncio.sleep(3600)
             await cleanup_old_data()
-    
+
     await task_manager.add(periodic_cleanup())
-    
+
     yield
-    
+
     # Stop all background tasks
     await task_manager.stop()
+
 
 @app.post("/process/")
 async def process_data(data: dict):
     async def background_process(d):
         await asyncio.sleep(10)
         print(f"Processed: {d}")
-    
+
     await task_manager.add(background_process(data))
     return {"status": "processing"}
 ```
@@ -572,26 +591,28 @@ Application Start
 class ResourceRegistry:
     def __init__(self):
         self.resources = {}
-    
+
     async def register(self, name: str, resource):
         self.resources[name] = resource
-    
+
     async def cleanup_all(self):
         for name in reversed(list(self.resources.keys())):
             await self.resources[name].close()
 
+
 registry = ResourceRegistry()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     db = await create_db()
     await registry.register("db", db)
-    
+
     cache = await create_cache()
     await registry.register("cache", cache)
-    
+
     yield
-    
+
     await registry.cleanup_all()
 ```
 
@@ -624,22 +645,23 @@ async def lifespan(app: FastAPI):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.health = {"status": "starting"}
-    
+
     try:
         app.state.db = await create_database()
         app.state.health["database"] = "connected"
-        
+
         yield
-        
+
     except Exception as e:
         app.state.health["status"] = "error"
         app.state.health["error"] = str(e)
         raise
-    
+
     finally:
         app.state.health["status"] = "shutdown"
-        if hasattr(app.state, 'db'):
+        if hasattr(app.state, "db"):
             await app.state.db.close()
+
 
 @app.get("/health/")
 async def health_check(request: Request):

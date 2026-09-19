@@ -48,8 +48,8 @@ if 5 > 2:
 # ============================================================
 a = 4
 A = 5  # This is a DIFFERENT variable from 'a'
-print(f"a = {a}")   # Output: a = 4
-print(f"A = {A}")   # Output: A = 5
+print(f"a = {a}")  # Output: a = 4
+print(f"A = {A}")  # Output: A = 5
 
 # Variable names are case-sensitive
 firstname = "John"

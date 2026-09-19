@@ -44,7 +44,7 @@ q = queue.Queue(maxsize=2)
 q.put(1)
 q.put(2)
 try:
-    q.put(3, timeout=0.05)          # full -> blocks, then raises
+    q.put(3, timeout=0.05)  # full -> blocks, then raises
 except queue.Full:
     print("producer refused (backpressure)")
 ```
@@ -65,12 +65,14 @@ queue has a bound *and* every `put` carries a timeout.
 ```python
 q = queue.Queue(maxsize=2)
 
+
 def bounded_put(q_, item, timeout=0.05):
     try:
         q_.put(item, timeout=timeout)
         return True
     except queue.Full:
         return False
+
 
 print(bounded_put(q, 1), bounded_put(q, 2), bounded_put(q, 3))
 ```
@@ -93,9 +95,9 @@ import queue
 
 q = queue.Queue(maxsize=3)
 for i in range(3):
-    q.put(i)                    # producer side
+    q.put(i)  # producer side
 while not q.empty():
-    print(q.get())              # consumer side (same thread, but never full)
+    print(q.get())  # consumer side (same thread, but never full)
 ```
 
 ```text
@@ -116,9 +118,11 @@ preserves input order in results.
 import time
 from concurrent.futures import ThreadPoolExecutor
 
+
 def fetch(x):
     time.sleep(0.01)
     return x * 2
+
 
 with ThreadPoolExecutor(max_workers=4) as pool:
     print(list(pool.map(fetch, range(4))))
@@ -139,15 +143,17 @@ fan-in merges the partial results back in the original order. This is how
 ```python
 from concurrent.futures import ThreadPoolExecutor
 
+
 def fan_out_fan_in(items, workers):
     chunk_size = max(1, len(items) // workers)
-    chunks = [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]
+    chunks = [items[i : i + chunk_size] for i in range(0, len(items), chunk_size)]
     with ThreadPoolExecutor(max_workers=workers) as pool:
         partials = list(pool.map(lambda c: [x * 2 for x in c], chunks))
     merged = []
     for part in partials:
         merged.extend(part)
     return merged
+
 
 print(fan_out_fan_in([1, 2, 3, 4], 2))
 ```
@@ -195,8 +201,10 @@ the exercises run in milliseconds and never flake on CI.
 ```python
 fake = {"t": 0.0}
 
+
 def fake_clock():
     return fake["t"]
+
 
 bucket = TokenBucket(capacity=2, rate=1.0, now=fake_clock)
 fake["t"] += 0.5
@@ -256,8 +264,7 @@ for *transient* failures (429, 5xx, network). Never retry 4xx client
 errors. Each retry sleeps `uniform(0, base * 2 ** attempt)` (full jitter).
 
 ```python
-def retry_with_jitter(fn, attempts=4, base_delay=0.1, sleep=time.sleep,
-                      rng=None):
+def retry_with_jitter(fn, attempts=4, base_delay=0.1, sleep=time.sleep, rng=None):
     rng = rng or random.Random(0)
     last_error = None
     for attempt in range(attempts):
@@ -266,7 +273,7 @@ def retry_with_jitter(fn, attempts=4, base_delay=0.1, sleep=time.sleep,
         except Exception as exc:
             last_error = exc
             if attempt + 1 < attempts:
-                sleep(rng.uniform(0.0, base_delay * (2 ** attempt)))
+                sleep(rng.uniform(0.0, base_delay * (2**attempt)))
     raise RuntimeError(f"failed after {attempts} attempts: {last_error}")
 ```
 
@@ -296,6 +303,7 @@ empty.
 import queue
 import threading
 
+
 class Worker:
     def __init__(self, q_):
         self.q = q_
@@ -322,6 +330,7 @@ chunk is a no-op when writes are keyed by content hash.
 ```python
 def apply_twice_equals_once(ops):
     return sorted(set(ops))
+
 
 print(apply_twice_equals_once(["a", "b", "a"]))
 ```

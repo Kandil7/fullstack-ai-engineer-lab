@@ -26,9 +26,11 @@ from collections import defaultdict
 # 1. RAG Evaluation Metrics
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class RetrievalResult:
     """A single retrieval result with context."""
+
     query: str
     retrieved_docs: list[str]
     relevant_doc_ids: list[int]
@@ -38,6 +40,7 @@ class RetrievalResult:
 @dataclass
 class GenerationResult:
     """A generation result with reference answer."""
+
     query: str
     generated_answer: str
     reference_answer: str
@@ -114,7 +117,9 @@ class RAGEvaluator:
         # Simulate retrieval (in real use, you'd track actual retrieval)
         context_str = " ".join(result.context)
         return {
-            "faithfulness": self.faithfulness_score(result.generated_answer, result.context),
+            "faithfulness": self.faithfulness_score(
+                result.generated_answer, result.context
+            ),
             "relevance": self.relevance_score(result.generated_answer, result.query),
             "answer_length": len(result.generated_answer.split()),
             "context_length": sum(len(c.split()) for c in result.context),
@@ -156,8 +161,8 @@ def demo_rag_evaluation():
         reference_answer="ML is a branch of AI that allows computers to learn without explicit programming.",
         context=[
             "Machine learning is a subset of artificial intelligence.",
-            "It enables systems to learn and improve from experience."
-        ]
+            "It enables systems to learn and improve from experience.",
+        ],
     )
 
     scores = evaluator.evaluate_rag_pair(gen_result)
@@ -170,9 +175,11 @@ def demo_rag_evaluation():
 # 2. LLM-as-Judge Evaluation
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class JudgementResult:
     """Result from LLM-as-judge evaluation."""
+
     score: int  # 1-5
     reasoning: str
     criteria: str
@@ -251,6 +258,7 @@ class LLMJudge:
     def _call_llm(self, prompt: str) -> str:
         """Call LLM for evaluation (simplified)."""
         from openai import OpenAI
+
         client = OpenAI()
 
         response = client.chat.completions.create(
@@ -261,15 +269,16 @@ class LLMJudge:
         )
         return response.choices[0].message.content
 
-    def judge(self, question: str, answer: str, criteria: str,
-              reference: str = None) -> JudgementResult:
+    def judge(
+        self, question: str, answer: str, criteria: str, reference: str = None
+    ) -> JudgementResult:
         """Evaluate an answer using LLM-as-judge."""
-        template = self.criteria_templates.get(criteria, self.criteria_templates["relevance"])
+        template = self.criteria_templates.get(
+            criteria, self.criteria_templates["relevance"]
+        )
 
         prompt = template.format(
-            question=question,
-            answer=answer,
-            reference=reference or "N/A"
+            question=question, answer=answer, reference=reference or "N/A"
         )
 
         try:
@@ -283,20 +292,15 @@ class LLMJudge:
                             score = int(word)
                             break
 
-            return JudgementResult(
-                score=score,
-                reasoning=response,
-                criteria=criteria
-            )
+            return JudgementResult(score=score, reasoning=response, criteria=criteria)
         except Exception as e:
             return JudgementResult(
-                score=3,
-                reasoning=f"Error calling LLM: {e}",
-                criteria=criteria
+                score=3, reasoning=f"Error calling LLM: {e}", criteria=criteria
             )
 
-    def multi_criteria_judge(self, question: str, answer: str,
-                            reference: str = None) -> dict[str, JudgementResult]:
+    def multi_criteria_judge(
+        self, question: str, answer: str, reference: str = None
+    ) -> dict[str, JudgementResult]:
         """Evaluate across multiple criteria."""
         results = {}
         for criteria in ["relevance", "accuracy", "completeness", "conciseness"]:
@@ -341,9 +345,11 @@ def demo_llm_judge():
 # 3. Prompt Regression Testing
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class PromptTestCase:
     """A test case for prompt evaluation."""
+
     test_id: str
     prompt_name: str
     input_vars: dict[str, str]
@@ -355,6 +361,7 @@ class PromptTestCase:
 @dataclass
 class TestResult:
     """Result of a prompt test case."""
+
     test_id: str
     passed: bool
     actual_output: str
@@ -439,14 +446,16 @@ class PromptRegressionTester:
             results.append(result)
 
         # Store results
-        self.results_history.append({
-            "suite": suite_name,
-            "timestamp": datetime.now().isoformat(),
-            "results": [
-                {"id": r.test_id, "passed": r.passed, "score": r.score}
-                for r in results
-            ]
-        })
+        self.results_history.append(
+            {
+                "suite": suite_name,
+                "timestamp": datetime.now().isoformat(),
+                "results": [
+                    {"id": r.test_id, "passed": r.passed, "score": r.score}
+                    for r in results
+                ],
+            }
+        )
 
         return results
 
@@ -461,7 +470,7 @@ class PromptRegressionTester:
             f"PROMPT REGRESSION TEST REPORT: {suite_name}",
             f"{'=' * 50}",
             f"Total Tests: {total}",
-            f"Passed: {passed}/{total} ({passed/total*100:.1f}%)",
+            f"Passed: {passed}/{total} ({passed / total * 100:.1f}%)",
             f"Average Score: {avg_score:.3f}",
             f"\nDetailed Results:",
         ]
@@ -527,9 +536,11 @@ def demo_prompt_regression():
 # 4. Agent Evaluation
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class AgentStep:
     """A single step in agent execution."""
+
     step_id: int
     action: str
     input_text: str
@@ -542,6 +553,7 @@ class AgentStep:
 @dataclass
 class AgentTrajectory:
     """Complete trajectory of agent execution."""
+
     task_id: str
     query: str
     steps: list[AgentStep]
@@ -596,8 +608,9 @@ class AgentEvaluator:
             "total_steps": len(steps),
         }
 
-    def evaluate_task_completion(self, trajectory: AgentTrajectory,
-                                  expected_answer: str) -> dict[str, Any]:
+    def evaluate_task_completion(
+        self, trajectory: AgentTrajectory, expected_answer: str
+    ) -> dict[str, Any]:
         """Evaluate if the agent completed the task correctly."""
         metrics = self.compute_metrics(trajectory)
 
@@ -648,9 +661,27 @@ def demo_agent_evaluation():
         task_id="task_001",
         query="What is the capital of France?",
         steps=[
-            AgentStep(1, "search", "capital of France", "Paris is the capital", "search_tool", True, 150.0),
-            AgentStep(2, "verify", "Paris capital France", "Confirmed", None, True, 100.0),
-            AgentStep(3, "format", "Paris", "The capital of France is Paris.", None, True, 50.0),
+            AgentStep(
+                1,
+                "search",
+                "capital of France",
+                "Paris is the capital",
+                "search_tool",
+                True,
+                150.0,
+            ),
+            AgentStep(
+                2, "verify", "Paris capital France", "Confirmed", None, True, 100.0
+            ),
+            AgentStep(
+                3,
+                "format",
+                "Paris",
+                "The capital of France is Paris.",
+                None,
+                True,
+                50.0,
+            ),
         ],
         final_answer="The capital of France is Paris.",
         total_latency_ms=300.0,
@@ -675,6 +706,7 @@ def demo_agent_evaluation():
 # 5. Evaluation Reports & Dashboards
 # ---------------------------------------------------------------------------
 
+
 class EvaluationReporter:
     """Generate comprehensive evaluation reports."""
 
@@ -683,12 +715,14 @@ class EvaluationReporter:
 
     def add_report(self, name: str, metrics: dict[str, Any], details: dict = None):
         """Add an evaluation report."""
-        self.reports.append({
-            "name": name,
-            "metrics": metrics,
-            "details": details or {},
-            "timestamp": datetime.now().isoformat(),
-        })
+        self.reports.append(
+            {
+                "name": name,
+                "metrics": metrics,
+                "details": details or {},
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     def generate_summary(self) -> str:
         """Generate a summary of all reports."""
@@ -772,7 +806,7 @@ def demo_evaluation_reports():
             "latency_ms": 450.0,
             "cost_per_1k": 0.005,
         },
-        {"model": "gpt-4o", "test_size": 100}
+        {"model": "gpt-4o", "test_size": 100},
     )
 
     reporter.add_report(
@@ -783,7 +817,7 @@ def demo_evaluation_reports():
             "latency_ms": 380.0,
             "cost_per_1k": 0.003,
         },
-        {"model": "claude-sonnet", "test_size": 100}
+        {"model": "claude-sonnet", "test_size": 100},
     )
 
     # Generate summary
@@ -791,11 +825,13 @@ def demo_evaluation_reports():
     print(summary)
 
     # Model comparison
-    comparison = reporter.compare_models({
-        "GPT-4o": {"accuracy": 0.92, "relevance": 0.89, "latency_ms": 450.0},
-        "Claude Sonnet": {"accuracy": 0.90, "relevance": 0.91, "latency_ms": 380.0},
-        "Llama 3.3": {"accuracy": 0.85, "relevance": 0.84, "latency_ms": 200.0},
-    })
+    comparison = reporter.compare_models(
+        {
+            "GPT-4o": {"accuracy": 0.92, "relevance": 0.89, "latency_ms": 450.0},
+            "Claude Sonnet": {"accuracy": 0.90, "relevance": 0.91, "latency_ms": 380.0},
+            "Llama 3.3": {"accuracy": 0.85, "relevance": 0.84, "latency_ms": 200.0},
+        }
+    )
     print("\n" + comparison)
 
 

@@ -152,6 +152,7 @@ this is the correct pattern and doubles as the testing lesson:
 ```python
 def _verify() -> None:
     from fastapi.testclient import TestClient
+
     client = TestClient(app)
 
     r = client.get("/items")
@@ -164,7 +165,7 @@ def _verify() -> None:
     r = client.get("/items/99999")
     assert r.status_code == 404, "missing resource must 404"
 
-    r = client.post("/items", json={})           # validation
+    r = client.post("/items", json={})  # validation
     assert r.status_code == 422, "invalid body must 422"
     print("[OK] all endpoint checks passed")
 ```

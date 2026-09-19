@@ -41,8 +41,9 @@ input string, including unseen words, can be represented.
 ## Example
 ```python
 from transformers import AutoTokenizer
+
 tokz = AutoTokenizer.from_pretrained("microsoft/deberta-v3-small")
-tokz.tokenize("unbelievable")   # ['▁un', 'bel', 'ievable'] — subword pieces
+tokz.tokenize("unbelievable")  # ['▁un', 'bel', 'ievable'] — subword pieces
 ```
 
 **Related Terms:**
@@ -61,8 +62,8 @@ words split into known pieces. This guarantees no word is ever fully unknown.
 ## Example
 ```python
 # 'tokenization' may split; 'the' stays a single token
-tokz.tokenize("tokenization")   # ['▁token', 'ization']
-tokz.tokenize("the")            # ['▁the']
+tokz.tokenize("tokenization")  # ['▁token', 'ization']
+tokz.tokenize("the")  # ['▁the']
 ```
 
 **Related Terms:**
@@ -83,7 +84,7 @@ prefix so the original word can be reconstructed.
 # WordPiece output style (BERT tokenizer):
 # 'playing' -> ['play', '##ing']
 bert = AutoTokenizer.from_pretrained("bert-base-uncased")
-bert.tokenize("playing")   # ['playing'] or ['play', '##ing'] depending on vocab
+bert.tokenize("playing")  # ['playing'] or ['play', '##ing'] depending on vocab
 ```
 
 **Related Terms:**
@@ -101,8 +102,8 @@ looking each token up in the vocabulary. The output is `input_ids` plus an
 ## Example
 ```python
 enc = tokz("abatement of pollution")
-enc["input_ids"]        # [1, 54453, 1104, 15877, 2]  <- integers
-enc["attention_mask"]   # [1, 1, 1, 1, 1]             <- 1 = real, 0 = pad
+enc["input_ids"]  # [1, 54453, 1104, 15877, 2]  <- integers
+enc["attention_mask"]  # [1, 1, 1, 1, 1]             <- 1 = real, 0 = pad
 ```
 
 **Related Terms:**
@@ -119,9 +120,9 @@ dimension. A pretrained model and its tokenizer must share the same vocabulary.
 
 ## Example
 ```python
-tokz.vocab_size                       # e.g. 128100
-tokz.convert_tokens_to_ids("▁the")    # 262
-tokz.convert_ids_to_tokens(262)       # '▁the'
+tokz.vocab_size  # e.g. 128100
+tokz.convert_tokens_to_ids("▁the")  # 262
+tokz.convert_ids_to_tokens(262)  # '▁the'
 ```
 
 **Related Terms:**
@@ -138,8 +139,8 @@ content: `[CLS]` (sequence/classification slot), `[SEP]` (separator), `[PAD]`
 
 ## Example
 ```python
-tokz.all_special_tokens   # ['[CLS]', '[SEP]', '[PAD]', '[UNK]', '[MASK]']
-tokz.cls_token_id         # id used at the start of every sequence
+tokz.all_special_tokens  # ['[CLS]', '[SEP]', '[PAD]', '[UNK]', '[MASK]']
+tokz.cls_token_id  # id used at the start of every sequence
 ```
 
 **Related Terms:**
@@ -157,9 +158,11 @@ It is the starting point you fine-tune, never a blank slate.
 ## Example
 ```python
 from transformers import AutoModelForSequenceClassification
+
 # weights arrive already knowing language:
 model = AutoModelForSequenceClassification.from_pretrained(
-    "microsoft/deberta-v3-small", num_labels=1)
+    "microsoft/deberta-v3-small", num_labels=1
+)
 ```
 
 **Related Terms:**
@@ -176,9 +179,10 @@ task. Requires far less data, time, and compute than training from scratch.
 
 ## Example
 ```python
-trainer = Trainer(model, args, train_dataset=dds["train"],
-                  eval_dataset=dds["test"], tokenizer=tokz)
-trainer.train()   # fine-tunes the pretrained weights
+trainer = Trainer(
+    model, args, train_dataset=dds["train"], eval_dataset=dds["test"], tokenizer=tokz
+)
+trainer.train()  # fine-tunes the pretrained weights
 ```
 
 **Related Terms:**
@@ -215,8 +219,9 @@ and preprocessing the model was trained with.
 ## Example
 ```python
 from transformers import AutoTokenizer
+
 tokz = AutoTokenizer.from_pretrained("microsoft/deberta-v3-small")
-row = tokz("TEXT1: A47; TEXT2: abatement")   # ready-to-feed input_ids
+row = tokz("TEXT1: A47; TEXT2: abatement")  # ready-to-feed input_ids
 ```
 
 **Related Terms:**
@@ -234,8 +239,10 @@ a single continuous value; with `num_labels=k` it predicts class logits.
 ## Example
 ```python
 from transformers import AutoModelForSequenceClassification
+
 model = AutoModelForSequenceClassification.from_pretrained(
-    "microsoft/deberta-v3-small", num_labels=1)   # regression: one output
+    "microsoft/deberta-v3-small", num_labels=1
+)  # regression: one output
 ```
 
 **Related Terms:**
@@ -253,9 +260,15 @@ function, it handles batching, optimization, mixed precision, and evaluation.
 ## Example
 ```python
 from transformers import Trainer
-trainer = Trainer(model, args, train_dataset=dds["train"],
-                  eval_dataset=dds["test"], tokenizer=tokz,
-                  compute_metrics=corr_metric)
+
+trainer = Trainer(
+    model,
+    args,
+    train_dataset=dds["train"],
+    eval_dataset=dds["test"],
+    tokenizer=tokz,
+    compute_metrics=corr_metric,
+)
 trainer.train()
 ```
 
@@ -275,8 +288,10 @@ overfitting.
 ## Example
 ```python
 from transformers import TrainingArguments
-args = TrainingArguments("out", num_train_epochs=4,
-                         evaluation_strategy="epoch")  # evaluate each epoch
+
+args = TrainingArguments(
+    "out", num_train_epochs=4, evaluation_strategy="epoch"
+)  # evaluate each epoch
 ```
 
 **Related Terms:**
@@ -332,6 +347,7 @@ model look excellent (e.g. accuracy on imbalanced data).
 def compute_metrics(eval_pred):
     preds, labels = eval_pred
     import numpy as np
+
     return {"pearson": np.corrcoef(preds.flatten(), labels)[0][1]}
 ```
 
@@ -350,7 +366,8 @@ Pearson `r`, so it is the metric to optimize here.
 ## Example
 ```python
 import numpy as np
-r = np.corrcoef(preds.flatten(), labels)[0][1]   # 1.0 = perfect, 0 = none
+
+r = np.corrcoef(preds.flatten(), labels)[0][1]  # 1.0 = perfect, 0 = none
 ```
 
 **Related Terms:**

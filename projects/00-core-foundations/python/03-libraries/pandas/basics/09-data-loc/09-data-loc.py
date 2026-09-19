@@ -5,6 +5,7 @@ W3Schools: https://www.w3schools.com/python/pandas_dataframe_loc.asp
 loc[] is label-based data selection. Unlike iloc[], which uses integer
 positions, loc[] uses the index labels.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -12,12 +13,15 @@ import numpy as np
 # Sample data with named index
 # ---------------------------------------------------------------------------
 
-df = pd.DataFrame({
-    "Product": ["Laptop", "Phone", "Tablet", "Monitor", "Keyboard"],
-    "Price": [999, 699, 449, 299, 129],
-    "Quantity": [10, 25, 40, 15, 50],
-    "Category": ["Electronics", "Electronics", "Electronics", "Peripherals", "Peripherals"],
-}, index=["P001", "P002", "P003", "P004", "P005"])
+df = pd.DataFrame(
+    {
+        "Product": ["Laptop", "Phone", "Tablet", "Monitor", "Keyboard"],
+        "Price": [999, 699, 449, 299, 129],
+        "Quantity": [10, 25, 40, 15, 50],
+        "Category": ["Electronics", "Electronics", "Electronics", "Peripherals", "Peripherals"],
+    },
+    index=["P001", "P002", "P003", "P004", "P005"],
+)
 
 print("Product DataFrame:")
 print(df)
@@ -123,10 +127,13 @@ print("Example 5: loc[] with Datetime Index")
 print("=" * 60)
 
 dates = pd.date_range("2024-01-01", periods=7, freq="D")
-ts_df = pd.DataFrame({
-    "Temperature": [32, 35, 28, 30, 38, 40, 36],
-    "Humidity": [65, 70, 80, 75, 60, 55, 62],
-}, index=dates)
+ts_df = pd.DataFrame(
+    {
+        "Temperature": [32, 35, 28, 30, 38, 40, 36],
+        "Humidity": [65, 70, 80, 75, 60, 55, 62],
+    },
+    index=dates,
+)
 
 print("Daily Weather:")
 print(ts_df)

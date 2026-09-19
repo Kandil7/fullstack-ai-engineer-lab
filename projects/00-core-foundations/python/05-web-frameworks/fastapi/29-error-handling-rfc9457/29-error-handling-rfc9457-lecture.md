@@ -63,10 +63,15 @@ Standard members: `type` (a URI identifying the error class), `title`
 ```python
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
-    return JSONResponse(status_code=exc.status_code,
-                        content=problem_detail(
-                            status=exc.status_code, title="Request failed",
-                            detail=exc.detail, instance=str(request.url.path)))
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=problem_detail(
+            status=exc.status_code,
+            title="Request failed",
+            detail=exc.detail,
+            instance=str(request.url.path),
+        ),
+    )
 ```
 
 Output:
@@ -82,12 +87,16 @@ comes out the same shape. Clients write one parser, not one per endpoint.
 ```python
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request, exc):
-    errors = [{"field": ".".join(str(p) for p in e["loc"]),
-               "message": e["msg"], "input": e.get("input")} for e in exc.errors()]
-    return JSONResponse(status_code=422,
-                        content=problem_detail(422, "Validation error",
-                                               "Request body failed validation",
-                                               errors=errors))
+    errors = [
+        {"field": ".".join(str(p) for p in e["loc"]), "message": e["msg"], "input": e.get("input")}
+        for e in exc.errors()
+    ]
+    return JSONResponse(
+        status_code=422,
+        content=problem_detail(
+            422, "Validation error", "Request body failed validation", errors=errors
+        ),
+    )
 ```
 
 Output:

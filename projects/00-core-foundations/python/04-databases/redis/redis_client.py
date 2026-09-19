@@ -108,20 +108,20 @@ class RedisClient:
 
     def __init__(self, clock: Optional[Callable[[], float]] = None) -> None:
         self._clock: Callable[[], float] = clock if clock is not None else time.monotonic
-        self._str: dict[str, str] = {}            # string keys -> values
-        self._expiry: dict[str, float] = {}       # key -> absolute expiry time
+        self._str: dict[str, str] = {}  # string keys -> values
+        self._expiry: dict[str, float] = {}  # key -> absolute expiry time
         self._hashes: dict[str, dict[str, str]] = {}
         self._lists: dict[str, list[Any]] = {}
         self._sets: dict[str, set[Any]] = {}
         self._zsets: dict[str, dict[str, float]] = {}
         self._subscribers: dict[str, list[Subscription]] = {}
-        self._access: dict[str, int] = {}         # LRU counter for eviction
+        self._access: dict[str, int] = {}  # LRU counter for eviction
         self._maxmemory: int = 0
         self._eviction_policy: str = "noeviction"
         self._in_txn: bool = False
         self._txn_queue: list[tuple[str, tuple, dict]] = []
         self._scripts: dict[str, Callable[[RedisClient, list[str], list[Any]], Any]] = {}
-        self._clock_counter: int = 0              # tie-breaker for LRU
+        self._clock_counter: int = 0  # tie-breaker for LRU
 
     # ------------------------------------------------------------------
     # internal helpers
@@ -175,10 +175,13 @@ class RedisClient:
         """Evict keys until the store fits under maxmemory (0 = unlimited)."""
         if self._maxmemory <= 0:
             return
-        used = sum(self._key_size(k) for k in self._str | self._hashes | self._lists
-                   | self._sets | self._zsets)
-        while used > self._maxmemory and (self._str or self._hashes or self._lists
-                                          or self._sets or self._zsets):
+        used = sum(
+            self._key_size(k)
+            for k in self._str | self._hashes | self._lists | self._sets | self._zsets
+        )
+        while used > self._maxmemory and (
+            self._str or self._hashes or self._lists or self._sets or self._zsets
+        ):
             if self._eviction_policy == "noeviction":
                 raise MemoryError("OOM command not allowed when used memory > maxmemory")
             if self._eviction_policy == "allkeys-lru":
@@ -196,8 +199,9 @@ class RedisClient:
     # ------------------------------------------------------------------
     # strings
     # ------------------------------------------------------------------
-    def set(self, name: str, value: Any, ex: Optional[float] = None,
-            nx: bool = False, xx: bool = False) -> bool:
+    def set(
+        self, name: str, value: Any, ex: Optional[float] = None, nx: bool = False, xx: bool = False
+    ) -> bool:
         self._purge(name)  # an expired key must not block NX / satisfy XX
         if nx and name in self._str:
             return False
@@ -378,7 +382,7 @@ class RedisClient:
         store = self._lists.get(name, [])
         if stop < 0:
             stop = len(store) + stop
-        return store[start:stop + 1]
+        return store[start : stop + 1]
 
     def lindex(self, name: str, index: int) -> Optional[Any]:
         self._purge(name)
@@ -460,45 +464,48 @@ class RedisClient:
         store = self._zsets.get(name, {})
         if member not in store:
             return None
-        return sum(1 for m, s in store.items() if s < store[member] or
-                   (s == store[member] and m < member))
+        return sum(
+            1 for m, s in store.items() if s < store[member] or (s == store[member] and m < member)
+        )
 
     def zrevrank(self, name: str, member: str) -> Optional[int]:
         self._purge(name)
         store = self._zsets.get(name, {})
         if member not in store:
             return None
-        return sum(1 for m, s in store.items() if s > store[member] or
-                   (s == store[member] and m > member))
+        return sum(
+            1 for m, s in store.items() if s > store[member] or (s == store[member] and m > member)
+        )
 
-    def zrange(self, name: str, start: int, stop: int,
-               withscores: bool = False, reverse: bool = False) -> list[Any]:
+    def zrange(
+        self, name: str, start: int, stop: int, withscores: bool = False, reverse: bool = False
+    ) -> list[Any]:
         self._purge(name)
         store = self._zsets.get(name, {})
-        ordered = sorted(store.items(), key=lambda kv: (kv[1], kv[0]),
-                         reverse=reverse)
+        ordered = sorted(store.items(), key=lambda kv: (kv[1], kv[0]), reverse=reverse)
         if stop < 0:
             stop = len(ordered) + stop
         if withscores:
-            return [tuple(item) for item in ordered[start:stop + 1]]
-        return [m for m, _ in ordered[start:stop + 1]]
+            return [tuple(item) for item in ordered[start : stop + 1]]
+        return [m for m, _ in ordered[start : stop + 1]]
 
-    def zrevrange(self, name: str, start: int, stop: int,
-                  withscores: bool = False) -> list[Any]:
+    def zrevrange(self, name: str, start: int, stop: int, withscores: bool = False) -> list[Any]:
         return self.zrange(name, start, stop, withscores=withscores, reverse=True)
 
-    def zrangebyscore(self, name: str, min_score: float,
-                      max_score: float, withscores: bool = False) -> list[Any]:
+    def zrangebyscore(
+        self, name: str, min_score: float, max_score: float, withscores: bool = False
+    ) -> list[Any]:
         self._purge(name)
         store = self._zsets.get(name, {})
-        hits = sorted([(m, s) for m, s in store.items()
-                       if min_score <= s <= max_score], key=lambda kv: (kv[1], kv[0]))
+        hits = sorted(
+            [(m, s) for m, s in store.items() if min_score <= s <= max_score],
+            key=lambda kv: (kv[1], kv[0]),
+        )
         if withscores:
             return [tuple(h) for h in hits]
         return [m for m, _ in hits]
 
-    def zremrangebyscore(self, name: str, min_score: float,
-                         max_score: float) -> int:
+    def zremrangebyscore(self, name: str, min_score: float, max_score: float) -> int:
         """Remove members whose score falls in [min_score, max_score]."""
         self._purge(name)
         store = self._zsets.get(name, {})
@@ -570,7 +577,9 @@ class RedisClient:
     def pipeline(self) -> Pipeline:
         return Pipeline(self)
 
-    def register_script(self, name: str, fn: Callable[[RedisClient, list[str], list[Any]], Any]) -> None:
+    def register_script(
+        self, name: str, fn: Callable[[RedisClient, list[str], list[Any]], Any]
+    ) -> None:
         """Register a named script that runs 'atomically' (single-threaded sim)."""
         self._scripts[name] = fn
 
@@ -583,16 +592,16 @@ class RedisClient:
     # admin / ops
     # ------------------------------------------------------------------
     def keys(self, pattern: str = "*") -> list[str]:
-        all_keys = [k for k in (self._str | self._hashes | self._lists
-                                | self._sets | self._zsets)]
+        all_keys = [k for k in (self._str | self._hashes | self._lists | self._sets | self._zsets)]
         import fnmatch
+
         return [k for k in sorted(all_keys) if fnmatch.fnmatchcase(k, pattern)]
 
     def scan(self, cursor: int = 0, match: str = "*", count: int = 10) -> tuple[int, list[str]]:
         """Non-blocking cursor-based scan (simulated: returns one batch per call)."""
         import fnmatch
-        all_keys = [k for k in (self._str | self._hashes | self._lists
-                                | self._sets | self._zsets)]
+
+        all_keys = [k for k in (self._str | self._hashes | self._lists | self._sets | self._zsets)]
         batch = [k for k in sorted(all_keys)[cursor:] if fnmatch.fnmatchcase(k, match)][:count]
         next_cursor = cursor + len(batch)
         if next_cursor >= len(all_keys):
@@ -600,8 +609,13 @@ class RedisClient:
         return next_cursor, batch
 
     def dbsize(self) -> int:
-        return len(self._str) + len(self._hashes) + len(self._lists) \
-            + len(self._sets) + len(self._zsets)
+        return (
+            len(self._str)
+            + len(self._hashes)
+            + len(self._lists)
+            + len(self._sets)
+            + len(self._zsets)
+        )
 
     def flushall(self) -> None:
         self._str.clear()
@@ -630,9 +644,11 @@ def get_client(clock: Optional[Callable[[], float]] = None) -> RedisClient:
         try:
             import redis as real_redis  # type: ignore
             from redis.exceptions import RedisError  # type: ignore
+
             client = real_redis.Redis.from_url(
                 os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0"),
-                socket_connect_timeout=2, socket_timeout=2,
+                socket_connect_timeout=2,
+                socket_timeout=2,
             )
             client.ping()
             return client  # type: ignore

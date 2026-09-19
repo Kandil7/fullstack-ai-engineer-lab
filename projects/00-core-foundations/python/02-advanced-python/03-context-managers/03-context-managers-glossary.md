@@ -33,16 +33,19 @@
 class Timer:
     def __init__(self):
         self.start = None
-    
+
     def __enter__(self):
         import time
+
         self.start = time.perf_counter()
         return self  # Bound to 'as' variable
-    
+
     def __exit__(self, *args):
         import time
+
         elapsed = time.perf_counter() - self.start
         print(f"Elapsed: {elapsed:.4f}s")
+
 
 with Timer() as t:
     # t is the return value of __enter__
@@ -69,20 +72,21 @@ class SafeFile:
         self.filename = filename
         self.mode = mode
         self.file = None
-    
+
     def __enter__(self):
         self.file = open(self.filename, self.mode)
         return self.file
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.file:
             self.file.close()
-        
+
         if exc_type is not None:
             print(f"Error: {exc_val}")
             return False  # Don't suppress exception
-        
+
         return False
+
 
 with SafeFile("test.txt", "w") as f:
     f.write("Hello")
@@ -100,6 +104,7 @@ with SafeFile("test.txt", "w") as f:
 ```python
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def async_resource(name):
     print(f"Acquiring {name}")
@@ -109,6 +114,7 @@ async def async_resource(name):
     finally:
         await resource.release()
         print(f"Released {name}")
+
 
 async def main():
     async with async_resource("database") as conn:
@@ -127,6 +133,7 @@ async def main():
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def managed_resource(name):
     resource = acquire(name)
@@ -136,6 +143,7 @@ def managed_resource(name):
         # This is cleanup code - always runs
         resource.close()
         print(f"Released {name}")
+
 
 # Even if exception occurs, cleanup runs
 with managed_resource("lock") as r:
@@ -182,16 +190,18 @@ with (
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def temporary_directory():
     import tempfile
     import shutil
-    
+
     path = tempfile.mkdtemp()
     try:
         yield path  # Bound to 'as' variable
     finally:
         shutil.rmtree(path)  # Cleanup in finally
+
 
 with temporary_directory() as tmpdir:
     # Use tmpdir for temporary files
@@ -211,19 +221,18 @@ with temporary_directory() as tmpdir:
 ```python
 from contextlib import ExitStack
 
+
 def process_many_files(filenames):
     with ExitStack() as stack:
         # Dynamically enter contexts
-        files = [
-            stack.enter_context(open(fn, "r"))
-            for fn in filenames
-        ]
-        
+        files = [stack.enter_context(open(fn, "r")) for fn in filenames]
+
         # All files are open
         for f in files:
             print(f.read()[:100])
-        
+
         # All files closed when ExitStack exits
+
 
 # Or use callback for custom cleanup
 with ExitStack() as stack:
@@ -245,15 +254,16 @@ with ExitStack() as stack:
 class ExpectedExceptionSuppressor:
     def __init__(self, *exceptions):
         self.exceptions = exceptions
-    
+
     def __enter__(self):
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type and issubclass(exc_type, self.exceptions):
             print(f"Suppressing: {exc_type.__name__}")
             return True  # Suppress the exception
         return False  # Propagate all others
+
 
 # Usage
 with ExpectedExceptionSuppressor(ZeroDivisionError):
@@ -274,12 +284,14 @@ print("Continues here")  # This runs
 ```python
 from contextlib import nullcontext
 
+
 def process_data(data, lock=None):
     cm = lock if lock is not None else nullcontext()
-    
+
     with cm:
         # Code runs the same regardless
         process(data)
+
 
 # In testing
 with nullcontext() as ctx:
@@ -416,9 +428,11 @@ with managed_resource() as resource:
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def timer(label="Timer"):
     import time
+
     start = time.perf_counter()
     try:
         yield
@@ -426,10 +440,12 @@ def timer(label="Timer"):
         elapsed = time.perf_counter() - start
         print(f"{label}: {elapsed:.4f}s")
 
+
 # Can also be used as a decorator!
 @timer("Function")
 def slow_function():
     import time
+
     time.sleep(0.1)
 ```
 
@@ -467,12 +483,13 @@ with ExitStack() as stack:
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def managed_connection(url):
     # Setup (before yield)
     conn = connect(url)
     print(f"Connected to {url}")
-    
+
     try:
         yield conn  # Value for 'as' variable
     except Exception as e:
@@ -497,20 +514,23 @@ def managed_connection(url):
 ```python
 from contextlib import ExitStack
 
+
 def cleanup_temp_file(path):
     import os
+
     if os.path.exists(path):
         os.remove(path)
         print(f"Removed {path}")
 
+
 with ExitStack() as stack:
     # Register cleanup callback
     stack.callback(cleanup_temp_file, "/tmp/data.txt")
-    
+
     # Do work
     with open("/tmp/data.txt", "w") as f:
         f.write("temporary data")
-    
+
     # cleanup_temp_file called when ExitStack exits
 ```
 

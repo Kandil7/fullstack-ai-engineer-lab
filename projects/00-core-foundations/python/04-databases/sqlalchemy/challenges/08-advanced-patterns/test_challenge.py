@@ -30,9 +30,7 @@ def _load(name: str):
     """
     parent = Path(__file__).parent.name.replace("-", "_")
     modname = f"{name}_{parent}"
-    spec = importlib.util.spec_from_file_location(
-        modname, Path(__file__).parent / f"{name}.py"
-    )
+    spec = importlib.util.spec_from_file_location(modname, Path(__file__).parent / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[modname] = module
     spec.loader.exec_module(module)
@@ -100,8 +98,9 @@ class TestPromotable:
         """The WHERE clause and Python evaluation must agree."""
         ids = solution.promotable_experiments(session)
         for exp in session.scalars(select(solution.Experiment)).all():
-            assert (exp.name in ids) == (exp.is_leader), \
+            assert (exp.name in ids) == (exp.is_leader), (
                 "SQL-side hybrid drifted from the instance-side rule"
+            )
 
 
 class TestStoreEmbedding:
@@ -150,8 +149,9 @@ class TestTopPerModel:
     def test_ordered_by_score_inside_model(self, session):
         result = solution.top_per_model(session, 2)
         bert = [r for r in result if r[1] == "bert"]
-        assert [r[2] for r in bert] == [0.92, 0.85], \
+        assert [r[2] for r in bert] == [0.92, 0.85], (
             "rows within a model must be ranked by score DESC"
+        )
 
 
 class TestUpdateIfVersion:
@@ -168,7 +168,7 @@ class TestUpdateIfVersion:
 
     def test_stale_version_is_rejected(self, session):
         exp = session.get(solution.Experiment, 1)
-        solution.update_if_version(session, exp.id, exp.version, 0.99)   # v1 -> v2
+        solution.update_if_version(session, exp.id, exp.version, 0.99)  # v1 -> v2
         before = session.get(solution.Experiment, 1)
         # now try to write with the OLD version 1: must refuse
         assert solution.update_if_version(session, exp.id, 1, 0.10) is False

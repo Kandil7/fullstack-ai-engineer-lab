@@ -52,12 +52,11 @@ management decisions are **what to keep** (system prompt always; recent
 turns always; old turns if room) and **what to drop** (oldest first):
 
 ```python
-def assemble_context(system_prompt: str, messages: list[dict], enc,
-                     window: int) -> list[dict]:
+def assemble_context(system_prompt: str, messages: list[dict], enc, window: int) -> list[dict]:
     """Build the prompt: system always kept; drop oldest user/assistant turns
     until it fits."""
     out = [{"role": "system", "content": system_prompt}]
-    for m in reversed(messages):                    # most recent first
+    for m in reversed(messages):  # most recent first
         trial = [{"role": "system", "content": system_prompt}] + [m] + out[1:]
         if len(enc.encode("".join(x["content"] for x in trial))) <= window:
             out.insert(1, m)
@@ -88,8 +87,10 @@ Conversation:
 {messages}
 Summary:"""
 
+
 def compress_history(old_turns: list[dict], llm_client) -> str:
     return llm_client.complete(SUMMARY_PROMPT.format(messages=old_turns))
+
 
 # context = [system, summary, recent_turns]
 ```
@@ -112,8 +113,10 @@ context) keyed by user, upserted over time:
 ```python
 import json
 
+
 class FactMemory:
     """User-keyed fact store: upsert, retrieve, forget."""
+
     def __init__(self, path: str = "outputs/memory.json"):
         self.path = path
         self._facts: dict[str, dict] = {}
@@ -131,6 +134,7 @@ class FactMemory:
 
     def forget(self, user_id: str, key: str) -> None:
         self._facts.get(user_id, {}).pop(key, None)
+
 
 m = FactMemory()
 m.upsert("u1", "plan", "pro")
@@ -154,19 +158,19 @@ embeddings (L6) and retrieve the relevant ones (L9):
 ```python
 class EpisodicMemory:
     """Past interactions embedded and retrieved by similarity."""
+
     def __init__(self, embed_fn):
         self.embed = embed_fn
-        self.items: list[tuple[str, list[float]]] = []   # (text, vector)
+        self.items: list[tuple[str, list[float]]] = []  # (text, vector)
 
     def remember(self, text: str) -> None:
         self.items.append((text, self.embed(text)))
 
     def recall(self, query: str, k: int = 3) -> list[str]:
         qv = self.embed(query)
-        scored = sorted(self.items,
-                        key=lambda it: cosine_similarity(qv, it[1]),
-                        reverse=True)
+        scored = sorted(self.items, key=lambda it: cosine_similarity(qv, it[1]), reverse=True)
         return [t for t, _ in scored[:k]]
+
 
 m = EpisodicMemory(embed_fn=embed_text)
 m.remember("User prefers email summaries")
@@ -187,15 +191,20 @@ Production systems combine the layers. The assembler decides, per call, what
 to include — ordered by importance and budgeted by tokens:
 
 ```python
-def assemble_full_context(user_id: str, messages: list[dict], fact_memory,
-                          episodic, system_prompt, enc, window: int) -> list[dict]:
+def assemble_full_context(
+    user_id: str, messages: list[dict], fact_memory, episodic, system_prompt, enc, window: int
+) -> list[dict]:
     """Layer: system + facts + episodic recalls + summarized history +
     recent turns — all inside the window."""
     facts = "\n".join(f"- {k}: {v}" for k, v in fact_memory.get_all(user_id).items())
     recalls = episodic.recall(messages[-1]["content"], k=2)
-    summary = load_or_build_summary(user_id)          # from compression step
-    blocks = [system_prompt, f"User facts:\n{facts}",
-              f"Prior context:\n{summary}", f"Related past: {recalls}"]
+    summary = load_or_build_summary(user_id)  # from compression step
+    blocks = [
+        system_prompt,
+        f"User facts:\n{facts}",
+        f"Prior context:\n{summary}",
+        f"Related past: {recalls}",
+    ]
     # ... include recent turns last (recency bias, L1) ...
     return trim_to_window(blocks, messages, enc, window)
 ```
@@ -221,8 +230,9 @@ Every memory layer has a cost (L18) — the budget table:
 | Full history (unbounded) | huge, every call | rarely worth it |
 
 ```python
-def memory_budget(facts: int, summary: int, turns: int, recent: int,
-                  window: int) -> tuple[bool, int]:
+def memory_budget(
+    facts: int, summary: int, turns: int, recent: int, window: int
+) -> tuple[bool, int]:
     used = facts + summary + turns + recent
     return used <= window, used
 ```

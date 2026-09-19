@@ -113,6 +113,7 @@ def get_user_post(user_id: int, post_id: int):
 
 class ItemCategory(str, Enum):
     """Valid item categories."""
+
     BOOKS = "books"
     ELECTRONICS = "electronics"
     CLOTHING = "clothing"
@@ -148,7 +149,7 @@ def get_items_by_category(category: ItemCategory):
 
 @app.get("/codes/{code}")
 def get_code(
-    code: str = Path(min_length=6, max_length=6, description="Code must be exactly 6 characters")
+    code: str = Path(min_length=6, max_length=6, description="Code must be exactly 6 characters"),
 ):
     """Validate code is exactly 6 characters."""
     return {"code": code, "valid": True}
@@ -156,7 +157,7 @@ def get_code(
 
 @app.get("/tags/{tag}")
 def get_tag(
-    tag: str = Path(min_length=2, max_length=10, description="Tag must be 2-10 characters")
+    tag: str = Path(min_length=2, max_length=10, description="Tag must be 2-10 characters"),
 ):
     """Validate tag length (2-10 characters)."""
     return {"tag": tag, "length": len(tag), "valid": True}

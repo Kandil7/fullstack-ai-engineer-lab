@@ -120,6 +120,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Templates
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/")
 async def root():
     return templates.TemplateResponse("index.html", {"request": request})
@@ -150,6 +151,7 @@ from fastapi.templating import Jinja2Templates
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+
 
 @app.get("/")
 async def root(request: Request):
@@ -396,15 +398,10 @@ templates = Jinja2Templates(directory="templates")
 # Configure CDN URLs
 CDN_URL = "https://cdn.example.com/v1"
 
+
 @app.get("/")
 async def root(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
-            "cdn_url": CDN_URL
-        }
-    )
+    return templates.TemplateResponse("index.html", {"request": request, "cdn_url": CDN_URL})
 ```
 
 **templates/index.html:**
@@ -448,17 +445,19 @@ app = FastAPI()
 from starlette.staticfiles import StaticFiles as StarletteStaticFiles
 from starlette.responses import Response
 
+
 class CachedStaticFiles(StarletteStaticFiles):
     async def get_response(self, path, scope):
         response = await super().get_response(path, scope)
-        
+
         # Add caching headers
-        if path.endswith(('.css', '.js', '.png', '.jpg', '.woff2')):
+        if path.endswith((".css", ".js", ".png", ".jpg", ".woff2")):
             response.headers["Cache-Control"] = "public, max-age=31536000"
-        elif path.endswith('.html'):
+        elif path.endswith(".html"):
             response.headers["Cache-Control"] = "no-cache"
-        
+
         return response
+
 
 app.mount("/static", CachedStaticFiles(directory="static"), name="static")
 ```
@@ -476,21 +475,23 @@ app = FastAPI()
 # Safe static file serving
 STATIC_DIR = Path("static").resolve()
 
+
 @app.get("/files/{file_path:path}")
 async def serve_file(file_path: str):
     # Construct full path
     full_path = (STATIC_DIR / file_path).resolve()
-    
+
     # Security check: ensure path is within static directory
     if not str(full_path).startswith(str(STATIC_DIR)):
         raise HTTPException(status_code=403, detail="Access forbidden")
-    
+
     # Check if file exists
     if not full_path.is_file():
         raise HTTPException(status_code=404, detail="File not found")
-    
+
     # Serve file
     from starlette.responses import FileResponse
+
     return FileResponse(full_path)
 ```
 
@@ -504,9 +505,12 @@ async def serve_file(file_path: str):
 # ❌ WRONG - Static files not accessible
 app = FastAPI()
 
+
 @app.get("/")
 async def root():
     return templates.TemplateResponse("index.html", {})
+
+
 # CSS/JS links won't work!
 
 # ✅ CORRECT - Mount static files

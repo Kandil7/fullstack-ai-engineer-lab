@@ -38,9 +38,9 @@ def serving_cast(weights: np.ndarray, budget: float) -> np.ndarray:
     if weights.dtype == np.float16:
         return weights
     half = weights.astype(np.float16)
-    err = half.astype(weights.dtype)          # back-cast, reuse buffer
-    np.abs(err - weights, out=err)            # |round(x) - x|
-    denom = np.abs(weights)                   # second buffer for |x| + eps
+    err = half.astype(weights.dtype)  # back-cast, reuse buffer
+    np.abs(err - weights, out=err)  # |round(x) - x|
+    denom = np.abs(weights)  # second buffer for |x| + eps
     denom += 1e-30
     np.divide(err, denom, out=err)
     if float(err.max()) <= budget:

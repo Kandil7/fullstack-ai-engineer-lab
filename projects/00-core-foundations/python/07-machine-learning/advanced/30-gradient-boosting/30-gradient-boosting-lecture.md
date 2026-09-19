@@ -51,8 +51,9 @@ raise the tree budget, and let **early stopping** find the sweet spot.
 ## 4. Early Stopping
 
 ```python
-HistGradientBoostingClassifier(max_iter=1000, early_stopping=True,
-                               validation_fraction=0.2, n_iter_no_change=10)
+HistGradientBoostingClassifier(
+    max_iter=1000, early_stopping=True, validation_fraction=0.2, n_iter_no_change=10
+)
 ```
 
 Watch validation loss during training; stop when it stops improving. This
@@ -72,10 +73,14 @@ replaces blind `n_estimators` guessing.
 
 ```python
 model = HistGradientBoostingClassifier(
-    max_iter=500, learning_rate=0.05, max_depth=5,
-    early_stopping=True, n_iter_no_change=20, random_state=0,
+    max_iter=500,
+    learning_rate=0.05,
+    max_depth=5,
+    early_stopping=True,
+    n_iter_no_change=20,
+    random_state=0,
 )
-model.fit(X_train, y_train)   # X may contain NaN and categoricals directly
+model.fit(X_train, y_train)  # X may contain NaN and categoricals directly
 ```
 
 ## Key Takeaways

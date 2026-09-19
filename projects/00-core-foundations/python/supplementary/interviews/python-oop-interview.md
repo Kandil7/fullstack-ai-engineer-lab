@@ -16,10 +16,11 @@ A class is a blueprint or template that defines the structure and behavior of ob
 ```python
 class Dog:
     species = "Canis familiaris"  # Class attribute (shared)
-    
+
     def __init__(self, name, age):
-        self.name = name    # Instance attribute (unique)
+        self.name = name  # Instance attribute (unique)
         self.age = age
+
 
 # Class - the blueprint
 print(Dog.species)  # Canis familiaris
@@ -28,9 +29,9 @@ print(Dog.species)  # Canis familiaris
 buddy = Dog("Buddy", 3)
 charlie = Dog("Charlie", 5)
 
-print(buddy.name)    # Buddy
+print(buddy.name)  # Buddy
 print(charlie.name)  # Charlie
-print(buddy.species) # Canis familiaris (inherits from class)
+print(buddy.species)  # Canis familiaris (inherits from class)
 ```
 
 ---
@@ -43,14 +44,15 @@ print(buddy.species) # Canis familiaris (inherits from class)
 ```python
 class Singleton:
     _instance = None
-    
+
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
-    
+
     def __init__(self, value):
         self.value = value
+
 
 # __new__ is also used for immutable types
 class FrozenList:
@@ -59,10 +61,11 @@ class FrozenList:
         instance._items = tuple(items)  # Make immutable
         return instance
 
+
 s1 = Singleton(1)
 s2 = Singleton(2)
-print(s1 is s2)      # True - same instance
-print(s1.value)      # 2 - last initialization wins
+print(s1 is s2)  # True - same instance
+print(s1.value)  # 2 - last initialization wins
 ```
 
 ---
@@ -78,22 +81,27 @@ class Animal:
     def speak(self):
         return "..."
 
+
 class Dog(Animal):
     def speak(self):
         return "Woof!"
+
 
 # Multiple Inheritance
 class Flyer:
     def fly(self):
         return "Flying"
 
+
 class Swimmer:
     def swim(self):
         return "Swimming"
 
+
 class Duck(Animal, Flyer, Swimmer):
     def speak(self):
         return "Quack!"
+
 
 # Method Resolution Order (MRO)
 print(Duck.__mro__)
@@ -112,22 +120,27 @@ class Cat:
     def speak(self):
         return "Meow"
 
+
 class Dog:
     def speak(self):
         return "Woof"
+
 
 class Duck:
     def speak(self):
         return "Quack"
 
+
 # Polymorphism in action
 def animal_sound(animal):
     print(animal.speak())
+
 
 # Works with any object that has a speak() method
 animals = [Cat(), Dog(), Duck()]
 for animal in animals:
     animal_sound(animal)
+
 
 # Duck typing - "If it walks like a duck and quacks like a duck..."
 # We don't care about the actual type
@@ -145,26 +158,27 @@ Python uses naming conventions for access control: public, protected (`_`), and 
 ```python
 class BankAccount:
     def __init__(self, balance):
-        self.balance = balance          # Public
+        self.balance = balance  # Public
         self._account_type = "savings"  # Protected (convention)
-        self.__pin = 1234               # Private (name mangling)
-    
+        self.__pin = 1234  # Private (name mangling)
+
     def deposit(self, amount):
         if amount > 0:
             self.balance += amount
             return True
         return False
-    
+
     def _validate(self, pin):
         """Protected method - convention only"""
         return pin == self.__pin
-    
+
     def __encrypt(self, data):
         """Private method - name mangled"""
         return f"encrypted_{data}"
 
+
 account = BankAccount(1000)
-print(account.balance)        # 1000 - accessible
+print(account.balance)  # 1000 - accessible
 print(account._account_type)  # savings - accessible (not enforced)
 # print(account.__pin)        # AttributeError
 print(account._BankAccount__pin)  # 1234 - accessible via name mangling
@@ -180,26 +194,27 @@ Class methods receive the class as the first argument. Static methods don't rece
 ```python
 class Employee:
     employee_count = 0
-    
+
     def __init__(self, name, salary):
         self.name = name
         self.salary = salary
         Employee.employee_count += 1
-    
+
     @classmethod
     def from_string(cls, emp_string):
         """Factory method using class method"""
         name, salary = emp_string.split("-")
         return cls(name, float(salary))
-    
+
     @staticmethod
     def is_workday(day):
         """Utility function - no access to class or instance"""
         return day.weekday() < 5
-    
+
     @classmethod
     def get_count(cls):
         return cls.employee_count
+
 
 # Usage
 emp1 = Employee("Alice", 50000)
@@ -208,6 +223,7 @@ print(Employee.get_count())  # 2
 
 # Static method doesn't need class or instance
 from datetime import date
+
 print(Employee.is_workday(date.today()))
 ```
 
@@ -222,35 +238,37 @@ Properties provide a way to implement getters, setters, and deleters with a clea
 class Circle:
     def __init__(self, radius):
         self._radius = radius
-    
+
     @property
     def radius(self):
         """Getter - accessed like an attribute"""
         return self._radius
-    
+
     @radius.setter
     def radius(self, value):
         """Setter - with validation"""
         if value < 0:
             raise ValueError("Radius cannot be negative")
         self._radius = value
-    
+
     @radius.deleter
     def radius(self):
         """Deleter"""
         print("Deleting radius")
         del self._radius
-    
+
     @property
     def area(self):
         """Read-only property"""
         import math
-        return math.pi * self._radius ** 2
+
+        return math.pi * self._radius**2
+
 
 c = Circle(5)
-print(c.radius)      # 5
-c.radius = 10        # Setter called
-print(c.area)        # 314.159... (read-only)
+print(c.radius)  # 5
+c.radius = 10  # Setter called
+print(c.area)  # 314.159... (read-only)
 # c.area = 100       # AttributeError - no setter
 ```
 
@@ -266,28 +284,28 @@ class Vector:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-    
+
     def __repr__(self):
         return f"Vector({self.x}, {self.y})"
-    
+
     def __str__(self):
         return f"({self.x}, {self.y})"
-    
+
     def __add__(self, other):
         return Vector(self.x + other.x, self.y + other.y)
-    
+
     def __sub__(self, other):
         return Vector(self.x - other.x, self.y - other.y)
-    
+
     def __mul__(self, scalar):
         return Vector(self.x * scalar, self.y * scalar)
-    
+
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
-    
+
     def __len__(self):
-        return int((self.x ** 2 + self.y ** 2) ** 0.5)
-    
+        return int((self.x**2 + self.y**2) ** 0.5)
+
     def __getitem__(self, index):
         if index == 0:
             return self.x
@@ -295,15 +313,16 @@ class Vector:
             return self.y
         raise IndexError("Vector index out of range")
 
+
 v1 = Vector(1, 2)
 v2 = Vector(3, 4)
 
-print(v1 + v2)      # (4, 6) - __add__
-print(v1 - v2)      # (-2, -2) - __sub__
-print(v1 * 3)       # (3, 6) - __mul__
-print(v1 == v2)     # False - __eq__
-print(len(v1))      # 2 - __len__
-print(v1[0])        # 1 - __getitem__
+print(v1 + v2)  # (4, 6) - __add__
+print(v1 - v2)  # (-2, -2) - __sub__
+print(v1 * 3)  # (3, 6) - __mul__
+print(v1 == v2)  # False - __eq__
+print(len(v1))  # 2 - __len__
+print(v1[0])  # 1 - __getitem__
 ```
 
 ---
@@ -319,22 +338,25 @@ class RegularPoint:
         self.x = x
         self.y = y
 
+
 class SlotPoint:
-    __slots__ = ['x', 'y']
-    
+    __slots__ = ["x", "y"]
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
 
 regular = RegularPoint(1, 2)
 slot = SlotPoint(1, 2)
 
 # Regular point has __dict__
-print(hasattr(regular, '__dict__'))  # True
+print(hasattr(regular, "__dict__"))  # True
 # print(hasattr(slot, '__dict__'))   # False
 
 # Memory comparison
 import sys
+
 print(sys.getsizeof(regular) + sys.getsizeof(regular.__dict__))  # ~400+ bytes
 print(sys.getsizeof(slot))  # ~56 bytes
 
@@ -352,47 +374,53 @@ Abstract classes cannot be instantiated and define a common interface for subcla
 ```python
 from abc import ABC, abstractmethod
 
+
 class Shape(ABC):
     @abstractmethod
     def area(self):
         pass
-    
+
     @abstractmethod
     def perimeter(self):
         pass
-    
+
     def describe(self):
         """Concrete method - can be inherited as-is"""
         return f"{self.__class__.__name__}: area={self.area():.2f}"
+
 
 class Rectangle(Shape):
     def __init__(self, width, height):
         self.width = width
         self.height = height
-    
+
     def area(self):
         return self.width * self.height
-    
+
     def perimeter(self):
         return 2 * (self.width + self.height)
+
 
 class Circle(Shape):
     def __init__(self, radius):
         self.radius = radius
-    
+
     def area(self):
         import math
-        return math.pi * self.radius ** 2
-    
+
+        return math.pi * self.radius**2
+
     def perimeter(self):
         import math
+
         return 2 * math.pi * self.radius
+
 
 # shape = Shape()  # TypeError: Can't instantiate abstract class
 rect = Rectangle(5, 3)
 circle = Circle(4)
-print(rect.describe())   # Rectangle: area=15.00
-print(circle.describe()) # Circle: area=50.27
+print(rect.describe())  # Rectangle: area=15.00
+print(circle.describe())  # Circle: area=50.27
 ```
 
 ---
@@ -407,16 +435,20 @@ class A:
     def method(self):
         return "A"
 
+
 class B(A):
     def method(self):
         return "B"
+
 
 class C(A):
     def method(self):
         return "C"
 
+
 class D(B, C):
     pass
+
 
 print(D.__mro__)
 # (<class 'D'>, <class 'B'>, <class 'C'>, <class 'A'>, <class 'object'>)
@@ -443,32 +475,33 @@ class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-    
+
     def __eq__(self, other):
         if not isinstance(other, Point):
             return False
         return self.x == other.x and self.y == other.y
-    
+
     def __hash__(self):
         return hash((self.x, self.y))
-    
+
     def __repr__(self):
         return f"Point({self.x}, {self.y})"
+
 
 # Usage
 p1 = Point(1, 2)
 p2 = Point(1, 2)
 p3 = Point(3, 4)
 
-print(p1 == p2)         # True
+print(p1 == p2)  # True
 print(hash(p1) == hash(p2))  # True
 
 # Can now use in sets and dicts
 point_set = {p1, p2, p3}
-print(len(point_set))   # 2 (p1 and p2 are equal)
+print(len(point_set))  # 2 (p1 and p2 are equal)
 
 point_dict = {p1: "first"}
-print(point_dict[p2])   # "first" (p2 equals p1)
+print(point_dict[p2])  # "first" (p2 equals p1)
 ```
 
 ---
@@ -482,27 +515,29 @@ Descriptors are objects that define `__get__`, `__set__`, or `__delete__` method
 class Validated:
     def __init__(self, validator):
         self.validator = validator
-    
+
     def __set_name__(self, owner, name):
         self.name = name
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         return obj.__dict__.get(self.name)
-    
+
     def __set__(self, obj, value):
         if not self.validator(value):
             raise ValueError(f"Invalid value for {self.name}")
         obj.__dict__[self.name] = value
 
+
 class Person:
     name = Validated(lambda x: isinstance(x, str) and len(x) > 0)
     age = Validated(lambda x: isinstance(x, int) and 0 <= x <= 150)
-    
+
     def __init__(self, name, age):
         self.name = name
         self.age = age
+
 
 # Usage
 p = Person("Alice", 30)
@@ -522,38 +557,45 @@ Metaclasses are classes whose instances are classes. They control how classes ar
 ```python
 class SingletonMeta(type):
     _instances = {}
-    
+
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
+
 class Database(metaclass=SingletonMeta):
     def __init__(self):
         self.connection = "Connected"
+
 
 # Both variables reference the same instance
 db1 = Database()
 db2 = Database()
 print(db1 is db2)  # True
 
+
 # Another example - auto-registration
 class PluginMeta(type):
     plugins = {}
-    
+
     def __init__(cls, name, bases, attrs):
         super().__init__(name, bases, attrs)
         if name != "Plugin":
             PluginMeta.plugins[name] = cls
 
+
 class Plugin(metaclass=PluginMeta):
     pass
+
 
 class Logger(Plugin):
     pass
 
+
 class Auth(Plugin):
     pass
+
 
 print(PluginMeta.plugins)  # {'Logger': <class 'Logger'>, 'Auth': <class 'Auth'>}
 ```
@@ -571,39 +613,45 @@ class Engine:
     def start(self):
         return "Engine started"
 
+
 class Car(Engine):  # Car IS-A Engine? Not really...
     pass
+
 
 # Composition approach (preferred)
 class Engine:
     def start(self):
         return "Engine started"
 
+
 class Car:
     def __init__(self):
         self.engine = Engine()  # Car HAS-A Engine
-    
+
     def start(self):
         return self.engine.start()
+
 
 # More complex example
 class Wheels:
     def __init__(self, count):
         self.count = count
 
+
 class GPS:
     def __init__(self):
         self.location = None
-    
+
     def locate(self):
         return "Locating..."
+
 
 class ModernCar:
     def __init__(self):
         self.engine = Engine()
         self.wheels = Wheels(4)
         self.gps = GPS()
-    
+
     def start(self):
         self.gps.locate()
         return self.engine.start()
@@ -622,38 +670,39 @@ class ModernCar:
 class Stack:
     def __init__(self):
         self._items = []
-    
+
     def push(self, item):
         self._items.append(item)
-    
+
     def pop(self):
         if self.is_empty():
             raise IndexError("Pop from empty stack")
         return self._items.pop()
-    
+
     def peek(self):
         if self.is_empty():
             raise IndexError("Peek from empty stack")
         return self._items[-1]
-    
+
     def is_empty(self):
         return len(self._items) == 0
-    
+
     def __len__(self):
         return len(self._items)
-    
+
     def __repr__(self):
         return f"Stack({self._items})"
+
 
 # Test
 stack = Stack()
 stack.push(1)
 stack.push(2)
 stack.push(3)
-print(stack.peek())   # 3
-print(stack.pop())    # 3
-print(stack.pop())    # 2
-print(len(stack))     # 1
+print(stack.peek())  # 3
+print(stack.pop())  # 3
+print(stack.pop())  # 2
+print(len(stack))  # 1
 ```
 
 ---
@@ -666,31 +715,33 @@ print(len(stack))     # 1
 ```python
 from collections import deque
 
+
 class Queue:
     def __init__(self):
         self._items = deque()
-    
+
     def enqueue(self, item):
         self._items.append(item)
-    
+
     def dequeue(self):
         if self.is_empty():
             raise IndexError("Dequeue from empty queue")
         return self._items.popleft()
-    
+
     def peek(self):
         if self.is_empty():
             raise IndexError("Peek from empty queue")
         return self._items[0]
-    
+
     def is_empty(self):
         return len(self._items) == 0
-    
+
     def size(self):
         return len(self._items)
-    
+
     def __repr__(self):
         return f"Queue({list(self._items)})"
+
 
 # Test
 queue = Queue()
@@ -698,8 +749,8 @@ queue.enqueue("first")
 queue.enqueue("second")
 queue.enqueue("third")
 print(queue.dequeue())  # first
-print(queue.peek())     # second
-print(queue.size())     # 2
+print(queue.peek())  # second
+print(queue.size())  # 2
 ```
 
 ---
@@ -715,10 +766,11 @@ class Node:
         self.data = data
         self.next = None
 
+
 class LinkedList:
     def __init__(self):
         self.head = None
-    
+
     def append(self, data):
         new_node = Node(data)
         if not self.head:
@@ -728,15 +780,15 @@ class LinkedList:
         while current.next:
             current = current.next
         current.next = new_node
-    
+
     def delete(self, data):
         if not self.head:
             return False
-        
+
         if self.head.data == data:
             self.head = self.head.next
             return True
-        
+
         current = self.head
         while current.next:
             if current.next.data == data:
@@ -744,7 +796,7 @@ class LinkedList:
                 return True
             current = current.next
         return False
-    
+
     def search(self, data):
         current = self.head
         while current:
@@ -752,7 +804,7 @@ class LinkedList:
                 return True
             current = current.next
         return False
-    
+
     def __repr__(self):
         nodes = []
         current = self.head
@@ -761,15 +813,16 @@ class LinkedList:
             current = current.next
         return " -> ".join(nodes) if nodes else "Empty"
 
+
 # Test
 ll = LinkedList()
 ll.append(1)
 ll.append(2)
 ll.append(3)
-print(ll)           # 1 -> 2 -> 3
+print(ll)  # 1 -> 2 -> 3
 ll.delete(2)
-print(ll)           # 1 -> 3
-print(ll.search(3)) # True
+print(ll)  # 1 -> 3
+print(ll.search(3))  # True
 ```
 
 ---
@@ -786,16 +839,17 @@ class TreeNode:
         self.left = None
         self.right = None
 
+
 class BST:
     def __init__(self):
         self.root = None
-    
+
     def insert(self, value):
         if not self.root:
             self.root = TreeNode(value)
         else:
             self._insert_recursive(self.root, value)
-    
+
     def _insert_recursive(self, node, value):
         if value < node.value:
             if node.left is None:
@@ -807,36 +861,37 @@ class BST:
                 node.right = TreeNode(value)
             else:
                 self._insert_recursive(node.right, value)
-    
+
     def search(self, value):
         return self._search_recursive(self.root, value)
-    
+
     def _search_recursive(self, node, value):
         if node is None or node.value == value:
             return node is not None
         if value < node.value:
             return self._search_recursive(node.left, value)
         return self._search_recursive(node.right, value)
-    
+
     def inorder(self):
         result = []
         self._inorder_recursive(self.root, result)
         return result
-    
+
     def _inorder_recursive(self, node, result):
         if node:
             self._inorder_recursive(node.left, result)
             result.append(node.value)
             self._inorder_recursive(node.right, result)
 
+
 # Test
 bst = BST()
 for val in [5, 3, 7, 1, 4, 6, 8]:
     bst.insert(val)
 
-print(bst.inorder())   # [1, 3, 4, 5, 6, 7, 8]
-print(bst.search(4))   # True
-print(bst.search(9))   # False
+print(bst.inorder())  # [1, 3, 4, 5, 6, 7, 8]
+print(bst.search(4))  # True
+print(bst.search(9))  # False
 ```
 
 ---
@@ -849,35 +904,37 @@ print(bst.search(9))   # False
 ```python
 from collections import OrderedDict
 
+
 class LRUCache:
     def __init__(self, capacity):
         self.capacity = capacity
         self.cache = OrderedDict()
-    
+
     def get(self, key):
         if key not in self.cache:
             return -1
         self.cache.move_to_end(key)
         return self.cache[key]
-    
+
     def put(self, key, value):
         if key in self.cache:
             self.cache.move_to_end(key)
         self.cache[key] = value
         if len(self.cache) > self.capacity:
             self.cache.popitem(last=False)
-    
+
     def __repr__(self):
         return f"LRUCache({dict(self.cache)})"
+
 
 # Test
 cache = LRUCache(3)
 cache.put(1, "one")
 cache.put(2, "two")
 cache.put(3, "three")
-print(cache.get(1))    # one
-cache.put(4, "four")   # Evicts key 2
-print(cache.get(2))    # -1 (not found)
+print(cache.get(1))  # one
+cache.put(4, "four")  # Evicts key 2
+print(cache.get(2))  # -1 (not found)
 ```
 
 ---
@@ -893,10 +950,10 @@ class FibonacciIterator:
         self.max_count = max_count
         self.count = 0
         self.a, self.b = 0, 1
-    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         if self.count >= self.max_count:
             raise StopIteration
@@ -904,6 +961,7 @@ class FibonacciIterator:
         self.a, self.b = self.b, self.a + self.b
         self.count += 1
         return value
+
 
 # Test
 fib = FibonacciIterator(10)
@@ -927,17 +985,18 @@ class FileManager:
         self.filename = filename
         self.mode = mode
         self.file = None
-    
+
     def __enter__(self):
         self.file = open(self.filename, self.mode)
         return self.file
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.file:
             self.file.close()
         if exc_type is not None:
             print(f"An error occurred: {exc_val}")
         return False  # Don't suppress exceptions
+
 
 # Usage
 with FileManager("test.txt", "w") as f:
@@ -946,6 +1005,7 @@ with FileManager("test.txt", "w") as f:
 # Alternative using contextlib
 from contextlib import contextmanager
 
+
 @contextmanager
 def file_manager(filename, mode):
     file = open(filename, mode)
@@ -953,6 +1013,7 @@ def file_manager(filename, mode):
         yield file
     finally:
         file.close()
+
 
 with file_manager("test.txt", "r") as f:
     print(f.read())
@@ -969,47 +1030,50 @@ with file_manager("test.txt", "r") as f:
 class Typed:
     def __init__(self, expected_type):
         self.expected_type = expected_type
-    
+
     def __set_name__(self, owner, name):
         self.name = name
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         return obj.__dict__.get(self.name)
-    
+
     def __set__(self, obj, value):
         if not isinstance(value, self.expected_type):
             raise TypeError(f"{self.name} must be {self.expected_type.__name__}")
         obj.__dict__[self.name] = value
 
+
 class Range:
     def __init__(self, min_val, max_val):
         self.min_val = min_val
         self.max_val = max_val
-    
+
     def __set_name__(self, owner, name):
         self.name = name
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         return obj.__dict__.get(self.name)
-    
+
     def __set__(self, obj, value):
         if not self.min_val <= value <= self.max_val:
             raise ValueError(f"{self.name} must be between {self.min_val} and {self.max_val}")
         obj.__dict__[self.name] = value
 
+
 class Student:
     name = Typed(str)
     age = Range(0, 150)
     gpa = Range(0.0, 4.0)
-    
+
     def __init__(self, name, age, gpa):
         self.name = name
         self.age = age
         self.gpa = gpa
+
 
 # Usage
 s = Student("Alice", 20, 3.8)

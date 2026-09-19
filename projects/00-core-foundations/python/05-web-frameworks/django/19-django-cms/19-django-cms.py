@@ -245,6 +245,7 @@ from django.utils.text import slugify
 
 class Page(models.Model):
     """Simple CMS page."""
+
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
     content = models.TextField()
@@ -256,7 +257,7 @@ class Page(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.title
@@ -267,30 +268,32 @@ class Page(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return f'/{self.slug}/'
+        return f"/{self.slug}/"
 
 
 class ContentBlock(models.Model):
     """Reusable content block."""
+
     BLOCK_TYPES = [
-        ('text', 'Text'),
-        ('image', 'Image'),
-        ('video', 'Video'),
-        ('code', 'Code'),
+        ("text", "Text"),
+        ("image", "Image"),
+        ("video", "Video"),
+        ("code", "Code"),
     ]
 
-    page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name='blocks')
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, related_name="blocks")
     block_type = models.CharField(max_length=20, choices=BLOCK_TYPES)
     title = models.CharField(max_length=200, blank=True)
     content = models.TextField(blank=True)
-    image = models.ImageField(upload_to='blocks/', blank=True)
+    image = models.ImageField(upload_to="blocks/", blank=True)
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
-        ordering = ['order']
+        ordering = ["order"]
 
     def __str__(self):
-        return f'{self.block_type}: {self.title}'
+        return f"{self.block_type}: {self.title}"
+
 
 # Views:
 # from django.shortcuts import render, get_object_or_404

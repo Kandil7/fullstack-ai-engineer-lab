@@ -19,6 +19,7 @@ from sqlalchemy.orm import sessionmaker, Session, relationship
 
 # ----- Database setup -----
 import pathlib
+
 DB_PATH = pathlib.Path(__file__).parent.parent.parent / "outputs" / "dbs" / "orm_demo.db"
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
@@ -134,9 +135,7 @@ def create_author(author: AuthorCreate, db: Session = Depends(get_db)):
 def list_authors(db: Session = Depends(get_db)):
     authors = db.query(AuthorDB).all()
     return [
-        AuthorResponse(
-            id=a.id, name=a.name, email=a.email, book_count=len(a.books)
-        )
+        AuthorResponse(id=a.id, name=a.name, email=a.email, book_count=len(a.books))
         for a in authors
     ]
 
@@ -152,8 +151,7 @@ def get_author_with_books(author_id: int, db: Session = Depends(get_db)):
         "name": author.name,
         "email": author.email,
         "books": [
-            {"id": b.id, "title": b.title, "genre": b.genre, "price": b.price}
-            for b in author.books
+            {"id": b.id, "title": b.title, "genre": b.genre, "price": b.price} for b in author.books
         ],
     }
 
@@ -206,8 +204,12 @@ def list_books(
     books = query.offset(skip).limit(limit).all()
     return [
         BookResponse(
-            id=b.id, title=b.title, genre=b.genre, price=b.price,
-            published_year=b.published_year, author_id=b.author_id,
+            id=b.id,
+            title=b.title,
+            genre=b.genre,
+            price=b.price,
+            published_year=b.published_year,
+            author_id=b.author_id,
             author_name=b.author.name,
         )
         for b in books
@@ -288,6 +290,7 @@ Testing with curl:
     curl http://127.0.0.1:8000/stats/by-author
 """
 
+
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server).
 
@@ -331,20 +334,38 @@ def _verify():
 
         r = client.post(
             "/books/",
-            json={"title": "Harry Potter", "genre": "Fantasy", "price": 29.99, "published_year": 1997, "author_id": 1},
+            json={
+                "title": "Harry Potter",
+                "genre": "Fantasy",
+                "price": 29.99,
+                "published_year": 1997,
+                "author_id": 1,
+            },
         )
         assert r.status_code == 201
         assert r.json()["author_name"] == "J.K. Rowling"
 
         r = client.post(
             "/books/",
-            json={"title": "Dune", "genre": "Sci-Fi", "price": 19.99, "published_year": 1965, "author_id": 1},
+            json={
+                "title": "Dune",
+                "genre": "Sci-Fi",
+                "price": 19.99,
+                "published_year": 1965,
+                "author_id": 1,
+            },
         )
         assert r.status_code == 201
 
         r = client.post(
             "/books/",
-            json={"title": "Orphan", "genre": "Fantasy", "price": 9.99, "published_year": 2020, "author_id": 99},
+            json={
+                "title": "Orphan",
+                "genre": "Fantasy",
+                "price": 9.99,
+                "published_year": 2020,
+                "author_id": 99,
+            },
         )
         assert r.status_code == 404  # Author not found
 
@@ -388,6 +409,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

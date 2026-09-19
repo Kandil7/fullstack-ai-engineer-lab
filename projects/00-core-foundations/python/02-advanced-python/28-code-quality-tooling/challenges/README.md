@@ -71,7 +71,9 @@ exactly once — expose the visit count as `lint_source.last_visit_count`.
 
 **Signature:**
 ```python
-def lint_source(source: str, config: dict[str, list[str]] | None = None) -> dict[str, list[tuple[int, str]]]: ...
+def lint_source(
+    source: str, config: dict[str, list[str]] | None = None
+) -> dict[str, list[tuple[int, str]]]: ...
 ```
 
 | Input | Expected |

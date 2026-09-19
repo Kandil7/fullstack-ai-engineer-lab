@@ -98,6 +98,7 @@ class QueryParams:
     Class-based dependency.
     FastAPI instantiates it once per request.
     """
+
     def __init__(self, q: str = "", page: int = 1, per_page: int = 20):
         self.q = q
         self.page = max(1, page)
@@ -180,6 +181,7 @@ Testing with curl:
     curl -H "Authorization: Bearer valid-token-123" -H "X-Api-Key: my-secret-key" http://127.0.0.1:8000/admin/stats/
 """
 
+
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
     try:
@@ -237,6 +239,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

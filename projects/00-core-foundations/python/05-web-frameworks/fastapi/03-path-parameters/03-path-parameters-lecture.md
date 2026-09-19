@@ -75,10 +75,12 @@ Use Python's `Enum` class to constrain path parameters to a fixed set of allowed
 ```python
 from enum import Enum
 
+
 class ModelName(str, Enum):
     alexnet = "alexnet"
     resnet = "resnet"
     lenet = "lenet"
+
 
 @app.get("/models/{model_name}")
 def get_model(model_name: ModelName):
@@ -100,15 +102,16 @@ The `Path()` function provides additional validation and documentation options:
 ```python
 from fastapi import Path
 
+
 @app.get("/products/{product_id}")
 def get_product(
     product_id: int = Path(
-        ...,                                    # Required (no default)
-        title="Product ID",                    # Display name in docs
-        description="The unique identifier",   # Description in docs
-        ge=1,                                  # Greater than or equal to 1
-        le=1000,                               # Less than or equal to 1000
-    )
+        ...,  # Required (no default)
+        title="Product ID",  # Display name in docs
+        description="The unique identifier",  # Description in docs
+        ge=1,  # Greater than or equal to 1
+        le=1000,  # Less than or equal to 1000
+    ),
 ):
     return {"product_id": product_id}
 ```
@@ -136,6 +139,7 @@ The `:path` converter allows slashes `/` within the parameter value, making it s
 def read_file(file_path: str):
     return {"file_path": file_path, "exists": True}
 
+
 # URL: /files/home/user/document.txt
 # file_path = "home/user/document.txt"
 ```
@@ -149,9 +153,11 @@ FastAPI natively supports UUID type conversion:
 ```python
 from uuid import UUID
 
+
 @app.get("/orders/{order_id}")
 def get_order(order_id: UUID):
     return {"order_id": str(order_id), "status": "shipped"}
+
 
 # URL: /orders/550e8400-e29b-41d4-a716-446655440000
 # order_id = UUID('550e8400-e29b-41d4-a716-446655440000')
@@ -163,6 +169,7 @@ For business logic validation beyond type constraints:
 
 ```python
 from fastapi import HTTPException
+
 
 @app.get("/categories/{category_name}")
 def get_category(category_name: str):
@@ -186,9 +193,11 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+
 @app.get("/users/{user_id}")
 def get_user(user_id: int):
     return {"user_id": user_id, "name": f"User {user_id}"}
+
 
 # Test:
 # GET /users/42     → {"user_id": 42, "name": "User 42"}
@@ -205,6 +214,7 @@ def get_user_post(user_id: int, post_id: int):
         "post_id": post_id,
     }
 
+
 # Test:
 # GET /users/5/posts/10 → {"user_id": 5, "post_id": 10}
 ```
@@ -214,14 +224,17 @@ def get_user_post(user_id: int, post_id: int):
 ```python
 from enum import Enum
 
+
 class Color(str, Enum):
     red = "red"
     green = "green"
     blue = "blue"
 
+
 @app.get("/colors/{color}")
 def get_color(color: Color):
     return {"color": color, "hex": {"red": "#FF0000", "green": "#00FF00", "blue": "#0000FF"}[color]}
+
 
 # Test:
 # GET /colors/red    → 200 OK
@@ -233,11 +246,11 @@ def get_color(color: Color):
 ```python
 from fastapi import Path
 
+
 @app.get("/items/{item_id}")
-def read_item(
-    item_id: int = Path(..., title="Item ID", ge=1, le=1000000)
-):
+def read_item(item_id: int = Path(..., title="Item ID", ge=1, le=1000000)):
     return {"item_id": item_id}
+
 
 # Test:
 # GET /items/42     → 200 OK
@@ -251,6 +264,7 @@ def read_item(
 @app.get("/files/{file_path:path}")
 def read_file(file_path: str):
     return {"file_path": file_path}
+
 
 # Test:
 # GET /files/home/user/document.txt
@@ -268,6 +282,7 @@ def read_file(file_path: str):
 def get_item(item_id: int, item_id: str):  # SyntaxError!
     ...
 
+
 # Fix: Use different names
 @app.get("/items/{item_id}/versions/{version_id}")
 def get_item_version(item_id: int, version_id: int): ...
@@ -279,10 +294,12 @@ def get_item_version(item_id: int, version_id: int): ...
 @app.get("/users/{user_id}")
 def get_user(user_id: int): ...
 
+
 # Fix: Put /users/me BEFORE /users/{user_id}
 @app.get("/users/me")
 def get_current_user():
     return {"user_id": "current"}
+
 
 @app.get("/users/{user_id}")
 def get_user(user_id: int): ...
@@ -296,11 +313,13 @@ def get_status(code: str):
     if code not in ["200", "404", "500"]:
         return {"error": "Invalid"}  # Manual check
 
+
 # Fix: Use Enum for automatic validation
 class StatusCode(str, Enum):
     ok = "200"
     not_found = "404"
     server_error = "500"
+
 
 @app.get("/status/{code}")
 def get_status(code: StatusCode):
@@ -314,6 +333,7 @@ def get_status(code: StatusCode):
 @app.get("/items/{item_id}")
 def get_item(item_id):  # item_id is always a string!
     return {"id": item_id + 1}  # TypeError!
+
 
 # With type hint, conversion is automatic
 @app.get("/items/{item_id}")
@@ -381,29 +401,36 @@ from uuid import UUID
 
 app = FastAPI()
 
+
 # Basic
 @app.get("/items/{item_id}")
 def get_item(item_id: int): ...
 
+
 # Multiple
 @app.get("/users/{user_id}/posts/{post_id}")
 def get_user_post(user_id: int, post_id: int): ...
+
 
 # Enum
 class Color(str, Enum):
     red = "red"
     green = "green"
 
+
 @app.get("/colors/{color}")
 def get_color(color: Color): ...
+
 
 # Validation
 @app.get("/products/{product_id}")
 def get_product(product_id: int = Path(..., ge=1, le=10000)): ...
 
+
 # File path
 @app.get("/files/{file_path:path}")
 def read_file(file_path: str): ...
+
 
 # UUID
 @app.get("/orders/{order_id}")

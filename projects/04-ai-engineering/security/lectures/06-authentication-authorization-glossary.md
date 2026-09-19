@@ -41,15 +41,20 @@ class AccessControl:
     def check_access(self, user: dict, resource: str, action: str) -> bool:
         """Check if user can perform action on resource."""
         for policy in self.policies:
-            if (policy["user_role"] == user.get("role") and
-                policy["resource"] == resource and
-                policy["action"] == action):
+            if (
+                policy["user_role"] == user.get("role")
+                and policy["resource"] == resource
+                and policy["action"] == action
+            ):
                 return policy.get("allowed", False)
         return False  # Default deny
 
+
 # Usage
 ac = AccessControl()
-ac.add_policy({"user_role": "admin", "resource": "users", "action": "delete", "allowed": True})
+ac.add_policy(
+    {"user_role": "admin", "resource": "users", "action": "delete", "allowed": True}
+)
 print(ac.check_access({"role": "admin"}, "users", "delete"))  # True
 ```
 
@@ -79,6 +84,7 @@ class AccessToken:
         """Check if token has required scope."""
         return required_scope in self.scope
 
+
 # Usage
 token = AccessToken("abc123", 3600, ["read", "write"])
 print(f"Valid: {token.is_valid()}")
@@ -100,8 +106,9 @@ class ABACPolicy:
         self.name = name
         self.conditions = conditions
 
-    def evaluate(self, subject: dict, resource: dict,
-                 action: str, environment: dict) -> bool:
+    def evaluate(
+        self, subject: dict, resource: dict, action: str, environment: dict
+    ) -> bool:
         """Evaluate policy against request."""
         for key, condition in self.conditions.items():
             if key == "subject":
@@ -118,6 +125,7 @@ class ABACPolicy:
                     return False
         return True
 
+
 # Usage
 policy = ABACPolicy(
     "engineer_access",
@@ -125,14 +133,14 @@ policy = ABACPolicy(
         "subject": lambda s: s.get("department") == "engineering",
         "resource": lambda r: r.get("classification") != "top_secret",
         "action": lambda a: a in ["read", "write"],
-    }
+    },
 )
 
 allowed = policy.evaluate(
     subject={"department": "engineering"},
     resource={"classification": "internal"},
     action="read",
-    environment={}
+    environment={},
 )
 print(f"Allowed: {allowed}")  # True
 ```
@@ -149,6 +157,7 @@ print(f"Allowed: {allowed}")  # True
 ```python
 import secrets
 import hashlib
+
 
 class APIKeyManager:
     def __init__(self):
@@ -210,8 +219,9 @@ class ABACSystem:
     def add_policy(self, name: str, conditions: dict):
         self.policies.append({"name": name, "conditions": conditions})
 
-    def evaluate(self, subject: dict, resource: dict,
-                 action: str, context: dict) -> dict:
+    def evaluate(
+        self, subject: dict, resource: dict, action: str, context: dict
+    ) -> dict:
         """Evaluate access request."""
         for policy in self.policies:
             if self._matches(policy["conditions"], subject, resource, action, context):
@@ -243,17 +253,12 @@ class ABACSystem:
 **Example**:
 ```python
 # Bearer token in HTTP header
-headers = {
-    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIs..."
-}
+headers = {"Authorization": "Bearer eyJhbGciOiJIUzI1NiIs..."}
 
 # Usage in requests
 import requests
 
-response = requests.get(
-    "https://api.example.com/data",
-    headers=headers
-)
+response = requests.get("https://api.example.com/data", headers=headers)
 ```
 
 **Related Terms**: Access Token, JWT, Authorization Header
@@ -268,6 +273,7 @@ response = requests.get(
 ```python
 import bcrypt
 
+
 class PasswordHasher:
     def hash_password(self, password: str) -> str:
         """Hash password with bcrypt."""
@@ -277,6 +283,7 @@ class PasswordHasher:
     def verify_password(self, password: str, hashed: str) -> bool:
         """Verify password against hash."""
         return bcrypt.checkpw(password.encode(), hashed.encode())
+
 
 # Usage
 hasher = PasswordHasher()
@@ -389,19 +396,17 @@ class MFAProvider:
 ```python
 # Role definitions with least privilege
 roles = {
-    "viewer": {
-        "permissions": ["read"],
-        "description": "Can only view data"
-    },
+    "viewer": {"permissions": ["read"], "description": "Can only view data"},
     "editor": {
         "permissions": ["read", "write"],
-        "description": "Can view and edit data"
+        "description": "Can view and edit data",
     },
     "admin": {
         "permissions": ["read", "write", "delete", "manage_users"],
-        "description": "Full system access"
-    }
+        "description": "Full system access",
+    },
 }
+
 
 def assign_minimum_role(user_task: str) -> str:
     """Assign minimum role needed for task."""
@@ -492,6 +497,7 @@ class RBACSystem:
                 return True
         return False
 
+
 # Usage
 rbac = RBACSystem()
 rbac.define_role("viewer", ["read"])
@@ -530,10 +536,12 @@ token = {
     "expires_in": 3600,
 }
 
+
 # Scope validation
 def has_scope(token_scopes: str, required_scope: str) -> bool:
     """Check if token has required scope."""
     return required_scope in token_scopes.split()
+
 
 print(has_scope("read write", "read"))  # True
 print(has_scope("read write", "delete"))  # False
@@ -674,6 +682,7 @@ class TokenWithExpiration:
         remaining = self.expires_at - time.time()
         return max(0, int(remaining))
 
+
 # Usage
 token = TokenWithExpiration("abc123", expires_in_seconds=3600)
 print(f"Expired: {token.is_expired()}")
@@ -701,10 +710,7 @@ class TwoFactorAuth:
 
         # Generate provisioning URI for QR code
         totp = pyotp.TOTP(secret)
-        provisioning_uri = totp.provisioning_uri(
-            name=user_id,
-            issuer_name="MyApp"
-        )
+        provisioning_uri = totp.provisioning_uri(name=user_id, issuer_name="MyApp")
 
         return {
             "secret": secret,

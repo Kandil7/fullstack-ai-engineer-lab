@@ -3,14 +3,17 @@ Matplotlib Contour Plots - W3Schools Exercises
 ================================================
 Contour and contourf for 2D scalar fields.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -81,9 +84,11 @@ def exercise_04():
     X, Y = np.meshgrid(x, y)
 
     # Generate terrain with peaks
-    Z = (5 * np.exp(-((X - 3)**2 + (Y - 7)**2) / 2)
-         + 8 * np.exp(-((X - 7)**2 + (Y - 3)**2) / 1.5)
-         + 3 * np.exp(-((X - 5)**2 + (Y - 5)**2) / 3))
+    Z = (
+        5 * np.exp(-((X - 3) ** 2 + (Y - 7) ** 2) / 2)
+        + 8 * np.exp(-((X - 7) ** 2 + (Y - 3) ** 2) / 1.5)
+        + 3 * np.exp(-((X - 5) ** 2 + (Y - 5) ** 2) / 3)
+    )
 
     plt.figure(figsize=(8, 8))
     cf = plt.contourf(X, Y, Z, levels=20, cmap="terrain")

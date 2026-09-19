@@ -72,15 +72,12 @@ differs.
 ```python
 import polars as pl
 
-lf = pl.LazyFrame({"k": [i % 10 for i in range(2_000_000)],
-                   "v": [float(i) for i in range(2_000_000)]})
+lf = pl.LazyFrame(
+    {"k": [i % 10 for i in range(2_000_000)], "v": [float(i) for i in range(2_000_000)]}
+)
 
-streamed = (lf.group_by("k")
-              .agg(pl.col("v").sum())
-              .collect(engine="streaming"))
-eager = (lf.group_by("k")
-           .agg(pl.col("v").sum())
-           .collect())
+streamed = lf.group_by("k").agg(pl.col("v").sum()).collect(engine="streaming")
+eager = lf.group_by("k").agg(pl.col("v").sum()).collect()
 print(streamed.equals(eager))
 ```
 
@@ -105,13 +102,12 @@ from pathlib import Path
 import tempfile
 
 tmp = Path(tempfile.mkdtemp())
-lf = pl.LazyFrame({"k": [i % 4 for i in range(1_000_000)],
-                   "v": [float(i) for i in range(1_000_000)]})
+lf = pl.LazyFrame(
+    {"k": [i % 4 for i in range(1_000_000)], "v": [float(i) for i in range(1_000_000)]}
+)
 
 out = tmp / "reduced.parquet"
-(lf.filter(pl.col("k") == 0)
-   .select("v")
-   .sink_parquet(out))
+(lf.filter(pl.col("k") == 0).select("v").sink_parquet(out))
 print(out.exists(), pl.scan_parquet(out).collect().height)
 ```
 
@@ -136,14 +132,13 @@ import tempfile
 
 tmp = Path(tempfile.mkdtemp())
 for shard in range(3):
-    pl.DataFrame({"k": [shard % 2] * 100_000,
-                  "v": [1.0] * 100_000}).write_parquet(tmp / f"s{shard}.parquet")
+    pl.DataFrame({"k": [shard % 2] * 100_000, "v": [1.0] * 100_000}).write_parquet(
+        tmp / f"s{shard}.parquet"
+    )
 
 totals = {}
 for p in sorted(tmp.glob("*.parquet")):
-    partial = dict(
-        pl.scan_parquet(p).group_by("k").agg(pl.col("v").sum()).collect().rows()
-    )
+    partial = dict(pl.scan_parquet(p).group_by("k").agg(pl.col("v").sum()).collect().rows())
     for key, value in partial.items():
         totals[key] = totals.get(key, 0) + value
 print(totals)
@@ -168,15 +163,16 @@ buffer.
 ```python
 import polars as pl
 
-big = pl.LazyFrame({"user": [i % 1000 for i in range(2_000_000)],
-                    "token_count": [100] * 2_000_000})
+big = pl.LazyFrame({"user": [i % 1000 for i in range(2_000_000)], "token_count": [100] * 2_000_000})
 meta = pl.DataFrame({"user": [0, 1, 2], "tier": ["free", "pro", "pro"]})
 
-joined = (big.select("user", "token_count")
-             .join(meta.lazy(), on="user", how="left")
-             .collect(engine="streaming"))
+joined = (
+    big.select("user", "token_count")
+    .join(meta.lazy(), on="user", how="left")
+    .collect(engine="streaming")
+)
 print(joined.height, joined.columns)
-print(joined["tier"].null_count())   # users 3..999 not in meta
+print(joined["tier"].null_count())  # users 3..999 not in meta
 ```
 
 ```text

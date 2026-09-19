@@ -31,9 +31,14 @@ def _compile_check(filepath: Path) -> tuple[bool, str]:
     """Check that a Python file compiles without syntax errors."""
     try:
         result = subprocess.run(
-            [sys.executable, "-c",
-             f"compile(open({str(filepath)!r}, 'r', encoding='utf-8').read(), {str(filepath.name)!r}, 'exec')"],
-            capture_output=True, text=True, timeout=15,
+            [
+                sys.executable,
+                "-c",
+                f"compile(open({str(filepath)!r}, 'r', encoding='utf-8').read(), {str(filepath.name)!r}, 'exec')",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=15,
         )
         if result.returncode != 0:
             return False, result.stderr.strip()[:200]
@@ -59,14 +64,16 @@ def test_phase1_compiles(filepath):
 
 
 @pytest.mark.parametrize(
-    "filepath", [f for f in PHASE1_FILES if f.name != "__init__.py"],
+    "filepath",
+    [f for f in PHASE1_FILES if f.name != "__init__.py"],
     ids=lambda p: p.name,
 )
 def test_phase1_has_docstring(filepath):
     """Every Phase 1 exercise must have a module-level docstring."""
     content = filepath.read_text(encoding="utf-8")
-    assert content.lstrip("\ufeff").startswith('"""') or content.lstrip("\ufeff").startswith("'''"), \
-        f"{filepath.name} missing module docstring"
+    assert content.lstrip("\ufeff").startswith('"""') or content.lstrip("\ufeff").startswith(
+        "'''"
+    ), f"{filepath.name} missing module docstring"
 
 
 def test_phase1_all_files_present():
@@ -92,7 +99,8 @@ def test_phase2_compiles(filepath):
 
 
 @pytest.mark.parametrize(
-    "filepath", [f for f in PHASE2_FILES if f.name != "__init__.py"],
+    "filepath",
+    [f for f in PHASE2_FILES if f.name != "__init__.py"],
     ids=lambda p: p.name,
 )
 def test_phase2_has_docstring(filepath):
@@ -133,11 +141,14 @@ def test_phase7_compiles(filepath):
 # Smoke Test Runner Tests
 # =========================================================================
 
+
 def test_smoke_runner_list_flag():
     """Smoke test runner --list must discover files."""
     result = subprocess.run(
         [sys.executable, str(HERE / "run_smoke_tests.py"), "--list"],
-        capture_output=True, text=True, timeout=30,
+        capture_output=True,
+        text=True,
+        timeout=30,
     )
     assert result.returncode == 0
     assert "Discovered Python Files" in result.stdout
@@ -149,8 +160,10 @@ def test_smoke_runner_list_flag():
 # Structure Validation Tests
 # =========================================================================
 
+
 def test_expected_directories_exist():
     """Verify all expected phase and sub-directories exist."""
+
     # Capstone dirs live under "projects/" in older snapshots and "capstones/"
     # in the current structure - accept either layout.
     def _any(*paths: str) -> bool:
@@ -176,7 +189,13 @@ def test_expected_directories_exist():
     # Dev-tooling dir: either scripts/ or _dev/ is acceptable.
     assert _any("scripts", "_dev"), "No dev-tooling directory (scripts/ or _dev/)"
     # Capstone dirs: accept projects/ or capstones/ layouts.
-    for name in ["01-calculator", "02-file-manager", "03-api-server", "04-data-analyzer", "05-ml-pipeline"]:
+    for name in [
+        "01-calculator",
+        "02-file-manager",
+        "03-api-server",
+        "04-data-analyzer",
+        "05-ml-pipeline",
+    ]:
         assert _any(f"projects/{name}", f"capstones/{name}"), f"Capstone {name} not found"
     missing = [d for d in expected if not (HERE / d).is_dir()]
     assert not missing, f"Missing directories: {missing}"
@@ -185,8 +204,12 @@ def test_expected_directories_exist():
 def test_readme_exists_in_phase_dirs():
     """Verify README.md exists in all phase directories."""
     phases = [
-        "01-core-python", "02-advanced-python", "03-libraries",
-        "04-databases", "05-web-frameworks", "06-data-structures-algorithms",
+        "01-core-python",
+        "02-advanced-python",
+        "03-libraries",
+        "04-databases",
+        "05-web-frameworks",
+        "06-data-structures-algorithms",
         "07-machine-learning",
     ]
     missing = [phase for phase in phases if not (HERE / phase / "README.md").is_file()]
@@ -208,6 +231,7 @@ def test_requirements_txt_parses():
 # =========================================================================
 # Supplementary Content Verification
 # =========================================================================
+
 
 def test_quizzes_exist():
     """Verify quiz files exist (directly under supplementary/quizzes)."""
@@ -236,6 +260,7 @@ def test_phase1_lectures_exist():
 # =========================================================================
 # No Stale Artifact Files Test
 # =========================================================================
+
 
 def test_no_stale_artifact_files():
     """Verify no stale err.txt or e.txt files exist in the module root."""

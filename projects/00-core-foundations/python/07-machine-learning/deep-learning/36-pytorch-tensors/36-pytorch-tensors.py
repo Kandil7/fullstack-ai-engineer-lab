@@ -42,11 +42,11 @@ print(f"  numpy <-> torch roundtrip: {back}")
 # 2. dtypes matter (float32 is the DL default)
 # ============================================================
 print("\nExample 2: dtypes")
-f64 = torch.tensor([1.0])          # float32 default
+f64 = torch.tensor([1.0])  # float32 default
 f16 = f64.half()
 i64 = torch.tensor([1]).long()
 print(f"  default float: {f64.dtype}, half: {f16.dtype}, long: {i64.dtype}")
-print(f"  float16 memory: {f64.element_size()/2} vs {f16.element_size()} bytes/elem")
+print(f"  float16 memory: {f64.element_size() / 2} vs {f16.element_size()} bytes/elem")
 
 # ============================================================
 # 3. Device — CPU vs GPU
@@ -65,9 +65,9 @@ print("\nExample 4: autograd")
 w = torch.tensor(3.0, requires_grad=True)
 b = torch.tensor(1.0, requires_grad=True)
 x = torch.tensor(2.0)
-y = w * x + b          # forward
+y = w * x + b  # forward
 print(f"  y = {y.item()}")
-y.backward()           # backprop
+y.backward()  # backprop
 print(f"  dy/dw = {w.grad.item()}  (expect 2 = x)")
 print(f"  dy/db = {b.grad.item()}  (expect 1)")
 
@@ -76,9 +76,9 @@ print(f"  dy/db = {b.grad.item()}  (expect 1)")
 # ============================================================
 print("\nExample 5: no_grad")
 with torch.no_grad():
-    z = w * x + b      # no graph built, no memory for gradients
+    z = w * x + b  # no graph built, no memory for gradients
 print(f"  z = {z.item()} (requires_grad={z.requires_grad})")
-w.grad.zero_()         # gradients accumulate — always zero before backward
+w.grad.zero_()  # gradients accumulate — always zero before backward
 print("  zero_() clears accumulated gradients")
 
 # ============================================================
@@ -87,17 +87,19 @@ print("  zero_() clears accumulated gradients")
 print("\nExample 6: broadcasting")
 a = torch.randn(3, 1)
 b = torch.randn(1, 4)
-c = a * b              # (3,1) * (1,4) -> (3,4)
+c = a * b  # (3,1) * (1,4) -> (3,4)
 print(f"  ({list(a.shape)}) * ({list(b.shape)}) -> {list(c.shape)}")
 
 # ============================================================
 # 7. Reshape / permute / squeeze
 # ============================================================
 print("\nExample 7: shape manipulation")
-t2 = torch.arange(12).reshape(3, 4)      # same data, new shape
-tp = t2.permute(1, 0)                     # transpose dims (view, no copy)
-ts = t2.unsqueeze(0).squeeze()            # add/remove dim of size 1
-print(f"  reshape {list(t2.shape)}, permute -> {list(tp.shape)}, unsqueeze/squeeze -> {list(ts.shape)}")
+t2 = torch.arange(12).reshape(3, 4)  # same data, new shape
+tp = t2.permute(1, 0)  # transpose dims (view, no copy)
+ts = t2.unsqueeze(0).squeeze()  # add/remove dim of size 1
+print(
+    f"  reshape {list(t2.shape)}, permute -> {list(tp.shape)}, unsqueeze/squeeze -> {list(ts.shape)}"
+)
 
 # ============================================================
 # Summary

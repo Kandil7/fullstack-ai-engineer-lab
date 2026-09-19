@@ -7,6 +7,7 @@ Run: python 21-functions.py
 Reference: https://www.w3schools.com/python/python_functions.asp
 """
 
+
 # ============================================================
 # Defining and Calling Functions
 # ============================================================
@@ -14,12 +15,15 @@ Reference: https://www.w3schools.com/python/python_functions.asp
 def greet():
     print("Hello, World!")
 
+
 greet()  # Call the function
 # Output: Hello, World!
+
 
 # Example 2: Function with parameters
 def greet_person(name):
     print(f"Hello, {name}!")
+
 
 greet_person("Alice")
 greet_person("Bob")
@@ -33,12 +37,15 @@ greet_person("Bob")
 # Parameters are the variables in the function definition
 # Arguments are the values passed to the function
 
+
 def add(a, b):  # a and b are PARAMETERS
     return a + b
+
 
 result = add(3, 5)  # 3 and 5 are ARGUMENTS
 print(f"\n3 + 5 = {result}")
 # Output: 3 + 5 = 8
+
 
 # ============================================================
 # Return Values
@@ -47,25 +54,31 @@ print(f"\n3 + 5 = {result}")
 def multiply(a, b):
     return a * b
 
+
 result = multiply(4, 5)
 print(f"4 * 5 = {result}")
+
 
 # Example 4: Return multiple values (as tuple)
 def getMinMax(numbers):
     return min(numbers), max(numbers)
 
+
 minimum, maximum = getMinMax([3, 1, 4, 1, 5, 9, 2, 6])
 print(f"Min: {minimum}, Max: {maximum}")
+
 
 # Example 5: Return without value (returns None)
 def say_hello():
     print("Hello!")
+
 
 result = say_hello()
 print(f"Return value: {result}")
 # Output:
 # Hello!
 # Return value: None
+
 
 # ============================================================
 # Default Parameters
@@ -74,15 +87,18 @@ print(f"Return value: {result}")
 def greet_with_title(name, title="Mr."):
     print(f"Hello, {title} {name}!")
 
-greet_with_title("Smith")           # Uses default title
+
+greet_with_title("Smith")  # Uses default title
 greet_with_title("Johnson", "Dr.")  # Custom title
 
 # ⚠️ Default parameters must come after non-default parameters!
 # def bad_func(a=1, b):  # SyntaxError!
 #     pass
 
+
 def good_func(a, b=1):  # Correct!
     return a + b
+
 
 # ============================================================
 # *args - Variable Number of Arguments
@@ -93,6 +109,7 @@ def sum_all(*args):
     print(f"type: {type(args)}")
     return sum(args)
 
+
 result = sum_all(1, 2, 3, 4, 5)
 print(f"Sum: {result}")
 
@@ -101,13 +118,16 @@ print(f"Sum: {result}")
 # type: <class 'tuple'>
 # Sum: 15
 
+
 # Example 8: *args with other parameters
 def print_info(name, *hobbies):
     print(f"\n{name}'s hobbies:")
     for hobby in hobbies:
         print(f"  - {hobby}")
 
+
 print_info("Alice", "reading", "coding", "hiking")
+
 
 # ============================================================
 # **kwargs - Variable Number of Keyword Arguments
@@ -117,6 +137,7 @@ def print_profile(**kwargs):
     print("Profile:")
     for key, value in kwargs.items():
         print(f"  {key}: {value}")
+
 
 print_profile(name="Alice", age=30, city="New York")
 
@@ -132,9 +153,11 @@ print_profile(name="Alice", age=30, city="New York")
 # Example 10: Local vs Global scope
 x = "global"  # Global variable
 
+
 def my_function():
     x = "local"  # Local variable (different from global!)
     print(f"Inside function: x = {x}")
+
 
 my_function()
 print(f"Outside function: x = {x}")
@@ -146,14 +169,17 @@ print(f"Outside function: x = {x}")
 # Example 11: Using global keyword
 counter = 0
 
+
 def increment():
     global counter
     counter += 1
+
 
 increment()
 increment()
 increment()
 print(f"\nCounter: {counter}")  # Output: Counter: 3
+
 
 # ============================================================
 # Lambda Functions
@@ -161,10 +187,11 @@ print(f"\nCounter: {counter}")  # Output: Counter: 3
 # Example 12: Anonymous functions
 # Regular function
 def square(x):
-    return x ** 2
+    return x**2
+
 
 # Lambda equivalent
-square_lambda = lambda x: x ** 2
+square_lambda = lambda x: x**2
 
 print(f"\nRegular: square(5) = {square(5)}")
 print(f"Lambda: square_lambda(5) = {square_lambda(5)}")
@@ -181,9 +208,10 @@ print(f"Students sorted: {students}")
 # Lambda in filter and map
 numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 evens = list(filter(lambda x: x % 2 == 0, numbers))
-squares = list(map(lambda x: x ** 2, numbers))
+squares = list(map(lambda x: x**2, numbers))
 print(f"Evens: {evens}")
 print(f"Squares: {squares}")
+
 
 # ============================================================
 # Recursion
@@ -195,8 +223,10 @@ def factorial(n):
         return 1
     return n * factorial(n - 1)  # Recursive case
 
+
 print(f"\nFactorial of 5: {factorial(5)}")  # 120
 print(f"Factorial of 10: {factorial(10)}")  # 3628800
+
 
 # Example 14: Fibonacci with recursion
 def fibonacci(n):
@@ -207,9 +237,11 @@ def fibonacci(n):
         return 1
     return fibonacci(n - 1) + fibonacci(n - 2)
 
+
 print(f"\nFibonacci sequence:")
 for i in range(10):
     print(f"  fib({i}) = {fibonacci(i)}")
+
 
 # ============================================================
 # Docstrings
@@ -218,14 +250,14 @@ for i in range(10):
 def calculate_area(length, width):
     """
     Calculate the area of a rectangle.
-    
+
     Parameters:
         length (float): The length of the rectangle
         width (float): The width of the rectangle
-    
+
     Returns:
         float: The area of the rectangle
-    
+
     Examples:
         >>> calculate_area(5, 3)
         15
@@ -233,6 +265,7 @@ def calculate_area(length, width):
         25.0
     """
     return length * width
+
 
 print(f"\nArea: {calculate_area(5, 3)}")
 print(f"Docstring preview: {calculate_area.__doc__[:50]}...")

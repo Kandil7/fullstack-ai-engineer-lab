@@ -85,6 +85,7 @@ def best_model_name(experiments: list[Experiment]) -> str | None:
 # isinstance() work on structural typing.
 # Complexity: all operations O(1) amortized on PK lookups.
 
+
 @runtime_checkable
 class ExperimentRepository(Protocol):
     """Storage contract: how experiments are stored is an implementation detail."""
@@ -118,6 +119,7 @@ class ExperimentRepository(Protocol):
 # this is the Unit of Work pattern. Repos stay composable: several
 # repositories can share one session/transaction.
 
+
 class SqlExperimentRepository:
     """Repository backed by SQLAlchemy. Session = injected Unit of Work."""
 
@@ -130,9 +132,7 @@ class SqlExperimentRepository:
         return experiment.id
 
     def get(self, name: str) -> Experiment | None:
-        return self.session.scalars(
-            select(Experiment).where(Experiment.name == name)
-        ).first()
+        return self.session.scalars(select(Experiment).where(Experiment.name == name)).first()
 
     def list_all(self) -> list[Experiment]:
         return list(self.session.scalars(select(Experiment).order_by(Experiment.id)))
@@ -156,6 +156,7 @@ class SqlExperimentRepository:
 # testable at full speed with zero setup. The tradeoff: the fake
 # does not model constraints, transactions, or SQL quirks — real
 # integration tests still run against sqlite/Postgres.
+
 
 class InMemoryExperimentRepository:
     """Dict-backed repository; behavior-compatible for tests."""
@@ -191,6 +192,7 @@ class InMemoryExperimentRepository:
 # The service is the application's use-case layer. It depends only
 # on the Protocol — so it runs against sqlite, Postgres, or the
 # dict fake without modification.
+
 
 class RegistryService:
     """Model-registry use cases: register, promote, rank."""
@@ -229,9 +231,8 @@ class RegistryService:
 # handler opens the session, builds repos on it, runs the service,
 # and commits ONCE. If any step fails, nothing is half-written.
 
-def register_batch_with_transaction(
-    session: Session, entries: list[tuple[str, str, float]]
-) -> int:
+
+def register_batch_with_transaction(session: Session, entries: list[tuple[str, str, float]]) -> int:
     """Register several runs atomically; roll back all on any failure."""
     repo = SqlExperimentRepository(session)
     service = RegistryService(repo)
@@ -327,15 +328,15 @@ def _verify() -> None:
     # 2. The SQL repository implements the protocol (structural typing)
     with Session(bind=engine) as verify_session:
         sql_repo = SqlExperimentRepository(verify_session)
-        assert isinstance(sql_repo, ExperimentRepository), \
+        assert isinstance(sql_repo, ExperimentRepository), (
             "SqlExperimentRepository must satisfy the repository protocol"
+        )
 
     # 3. Service behaves identically on sqlite and the fake
     with Session(bind=engine) as verify_session:
         sql_log = run_service_demo(SqlExperimentRepository(verify_session))
     fake_log = run_service_demo(InMemoryExperimentRepository())
-    assert sql_log == fake_log, \
-        "service must produce identical results on both repositories"
+    assert sql_log == fake_log, "service must produce identical results on both repositories"
     assert "promote bert-1 -> True" in sql_log, "threshold promotion must work"
     assert "champion model  -> bert" in sql_log, "champion rule must rank models"
 

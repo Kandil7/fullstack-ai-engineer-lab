@@ -54,26 +54,22 @@ Pure vector similarity is not enough. Metadata filters narrow the search space b
 ### Filter Design Patterns
 ```python
 # Temporal filter: only recent documents
-Filter(must=[
-    FieldCondition(key="updated_at", range=Gte(gte="2024-01-01"))
-])
+Filter(must=[FieldCondition(key="updated_at", range=Gte(gte="2024-01-01"))])
 
 # Language filter: Arabic content only
-Filter(must=[
-    FieldCondition(key="language", match=MatchValue(value="ar"))
-])
+Filter(must=[FieldCondition(key="language", match=MatchValue(value="ar"))])
 
 # Source authority filter: official docs over blog posts
-Filter(must=[
-    FieldCondition(key="source_type", match=MatchValue(value="official"))
-])
+Filter(must=[FieldCondition(key="source_type", match=MatchValue(value="official"))])
 
 # Combined filter: Arabic + recent + official
-Filter(must=[
-    FieldCondition(key="language", match=MatchValue(value="ar")),
-    FieldCondition(key="updated_at", range=Gte(gte="2024-01-01")),
-    FieldCondition(key="source_type", match=MatchValue(value="official")),
-])
+Filter(
+    must=[
+        FieldCondition(key="language", match=MatchValue(value="ar")),
+        FieldCondition(key="updated_at", range=Gte(gte="2024-01-01")),
+        FieldCondition(key="source_type", match=MatchValue(value="official")),
+    ]
+)
 ```
 
 ### Filter Placement Strategy
@@ -123,7 +119,7 @@ Turn 3: "What about token theft?"    → needs both Turn 1 + Turn 2
        "topic": "authentication",
        "subtopics": ["JWT", "refresh tokens"],
        "depth": "intermediate",
-       "asked_so_far": ["jwt_basics", "refresh_flow"]
+       "asked_so_far": ["jwt_basics", "refresh_flow"],
    }
    ```
 

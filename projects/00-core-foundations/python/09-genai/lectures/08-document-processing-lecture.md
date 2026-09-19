@@ -58,12 +58,12 @@ A single `ingest` function per format, all converging on one output: a list of
 ```python
 def ingest_pipeline(source_path: str, chunk_strategy) -> list:
     """Parse → clean → structure → chunk. Returns Chunks with metadata."""
-    raw = read_bytes(source_path)                 # 1. ingest
-    text, tables = parse(source_path, raw)        # 2. parse (format-specific)
-    cleaned = clean_text(text)                    # 3. clean
-    structured = structure(cleaned, tables)       # 4. structure (headings, tables)
+    raw = read_bytes(source_path)  # 1. ingest
+    text, tables = parse(source_path, raw)  # 2. parse (format-specific)
+    cleaned = clean_text(text)  # 3. clean
+    structured = structure(cleaned, tables)  # 4. structure (headings, tables)
     chunks = chunk_strategy(structured, source_path)  # 5. chunk (L7)
-    validate_chunks(chunks)                       # 6. gate (L10 discipline)
+    validate_chunks(chunks)  # 6. gate (L10 discipline)
     return chunks
 ```
 
@@ -82,6 +82,7 @@ handles most; tables need dedicated extraction; scanned PDFs need OCR.
 
 ```python
 import pdfplumber
+
 
 def parse_pdf_text(path: str) -> tuple[str, list]:
     """Extract text + tables from a PDF."""
@@ -113,6 +114,7 @@ def needs_ocr(text: str, sample: str = "") -> bool:
     """Scanned pages have no text layer."""
     return len(text.strip()) == 0
 
+
 # OCR decision point in the pipeline:
 # parse → if text empty → OCR → text
 ```
@@ -134,12 +136,13 @@ encodings mix, boilerplate (nav menus in HTML) pollutes the corpus.
 ```python
 import re
 
+
 def clean_text(text: str) -> str:
     """Normalize whitespace, drop page furniture, fix encoding artifacts."""
-    text = re.sub(r"\s+", " ", text)                     # collapse whitespace
+    text = re.sub(r"\s+", " ", text)  # collapse whitespace
     text = re.sub(r"(?i)(page \d+ of \d+|\s+\d+\s*$)", "", text)  # page furniture
-    text = text.replace("\u00a0", " ")                    # nbsp → space
-    text = text.replace("\uFFFD", "")                     # replacement chars
+    text = text.replace("\u00a0", " ")  # nbsp → space
+    text = text.replace("\ufffd", "")  # replacement chars
     return text.strip()
 ```
 
@@ -219,7 +222,9 @@ version bump* with a re-index decision.
 ```python
 def doc_hash(text: str) -> str:
     import hashlib
+
     return f"sha256:{hashlib.sha256(text.encode()).hexdigest()[:16]}"
+
 
 # incremental: re-ingest only docs whose hash changed since the last index
 changed = [p for p in all_docs if doc_hash(read(p)) != last_index.get(p)]

@@ -35,6 +35,7 @@ apply. It holds no data itself until you call `.dataloaders(source)`.
 ## Example
 ```python
 from fastai.vision.all import *
+
 block = DataBlock(
     blocks=(ImageBlock, CategoryBlock),
     get_items=get_image_files,
@@ -62,7 +63,7 @@ dls = block.dataloaders(path)
 ```python
 dls = block.dataloaders(path, bs=64)
 dls.show_batch(max_n=9)
-print(dls.vocab)              # ordered class names
+print(dls.vocab)  # ordered class names
 len(dls.train_ds), len(dls.valid_ds)
 ```
 
@@ -82,7 +83,7 @@ augmentation should live for speed.
 ## Example
 ```python
 block = DataBlock(
-    item_tfms=Resize(460),                         # CPU, per image
+    item_tfms=Resize(460),  # CPU, per image
     batch_tfms=aug_transforms(size=224, min_scale=0.75),  # GPU, per batch
 )
 ```
@@ -102,7 +103,7 @@ small interpolations.
 
 ## Example
 ```python
-item_tfms  = Resize(460)                               # step 1: big, CPU
+item_tfms = Resize(460)  # step 1: big, CPU
 batch_tfms = aug_transforms(size=224, min_scale=0.75)  # step 2: augment+crop, GPU
 ```
 
@@ -172,7 +173,7 @@ file for deployment.
 
 ## Example
 ```python
-learn.export("model.pkl")     # written to learn.path/model.pkl
+learn.export("model.pkl")  # written to learn.path/model.pkl
 ```
 
 **Related Terms:** load_learner, inference
@@ -225,9 +226,10 @@ component to a prediction function.
 ## Example
 ```python
 import gradio as gr
-demo = gr.Interface(fn=predict,
-                    inputs=gr.Image(type="pil"),
-                    outputs=gr.Label(num_top_classes=3))
+
+demo = gr.Interface(
+    fn=predict, inputs=gr.Image(type="pil"), outputs=gr.Label(num_top_classes=3)
+)
 demo.launch()
 ```
 

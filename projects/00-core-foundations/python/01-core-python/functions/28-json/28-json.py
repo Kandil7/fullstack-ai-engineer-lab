@@ -23,12 +23,7 @@ import json
 print("--- Python to JSON ---")
 
 # Python dict to JSON string
-python_dict = {
-    "name": "Alice",
-    "age": 30,
-    "city": "New York",
-    "is_student": False
-}
+python_dict = {"name": "Alice", "age": 30, "city": "New York", "is_student": False}
 
 json_string = json.dumps(python_dict)
 print(f"JSON string: {json_string}")
@@ -53,7 +48,7 @@ python_data = {
     "none_value": None,
     "list": [1, 2, 3],
     "tuple": (4, 5, 6),  # Tuples become JSON arrays
-    "dict": {"key": "value"}
+    "dict": {"key": "value"},
 }
 
 json_data = json.dumps(python_data, indent=2)
@@ -104,7 +99,7 @@ print(f"Scores: {python_obj['scores']}")
 # Example 4: How JSON types map to Python
 print("\n--- JSON to Python Mapping ---")
 
-json_data = '''
+json_data = """
 {
     "string": "hello",
     "integer": 42,
@@ -115,7 +110,7 @@ json_data = '''
     "array": [1, 2, 3],
     "object": {"key": "value"}
 }
-'''
+"""
 
 python_data = json.loads(json_data)
 for key, value in python_data.items():
@@ -162,7 +157,7 @@ data = {
     "employees": [
         {"name": "Alice", "department": "Engineering", "salary": 95000},
         {"name": "Bob", "department": "Marketing", "salary": 75000},
-        {"name": "Charlie", "department": "Engineering", "salary": 105000}
+        {"name": "Charlie", "department": "Engineering", "salary": 105000},
     ]
 }
 
@@ -179,6 +174,7 @@ print(f"Loaded: {loaded_data['employees'][0]['name']}")
 
 # Clean up
 import os
+
 os.remove("employees.json")
 
 # ============================================================
@@ -200,17 +196,17 @@ data_unicode = {"name": "José", "city": "München"}
 print(json.dumps(data_unicode, ensure_ascii=False))
 print(json.dumps(data_unicode, ensure_ascii=True))
 
+
 # default - handle non-serializable objects
 def custom_serializer(obj):
-    if hasattr(obj, 'isoformat'):
+    if hasattr(obj, "isoformat"):
         return obj.isoformat()
     raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
+
 from datetime import datetime
-data_with_date = {
-    "event": "Meeting",
-    "date": datetime.now()
-}
+
+data_with_date = {"event": "Meeting", "date": datetime.now()}
 
 # This would fail:
 # json.dumps(data_with_date)  # TypeError
@@ -225,7 +221,7 @@ print(json.dumps(data_with_date, default=custom_serializer, indent=2))
 print("\n--- Practical Examples ---")
 
 # API response simulation
-api_response = '''
+api_response = """
 {
     "status": "success",
     "data": {
@@ -237,24 +233,20 @@ api_response = '''
         "page": 1
     }
 }
-'''
+"""
 
 response = json.loads(api_response)
 print(f"Status: {response['status']}")
 print(f"Total users: {response['data']['total']}")
 
-for user in response['data']['users']:
+for user in response["data"]["users"]:
     print(f"  - {user['name']} ({user['email']})")
 
 # Configuration file
 config = {
-    "database": {
-        "host": "localhost",
-        "port": 5432,
-        "name": "myapp"
-    },
+    "database": {"host": "localhost", "port": 5432, "name": "myapp"},
     "debug": True,
-    "log_level": "INFO"
+    "log_level": "INFO",
 }
 
 # Save config

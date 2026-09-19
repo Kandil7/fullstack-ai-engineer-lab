@@ -3,24 +3,27 @@ Input and output guardrails for security and safety.
 """
 
 import re
+from abc import abstractmethod
 from dataclasses import dataclass
-from enum import Enum
-from typing import Any, Dict, List, Optional, Set
+from enum import StrEnum
+from typing import Any
 
 from devmate.config import settings
 from devmate.obs.tracing import tracer
 
 
-class GuardrailAction(str, Enum):
+class GuardrailAction(StrEnum):
     """Action to take when guardrail triggers."""
+
     BLOCK = "block"
     WARN = "warn"
     REDACT = "redact"
     LOG = "log"
 
 
-class GuardrailCategory(str, Enum):
+class GuardrailCategory(StrEnum):
     """Categories of guardrail checks."""
+
     PROMPT_INJECTION = "prompt_injection"
     PII = "pii"
     TOXICITY = "toxicity"
@@ -33,29 +36,30 @@ class GuardrailCategory(str, Enum):
 @dataclass
 class GuardrailResult:
     """Result of a guardrail check."""
+
     triggered: bool
     category: GuardrailCategory
     action: GuardrailAction
     message: str
-    details: Dict[str, Any] = None
-    sanitized_content: Optional[str] = None
+    details: dict[str, Any] = None
+    sanitized_content: str | None = None
 
 
 class BaseGuardrail:
     """Base class for guardrails."""
-    
-    def __init__(self, action: GuardrailAction = GuardrailAction.BLOCK):
+
+    def __init__(self, action: GuardrailAction = GuardrailAction.BLOCK) -> None:
         self.action = action
         self.enabled = True
-    
+
     @abstractmethod
-    async def check(self, content: str, context: Dict[str, Any] = None) -> GuardrailResult:
+    async def check(self, content: str, context: dict[str, Any] = None) -> GuardrailResult:
         pass
 
 
 class PromptInjectionGuardrail(BaseGuardrail):
     """Detect prompt injection attempts."""
-    
+
     # Common injection patterns
     INJECTION_PATTERNS = [
         r"ignore\s+(previous|above|all)\s+instructions",
@@ -77,15 +81,17 @@ class PromptInjectionGuardrail(BaseGuardrail):
         r"DAN\s+mode",
         r"developer\s+mode",
     ]
-    
-    def __init__(self, action: GuardrailAction = GuardrailAction.BLOCK):
+
+    def __init__(self, action: GuardrailAction = GuardrailAction.BLOCK) -> None:
         super().__init__(action)
         self.compiled_patterns = [re.compile(p, re.IGNORECASE) for p in self.INJECTION_PATTERNS]
-    
-    async def check(self, content: str, context: Dict[str, Any] = None) -> GuardrailResult:
+
+    async def check(self, content: str, context: dict[str, Any] = None) -> GuardrailResult:
         if not self.enabled or not settings.injection_detection_enabled:
-            return GuardrailResult(False, GuardrailCategory.PROMPT_INJECTION, GuardrailAction.LOG, "Disabled")
-        
+            return GuardrailResult(
+                False, GuardrailCategory.PROMPT_INJECTION, GuardrailAction.LOG, "Disabled"
+            )
+
         async with tracer.trace("guardrail.prompt_injection"):
             for pattern in self.compiled_patterns:
                 match = pattern.search(content)
@@ -97,13 +103,15 @@ class PromptInjectionGuardrail(BaseGuardrail):
                         message=f"Prompt injection detected: {match.group()[:50]}",
                         details={"pattern": match.group(), "position": match.start()},
                     )
-            
-            return GuardrailResult(False, GuardrailCategory.PROMPT_INJECTION, GuardrailAction.LOG, "Clean")
+
+            return GuardrailResult(
+                False, GuardrailCategory.PROMPT_INJECTION, GuardrailAction.LOG, "Clean"
+            )
 
 
 class PIIGuardrail(BaseGuardrail):
     """Detect and redact PII (Personally Identifiable Information)."""
-    
+
     PII_PATTERNS = {
         "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
         "phone_us": r"\b(?:\+?1[-.\s]?)?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})\b",
@@ -114,33 +122,35 @@ class PIIGuardrail(BaseGuardrail):
         "aws_key": r"\bAKIA[0-9A-Z]{16}\b",
         "github_token": r"\bgh[ps]_[A-Za-z0-9]{36}\b",
     }
-    
-    def __init__(self, action: GuardrailAction = GuardrailAction.REDACT):
+
+    def __init__(self, action: GuardrailAction = GuardrailAction.REDACT) -> None:
         super().__init__(action)
         self.compiled_patterns = {
             name: re.compile(pattern) for name, pattern in self.PII_PATTERNS.items()
         }
-    
-    async def check(self, content: str, context: Dict[str, Any] = None) -> GuardrailResult:
+
+    async def check(self, content: str, context: dict[str, Any] = None) -> GuardrailResult:
         if not self.enabled or not settings.pii_detection_enabled:
             return GuardrailResult(False, GuardrailCategory.PII, GuardrailAction.LOG, "Disabled")
-        
+
         async with tracer.trace("guardrail.pii"):
             findings = []
             sanitized = content
-            
+
             for pii_type, pattern in self.compiled_patterns.items():
                 matches = list(pattern.finditer(content))
                 if matches:
-                    findings.append({
-                        "type": pii_type,
-                        "count": len(matches),
-                        "positions": [m.start() for m in matches],
-                    })
-                    
+                    findings.append(
+                        {
+                            "type": pii_type,
+                            "count": len(matches),
+                            "positions": [m.start() for m in matches],
+                        }
+                    )
+
                     if self.action == GuardrailAction.REDACT:
                         sanitized = pattern.sub(f"[REDACTED_{pii_type.upper()}]", sanitized)
-            
+
             if findings:
                 return GuardrailResult(
                     triggered=True,
@@ -150,21 +160,25 @@ class PIIGuardrail(BaseGuardrail):
                     details={"findings": findings},
                     sanitized_content=sanitized if self.action == GuardrailAction.REDACT else None,
                 )
-            
+
             return GuardrailResult(False, GuardrailCategory.PII, GuardrailAction.LOG, "Clean")
 
 
 class LengthGuardrail(BaseGuardrail):
     """Check for excessive input length."""
-    
-    def __init__(self, max_length: int = None, action: GuardrailAction = GuardrailAction.BLOCK):
+
+    def __init__(
+        self, max_length: int = None, action: GuardrailAction = GuardrailAction.BLOCK
+    ) -> None:
         super().__init__(action)
         self.max_length = max_length or settings.max_prompt_length
-    
-    async def check(self, content: str, context: Dict[str, Any] = None) -> GuardrailResult:
+
+    async def check(self, content: str, context: dict[str, Any] = None) -> GuardrailResult:
         if not self.enabled:
-            return GuardrailResult(False, GuardrailCategory.EXCESSIVE_LENGTH, GuardrailAction.LOG, "Disabled")
-        
+            return GuardrailResult(
+                False, GuardrailCategory.EXCESSIVE_LENGTH, GuardrailAction.LOG, "Disabled"
+            )
+
         if len(content) > self.max_length:
             return GuardrailResult(
                 triggered=True,
@@ -172,15 +186,17 @@ class LengthGuardrail(BaseGuardrail):
                 action=self.action,
                 message=f"Input exceeds maximum length: {len(content)} > {self.max_length}",
                 details={"length": len(content), "max_length": self.max_length},
-                sanitized_content=content[:self.max_length] if self.action == GuardrailAction.REDACT else None,
+                sanitized_content=content[: self.max_length]
+                if self.action == GuardrailAction.REDACT
+                else None,
             )
-        
+
         return GuardrailResult(False, GuardrailCategory.EXCESSIVE_LENGTH, GuardrailAction.LOG, "OK")
 
 
 class SystemPromptExtractionGuardrail(BaseGuardrail):
     """Detect attempts to extract system prompt."""
-    
+
     EXTRACTION_PATTERNS = [
         r"what\s+(is|was)\s+(your|the)\s+(system|initial)\s+prompt",
         r"show\s+me\s+(your|the)\s+(system|initial)\s+prompt",
@@ -192,15 +208,17 @@ class SystemPromptExtractionGuardrail(BaseGuardrail):
         r"what\s+are\s+your\s+instructions",
         r"tell\s+me\s+your\s+instructions",
     ]
-    
-    def __init__(self, action: GuardrailAction = GuardrailAction.BLOCK):
+
+    def __init__(self, action: GuardrailAction = GuardrailAction.BLOCK) -> None:
         super().__init__(action)
         self.compiled_patterns = [re.compile(p, re.IGNORECASE) for p in self.EXTRACTION_PATTERNS]
-    
-    async def check(self, content: str, context: Dict[str, Any] = None) -> GuardrailResult:
+
+    async def check(self, content: str, context: dict[str, Any] = None) -> GuardrailResult:
         if not self.enabled:
-            return GuardrailResult(False, GuardrailCategory.SYSTEM_PROMPT_EXTRACTION, GuardrailAction.LOG, "Disabled")
-        
+            return GuardrailResult(
+                False, GuardrailCategory.SYSTEM_PROMPT_EXTRACTION, GuardrailAction.LOG, "Disabled"
+            )
+
         async with tracer.trace("guardrail.system_prompt_extraction"):
             for pattern in self.compiled_patterns:
                 match = pattern.search(content)
@@ -212,13 +230,15 @@ class SystemPromptExtractionGuardrail(BaseGuardrail):
                         message="System prompt extraction attempt detected",
                         details={"pattern": match.group()},
                     )
-            
-            return GuardrailResult(False, GuardrailCategory.SYSTEM_PROMPT_EXTRACTION, GuardrailAction.LOG, "Clean")
+
+            return GuardrailResult(
+                False, GuardrailCategory.SYSTEM_PROMPT_EXTRACTION, GuardrailAction.LOG, "Clean"
+            )
 
 
 class CodeExecutionGuardrail(BaseGuardrail):
     """Detect code execution attempts in user input."""
-    
+
     EXECUTION_PATTERNS = [
         r"```\s*(python|py|javascript|js|bash|sh|sql)\s*\n.*?(?:exec|eval|subprocess|os\.system|shell)",
         r"(?:exec|eval|compile)\s*\(",
@@ -229,15 +249,19 @@ class CodeExecutionGuardrail(BaseGuardrail):
         r"pickle\.loads?",
         r"marshal\.loads?",
     ]
-    
-    def __init__(self, action: GuardrailAction = GuardrailAction.WARN):
+
+    def __init__(self, action: GuardrailAction = GuardrailAction.WARN) -> None:
         super().__init__(action)
-        self.compiled_patterns = [re.compile(p, re.IGNORECASE | re.DOTALL) for p in self.EXECUTION_PATTERNS]
-    
-    async def check(self, content: str, context: Dict[str, Any] = None) -> GuardrailResult:
+        self.compiled_patterns = [
+            re.compile(p, re.IGNORECASE | re.DOTALL) for p in self.EXECUTION_PATTERNS
+        ]
+
+    async def check(self, content: str, context: dict[str, Any] = None) -> GuardrailResult:
         if not self.enabled:
-            return GuardrailResult(False, GuardrailCategory.CODE_EXECUTION, GuardrailAction.LOG, "Disabled")
-        
+            return GuardrailResult(
+                False, GuardrailCategory.CODE_EXECUTION, GuardrailAction.LOG, "Disabled"
+            )
+
         async with tracer.trace("guardrail.code_execution"):
             for pattern in self.compiled_patterns:
                 match = pattern.search(content)
@@ -249,19 +273,21 @@ class CodeExecutionGuardrail(BaseGuardrail):
                         message="Potential code execution attempt detected",
                         details={"pattern": match.group()[:100]},
                     )
-            
-            return GuardrailResult(False, GuardrailCategory.CODE_EXECUTION, GuardrailAction.LOG, "Clean")
+
+            return GuardrailResult(
+                False, GuardrailCategory.CODE_EXECUTION, GuardrailAction.LOG, "Clean"
+            )
 
 
 class GuardrailManager:
     """Manages and runs all guardrails."""
-    
-    def __init__(self):
-        self.input_guardrails: List[BaseGuardrail] = []
-        self.output_guardrails: List[BaseGuardrail] = []
+
+    def __init__(self) -> None:
+        self.input_guardrails: list[BaseGuardrail] = []
+        self.output_guardrails: list[BaseGuardrail] = []
         self._setup_default_guardrails()
-    
-    def _setup_default_guardrails(self):
+
+    def _setup_default_guardrails(self) -> None:
         """Setup default guardrails."""
         # Input guardrails
         self.input_guardrails = [
@@ -271,55 +297,59 @@ class GuardrailManager:
             SystemPromptExtractionGuardrail(),
             CodeExecutionGuardrail(GuardrailAction.WARN),
         ]
-        
+
         # Output guardrails (for LLM responses)
         self.output_guardrails = [
             PIIGuardrail(GuardrailAction.REDACT),
         ]
-    
-    async def check_input(self, content: str, context: Dict[str, Any] = None) -> List[GuardrailResult]:
+
+    async def check_input(
+        self, content: str, context: dict[str, Any] = None
+    ) -> list[GuardrailResult]:
         """Run all input guardrails."""
         results = []
-        
+
         for guardrail in self.input_guardrails:
             if guardrail.enabled:
                 result = await guardrail.check(content, context)
                 results.append(result)
-                
+
                 if result.triggered and result.action == GuardrailAction.BLOCK:
                     # Stop on first blocking guardrail
                     break
-        
+
         return results
-    
-    async def check_output(self, content: str, context: Dict[str, Any] = None) -> Tuple[str, List[GuardrailResult]]:
+
+    async def check_output(
+        self, content: str, context: dict[str, Any] = None
+    ) -> tuple[str, list[GuardrailResult]]:
         """Run all output guardrails, return sanitized content and results."""
         results = []
         sanitized = content
-        
+
         for guardrail in self.output_guardrails:
             if guardrail.enabled:
                 result = await guardrail.check(sanitized, context)
                 results.append(result)
-                
+
                 if result.sanitized_content:
                     sanitized = result.sanitized_content
-        
+
         return sanitized, results
-    
-    def enable(self, category: GuardrailCategory):
+
+    def enable(self, category: GuardrailCategory) -> None:
         """Enable a guardrail category."""
         for g in self.input_guardrails + self.output_guardrails:
             if g.category == category:
                 g.enabled = True
-    
-    def disable(self, category: GuardrailCategory):
+
+    def disable(self, category: GuardrailCategory) -> None:
         """Disable a guardrail category."""
         for g in self.input_guardrails + self.output_guardrails:
             if g.category == category:
                 g.enabled = False
-    
-    def set_action(self, category: GuardrailCategory, action: GuardrailAction):
+
+    def set_action(self, category: GuardrailCategory, action: GuardrailAction) -> None:
         """Set action for a guardrail category."""
         for g in self.input_guardrails + self.output_guardrails:
             if g.category == category:

@@ -30,6 +30,7 @@ A collection of elements stored at contiguous memory locations with the same dat
 
 ```python
 import numpy as np
+
 arr = np.array([1, 2, 3, 4, 5])
 print(type(arr))  # <class 'numpy.ndarray'>
 ```
@@ -76,7 +77,7 @@ result = arr + 5  # [6, 7, 8]
 
 # Array broadcasting
 a = np.array([[1], [2], [3]])  # shape (3, 1)
-b = np.array([10, 20, 30])     # shape (3,)
+b = np.array([10, 20, 30])  # shape (3,)
 result = a + b  # shape (3, 3) — a expands columns, b expands rows
 ```
 
@@ -92,7 +93,7 @@ The type of data stored in array elements. NumPy supports many numeric types, st
 ```python
 arr_float = np.array([1.0, 2.0], dtype=np.float64)
 arr_int = np.array([1, 2], dtype=np.int32)
-arr_complex = np.array([1+2j, 3+4j], dtype=np.complex128)
+arr_complex = np.array([1 + 2j, 3 + 4j], dtype=np.complex128)
 ```
 
 **Related:** ndarray, type promotion, casting
@@ -119,8 +120,8 @@ np.sqrt(arr)  # [1.0, 2.0, 3.0, 4.0]
 Memory layout where elements are stored column-first (as in Fortran). Contrast with C order (row-first).
 
 ```python
-arr_c = np.array([[1, 2], [3, 4]], order='C')    # Row-major
-arr_f = np.array([[1, 2], [3, 4]], order='F')    # Column-major
+arr_c = np.array([[1, 2], [3, 4]], order="C")  # Row-major
+arr_f = np.array([[1, 2], [3, 4]], order="F")  # Column-major
 ```
 
 **Related:** strides, contiguous, memory layout
@@ -134,8 +135,8 @@ How array data is organized in physical memory. NumPy supports C-contiguous (row
 
 ```python
 arr = np.array([[1, 2, 3], [4, 5, 6]])
-print(arr.flags['C_CONTIGUOUS'])    # True
-print(arr.flags['F_CONTIGUOUS'])    # False
+print(arr.flags["C_CONTIGUOUS"])  # True
+print(arr.flags["F_CONTIGUOUS"])  # False
 ```
 
 **Related:** strides, contiguous, order
@@ -179,6 +180,7 @@ Numerical Python — the foundational library for scientific computing. Provides
 
 ```python
 import numpy as np
+
 print(np.__version__)
 ```
 
@@ -193,8 +195,8 @@ A 0-dimensional array (single value). NumPy treats scalars as 0-d arrays.
 
 ```python
 scalar = np.array(42)
-print(scalar.ndim)    # 0
-print(scalar.shape)   # ()
+print(scalar.ndim)  # 0
+print(scalar.shape)  # ()
 ```
 
 **Related:** ndarray, broadcasting
@@ -231,10 +233,10 @@ print(arr.strides)  # (24, 8) — 24 bytes to next row, 8 bytes to next column
 When operations involve different dtypes, NumPy automatically promotes to a common type.
 
 ```python
-a = np.array([1, 2, 3])         # int64
+a = np.array([1, 2, 3])  # int64
 b = np.array([1.0, 2.0, 3.0])  # float64
-c = a + b                       # float64 (promoted from int)
-print(c.dtype)                   # float64
+c = a + b  # float64 (promoted from int)
+print(c.dtype)  # float64
 ```
 
 **Related:** dtype, casting, ufunc
@@ -248,9 +250,9 @@ Functions that operate element-wise on arrays. They are implemented in C and are
 
 ```python
 arr = np.array([1, 4, 9, 16, 25])
-np.sqrt(arr)    # [1. 2. 3. 4. 5.]
+np.sqrt(arr)  # [1. 2. 3. 4. 5.]
 np.add(arr, 1)  # [ 2  5 10 17 26]
-np.sin(arr)     # element-wise sine
+np.sin(arr)  # element-wise sine
 ```
 
 **Related:** broadcasting, vectorization, dtype
@@ -266,11 +268,11 @@ The process of converting element-wise operations into array-level operations, e
 # WITHOUT vectorization (slow)
 result = []
 for x in range(1000000):
-    result.append(x ** 2)
+    result.append(x**2)
 
 # WITH vectorization (fast)
 arr = np.arange(1000000)
-result = arr ** 2
+result = arr**2
 ```
 
 **Related:** ufunc, broadcasting, ndarray

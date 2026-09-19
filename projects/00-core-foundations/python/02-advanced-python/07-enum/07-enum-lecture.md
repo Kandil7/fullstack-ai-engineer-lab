@@ -30,19 +30,21 @@ By the end of this lecture, you will be able to:
 ```python
 from enum import Enum
 
+
 class Color(Enum):
     RED = 1
     GREEN = 2
     BLUE = 3
 
+
 # Access members
-print(Color.RED)           # Color.RED
-print(Color.RED.name)      # "RED"
-print(Color.RED.value)     # 1
+print(Color.RED)  # Color.RED
+print(Color.RED.name)  # "RED"
+print(Color.RED.value)  # 1
 
 # Comparison
-print(Color.RED == Color.RED)    # True
-print(Color.RED == Color.BLUE)   # False
+print(Color.RED == Color.RED)  # True
+print(Color.RED == Color.BLUE)  # False
 
 # Membership check
 print(Color.RED in Color)  # True
@@ -53,11 +55,13 @@ print(Color.RED in Color)  # True
 ```python
 from enum import Enum
 
+
 class Direction(Enum):
     NORTH = "N"
     SOUTH = "S"
     EAST = "E"
     WEST = "W"
+
 
 # Iterate over members
 for direction in Direction:
@@ -67,7 +71,7 @@ for direction in Direction:
 print(Direction["NORTH"])  # Direction.NORTH
 
 # Get member by value
-print(Direction["N"])      # Direction.NORTH
+print(Direction["N"])  # Direction.NORTH
 
 # List all members
 print(list(Direction))
@@ -83,17 +87,20 @@ print(list(Direction))
 ```python
 from enum import IntEnum
 
+
 class Priority(IntEnum):
     LOW = 1
     MEDIUM = 2
     HIGH = 3
     CRITICAL = 4
 
+
 # Can be used as integers
-print(Priority.HIGH > Priority.LOW)   # True
-print(Priority.HIGH + 10)             # 13
+print(Priority.HIGH > Priority.LOW)  # True
+print(Priority.HIGH + 10)  # 13
 print(sorted([Priority.CRITICAL, Priority.LOW]))
 # [Priority.LOW, Priority.CRITICAL]
+
 
 # Useful for comparisons
 def process(priority: int) -> str:
@@ -101,8 +108,9 @@ def process(priority: int) -> str:
         return "Urgent"
     return "Normal"
 
+
 print(process(Priority.CRITICAL))  # "Urgent"
-print(process(Priority.LOW))       # "Normal"
+print(process(Priority.LOW))  # "Normal"
 ```
 
 ### `StrEnum` — String Enums (Python 3.11+)
@@ -130,23 +138,26 @@ print(json.dumps({"status": HttpStatus.OK}))
 ```python
 from enum import Flag, IntFlag
 
+
 class Permission(Flag):
     READ = 1
     WRITE = 2
     EXECUTE = 4
     ALL = READ | WRITE | EXECUTE
 
+
 # Bitwise operations
 read_write = Permission.READ | Permission.WRITE
 print(read_write)  # Permission.READ|WRITE
 
 # Check membership
-print(Permission.READ in read_write)   # True
+print(Permission.READ in read_write)  # True
 print(Permission.EXECUTE in read_write)  # False
 
 # Iteration over combined flags
 for perm in read_write:
     print(perm.name)  # "READ", "WRITE"
+
 
 # IntFlag allows integer operations
 class FileMode(IntFlag):
@@ -154,6 +165,7 @@ class FileMode(IntFlag):
     OWNER_WRITE = 0o200
     GROUP_READ = 0o040
     OTHER_READ = 0o004
+
 
 mode = FileMode.OWNER_READ | FileMode.OWNER_WRITE
 print(oct(mode))  # 0o600
@@ -166,23 +178,27 @@ print(oct(mode))  # 0o600
 ```python
 from enum import Enum, auto
 
+
 class Status(Enum):
-    PENDING = auto()    # 1
-    RUNNING = auto()    # 2
+    PENDING = auto()  # 1
+    RUNNING = auto()  # 2
     COMPLETED = auto()  # 3
-    FAILED = auto()     # 4
+    FAILED = auto()  # 4
+
 
 print(Status.PENDING.value)  # 1
 print(Status.RUNNING.value)  # 2
+
 
 # Custom auto with __init__
 class Color(Enum):
     def __init__(self, rgb):
         self.rgb = rgb
-    
+
     RED = auto(), (255, 0, 0)
     GREEN = auto(), (0, 255, 0)
     BLUE = auto(), (0, 0, 255)
+
 
 print(Color.RED.rgb)  # (255, 0, 0)
 print(Color.RED.value)  # 1 (auto-assigned)
@@ -196,35 +212,33 @@ print(Color.RED.value)  # 1 (auto-assigned)
 from enum import Enum
 import math
 
+
 class Shape(Enum):
     CIRCLE = "circle"
     SQUARE = "square"
     TRIANGLE = "triangle"
-    
+
     def area(self, *dimensions):
         if self == Shape.CIRCLE:
             radius = dimensions[0]
-            return math.pi * radius ** 2
+            return math.pi * radius**2
         elif self == Shape.SQUARE:
             side = dimensions[0]
-            return side ** 2
+            return side**2
         elif self == Shape.TRIANGLE:
             base, height = dimensions
             return 0.5 * base * height
-    
+
     @property
     def emoji(self):
-        emojis = {
-            "circle": "⭕",
-            "square": "⬜",
-            "triangle": "🔺"
-        }
+        emojis = {"circle": "⭕", "square": "⬜", "triangle": "🔺"}
         return emojis[self.value]
 
+
 # Usage
-print(Shape.CIRCLE.area(5))       # 78.54
-print(Shape.SQUARE.area(4))       # 16.0
-print(Shape.CIRCLE.emoji)         # "⭕"
+print(Shape.CIRCLE.area(5))  # 78.54
+print(Shape.SQUARE.area(4))  # 16.0
+print(Shape.CIRCLE.emoji)  # "⭕"
 ```
 
 ### Functional API
@@ -250,6 +264,7 @@ print(Animal.CAT.value)  # "meow"
 ```python
 from enum import Enum, auto
 
+
 class OrderState(Enum):
     CREATED = auto()
     PAYMENT_PENDING = auto()
@@ -258,11 +273,11 @@ class OrderState(Enum):
     SHIPPED = auto()
     DELIVERED = auto()
     CANCELLED = auto()
-    
+
     @property
     def is_terminal(self):
         return self in (OrderState.DELIVERED, OrderState.CANCELLED)
-    
+
     @property
     def can_transition_to(self):
         transitions = {
@@ -276,16 +291,16 @@ class OrderState(Enum):
         }
         return transitions.get(self, [])
 
+
 class Order:
     def __init__(self):
         self.state = OrderState.CREATED
-    
+
     def transition(self, new_state):
         if new_state not in self.state.can_transition_to:
-            raise ValueError(
-                f"Cannot transition from {self.state} to {new_state}"
-            )
+            raise ValueError(f"Cannot transition from {self.state} to {new_state}")
         self.state = new_state
+
 
 # Usage
 order = Order()
@@ -303,12 +318,14 @@ print(order.state)  # OrderState.PROCESSING
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
+
 class LogLevel(Enum):
     DEBUG = auto()
     INFO = auto()
     WARNING = auto()
     ERROR = auto()
     CRITICAL = auto()
+
 
 @dataclass
 class LogEntry:
@@ -317,24 +334,22 @@ class LogEntry:
     timestamp: str = ""
     metadata: dict = field(default_factory=dict)
 
+
 @dataclass
 class Logger:
     name: str
     min_level: LogLevel = LogLevel.INFO
     entries: list[LogEntry] = field(default_factory=list)
-    
+
     def log(self, level: LogLevel, message: str, **metadata):
         if level.value >= self.min_level.value:
-            entry = LogEntry(
-                message=message,
-                level=level,
-                metadata=metadata
-            )
+            entry = LogEntry(message=message, level=level, metadata=metadata)
             self.entries.append(entry)
+
 
 # Usage
 logger = Logger("app", min_level=LogLevel.WARNING)
-logger.log(LogLevel.DEBUG, "Debug message")    # Ignored
+logger.log(LogLevel.DEBUG, "Debug message")  # Ignored
 logger.log(LogLevel.WARNING, "Something happened")
 logger.log(LogLevel.ERROR, "Critical failure")
 
@@ -353,6 +368,7 @@ for entry in logger.entries:
 ```python
 from enum import Enum, auto
 
+
 class ModelType(Enum):
     TRANSFORMER = auto()
     CNN = auto()
@@ -360,12 +376,14 @@ class ModelType(Enum):
     GAN = auto()
     VAE = auto()
 
+
 class TaskType(Enum):
     CLASSIFICATION = auto()
     REGRESSION = auto()
     GENERATION = auto()
     EXTRACTION = auto()
     TRANSLATION = auto()
+
 
 class TrainingStatus(Enum):
     NOT_STARTED = auto()
@@ -375,12 +393,13 @@ class TrainingStatus(Enum):
     EVALUATING = auto()
     COMPLETED = auto()
     FAILED = auto()
-    
+
     @property
     def progress_percentage(self):
         stages = list(TrainingStatus)
         index = stages.index(self)
         return int((index / (len(stages) - 1)) * 100)
+
 
 @dataclass
 class ModelConfig:
@@ -388,19 +407,20 @@ class ModelConfig:
     task: TaskType
     status: TrainingStatus = TrainingStatus.NOT_STARTED
     hyperparameters: dict = field(default_factory=dict)
-    
+
     def start_training(self):
         self.status = TrainingStatus.LOADING_DATA
-    
+
     def update_status(self, new_status: TrainingStatus):
         print(f"Status: {self.status.name} -> {new_status.name}")
         self.status = new_status
+
 
 # Usage
 config = ModelConfig(
     model_type=ModelType.TRANSFORMER,
     task=TaskType.GENERATION,
-    hyperparameters={"lr": 0.001, "epochs": 100}
+    hyperparameters={"lr": 0.001, "epochs": 100},
 )
 
 config.start_training()
@@ -413,6 +433,7 @@ print(f"Progress: {config.status.progress_percentage}%")
 ```python
 from enum import IntEnum
 
+
 class APIStatus(IntEnum):
     SUCCESS = 200
     CREATED = 201
@@ -422,23 +443,25 @@ class APIStatus(IntEnum):
     RATE_LIMITED = 429
     SERVER_ERROR = 500
 
+
 @dataclass
 class APIResponse:
     status: APIStatus
     data: Any = None
     error: Optional[str] = None
-    
+
     @property
     def is_success(self):
         return 200 <= self.status < 300
-    
+
     @property
     def is_client_error(self):
         return 400 <= self.status < 500
-    
+
     @property
     def is_server_error(self):
         return 500 <= self.status < 600
+
 
 # Usage
 response = APIResponse(status=APIStatus.SUCCESS, data={"users": []})
@@ -453,14 +476,16 @@ print(f"Status code: {response.status.value}")  # 200
 ```python
 from enum import Enum
 
+
 class Color(Enum):
     RED = 1
     GREEN = 2
     BLUE = 3
 
+
 # Enum to value
 value = Color.RED.value  # 1
-name = Color.RED.name    # "RED"
+name = Color.RED.name  # "RED"
 
 # Value to Enum
 color = Color(1)  # Color.RED
@@ -477,15 +502,18 @@ print(values)  # [1, 2, 3]
 # JSON serialization
 import json
 
+
 class Status(Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
+
 
 # Custom serializer
 def enum_serializer(obj):
     if isinstance(obj, Enum):
         return obj.value
     raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
 
 print(json.dumps({"status": Status.ACTIVE}, default=enum_serializer))
 # {"status": "active"}
@@ -564,6 +592,7 @@ class PipelineStage(Enum):
     TRANSFORM = auto()
     LOAD = auto()
     VALIDATE = auto()
+
 
 class PipelineStatus(Enum):
     PENDING = auto()

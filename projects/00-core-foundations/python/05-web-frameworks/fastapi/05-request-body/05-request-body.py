@@ -18,6 +18,7 @@ app = FastAPI(title="Request Body in FastAPI")
 # ----- Pydantic Models -----
 class UserCreate(BaseModel):
     """Model for creating a new user."""
+
     name: str = Field(..., min_length=1, max_length=100, description="User's full name")
     email: str = Field(..., description="User's email address")
     age: int = Field(..., ge=0, le=150, description="User's age")
@@ -27,6 +28,7 @@ class UserCreate(BaseModel):
 
 class UserUpdate(BaseModel):
     """Model for updating a user (all fields optional)."""
+
     name: str | None = Field(default=None, min_length=1, max_length=100)
     email: str | None = None
     age: int | None = Field(default=None, ge=0, le=150)
@@ -36,6 +38,7 @@ class UserUpdate(BaseModel):
 
 class UserResponse(BaseModel):
     """Model for user response (includes generated fields)."""
+
     id: int
     name: str
     email: str
@@ -61,6 +64,7 @@ class OrderItem(BaseModel):
 
 class Order(BaseModel):
     """Nested Pydantic model for complex request bodies."""
+
     customer_name: str
     items: list[OrderItem]
     shipping_address: Address
@@ -173,6 +177,7 @@ def batch_create(
 # ----- Request body with field examples -----
 class ProductCreate(BaseModel):
     """Product with field examples for better docs."""
+
     name: str = Field(..., examples=["Wireless Mouse"])
     description: str = Field(default="", examples=["Ergonomic wireless mouse with USB receiver"])
     price: float = Field(..., gt=0, examples=[29.99])
@@ -201,6 +206,7 @@ Testing with curl:
 
     curl -X POST http://127.0.0.1:8000/batch-create -H "Content-Type: application/json" -d '[{"name": "User1", "email": "u1@test.com", "age": 20}, {"name": "User2", "email": "u2@test.com", "age": 25}]'
 """
+
 
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
@@ -243,8 +249,10 @@ def _verify():
             "customer_name": "Bob",
             "items": [{"product_name": "Keyboard", "quantity": 2, "unit_price": 79.99}],
             "shipping_address": {
-                "street": "123 Main St", "city": "Springfield",
-                "state": "IL", "zip_code": "62701",
+                "street": "123 Main St",
+                "city": "Springfield",
+                "state": "IL",
+                "zip_code": "62701",
             },
         },
     )
@@ -273,6 +281,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

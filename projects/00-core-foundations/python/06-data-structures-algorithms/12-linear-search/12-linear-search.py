@@ -17,12 +17,14 @@ When to use:
 # 1. BASIC LINEAR SEARCH
 # =============================================================================
 
+
 def linear_search(arr, target):
     """Search for target in array. Returns index or -1."""
     for i in range(len(arr)):
         if arr[i] == target:
             return i
     return -1
+
 
 print("=== Basic Linear Search ===")
 arr = [10, 23, 45, 70, 11, 15]
@@ -40,6 +42,7 @@ print(f"Search {target}: index {result}")
 # 2. SENTINEL LINEAR SEARCH
 # =============================================================================
 
+
 def sentinel_search(arr, target):
     """Linear search with sentinel - eliminates boundary check"""
     n = len(arr)
@@ -56,6 +59,7 @@ def sentinel_search(arr, target):
         return i
     return -1
 
+
 print("\n=== Sentinel Search ===")
 arr = [10, 23, 45, 70, 11, 15]
 target = 70
@@ -67,6 +71,7 @@ print(f"Sentinel search {target}: index {result}")
 # 3. SEARCH IN SORTED ARRAY (LINEAR)
 # =============================================================================
 
+
 def linear_search_sorted(arr, target):
     """Optimized for sorted arrays - stop early"""
     for i in range(len(arr)):
@@ -75,6 +80,7 @@ def linear_search_sorted(arr, target):
         if arr[i] > target:
             return -1  # Not found, passed target
     return -1
+
 
 print("\n=== Linear Search in Sorted Array ===")
 sorted_arr = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]
@@ -86,6 +92,7 @@ print(f"Search 10: {linear_search_sorted(sorted_arr, 10)}")
 # 4. FIND MIN AND MAX
 # =============================================================================
 
+
 def find_min(arr):
     """Find minimum using linear search. O(n)"""
     if not arr:
@@ -96,6 +103,7 @@ def find_min(arr):
             min_val = val
     return min_val
 
+
 def find_max(arr):
     """Find maximum using linear search. O(n)"""
     if not arr:
@@ -105,6 +113,7 @@ def find_max(arr):
         if val > max_val:
             max_val = val
     return max_val
+
 
 def find_min_max(arr):
     """Find both min and max in single pass. O(n)"""
@@ -128,6 +137,7 @@ def find_min_max(arr):
 
     return min_val, max_val
 
+
 print("\n=== Find Min and Max ===")
 arr = [38, 27, 43, 3, 9, 82, 10]
 print(f"Array: {arr}")
@@ -141,6 +151,7 @@ print(f"Min-Max (single pass): {min_val}, {max_val}")
 # 5. SEARCH FOR MULTIPLE OCCURRENCES
 # =============================================================================
 
+
 def find_all_occurrences(arr, target):
     """Find all indices of target. O(n)"""
     indices = []
@@ -149,6 +160,7 @@ def find_all_occurrences(arr, target):
             indices.append(i)
     return indices
 
+
 def count_occurrences(arr, target):
     """Count occurrences of target. O(n)"""
     count = 0
@@ -156,6 +168,7 @@ def count_occurrences(arr, target):
         if val == target:
             count += 1
     return count
+
 
 print("\n=== Multiple Occurrences ===")
 arr = [1, 3, 5, 3, 7, 3, 9, 3]
@@ -168,6 +181,7 @@ print(f"Count of 3: {count_occurrences(arr, 3)}")
 # 6. SEARCH IN 2D ARRAY
 # =============================================================================
 
+
 def search_2d(matrix, target):
     """Search in 2D array. O(m*n)"""
     for i in range(len(matrix)):
@@ -175,6 +189,7 @@ def search_2d(matrix, target):
             if matrix[i][j] == target:
                 return (i, j)
     return None
+
 
 def search_2d_sorted(matrix, target):
     """Search in row-sorted 2D array. O(m + n)"""
@@ -194,13 +209,9 @@ def search_2d_sorted(matrix, target):
 
     return None
 
+
 print("\n=== Search in 2D Array ===")
-matrix = [
-    [10, 20, 30, 40],
-    [15, 25, 35, 45],
-    [27, 29, 37, 48],
-    [32, 33, 39, 50]
-]
+matrix = [[10, 20, 30, 40], [15, 25, 35, 45], [27, 29, 37, 48], [32, 33, 39, 50]]
 print(f"Matrix:")
 for row in matrix:
     print(f"  {row}")
@@ -214,22 +225,25 @@ print(f"Search {target} (sorted): {search_2d_sorted(matrix, target)}")
 # 7. SEARCH STRING IN TEXT
 # =============================================================================
 
+
 def find_substring(text, pattern):
     """Find first occurrence of pattern in text. O(n*m)"""
     n, m = len(text), len(pattern)
     for i in range(n - m + 1):
-        if text[i:i + m] == pattern:
+        if text[i : i + m] == pattern:
             return i
     return -1
+
 
 def find_all_substrings(text, pattern):
     """Find all occurrences of pattern. O(n*m)"""
     indices = []
     n, m = len(text), len(pattern)
     for i in range(n - m + 1):
-        if text[i:i + m] == pattern:
+        if text[i : i + m] == pattern:
             indices.append(i)
     return indices
+
 
 print("\n=== String Search ===")
 text = "ababcabcababc"
@@ -243,6 +257,7 @@ print(f"All occurrences: {find_all_substrings(text, pattern)}")
 # =============================================================================
 # 8. INTERPOLATION SEARCH
 # =============================================================================
+
 
 def interpolation_search(arr, target):
     """Improved linear search for uniformly distributed data. O(log log n) avg"""
@@ -264,6 +279,7 @@ def interpolation_search(arr, target):
 
     return -1
 
+
 print("\n=== Interpolation Search ===")
 uniform_arr = [10, 12, 13, 16, 18, 19, 20, 21, 22, 23, 24, 33, 35, 42, 47]
 print(f"Uniform array: {uniform_arr}")
@@ -274,6 +290,7 @@ print(f"Search 33: {interpolation_search(uniform_arr, 33)}")
 # =============================================================================
 # 9. TERNARY SEARCH
 # =============================================================================
+
 
 def ternary_search(arr, target):
     """Divide array into 3 parts. O(log3 n)"""
@@ -298,6 +315,7 @@ def ternary_search(arr, target):
 
     return -1
 
+
 print("\n=== Ternary Search ===")
 sorted_data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 print(f"Search 7: {ternary_search(sorted_data, 7)}")
@@ -307,6 +325,7 @@ print(f"Search 12: {ternary_search(sorted_data, 12)}")
 # =============================================================================
 # 10. COMPARISON OF SEARCH ALGORITHMS
 # =============================================================================
+
 
 def compare_searches():
     """Compare performance of different search algorithms"""
@@ -349,7 +368,10 @@ def compare_searches():
                     high = mid - 1
         binary_time = (time.time() - start) / 1000
 
-        print(f"{size:<10} {linear_time*1000:<12.4f} {sentinel_time*1000:<12.4f} {binary_time*1000:<12.4f}")
+        print(
+            f"{size:<10} {linear_time * 1000:<12.4f} {sentinel_time * 1000:<12.4f} {binary_time * 1000:<12.4f}"
+        )
+
 
 compare_searches()
 
@@ -359,6 +381,7 @@ compare_searches()
 # =============================================================================
 
 print("\n=== Practical Applications ===")
+
 
 # Find duplicate
 def find_duplicates(arr):
@@ -371,21 +394,25 @@ def find_duplicates(arr):
         seen.add(val)
     return list(duplicates)
 
+
 # Find missing number
 def find_missing(arr, n):
     """Find missing number in 1..n. O(n)"""
     total = n * (n + 1) // 2
     return total - sum(arr)
 
+
 # First non-repeating
 def first_non_repeating(arr):
     """Find first non-repeating element. O(n)"""
     from collections import Counter
+
     count = Counter(arr)
     for val in arr:
         if count[val] == 1:
             return val
     return None
+
 
 arr = [1, 2, 3, 2, 4, 3, 5]
 print(f"Duplicates in {arr}: {find_duplicates(arr)}")

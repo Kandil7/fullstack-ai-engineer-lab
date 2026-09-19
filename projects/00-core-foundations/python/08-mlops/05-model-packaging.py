@@ -32,6 +32,7 @@ from typing import Any
 # ============================================================
 # Ship more than the weights: model + format + schema + env + version.
 
+
 @dataclass
 class ModelArtifact:
     model: Any
@@ -73,12 +74,15 @@ print("Example 1: pickle round-trip")
 print(f"  predict(3) = {loaded.predict(3)}")
 assert loaded.predict(3) == 7.0
 
+
 # Example 2: pickle executes arbitrary code on load (the supply-chain risk).
 class _Exploit:
     def __reduce__(self):
         # Would run any command on unpickle - this one only prints.
         import builtins
+
         return (builtins.print, ("  [REDACTED] pickle would run arbitrary code!",))
+
 
 malicious = pickle.dumps(_Exploit())
 print("\nExample 2: why pickle is risky")
@@ -91,8 +95,10 @@ print("  -> never unpickle untrusted artifacts")
 # ============================================================
 # For small models / configs, JSON is portable and safe to load.
 
+
 def model_to_json(model: _Model) -> str:
     return json.dumps({"w": model.w, "b": model.b, "class": "linear"})
+
 
 def model_from_json(blob: str) -> _Model:
     data = json.loads(blob)
@@ -111,9 +117,11 @@ assert rebuilt.predict(3) == 7.0
 # An artifact without its environment is a time bomb: numpy 1.x vs 2.x
 # can silently change model behavior.
 
+
 def pin_environment() -> dict[str, str]:
     import platform
     import numpy
+
     return {
         "python": platform.python_version(),
         "numpy": numpy.__version__,
@@ -125,6 +133,7 @@ env = pin_environment()
 print(f"  {env}")
 assert "python" in env and "numpy" in env
 
+
 # ============================================================
 # Production Pattern
 # ============================================================
@@ -132,6 +141,7 @@ def build_artifact(model: _Model, out_dir: Path) -> Path:
     """Write a safe JSON artifact plus a manifest of its environment."""
     import platform
     import numpy
+
     out_dir.mkdir(parents=True, exist_ok=True)
     manifest = {
         "model": model_to_json(model),

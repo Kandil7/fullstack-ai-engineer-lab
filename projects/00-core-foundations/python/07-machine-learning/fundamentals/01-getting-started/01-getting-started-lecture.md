@@ -156,7 +156,7 @@ print(f"y range: {y.min():.2f} to {y.max():.2f}")
 ml_types = {
     "Supervised Learning": "Learns from labeled data (classification, regression)",
     "Unsupervised Learning": "Finds patterns in unlabeled data (clustering, dimensionality reduction)",
-    "Reinforcement Learning": "Learns through trial and error with rewards"
+    "Reinforcement Learning": "Learns through trial and error with rewards",
 }
 
 for ml_type, description in ml_types.items():
@@ -172,7 +172,7 @@ from sklearn import datasets
 iris = datasets.load_iris()
 
 print(f"Dataset shape: {iris.data.shape}")  # (150, 4) — 150 samples, 4 features
-print(f"Features: {iris.feature_names}")     # sepal length, sepal width, etc.
+print(f"Features: {iris.feature_names}")  # sepal length, sepal width, etc.
 print(f"Target classes: {list(iris.target_names)}")  # setosa, versicolor, virginica
 
 # Explore the data
@@ -218,13 +218,13 @@ print(f"Model accuracy: {accuracy:.2%}")
 ```python
 from sklearn.preprocessing import LabelEncoder
 
-categories = np.array(['cat', 'dog', 'bird', 'cat', 'dog'])
+categories = np.array(["cat", "dog", "bird", "cat", "dog"])
 le = LabelEncoder()
 encoded = le.fit_transform(categories)
 
 print(f"Original: {categories}")
-print(f"Encoded: {encoded}")          # [0, 1, 2, 0, 1]
-print(f"Classes: {le.classes_}")      # ['bird', 'cat', 'dog']
+print(f"Encoded: {encoded}")  # [0, 1, 2, 0, 1]
+print(f"Classes: {le.classes_}")  # ['bird', 'cat', 'dog']
 ```
 
 **Explanation:**

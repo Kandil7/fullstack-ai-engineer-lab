@@ -54,9 +54,9 @@ print(f"corpus: {vectors.shape}, truth: exact top-10 per query")
 # It keeps the exact mechanics: entry point, greedy descent, ef-controlled
 # candidate list.
 
+
 class HNSWLite:
-    def __init__(self, M: int = 8, ef_construction: int = 20,
-                 seed: int = 42) -> None:
+    def __init__(self, M: int = 8, ef_construction: int = 20, seed: int = 42) -> None:
         self._M = M
         self._ef = ef_construction
         self._vectors: np.ndarray | None = None
@@ -71,9 +71,9 @@ class HNSWLite:
         # connect to the nearest M existing points (greedy insert)
         dists = np.linalg.norm(self._vectors - vec, axis=1)
         nbrs = np.argsort(dists)[: self._M]
-        self._edges.append([])                     # room for the new node
+        self._edges.append([])  # room for the new node
         for n in nbrs:
-            self._edges[int(n)].append(idx)        # bidirectional edges
+            self._edges[int(n)].append(idx)  # bidirectional edges
             self._edges[idx].append(int(n))
         self._vectors = np.vstack([self._vectors, vec.reshape(1, -1)])
 
@@ -98,7 +98,7 @@ class HNSWLite:
                 visited.add(nbr)
                 nd = float(np.linalg.norm(self._vectors[nbr] - query))
                 heapq.heappush(candidates, (nd, nbr))
-            if len(visited) > 2 * ef_search:   # stop expanding beyond budget
+            if len(visited) > 2 * ef_search:  # stop expanding beyond budget
                 break
         ranked = sorted(visited, key=lambda i: dists[i])
         return ranked[:ef_search]
@@ -129,6 +129,7 @@ print(f"HNSW-lite  (M=2,  ef=10): recall@10 = {recall_low:.2f}  <- lower M hurts
 # cells only. nlist up = more cells (faster, needs more probes); nprobe
 # up = more cells checked (better recall, slower).
 
+
 class IVF:
     def __init__(self, nlist: int = 8, seed: int = 42) -> None:
         self._nlist = nlist
@@ -142,7 +143,7 @@ class IVF:
         n, d = data.shape
         idx = self._rng.choice(n, size=min(self._nlist, n), replace=False)
         centroids = data[idx].copy()
-        for _ in range(iters):                      # mini k-means
+        for _ in range(iters):  # mini k-means
             dists = np.linalg.norm(data[:, None, :] - centroids[None, :, :], axis=2)
             assign = np.argmin(dists, axis=1)
             for c in range(self._nlist):
@@ -152,8 +153,7 @@ class IVF:
         self._centroids = centroids
         dists = np.linalg.norm(data[:, None, :] - centroids[None, :, :], axis=2)
         assign = np.argmin(dists, axis=1)
-        self._postings = [[i for i in range(n) if assign[i] == c]
-                          for c in range(self._nlist)]
+        self._postings = [[i for i in range(n) if assign[i] == c] for c in range(self._nlist)]
 
     def search(self, query: np.ndarray, nprobe: int = 2, k: int = 10) -> list[int]:
         cdist = np.linalg.norm(self._centroids - query, axis=1)
@@ -182,11 +182,12 @@ print(f"IVF (nlist=8, nprobe=4): recall@10 = {ivf_4:.2f}  <- more probes help")
 # becomes m bytes — e.g. 12x compression. Query uses lookup tables
 # (ADC), never the original floats.
 
+
 class PQ:
     def __init__(self, m: int = 4, s: int = 16, seed: int = 42) -> None:
         self._m, self._s = m, s
         self._rng = np.random.default_rng(seed)
-        self._codebooks: list[np.ndarray] = []   # per subspace: (s, d/m)
+        self._codebooks: list[np.ndarray] = []  # per subspace: (s, d/m)
         self._codes: np.ndarray | None = None
 
     def build(self, data: np.ndarray, iters: int = 5) -> None:
@@ -195,7 +196,7 @@ class PQ:
         sub_d = d // self._m
         codes = np.zeros((n, self._m), dtype=np.uint8)
         for sub in range(self._m):
-            part = data[:, sub * sub_d:(sub + 1) * sub_d]
+            part = data[:, sub * sub_d : (sub + 1) * sub_d]
             idx = self._rng.choice(n, size=min(self._s, n), replace=False)
             cb = part[idx].copy()
             for _ in range(iters):
@@ -214,14 +215,13 @@ class PQ:
         d = 0.0
         sub_d = query.shape[0] // self._m
         for sub in range(self._m):
-            qpart = query[sub * sub_d:(sub + 1) * sub_d]
+            qpart = query[sub * sub_d : (sub + 1) * sub_d]
             cb = self._codebooks[sub]
             d += np.linalg.norm(qpart - cb[self._codes[idx, sub]]) ** 2
-        return d ** 0.5
+        return d**0.5
 
     def search(self, query: np.ndarray, k: int = 10) -> list[int]:
-        scored = sorted(range(len(self._codes)),
-                        key=lambda i: self.adc_distance(query, i))
+        scored = sorted(range(len(self._codes)), key=lambda i: self.adc_distance(query, i))
         return scored[:k]
 
 
@@ -240,10 +240,10 @@ print(f"\nPQ (m=4, s=16, 4x compression): recall@10 = {recall_at_k(pq_hits, trut
 # candidates. Simple, but bucket sizes explode in high dims — mostly
 # replaced by HNSW/IVF in practice.
 
+
 class LSH:
     def __init__(self, n_planes: int = 6, seed: int = 42) -> None:
-        self._planes = np.random.default_rng(seed).normal(
-            size=(n_planes, 16))
+        self._planes = np.random.default_rng(seed).normal(size=(n_planes, 16))
         self._buckets: dict[tuple, list[int]] = {}
 
     def _hash(self, v: np.ndarray) -> tuple:
@@ -257,7 +257,7 @@ class LSH:
         cands = self._buckets.get(self._hash(query), [])
         scored = sorted(cands, key=lambda i: l2_dist(query, self._vectors[i]))
         scored = scored[:k]
-        return scored + [-1] * (k - len(scored))   # pad, never ragged
+        return scored + [-1] * (k - len(scored))  # pad, never ragged
 
 
 lsh = LSH(n_planes=6)
@@ -275,6 +275,7 @@ print(f"LSH (6 planes):            recall@10 = {recall_at_k(lsh_hits, truth, 10)
 # Build cost grows with ef_construction; recall grows with ef_search;
 # memory grows with M. These are measured on the SAME corpus so the
 # deltas are attributable to the parameter.
+
 
 def build_time(index: object, data: np.ndarray) -> float:
     t0 = _time.perf_counter()
@@ -304,41 +305,38 @@ print("(wall-clock; the exact numbers vary per machine, the ORDER does not)")
 #   behavior changes with n (HNSW shines at scale; IVF needs enough
 #   points per cell).
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # HNSW: higher M/ef must beat lower M/ef on the same corpus
-    assert recall_hns > recall_low, \
-        "raising M and ef must improve recall"
+    assert recall_hns > recall_low, "raising M and ef must improve recall"
 
     # IVF: more probes must not reduce recall
     assert ivf_4 >= ivf_1, "nprobe=4 must match or beat nprobe=1"
 
     # PQ: compressed index still finds the true nearest neighbor often
-    assert recall_at_k(pq_hits, truth, 10) > 0.5, \
-        "PQ at 4x compression should keep majority recall"
+    assert recall_at_k(pq_hits, truth, 10) > 0.5, "PQ at 4x compression should keep majority recall"
 
     # LSH with few planes is weak (buckets are coarse)
-    assert recall_at_k(lsh_hits, truth, 10) < recall_hns, \
-        "HNSW must beat coarse LSH on this corpus"
+    assert recall_at_k(lsh_hits, truth, 10) < recall_hns, "HNSW must beat coarse LSH on this corpus"
 
     # parameter effect: heavier build config costs more time
-    assert slow_build > fast_build, \
-        "larger M and ef_construction must cost more build time"
+    assert slow_build > fast_build, "larger M and ef_construction must cost more build time"
 
     # all ANN hits are valid corpus indices
     for hit in hits:
-        assert all(0 <= i < len(vectors) for i in hit), \
-            "ANN must return valid corpus indices"
+        assert all(0 <= i < len(vectors) for i in hit), "ANN must return valid corpus indices"
 
     # HNSW with full ef_search converges to brute force on small data
     hns_full = HNSWLite(M=64, ef_construction=64)
     hns_full.build(vectors)
     full_hits = np.array([hns_full.search(q, ef_search=300)[:10] for q in queries])
-    assert recall_at_k(full_hits, truth, 10) >= 0.95, \
+    assert recall_at_k(full_hits, truth, 10) >= 0.95, (
         "generous HNSW params must approach exact recall on 300 vectors"
+    )
 
     print("[OK] 02-ann-algorithms: all checks passed")
 

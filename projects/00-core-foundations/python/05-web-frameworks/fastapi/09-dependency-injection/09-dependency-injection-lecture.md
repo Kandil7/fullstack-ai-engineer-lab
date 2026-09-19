@@ -34,6 +34,7 @@ Dependency Injection is a pattern where:
 ```python
 from fastapi import Depends
 
+
 def get_db():
     """This is a dependency — it produces a database session."""
     db = DatabaseSession()
@@ -41,6 +42,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 @app.get("/users/")
 def list_users(db: DatabaseSession = Depends(get_db)):
@@ -62,8 +64,10 @@ The `Depends()` function declares that a parameter should be populated by callin
 ```python
 from fastapi import Depends
 
+
 def get_common_query():
     return {"skip": 0, "limit": 10, "sort": "name"}
+
 
 @app.get("/items/")
 def list_items(common: dict = Depends(get_common_query)):
@@ -85,13 +89,16 @@ def get_pagination(skip: int = 0, limit: int = 10):
     """Reusable pagination dependency."""
     return {"skip": skip, "limit": limit}
 
+
 @app.get("/products/")
 def list_products(pagination: dict = Depends(get_pagination)):
     return {"pagination": pagination, "products": []}
 
+
 @app.get("/categories/")
 def list_categories(pagination: dict = Depends(get_pagination)):
     return {"pagination": pagination, "categories": []}
+
 
 # GET /products/?skip=5&limit=5
 # pagination = {"skip": 5, "limit": 5}
@@ -110,8 +117,9 @@ def get_db_session():
     finally:
         session.close()  # Cleanup after request
 
+
 @app.get("/users/")
-def list_users(db = Depends(get_db_session)):
+def list_users(db=Depends(get_db_session)):
     return db.query(User).all()
     # After response, session.close() is called automatically
 ```
@@ -134,15 +142,17 @@ def get_db_session():
     finally:
         session.close()
 
-def get_current_user(db = Depends(get_db_session)):
+
+def get_current_user(db=Depends(get_db_session)):
     """Depends on get_db_session — chained dependency."""
     user = db.query(User).first()
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return user
 
+
 @app.get("/my-profile/")
-def get_profile(user = Depends(get_current_user)):
+def get_profile(user=Depends(get_current_user)):
     # Chained: get_db_session → get_current_user → get_profile
     return {"username": user.username}
 ```
@@ -161,6 +171,7 @@ def verify_token(authorization: str = Header(...)):
         raise HTTPException(status_code=401, detail="Invalid token")
     return token
 
+
 @app.get("/protected/")
 def protected_endpoint(token: str = Depends(verify_token)):
     return {"message": "Access granted", "token": token[:10] + "..."}
@@ -177,6 +188,7 @@ class QueryParams:
         self.page = max(1, page)
         self.per_page = min(max(1, per_page), 100)
         self.offset = (self.page - 1) * self.per_page
+
 
 @app.get("/search/")
 def search(params: QueryParams = Depends()):
@@ -199,9 +211,11 @@ def get_db():
     finally:
         session.close()
 
+
 def fake_get_db():
     """Fake DB for testing — no real database needed."""
     return {"connected": True, "test": True}
+
 
 # In tests:
 # app.dependency_overrides[get_db] = fake_get_db
@@ -216,6 +230,7 @@ def verify_api_key(x_api_key: str = Header(...)):
     if x_api_key != "my-secret-key":
         raise HTTPException(status_code=403, detail="Invalid API key")
     return x_api_key
+
 
 @app.get("/admin/stats/")
 def admin_stats(
@@ -241,8 +256,10 @@ from fastapi import FastAPI, Depends
 
 app = FastAPI()
 
+
 def get_common_query():
     return {"skip": 0, "limit": 10, "sort": "name"}
+
 
 @app.get("/items/")
 def list_items(common: dict = Depends(get_common_query)):
@@ -255,9 +272,11 @@ def list_items(common: dict = Depends(get_common_query)):
 def get_pagination(skip: int = 0, limit: int = 10):
     return {"skip": skip, "limit": limit}
 
+
 @app.get("/products/")
 def list_products(pagination: dict = Depends(get_pagination)):
     return {"pagination": pagination, "products": []}
+
 
 @app.get("/categories/")
 def list_categories(pagination: dict = Depends(get_pagination)):
@@ -269,6 +288,7 @@ def list_categories(pagination: dict = Depends(get_pagination)):
 ```python
 from datetime import datetime
 
+
 def get_db_session():
     """Simulated database session with lifecycle."""
     session = {"connected": True, "created_at": datetime.now().isoformat()}
@@ -276,6 +296,7 @@ def get_db_session():
         yield session  # Available during request
     finally:
         session["connected"] = False  # Cleanup
+
 
 @app.get("/my-profile/")
 def get_profile(db: dict = Depends(get_db_session)):
@@ -287,6 +308,7 @@ def get_profile(db: dict = Depends(get_db_session)):
 ```python
 from fastapi import Header
 
+
 def verify_token(authorization: str = Header(...)):
     if not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Invalid header")
@@ -295,9 +317,11 @@ def verify_token(authorization: str = Header(...)):
         raise HTTPException(status_code=401, detail="Invalid token")
     return token
 
+
 @app.get("/protected/")
 def protected(token: str = Depends(verify_token)):
     return {"message": "Access granted", "token": token[:10] + "..."}
+
 
 # Test:
 # curl -H "Authorization: Bearer valid-token-123" http://localhost:8000/protected/
@@ -313,6 +337,7 @@ class QueryParams:
         self.per_page = min(max(1, per_page), 100)
         self.offset = (self.page - 1) * self.per_page
 
+
 @app.get("/search/")
 def search(params: QueryParams = Depends()):
     return {"query": params.q, "page": params.page, "offset": params.offset}
@@ -326,6 +351,7 @@ def verify_api_key(x_api_key: str = Header(...)):
         raise HTTPException(status_code=403, detail="Invalid API key")
     return x_api_key
 
+
 @app.get("/admin/stats/")
 def admin_stats(
     token: str = Depends(verify_token),
@@ -333,6 +359,7 @@ def admin_stats(
     db: dict = Depends(get_db_session),
 ):
     return {"authorized": True, "db_connected": db["connected"]}
+
 
 # Test:
 # curl -H "Authorization: Bearer valid-token-123" \
@@ -351,6 +378,7 @@ def get_db():
     session = create_session()
     return session  # Never closed!
 
+
 # Fix: Use yield for automatic cleanup
 def get_db():
     session = create_session()
@@ -364,13 +392,12 @@ def get_db():
 ```python
 # Wrong: This is just a regular parameter, not a dependency
 @app.get("/items/")
-def list_items(db: dict = get_db()):
-    ...
+def list_items(db: dict = get_db()): ...
+
 
 # Fix: Wrap in Depends()
 @app.get("/items/")
-def list_items(db: dict = Depends(get_db)):
-    ...
+def list_items(db: dict = Depends(get_db)): ...
 ```
 
 ### Mistake 3: Doing too much in a dependency
@@ -381,12 +408,14 @@ def get_user_data():
     orders = get_orders(user.id)
     return {"user": user, "orders": orders}
 
+
 # Fix: Keep dependencies focused
 def get_current_user():
     return authenticate_user()
 
+
 @app.get("/profile/")
-def get_profile(user = Depends(get_current_user)):
+def get_profile(user=Depends(get_current_user)):
     # Business logic in the endpoint
     orders = get_orders(user.id)
     return {"user": user, "orders": orders}
@@ -398,6 +427,7 @@ def get_profile(user = Depends(get_current_user)):
 def test_get_users():
     response = client.get("/users/")
     assert response.status_code == 200
+
 
 # Fix: Override dependencies in tests
 def test_get_users():
@@ -465,13 +495,16 @@ from fastapi import FastAPI, Depends, Header
 
 app = FastAPI()
 
+
 # Simple dependency
 def get_settings():
     return {"debug": True}
 
+
 @app.get("/settings/")
 def read_settings(settings: dict = Depends(get_settings)):
     return settings
+
 
 # Yield dependency (lifecycle)
 def get_db():
@@ -481,6 +514,7 @@ def get_db():
     finally:
         db.close()
 
+
 # Auth dependency
 def verify_token(authorization: str = Header(...)):
     token = authorization.replace("Bearer ", "")
@@ -488,15 +522,17 @@ def verify_token(authorization: str = Header(...)):
         raise HTTPException(401, "Invalid token")
     return token
 
+
 @app.get("/protected/")
 def protected(token: str = Depends(verify_token)):
     return {"message": "OK"}
+
 
 # Multiple dependencies
 @app.get("/admin/")
 def admin(
     token: str = Depends(verify_token),
-    db = Depends(get_db),
+    db=Depends(get_db),
 ):
     return {"admin": True}
 ```

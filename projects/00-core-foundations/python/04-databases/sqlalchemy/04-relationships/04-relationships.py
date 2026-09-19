@@ -77,9 +77,7 @@ class Book(Base):
     author: Mapped[Author | None] = relationship(back_populates="books")
     # String annotation "Tag" resolves when the mapper is configured,
     # by which time Tag below already exists.
-    tags: Mapped[list["Tag"]] = relationship(
-        secondary=book_tag, back_populates="books"
-    )
+    tags: Mapped[list["Tag"]] = relationship(secondary=book_tag, back_populates="books")
 
 
 # Tag is declared HERE (before the first create_all) because the
@@ -91,9 +89,7 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     label: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
 
-    books: Mapped[list[Book]] = relationship(
-        secondary=book_tag, back_populates="tags"
-    )
+    books: Mapped[list[Book]] = relationship(secondary=book_tag, back_populates="tags")
 
 
 Base.metadata.create_all(engine)
@@ -152,9 +148,7 @@ with Session(bind=engine) as session:
 with Session(bind=engine) as session:
     fantasy = Tag(label="fantasy")
     classic = Tag(label="classic")
-    hobbit = session.scalars(
-        select(Book).where(Book.title == "The Hobbit")
-    ).one()
+    hobbit = session.scalars(select(Book).where(Book.title == "The Hobbit")).one()
     hobbit.tags.extend([fantasy, classic])
     session.add_all([fantasy, classic])
     session.commit()
@@ -177,14 +171,13 @@ with Session(bind=engine) as session:
 # A node pointing at a parent node of the same type. Used for prompt
 # template inheritance, dataset hierarchies, org charts.
 
+
 class PromptTemplate(Base):
     __tablename__ = "prompt_templates"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(80), nullable=False)
-    parent_id: Mapped[int | None] = mapped_column(
-        ForeignKey("prompt_templates.id")
-    )
+    parent_id: Mapped[int | None] = mapped_column(ForeignKey("prompt_templates.id"))
 
     children: Mapped[list["PromptTemplate"]] = relationship(
         back_populates="parent", cascade="all, delete-orphan"
@@ -207,9 +200,7 @@ with Session(bind=engine) as session:
     session.add_all([base, en, de])
     session.commit()
 
-    root = session.scalars(
-        select(PromptTemplate).where(PromptTemplate.name == "base-rag")
-    ).one()
+    root = session.scalars(select(PromptTemplate).where(PromptTemplate.name == "base-rag")).one()
     print(f"root '{root.name}' children: {sorted(c.name for c in root.children)}")
 
 # Output:
@@ -243,6 +234,7 @@ with Session(bind=engine) as session:
 # One add() persists the whole graph thanks to the unit of work:
 # author -> books -> tags all inserted in the correct dependency order.
 
+
 def create_review_graph(
     title: str, tags: list[str], author_name: str = "Review Bot"
 ) -> tuple[int, list[int]]:
@@ -252,16 +244,12 @@ def create_review_graph(
     write must always satisfy every FK that the schema declares.
     """
     with Session(bind=engine) as session:
-        author = session.scalars(
-            select(Author).where(Author.name == author_name)
-        ).first()
+        author = session.scalars(select(Author).where(Author.name == author_name)).first()
         if author is None:
             author = Author(name=author_name)
         book = Book(title=title, author=author)
         for label in tags:
-            existing = session.scalars(
-                select(Tag).where(Tag.label == label)
-            ).first()
+            existing = session.scalars(select(Tag).where(Tag.label == label)).first()
             book.tags.append(existing if existing else Tag(label=label))
         session.add(book)
         session.commit()
@@ -272,13 +260,11 @@ def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # 1. Relationship navigation works both directions
     with Session(bind=engine) as session:
-        hobbit = session.scalars(
-            select(Book).where(Book.title == "The Hobbit")
-        ).one()
-        assert hobbit.author.name == "J.R.R. Tolkien", \
-            "child -> parent navigation must work"
-        assert "The Hobbit" in [b.title for b in hobbit.author.books], \
+        hobbit = session.scalars(select(Book).where(Book.title == "The Hobbit")).one()
+        assert hobbit.author.name == "J.R.R. Tolkien", "child -> parent navigation must work"
+        assert "The Hobbit" in [b.title for b in hobbit.author.books], (
             "parent -> children navigation must work"
+        )
 
     # 2. Many-to-many association rows exist after graph insert
     #    (checked BEFORE the cascade delete below removes them)
@@ -288,22 +274,16 @@ def _verify() -> None:
 
     # 3. Tag navigation back to books works
     with Session(bind=engine) as session:
-        fantasy = session.scalars(
-            select(Tag).where(Tag.label == "fantasy")
-        ).one()
+        fantasy = session.scalars(select(Tag).where(Tag.label == "fantasy")).one()
         titles = [b.title for b in fantasy.books]
         assert "The Hobbit" in titles, "many-to-many reverse navigation must work"
 
     # 4. Cascade delete removes children rows (no orphans left behind)
     with Session(bind=engine) as session:
-        tolkien = session.scalars(
-            select(Author).where(Author.name == "J.R.R. Tolkien")
-        ).one()
+        tolkien = session.scalars(select(Author).where(Author.name == "J.R.R. Tolkien")).one()
         session.delete(tolkien)
         session.commit()
-        leftover = session.scalars(
-            select(Book).where(Book.author_id.is_(None))
-        ).all()
+        leftover = session.scalars(select(Book).where(Book.author_id.is_(None))).all()
         # books deleted by cascade: ZERO rows may remain orphaned
         assert leftover == [], "delete-orphan must remove every child row"
 
@@ -314,13 +294,11 @@ def _verify() -> None:
         ).one()
         child_names = sorted(c.name for c in root.children)
         assert child_names == ["de-rag", "en-rag"], "tree children must resolve"
-        assert root.children[0].parent.name == "base-rag", \
-            "child -> parent must resolve"
+        assert root.children[0].parent.name == "base-rag", "child -> parent must resolve"
 
     # 6. Production pattern writes a full graph in one transaction
     book_id, tag_ids = create_review_graph("Dune", ["sci-fi", "classic"])
-    assert book_id is not None and len(tag_ids) == 2, \
-        "graph insert must return ids"
+    assert book_id is not None and len(tag_ids) == 2, "graph insert must return ids"
 
     print("[OK] 04-relationships: all checks passed")
 

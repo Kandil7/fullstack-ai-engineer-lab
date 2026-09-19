@@ -20,6 +20,7 @@ Prerequisites:
 # EASY PROBLEMS (20 XP)
 # ============================================================
 
+
 # Problem 1: Zero-Shot Classifier
 # Write a function that takes a text and a list of labels, and uses
 # zero-shot prompting to classify the text into one of the labels.
@@ -67,6 +68,7 @@ def problem_05():
 # ============================================================
 # MEDIUM PROBLEMS (50 XP)
 # ============================================================
+
 
 # Problem 6: Chain-of-Thought Solver
 # Write a function that solves a math word problem using chain-of-thought.
@@ -122,6 +124,7 @@ def problem_10():
 # ============================================================
 # HARD PROBLEMS (100 XP)
 # ============================================================
+
 
 # Problem 11: Prompt Chain Executor
 # Build a PromptChain class that:

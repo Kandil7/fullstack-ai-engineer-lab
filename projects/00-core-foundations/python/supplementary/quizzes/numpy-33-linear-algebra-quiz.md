@@ -10,6 +10,7 @@ Answers with full explanations and distractor analysis at the end.
 **E1 (code-output).** What prints?
 ```python
 import numpy as np
+
 a = np.array([1.0, 2.0, 3.0])
 b = np.array([4.0, 5.0, 6.0])
 print(a @ b)
@@ -31,6 +32,7 @@ print((a @ b).shape)
 **E3 (code-output).** What prints?
 ```python
 import numpy as np
+
 x = np.array([3.0, -4.0])
 print(np.linalg.norm(x))
 print(np.linalg.norm(x, 1))
@@ -58,6 +60,7 @@ print(np.linalg.norm(x, 1))
 **E6 (code-output).** What prints?
 ```python
 import numpy as np
+
 M = np.array([[1.0, 2.0], [3.0, 4.0]])
 print(np.linalg.norm(M))
 ```
@@ -74,6 +77,7 @@ print(np.linalg.norm(M))
 **M1 (code-output).** What prints?
 ```python
 import numpy as np
+
 X = np.random.default_rng(0).normal(size=(5, 8, 4))
 W = np.random.default_rng(1).normal(size=(4, 3))
 print((X @ W).shape)
@@ -95,9 +99,10 @@ print((X @ W.T).shape)
 **M3 (code-output).** What prints?
 ```python
 import numpy as np
+
 A = np.random.default_rng(42).normal(size=(6, 5))
 U, s, Vh = np.linalg.svd(A)
-recon = (U[:, :s.size] * s) @ Vh
+recon = (U[:, : s.size] * s) @ Vh
 print(np.allclose(recon, A, atol=1e-12))
 print(U.shape, Vh.shape)
 ```
@@ -117,6 +122,7 @@ print(U.shape, Vh.shape)
 **M5 (code-output).** What prints?
 ```python
 import numpy as np
+
 A = np.random.default_rng(1).normal(size=(6, 4))
 Q, R = np.linalg.qr(A)
 print(np.allclose(Q.T @ Q, np.eye(4), atol=1e-12))
@@ -138,6 +144,7 @@ print(np.allclose(Q @ R, A, atol=1e-12))
 **M7 (code-output).** What prints?
 ```python
 import numpy as np
+
 rng = np.random.default_rng(3)
 S = rng.normal(size=(5, 5))
 S = S + S.T
@@ -172,13 +179,13 @@ print(np.allclose(S @ V, V @ np.diag(w), atol=1e-10))
 **H1 (code-output).** What prints?
 ```python
 import numpy as np
+
 rng = np.random.default_rng(9)
 A = rng.normal(size=(7, 4))
 U, s, Vh = np.linalg.svd(A)
 k = 3
 approx = (U[:, :k] * s[:k]) @ Vh[:k, :]
-print(np.allclose(np.linalg.norm(A - approx),
-                  np.sqrt(np.sum(s[k:] ** 2)), rtol=1e-6))
+print(np.allclose(np.linalg.norm(A - approx), np.sqrt(np.sum(s[k:] ** 2)), rtol=1e-6))
 print(np.linalg.norm(A - approx) <= np.linalg.norm(A - (U[:, :1] * s[:1]) @ Vh[:1, :]))
 ```
 
@@ -197,6 +204,7 @@ print(np.linalg.norm(A - approx) <= np.linalg.norm(A - (U[:, :1] * s[:1]) @ Vh[:
 **H3 (code-output).** What prints?
 ```python
 import numpy as np
+
 i, j = np.indices((6, 6))
 H = 1.0 / (i + j + 1.0)
 print(f"{np.linalg.cond(H):.1e}")

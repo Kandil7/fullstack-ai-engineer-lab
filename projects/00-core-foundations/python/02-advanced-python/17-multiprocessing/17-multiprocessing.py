@@ -66,6 +66,7 @@ def _background_task():
 # 1. Basic Process
 # =============================================================================
 
+
 def demo_basic_process():
     """Demonstrate basic process creation."""
     processes = []
@@ -84,9 +85,10 @@ def demo_basic_process():
 # 2. Process with Return Value
 # =============================================================================
 
+
 def compute_square(n: int) -> int:
     """Compute square of a number."""
-    return n ** 2
+    return n**2
 
 
 def demo_process_return():
@@ -104,6 +106,7 @@ def demo_process_return():
 # =============================================================================
 # 3. CPU-Bound Task
 # =============================================================================
+
 
 def fibonacci(n: int) -> int:
     """Calculate Fibonacci number (CPU-bound)."""
@@ -128,17 +131,18 @@ def demo_cpu_bound():
         par_results = pool.map(fibonacci, numbers)
     par_time = time.perf_counter() - start
     print(f"  Parallel: {par_time:.2f}s, results: {par_results}")
-    print(f"  Speedup: {seq_time/par_time:.2f}x")
+    print(f"  Speedup: {seq_time / par_time:.2f}x")
 
 
 # =============================================================================
 # 4. Shared State
 # =============================================================================
 
+
 def demo_shared_state():
     """Demonstrate shared memory between processes."""
     # Shared value
-    counter = Value('i', 0)  # 'i' = int
+    counter = Value("i", 0)  # 'i' = int
 
     processes = []
     for _ in range(4):
@@ -152,7 +156,7 @@ def demo_shared_state():
     print(f"  Shared counter: {counter.value} (expected 4000)")
 
     # Shared array
-    arr = Array('i', [0, 0, 0, 0, 0])
+    arr = Array("i", [0, 0, 0, 0, 0])
 
     processes = []
     for i in range(5):
@@ -169,6 +173,7 @@ def demo_shared_state():
 # =============================================================================
 # 5. Queue Communication
 # =============================================================================
+
 
 def demo_queue():
     """Demonstrate Queue for inter-process communication."""
@@ -192,9 +197,10 @@ def demo_queue():
 # 6. Pool with Multiple Arguments
 # =============================================================================
 
+
 def power(base: int, exponent: int) -> int:
     """Calculate power."""
-    return base ** exponent
+    return base**exponent
 
 
 def demo_pool_starmap():
@@ -218,6 +224,7 @@ def demo_pool_starmap():
 # 7. Process with Lock
 # =============================================================================
 
+
 def demo_process_lock():
     """Demonstrate Lock for process safety."""
     lock = multiprocessing.Lock()
@@ -235,6 +242,7 @@ def demo_process_lock():
 # =============================================================================
 # 8. Daemon Processes
 # =============================================================================
+
 
 def demo_daemon():
     """Demonstrate daemon processes."""

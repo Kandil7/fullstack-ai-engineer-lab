@@ -30,9 +30,7 @@ def _load(name: str):
     """
     parent = Path(__file__).parent.name.replace("-", "_")
     modname = f"{name}_{parent}"
-    spec = importlib.util.spec_from_file_location(
-        modname, Path(__file__).parent / f"{name}.py"
-    )
+    spec = importlib.util.spec_from_file_location(modname, Path(__file__).parent / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[modname] = module
     spec.loader.exec_module(module)
@@ -54,9 +52,7 @@ def session():
 
 
 def _count(session: Session, name: str) -> int:
-    return len(
-        session.scalars(select(solution.User).where(solution.User.name == name)).all()
-    )
+    return len(session.scalars(select(solution.User).where(solution.User.name == name)).all())
 
 
 class TestStarterRaises:
@@ -106,8 +102,9 @@ class TestGetOrCreate:
     def test_identity_map_returns_same_object(self, session):
         first, _ = solution.get_or_create(session, "same")
         second, created = solution.get_or_create(session, "same")
-        assert created is False and second is first, \
+        assert created is False and second is first, (
             "second load in the same session must hit the identity map"
+        )
 
 
 class TestGuardedCommit:

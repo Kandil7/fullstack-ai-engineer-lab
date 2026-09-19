@@ -49,8 +49,8 @@ pd.concat([df1, df2], ignore_index=True)
 **join**
 Controls how columns are handled. `'outer'` (default) keeps all columns, filling NaN where missing. `'inner'` keeps only common columns.
 ```python
-pd.concat([df1, df2], join='outer')  # All columns
-pd.concat([df1, df2], join='inner')  # Common columns only
+pd.concat([df1, df2], join="outer")  # All columns
+pd.concat([df1, df2], join="inner")  # Common columns only
 ```
 
 ### K
@@ -58,7 +58,7 @@ pd.concat([df1, df2], join='inner')  # Common columns only
 **keys**
 Adds a level to the MultiIndex identifying which DataFrame each row came from. Useful for tracking source data.
 ```python
-result = pd.concat([df1, df2], keys=['source_a', 'source_b'])
+result = pd.concat([df1, df2], keys=["source_a", "source_b"])
 print(result.index)
 # MultiIndex([('source_a', 0), ('source_a', 1), ('source_b', 0), ...])
 ```
@@ -68,7 +68,7 @@ print(result.index)
 **MultiIndex**
 Hierarchical index created by the `keys` parameter. Levels represent source DataFrame labels and original row indices.
 ```python
-result = pd.concat(data_dict, names=['source', 'row_id'])
+result = pd.concat(data_dict, names=["source", "row_id"])
 result.reset_index()  # Convert to flat DataFrame
 ```
 
@@ -77,7 +77,7 @@ result.reset_index()  # Convert to flat DataFrame
 **names**
 Names the levels of the MultiIndex created by `keys`. Improves readability.
 ```python
-pd.concat(data, keys=['Jan', 'Feb', 'Mar'], names=['month', 'idx'])
+pd.concat(data, keys=["Jan", "Feb", "Mar"], names=["month", "idx"])
 ```
 
 ### S
@@ -99,14 +99,14 @@ import pandas as pd
 import glob
 
 # Find all CSV files
-files = glob.glob('data/*.csv')
+files = glob.glob("data/*.csv")
 print(f"Found {len(files)} files")
 
 # Efficient batch concat
 dfs = []
 for file in files:
     df = pd.read_csv(file)
-    df['source_file'] = file  # Track origin
+    df["source_file"] = file  # Track origin
     dfs.append(df)
 
 # Single concat operation (fast)
@@ -117,11 +117,11 @@ print(f"Combined shape: {combined.shape}")
 ### Example 2: Column Alignment
 
 ```python
-df_a = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
-df_b = pd.DataFrame({'B': [5, 6], 'C': [7, 8]})
+df_a = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
+df_b = pd.DataFrame({"B": [5, 6], "C": [7, 8]})
 
 # Outer: All columns
-outer = pd.concat([df_a, df_b], join='outer', ignore_index=True)
+outer = pd.concat([df_a, df_b], join="outer", ignore_index=True)
 print("Outer join:")
 print(outer)
 #     A  B    C
@@ -131,7 +131,7 @@ print(outer)
 # 3  NaN  6  8.0
 
 # Inner: Common columns only
-inner = pd.concat([df_a, df_b], join='inner', ignore_index=True)
+inner = pd.concat([df_a, df_b], join="inner", ignore_index=True)
 print("\nInner join:")
 print(inner)
 #    B
@@ -145,13 +145,13 @@ print(inner)
 
 ```python
 quarterly = {
-    'Q1': pd.DataFrame({'sales': [100, 120, 110]}),
-    'Q2': pd.DataFrame({'sales': [130, 140, 125]}),
-    'Q3': pd.DataFrame({'sales': [150, 145, 160]}),
-    'Q4': pd.DataFrame({'sales': [170, 180, 175]})
+    "Q1": pd.DataFrame({"sales": [100, 120, 110]}),
+    "Q2": pd.DataFrame({"sales": [130, 140, 125]}),
+    "Q3": pd.DataFrame({"sales": [150, 145, 160]}),
+    "Q4": pd.DataFrame({"sales": [170, 180, 175]}),
 }
 
-result = pd.concat(quarterly, names=['quarter', 'month_idx'])
+result = pd.concat(quarterly, names=["quarter", "month_idx"])
 print(result)
 
 # Reset to flat DataFrame

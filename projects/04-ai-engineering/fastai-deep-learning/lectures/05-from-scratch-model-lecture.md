@@ -109,8 +109,9 @@ probability.
 ```python
 torch.manual_seed(442)
 n_coeff = t.shape[1]
-coeffs = torch.rand(n_coeff) - 0.5      # centered on 0, in [-0.5, 0.5]
+coeffs = torch.rand(n_coeff) - 0.5  # centered on 0, in [-0.5, 0.5]
 coeffs.requires_grad_()
+
 
 def calc_preds(coeffs, indeps):
     return torch.sigmoid((indeps * coeffs).sum(axis=1))
@@ -134,12 +135,13 @@ about.
 def calc_loss(coeffs, indeps, deps):
     return torch.abs(calc_preds(coeffs, indeps) - deps).mean()
 
+
 loss = calc_loss(coeffs, trn_indep, trn_dep)
-loss.backward()                 # fills coeffs.grad
+loss.backward()  # fills coeffs.grad
 
 with torch.no_grad():
-    coeffs.sub_(coeffs.grad * lr)   # step downhill
-    coeffs.grad.zero_()             # reset for next epoch
+    coeffs.sub_(coeffs.grad * lr)  # step downhill
+    coeffs.grad.zero_()  # reset for next epoch
 ```
 
 `loss.backward()` computes `d(loss)/d(coeff)` for every coefficient.
@@ -179,10 +181,11 @@ def init_coeffs(n_hidden=20):
     const = torch.rand(1)[0]
     return l1.requires_grad_(), l2.requires_grad_(), const.requires_grad_()
 
+
 def calc_preds(coeffs, indeps):
     l1, l2, const = coeffs
-    res = torch.relu(indeps @ l1)      # hidden layer + nonlinearity
-    res = res @ l2 + const             # output layer
+    res = torch.relu(indeps @ l1)  # hidden layer + nonlinearity
+    res = res @ l2 + const  # output layer
     return torch.sigmoid(res)
 ```
 
@@ -202,11 +205,13 @@ fan-in (`/ n_hidden`) keeps the signal at a sane scale.
 
 ```python
 def init_coeffs():
-    hiddens = [10, 10]                 # two hidden layers -> "deep"
+    hiddens = [10, 10]  # two hidden layers -> "deep"
     sizes = [n_coeff] + hiddens + [1]
     n = len(sizes)
-    layers = [(torch.rand(sizes[i], sizes[i+1]) - 0.3) / sizes[i+1] * 4
-              for i in range(n - 1)]
+    layers = [
+        (torch.rand(sizes[i], sizes[i + 1]) - 0.3) / sizes[i + 1] * 4
+        for i in range(n - 1)
+    ]
     consts = [(torch.rand(1)[0] - 0.5) * 0.1 for _ in range(n - 1)]
     for layer in layers + consts:
         layer.requires_grad_()
@@ -225,25 +230,32 @@ This is exactly the machinery `nn.Linear` and `Kaiming` init hide from you.
 import torch
 import pandas as pd
 
-def prep_data(df: pd.DataFrame, indep_cols: list[str], dep_col: str
-              ) -> tuple[torch.Tensor, torch.Tensor]:
+
+def prep_data(
+    df: pd.DataFrame, indep_cols: list[str], dep_col: str
+) -> tuple[torch.Tensor, torch.Tensor]:
     """Impute, dummy-encode, tensorize, and normalize."""
     df = df.copy()
     df = df.fillna(df.mode().iloc[0])
     indeps = torch.tensor(df[indep_cols].values, dtype=torch.float)
-    indeps = indeps / indeps.max(dim=0).values      # normalize columns
+    indeps = indeps / indeps.max(dim=0).values  # normalize columns
     deps = torch.tensor(df[dep_col].values, dtype=torch.float)
     return indeps, deps
+
 
 def calc_preds(coeffs: torch.Tensor, indeps: torch.Tensor) -> torch.Tensor:
     return torch.sigmoid((indeps * coeffs).sum(axis=1))
 
-def calc_loss(coeffs: torch.Tensor, indeps: torch.Tensor,
-              deps: torch.Tensor) -> torch.Tensor:
+
+def calc_loss(
+    coeffs: torch.Tensor, indeps: torch.Tensor, deps: torch.Tensor
+) -> torch.Tensor:
     return torch.abs(calc_preds(coeffs, indeps) - deps).mean()
 
-def one_epoch(coeffs: torch.Tensor, indeps: torch.Tensor,
-              deps: torch.Tensor, lr: float) -> None:
+
+def one_epoch(
+    coeffs: torch.Tensor, indeps: torch.Tensor, deps: torch.Tensor, lr: float
+) -> None:
     loss = calc_loss(coeffs, indeps, deps)
     loss.backward()
     with torch.no_grad():
@@ -251,8 +263,10 @@ def one_epoch(coeffs: torch.Tensor, indeps: torch.Tensor,
         coeffs.grad.zero_()
     print(f"loss: {loss:.3f}", end="; ")
 
-def train(indeps: torch.Tensor, deps: torch.Tensor,
-          epochs: int = 30, lr: float = 2.0) -> torch.Tensor:
+
+def train(
+    indeps: torch.Tensor, deps: torch.Tensor, epochs: int = 30, lr: float = 2.0
+) -> torch.Tensor:
     torch.manual_seed(442)
     coeffs = (torch.rand(indeps.shape[1]) - 0.5).requires_grad_()
     for _ in range(epochs):
@@ -263,12 +277,12 @@ def train(indeps: torch.Tensor, deps: torch.Tensor,
 ### Example 2: Measuring Accuracy Against a Threshold
 
 ```python
-def accuracy(coeffs: torch.Tensor, indeps: torch.Tensor,
-             deps: torch.Tensor) -> float:
+def accuracy(coeffs: torch.Tensor, indeps: torch.Tensor, deps: torch.Tensor) -> float:
     """Predictions > 0.5 count as 'survived'; compare to labels."""
     preds = calc_preds(coeffs, indeps)
     correct = (preds > 0.5) == deps.bool()
     return correct.float().mean().item()
+
 
 # A hand-rolled linear model typically lands around 0.78-0.82 on Titanic —
 # competitive with an untuned framework model, which is the whole point.
@@ -283,11 +297,13 @@ def init_nn(n_coeff: int, n_hidden: int = 20) -> list[torch.Tensor]:
     const = torch.rand(1).requires_grad_()
     return [l1, l2, const]
 
+
 def nn_preds(coeffs: list[torch.Tensor], indeps: torch.Tensor) -> torch.Tensor:
     l1, l2, const = coeffs
     res = torch.relu(indeps @ l1)
     res = res @ l2 + const
     return torch.sigmoid(res.squeeze())
+
 
 # Only calc_preds changed. The loss, the loop, backward(), and the step are
 # identical to the linear model. That is the core insight of the lesson.
@@ -303,7 +319,7 @@ def nn_preds(coeffs: list[torch.Tensor], indeps: torch.Tensor) -> torch.Tensor:
 # BAD: gradients accumulate across epochs -> steps get wildly too big
 loss.backward()
 with torch.no_grad():
-    coeffs.sub_(coeffs.grad * lr)   # grad never reset!
+    coeffs.sub_(coeffs.grad * lr)  # grad never reset!
 
 # GOOD: reset after every step
 loss.backward()

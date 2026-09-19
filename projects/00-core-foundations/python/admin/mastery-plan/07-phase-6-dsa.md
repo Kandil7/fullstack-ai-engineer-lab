@@ -93,11 +93,13 @@ def _verify() -> None:
     bst = BST()
     for v in [50, 30, 70, 20, 40]:
         bst.insert(v)
-    assert bst.in_order() == sorted([50, 30, 70, 20, 40]), \
+    assert bst.in_order() == sorted([50, 30, 70, 20, 40]), (
         "BST in-order traversal must yield sorted output"
+    )
 
     # 4. Property-based: random inputs, invariant must hold
     import random
+
     rng = random.Random(42)
     for _ in range(100):
         arr = [rng.randint(-50, 50) for _ in range(rng.randint(0, 30))]

@@ -51,13 +51,15 @@ different names can hold identical bytes. Content addressing fixes both:
 ```python
 import hashlib, json
 
+
 def dataset_version(data_bytes: bytes) -> str:
     """A version is the content hash, not a filename."""
     return f"sha256:{hashlib.sha256(data_bytes).hexdigest()[:16]}"
 
+
 print(dataset_version(b"row1,row2"))
-print(dataset_version(b"row1,row2"))          # identical bytes → identical version
-print(dataset_version(b"row1,row2CHANGED"))   # any change → new version
+print(dataset_version(b"row1,row2"))  # identical bytes → identical version
+print(dataset_version(b"row1,row2CHANGED"))  # any change → new version
 ```
 
 Output (conceptually):
@@ -99,12 +101,13 @@ sources must hash differently.
 from dataclasses import dataclass, asdict
 import json
 
+
 @dataclass
 class Provenance:
-    version: str                 # sha256 of the output bytes
-    raw_sources: list[str]       # hashes of the raw inputs
-    transform_git_sha: str       # code that produced this version
-    config: dict[str, str]       # params of the transform
+    version: str  # sha256 of the output bytes
+    raw_sources: list[str]  # hashes of the raw inputs
+    transform_git_sha: str  # code that produced this version
+    config: dict[str, str]  # params of the transform
     seed: int
     created_by: str
     notes: str = ""
@@ -139,6 +142,7 @@ def dataset_diff(old: list[tuple], new: list[tuple]) -> dict:
         "total_new": len(new),
     }
 
+
 print(dataset_diff([(1, "a"), (2, "b")], [(1, "a"), (3, "c")]))
 ```
 
@@ -164,6 +168,7 @@ def version_preprocessor(scaler_params: dict) -> str:
     """A scaler's identity is the params it fitted with."""
     raw = json.dumps(scaler_params, sort_keys=True).encode()
     return f"sha256:{hashlib.sha256(raw).hexdigest()[:16]}"
+
 
 print(version_preprocessor({"mean": [0.5, 1.2], "scale": [0.1, 0.3]}))
 ```

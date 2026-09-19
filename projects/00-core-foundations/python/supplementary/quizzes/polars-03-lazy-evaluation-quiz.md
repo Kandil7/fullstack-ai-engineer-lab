@@ -24,6 +24,7 @@ Answers with full explanations and distractor analysis at the end.
 **E3 (code-output).** What prints?
 ```python
 import polars as pl
+
 lf = pl.DataFrame({"a": [1, 2, 3]}).lazy()
 print(lf.select(pl.len()).collect().item())
 ```
@@ -43,6 +44,7 @@ print(lf.select(pl.len()).collect().item())
 **E5 (code-output).** What prints?
 ```python
 import polars as pl
+
 lf = pl.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]}).lazy()
 print(lf.columns)
 print(lf.select(pl.col("a").sum()).collect().item())
@@ -75,6 +77,7 @@ plan as:
 **M2 (code-output).** What prints?
 ```python
 import polars as pl
+
 lf = pl.scan_csv("data.csv").filter(pl.col("split") == "valid")
 plan = lf.explain(optimized=True)
 print("SELECTION" in plan)
@@ -112,6 +115,7 @@ Assume the CSV scan supports predicate pushdown.
 **M6 (code-output).** What prints?
 ```python
 import polars as pl
+
 lf = pl.DataFrame({"a": [1, 2, 3]}).lazy()
 q = lf.filter(pl.col("a") > 1).select(pl.col("a").sum())
 print(q.collect().item())
@@ -126,6 +130,7 @@ print(q.collect().item())
 ```python
 import os
 import polars as pl
+
 lf = pl.scan_csv("data.csv").select(pl.len())
 lf.sink_parquet("count.parquet", engine="streaming")
 print(os.path.exists("count.parquet"))
@@ -146,6 +151,7 @@ print(os.path.exists("count.parquet"))
 **M9 (code-output).** What prints?
 ```python
 import polars as pl
+
 lf = pl.scan_csv("data.csv")
 plan = lf.explain(optimized=True)
 print(type(plan).__name__)
@@ -201,6 +207,7 @@ larger-than-memory pipeline?
 **H5 (code-output).** What prints?
 ```python
 import polars as pl
+
 lf = pl.DataFrame({"a": [1, 2, 3, 4]}).lazy()
 filtered = lf.filter(pl.col("a") % 2 == 0)
 plan = filtered.explain(optimized=True)

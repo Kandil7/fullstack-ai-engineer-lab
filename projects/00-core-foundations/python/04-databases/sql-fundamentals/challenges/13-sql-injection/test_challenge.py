@@ -11,12 +11,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
 starter_spec = importlib.util.spec_from_file_location(
-    "starter", Path(__file__).parent / "starter.py")
+    "starter", Path(__file__).parent / "starter.py"
+)
 starter_module = importlib.util.module_from_spec(starter_spec)
 starter_spec.loader.exec_module(starter_module)
 
 solution_spec = importlib.util.spec_from_file_location(
-    "solution", Path(__file__).parent / "solution.py")
+    "solution", Path(__file__).parent / "solution.py"
+)
 solution_module = importlib.util.module_from_spec(solution_spec)
 solution_spec.loader.exec_module(solution_module)
 
@@ -25,8 +27,7 @@ import pytest
 
 def users_conn() -> sqlite3.Connection:
     conn = sqlite3.connect(":memory:")
-    conn.execute(
-        "CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT UNIQUE, role TEXT)")
+    conn.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT UNIQUE, role TEXT)")
     conn.execute("INSERT INTO users (username, role) VALUES ('admin', 'owner')")
     return conn
 
@@ -36,7 +37,8 @@ def models_conn() -> sqlite3.Connection:
     conn.execute("CREATE TABLE models (id INTEGER PRIMARY KEY, name TEXT, metric REAL)")
     conn.executemany(
         "INSERT INTO models (name, metric) VALUES (?, ?)",
-        [("bert", 0.9), ("gpt", 0.8), ("bert_v2", 0.95)])
+        [("bert", 0.9), ("gpt", 0.8), ("bert_v2", 0.95)],
+    )
     return conn
 
 
@@ -103,15 +105,13 @@ class TestSecureSearch:
 
     def test_probe_blocked(self):
         conn = models_conn()
-        result = solution_module.secure_search(
-            conn, "bert'; DELETE FROM models; --", 5)
+        result = solution_module.secure_search(conn, "bert'; DELETE FROM models; --", 5)
         assert result["probe_ok"] is True
         assert conn.execute("SELECT COUNT(*) FROM models").fetchone()[0] == 3
 
     def test_probe_rows_safe(self):
         conn = models_conn()
-        result = solution_module.secure_search(
-            conn, "x'; DROP TABLE models; --", 5)
+        result = solution_module.secure_search(conn, "x'; DROP TABLE models; --", 5)
         assert result["rows"] == []
 
 

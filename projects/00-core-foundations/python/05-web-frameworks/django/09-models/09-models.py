@@ -27,14 +27,15 @@ from django.utils.text import slugify
 
 class Category(models.Model):
     """Blog post category."""
+
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name_plural = 'categories'
-        ordering = ['name']
+        verbose_name_plural = "categories"
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -47,32 +48,33 @@ class Category(models.Model):
 
 class Post(models.Model):
     """Blog post."""
+
     STATUS_CHOICES = [
-        ('draft', 'Draft'),
-        ('published', 'Published'),
-        ('archived', 'Archived'),
+        ("draft", "Draft"),
+        ("published", "Published"),
+        ("archived", "Archived"),
     ]
 
     title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200, unique_for_date='published_at')
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+    slug = models.SlugField(max_length=200, unique_for_date="published_at")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     content = models.TextField()
     excerpt = models.TextField(max_length=500, blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="draft")
     is_featured = models.BooleanField(default=False)
     views_count = models.PositiveIntegerField(default=0)
     published_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    tags = models.ManyToManyField('Tag', blank=True, related_name='posts')
+    tags = models.ManyToManyField("Tag", blank=True, related_name="posts")
 
     class Meta:
-        ordering = ['-published_at', '-created_at']
+        ordering = ["-published_at", "-created_at"]
         indexes = [
-            models.Index(fields=['-published_at']),
-            models.Index(fields=['status']),
-            models.Index(fields=['slug']),
+            models.Index(fields=["-published_at"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["slug"]),
         ]
 
     def __str__(self):
@@ -85,17 +87,18 @@ class Post(models.Model):
 
     def publish(self):
         """Publish this post."""
-        self.status = 'published'
+        self.status = "published"
         self.published_at = timezone.now()
         self.save()
 
     @property
     def is_published(self):
-        return self.status == 'published'
+        return self.status == "published"
 
 
 class Tag(models.Model):
     """Tag for blog posts."""
+
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=50, unique=True)
 
@@ -105,7 +108,8 @@ class Tag(models.Model):
 
 class Comment(models.Model):
     """Comment on a blog post."""
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     is_approved = models.BooleanField(default=False)
@@ -113,10 +117,10 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ["created_at"]
 
     def __str__(self):
-        return f'Comment by {self.author} on {self.post}'
+        return f"Comment by {self.author} on {self.post}"
 
 
 # ---------------------------------------------------------------------------
@@ -193,37 +197,41 @@ class Comment(models.Model):
 # 5. Model Meta Options
 # ---------------------------------------------------------------------------
 
+
 class Meta:
     """Options that control model behavior."""
+
     # Display
-    verbose_name = 'blog post'               # Singular name (admin)
-    verbose_name_plural = 'blog posts'       # Plural name (admin)
+    verbose_name = "blog post"  # Singular name (admin)
+    verbose_name_plural = "blog posts"  # Plural name (admin)
 
     # Ordering
-    ordering = ['-created_at', 'title']      # Default sort order
+    ordering = ["-created_at", "title"]  # Default sort order
 
     # Database
-    db_table = 'blog_posts'                  # Custom table name
-    indexes = [                              # Database indexes
-        models.Index(fields=['title']),
-        models.Index(fields=['-created_at'], name='idx_created'),
+    db_table = "blog_posts"  # Custom table name
+    indexes = [  # Database indexes
+        models.Index(fields=["title"]),
+        models.Index(fields=["-created_at"], name="idx_created"),
     ]
-    unique_together = [['title', 'author']]  # Unique constraint
+    unique_together = [["title", "author"]]  # Unique constraint
 
     # Permissions
     permissions = [
-        ('can_publish', 'Can publish posts'),
-        ('can_feature', 'Can feature posts'),
+        ("can_publish", "Can publish posts"),
+        ("can_feature", "Can feature posts"),
     ]
 
     # Other
-    abstract = True          # Don't create table (base class only)
-    managed = True           # Let Django manage migrations
-    app_label = 'blog'       # Override app label
+    abstract = True  # Don't create table (base class only)
+    managed = True  # Let Django manage migrations
+    app_label = "blog"  # Override app label
+
 
 # ---------------------------------------------------------------------------
 # 6. Model Methods
 # ---------------------------------------------------------------------------
+
 
 class Article(models.Model):
     title = models.CharField(max_length=200)
@@ -260,6 +268,7 @@ class Article(models.Model):
     def recent(cls, days=7):
         """Get articles from the last N days."""
         from datetime import timedelta
+
         cutoff = timezone.now() - timedelta(days=days)
         return cls.objects.filter(created_at__gte=cutoff)
 
@@ -268,29 +277,34 @@ class Article(models.Model):
     def calculate_reading_time(word_count):
         return max(1, round(word_count / 200))
 
+
 # ---------------------------------------------------------------------------
 # 7. Model Managers
 # ---------------------------------------------------------------------------
 # Managers provide QuerySet methods for models.
 
+
 class PostManager(models.Manager):
     """Custom manager for Post model."""
+
     def published(self):
-        return self.filter(status='published')
+        return self.filter(status="published")
 
     def drafts(self):
-        return self.filter(status='draft')
+        return self.filter(status="draft")
 
     def featured(self):
-        return self.filter(is_featured=True, status='published')
+        return self.filter(is_featured=True, status="published")
 
     def by_author(self, author):
         return self.filter(author=author)
+
 
 class Post(models.Model):
     # ... fields ...
     objects = PostManager()  # Default manager
     # Use: Post.objects.published()
+
 
 # ---------------------------------------------------------------------------
 # 8. Model Inheritance
@@ -333,18 +347,21 @@ class Post(models.Model):
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
+
 @receiver(pre_save, sender=Post)
 def auto_generate_slug(sender, instance, **kwargs):
     """Auto-generate slug before saving."""
     if not instance.slug:
         instance.slug = slugify(instance.title)
 
+
 @receiver(post_save, sender=Post)
 def notify_author_on_publish(sender, instance, created, **kwargs):
     """Notify author when post is published."""
-    if instance.status == 'published':
+    if instance.status == "published":
         # Send notification logic here
         pass
+
 
 # ---------------------------------------------------------------------------
 # 10. Model Best Practices

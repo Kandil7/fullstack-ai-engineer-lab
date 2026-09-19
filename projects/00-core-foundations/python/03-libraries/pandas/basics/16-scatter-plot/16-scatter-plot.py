@@ -5,9 +5,11 @@ W3Schools: https://www.w3schools.com/python/pandas_plotting_scatter.asp
 Scatter plots show the relationship between two numerical variables.
 Pandas has built-in plotting via matplotlib.
 """
+
 import pandas as pd
 import numpy as np
 import matplotlib
+
 matplotlib.use("Agg")  # Non-interactive backend
 import matplotlib.pyplot as plt
 import os
@@ -23,10 +25,12 @@ print("=" * 60)
 
 np.random.seed(42)
 n = 50
-df = pd.DataFrame({
-    "height": np.random.normal(170, 10, n),
-    "weight": np.random.normal(70, 12, n),
-})
+df = pd.DataFrame(
+    {
+        "height": np.random.normal(170, 10, n),
+        "weight": np.random.normal(70, 12, n),
+    }
+)
 
 print("Data (first 5 rows):")
 print(df.head())
@@ -53,12 +57,14 @@ print("Example 2: Scatter with Color and Size")
 print("=" * 60)
 
 n = 100
-df2 = pd.DataFrame({
-    "x": np.random.uniform(0, 10, n),
-    "y": np.random.uniform(0, 10, n),
-    "size": np.random.randint(10, 200, n),
-    "category": np.random.choice(["A", "B", "C"], n),
-})
+df2 = pd.DataFrame(
+    {
+        "x": np.random.uniform(0, 10, n),
+        "y": np.random.uniform(0, 10, n),
+        "size": np.random.randint(10, 200, n),
+        "category": np.random.choice(["A", "B", "C"], n),
+    }
+)
 
 print("Data (first 5 rows):")
 print(df2.head())
@@ -68,7 +74,8 @@ fig, ax = plt.subplots(figsize=(8, 5))
 colors = {"A": "red", "B": "green", "C": "blue"}
 for cat, group in df2.groupby("category"):
     ax.scatter(
-        group["x"], group["y"],
+        group["x"],
+        group["y"],
         s=group["size"],
         alpha=0.5,
         label=cat,
@@ -128,12 +135,14 @@ print("=" * 60)
 print("Example 4: Pandas .plot.scatter()")
 print("=" * 60)
 
-df4 = pd.DataFrame({
-    "GDP_per_capita": [45000, 55000, 38000, 62000, 35000, 48000, 52000],
-    "Life_Expectancy": [78, 81, 74, 83, 72, 79, 80],
-    "Population": [330, 67, 83, 126, 1400, 230, 67],
-    "Country": ["USA", "UK", "France", "Japan", "India", "Brazil", "Germany"],
-})
+df4 = pd.DataFrame(
+    {
+        "GDP_per_capita": [45000, 55000, 38000, 62000, 35000, 48000, 52000],
+        "Life_Expectancy": [78, 81, 74, 83, 72, 79, 80],
+        "Population": [330, 67, 83, 126, 1400, 230, 67],
+        "Country": ["USA", "UK", "France", "Japan", "India", "Brazil", "Germany"],
+    }
+)
 
 fig, ax = plt.subplots(figsize=(8, 5))
 df4.plot.scatter(
@@ -148,7 +157,9 @@ for _, row in df4.iterrows():
     ax.annotate(
         row["Country"],
         (row["GDP_per_capita"], row["Life_Expectancy"]),
-        fontsize=8, ha="center", va="bottom",
+        fontsize=8,
+        ha="center",
+        va="bottom",
     )
 ax.set_title("GDP per Capita vs Life Expectancy")
 ax.set_xlabel("GDP per Capita ($)")

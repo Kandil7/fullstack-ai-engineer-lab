@@ -64,19 +64,21 @@ print("Linspace (0 to 1, 5 points):", arr_linspace)
 
 # Integer array
 arr_int = np.array([1, 2, 3])
-print("\nInteger array dtype:", arr_int.dtype)  # int64 on Linux/macOS, int32 on Windows (platform-dependent)
+print(
+    "\nInteger array dtype:", arr_int.dtype
+)  # int64 on Linux/macOS, int32 on Windows (platform-dependent)
 
 # Float array
 arr_float = np.array([1.0, 2.0, 3.0])
-print("Float array dtype:", arr_float.dtype)    # float64
+print("Float array dtype:", arr_float.dtype)  # float64
 
 # String array
 arr_str = np.array(["apple", "banana", "cherry"])
-print("String array dtype:", arr_str.dtype)     # <U6
+print("String array dtype:", arr_str.dtype)  # <U6
 
 # Mixed types - NumPy upcasts to common type
 arr_mixed = np.array([1, 2.5, "three"])
-print("Mixed array dtype:", arr_mixed.dtype)    # <U32 (all become strings)
+print("Mixed array dtype:", arr_mixed.dtype)  # <U32 (all become strings)
 print("Mixed array:", arr_mixed)
 # Output:
 # Integer array dtype: int64
@@ -93,14 +95,14 @@ print("Mixed array:", arr_mixed)
 arr = np.array([10, 20, 30, 40, 50])
 
 # Single element
-print("\nFirst element:", arr[0])    # 10
-print("Third element:", arr[2])     # 30
-print("Last element:", arr[-1])     # 50
+print("\nFirst element:", arr[0])  # 10
+print("Third element:", arr[2])  # 30
+print("Last element:", arr[-1])  # 50
 
 # 2D array indexing
 arr2d = np.array([[1, 2, 3], [4, 5, 6]])
-print("\nFirst row:", arr2d[0])         # [1 2 3]
-print("Second row:", arr2d[1])         # [4 5 6]
+print("\nFirst row:", arr2d[0])  # [1 2 3]
+print("Second row:", arr2d[1])  # [4 5 6]
 print("Element (1,2):", arr2d[1, 2])  # 6
 # Output:
 # First element: 10
@@ -120,18 +122,18 @@ a = np.array([1, 2, 3])
 b = np.array([4, 5, 6])
 
 # Arithmetic operations
-print("\nAddition:", a + b)          # [5 7 9]
-print("Subtraction:", a - b)        # [-3 -3 -3]
-print("Multiplication:", a * b)     # [ 4 10 18]
-print("Division:", b / a)           # [4.  2.5 2. ]
-print("Power:", a ** 2)             # [1 4 9]
+print("\nAddition:", a + b)  # [5 7 9]
+print("Subtraction:", a - b)  # [-3 -3 -3]
+print("Multiplication:", a * b)  # [ 4 10 18]
+print("Division:", b / a)  # [4.  2.5 2. ]
+print("Power:", a**2)  # [1 4 9]
 
 # Aggregation functions
-print("\nSum:", np.sum(a))           # 6
-print("Mean:", np.mean(a))          # 2.0
-print("Max:", np.max(a))            # 3
-print("Min:", np.min(a))            # 1
-print("Std:", np.std(a))            # 0.816...
+print("\nSum:", np.sum(a))  # 6
+print("Mean:", np.mean(a))  # 2.0
+print("Max:", np.max(a))  # 3
+print("Min:", np.min(a))  # 1
+print("Std:", np.std(a))  # 0.816...
 # Output:
 # Addition: [5 7 9]
 # Subtraction: [-3 -3 -3]

@@ -67,9 +67,9 @@ print(x is y)  # May be False - depends on implementation
 ```python
 # Type checking
 x = 42
-print(type(x))        # <class 'int'>
+print(type(x))  # <class 'int'>
 print(isinstance(x, (int, float)))  # True
-print(isinstance(x, str))           # False
+print(isinstance(x, str))  # False
 ```
 
 ---
@@ -82,21 +82,23 @@ Python looks up variables in the following order: Local, Enclosing, Global, Buil
 ```python
 x = "global"
 
+
 def outer():
     x = "enclosing"
-    
+
     def inner():
         x = "local"
-        print(x)      # local
-    
+        print(x)  # local
+
     inner()
-    print(x)          # enclosing
+    print(x)  # enclosing
+
 
 outer()
-print(x)              # global
+print(x)  # global
 
 # Built-in example
-print(len)            # <built-in function len>
+print(len)  # <built-in function len>
 ```
 
 ---
@@ -148,7 +150,7 @@ In Python 2, `range()` returns a list, while `xrange()` returns an iterator (laz
 ```python
 # Python 3 - range is an iterator
 r = range(1000000)
-print(type(r))    # <class 'range'>
+print(type(r))  # <class 'range'>
 print(sys.getsizeof(r))  # Small - doesn't store all values
 
 # Use range() for iteration
@@ -197,10 +199,10 @@ List comprehensions provide a concise way to create lists. They are generally fa
 squares = []
 for x in range(10):
     if x % 2 == 0:
-        squares.append(x ** 2)
+        squares.append(x**2)
 
 # List comprehension
-squares = [x ** 2 for x in range(10) if x % 2 == 0]
+squares = [x**2 for x in range(10) if x % 2 == 0]
 
 # Nested comprehension
 matrix = [[i * j for j in range(5)] for i in range(5)]
@@ -221,15 +223,16 @@ An iterator is any object implementing `__iter__()` and `__next__()` methods. A 
 class CountDown:
     def __init__(self, start):
         self.current = start
-    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         if self.current <= 0:
             raise StopIteration
         self.current -= 1
         return self.current + 1
+
 
 # Generator function
 def countdown(start):
@@ -237,8 +240,9 @@ def countdown(start):
         yield start
         start -= 1
 
+
 # Generator expression
-squares_gen = (x ** 2 for x in range(1000000))  # Memory efficient
+squares_gen = (x**2 for x in range(1000000))  # Memory efficient
 ```
 
 ---
@@ -288,9 +292,11 @@ first, *middle, last = [1, 2, 3, 4, 5]
 # Swapping with unpacking
 a, b = b, a
 
+
 # Unpacking in function calls
 def func(a, b, c):
     return a + b + c
+
 
 values = [1, 2, 3]
 func(*values)  # Unpacks list as positional arguments
@@ -312,7 +318,7 @@ deep = copy.deepcopy(original)
 
 original[0][0] = 999
 print(shallow)  # [[999, 2], [3, 4]] - affected
-print(deep)     # [[1, 2], [3, 4]] - not affected
+print(deep)  # [[1, 2], [3, 4]] - not affected
 
 # For flat lists, shallow copy is sufficient
 simple = [1, 2, 3]
@@ -347,6 +353,7 @@ print(s1 is s2)  # May be False - not interned
 
 # Force interning
 import sys
+
 s1 = sys.intern("hello world!")
 s2 = sys.intern("hello world!")
 print(s1 is s2)  # True
@@ -365,10 +372,10 @@ data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 result = []
 for x in data:
     if x % 2 == 0:
-        result.append(x ** 2)
+        result.append(x**2)
 
 # With walrus operator in list comprehension
-result = [y for x in data if x % 2 == 0 and (y := x ** 2)]
+result = [y for x in data if x % 2 == 0 and (y := x**2)]
 
 # Useful in while loops
 while (line := input("Enter: ")) != "quit":
@@ -395,9 +402,11 @@ def reverse_string(s):
         result = char + result
     return result
 
+
 # Or using join
 def reverse_string_v2(s):
     return "".join(s[i] for i in range(len(s) - 1, -1, -1))
+
 
 # Recursive approach
 def reverse_string_v3(s):
@@ -423,12 +432,15 @@ def find_duplicates(lst):
         seen.add(item)
     return list(duplicates)
 
+
 # Alternative using Counter
 from collections import Counter
+
 
 def find_duplicates_v2(lst):
     counts = Counter(lst)
     return [item for item, count in counts.items() if count > 1]
+
 
 # Test
 print(find_duplicates([1, 2, 3, 2, 4, 3, 5]))  # [2, 3]
@@ -451,6 +463,7 @@ def flatten(lst):
             result.append(item)
     return result
 
+
 # Generator version (memory efficient)
 def flatten_gen(lst):
     for item in lst:
@@ -458,6 +471,7 @@ def flatten_gen(lst):
             yield from flatten_gen(item)
         else:
             yield item
+
 
 # Test
 nested = [1, [2, 3], [4, [5, 6]], 7]
@@ -483,6 +497,7 @@ def fizzbuzz(start, end):
         else:
             yield i
 
+
 # Alternative using tuple unpacking
 def fizzbuzz_v2(start, end):
     for i in range(start, end + 1):
@@ -492,6 +507,7 @@ def fizzbuzz_v2(start, end):
         if i % 5 == 0:
             result += "Buzz"
         yield result or i
+
 
 # Test
 for val in fizzbuzz(1, 15):
@@ -515,13 +531,16 @@ def word_frequency(sentence):
         freq[word] = freq.get(word, 0) + 1
     return dict(sorted(freq.items(), key=lambda x: x[1], reverse=True))
 
+
 # Using collections.Counter
 from collections import Counter
+
 
 def word_frequency_v2(sentence):
     words = sentence.lower().split()
     words = [w.strip(".,!?;:") for w in words]
     return dict(Counter(words).most_common())
+
 
 # Test
 text = "The cat sat on the mat. The cat liked the mat."
@@ -540,9 +559,11 @@ print(word_frequency(text))
 def transpose(matrix):
     return [[row[i] for row in matrix] for i in range(len(matrix[0]))]
 
+
 # Using zip
 def transpose_v2(matrix):
     return [list(row) for row in zip(*matrix)]
+
 
 # Manual approach
 def transpose_v3(matrix):
@@ -552,6 +573,7 @@ def transpose_v3(matrix):
         for j in range(cols):
             result[j][i] = matrix[i][j]
     return result
+
 
 # Test
 matrix = [[1, 2, 3], [4, 5, 6]]
@@ -576,9 +598,11 @@ def remove_duplicates(lst):
             result.append(item)
     return result
 
+
 # Using dict.fromkeys (Python 3.7+ preserves order)
 def remove_duplicates_v2(lst):
     return list(dict.fromkeys(lst))
+
 
 # Test
 print(remove_duplicates([3, 1, 4, 1, 5, 9, 2, 6, 5, 3]))
@@ -600,8 +624,10 @@ def group_anagrams(words):
         anagram_dict.setdefault(sorted_word, []).append(word)
     return list(anagram_dict.values())
 
+
 # Alternative using defaultdict
 from collections import defaultdict
+
 
 def group_anagrams_v2(words):
     anagram_dict = defaultdict(list)
@@ -609,6 +635,7 @@ def group_anagrams_v2(words):
         sorted_word = "".join(sorted(word.lower()))
         anagram_dict[sorted_word].append(word)
     return list(anagram_dict.values())
+
 
 # Test
 words = ["listen", "silent", "enlist", "rat", "tar", "art"]

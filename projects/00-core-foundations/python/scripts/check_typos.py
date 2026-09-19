@@ -55,7 +55,7 @@ def check_content_typos(filepath: str, typos: list):
             content = f.read()
     except (UnicodeDecodeError, OSError):
         return
-    
+
     for pattern, correction in DICTIONARY.items():
         for i, line in enumerate(content.split("\n"), 1):
             if re.search(pattern, line, re.IGNORECASE):
@@ -65,23 +65,23 @@ def check_content_typos(filepath: str, typos: list):
 
 def main():
     typos = []
-    
+
     print("Scanning for typos...")
     print()
-    
+
     for dirpath, dirnames, filenames in os.walk(HERE):
         dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
-        
+
         for filename in filenames:
             filepath = os.path.join(dirpath, filename)
-            
+
             # Check filenames
             check_filename_typos(dirpath, filename, typos)
-            
+
             # Check .py and .md file contents
             if filename.endswith((".py", ".md")):
                 check_content_typos(filepath, typos)
-    
+
     if typos:
         print(f"❌ Found {len(typos)} potential typo(s):")
         print()

@@ -1,4 +1,5 @@
 """Challenge 43 solution — reference implementation with reasoning comments."""
+
 from __future__ import annotations
 
 import heapq
@@ -62,6 +63,4 @@ class RecordStore:
         if k <= 0:
             return []
         # nlargest is O(n log k); sorted()[:k] would be O(n log n).
-        return heapq.nlargest(
-            k, self._records, key=lambda e: sum(e.vector) / len(e.vector)
-        )
+        return heapq.nlargest(k, self._records, key=lambda e: sum(e.vector) / len(e.vector))

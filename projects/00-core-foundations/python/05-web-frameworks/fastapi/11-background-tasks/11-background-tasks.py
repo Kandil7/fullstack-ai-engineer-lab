@@ -119,9 +119,7 @@ def create_order(
     """
     Process an order and send confirmation in background.
     """
-    background_tasks.add_task(
-        write_log, "ORDER", "Order created", f"product={order.product}"
-    )
+    background_tasks.add_task(write_log, "ORDER", "Order created", f"product={order.product}")
     background_tasks.add_task(
         send_email,
         to=order.customer_email,
@@ -197,6 +195,7 @@ Testing with curl:
     Check the terminal output for background task logs!
 """
 
+
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
     try:
@@ -229,6 +228,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

@@ -37,7 +37,8 @@ non-standard `NaN`/`Infinity` tokens that other parsers reject.
 **Example**:
 ```python
 import json
-json.dumps({"s": float("nan")})              # '{"s": NaN}' - not valid JSON
+
+json.dumps({"s": float("nan")})  # '{"s": NaN}' - not valid JSON
 json.dumps({"s": float("nan")}, allow_nan=False)  # ValueError
 ```
 
@@ -53,7 +54,8 @@ the raw bytes.
 **Example**:
 ```python
 import base64
-print(base64.b64encode(b"hello").decode())   # aGVsbG8=
+
+print(base64.b64encode(b"hello").decode())  # aGVsbG8=
 ```
 
 **Complexity**: O(n).
@@ -69,8 +71,9 @@ but does not close the connection.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
-with conn:                                   # commits
+with conn:  # commits
     conn.execute("CREATE TABLE t (x INTEGER)")
 conn.close()
 ```
@@ -88,9 +91,10 @@ always arrive as strings; convert numbers explicitly. Windows files need
 **Example**:
 ```python
 import csv, io
+
 buf = io.StringIO()
 csv.DictWriter(buf, fieldnames=["id", "text"]).writerow({"id": 1, "text": "a,b"})
-print(buf.getvalue())                        # 'id,text\r\n1,"a,b"\r\n'
+print(buf.getvalue())  # 'id,text\r\n1,"a,b"\r\n'
 ```
 
 **Complexity**: O(n) streaming.
@@ -107,10 +111,14 @@ any type JSON cannot encode; it must return a JSON-able value or raise
 ```python
 from datetime import datetime
 import json
+
+
 def enc(o):
     if isinstance(o, datetime):
         return {"$iso": o.isoformat()}
     raise TypeError(o)
+
+
 print(json.dumps({"t": datetime(2026, 8, 6)}, default=enc))
 # '{"t": {"$iso": "2026-08-06T00:00:00"}}'
 ```
@@ -127,8 +135,9 @@ row. Missing cells become `None` (restval); extra columns become
 **Example**:
 ```python
 import csv, io
+
 rows = list(csv.DictReader(io.StringIO("id,name\n1,ada")))
-print(rows)                                  # [{'id': '1', 'name': 'ada'}]
+print(rows)  # [{'id': '1', 'name': 'ada'}]
 ```
 
 **Complexity**: O(n) streaming.
@@ -143,6 +152,7 @@ writes the header with `writeheader()`. Rows with keys outside
 **Example**:
 ```python
 import csv, io
+
 buf = io.StringIO()
 w = csv.DictWriter(buf, fieldnames=["id", "text"])
 w.writeheader()
@@ -161,8 +171,9 @@ essential for human-readable JSONL datasets.
 **Example**:
 ```python
 import json
-print(json.dumps({"x": "مرحبا"}))                       # '{"x": "\\u0645..."}'
-print(json.dumps({"x": "مرحبا"}, ensure_ascii=False))   # '{"x": "مرحبا"}'
+
+print(json.dumps({"x": "مرحبا"}))  # '{"x": "\\u0645..."}'
+print(json.dumps({"x": "مرحبا"}, ensure_ascii=False))  # '{"x": "مرحبا"}'
 ```
 
 **Complexity**: O(1) per character.
@@ -226,6 +237,7 @@ non-finite floats emit invalid `NaN` tokens unless `allow_nan=False`.
 **Example**:
 ```python
 import json
+
 print(json.loads(json.dumps({"pair": (1, 2)}))["pair"])  # [1, 2] - list!
 ```
 
@@ -290,8 +302,9 @@ untrusted data is arbitrary code execution.
 **Example**:
 ```python
 import pickle
+
 data = pickle.dumps({"a": [1, 2]})
-print(pickle.loads(data))                      # {'a': [1, 2]}
+print(pickle.loads(data))  # {'a': [1, 2]}
 ```
 
 **Complexity**: O(n) native speed.
@@ -307,7 +320,8 @@ older runtimes. Objects survive moves between versions poorly.
 **Example**:
 ```python
 import pickle
-print(pickle.DEFAULT_PROTOCOL, pickle.HIGHEST_PROTOCOL)   # 4 5
+
+print(pickle.DEFAULT_PROTOCOL, pickle.HIGHEST_PROTOCOL)  # 4 5
 ```
 
 **Complexity**: — (compat knob).
@@ -337,6 +351,7 @@ rule applies. One process at a time; no concurrency guarantees.
 **Example**:
 ```python
 import shelve
+
 with shelve.open("cache.shlv") as db:
     db["meta"] = {"version": "v2"}
 ```
@@ -353,7 +368,8 @@ low-level tool for compact wire formats and file headers.
 **Example**:
 ```python
 import struct
-print(struct.pack(">f", 3.5).hex())          # 40600000
+
+print(struct.pack(">f", 3.5).hex())  # 40600000
 ```
 
 **Complexity**: O(n) per record.
@@ -388,8 +404,9 @@ data fails with `TypeError` — plan for lists.
 **Example**:
 ```python
 import json
+
 pair = json.loads('{"pair": [1, 2]}')["pair"]
-print(type(pair).__name__)                   # list
+print(type(pair).__name__)  # list
 ```
 
 **Complexity**: — (type semantics).

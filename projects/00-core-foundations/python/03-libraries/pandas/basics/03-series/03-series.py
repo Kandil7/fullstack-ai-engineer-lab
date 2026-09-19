@@ -5,6 +5,7 @@ W3Schools: https://www.w3schools.com/python/pandas_series.asp
 A Pandas Series is a one-dimensional labeled array capable of holding any
 data type (integers, strings, floats, Python objects, etc.).
 """
+
 import pandas as pd
 import numpy as np
 
@@ -39,9 +40,7 @@ print("Example 2: Custom Index Labels")
 print("=" * 60)
 
 scores = pd.Series(
-    [88, 92, 76, 95, 84],
-    index=["Alice", "Bob", "Charlie", "Diana", "Eve"],
-    name="Test Scores"
+    [88, 92, 76, 95, 84], index=["Alice", "Bob", "Charlie", "Diana", "Eve"], name="Test Scores"
 )
 print("Student scores:")
 print(scores)
@@ -74,10 +73,7 @@ print("=" * 60)
 print("Example 3: Series Operations")
 print("=" * 60)
 
-temps = pd.Series(
-    [72.5, 68.0, 75.3, 71.8, 69.2],
-    index=["Mon", "Tue", "Wed", "Thu", "Fri"]
-)
+temps = pd.Series([72.5, 68.0, 75.3, 71.8, 69.2], index=["Mon", "Tue", "Wed", "Thu", "Fri"])
 print("Weekly temperatures:")
 print(temps)
 print()

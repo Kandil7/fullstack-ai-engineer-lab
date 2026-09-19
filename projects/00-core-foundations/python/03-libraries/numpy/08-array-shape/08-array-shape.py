@@ -14,24 +14,21 @@ import numpy as np
 
 # 1D array
 arr1d = np.array([1, 2, 3, 4, 5])
-print("1D shape:", arr1d.shape)     # (5,)
-print("ndim:", arr1d.ndim)         # 1
-print("size:", arr1d.size)         # 5
+print("1D shape:", arr1d.shape)  # (5,)
+print("ndim:", arr1d.ndim)  # 1
+print("size:", arr1d.size)  # 5
 
 # 2D array (3 rows, 4 columns)
-arr2d = np.array([[1, 2, 3, 4],
-                   [5, 6, 7, 8],
-                   [9, 10, 11, 12]])
-print("\n2D shape:", arr2d.shape)   # (3, 4)
-print("ndim:", arr2d.ndim)         # 2
-print("rows:", arr2d.shape[0])     # 3
-print("cols:", arr2d.shape[1])     # 4
+arr2d = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]])
+print("\n2D shape:", arr2d.shape)  # (3, 4)
+print("ndim:", arr2d.ndim)  # 2
+print("rows:", arr2d.shape[0])  # 3
+print("cols:", arr2d.shape[1])  # 4
 
 # 3D array
-arr3d = np.array([[[1, 2], [3, 4]],
-                   [[5, 6], [7, 8]]])
-print("\n3D shape:", arr3d.shape)   # (2, 2, 2)
-print("ndim:", arr3d.ndim)         # 3
+arr3d = np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
+print("\n3D shape:", arr3d.shape)  # (2, 2, 2)
+print("ndim:", arr3d.ndim)  # 3
 # Output:
 # 1D shape: (5,)
 # ndim: 1
@@ -136,8 +133,8 @@ print("\nnp.transpose:", arr_t2.shape)  # (3, 2)
 
 # 3D transpose
 arr3d = np.arange(24).reshape(2, 3, 4)
-print("\n3D shape:", arr3d.shape)          # (2, 3, 4)
-print("3D transposed:", arr3d.T.shape)     # (4, 3, 2)
+print("\n3D shape:", arr3d.shape)  # (2, 3, 4)
+print("3D transposed:", arr3d.T.shape)  # (4, 3, 2)
 print("3D transpose:", np.transpose(arr3d, (1, 0, 2)).shape)  # (3, 2, 4)
 # Output:
 # Original:
@@ -168,19 +165,19 @@ arr_1d = np.array([1, 2, 3])
 print("\n1D shape:", arr_1d.shape)  # (3,)
 
 arr_row = np.expand_dims(arr_1d, axis=0)
-print("As row:", arr_row.shape)    # (1, 3)
+print("As row:", arr_row.shape)  # (1, 3)
 
 arr_col = np.expand_dims(arr_1d, axis=1)
-print("As col:", arr_col.shape)    # (3, 1)
+print("As col:", arr_col.shape)  # (3, 1)
 
 # Squeeze - removes size-1 dimensions
 arr_squeeze = np.array([[[1, 2, 3]]])
 print("\nBefore squeeze:", arr_squeeze.shape)  # (1, 1, 3)
 arr_squeezed = arr_squeeze.squeeze()
-print("After squeeze:", arr_squeezed.shape)   # (3,)
+print("After squeeze:", arr_squeezed.shape)  # (3,)
 
 # Column stack and row stack
 a = np.array([1, 2, 3])
 b = np.array([4, 5, 6])
 print("\nColumn stack:", np.column_stack((a, b)).shape)  # (3, 2)
-print("Row stack:", np.vstack((a, b)).shape)             # (2, 3)
+print("Row stack:", np.vstack((a, b)).shape)  # (2, 3)

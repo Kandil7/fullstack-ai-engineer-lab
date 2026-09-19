@@ -60,9 +60,7 @@ class Project(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(60), nullable=False)
 
-    experiments: Mapped[list["Experiment"]] = relationship(
-        back_populates="project"
-    )
+    experiments: Mapped[list["Experiment"]] = relationship(back_populates="project")
 
 
 class Experiment(Base):
@@ -70,9 +68,7 @@ class Experiment(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(60), nullable=False)
-    project_id: Mapped[int] = mapped_column(
-        ForeignKey("projects.id"), nullable=False
-    )
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"), nullable=False)
 
     project: Mapped[Project] = relationship(back_populates="experiments")
 
@@ -104,6 +100,7 @@ def new_session() -> Session:
 # cursor execute. A listener counts statements — the honest way to
 # see how many queries your ORM code really sends. No guessing.
 # Complexity: 1 + N queries for N parents (lazy); O(1) counting.
+
 
 class QueryCounter:
     """Counts SQL statements executed on a given engine."""
@@ -223,6 +220,7 @@ print(f"subqueryload: {subquery_count} queries ({total_runs} runs loaded)")
 # the standard trick to catch N+1 in tests. Joined and selectin
 # can also be set as relationship DEFAULTS, not just per-query.
 
+
 class StrictProject(Base):
     """Same shape as Project, but lazy access is a hard error."""
 
@@ -241,9 +239,7 @@ class StrictExperiment(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(60), nullable=False)
-    project_id: Mapped[int] = mapped_column(
-        ForeignKey("strict_projects.id"), nullable=False
-    )
+    project_id: Mapped[int] = mapped_column(ForeignKey("strict_projects.id"), nullable=False)
 
     project: Mapped[StrictProject] = relationship(back_populates="experiments")
 
@@ -282,9 +278,8 @@ print(f"lazy='raise' access -> {touch_lazy(engine)}")
 # shaped. The verify block below asserts the query counts, so any
 # future edit that reintroduces N+1 fails the exercise.
 
-def fetch_projects_with_runs(
-    session: Session, eager: bool = True
-) -> tuple[list[Project], int]:
+
+def fetch_projects_with_runs(session: Session, eager: bool = True) -> tuple[list[Project], int]:
     """Return (projects, queries_fired) — eager loads by default.
 
     Chosen over a fixed lazy="" strategy because the loading policy
@@ -333,48 +328,31 @@ def _verify() -> None:
         run_count = sum(len(p.experiments) for p in projects)
         lazy_queries = counter.count()
         assert run_count == N_PROJECTS * K_EXPERIMENTS, "seed data must be intact"
-        assert lazy_queries == 1 + N_PROJECTS, \
-            f"lazy must be N+1 queries, got {lazy_queries}"
+        assert lazy_queries == 1 + N_PROJECTS, f"lazy must be N+1 queries, got {lazy_queries}"
 
         # 2. selectinload: exactly 2 queries (parents + children IN ...)
         counter.reset()
-        stmt = (
-            select(Project)
-            .options(selectinload(Project.experiments))
-            .order_by(Project.id)
-        )
+        stmt = select(Project).options(selectinload(Project.experiments)).order_by(Project.id)
         eager_projects = session.scalars(stmt).all()
         eager_runs = sum(len(p.experiments) for p in eager_projects)
-        assert counter.count() == 2, \
-            f"selectinload must be 2 queries, got {counter.count()}"
-        assert eager_runs == N_PROJECTS * K_EXPERIMENTS, \
-            "selectinload must load every child"
+        assert counter.count() == 2, f"selectinload must be 2 queries, got {counter.count()}"
+        assert eager_runs == N_PROJECTS * K_EXPERIMENTS, "selectinload must load every child"
 
         # 3. joinedload: exactly 1 query, parents de-duplicated
         counter.reset()
-        stmt = (
-            select(Project)
-            .options(joinedload(Project.experiments))
-            .order_by(Project.id)
-        )
+        stmt = select(Project).options(joinedload(Project.experiments)).order_by(Project.id)
         joined_projects = session.scalars(stmt).unique().all()
-        assert counter.count() == 1, \
-            f"joinedload must be 1 query, got {counter.count()}"
-        assert len(joined_projects) == N_PROJECTS, \
-            "joinedload must de-duplicate parent rows"
+        assert counter.count() == 1, f"joinedload must be 1 query, got {counter.count()}"
+        assert len(joined_projects) == N_PROJECTS, "joinedload must de-duplicate parent rows"
 
         # 4. subqueryload: exactly 2 queries
         counter.reset()
-        stmt = (
-            select(Project)
-            .options(subqueryload(Project.experiments))
-            .order_by(Project.id)
-        )
+        stmt = select(Project).options(subqueryload(Project.experiments)).order_by(Project.id)
         sub_projects = session.scalars(stmt).all()
-        assert counter.count() == 2, \
-            f"subqueryload must be 2 queries, got {counter.count()}"
-        assert sum(len(p.experiments) for p in sub_projects) == N_PROJECTS * K_EXPERIMENTS, \
+        assert counter.count() == 2, f"subqueryload must be 2 queries, got {counter.count()}"
+        assert sum(len(p.experiments) for p in sub_projects) == N_PROJECTS * K_EXPERIMENTS, (
             "subqueryload must load every child"
+        )
 
         # 5. All strategies return identical data (correctness parity)
         eager_names = {
@@ -388,8 +366,9 @@ def _verify() -> None:
         ), "loaded graphs must match the seed"
 
         # 6. lazy='raise' turns accidental N+1 into an exception
-        assert touch_lazy(engine) == "InvalidRequestError", \
+        assert touch_lazy(engine) == "InvalidRequestError", (
             "lazy='raise' must raise on unloaded access"
+        )
 
         # 7. Production loader: eager by default -> 2 queries
         #    (fresh sessions so the identity map never hides queries)
@@ -399,8 +378,7 @@ def _verify() -> None:
 
         # 8. Production loader with eager=False reproduces N+1 (visible, not silent)
         loaded, queries = fetch_projects_with_runs(new_session(), eager=False)
-        assert queries == 1 + N_PROJECTS, \
-            "non-eager loader must show the N+1 cost explicitly"
+        assert queries == 1 + N_PROJECTS, "non-eager loader must show the N+1 cost explicitly"
 
     print("[OK] 06-eager-loading: all checks passed")
 

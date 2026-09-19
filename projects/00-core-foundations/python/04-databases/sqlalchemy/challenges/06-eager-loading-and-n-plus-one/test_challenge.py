@@ -29,9 +29,7 @@ def _load(name: str):
     """
     parent = Path(__file__).parent.name.replace("-", "_")
     modname = f"{name}_{parent}"
-    spec = importlib.util.spec_from_file_location(
-        modname, Path(__file__).parent / f"{name}.py"
-    )
+    spec = importlib.util.spec_from_file_location(modname, Path(__file__).parent / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[modname] = module
     spec.loader.exec_module(module)
@@ -66,7 +64,7 @@ def env():
     solution.Base.metadata.create_all(engine)
     with Session(bind=engine) as session:
         _seed(session)
-        session.expunge_all()          # drop identity map: every load hits SQL
+        session.expunge_all()  # drop identity map: every load hits SQL
         counter = QueryCounter(engine)
         yield session, counter
     engine.dispose()
@@ -114,8 +112,9 @@ class TestSelectinLoad:
         session, counter = env
         counter.reset()
         solution.load_projects(session)
-        assert counter.count() == 2, \
+        assert counter.count() == 2, (
             f"selectinload must fire exactly 2 queries, got {counter.count()}"
+        )
 
     def test_no_extra_query_on_traversal(self, env):
         """Accessing loaded children must not fire more SQL."""
@@ -123,7 +122,7 @@ class TestSelectinLoad:
         counter.reset()
         result = solution.load_projects(session)
         first = counter.count()
-        _ = [len(runs) for _, runs in result]      # pure Python now
+        _ = [len(runs) for _, runs in result]  # pure Python now
         assert counter.count() == first == 2
 
 
@@ -144,8 +143,7 @@ class TestJoinedLoad:
         session, counter = env
         counter.reset()
         solution.load_projects_joined(session)
-        assert counter.count() == 1, \
-            f"joinedload must fire exactly 1 query, got {counter.count()}"
+        assert counter.count() == 1, f"joinedload must fire exactly 1 query, got {counter.count()}"
 
 
 class TestFetchAndGuard:

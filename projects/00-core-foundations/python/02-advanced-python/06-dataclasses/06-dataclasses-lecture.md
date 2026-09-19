@@ -33,29 +33,32 @@ class PointRegular:
     def __init__(self, x: float, y: float):
         self.x = x
         self.y = y
-    
+
     def __repr__(self) -> str:
         return f"PointRegular(x={self.x}, y={self.y})"
-    
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, PointRegular):
             return False
         return self.x == other.x and self.y == other.y
 
+
 # With dataclasses - one decorator does it all
 from dataclasses import dataclass
+
 
 @dataclass
 class Point:
     x: float
     y: float
 
+
 # Automatically generates:
 # __init__, __repr__, __eq__, and more
 p1 = Point(3.0, 4.0)
 p2 = Point(3.0, 4.0)
-print(p1)           # Point(x=3.0, y=4.0)
-print(p1 == p2)     # True
+print(p1)  # Point(x=3.0, y=4.0)
+print(p1 == p2)  # True
 ```
 
 ### Generated Special Methods
@@ -63,11 +66,13 @@ print(p1 == p2)     # True
 ```python
 from dataclasses import dataclass
 
+
 @dataclass
 class User:
     name: str
     age: int
     email: str
+
 
 user = User("Alice", 30, "alice@example.com")
 
@@ -95,21 +100,24 @@ print(user == user2)  # True
 ```python
 from dataclasses import dataclass
 
+
 # Disable specific methods
 @dataclass(repr=False, eq=False, frozen=True)
 class Config:
     host: str = "localhost"
     port: int = 8080
 
+
 config = Config()
 # print(repr(config))  # AttributeError - repr disabled
 # config.host = "new"  # AttributeError - frozen
+
 
 # Or selectively disable
 @dataclass(eq=False)
 class NoEquality:
     value: int
-    
+
     def __eq__(self, other):
         """Custom equality check."""
         return self.value > other.value
@@ -120,18 +128,20 @@ class NoEquality:
 ```python
 from dataclasses import dataclass
 
+
 @dataclass(order=True)
 class Score:
     name: str
     points: int
 
+
 # Generates __lt__, __le__, __gt__, __ge__
 s1 = Score("Alice", 95)
 s2 = Score("Bob", 87)
 
-print(s1 > s2)   # True (compares by fields in order)
+print(s1 > s2)  # True (compares by fields in order)
 print(s1 >= s2)  # True
-print(s1 < s2)   # False
+print(s1 < s2)  # False
 ```
 
 ---
@@ -141,6 +151,7 @@ print(s1 < s2)   # False
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class User:
     name: str
@@ -149,6 +160,7 @@ class User:
     tags: list[str] = field(default_factory=list)
     score: float = field(default=0.0)
     _id: int = field(init=False, repr=False)
+
 
 # field() options:
 # - default: Default value
@@ -166,12 +178,14 @@ class User:
 from dataclasses import dataclass, field
 from typing import Any
 
+
 @dataclass
 class DataProcessor:
     name: str
     config: dict[str, Any] = field(default_factory=dict)
     history: list[str] = field(default_factory=list)
     cache: set[str] = field(default_factory=set)
+
 
 # Each instance gets its own copy
 p1 = DataProcessor("p1")
@@ -185,11 +199,13 @@ print(p2.config)  # {} - separate instance
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class APIEndpoint:
     path: str = field(metadata={"description": "API path", "required": True})
     method: str = field(metadata={"description": "HTTP method", "default": "GET"})
     auth_required: bool = field(metadata={"description": "Requires authentication"})
+
 
 # Access metadata
 for f in field(APIEndpoint):
@@ -204,10 +220,12 @@ for f in field(APIEndpoint):
 ```python
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class Point:
     x: float
     y: float
+
 
 p = Point(3.0, 4.0)
 # p.x = 5.0  # AttributeError: cannot assign to field
@@ -216,11 +234,13 @@ p = Point(3.0, 4.0)
 point_set = {p}
 point_dict = {p: "origin"}
 
+
 # Can be used in another frozen dataclass
 @dataclass(frozen=True)
 class Line:
     start: Point
     end: Point
+
 
 line = Line(Point(0, 0), Point(1, 1))
 ```
@@ -230,11 +250,13 @@ line = Line(Point(0, 0), Point(1, 1))
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass(frozen=True, eq=True)
 class Vertex:
     x: float
     y: float
     label: str = field(hash=False, compare=False)
+
 
 v1 = Vertex(1.0, 2.0, "A")
 v2 = Vertex(1.0, 2.0, "B")
@@ -249,17 +271,19 @@ print(hash(v1) == hash(v2))  # True (label excluded from hash)
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Temperature:
     celsius: float
-    
+
     def __post_init__(self):
         if self.celsius < -273.15:
             raise ValueError("Temperature below absolute zero")
-    
+
     @property
     def fahrenheit(self) -> float:
-        return self.celsius * 9/5 + 32
+        return self.celsius * 9 / 5 + 32
+
 
 # Usage
 temp = Temperature(100.0)
@@ -278,6 +302,7 @@ except ValueError as e:
 from dataclasses import dataclass, field
 from typing import Any
 
+
 @dataclass
 class UserRegistration:
     username: str
@@ -285,29 +310,30 @@ class UserRegistration:
     password: str
     confirm_password: str
     age: int
-    
+
     def __post_init__(self):
         # Validate username
         if not self.username.isalnum():
             raise ValueError("Username must be alphanumeric")
         if len(self.username) < 3:
             raise ValueError("Username must be at least 3 characters")
-        
+
         # Validate email
         if "@" not in self.email:
             raise ValueError("Invalid email address")
-        
+
         # Validate password match
         if self.password != self.confirm_password:
             raise ValueError("Passwords do not match")
-        
+
         # Validate age
         if self.age < 13:
             raise ValueError("Must be at least 13 years old")
-        
+
         # Derived values
         self.username = self.username.lower()
         self.email = self.email.lower()
+
 
 # Usage
 user = UserRegistration(
@@ -315,10 +341,10 @@ user = UserRegistration(
     email="Alice@Example.COM",
     password="secret123",
     confirm_password="secret123",
-    age=25
+    age=25,
 )
 print(user.username)  # "alice" (normalized)
-print(user.email)     # "alice@example.com" (normalized)
+print(user.email)  # "alice@example.com" (normalized)
 ```
 
 ---
@@ -328,15 +354,18 @@ print(user.email)     # "alice@example.com" (normalized)
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Base:
     name: str
     created_at: str = "2024-01-01"
 
+
 @dataclass
 class Derived(Base):
     value: int
     extra: str = "default"
+
 
 # Generated __init__ includes all fields
 d = Derived(name="test", value=42)
@@ -348,14 +377,17 @@ print(d)  # Derived(name='test', created_at='2024-01-01', value=42, extra='defau
 ```python
 from dataclasses import dataclass, field
 
+
 # Problem: Mutable default in parent
 @dataclass
 class Parent:
     items: list[str] = field(default_factory=list)
 
+
 @dataclass
 class Child(Parent):
     extra: str = "child"
+
 
 # Solution: Use default_factory
 @dataclass
@@ -363,10 +395,12 @@ class SafeParent:
     items: list[str] = field(default_factory=list)
     metadata: dict[str, str] = field(default_factory=dict)
 
+
 @dataclass
 class SafeChild(SafeParent):
     extra: str = "child"
     tags: set[str] = field(default_factory=set)
+
 
 child = SafeChild(items=["a", "b"], extra="custom")
 print(child)  # SafeChild(items=['a', 'b'], metadata={}, extra='custom', tags=set())
@@ -379,12 +413,14 @@ print(child)  # SafeChild(items=['a', 'b'], metadata={}, extra='custom', tags=se
 ```python
 from dataclasses import dataclass, asdict, astuple, fields
 
+
 @dataclass
 class User:
     name: str
     age: int
     email: str
     scores: list[int] = field(default_factory=list)
+
 
 user = User("Alice", 30, "alice@example.com", [95, 87, 92])
 
@@ -403,6 +439,7 @@ for f in fields(user):
 
 # JSON serialization
 import json
+
 json_str = json.dumps(asdict(user))
 ```
 
@@ -412,29 +449,30 @@ json_str = json.dumps(asdict(user))
 from dataclasses import dataclass, asdict
 from typing import Any
 
+
 @dataclass
 class Address:
     street: str
     city: str
     country: str
 
+
 @dataclass
 class Company:
     name: str
     address: Address
+
 
 @dataclass
 class Employee:
     name: str
     company: Company
 
+
 # asdict recursively converts nested dataclasses
 emp = Employee(
     name="Alice",
-    company=Company(
-        name="TechCorp",
-        address=Address("123 Main St", "Springfield", "US")
-    )
+    company=Company(name="TechCorp", address=Address("123 Main St", "Springfield", "US")),
 )
 
 print(asdict(emp))
@@ -452,15 +490,19 @@ class PointDC:
     x: float
     y: float
 
+
 # NamedTuple (immutable, lighter weight)
 from typing import NamedTuple
+
 
 class PointNT(NamedTuple):
     x: float
     y: float
 
+
 # Regular dict
 point_dict = {"x": 3.0, "y": 4.0}
+
 
 # Regular class
 class PointClass:
@@ -482,10 +524,11 @@ class Config:
     port: int
     debug: bool = False
     tags: list[str] = field(default_factory=list)
-    
+
     def __post_init__(self):
         if self.port < 1 or self.port > 65535:
             raise ValueError("Invalid port")
+
 
 # Use NamedTuple when:
 # - Need immutable, lightweight tuples
@@ -493,9 +536,11 @@ class Config:
 # - Memory efficiency matters
 from typing import NamedTuple
 
+
 class Coordinate(NamedTuple):
     latitude: float
     longitude: float
+
 
 # Use dict when:
 # - Schema is dynamic or unknown
@@ -512,6 +557,7 @@ class Coordinate(NamedTuple):
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class TrainingConfig:
     model_name: str
@@ -522,12 +568,13 @@ class TrainingConfig:
     weight_decay: float = 0.0
     scheduler: str = "cosine"
     warmup_steps: int = 1000
-    
+
     def __post_init__(self):
         if self.learning_rate <= 0:
             raise ValueError("Learning rate must be positive")
         if self.batch_size <= 0:
             raise ValueError("Batch size must be positive")
+
 
 @dataclass
 class ModelArchitecture:
@@ -536,7 +583,7 @@ class ModelArchitecture:
     output_dim: int = 10
     dropout: float = 0.2
     activation: str = "relu"
-    
+
     def total_parameters(self) -> int:
         # Calculate total parameters
         params = self.input_dim * self.hidden_dims[0]
@@ -552,6 +599,7 @@ class ModelArchitecture:
 from dataclasses import dataclass, field
 from typing import Optional
 
+
 @dataclass
 class DataPipelineConfig:
     source_path: str
@@ -562,11 +610,11 @@ class DataPipelineConfig:
     retry_attempts: int = 3
     compression: Optional[str] = None
     validation_rules: dict[str, str] = field(default_factory=dict)
-    
+
     def __post_init__(self):
         if self.compression and self.compression not in ("gzip", "lz4", "snappy"):
             raise ValueError(f"Unsupported compression: {self.compression}")
-        
+
         # Default validation rules
         if not self.validation_rules:
             self.validation_rules = {
@@ -574,12 +622,13 @@ class DataPipelineConfig:
                 "unique": "id_column",
             }
 
+
 # Usage
 config = DataPipelineConfig(
     source_path="s3://data/raw/",
     output_path="s3://data/processed/",
     batch_size=5000,
-    compression="gzip"
+    compression="gzip",
 )
 ```
 
@@ -590,6 +639,7 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime
 import json
 
+
 @dataclass
 class Experiment:
     name: str
@@ -599,21 +649,22 @@ class Experiment:
     status: str = "created"
     metrics: dict = field(default_factory=dict)
     tags: list[str] = field(default_factory=list)
-    
+
     def log_metric(self, name: str, value: float):
         if name not in self.metrics:
             self.metrics[name] = []
         self.metrics[name].append(value)
-    
+
     def save(self, path: str):
         with open(path, "w") as f:
             json.dump(asdict(self), f, indent=2)
+
 
 # Usage
 exp = Experiment(
     name="resnet50_v2",
     description="Fine-tuning ResNet50 on custom dataset",
-    config={"lr": 0.001, "epochs": 50, "batch_size": 16}
+    config={"lr": 0.001, "epochs": 50, "batch_size": 16},
 )
 
 exp.log_metric("accuracy", 0.85)
@@ -695,6 +746,7 @@ Create a dataclass hierarchy for nested configuration:
 class LoggingConfig:
     level: str = "INFO"
     format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
 
 @dataclass
 class AppConfig:

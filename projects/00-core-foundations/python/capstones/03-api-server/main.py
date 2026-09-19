@@ -22,6 +22,7 @@ app = FastAPI(
 
 # ── Models ─────────────────────────────────────────────────────────────────
 
+
 class TaskCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200, examples=["Buy groceries"])
     description: str = Field(default="", max_length=1000)
@@ -71,6 +72,7 @@ async def startup():
 
 
 # ── Endpoints ──────────────────────────────────────────────────────────────
+
 
 @app.get("/", tags=["Root"])
 def root():
@@ -172,4 +174,5 @@ def get_stats():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="127.0.0.1", port=8000)

@@ -35,23 +35,24 @@ A **context manager** is an object that defines the runtime context to be establ
 ```python
 class FileManager:
     """Basic context manager for file operations."""
-    
+
     def __init__(self, filename, mode):
         self.filename = filename
         self.mode = mode
         self.file = None
-    
+
     def __enter__(self):
         print(f"Opening {self.filename}")
         self.file = open(self.filename, self.mode)
         return self.file
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         print(f"Closing {self.filename}")
         if self.file:
             self.file.close()
         # Return False to propagate exceptions, True to suppress
         return False
+
 
 # Usage
 with FileManager("test.txt", "w") as f:
@@ -68,7 +69,7 @@ class ExceptionAwareManager:
     def __enter__(self):
         print("Entering context")
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         """
         exc_type:  Exception class (None if no exception)
@@ -81,6 +82,7 @@ class ExceptionAwareManager:
             return False  # Propagate the exception
         print("No exception occurred")
         return False
+
 
 with ExceptionAwareManager():
     print("Doing work")
@@ -99,26 +101,28 @@ with ExceptionAwareManager():
 ```python
 import time
 
+
 class Timer:
     """Context manager that times code execution."""
-    
+
     def __init__(self, label="Block"):
         self.label = label
         self.start = None
         self.elapsed = None
-    
+
     def __enter__(self):
         self.start = time.perf_counter()
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.elapsed = time.perf_counter() - self.start
         print(f"{self.label} took {self.elapsed:.4f}s")
         return False  # Don't suppress exceptions
 
+
 # Usage
 with Timer("Data processing"):
-    total = sum(i ** 2 for i in range(1_000_000))
+    total = sum(i**2 for i in range(1_000_000))
 # "Data processing took 0.1234s"
 ```
 
@@ -127,13 +131,13 @@ with Timer("Data processing"):
 ```python
 class DatabaseConnection:
     """Context manager for database connections."""
-    
+
     def __init__(self, host, port, database):
         self.host = host
         self.port = port
         self.database = database
         self.connection = None
-    
+
     def __enter__(self):
         print(f"Connecting to {self.host}:{self.port}/{self.database}")
         # Simulate connection
@@ -141,21 +145,22 @@ class DatabaseConnection:
             "host": self.host,
             "port": self.port,
             "database": self.database,
-            "connected": True
+            "connected": True,
         }
         return self.connection
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.connection:
             print(f"Disconnecting from {self.database}")
             self.connection["connected"] = False
             self.connection = None
-        
+
         if exc_type is not None:
             print(f"Error: {exc_val}")
             # Rollback on error
             return False  # Propagate exception
         return False
+
 
 # Usage
 with DatabaseConnection("localhost", 5432, "mydb") as conn:
@@ -170,27 +175,30 @@ with DatabaseConnection("localhost", 5432, "mydb") as conn:
 ```python
 import threading
 
+
 class ManagedLock:
     """Context manager for thread locks."""
-    
+
     def __init__(self, lock=None):
         self.lock = lock or threading.Lock()
         self.acquired = False
-    
+
     def __enter__(self):
         self.lock.acquire()
         self.acquired = True
         return self.lock
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.acquired:
             self.lock.release()
             self.acquired = False
         return False
 
+
 # Usage
 lock = ManagedLock()
 shared_data = []
+
 
 def worker():
     with lock:
@@ -207,12 +215,13 @@ The `contextlib.contextmanager` decorator allows you to create context managers 
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def managed_resource(name):
     """Function-based context manager using yield."""
     print(f"Acquiring {name}")
     resource = {"name": name, "active": True}
-    
+
     try:
         yield resource  # Value bound to 'as' variable
     except Exception as e:
@@ -222,6 +231,7 @@ def managed_resource(name):
     finally:
         print(f"Releasing {name}")
         resource["active"] = False
+
 
 # Usage
 with managed_resource("database") as res:
@@ -238,6 +248,7 @@ with managed_resource("database") as res:
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def suppress_and_log(*exceptions):
     """Suppress specified exceptions and log them."""
@@ -245,6 +256,7 @@ def suppress_and_log(*exceptions):
         yield
     except exceptions as e:
         print(f"Suppressed: {type(e).__name__}: {e}")
+
 
 # Usage
 with suppress_and_log(ZeroDivisionError, ValueError):
@@ -260,12 +272,13 @@ print("Continues normally")
 from contextlib import contextmanager
 import time
 
+
 @contextmanager
 def retry_context(max_attempts=3, delay=1):
     """Context manager that retries the block on failure."""
     attempt = 0
     last_exception = None
-    
+
     while attempt < max_attempts:
         try:
             yield attempt
@@ -276,8 +289,9 @@ def retry_context(max_attempts=3, delay=1):
             print(f"Attempt {attempt} failed: {e}")
             if attempt < max_attempts:
                 time.sleep(delay)
-    
+
     raise last_exception
+
 
 # Usage
 with retry_context(max_attempts=3, delay=0.5) as attempt:
@@ -321,6 +335,7 @@ print(f"Captured: {output!r}")
 
 # Capture stderr
 import sys
+
 f = io.StringIO()
 with redirect_stderr(f):
     print("Error message", file=sys.stderr)
@@ -333,20 +348,19 @@ error_output = f.getvalue()
 ```python
 from contextlib import ExitStack
 
+
 def process_files(filenames):
     """Manage multiple context managers dynamically."""
     with ExitStack() as stack:
         # Dynamically enter contexts
-        files = [
-            stack.enter_context(open(fn, "r"))
-            for fn in filenames
-        ]
-        
+        files = [stack.enter_context(open(fn, "r")) for fn in filenames]
+
         # All files are open here
         for f in files:
             print(f.read()[:100])
-        
+
         # All files closed automatically when exiting ExitStack
+
 
 # Usage
 process_files(["file1.txt", "file2.txt", "file3.txt"])
@@ -357,13 +371,15 @@ process_files(["file1.txt", "file2.txt", "file3.txt"])
 ```python
 from contextlib import nullcontext
 
+
 def process_data(data, use_lock=False, lock=None):
     """Optionally use a context manager."""
     cm = lock if use_lock else nullcontext()
-    
+
     with cm:
         # Same code regardless of whether lock is used
         process(data)
+
 
 # In testing, nullcontext replaces real context managers
 with nullcontext():
@@ -375,6 +391,7 @@ with nullcontext():
 ```python
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def async_database_connection(url):
     """Async context manager for database connections."""
@@ -383,6 +400,7 @@ async def async_database_connection(url):
         yield conn
     finally:
         await conn.close()
+
 
 # Usage
 async def main():
@@ -399,10 +417,12 @@ async def main():
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def timer(label="Timer"):
     """Can be used as both context manager and decorator."""
     import time
+
     start = time.perf_counter()
     try:
         yield
@@ -410,9 +430,11 @@ def timer(label="Timer"):
         elapsed = time.perf_counter() - start
         print(f"{label}: {elapsed:.4f}s")
 
+
 # As context manager
 with timer("Sum"):
     total = sum(range(1_000_000))
+
 
 # As decorator
 @timer("Fibonacci")
@@ -427,6 +449,7 @@ def fibonacci(n):
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def database_connection(url):
     conn = connect(url)
@@ -434,6 +457,7 @@ def database_connection(url):
         yield conn
     finally:
         conn.close()
+
 
 @contextmanager
 def transaction(conn):
@@ -444,14 +468,14 @@ def transaction(conn):
         conn.rollback()
         raise
 
+
 # Nested usage
 with database_connection("postgresql://...") as conn:
     with transaction(conn) as tx:
         tx.execute("INSERT INTO users ...")
 
 # Or using multiple with
-with database_connection("postgresql://...") as conn, \
-     transaction(conn) as tx:
+with database_connection("postgresql://...") as conn, transaction(conn) as tx:
     tx.execute("INSERT INTO users ...")
 ```
 
@@ -460,11 +484,13 @@ with database_connection("postgresql://...") as conn, \
 ```python
 from contextlib import contextmanager
 
+
 @contextmanager
 def step1():
     print("Step 1: Setup")
     yield "resource1"
     print("Step 1: Cleanup")
+
 
 @contextmanager
 def step2(resource1):
@@ -472,11 +498,13 @@ def step2(resource1):
     yield "resource2"
     print("Step 2: Cleanup")
 
+
 @contextmanager
 def combined():
     with step1() as r1:
         with step2(r1) as r2:
             yield r1, r2
+
 
 with combined() as (r1, r2):
     print(f"Working with {r1} and {r2}")
@@ -491,6 +519,7 @@ with combined() as (r1, r2):
 ```python
 from contextlib import contextmanager
 import torch
+
 
 @contextmanager
 def load_model(model_path, device="cuda"):
@@ -508,6 +537,7 @@ def load_model(model_path, device="cuda"):
             torch.cuda.empty_cache()
             print("Model unloaded and GPU memory freed")
 
+
 # Usage
 with load_model("model.pt") as model:
     output = model(input_tensor)
@@ -520,6 +550,7 @@ import tempfile
 import shutil
 from pathlib import Path
 
+
 @contextmanager
 def temporary_workspace(prefix="workspace_"):
     """Create a temporary directory for processing."""
@@ -528,6 +559,7 @@ def temporary_workspace(prefix="workspace_"):
         yield Path(tmp_dir)
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
+
 
 # Usage
 with temporary_workspace() as workspace:
@@ -543,6 +575,7 @@ from contextlib import contextmanager
 import json
 import time
 
+
 @contextmanager
 def experiment_tracking(experiment_name, config):
     """Track experiment execution with metrics."""
@@ -551,9 +584,9 @@ def experiment_tracking(experiment_name, config):
         "config": config,
         "start_time": time.time(),
         "metrics": {},
-        "status": "running"
+        "status": "running",
     }
-    
+
     try:
         yield experiment
         experiment["status"] = "completed"
@@ -564,13 +597,15 @@ def experiment_tracking(experiment_name, config):
     finally:
         experiment["end_time"] = time.time()
         experiment["duration"] = experiment["end_time"] - experiment["start_time"]
-        
+
         # Save experiment data
         with open(f"experiments/{experiment_name}.json", "w") as f:
             json.dump(experiment, f, indent=2)
-        
-        print(f"Experiment {experiment_name}: {experiment['status']} "
-              f"({experiment['duration']:.2f}s)")
+
+        print(
+            f"Experiment {experiment_name}: {experiment['status']} ({experiment['duration']:.2f}s)"
+        )
+
 
 # Usage
 with experiment_tracking("resnet50_v2", {"lr": 0.001, "epochs": 10}) as exp:
@@ -591,6 +626,7 @@ class BadManager:
     def __exit__(self, *args):
         return True  # This suppresses all exceptions!
 
+
 # GOOD: Only suppress specific exceptions when intentional
 class GoodManager:
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -608,6 +644,7 @@ def bad_manager():
     resource = acquire()
     yield resource
     resource.release()  # Skipped if exception occurs!
+
 
 # GOOD: Use try/finally
 @contextmanager
@@ -627,6 +664,7 @@ class SuspiciousManager:
     def __exit__(self, *args):
         cleanup()
         return True  # Oops! Suppresses exception after cleanup
+
 
 # BETTER: Explicit exception handling
 class ExplicitManager:

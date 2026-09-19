@@ -58,24 +58,24 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
+
 def make_engine() -> object:
     """Create a brand-new in-memory engine with the schema applied."""
     eng = create_engine("sqlite://", poolclass=StaticPool)
     Base.metadata.create_all(eng)
     return eng
 
+
 def transactional_session(eng):
     """Yield a session whose writes roll back when the generator ends."""
     connection = eng.connect()
-    outer = connection.begin()   # outer transaction: never committed
-    session = Session(
-        bind=connection, join_transaction_mode="create_savepoint"
-    )
+    outer = connection.begin()  # outer transaction: never committed
+    session = Session(bind=connection, join_transaction_mode="create_savepoint")
     try:
         yield session
     finally:
         session.close()
-        outer.rollback()         # discard every write the test made
+        outer.rollback()  # discard every write the test made
         connection.close()
 ```
 
@@ -104,7 +104,7 @@ def simulate_rollback_isolation(eng) -> tuple[int, int]:
     session = next(gen)
     session.add_all([make_experiment("t1-a"), make_experiment("t1-b")])
     seen_test1 = len(session.scalars(select(Experiment.id)).all())
-    gen.close()   # rollback
+    gen.close()  # rollback
 
     # "test 2": a plain committed session must see NONE of test 1's rows
     with Session(bind=eng) as fresh:

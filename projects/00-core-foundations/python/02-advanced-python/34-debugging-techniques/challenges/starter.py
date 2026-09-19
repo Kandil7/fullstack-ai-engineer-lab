@@ -15,6 +15,7 @@ from typing import Callable
 # Bronze: Full-Stack Logging
 # ============================================================
 
+
 def capture(fn: Callable[[], object]) -> str:
     """Run fn; return the full traceback string, or '' on success. O(1)."""
     raise NotImplementedError
@@ -29,6 +30,7 @@ def format_exception_text(exc: BaseException) -> str:
 # Silver: Boundary-Asserting Pipeline
 # ============================================================
 
+
 class DebugPipeline:
     """3-stage pipeline with invariant assertions at each boundary."""
 
@@ -40,6 +42,7 @@ class DebugPipeline:
 # ============================================================
 # Gold: Repro Harness + Config Bisect
 # ============================================================
+
 
 def make_repro(shuffle_seed: int) -> Callable[[list[str]], list[str]]:
     """Return a deterministic shuffler seeded with shuffle_seed. O(n)."""

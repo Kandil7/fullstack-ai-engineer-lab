@@ -11,12 +11,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
 starter_spec = importlib.util.spec_from_file_location(
-    "starter", Path(__file__).parent / "starter.py")
+    "starter", Path(__file__).parent / "starter.py"
+)
 starter_module = importlib.util.module_from_spec(starter_spec)
 starter_spec.loader.exec_module(starter_module)
 
 solution_spec = importlib.util.spec_from_file_location(
-    "solution", Path(__file__).parent / "solution.py")
+    "solution", Path(__file__).parent / "solution.py"
+)
 solution_module = importlib.util.module_from_spec(solution_spec)
 solution_spec.loader.exec_module(solution_module)
 
@@ -32,8 +34,7 @@ class TestCreateProductsTable:
         conn = fresh_conn()
         solution_module.create_products_table(conn)
         with pytest.raises(sqlite3.IntegrityError):
-            conn.execute(
-                "INSERT INTO products (sku, price) VALUES ('A', -5)")
+            conn.execute("INSERT INTO products (sku, price) VALUES ('A', -5)")
 
     def test_null_sku_rejected(self):
         conn = fresh_conn()
@@ -52,15 +53,13 @@ class TestCreateProductsTable:
         conn = fresh_conn()
         solution_module.create_products_table(conn)
         conn.execute("INSERT INTO products (sku, price) VALUES ('A', 1.0)")
-        stock = conn.execute(
-            "SELECT stock FROM products WHERE sku = 'A'").fetchone()[0]
+        stock = conn.execute("SELECT stock FROM products WHERE sku = 'A'").fetchone()[0]
         assert stock == 0
 
     def test_table_actually_exists(self):
         conn = fresh_conn()
         solution_module.create_products_table(conn)
-        names = [r[0] for r in conn.execute(
-            "SELECT name FROM sqlite_master WHERE type='table'")]
+        names = [r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")]
         assert "products" in names
 
 
@@ -68,8 +67,7 @@ class TestAddStatusAndBackfill:
     def _setup(self, conn, n=2500, premium=800):
         solution_module.create_products_table(conn)
         rows = [(f"sku{i}", 100.0 if i < premium else 10.0) for i in range(n)]
-        conn.executemany(
-            "INSERT INTO products (sku, price) VALUES (?, ?)", rows)
+        conn.executemany("INSERT INTO products (sku, price) VALUES (?, ?)", rows)
 
     def test_full_backfill(self):
         conn = fresh_conn()
@@ -94,8 +92,7 @@ class TestAddStatusAndBackfill:
         conn = fresh_conn()
         self._setup(conn)
         solution_module.add_status_and_backfill(conn)
-        nulls = conn.execute(
-            "SELECT COUNT(*) FROM products WHERE status IS NULL").fetchone()[0]
+        nulls = conn.execute("SELECT COUNT(*) FROM products WHERE status IS NULL").fetchone()[0]
         assert nulls == 0
 
 
@@ -127,17 +124,17 @@ class TestCreateAuditSchema:
         conn.execute("INSERT INTO orders DEFAULT VALUES")
         oid = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
         conn.execute(
-            "INSERT INTO order_items (order_id, qty, unit_price) VALUES (?, ?, ?)",
-            (oid, 3, 2.0))
-        total = conn.execute(
-            "SELECT total FROM order_items WHERE order_id = ?", (oid,)).fetchone()[0]
+            "INSERT INTO order_items (order_id, qty, unit_price) VALUES (?, ?, ?)", (oid, 3, 2.0)
+        )
+        total = conn.execute("SELECT total FROM order_items WHERE order_id = ?", (oid,)).fetchone()[
+            0
+        ]
         assert total == pytest.approx(6.0)
 
     def test_items_existed_before_delete(self):
         conn = fresh_conn()
         solution_module.create_audit_schema(conn)
-        assert conn.execute(
-            "SELECT COUNT(*) FROM order_items").fetchone()[0] == 0
+        assert conn.execute("SELECT COUNT(*) FROM order_items").fetchone()[0] == 0
 
 
 if __name__ == "__main__":

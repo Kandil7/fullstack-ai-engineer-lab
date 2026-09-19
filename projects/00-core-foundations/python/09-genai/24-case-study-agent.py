@@ -27,6 +27,7 @@ from typing import Any, Callable
 # Components (compact forms of topics 13, 14, 17)
 # ============================================================
 
+
 @dataclass
 class Tool:
     name: str
@@ -48,17 +49,26 @@ class AgentTrace:
     end_ns: int = 0
 
     def log(self, kind: str, detail: str = "") -> None:
-        self.events.append({"kind": kind, "detail": detail, "at_ms": round(
-            (time.perf_counter_ns() - self.start_ns) / 1e6, 2)})
+        self.events.append(
+            {
+                "kind": kind,
+                "detail": detail,
+                "at_ms": round((time.perf_counter_ns() - self.start_ns) / 1e6, 2),
+            }
+        )
 
     def summary(self) -> dict:
-        return {"request_id": self.request_id, "events": len(self.events),
-                "duration_ms": round((self.end_ns - self.start_ns) / 1e6, 2)}
+        return {
+            "request_id": self.request_id,
+            "events": len(self.events),
+            "duration_ms": round((self.end_ns - self.start_ns) / 1e6, 2),
+        }
 
 
 # ============================================================
 # The Agent
 # ============================================================
+
 
 @dataclass
 class Agent:
@@ -136,9 +146,11 @@ for event in trace.events:
     print(f"  [{event['at_ms']:>6.1f}ms] {event['kind']}: {event['detail'][:60]}")
 print(f"  summary: {trace.summary()}")
 
+
 # Failing path: an agent that repeatedly hits unknown tools
 def broken_planner(task: str) -> list[tuple[str, dict]]:
     return [("ghost_tool", {}), ("ghost_tool", {}), ("ghost_tool", {})]
+
 
 bad_verdict, bad_trace = agent.run("x", broken_planner)
 print(f"\n  broken planner verdict: {bad_verdict}")
@@ -150,8 +162,10 @@ print(f"  failures logged: {sum(1 for e in bad_trace.events if e['kind'] == 'err
 # The production agent wraps everything: bounded steps, budget caps,
 # retries on transient tool errors, and a trace for every request.
 
-def production_agent_run(agent: Agent, task: str, planner,
-                         on_error: Callable[[str], None] | None = None) -> dict:
+
+def production_agent_run(
+    agent: Agent, task: str, planner, on_error: Callable[[str], None] | None = None
+) -> dict:
     verdict, trace = agent.run(task, planner)
     if verdict == "failed" and on_error:
         on_error(trace.summary())
@@ -178,8 +192,9 @@ def _verify() -> None:
     assert verdict == "ok" and trace.events, "agent succeeds"
 
     # bad args cause a failure but the loop continues
-    verdict2, trace2 = a.run("t", lambda t: [("add", {"a": "x", "b": 2}),
-                                             ("add", {"a": 1, "b": 2})])
+    verdict2, trace2 = a.run(
+        "t", lambda t: [("add", {"a": "x", "b": 2}), ("add", {"a": 1, "b": 2})]
+    )
     assert verdict2 == "ok", "recovered after one failure"
     assert any("failed" in e["detail"] for e in trace2.events), "failure logged"
 
@@ -190,8 +205,9 @@ def _verify() -> None:
     # step cap
     a2 = Agent(tools, max_steps=1, max_failures=5, token_budget=1000)
     verdict4, trace4 = a2.run("t", lambda t: [("add", {"a": 1, "b": 1})] * 5)
-    assert any(e["kind"] == "cap" and "max_steps" in e["detail"]
-               for e in trace4.events), "step cap logged"
+    assert any(e["kind"] == "cap" and "max_steps" in e["detail"] for e in trace4.events), (
+        "step cap logged"
+    )
 
     t = Tool("t", {"x": "int"}, lambda x: x)
     try:

@@ -80,7 +80,7 @@ import polars as pl
 df = pl.DataFrame({"user": ["a", "b"], "score": [0.9, 0.4]})
 
 e = pl.col("score").mean()
-print(df.select(e).rows())          # scalar aggregate, 1 row
+print(df.select(e).rows())  # scalar aggregate, 1 row
 print(df.group_by("user").agg(e).sort("user").rows())
 ```
 
@@ -102,8 +102,7 @@ order given. It may compute columns on the fly. Think of it as the
 ```python
 import polars as pl
 
-df = pl.DataFrame({"user": ["a", "b", "c"], "spend": [10, 20, 30],
-                   "score": [0.9, 0.4, 0.7]})
+df = pl.DataFrame({"user": ["a", "b", "c"], "spend": [10, 20, 30], "score": [0.9, 0.4, 0.7]})
 
 out = df.select(
     pl.col("user"),
@@ -135,10 +134,7 @@ df = pl.DataFrame({"score": [0.9, 0.4, 0.7, 0.2], "spend": [10, 20, 30, 40]})
 w = df.with_columns(
     (pl.col("spend") / 100).alias("spend_norm"),
     pl.col("score").rank(descending=True).alias("score_rank"),
-    pl.when(pl.col("score") >= 0.5)
-    .then(pl.lit("high"))
-    .otherwise(pl.lit("low"))
-    .alias("band"),
+    pl.when(pl.col("score") >= 0.5).then(pl.lit("high")).otherwise(pl.lit("low")).alias("band"),
 )
 print(w.columns)
 print(w["band"].to_list())
@@ -163,9 +159,9 @@ boolean keywords.
 ```python
 import polars as pl
 
-df = pl.DataFrame({"user": ["a", "b", "c", "a"],
-                   "score": [0.9, 0.4, 0.7, 0.2],
-                   "spend": [10, 20, 30, 40]})
+df = pl.DataFrame(
+    {"user": ["a", "b", "c", "a"], "score": [0.9, 0.4, 0.7, 0.2], "spend": [10, 20, 30, 40]}
+)
 
 kept = df.filter((pl.col("score") >= 0.5) & (pl.col("spend") >= 15))
 print(kept.rows())
@@ -190,15 +186,19 @@ Python function per group.
 ```python
 import polars as pl
 
-df = pl.DataFrame({"user": ["a", "b", "c", "a"],
-                   "score": [0.9, 0.4, 0.7, 0.2],
-                   "spend": [10, 20, 30, 40]})
+df = pl.DataFrame(
+    {"user": ["a", "b", "c", "a"], "score": [0.9, 0.4, 0.7, 0.2], "spend": [10, 20, 30, 40]}
+)
 
-g = df.group_by("user").agg(
-    pl.col("score").mean().alias("avg_score"),
-    pl.col("spend").sum().alias("total_spend"),
-    pl.len().alias("n_events"),
-).sort("user")
+g = (
+    df.group_by("user")
+    .agg(
+        pl.col("score").mean().alias("avg_score"),
+        pl.col("spend").sum().alias("total_spend"),
+        pl.len().alias("n_events"),
+    )
+    .sort("user")
+)
 print(g.rows())
 ```
 
@@ -220,9 +220,9 @@ the result back onto every row of the group.
 ```python
 import polars as pl
 
-df = pl.DataFrame({"user": ["a", "b", "c", "a"],
-                   "score": [0.9, 0.4, 0.7, 0.2],
-                   "spend": [10, 20, 30, 40]})
+df = pl.DataFrame(
+    {"user": ["a", "b", "c", "a"], "score": [0.9, 0.4, 0.7, 0.2], "spend": [10, 20, 30, 40]}
+)
 
 w = df.with_columns(
     pl.col("spend").rank().over("user").alias("spend_rank_in_user"),
@@ -256,8 +256,10 @@ FEATURES = [
     pl.when(pl.col("score") >= 0.5).then(pl.lit(1)).otherwise(pl.lit(0)).alias("high"),
 ]
 
+
 def build_features(df: pl.DataFrame) -> pl.DataFrame:
     return df.with_columns(FEATURES)
+
 
 df = pl.DataFrame({"user": ["a", "a"], "score": [0.9, None], "spend": [10, 20]})
 print(build_features(df).rows())

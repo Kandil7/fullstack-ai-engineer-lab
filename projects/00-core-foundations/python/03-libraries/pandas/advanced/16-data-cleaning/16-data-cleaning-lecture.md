@@ -24,17 +24,16 @@ Cleaning is not glamorous — it is **most** of an ML engineer's job. A reusable
 ## 2. dtype Repair — The Foundation
 
 ```python
-df = pd.DataFrame({
-    "price": ["$1,234.56", "$99.99", "n/a"],
-    "joined": ["2026-01-05", "2026-02-14", "2025-12-30"],
-    "zip": ["02134", "10001", "94016"],
-})
+df = pd.DataFrame(
+    {
+        "price": ["$1,234.56", "$99.99", "n/a"],
+        "joined": ["2026-01-05", "2026-02-14", "2025-12-30"],
+        "zip": ["02134", "10001", "94016"],
+    }
+)
 
 # String money -> float (strip $ and commas, coerce junk to NaN)
-df["price"] = (
-    df["price"].str.replace(r"[\$,]", "", regex=True)
-               .astype(float)
-)
+df["price"] = df["price"].str.replace(r"[\$,]", "", regex=True).astype(float)
 
 # ISO date strings -> datetime64
 df["joined"] = pd.to_datetime(df["joined"], errors="coerce")
@@ -89,17 +88,21 @@ silently drop.
 df["city"] = df["city"].str.strip().str.title()
 
 # Unify synonyms
-df["status"] = df["status"].replace({
-    "active": "active", "ACTIVE": "active", "Active ": "active",
-    "closed": "inactive", "disabled": "inactive",
-})
+df["status"] = df["status"].replace(
+    {
+        "active": "active",
+        "ACTIVE": "active",
+        "Active ": "active",
+        "closed": "inactive",
+        "disabled": "inactive",
+    }
+)
 
 # Split a combined field
 df[["first", "last"]] = df["full_name"].str.split(" ", n=1, expand=True)
 
 # Categorical cleanup via CategoricalDtype catches typos at assignment
-df["status"] = pd.Categorical(df["status"],
-                              categories=["active", "inactive"])
+df["status"] = pd.Categorical(df["status"], categories=["active", "inactive"])
 ```
 
 ## 6. Missing Values — Strategy by Column

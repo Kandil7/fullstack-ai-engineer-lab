@@ -63,6 +63,7 @@ Base.metadata.create_all(engine)  # module-level schema for the demos below
 # INSERT/UPSERT the test made vanishes WITHOUT any cleanup code.
 # This is the pattern pytest plugins and FastAPI test clients use.
 
+
 def make_engine() -> object:
     """Create a brand-new in-memory engine with the schema applied."""
     eng = create_engine("sqlite://", poolclass=StaticPool)
@@ -84,9 +85,7 @@ def transactional_session(eng):
     """
     connection = eng.connect()
     outer = connection.begin()  # outer transaction: never committed
-    session = Session(
-        bind=connection, join_transaction_mode="create_savepoint"
-    )
+    session = Session(bind=connection, join_transaction_mode="create_savepoint")
     try:
         yield session
     finally:
@@ -106,6 +105,7 @@ def commit_session(eng) -> Session:
 # Two "tests" run against the SAME engine. The first writes rows
 # inside a rollback fixture; the second sees NONE of them. This is
 # the guarantee that makes DB tests parallelizable and repeatable.
+
 
 def simulate_rollback_isolation(eng) -> tuple[int, int]:
     """Run two fake tests; return (rows_test1_saw, rows_test2_saw)."""
@@ -161,6 +161,7 @@ def make_experiment(name: str | None = None, **overrides) -> Experiment:
 # Rollback fixtures are fast but cannot undo DDL. When tests
 # exercise schema behavior (constraints, indexes, migrations),
 # create_all/drop_all per test is the honest answer.
+
 
 def reset_schema(eng) -> None:
     """Drop and recreate every table — per-test schema isolation."""
@@ -255,9 +256,10 @@ def _verify() -> None:
         session.add(Experiment(name="persisted", score=0.7))
         session.commit()
     with commit_session(eng) as session:
-        assert session.scalars(
-            select(Experiment).where(Experiment.name == "persisted")
-        ).first() is not None, "committed writes must survive"
+        assert (
+            session.scalars(select(Experiment).where(Experiment.name == "persisted")).first()
+            is not None
+        ), "committed writes must survive"
 
     # 3. Factory produces unique, override-aware rows
     a = make_experiment()
@@ -292,14 +294,13 @@ def _verify() -> None:
         ).scalar_one()
         assert isinstance(raw, str), "sqlite JSON must be stored as text"
         try:
-            session.execute(
-                text("SELECT config @> '{\"lr\": 0.001}' FROM experiments")
-            )
+            session.execute(text("SELECT config @> '{\"lr\": 0.001}' FROM experiments"))
             jsonb_works = True
         except Exception:
             jsonb_works = False
-        assert jsonb_works is False, \
+        assert jsonb_works is False, (
             "sqlite must NOT support the Postgres JSONB containment operator"
+        )
 
     # 7. Transactions: rollback inside a session undoes flushes
     with Session(bind=eng) as session:
@@ -307,9 +308,7 @@ def _verify() -> None:
         session.flush()
         session.rollback()
     with commit_session(eng) as session:
-        ghosts = session.scalars(
-            select(Experiment).where(Experiment.name == "ghost-row")
-        ).all()
+        ghosts = session.scalars(select(Experiment).where(Experiment.name == "ghost-row")).all()
         assert ghosts == [], "session rollback must undo flushed rows"
 
     print("[OK] 09-testing-with-db: all checks passed")

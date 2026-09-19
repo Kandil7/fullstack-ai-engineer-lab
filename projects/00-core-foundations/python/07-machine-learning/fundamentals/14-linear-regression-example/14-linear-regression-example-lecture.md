@@ -76,9 +76,9 @@ Where:
 ### Step 1: Problem Definition
 
 ```python
-print("="*60)
+print("=" * 60)
 print("LINEAR REGRESSION PROJECT: House Price Prediction")
-print("="*60)
+print("=" * 60)
 
 print("\nStep 1: Problem Definition")
 print("- Predict house prices based on features")
@@ -104,21 +104,25 @@ age = np.random.randint(0, 50, n_samples)
 distance_to_center = np.random.uniform(0.5, 20, n_samples)
 
 # Generate target with realistic relationship
-price = (50000 + 
-         150 * square_feet + 
-         25000 * bedrooms - 
-         1000 * age - 
-         5000 * distance_to_center + 
-         np.random.randn(n_samples) * 25000)
+price = (
+    50000
+    + 150 * square_feet
+    + 25000 * bedrooms
+    - 1000 * age
+    - 5000 * distance_to_center
+    + np.random.randn(n_samples) * 25000
+)
 
 # Create DataFrame
-df = pd.DataFrame({
-    'square_feet': square_feet,
-    'bedrooms': bedrooms,
-    'age': age,
-    'distance_to_center': distance_to_center,
-    'price': price
-})
+df = pd.DataFrame(
+    {
+        "square_feet": square_feet,
+        "bedrooms": bedrooms,
+        "age": age,
+        "distance_to_center": distance_to_center,
+        "price": price,
+    }
+)
 
 print(f"Generated {n_samples} samples")
 print(f"Features: square_feet, bedrooms, age, distance_to_center")
@@ -162,7 +166,7 @@ print("\nStep 4: Feature Engineering")
 
 # Check correlations
 print("\nFeature correlations with price:")
-corr_with_price = df.corr()['price'].drop('price').sort_values(ascending=False)
+corr_with_price = df.corr()["price"].drop("price").sort_values(ascending=False)
 print(corr_with_price)
 ```
 
@@ -177,16 +181,14 @@ from sklearn.preprocessing import StandardScaler
 print("\nStep 5: Data Preparation")
 
 # Separate features and target
-X = df.drop('price', axis=1)
-y = df['price']
+X = df.drop("price", axis=1)
+y = df["price"]
 
 print(f"Features shape: {X.shape}")
 print(f"Target shape: {y.shape}")
 
 # Train/test split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 print(f"\nTraining set: {len(X_train)} samples")
 print(f"Test set: {len(X_test)} samples")
@@ -271,10 +273,9 @@ print("\nStep 8: Model Interpretation")
 
 # Feature importance
 importance = np.abs(model.coef_)
-feature_importance = pd.DataFrame({
-    'feature': X.columns,
-    'importance': importance
-}).sort_values('importance', ascending=False)
+feature_importance = pd.DataFrame({"feature": X.columns, "importance": importance}).sort_values(
+    "importance", ascending=False
+)
 
 print("\nFeature Importance (absolute coefficients):")
 for _, row in feature_importance.iterrows():
@@ -298,12 +299,14 @@ print(f"  - Each km from center reduces price by ~${abs(model.coef_[3]):.0f}")
 print("\nStep 9: Making Predictions")
 
 # New houses to predict
-new_houses = pd.DataFrame({
-    'square_feet': [1500, 2500, 3500],
-    'bedrooms': [3, 4, 5],
-    'age': [10, 5, 2],
-    'distance_to_center': [5.0, 2.0, 10.0]
-})
+new_houses = pd.DataFrame(
+    {
+        "square_feet": [1500, 2500, 3500],
+        "bedrooms": [3, 4, 5],
+        "age": [10, 5, 2],
+        "distance_to_center": [5.0, 2.0, 10.0],
+    }
+)
 
 print("\nNew houses to predict:")
 print(new_houses)
@@ -316,7 +319,7 @@ predictions = model.predict(new_houses_scaled)
 
 print("\nPredictions:")
 for i, (_, house) in enumerate(new_houses.iterrows()):
-    print(f"  House {i+1}: {house['square_feet']} sqft, {house['bedrooms']} bedrooms")
+    print(f"  House {i + 1}: {house['square_feet']} sqft, {house['bedrooms']} bedrooms")
     print(f"    Predicted price: ${predictions[i]:,.0f}")
 ```
 
@@ -325,12 +328,12 @@ for i, (_, house) in enumerate(new_houses.iterrows()):
 ### Step 10: Model Summary
 
 ```python
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("PROJECT SUMMARY")
-print("="*60)
+print("=" * 60)
 
 print("\nModel Performance:")
-print(f"  - R² Score: {test_r2:.4f} (explains {test_r2*100:.1f}% of price variance)")
+print(f"  - R² Score: {test_r2:.4f} (explains {test_r2 * 100:.1f}% of price variance)")
 print(f"  - RMSE: ${test_rmse:,.0f} (average prediction error)")
 print(f"  - MAE: ${test_mae:,.0f} (average absolute error)")
 
@@ -349,7 +352,7 @@ print("\nNext Steps:")
 print("  - Add more features (location, condition, etc.)")
 print("  - Try polynomial regression for non-linear relationships")
 print("  - Use cross-validation for more robust evaluation")
-print("="*60)
+print("=" * 60)
 ```
 
 ---
@@ -400,16 +403,16 @@ plt.figure(figsize=(10, 4))
 
 plt.subplot(1, 2, 1)
 plt.scatter(y_pred_test, residuals)
-plt.xlabel('Predicted')
-plt.ylabel('Residuals')
-plt.title('Residuals vs Predicted')
-plt.axhline(y=0, color='r', linestyle='--')
+plt.xlabel("Predicted")
+plt.ylabel("Residuals")
+plt.title("Residuals vs Predicted")
+plt.axhline(y=0, color="r", linestyle="--")
 
 plt.subplot(1, 2, 2)
 plt.hist(residuals, bins=20)
-plt.xlabel('Residual')
-plt.ylabel('Frequency')
-plt.title('Residual Distribution')
+plt.xlabel("Residual")
+plt.ylabel("Frequency")
+plt.title("Residual Distribution")
 
 plt.tight_layout()
 plt.show()
@@ -446,7 +449,7 @@ score = model.score(X_test_scaled, y_test)
 from sklearn.model_selection import cross_val_score
 
 model = LinearRegression()
-cv_scores = cross_val_score(model, X_train_scaled, y_train, cv=5, scoring='r2')
+cv_scores = cross_val_score(model, X_train_scaled, y_train, cv=5, scoring="r2")
 
 print(f"CV R² scores: {cv_scores}")
 print(f"Mean R²: {cv_scores.mean():.4f} +/- {cv_scores.std():.4f}")
@@ -458,10 +461,7 @@ print(f"Mean R²: {cv_scores.mean():.4f} +/- {cv_scores.std():.4f}")
 # Create a reproducible pipeline
 from sklearn.pipeline import Pipeline
 
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('model', LinearRegression())
-])
+pipeline = Pipeline([("scaler", StandardScaler()), ("model", LinearRegression())])
 
 # Train
 pipeline.fit(X_train, y_train)
@@ -476,10 +476,10 @@ predictions = pipeline.predict(X_test)
 import joblib
 
 # Save model and scaler
-joblib.dump(pipeline, 'house_price_model.pkl')
+joblib.dump(pipeline, "house_price_model.pkl")
 
 # Load later
-loaded_pipeline = joblib.load('house_price_model.pkl')
+loaded_pipeline = joblib.load("house_price_model.pkl")
 predictions = loaded_pipeline.predict(new_data)
 ```
 
@@ -496,17 +496,20 @@ Extend the model to capture non-linear relationships.
 2. Compare performance with linear model
 3. Check for overfitting
 """
+
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import r2_score
 
 # Your code here
-poly_pipeline = Pipeline([
-    ('poly', PolynomialFeatures(degree=2, include_bias=False)),
-    ('scaler', StandardScaler()),
-    ('model', LinearRegression())
-])
+poly_pipeline = Pipeline(
+    [
+        ("poly", PolynomialFeatures(degree=2, include_bias=False)),
+        ("scaler", StandardScaler()),
+        ("model", LinearRegression()),
+    ]
+)
 
 poly_pipeline.fit(X_train, y_train)
 
@@ -526,14 +529,11 @@ Try Ridge and Lasso regression to handle potential overfitting.
 2. Train Lasso regression (alpha=1.0)
 3. Compare coefficients with linear regression
 """
+
 from sklearn.linear_model import Ridge, Lasso
 
 # Your code here
-models = {
-    'Linear': LinearRegression(),
-    'Ridge': Ridge(alpha=1.0),
-    'Lasso': Lasso(alpha=1.0)
-}
+models = {"Linear": LinearRegression(), "Ridge": Ridge(alpha=1.0), "Lasso": Lasso(alpha=1.0)}
 
 for name, model in models.items():
     model.fit(X_train_scaled, y_train)
@@ -552,8 +552,9 @@ Use correlation analysis to select the best features.
 3. Train model with only those features
 4. Compare performance
 """
+
 # Your code here
-corr_with_price = df.corr()['price'].drop('price').abs().sort_values(ascending=False)
+corr_with_price = df.corr()["price"].drop("price").abs().sort_values(ascending=False)
 print("Feature correlations:")
 print(corr_with_price)
 

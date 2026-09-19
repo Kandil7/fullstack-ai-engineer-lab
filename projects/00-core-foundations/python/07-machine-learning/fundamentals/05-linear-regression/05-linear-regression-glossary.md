@@ -170,11 +170,7 @@ y = b₀ + b₁x₁ + b₂x₂ + ... + bₙxₙ
 from sklearn.linear_model import LinearRegression
 
 # Features: square_feet, bedrooms, age
-X = np.array([
-    [1500, 3, 10],
-    [2000, 4, 5],
-    [1200, 2, 15]
-])
+X = np.array([[1500, 3, 10], [2000, 4, 5], [1200, 2, 15]])
 y = np.array([300000, 450000, 250000])
 
 model = LinearRegression()

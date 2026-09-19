@@ -131,15 +131,15 @@ df.info()
 # <class 'pandas.core.frame.DataFrame'>
 # RangeIndex: 244 entries, 0 to 243
 # Data columns (total 7 columns):
-#  #   Column      Non-Null Count  Dtype  
-# ---  ------      --------------  -----  
+#  #   Column      Non-Null Count  Dtype
+# ---  ------      --------------  -----
 #  0   total_bill  244 non-null    float64
 #  1   tip         244 non-null    float64
-#  2   sex         244 non-null    object 
-#  3   smoker      244 non-null    object 
-#  4   day         244 non-null    object 
-#  5   time        244 non-null    object 
-#  6   size        244 non-null    int64  
+#  2   sex         244 non-null    object
+#  3   smoker      244 non-null    object
+#  4   day         244 non-null    object
+#  5   time        244 non-null    object
+#  6   size        244 non-null    int64
 # dtypes: float64(2), int64(1), object(4)
 # memory usage: 13.5+ KB
 ```

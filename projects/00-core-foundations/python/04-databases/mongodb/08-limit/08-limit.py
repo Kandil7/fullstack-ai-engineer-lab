@@ -27,7 +27,7 @@ products = [
     {"_id": 9, "name": "Notebook", "price": 12.99, "category": "Stationery"},
     {"_id": 10, "name": "Pen Set", "price": 24.99, "category": "Stationery"},
     {"_id": 11, "name": "Stapler", "price": 15.99, "category": "Stationery"},
-    {"_id": 12, "name": "Tape Dispenser", "price": 8.99, "category": "Stationery"}
+    {"_id": 12, "name": "Tape Dispenser", "price": 8.99, "category": "Stationery"},
 ]
 
 # ============================================================
@@ -37,9 +37,11 @@ products = [
 # Example 1: Limit to first 5 results
 # MongoDB equivalent: db.products.find().limit(5)
 
+
 def limit_results(collection, limit):
     """Return only the first 'limit' documents"""
     return collection[:limit]
+
 
 first_5 = limit_results(products, 5)
 print("First 5 products:")
@@ -59,9 +61,11 @@ for product in first_3:
 # Example 3: Skip first 5 results
 # MongoDB equivalent: db.products.find().skip(5)
 
+
 def skip_results(collection, skip):
     """Skip the first 'skip' documents"""
     return collection[skip:]
+
 
 skip_5 = skip_results(products, 5)
 print("\nAfter skipping 5:")
@@ -81,9 +85,11 @@ for product in skip_10:
 # Example 5: Get products 6-10 (page 2 with 5 per page)
 # MongoDB equivalent: db.products.find().skip(5).limit(5)
 
+
 def paginate(collection, skip=0, limit=5):
     """Get a page of results"""
-    return collection[skip:skip + limit]
+    return collection[skip : skip + limit]
+
 
 page_2 = paginate(products, skip=5, limit=5)
 print("\nPage 2 (products 6-10):")
@@ -100,22 +106,25 @@ for product in page_3:
 # Pagination Pattern
 # ============================================================
 
+
 # Example 7: Full pagination implementation
 def get_page(collection, page_number, page_size=5):
     """Get a specific page of results"""
     skip = (page_number - 1) * page_size
-    return collection[skip:skip + page_size]
+    return collection[skip : skip + page_size]
+
 
 def get_total_pages(collection, page_size=5):
     """Calculate total number of pages"""
     return (len(collection) + page_size - 1) // page_size
+
 
 def get_pagination_info(collection, page_number, page_size=5):
     """Get full pagination information"""
     total_items = len(collection)
     total_pages = get_total_pages(collection, page_size)
     items_on_page = len(get_page(collection, page_number, page_size))
-    
+
     return {
         "page": page_number,
         "page_size": page_size,
@@ -123,8 +132,9 @@ def get_pagination_info(collection, page_number, page_size=5):
         "total_pages": total_pages,
         "items_on_page": items_on_page,
         "has_next": page_number < total_pages,
-        "has_prev": page_number > 1
+        "has_prev": page_number > 1,
     }
+
 
 # Display all pages
 print("\n" + "=" * 40)
@@ -150,14 +160,17 @@ for page in range(1, total_pages + 1):
 # Example 8: Count all documents
 # MongoDB equivalent: db.products.count_documents({})
 
+
 def count_all(collection):
     """Count all documents"""
     return len(collection)
+
 
 print(f"\nTotal products: {count_all(products)}")
 
 # Example 9: Count with filter
 # MongoDB equivalent: db.products.count_documents({"category": "Electronics"})
+
 
 def count_filtered(collection, query):
     """Count documents matching a query"""
@@ -172,6 +185,7 @@ def count_filtered(collection, query):
             count += 1
     return count
 
+
 electronics_count = count_filtered(products, {"category": "Electronics"})
 print(f"Electronics products: {electronics_count}")
 
@@ -181,6 +195,7 @@ print(f"Furniture products: {furniture_count}")
 # ============================================================
 # Advanced Pagination
 # ============================================================
+
 
 # Example 10: Cursor-style pagination (using _id)
 def get_page_by_id(collection, last_id=None, limit=5):
@@ -194,8 +209,9 @@ def get_page_by_id(collection, last_id=None, limit=5):
             if doc["_id"] == last_id:
                 start = i + 1
                 break
-    
-    return collection[start:start + limit]
+
+    return collection[start : start + limit]
+
 
 print("\n" + "=" * 40)
 print("ID-based Pagination")
@@ -225,11 +241,13 @@ for product in batch3:
 # Limit with Sort
 # ============================================================
 
+
 # Example 11: Get top 3 most expensive products
 def top_n_products(collection, n, sort_field="price", reverse=True):
     """Get top N products by a field"""
     sorted_products = sorted(collection, key=lambda x: x.get(sort_field, 0), reverse=reverse)
     return sorted_products[:n]
+
 
 top_3_expensive = top_n_products(products, 3)
 print("\nTop 3 most expensive:")
@@ -239,6 +257,7 @@ for i, product in enumerate(top_3_expensive, 1):
 # ============================================================
 # Practical Examples
 # ============================================================
+
 
 # Example 12: Search with pagination
 def search_paginated(collection, query, page=1, page_size=5):
@@ -255,22 +274,25 @@ def search_paginated(collection, query, page=1, page_size=5):
                 break
         if match:
             filtered.append(doc)
-    
+
     # Paginate
     skip = (page - 1) * page_size
-    results = filtered[skip:skip + page_size]
-    
+    results = filtered[skip : skip + page_size]
+
     return {
         "results": results,
         "total": len(filtered),
         "page": page,
-        "total_pages": (len(filtered) + page_size - 1) // page_size
+        "total_pages": (len(filtered) + page_size - 1) // page_size,
     }
+
 
 # Search for electronics
 search_result = search_paginated(products, {"category": "Electronics"}, page=1, page_size=2)
 print("\nSearch 'Electronics' (page 1, 2 per page):")
-print(f"  Found {search_result['total']} items, showing page {search_result['page']}/{search_result['total_pages']}")
+print(
+    f"  Found {search_result['total']} items, showing page {search_result['page']}/{search_result['total_pages']}"
+)
 for product in search_result["results"]:
     print(f"    {product['name']}: ${product['price']}")
 
@@ -292,6 +314,7 @@ print("""
 8. Always calculate total_pages for UI pagination
 9. Consider cursor-based pagination for real-time data
 """)
+
 
 # ============================================================
 # Self-Verification  (MANDATORY)

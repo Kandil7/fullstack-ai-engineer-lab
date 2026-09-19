@@ -14,6 +14,4 @@ DSA_FILES = discover_phase_files("06-data-structures-algorithms")
 def test_dsa_example_runs(filepath):
     """Every DSA example must execute without errors (and without hanging)."""
     result = run_py_file(filepath, timeout=120)
-    assert result.returncode == 0, (
-        f"{filepath.name} failed:\n{result.stderr[-500:]}"
-    )
+    assert result.returncode == 0, f"{filepath.name} failed:\n{result.stderr[-500:]}"

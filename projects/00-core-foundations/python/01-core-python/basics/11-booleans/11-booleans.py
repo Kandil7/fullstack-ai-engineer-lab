@@ -30,24 +30,24 @@ print(f"type(x) = {type(x)}")
 print("\n--- bool() Function ---")
 
 # These evaluate to True:
-print(f"bool(1) = {bool(1)}")           # True (non-zero int)
-print(f"bool(-1) = {bool(-1)}")         # True (negative int)
-print(f"bool(3.14) = {bool(3.14)}")     # True (non-zero float)
+print(f"bool(1) = {bool(1)}")  # True (non-zero int)
+print(f"bool(-1) = {bool(-1)}")  # True (negative int)
+print(f"bool(3.14) = {bool(3.14)}")  # True (non-zero float)
 print(f"bool('hello') = {bool('hello')}")  # True (non-empty string)
-print(f"bool([1,2]) = {bool([1,2])}")   # True (non-empty list)
-d = {'a': 1}
+print(f"bool([1,2]) = {bool([1, 2])}")  # True (non-empty list)
+d = {"a": 1}
 print(f"bool(d) = {bool(d)}")  # True (non-empty dict)
 
 # These evaluate to False:
-print(f"bool(0) = {bool(0)}")           # False (zero)
-print(f"bool(0.0) = {bool(0.0)}")       # False (zero float)
-print(f"bool('') = {bool('')}")         # False (empty string)
-print(f"bool([]) = {bool([])}")         # False (empty list)
-print(f"bool(()) = {bool(())}")         # False (empty tuple)
+print(f"bool(0) = {bool(0)}")  # False (zero)
+print(f"bool(0.0) = {bool(0.0)}")  # False (zero float)
+print(f"bool('') = {bool('')}")  # False (empty string)
+print(f"bool([]) = {bool([])}")  # False (empty list)
+print(f"bool(()) = {bool(())}")  # False (empty tuple)
 d = {}
-print(f"bool(d) = {bool(d)}")     # False (empty dict)
-print(f"bool(set()) = {bool(set())}")   # False (empty set)
-print(f"bool(None) = {bool(None)}")     # False (None)
+print(f"bool(d) = {bool(d)}")  # False (empty dict)
+print(f"bool(set()) = {bool(set())}")  # False (empty set)
+print(f"bool(None) = {bool(None)}")  # False (None)
 
 # ============================================================
 # Comparison Operators (Return Booleans)
@@ -57,12 +57,12 @@ print("\n--- Comparison Operators ---")
 x = 10
 y = 20
 
-print(f"{x} == {y}: {x == y}")   # False - equal
-print(f"{x} != {y}: {x != y}")   # True - not equal
-print(f"{x} > {y}: {x > y}")     # False - greater than
-print(f"{x} < {y}: {x < y}")     # True - less than
-print(f"{x} >= {y}: {x >= y}")   # False - greater or equal
-print(f"{x} <= {y}: {x <= y}")   # True - less or equal
+print(f"{x} == {y}: {x == y}")  # False - equal
+print(f"{x} != {y}: {x != y}")  # True - not equal
+print(f"{x} > {y}: {x > y}")  # False - greater than
+print(f"{x} < {y}: {x < y}")  # True - less than
+print(f"{x} >= {y}: {x >= y}")  # False - greater or equal
+print(f"{x} <= {y}: {x <= y}")  # True - less or equal
 
 # Output:
 # 10 == 20: False
@@ -81,18 +81,18 @@ print("\n--- Logical Operators ---")
 x = True
 y = False
 
-print(f"True and True: {True and True}")      # True
-print(f"True and False: {True and False}")    # False
-print(f"False and True: {False and True}")    # False
+print(f"True and True: {True and True}")  # True
+print(f"True and False: {True and False}")  # False
+print(f"False and True: {False and True}")  # False
 print(f"False and False: {False and False}")  # False
 
-print(f"True or True: {True or True}")        # True
-print(f"True or False: {True or False}")      # True
-print(f"False or True: {False or True}")      # True
-print(f"False or False: {False or False}")    # False
+print(f"True or True: {True or True}")  # True
+print(f"True or False: {True or False}")  # True
+print(f"False or True: {False or True}")  # True
+print(f"False or False: {False or False}")  # False
 
-print(f"not True: {not True}")                # False
-print(f"not False: {not False}")              # True
+print(f"not True: {not True}")  # False
+print(f"not False: {not False}")  # True
 
 # ============================================================
 # Practical Boolean Examples
@@ -156,20 +156,20 @@ print(f"(not p) and (not q) = {(not p) and (not q)}")
 # Both should be False (De Morgan's Law)
 
 # Double negation
-print(f"not not True = {not not True}")    # True
+print(f"not not True = {not not True}")  # True
 print(f"not not False = {not not False}")  # False
 
 # ============================================================
 # Booleans are Subclass of int
 # ============================================================
 # Example 8: Booleans in math
-print(f"\nTrue + True = {True + True}")      # 2
-print(f"True * 10 = {True * 10}")           # 10
-print(f"False + 5 = {False + 5}")           # 5
-print(f"False * 100 = {False * 100}")       # 0
-print(f"True == 1: {True == 1}")            # True
-print(f"False == 0: {False == 0}")          # True
-print(f"True > False: {True > False}")      # True
+print(f"\nTrue + True = {True + True}")  # 2
+print(f"True * 10 = {True * 10}")  # 10
+print(f"False + 5 = {False + 5}")  # 5
+print(f"False * 100 = {False * 100}")  # 0
+print(f"True == 1: {True == 1}")  # True
+print(f"False == 0: {False == 0}")  # True
+print(f"True > False: {True > False}")  # True
 
 # ============================================================
 # Summary

@@ -37,7 +37,7 @@ the dominant adapter family for LLMs.
 (possibly frozen) for a new task.
 **Example**:
 ```python
-backbone.features     # the reusable part; head is task-specific
+backbone.features  # the reusable part; head is task-specific
 ```
 **Related**: Head, Pretraining
 
@@ -54,7 +54,7 @@ linear probe.
 **Example**:
 ```python
 with torch.no_grad():
-    feats = model.features(x)   # (N, d) embeddings
+    feats = model.features(x)  # (N, d) embeddings
 ```
 **Related**: Feature extraction, Linear probe
 

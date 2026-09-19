@@ -21,8 +21,10 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np
 from scipy import stats  # noqa: E402
 
-OUT = ("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/"
-       "projects/00-core-foundations/python/outputs/scipy")
+OUT = (
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/"
+    "projects/00-core-foundations/python/outputs/scipy"
+)
 os.makedirs(OUT, exist_ok=True)
 
 rng = np.random.default_rng(42)
@@ -37,7 +39,7 @@ rng = np.random.default_rng(42)
 
 a = rng.normal(loc=0.0, scale=1.0, size=60)
 b = rng.normal(loc=0.5, scale=1.0, size=60)
-t, p = stats.ttest_ind(a, b)          # Welch's t-test (equal_var=False default)
+t, p = stats.ttest_ind(a, b)  # Welch's t-test (equal_var=False default)
 print(f"Example 1: t={t:.3f}  p={p:.4f}  significant={p < 0.05}")
 
 # Identical samples -> zero evidence for an effect:
@@ -81,9 +83,9 @@ print(f"Example 3: kruskal: H={H:.3f} p={p_kruskal:.2e}")
 # t-test assumes normality; Mann-Whitney only assumes ordinal values.
 # Use it on skewed, heavy-tailed, or bounded data (revenue, latency).
 
-u1 = rng.exponential(scale=1.0, size=80)          # skewed!
-u2 = rng.exponential(scale=1.0, size=80)          # same distribution
-u3 = rng.exponential(scale=1.3, size=80)          # shifted scale
+u1 = rng.exponential(scale=1.0, size=80)  # skewed!
+u2 = rng.exponential(scale=1.0, size=80)  # same distribution
+u3 = rng.exponential(scale=1.3, size=80)  # shifted scale
 U_same, p_us = stats.mannwhitneyu(u1, u2, alternative="two-sided")
 U_diff, p_ud = stats.mannwhitneyu(u1, u3, alternative="two-sided")
 print(f"Example 4: same dist: U={U_same:.0f} p={p_us:.4f}")
@@ -95,8 +97,8 @@ print(f"Example 4: shifted:   U={U_diff:.0f} p={p_ud:.2e}")
 # chisquare = goodness of fit (observed vs expected); chi2_contingency
 # = independence of two categorical variables.
 
-fair = rng.integers(1, 7, size=600)               # fair die
-_, obs = np.unique(fair, return_counts=True)      # np.unique -> (values, counts)
+fair = rng.integers(1, 7, size=600)  # fair die
+_, obs = np.unique(fair, return_counts=True)  # np.unique -> (values, counts)
 chi2, p_gof = stats.chisquare(obs)
 print(f"Example 5: fair die chi2={chi2:.3f} p={p_gof:.4f}")
 
@@ -105,7 +107,7 @@ _, obs2 = np.unique(loaded, return_counts=True)
 chi2b, p_gofb = stats.chisquare(obs2)
 print(f"Example 5: loaded die chi2={chi2b:.3f} p={p_gofb:.2e}")
 
-table = np.array([[120, 80], [70, 130]])          # rows: variant, cols: outcome
+table = np.array([[120, 80], [70, 130]])  # rows: variant, cols: outcome
 chi2c, p_c, dof_c, expected = stats.chi2_contingency(table)
 print(f"Example 5: contingency chi2={chi2c:.3f} p={p_c:.2e} df={dof_c}")
 
@@ -144,6 +146,7 @@ print(f"Example 7: spearman rho={r_spear:.3f} p={p_spear:.2e}")
 #   Bonferroni: multiply every p-value by the number of tests (conservative).
 #   Benjamini-Hochberg (FDR): sort, scale by rank, enforce monotonicity.
 
+
 def bonferroni(pvals: np.ndarray) -> np.ndarray:
     """p-values corrected by the Bonferroni method (cap at 1)."""
     return np.minimum(1.0, np.asarray(pvals, dtype=float) * pvals.size)
@@ -155,7 +158,7 @@ def benjamini_hochberg(pvals: np.ndarray) -> np.ndarray:
     n = p.size
     order = np.argsort(p)
     adjusted = p[order] * n / np.arange(1, n + 1)
-    adjusted = np.minimum.accumulate(adjusted[::-1])[::-1]   # monotone
+    adjusted = np.minimum.accumulate(adjusted[::-1])[::-1]  # monotone
     corrected = np.empty_like(adjusted)
     corrected[order] = np.minimum(adjusted, 1.0)
     return corrected
@@ -165,14 +168,14 @@ pvals = np.array([0.001, 0.009, 0.02, 0.03, 0.05, 0.07, 0.5, 0.6, 0.8, 0.9])
 p_bonf = bonferroni(pvals)
 p_bh = benjamini_hochberg(pvals)
 print(f"Example 8: raw p<0.05 count: {(pvals < 0.05).sum()}")
-print(f"Example 8: bonferroni rejects: {(p_bonf < 0.05).sum()} | "
-      f"BH rejects: {(p_bh < 0.05).sum()}")
+print(f"Example 8: bonferroni rejects: {(p_bonf < 0.05).sum()} | BH rejects: {(p_bh < 0.05).sum()}")
 
 # ---------------------------------------------------------------------------
 # Example 9: effect size and power — beyond "is it significant?"
 # ---------------------------------------------------------------------------
 # p answers "is there an effect?"; Cohen's d answers "how big?"; power
 # answers "could this study have detected it?".
+
 
 def cohen_d(group1, group2):
     """Standardized mean difference: (m1 - m2) / pooled std."""
@@ -189,7 +192,7 @@ def sample_size_t2(effect_size, alpha=0.05, power=0.8):
     """
     z_alpha2 = stats.norm.ppf(1.0 - alpha / 2)
     z_power = stats.norm.ppf(power)
-    return 2.0 * (z_alpha2 + z_power) ** 2 / effect_size ** 2
+    return 2.0 * (z_alpha2 + z_power) ** 2 / effect_size**2
 
 
 d_effect = cohen_d(rng.normal(0.0, 1.0, 100), rng.normal(0.5, 1.0, 100))
@@ -198,6 +201,7 @@ print(f"Example 9: cohen d (0.5 shift) ~ {d_effect:.3f}")
 # Required sample size for a two-sample t-test: effect 0.5, alpha 0.05, power 0.8
 n_needed = sample_size_t2(effect_size=0.5)
 print(f"Example 9: n per group for d=0.5, power=0.8: {n_needed:.1f}")
+
 
 # ---------------------------------------------------------------------------
 # Example 10: a power curve (plot)
@@ -208,7 +212,7 @@ def power_t2(n, effect_size, alpha=0.05):
     power = Phi(sqrt(n * d^2 / 2) - z_{1-alpha/2})
     """
     z_alpha2 = stats.norm.ppf(1.0 - alpha / 2)
-    return stats.norm.cdf(np.sqrt(n * effect_size ** 2 / 2.0) - z_alpha2)
+    return stats.norm.cdf(np.sqrt(n * effect_size**2 / 2.0) - z_alpha2)
 
 
 ns = np.arange(10, 201, 5)
@@ -242,13 +246,11 @@ def _verify() -> None:
     assert p2 < 1e-5
 
     # 3. ANOVA separates mixed groups
-    _, p3 = stats.f_oneway(rng.normal(size=40), rng.normal(size=40),
-                           rng.normal(loc=1.5, size=40))
+    _, p3 = stats.f_oneway(rng.normal(size=40), rng.normal(size=40), rng.normal(loc=1.5, size=40))
     assert p3 < 1e-3
 
     # 4. Mann-Whitney detects a scale shift in skewed data
-    _, p4 = stats.mannwhitneyu(rng.exponential(size=100),
-                               rng.exponential(scale=1.8, size=100))
+    _, p4 = stats.mannwhitneyu(rng.exponential(size=100), rng.exponential(scale=1.8, size=100))
     assert p4 < 0.01
 
     # 5. chi-square GOF: fair die passes, loaded die fails

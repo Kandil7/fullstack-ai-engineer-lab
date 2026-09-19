@@ -61,9 +61,7 @@ conn.executemany(
         for t in range(12000)
     ],
 )
-plan = conn.execute(
-    "EXPLAIN QUERY PLAN SELECT id FROM events WHERE tenant_id = ?", (3,)
-).fetchall()
+plan = conn.execute("EXPLAIN QUERY PLAN SELECT id FROM events WHERE tenant_id = ?", (3,)).fetchall()
 print(f"1. before index: {plan}  <- SCAN, reads every row")
 print()
 
@@ -84,9 +82,7 @@ plan = conn.execute(
 print(f"2. composite index used: {any('idx_events_tenant_time' in str(r) for r in plan)}")
 # ORDER BY created_at alone cannot use it: created_at is the SECOND key,
 # so the planner must still sort (see the USE TEMP B-TREE step below).
-plan = conn.execute(
-    "EXPLAIN QUERY PLAN SELECT id FROM events ORDER BY created_at"
-).fetchall()
+plan = conn.execute("EXPLAIN QUERY PLAN SELECT id FROM events ORDER BY created_at").fetchall()
 print("   ORDER BY created_at alone (needs the FIRST key for equality first):")
 print("   ", plan)
 print()
@@ -112,7 +108,9 @@ plan = conn.execute(
     "EXPLAIN QUERY PLAN SELECT id FROM events WHERE latency_ms > 500.0 AND tenant_id = ?",
     (2,),
 ).fetchall()
-print(f"3. partial index chosen for the hot subset: {any('idx_events_active' in str(r) for r in plan)}")
+print(
+    f"3. partial index chosen for the hot subset: {any('idx_events_active' in str(r) for r in plan)}"
+)
 print("   plan:", plan)
 print()
 
@@ -158,9 +156,7 @@ conn.execute("CREATE INDEX idx_flags_flag ON flags (flag)")
 plan_common = conn.execute(
     "EXPLAIN QUERY PLAN SELECT id FROM flags WHERE flag = ?", (1,)
 ).fetchall()
-plan_rare = conn.execute(
-    "EXPLAIN QUERY PLAN SELECT id FROM flags WHERE flag = ?", (0,)
-).fetchall()
+plan_rare = conn.execute("EXPLAIN QUERY PLAN SELECT id FROM flags WHERE flag = ?", (0,)).fetchall()
 print("5. flag=1 (95% of rows):", plan_common)
 print("   flag=0 (5% of rows): ", plan_rare)
 print("   sqlite uses the index for both here; on Postgres the 95% query")
@@ -176,7 +172,9 @@ print()
 # the indexes no plan references.
 
 # Example 6: audit which indexes the real query workload uses
-conn.execute("CREATE TABLE features (id INTEGER PRIMARY KEY, model TEXT, is_active INTEGER, latency_ms REAL)")
+conn.execute(
+    "CREATE TABLE features (id INTEGER PRIMARY KEY, model TEXT, is_active INTEGER, latency_ms REAL)"
+)
 conn.executemany(
     "INSERT INTO features (model, is_active, latency_ms) VALUES (?, ?, ?)",
     [("m" + str(t % 10), 1, float(t % 100)) for t in range(20000)],
@@ -201,14 +199,13 @@ print(f"6. indexes referenced by the workload: {sorted(referenced)}")
 print(f"   unused candidates (pg_stat_user_indexes.idx_scan = 0 analog): {unused}")
 print()
 
+
 # ============================================================
 # 7. Real Postgres index zoo (guarded — skips when no server)
 # ============================================================
 def pg_demo() -> None:
     """Create GIN/GiST/BRIN/Hash indexes + read EXPLAIN; [skip] when down."""
-    dsn = os.environ.get(
-        "PGDSN", "postgresql://postgres:postgres@localhost:5432/postgres"
-    )
+    dsn = os.environ.get("PGDSN", "postgresql://postgres:postgres@localhost:5432/postgres")
     try:
         import psycopg
     except ImportError:
@@ -223,17 +220,16 @@ def pg_demo() -> None:
                 cur.execute("CREATE INDEX ON docs USING btree (id) WHERE id > 0")
                 # EXPLAIN with BUFFERS proves plan + IO cost
                 cur.execute(
-                    "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) "
-                    "SELECT id FROM docs WHERE id = 1"
+                    "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) SELECT id FROM docs WHERE id = 1"
                 )
                 plan_json = cur.fetchone()[0][0]
                 node = plan_json["Plan"]
-                print(f"7. real EXPLAIN: node type={node['Node Type']}, "
-                      f"actual rows={node['Actual Rows']}")
-                # Unused-index audit — the pg_stat_user_indexes query
-                cur.execute(
-                    "SELECT indexrelname FROM pg_stat_user_indexes WHERE idx_scan = 0"
+                print(
+                    f"7. real EXPLAIN: node type={node['Node Type']}, "
+                    f"actual rows={node['Actual Rows']}"
                 )
+                # Unused-index audit — the pg_stat_user_indexes query
+                cur.execute("SELECT indexrelname FROM pg_stat_user_indexes WHERE idx_scan = 0")
                 print("   indexes with idx_scan = 0:", [r[0] for r in cur.fetchall()])
     except Exception as exc:  # noqa: BLE001
         print(
@@ -262,18 +258,16 @@ print()
 #
 # MISTAKE: B-tree for jsonb containment -> does not work; CORRECT: GIN
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
+
     # Each concept gets its own table so the planner has ONE candidate.
-    def _seed(
-        conn: sqlite3.Connection, g: str = "g", v: str = "v"
-    ) -> None:
-        conn.execute(
-            f"CREATE TABLE t (id INTEGER PRIMARY KEY, {g} TEXT, {v} REAL)"
-        )
+    def _seed(conn: sqlite3.Connection, g: str = "g", v: str = "v") -> None:
+        conn.execute(f"CREATE TABLE t (id INTEGER PRIMARY KEY, {g} TEXT, {v} REAL)")
         conn.executemany(
             f"INSERT INTO t ({g}, {v}) VALUES (?, ?)",
             [(f"{g}{i % 4}", float(i) % 10.0) for i in range(12000)],
@@ -288,8 +282,9 @@ def _verify() -> None:
             "EXPLAIN QUERY PLAN SELECT id FROM t WHERE g = ? AND v > ?",
             ("g1", 3.0),
         ).fetchall()
-        assert any("idx_t_g_v" in str(r) for r in plan), \
+        assert any("idx_t_g_v" in str(r) for r in plan), (
             "composite index must be used for prefix equality + range"
+        )
 
         # 2. Partial index (only candidate) is used for its subset
         conn.execute("DROP INDEX idx_t_g_v")
@@ -298,8 +293,7 @@ def _verify() -> None:
             "EXPLAIN QUERY PLAN SELECT id FROM t WHERE v > 5.0 AND g = ?",
             ("g2",),
         ).fetchall()
-        assert any("idx_t_big" in str(r) for r in plan), \
-            "partial index must match the predicate"
+        assert any("idx_t_big" in str(r) for r in plan), "partial index must match the predicate"
     finally:
         conn.close()
 
@@ -307,16 +301,13 @@ def _verify() -> None:
     conn = sqlite3.connect(":memory:")
     try:
         conn.execute("CREATE TABLE u (id INTEGER PRIMARY KEY, email TEXT)")
-        conn.executemany(
-            "INSERT INTO u (email) VALUES (?)", [(f"U{i}@X.com",) for i in range(30)]
-        )
+        conn.executemany("INSERT INTO u (email) VALUES (?)", [(f"U{i}@X.com",) for i in range(30)])
         conn.execute("CREATE INDEX idx_u_lower ON u (lower(email))")
         plan = conn.execute(
             "EXPLAIN QUERY PLAN SELECT id FROM u WHERE lower(email) = ?",
             ("u1@x.com",),
         ).fetchall()
-        assert any("idx_u_lower" in str(r) for r in plan), \
-            "expression index must be used"
+        assert any("idx_u_lower" in str(r) for r in plan), "expression index must be used"
     finally:
         conn.close()
 
@@ -335,10 +326,12 @@ def _verify() -> None:
         plan_rare_2 = conn.execute(
             "EXPLAIN QUERY PLAN SELECT id FROM f WHERE flag = ?", (0,)
         ).fetchall()
-        assert any("idx_f_flag" in str(r) for r in plan_rare), \
+        assert any("idx_f_flag" in str(r) for r in plan_rare), (
             "rare-value predicate must reference the index"
-        assert str(plan_rare) == str(plan_rare_2), \
+        )
+        assert str(plan_rare) == str(plan_rare_2), (
             "the planner must be deterministic for identical queries"
+        )
     finally:
         conn.close()
 
@@ -348,13 +341,11 @@ def _verify() -> None:
         _seed(conn)
         conn.execute("CREATE INDEX idx_t_g_v ON t (g, v)")
         conn.execute("CREATE INDEX idx_t_never ON t (v)")
-        plan = conn.execute(
-            "EXPLAIN QUERY PLAN SELECT id FROM t WHERE g = ?", ("g1",)
-        ).fetchall()
-        assert any("idx_t_g_v" in str(r) for r in plan), \
-            "workload query must use its index"
-        assert not any("idx_t_never" in str(r) for r in plan), \
+        plan = conn.execute("EXPLAIN QUERY PLAN SELECT id FROM t WHERE g = ?", ("g1",)).fetchall()
+        assert any("idx_t_g_v" in str(r) for r in plan), "workload query must use its index"
+        assert not any("idx_t_never" in str(r) for r in plan), (
             "idx_t_never must appear in no plan (unused index)"
+        )
 
         # 6. ANALYZE runs and does not change the chosen plan
         conn.execute("ANALYZE")
@@ -362,8 +353,9 @@ def _verify() -> None:
             "EXPLAIN QUERY PLAN SELECT id FROM t WHERE g = ? AND v > ?",
             ("g1", 3.0),
         ).fetchall()
-        assert any("idx_t_g_v" in str(r) for r in plan_after), \
+        assert any("idx_t_g_v" in str(r) for r in plan_after), (
             "ANALYZE must not break the composite-index plan"
+        )
     finally:
         conn.close()
 
@@ -380,4 +372,4 @@ if __name__ == "__main__":
         print("3. Partial indexes shrink to the hot subset")
         print("4. Expression indexes match transformed predicates")
         print("5. Read the plan on the real engine; ANALYZE; drop idx_scan = 0")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

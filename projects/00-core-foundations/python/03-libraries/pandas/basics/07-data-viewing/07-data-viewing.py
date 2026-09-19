@@ -4,6 +4,7 @@ W3Schools: https://www.w3schools.com/python/pandas_viewing_data.asp
 
 Pandas provides many methods to inspect and view your data quickly.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -12,22 +13,48 @@ import numpy as np
 # ---------------------------------------------------------------------------
 
 np.random.seed(42)
-df = pd.DataFrame({
-    "Name": [
-        "Alice", "Bob", "Charlie", "Diana", "Eve",
-        "Frank", "Grace", "Heidi", "Ivan", "Judy",
-    ],
-    "Department": [
-        "Engineering", "Marketing", "Engineering", "Sales", "Engineering",
-        "Marketing", "Sales", "Engineering", "Marketing", "Sales",
-    ],
-    "Age": [25, 30, 35, 28, 22, 40, 33, 29, 45, 31],
-    "Salary": [
-        70000, 80000, 95000, 75000, 65000,
-        88000, 72000, 91000, 85000, 68000,
-    ],
-    "Performance": np.random.randint(60, 100, 10),
-})
+df = pd.DataFrame(
+    {
+        "Name": [
+            "Alice",
+            "Bob",
+            "Charlie",
+            "Diana",
+            "Eve",
+            "Frank",
+            "Grace",
+            "Heidi",
+            "Ivan",
+            "Judy",
+        ],
+        "Department": [
+            "Engineering",
+            "Marketing",
+            "Engineering",
+            "Sales",
+            "Engineering",
+            "Marketing",
+            "Sales",
+            "Engineering",
+            "Marketing",
+            "Sales",
+        ],
+        "Age": [25, 30, 35, 28, 22, 40, 33, 29, 45, 31],
+        "Salary": [
+            70000,
+            80000,
+            95000,
+            75000,
+            65000,
+            88000,
+            72000,
+            91000,
+            85000,
+            68000,
+        ],
+        "Performance": np.random.randint(60, 100, 10),
+    }
+)
 
 print("Full DataFrame:")
 print(df)

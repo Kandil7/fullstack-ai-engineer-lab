@@ -26,7 +26,7 @@ print("\nExample 2: Types of ML")
 ml_types = {
     "Supervised Learning": "Learns from labeled data (classification, regression)",
     "Unsupervised Learning": "Finds patterns in unlabeled data (clustering, dimensionality reduction)",
-    "Reinforcement Learning": "Learns through trial and error with rewards"
+    "Reinforcement Learning": "Learns through trial and error with rewards",
 }
 for ml_type, description in ml_types.items():
     print(f"{ml_type}: {description}")
@@ -53,7 +53,7 @@ workflow_steps = [
     "4. Train Model",
     "5. Evaluate Model",
     "6. Tune Parameters",
-    "7. Deploy Model"
+    "7. Deploy Model",
 ]
 for step in workflow_steps:
     print(step)
@@ -101,16 +101,14 @@ print(f"Simple model accuracy: {accuracy:.2%}")
 
 # Example 8: Numerical data
 print("\nExample 8: Numerical data example")
-numerical_data = np.array([[1.0, 2.0, 3.0],
-                           [4.0, 5.0, 6.0],
-                           [7.0, 8.0, 9.0]])
+numerical_data = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]])
 print(f"Numerical data shape: {numerical_data.shape}")
 
 # Example 9: Categorical data encoding
 print("\nExample 9: Encoding categorical data")
 from sklearn.preprocessing import LabelEncoder
 
-categories = np.array(['cat', 'dog', 'bird', 'cat', 'dog'])
+categories = np.array(["cat", "dog", "bird", "cat", "dog"])
 le = LabelEncoder()
 encoded = le.fit_transform(categories)
 print(f"Original: {categories}")
@@ -128,16 +126,16 @@ libraries = {
     "Pandas": "Data manipulation and analysis",
     "Scikit-learn": "Machine learning algorithms",
     "Matplotlib": "Data visualization",
-    "Seaborn": "Statistical visualization"
+    "Seaborn": "Statistical visualization",
 }
 for lib, purpose in libraries.items():
     print(f"{lib}: {purpose}")
 
 # Summary
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Machine Learning: Systems that learn from data")
 print("- Main types: Supervised, Unsupervised, Reinforcement")
 print("- Scikit-learn provides easy-to-use ML tools")
 print("- Basic workflow: Data -> Prepare -> Train -> Evaluate")
-print("="*60)
+print("=" * 60)

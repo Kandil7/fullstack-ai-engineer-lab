@@ -32,8 +32,12 @@ print("Support vectors are the closest points to the hyperplane")
 print("\nExample 2: Linear Data")
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=200, n_features=2, n_redundant=0,
-    n_informative=2, random_state=42, n_clusters_per_class=1
+    n_samples=200,
+    n_features=2,
+    n_redundant=0,
+    n_informative=2,
+    random_state=42,
+    n_clusters_per_class=1,
 )
 
 print(f"Samples: {X.shape[0]}")
@@ -41,9 +45,7 @@ print(f"Features: {X.shape[1]}")
 
 # Example 3: Train/test split
 print("\nExample 3: Train/Test Split")
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Scale features
 scaler = StandardScaler()
@@ -52,7 +54,7 @@ X_test_scaled = scaler.transform(X_test)
 
 # Example 4: Linear SVM
 print("\nExample 4: Linear SVM")
-svm_linear = SVC(kernel='linear', random_state=42)
+svm_linear = SVC(kernel="linear", random_state=42)
 svm_linear.fit(X_train_scaled, y_train)
 
 y_pred = svm_linear.predict(X_test_scaled)
@@ -87,7 +89,7 @@ print("We need the kernel trick to handle it")
 
 # Example 7: Different kernels
 print("\nExample 7: Different Kernels")
-kernels = ['linear', 'rbf', 'poly', 'sigmoid']
+kernels = ["linear", "rbf", "poly", "sigmoid"]
 
 X_train_c, X_test_c, y_train_c, y_test_c = train_test_split(
     X_circles, y_circles, test_size=0.2, random_state=42
@@ -118,13 +120,13 @@ print("\nExample 9: Parameter Tuning")
 results = []
 for C in [0.1, 1, 10, 100]:
     for gamma in [0.1, 1, 10]:
-        svm = SVC(kernel='rbf', C=C, gamma=gamma, random_state=42)
+        svm = SVC(kernel="rbf", C=C, gamma=gamma, random_state=42)
         svm.fit(X_train_scaled, y_train)
         acc = accuracy_score(y_test, svm.predict(X_test_scaled))
-        results.append({'C': C, 'gamma': gamma, 'accuracy': acc})
+        results.append({"C": C, "gamma": gamma, "accuracy": acc})
 
 # Find best
-best = max(results, key=lambda x: x['accuracy'])
+best = max(results, key=lambda x: x["accuracy"])
 print(f"Best parameters: C={best['C']}, gamma={best['gamma']}")
 print(f"Best accuracy: {best['accuracy']:.4f}")
 
@@ -134,7 +136,7 @@ print(f"Best accuracy: {best['accuracy']:.4f}")
 
 # Example 10: Support vectors
 print("\nExample 10: Support Vectors")
-svm = SVC(kernel='rbf', random_state=42)
+svm = SVC(kernel="rbf", random_state=42)
 svm.fit(X_train_scaled, y_train)
 
 print(f"Number of support vectors per class: {svm.n_support_}")
@@ -159,7 +161,7 @@ scaler_reg = StandardScaler()
 X_train_reg_scaled = scaler_reg.fit_transform(X_train_reg)
 X_test_reg_scaled = scaler_reg.transform(X_test_reg)
 
-svr = SVR(kernel='rbf')
+svr = SVR(kernel="rbf")
 svr.fit(X_train_reg_scaled, y_train_reg)
 
 r2 = r2_score(y_test_reg, svr.predict(X_test_reg_scaled))
@@ -185,7 +187,7 @@ print("  - No probability estimates by default")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- SVM finds the best hyperplane to separate classes")
 print("- Kernel trick handles non-linear data")
@@ -193,4 +195,4 @@ print("- RBF kernel is most common")
 print("- Scale features before SVM")
 print("- Good for high-dimensional data")
 print("- Tune C and gamma for best performance")
-print("="*60)
+print("=" * 60)

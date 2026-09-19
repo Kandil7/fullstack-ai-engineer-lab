@@ -27,6 +27,7 @@ from typing import Any
 # A model moves: None -> Staging -> Production -> Archived.
 # Only a promotion (with a reason and an approver) moves it forward.
 
+
 @dataclass
 class RegisteredModel:
     name: str
@@ -53,21 +54,23 @@ GATES = {
 # 2. The Registry
 # ============================================================
 
+
 class ModelRegistry:
     def __init__(self) -> None:
         self._models: dict[str, list[RegisteredModel]] = {}
 
-    def register(self, name: str, metrics: dict[str, float],
-                 signature: dict[str, Any]) -> RegisteredModel:
+    def register(
+        self, name: str, metrics: dict[str, float], signature: dict[str, Any]
+    ) -> RegisteredModel:
         versions = self._models.setdefault(name, [])
         version = max((m.version for m in versions), default=0) + 1
-        model = RegisteredModel(name=name, version=version,
-                                metrics=metrics, signature=signature)
+        model = RegisteredModel(name=name, version=version, metrics=metrics, signature=signature)
         versions.append(model)
         return model
 
-    def promote(self, model: RegisteredModel, to_stage: str,
-                by: str, reason: str, force: bool = False) -> tuple[bool, str]:
+    def promote(
+        self, model: RegisteredModel, to_stage: str, by: str, reason: str, force: bool = False
+    ) -> tuple[bool, str]:
         """Promote a model to a stage, enforcing gates.
 
         ``force=True`` bypasses gates - reserved for rollbacks, where an
@@ -112,10 +115,16 @@ class ModelRegistry:
 registry = ModelRegistry()
 
 # Example 1: register two candidate models
-m1 = registry.register("churn", metrics={"accuracy": 0.88, "latency_ms": 5.0},
-                       signature={"input": ["int"], "output": ["float"]})
-m2 = registry.register("churn", metrics={"accuracy": 0.94, "latency_ms": 8.0},
-                       signature={"input": ["int"], "output": ["float"]})
+m1 = registry.register(
+    "churn",
+    metrics={"accuracy": 0.88, "latency_ms": 5.0},
+    signature={"input": ["int"], "output": ["float"]},
+)
+m2 = registry.register(
+    "churn",
+    metrics={"accuracy": 0.94, "latency_ms": 8.0},
+    signature={"input": ["int"], "output": ["float"]},
+)
 print("Example 1: registered versions")
 print(f"  {m1.name} v{m1.version}: accuracy={m1.metrics['accuracy']}")
 print(f"  {m2.name} v{m2.version}: accuracy={m2.metrics['accuracy']}")
@@ -138,10 +147,12 @@ assert live is m2, "only one model in production"
 # Example 4: rollback = force-promote the archived version. Gates apply
 # to NEW promotions; a rollback is an explicit operator decision to revert
 # a regression, so it is forced but still fully logged.
-ok3, msg3 = registry.promote(m1, "Production", by="bob",
-                             reason="rollback: m2 regression", force=True)
+ok3, msg3 = registry.promote(
+    m1, "Production", by="bob", reason="rollback: m2 regression", force=True
+)
 print(f"\nExample 4: rollback (forced, logged) -> {msg3} (ok={ok3})")
 assert ok3 and registry.get_stage("churn", "Production") is m1, "rollback must swap live model"
+
 
 # ============================================================
 # Production Pattern

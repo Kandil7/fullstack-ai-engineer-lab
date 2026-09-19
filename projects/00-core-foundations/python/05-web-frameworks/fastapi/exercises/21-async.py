@@ -27,6 +27,7 @@ app = FastAPI(title="Async Programming Exercises")
 # Exercise 21.1: Sync vs Async Endpoints
 # ============================================================
 
+
 @app.get("/sync/slow")
 def sync_slow():
     """Synchronous endpoint that blocks the thread for 2 seconds."""
@@ -76,7 +77,7 @@ async def compare():
         "sync_sequential": round(sync_duration, 2),
         "async_concurrent": round(async_duration, 2),
         "sync_results": sync_results,
-        "async_results": async_results
+        "async_results": async_results,
     }
 
 
@@ -123,23 +124,21 @@ async def admin_dashboard(user: dict = Depends(get_admin_user)):
         "dashboard": {
             "total_users": len(MOCK_USERS),
             "active_sessions": 42,
-            "system_health": "good"
-        }
+            "system_health": "good",
+        },
     }
 
 
 @app.get("/admin/users")
 async def admin_list_users(
-    user: dict = Depends(get_admin_user),
-    rate_ok: dict = Depends(check_rate_limit)
+    user: dict = Depends(get_admin_user), rate_ok: dict = Depends(check_rate_limit)
 ):
     """Admin-only users list with rate limiting."""
     return {
         "admin": user["name"],
         "users": [
-            {"id": uid, "name": u["name"], "role": u["role"]}
-            for uid, u in MOCK_USERS.items()
-        ]
+            {"id": uid, "name": u["name"], "role": u["role"]} for uid, u in MOCK_USERS.items()
+        ],
     }
 
 
@@ -152,6 +151,7 @@ async def get_profile(user: dict = Depends(get_current_user)):
 # ============================================================
 # Exercise 21.3: Concurrent HTTP Requests
 # ============================================================
+
 
 # Simulated external API functions
 async def fetch_weather(city: str) -> dict:
@@ -250,11 +250,7 @@ async def process_job(job_id: str, data: dict):
 async def start_processing(data: dict):
     """Start async processing and return job ID."""
     job_id = str(uuid.uuid4())
-    jobs[job_id] = {
-        "status": "pending",
-        "progress": 0,
-        "created_at": datetime.utcnow().isoformat()
-    }
+    jobs[job_id] = {"status": "pending", "progress": 0, "created_at": datetime.utcnow().isoformat()}
     asyncio.create_task(process_job(job_id, data))
     return {"job_id": job_id, "status": "pending"}
 
@@ -270,7 +266,7 @@ async def get_job_status(job_id: str):
         "status": job["status"],
         "progress": job.get("progress", 0),
         "result": job.get("result"),
-        "error": job.get("error")
+        "error": job.get("error"),
     }
 
 
@@ -290,6 +286,7 @@ async def cancel_job(job_id: str):
 # ============================================================
 # Exercise 21.5: Async Rate Limiter (Advanced)
 # ============================================================
+
 
 class AsyncRateLimiter:
     """Sliding window rate limiter using asyncio.Lock for thread safety."""
@@ -311,10 +308,7 @@ class AsyncRateLimiter:
                 self.requests[key] = []
 
             # Remove old timestamps outside the window
-            self.requests[key] = [
-                t for t in self.requests[key]
-                if now - t < self.window
-            ]
+            self.requests[key] = [t for t in self.requests[key] if now - t < self.window]
 
             remaining = self.limit - len(self.requests[key])
             if remaining <= 0:
@@ -337,9 +331,7 @@ async def rate_limited_data(x_api_key: str = Header(default="default")):
 
     if not allowed:
         raise HTTPException(
-            status_code=429,
-            detail="Rate limit exceeded",
-            headers={"Retry-After": str(info)}
+            status_code=429, detail="Rate limit exceeded", headers={"Retry-After": str(info)}
         )
 
     return {
@@ -347,6 +339,6 @@ async def rate_limited_data(x_api_key: str = Header(default="default")):
         "rate_limit": {
             "limit": rate_limiter.limit,
             "remaining": info,
-            "window_seconds": rate_limiter.window
-        }
+            "window_seconds": rate_limiter.window,
+        },
     }

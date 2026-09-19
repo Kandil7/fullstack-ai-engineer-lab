@@ -33,11 +33,11 @@ data_dict = {i: i for i in data}
 
 # Search comparison
 start = time.time()
-999999 in data       # O(n)
+999999 in data  # O(n)
 list_time = time.time() - start
 
 start = time.time()
-999999 in data_set   # O(1)
+999999 in data_set  # O(1)
 set_time = time.time() - start
 
 print(f"List search: {list_time:.6f}s")
@@ -80,8 +80,8 @@ Python dictionaries use hash tables with open addressing for collision resolutio
 
 ```python
 # How hashing works
-hash("hello")      # Hash value
-hash((1, 2, 3))   # Hashable types
+hash("hello")  # Hash value
+hash((1, 2, 3))  # Hashable types
 # hash([1, 2, 3]) # TypeError: unhashable type
 
 # Dictionary internals
@@ -127,7 +127,7 @@ od = OrderedDict()
 od["first"] = 1
 od["second"] = 2
 od.move_to_end("first")  # Move to end
-print(list(od.keys()))   # ['second', 'first']
+print(list(od.keys()))  # ['second', 'first']
 ```
 
 ---
@@ -145,16 +145,16 @@ import time
 start = time.time()
 queue_list = []
 for i in range(100000):
-    queue_list.append(i)      # O(1)
-    _ = queue_list.pop(0)     # O(n) - shifts all elements
+    queue_list.append(i)  # O(1)
+    _ = queue_list.pop(0)  # O(n) - shifts all elements
 list_time = time.time() - start
 
 # Deque as queue - FAST
 start = time.time()
 queue_deque = deque()
 for i in range(100000):
-    queue_deque.append(i)     # O(1)
-    _ = queue_deque.popleft() # O(1)
+    queue_deque.append(i)  # O(1)
+    _ = queue_deque.popleft()  # O(1)
 deque_time = time.time() - start
 
 print(f"List queue: {list_time:.4f}s")
@@ -166,7 +166,7 @@ recent.append(1)
 recent.append(2)
 recent.append(3)
 recent.append(4)  # Auto-removes 1
-print(recent)     # deque([2, 3, 4])
+print(recent)  # deque([2, 3, 4])
 ```
 
 ---
@@ -183,7 +183,7 @@ from collections import Counter, ChainMap
 text = "hello world hello python world hello"
 word_count = Counter(text.split())
 print(word_count.most_common(2))  # [('hello', 3), ('world', 2)]
-print(word_count["missing"])      # 0 (no KeyError)
+print(word_count["missing"])  # 0 (no KeyError)
 
 # Counter arithmetic
 a = Counter(["x", "y", "x"])
@@ -195,8 +195,8 @@ print(a - b)  # Counter({'y': 1})
 defaults = {"color": "red", "user": "guest"}
 environment = {"user": "admin"}
 config = ChainMap(environment, defaults)
-print(config["user"])     # admin (first found)
-print(config["color"])    # red (from defaults)
+print(config["user"])  # admin (first found)
+print(config["color"])  # red (from defaults)
 ```
 
 ---
@@ -224,6 +224,7 @@ print(len(set_of_sets))  # 2
 # Can't modify
 fs = frozenset([1, 2, 3])
 # fs.add(4)  # AttributeError: 'frozenset' object has no attribute 'add'
+
 
 # Useful for caching/memoization keys
 def compute(input_set):
@@ -259,7 +260,7 @@ heapq.heapify(data)  # In-place transformation
 
 # Get n largest/smallest
 nums = [4, 1, 7, 3, 8, 2]
-print(heapq.nlargest(3, nums))   # [8, 7, 4]
+print(heapq.nlargest(3, nums))  # [8, 7, 4]
 print(heapq.nsmallest(2, nums))  # [1, 2]
 
 # Priority queue pattern
@@ -287,14 +288,16 @@ from collections import namedtuple
 Point = namedtuple("Point", ["x", "y"])
 p = Point(1, 2)
 
-print(p.x, p.y)      # 1 2 (attribute access)
-print(p[0], p[1])     # 1 2 (index access)
-print(p)              # Point(x=1, y=2)
+print(p.x, p.y)  # 1 2 (attribute access)
+print(p[0], p[1])  # 1 2 (index access)
+print(p)  # Point(x=1, y=2)
+
 
 # Useful for returning multiple values with names
 def get_user_info():
     User = namedtuple("User", ["name", "email", "age"])
     return User("Alice", "alice@example.com", 30)
+
 
 user = get_user_info()
 print(f"{user.name} is {user.age}")
@@ -328,6 +331,7 @@ pos = bisect.bisect_right(sorted_list, 3)  # 2 (after 3)
 bisect.insort(sorted_list, 4)
 print(sorted_list)  # [1, 3, 4, 5, 7, 9]
 
+
 # Binary search
 def find_closest(sorted_arr, target):
     pos = bisect.bisect_left(sorted_arr, target)
@@ -340,6 +344,7 @@ def find_closest(sorted_arr, target):
     if target - before < after - target:
         return before
     return after
+
 
 nums = [1, 3, 5, 7, 9]
 print(find_closest(nums, 4))  # 3
@@ -362,11 +367,11 @@ list_ints = [i for i in range(1000)]
 print(f"List: {sys.getsizeof(list_ints)} bytes")
 
 # Array of integers
-array_ints = array.array('i', range(1000))
+array_ints = array.array("i", range(1000))
 print(f"Array: {sys.getsizeof(array_ints)} bytes")
 
 # Array operations
-arr = array.array('i', [1, 2, 3, 4, 5])
+arr = array.array("i", [1, 2, 3, 4, 5])
 arr.append(6)
 arr.extend([7, 8])
 print(arr)  # array('i', [1, 2, 3, 4, 5, 6, 7, 8])
@@ -459,12 +464,14 @@ Weak references allow garbage collection of objects even when referenced.
 ```python
 import weakref
 
+
 class Data:
     def __init__(self, value):
         self.value = value
-    
+
     def __repr__(self):
         return f"Data({self.value})"
+
 
 # WeakValueDictionary
 cache = weakref.WeakValueDictionary()
@@ -472,7 +479,7 @@ obj1 = Data(1)
 cache["key1"] = obj1  # Weak reference
 
 print(cache["key1"])  # Data(1)
-del obj1              # Object can be garbage collected
+del obj1  # Object can be garbage collected
 print("key1" in cache)  # False (reference gone)
 
 # WeakSet
@@ -498,10 +505,10 @@ Sets are unordered collections of unique elements, optimized for membership test
 a = {1, 2, 3, 4}
 b = {3, 4, 5, 6}
 
-print(a | b)   # Union: {1, 2, 3, 4, 5, 6}
-print(a & b)   # Intersection: {3, 4}
-print(a - b)   # Difference: {1, 2}
-print(a ^ b)   # Symmetric difference: {1, 2, 5, 6}
+print(a | b)  # Union: {1, 2, 3, 4, 5, 6}
+print(a & b)  # Intersection: {3, 4}
+print(a - b)  # Difference: {1, 2}
+print(a ^ b)  # Symmetric difference: {1, 2, 5, 6}
 
 # Practical uses
 # 1. Remove duplicates
@@ -543,9 +550,10 @@ def two_sum(nums, target):
         seen[num] = i
     return []
 
+
 # Test
 print(two_sum([2, 7, 11, 15], 9))  # [0, 1]
-print(two_sum([3, 2, 4], 6))        # [1, 2]
+print(two_sum([3, 2, 4], 6))  # [1, 2]
 
 # Time: O(n), Space: O(n)
 ```
@@ -560,6 +568,7 @@ print(two_sum([3, 2, 4], 6))        # [1, 2]
 ```python
 from collections import defaultdict
 
+
 def group_anagrams(words):
     groups = defaultdict(list)
     for word in words:
@@ -567,6 +576,7 @@ def group_anagrams(words):
         key = "".join(sorted(word.lower()))
         groups[key].append(word)
     return list(groups.values())
+
 
 # Test
 words = ["listen", "silent", "enlist", "rat", "tar", "art"]
@@ -586,17 +596,18 @@ print(group_anagrams(words))
 ```python
 from collections import OrderedDict
 
+
 class LRUCache:
     def __init__(self, capacity):
         self.capacity = capacity
         self.cache = OrderedDict()
-    
+
     def get(self, key):
         if key not in self.cache:
             return -1
         self.cache.move_to_end(key)
         return self.cache[key]
-    
+
     def put(self, key, value):
         if key in self.cache:
             self.cache.move_to_end(key)
@@ -604,13 +615,14 @@ class LRUCache:
         if len(self.cache) > self.capacity:
             self.cache.popitem(last=False)
 
+
 # Test
 cache = LRUCache(2)
 cache.put(1, 1)
 cache.put(2, 2)
-print(cache.get(1))    # 1
-cache.put(3, 3)        # Evicts key 2
-print(cache.get(2))    # -1
+print(cache.get(1))  # 1
+cache.put(3, 3)  # Evicts key 2
+print(cache.get(2))  # -1
 ```
 
 ---
@@ -624,7 +636,7 @@ print(cache.get(2))    # -1
 def merge_sorted(list1, list2):
     result = []
     i = j = 0
-    
+
     while i < len(list1) and j < len(list2):
         if list1[i] <= list2[j]:
             result.append(list1[i])
@@ -632,16 +644,19 @@ def merge_sorted(list1, list2):
         else:
             result.append(list2[j])
             j += 1
-    
+
     result.extend(list1[i:])
     result.extend(list2[j:])
     return result
 
+
 # Alternative using heapq
 import heapq
 
+
 def merge_sorted_heapq(list1, list2):
     return list(heapq.merge(list1, list2))
+
 
 # Test
 print(merge_sorted([1, 3, 5], [2, 4, 6]))  # [1, 2, 3, 4, 5, 6]
@@ -661,7 +676,7 @@ def majority_element(nums):
     # Boyer-Moore Voting Algorithm
     candidate = None
     count = 0
-    
+
     for num in nums:
         if count == 0:
             candidate = num
@@ -670,14 +685,16 @@ def majority_element(nums):
             count += 1
         else:
             count -= 1
-    
+
     # Verify (optional if majority guaranteed)
     if nums.count(candidate) > len(nums) // 2:
         return candidate
     return None
 
+
 # Alternative using Counter
 from collections import Counter
+
 
 def majority_element_counter(nums):
     counts = Counter(nums)
@@ -685,8 +702,9 @@ def majority_element_counter(nums):
         if count > len(nums) // 2:
             return num
 
+
 # Test
-print(majority_element([3, 3, 4]))      # 3
+print(majority_element([3, 3, 4]))  # 3
 print(majority_element([2, 2, 1, 1, 1]))  # 1
 
 # Time: O(n), Space: O(1)
@@ -705,10 +723,11 @@ class TrieNode:
         self.children = {}
         self.is_end = False
 
+
 class Trie:
     def __init__(self):
         self.root = TrieNode()
-    
+
     def insert(self, word):
         node = self.root
         for char in word:
@@ -716,7 +735,7 @@ class Trie:
                 node.children[char] = TrieNode()
             node = node.children[char]
         node.is_end = True
-    
+
     def search(self, word):
         node = self.root
         for char in word:
@@ -724,7 +743,7 @@ class Trie:
                 return False
             node = node.children[char]
         return node.is_end
-    
+
     def starts_with(self, prefix):
         node = self.root
         for char in prefix:
@@ -732,23 +751,24 @@ class Trie:
                 return False
             node = node.children[char]
         return True
-    
+
     def autocomplete(self, prefix):
         node = self.root
         for char in prefix:
             if char not in node.children:
                 return []
             node = node.children[char]
-        
+
         results = []
         self._dfs(node, prefix, results)
         return results
-    
+
     def _dfs(self, node, path, results):
         if node.is_end:
             results.append(path)
         for char, child in node.children.items():
             self._dfs(child, path + char, results)
+
 
 # Test
 trie = Trie()
@@ -757,9 +777,9 @@ trie.insert("app")
 trie.insert("application")
 trie.insert("banana")
 
-print(trie.search("apple"))        # True
-print(trie.starts_with("app"))     # True
-print(trie.autocomplete("app"))    # ['app', 'apple', 'application']
+print(trie.search("apple"))  # True
+print(trie.starts_with("app"))  # True
+print(trie.autocomplete("app"))  # ['app', 'apple', 'application']
 ```
 
 ---
@@ -780,11 +800,14 @@ def find_duplicates(nums):
             nums[index] = -nums[index]
     return result
 
+
 # Alternative using Counter
 from collections import Counter
 
+
 def find_duplicates_counter(nums):
     return [num for num, count in Counter(nums).items() if count > 1]
+
 
 # Test
 print(find_duplicates([4, 3, 2, 7, 8, 2, 3, 1]))  # [2, 3]
@@ -804,21 +827,22 @@ class MinStack:
     def __init__(self):
         self.stack = []
         self.min_stack = []
-    
+
     def push(self, val):
         self.stack.append(val)
         val = min(val, self.min_stack[-1] if self.min_stack else val)
         self.min_stack.append(val)
-    
+
     def pop(self):
         self.stack.pop()
         self.min_stack.pop()
-    
+
     def top(self):
         return self.stack[-1]
-    
+
     def get_min(self):
         return self.min_stack[-1]
+
 
 # Test
 ms = MinStack()
@@ -827,7 +851,7 @@ ms.push(0)
 ms.push(-3)
 print(ms.get_min())  # -3
 ms.pop()
-print(ms.top())      # 0
+print(ms.top())  # 0
 print(ms.get_min())  # -2
 ```
 

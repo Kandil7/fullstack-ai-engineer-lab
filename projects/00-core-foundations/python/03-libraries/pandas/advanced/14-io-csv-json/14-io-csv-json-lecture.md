@@ -17,13 +17,13 @@ import pandas as pd
 
 df = pd.read_csv(
     "sales.csv",
-    sep=",",                # or ";" (European exports), "\t" (TSV)
-    encoding="utf-8",       # try "latin-1" or "cp1252" for legacy files
-    parse_dates=["date"],   # turn date strings into datetime64
-    index_col="id",         # use a column as the index
-    dtype={"zip": str},     # stop pandas from eating leading zeros
+    sep=",",  # or ";" (European exports), "\t" (TSV)
+    encoding="utf-8",  # try "latin-1" or "cp1252" for legacy files
+    parse_dates=["date"],  # turn date strings into datetime64
+    index_col="id",  # use a column as the index
+    dtype={"zip": str},  # stop pandas from eating leading zeros
     na_values=["", "N/A", "unknown"],
-    usecols=["id", "date", "amount"],   # read only what you need
+    usecols=["id", "date", "amount"],  # read only what you need
 )
 ```
 
@@ -52,7 +52,7 @@ from pandas import json_normalize
 
 df = json_normalize(
     payload["results"],
-    record_path="purchases",          # nested array to expand
+    record_path="purchases",  # nested array to expand
     meta=["name", "email", ["address", "city"]],  # fields to keep alongside
 )
 ```
@@ -132,8 +132,9 @@ Other readers: `read_excel`/`to_excel` (covered), `read_feather`, `read_hdf`,
 raw = pd.read_csv("partner_export.csv", dtype={"customer_id": str})
 
 # 2. Enrich with a JSON API dump
-api = json_normalize(load("api_response.json")["data"], record_path="orders",
-                     meta=["customer_id", "tier"])
+api = json_normalize(
+    load("api_response.json")["data"], record_path="orders", meta=["customer_id", "tier"]
+)
 
 # 3. Merge into a clean table
 clean = raw.merge(api, on="customer_id", how="left")

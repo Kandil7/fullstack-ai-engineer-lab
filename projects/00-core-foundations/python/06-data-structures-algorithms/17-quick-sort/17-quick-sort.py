@@ -17,6 +17,7 @@ Stable: No (default)
 # 1. BASIC QUICK SORT
 # =============================================================================
 
+
 def quick_sort(arr):
     """Basic quick sort. O(n log n) average"""
     if len(arr) <= 1:
@@ -29,6 +30,7 @@ def quick_sort(arr):
 
     return quick_sort(left) + middle + quick_sort(right)
 
+
 print("=== Basic Quick Sort ===")
 arr = [3, 6, 8, 10, 1, 2, 1]
 print(f"Original: {arr}")
@@ -38,6 +40,7 @@ print(f"Sorted: {quick_sort(arr)}")
 # =============================================================================
 # 2. IN-PLACE QUICK SORT
 # =============================================================================
+
 
 def quick_sort_inplace(arr, low=0, high=None):
     """In-place quick sort using Lomuto partition"""
@@ -50,6 +53,7 @@ def quick_sort_inplace(arr, low=0, high=None):
         quick_sort_inplace(arr, pivot_idx + 1, high)
 
     return arr
+
 
 def partition(arr, low, high):
     """Lomuto partition scheme"""
@@ -64,6 +68,7 @@ def partition(arr, low, high):
     arr[i + 1], arr[high] = arr[high], arr[i + 1]
     return i + 1
 
+
 print("\n=== In-Place Quick Sort ===")
 arr = [10, 7, 8, 9, 1, 5]
 print(f"Original: {arr}")
@@ -73,6 +78,7 @@ print(f"Sorted: {quick_sort_inplace(arr.copy())}")
 # =============================================================================
 # 3. HOARE PARTITION
 # =============================================================================
+
 
 def quick_sort_hoare(arr, low=0, high=None):
     """Quick sort with Hoare partition - more efficient"""
@@ -85,6 +91,7 @@ def quick_sort_hoare(arr, low=0, high=None):
         quick_sort_hoare(arr, pivot_idx + 1, high)
 
     return arr
+
 
 def hoare_partition(arr, low, high):
     """Hoare partition scheme - fewer swaps"""
@@ -106,6 +113,7 @@ def hoare_partition(arr, low, high):
 
         arr[i], arr[j] = arr[j], arr[i]
 
+
 print("\n=== Hoare Partition ===")
 arr = [10, 7, 8, 9, 1, 5]
 print(f"Sorted: {quick_sort_hoare(arr.copy())}")
@@ -114,6 +122,7 @@ print(f"Sorted: {quick_sort_hoare(arr.copy())}")
 # =============================================================================
 # 4. THREE-WAY QUICK SORT (DUPLICATES)
 # =============================================================================
+
 
 def quick_sort_three_way(arr, low=0, high=None):
     """Three-way partition for arrays with many duplicates"""
@@ -143,6 +152,7 @@ def quick_sort_three_way(arr, low=0, high=None):
 
     return arr
 
+
 print("\n=== Three-Way Quick Sort ===")
 arr = [4, 9, 4, 4, 1, 9, 4, 4, 9, 4, 4, 1, 4]
 print(f"Original: {arr}")
@@ -154,6 +164,7 @@ print(f"Sorted: {quick_sort_three_way(arr.copy())}")
 # =============================================================================
 
 import random
+
 
 def randomized_quick_sort(arr, low=0, high=None):
     """Quick sort with random pivot selection"""
@@ -167,11 +178,13 @@ def randomized_quick_sort(arr, low=0, high=None):
 
     return arr
 
+
 def randomized_partition(arr, low, high):
     """Random pivot selection"""
     rand_idx = random.randint(low, high)
     arr[rand_idx], arr[high] = arr[high], arr[rand_idx]
     return partition(arr, low, high)
+
 
 print("\n=== Randomized Quick Sort ===")
 arr = [10, 7, 8, 9, 1, 5]
@@ -181,6 +194,7 @@ print(f"Sorted: {randomized_quick_sort(arr.copy())}")
 # =============================================================================
 # 6. QUICK SORT WITH MEDIAN-OF-THREE
 # =============================================================================
+
 
 def median_of_three(arr, low, high):
     """Select median of first, middle, last as pivot"""
@@ -196,6 +210,7 @@ def median_of_three(arr, low, high):
     # Place median at high-1
     arr[mid], arr[high - 1] = arr[high - 1], arr[mid]
     return arr[high - 1]
+
 
 def quick_sort_median(arr, low=0, high=None):
     """Quick sort with median-of-three pivot"""
@@ -229,6 +244,7 @@ def quick_sort_median(arr, low=0, high=None):
 
     return arr
 
+
 print("\n=== Median-of-Three Quick Sort ===")
 arr = [10, 7, 8, 9, 1, 5]
 print(f"Sorted: {quick_sort_median(arr.copy())}")
@@ -237,6 +253,7 @@ print(f"Sorted: {quick_sort_median(arr.copy())}")
 # =============================================================================
 # 7. QUICK SELECT (KTH SMALLEST)
 # =============================================================================
+
 
 def quick_select(arr, k):
     """Find kth smallest element. O(n) average"""
@@ -255,6 +272,7 @@ def quick_select(arr, k):
     else:
         return quick_select(right, k - len(left) - len(middle))
 
+
 print("\n=== Quick Select ===")
 arr = [3, 2, 1, 5, 6, 4]
 print(f"Array: {arr}")
@@ -266,10 +284,12 @@ for k in range(1, len(arr) + 1):
 # 8. QUICK SORT ON LINKED LIST
 # =============================================================================
 
+
 class Node:
     def __init__(self, data):
         self.data = data
         self.next = None
+
 
 def quick_sort_linked_list(head):
     """Quick sort on linked list"""
@@ -282,6 +302,7 @@ def quick_sort_linked_list(head):
         tail = tail.next
 
     return _quick_sort_ll(head, tail)
+
 
 def _quick_sort_ll(head, tail):
     if not head or head == tail:
@@ -342,6 +363,7 @@ def _quick_sort_ll(head, tail):
 # 9. COUNTING COMPARISONS
 # =============================================================================
 
+
 def quick_sort_counted(arr):
     """Quick sort counting comparisons"""
     comparisons = [0]
@@ -366,6 +388,7 @@ def quick_sort_counted(arr):
     _sort(arr, 0, len(arr) - 1)
     return arr, comparisons[0]
 
+
 print("\n=== Quick Sort Comparisons ===")
 test_cases = [
     [3, 6, 8, 10, 1, 2, 1],
@@ -381,6 +404,7 @@ for arr in test_cases:
 # =============================================================================
 # 10. QUICK SORT VARIANTS COMPARISON
 # =============================================================================
+
 
 def compare_quick_sort_variants():
     """Compare different quick sort implementations"""
@@ -418,10 +442,11 @@ def compare_quick_sort_variants():
         random_time = time.time() - start
 
         print(f"\nn={size}:")
-        print(f"  Basic (Lomuto):  {basic_time*1000:.2f}ms")
-        print(f"  Hoare:           {hoare_time*1000:.2f}ms")
-        print(f"  Three-way:       {three_way_time*1000:.2f}ms")
-        print(f"  Randomized:      {random_time*1000:.2f}ms")
+        print(f"  Basic (Lomuto):  {basic_time * 1000:.2f}ms")
+        print(f"  Hoare:           {hoare_time * 1000:.2f}ms")
+        print(f"  Three-way:       {three_way_time * 1000:.2f}ms")
+        print(f"  Randomized:      {random_time * 1000:.2f}ms")
+
 
 compare_quick_sort_variants()
 

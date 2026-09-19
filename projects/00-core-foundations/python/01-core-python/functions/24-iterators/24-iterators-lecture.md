@@ -47,19 +47,20 @@ print(next(my_iter))  # 3
 ```python
 class CountDown:
     """Custom iterator that counts down from n to 1."""
-    
+
     def __init__(self, start):
         self.current = start
-    
+
     def __iter__(self):
         return self  # Iterator returns itself
-    
+
     def __next__(self):
         if self.current <= 0:
             raise StopIteration  # Signal end of iteration
         value = self.current
         self.current -= 1
         return value
+
 
 # Usage
 for num in CountDown(5):
@@ -78,8 +79,8 @@ for num in CountDown(5):
 my_list = [1, 2, 3]  # Iterable (has __iter__)
 my_iter = iter(my_list)  # Iterator (has __next__)
 
-print(type(my_list))   # <class 'list'>
-print(type(my_iter))   # <class 'list_iterator'>
+print(type(my_list))  # <class 'list'>
+print(type(my_iter))  # <class 'list_iterator'>
 
 # An iterator IS an iterable (returns itself)
 print(my_iter.__iter__() is my_iter)  # True
@@ -93,6 +94,7 @@ def countdown(n):
     while n > 0:
         yield n
         n -= 1
+
 
 # Using generator
 for num in countdown(5):
@@ -117,8 +119,9 @@ squares_gen = (x**2 for x in range(1000000))
 
 # Generator uses much less memory
 import sys
+
 print(sys.getsizeof(squares_list))  # ~8 MB
-print(sys.getsizeof(squares_gen))   # ~200 bytes
+print(sys.getsizeof(squares_gen))  # ~200 bytes
 
 # Can only iterate once!
 for val in squares_gen:
@@ -160,17 +163,20 @@ print(list(combined))  # [1, 2, 3, 4, 5, 6]
 
 # islice — slice an iterator
 from itertools import islice
+
 gen = (x for x in range(100))
 first_five = list(islice(gen, 5))
 print(first_five)  # [0, 1, 2, 3, 4]
 
 # accumulate — running total
 from itertools import accumulate
+
 totals = list(accumulate([1, 2, 3, 4, 5]))
 print(totals)  # [1, 3, 6, 10, 15]
 
 # takewhile / dropwhile
 from itertools import takewhile, dropwhile
+
 small = list(takewhile(lambda x: x < 5, [1, 3, 5, 2, 7]))
 print(small)  # [1, 3]
 ```
@@ -191,6 +197,7 @@ for name, score in zip(names, scores):
 
 # zip_longest — fill missing values
 from itertools import zip_longest
+
 a = [1, 2, 3]
 b = [10, 20]
 for x, y in zip_longest(a, b, fillvalue=0):
@@ -206,17 +213,18 @@ for x, y in zip_longest(a, b, fillvalue=0):
 ```python
 class Fibonacci:
     """Generate Fibonacci numbers indefinitely."""
-    
+
     def __init__(self):
         self.a, self.b = 0, 1
-    
+
     def __iter__(self):
         return self
-    
+
     def __next__(self):
         value = self.a
         self.a, self.b = self.b, self.a + self.b
         return value
+
 
 # Get first 10 Fibonacci numbers
 fib = Fibonacci()
@@ -229,9 +237,10 @@ print(first_10)  # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 ```python
 def read_lines(filename, chunk_size=1024):
     """Read file line by line (memory efficient)."""
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         for line in f:  # File object is an iterator
             yield line.strip()
+
 
 # Usage
 for line in read_lines("large_file.txt"):
@@ -249,6 +258,7 @@ def batch(iterable, n):
         if not batch_items:
             break
         yield batch_items
+
 
 # Usage
 data = range(25)
@@ -272,10 +282,11 @@ def window(iterable, size=3):
         except StopIteration:
             return
     yield tuple(win)
-    
+
     for item in it:
         win = win[1:] + [item]
         yield tuple(win)
+
 
 # Usage
 data = [1, 2, 3, 4, 5, 6]
@@ -346,6 +357,7 @@ class MyRange:
     # Your code here
     pass
 
+
 for i in MyRange(1, 10, 2):
     print(i)  # 1, 3, 5, 7, 9
 ```
@@ -358,6 +370,7 @@ def chunks(iterable, size):
     # Your code here
     pass
 
+
 for chunk in chunks(range(10), 3):
     print(chunk)  # [0,1,2], [3,4,5], [6,7,8], [9]
 ```
@@ -369,6 +382,7 @@ Write an iterator that flattens nested iterables.
 def flatten(nested):
     # Your code here
     pass
+
 
 for item in flatten([1, [2, 3], [4, [5, 6]]]):
     print(item)  # 1, 2, 3, 4, 5, 6

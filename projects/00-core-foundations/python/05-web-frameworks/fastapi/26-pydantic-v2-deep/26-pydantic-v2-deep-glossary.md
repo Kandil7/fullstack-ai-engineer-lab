@@ -34,7 +34,9 @@ type — "42" becomes 42, True becomes 1. Disabled per model with strict mode.
 ```python
 class Item(BaseModel):
     qty: int
-Item(qty="3")   # qty == 3 (int)
+
+
+Item(qty="3")  # qty == 3 (int)
 ```
 **Related**: Strict mode
 

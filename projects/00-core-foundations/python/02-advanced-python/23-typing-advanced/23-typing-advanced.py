@@ -46,7 +46,7 @@ from typing import (
 )
 
 random.seed(42)
-os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
+os.environ.setdefault("MPLBACKEND", "Agg")  # never open a GUI window
 
 # ============================================================
 # 1. TypeVar: Bounds and Constraints
@@ -81,6 +81,7 @@ print(f"  clamp(3, 1, 2)       = {clamp(3, 1, 2)}")
 # ============================================================
 # A class that is generic over T: the container type parameter is declared
 # on the class, so Stack[int] and Stack[str] are distinct at check time.
+
 
 class Stack(typing.Generic[T]):
     """A minimal LIFO container generic over its element type.
@@ -117,6 +118,7 @@ print(f"  pop -> {s.pop()}, pop -> {s.pop()}, len -> {len(s)}")
 # A Protocol describes what an object MUST HAVE, not what it inherits.
 # With @runtime_checkable, isinstance() verifies the structure at runtime.
 # This is how one VectorStore interface accepts Qdrant, Chroma, FAISS.
+
 
 @runtime_checkable
 class Retriever(Protocol):
@@ -156,8 +158,10 @@ class WrongSignatureRetriever:
 print("\nExample 3: runtime_checkable Protocol")
 print(f"  SqlRetriever is Retriever: {isinstance(SqlRetriever(), Retriever)}")
 print(f"  MissingRetriever is Retriever: {isinstance(MissingRetriever(), Retriever)}")
-print(f"  WrongSignature is Retriever (limitation): "
-      f"{isinstance(WrongSignatureRetriever(), Retriever)}")
+print(
+    f"  WrongSignature is Retriever (limitation): "
+    f"{isinstance(WrongSignatureRetriever(), Retriever)}"
+)
 print(f"  retrieve through protocol: {SqlRetriever().retrieve('cat', 2)}")
 # Output:
 #   SqlRetriever is Retriever: True
@@ -228,11 +232,14 @@ print(f"  embed('hi') = {embed('hi')}")
 # Overloads declare the type checker's view; only the final implementation
 # runs. typing.get_overloads() can inspect them at runtime (3.11+).
 
+
 @overload
 def to_num(value: int) -> int: ...
 
+
 @overload
 def to_num(value: str) -> int: ...
+
 
 @overload
 def to_num(value: list[str]) -> list[int]: ...
@@ -290,6 +297,7 @@ print(f"  type(Device) = {type(Device).__name__}")
 # (validation rules, JSON schema hints, units). Runtime introspection via
 # typing.get_origin / get_args.
 
+
 class Between:
     """Metadata: value must lie in [low, high]."""
 
@@ -310,8 +318,10 @@ def check_temp(value: Temperature) -> float:
 print("\nExample 7: Annotated")
 origin = get_origin(Temperature)
 args = get_args(Temperature)
-print(f"  origin = {origin.__name__}, base type = {args[0].__name__}, "
-      f"meta = {type(args[1]).__name__}({args[1].low}, {args[1].high})")
+print(
+    f"  origin = {origin.__name__}, base type = {args[0].__name__}, "
+    f"meta = {type(args[1]).__name__}({args[1].low}, {args[1].high})"
+)
 hints = get_type_hints(check_temp, include_extras=True)
 print(f"  annotated hint survives: {hints['value']}")
 # Output:
@@ -324,6 +334,7 @@ print(f"  annotated hint survives: {hints['value']}")
 # ============================================================
 # Self means "the exact type of the instance". Subclasses get the builder
 # methods back typed as themselves -- no lossy Base annotations.
+
 
 class ModelConfig:
     """Fluent config builder returning Self from every step."""
@@ -345,7 +356,7 @@ class SpecialConfig(ModelConfig):
     """Subclass: inherited builders must still return SpecialConfig."""
 
     def with_top_p(self, value: float) -> Self:
-        self.top_p = value      # type: ignore[attr-defined]  # demo only
+        self.top_p = value  # type: ignore[attr-defined]  # demo only
         return self
 
 
@@ -433,21 +444,26 @@ print(f"  TYPE_CHECKING at runtime: {TYPE_CHECKING}")
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # 1. Protocol structural match at runtime, no inheritance involved.
-    assert isinstance(SqlRetriever(), Retriever), \
+    assert isinstance(SqlRetriever(), Retriever), (
         "SqlRetriever must structurally satisfy the Retriever protocol"
-    assert not isinstance(MissingRetriever(), Retriever), \
+    )
+    assert not isinstance(MissingRetriever(), Retriever), (
         "MissingRetriever must NOT satisfy the Retriever protocol"
-    assert isinstance(WrongSignatureRetriever(), Retriever), \
+    )
+    assert isinstance(WrongSignatureRetriever(), Retriever), (
         "runtime_checkable is shallow: wrong signatures still pass (documented)"
-    assert SqlRetriever().retrieve("cat", 2) == ["sql:cat:0", "sql:cat:1"], \
+    )
+    assert SqlRetriever().retrieve("cat", 2) == ["sql:cat:0", "sql:cat:1"], (
         "protocol methods must be callable through the concrete class"
+    )
 
     # 2. Generic class behaves LIFO for any element type.
     stack = Stack[str]()
     stack.push("a")
     stack.push("b")
-    assert stack.pop() == "b" and stack.pop() == "a" and len(stack) == 0, \
+    assert stack.pop() == "b" and stack.pop() == "a" and len(stack) == 0, (
         "generic Stack must pop LIFO"
+    )
 
     # 3. TypeVar-bound generic function works across numeric types.
     assert clamp(1.5, 0.0, 1.0) == 1.0, "clamp must cap at high"
@@ -455,12 +471,14 @@ def _verify() -> None:
     assert clamp(5, 1, 3) == 3, "clamp must cap at high for ints"
 
     # 4. ParamSpec preserves the signature for inspection tools.
-    assert list(inspect.signature(add).parameters) == ["a", "b"], \
+    assert list(inspect.signature(add).parameters) == ["a", "b"], (
         "ParamSpec decorator must preserve the wrapped parameter names"
+    )
 
     # 5. Concatenate injects the config argument transparently.
-    assert embed("hi") == "gpt-4o-mini embedded: hi", \
+    assert embed("hi") == "gpt-4o-mini embedded: hi", (
         "Concatenate must inject the config as the first argument"
+    )
 
     # 6. overload: the implementation handles every declared arm.
     assert to_num("42") == 42, "overload str -> int arm must work"
@@ -469,10 +487,10 @@ def _verify() -> None:
 
     # 7. Annotated metadata is inspectable at runtime.
     hint = get_type_hints(check_temp, include_extras=True)["value"]
-    assert get_args(hint) and get_args(hint)[0] is float, \
+    assert get_args(hint) and get_args(hint)[0] is float, (
         "Annotated hint must peel back to its base type via get_args"
-    assert get_args(hint)[1].low == 0.0, \
-        "Annotated metadata must be readable via get_args"
+    )
+    assert get_args(hint)[1].low == 0.0, "Annotated metadata must be readable via get_args"
 
     # 8. Self-typed builder chains return the instance type.
     assert isinstance(cfg, ModelConfig), "builder chain must return ModelConfig"
@@ -481,12 +499,11 @@ def _verify() -> None:
     assert UserId(7) == 7, "NewType value must equal the base value"
     assert type(UserId(7)) is int, "NewType must not create a new class"
     try:
-        isinstance(UserId(7), UserId)      # type: ignore[arg-type]
+        isinstance(UserId(7), UserId)  # type: ignore[arg-type]
         newtype_isinstance_failed = False
     except TypeError:
         newtype_isinstance_failed = True
-    assert newtype_isinstance_failed, \
-        "isinstance() against a NewType must raise TypeError"
+    assert newtype_isinstance_failed, "isinstance() against a NewType must raise TypeError"
 
     # 10. TYPE_CHECKING is a runtime-visible constant, False on execution.
     assert TYPE_CHECKING is False, "TYPE_CHECKING must be False at runtime"
@@ -512,8 +529,10 @@ if __name__ == "__main__":
         print("\n3. Protocol structural match")
         print(f"  SqlRetriever is Retriever: {isinstance(SqlRetriever(), Retriever)}")
         print(f"  MissingRetriever is Retriever: {isinstance(MissingRetriever(), Retriever)}")
-        print(f"  WrongSignature is Retriever (shallow check): "
-              f"{isinstance(WrongSignatureRetriever(), Retriever)}")
+        print(
+            f"  WrongSignature is Retriever (shallow check): "
+            f"{isinstance(WrongSignatureRetriever(), Retriever)}"
+        )
         print("\n4. ParamSpec / Concatenate")
         print(f"  add(2, 3) = {add(2, 3)}")
         print(f"  parameters: {list(inspect.signature(add).parameters)}")
@@ -525,7 +544,9 @@ if __name__ == "__main__":
         print("\n7. Annotated")
         origin = get_origin(Temperature)
         args = get_args(Temperature)
-        print(f"  origin = {origin.__name__}, base = {args[0].__name__}, meta = {type(args[1]).__name__}")
+        print(
+            f"  origin = {origin.__name__}, base = {args[0].__name__}, meta = {type(args[1]).__name__}"
+        )
         print("\n8. Self")
         print(f"  {cfg.model} @ {cfg.temperature}")
         print("\n9. NewType")

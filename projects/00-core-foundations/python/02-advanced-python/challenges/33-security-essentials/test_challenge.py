@@ -30,6 +30,7 @@ import yaml  # noqa: E402
 # Bronze: Password Store
 # ============================================================
 
+
 def test_hash_lengths():
     digest, salt = solution.hash_password("p@ss")
     assert len(digest) == 32, "SHA-256 digest is 32 bytes"
@@ -66,6 +67,7 @@ def test_verify_uses_compare_digest():
 # Silver: Safe Query Layer
 # ============================================================
 
+
 def test_add_and_find():
     store = solution.SafeStore()
     store.add("1", "alice")
@@ -82,30 +84,29 @@ def test_injection_payload_blocked():
     store.add("1", "alice")
     store.add("2", "bob")
     payload = "1' OR '1'='1"
-    assert store.find(payload) == [], \
-        "parameterized query must treat the payload as a literal"
+    assert store.find(payload) == [], "parameterized query must treat the payload as a literal"
 
 
 def test_injection_variant_blocked():
     store = solution.SafeStore()
     store.add("1", "alice")
     payload = "1'; DROP TABLE users; --"
-    assert store.find(payload) == [], \
-        "multi-statement injection must not execute"
+    assert store.find(payload) == [], "multi-statement injection must not execute"
 
 
 def test_no_fstring_sql():
     source = (HERE / "solution.py").read_text(encoding="utf-8")
     # f-strings are fine for messages; SQL must never be built from them
-    assert "f\"SELECT" not in source and "f'SELECT" not in source
-    assert "f\"INSERT" not in source and "f'INSERT" not in source
-    assert "f\"WHERE" not in source and "f'WHERE" not in source
+    assert 'f"SELECT' not in source and "f'SELECT" not in source
+    assert 'f"INSERT' not in source and "f'INSERT" not in source
+    assert 'f"WHERE' not in source and "f'WHERE" not in source
     assert "? " in source or "?," in source, "placeholders must be used"
 
 
 # ============================================================
 # Gold: Safe Config Loader
 # ============================================================
+
 
 def _write_config(text: str) -> Path:
     tmp = tempfile.TemporaryDirectory()
@@ -151,9 +152,7 @@ def test_load_rejects_non_mapping():
 
 
 def test_load_rejects_python_tag():
-    path, tmp = _write_config(
-        "model: !!python/object/apply:os.system ['echo x']\n"
-    )
+    path, tmp = _write_config("model: !!python/object/apply:os.system ['echo x']\n")
     try:
         with pytest.raises(yaml.YAMLError):
             solution.load_config(path)

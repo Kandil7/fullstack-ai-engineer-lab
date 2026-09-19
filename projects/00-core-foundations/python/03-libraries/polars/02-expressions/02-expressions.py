@@ -71,6 +71,7 @@ print(result2.columns)
 # It can also compute new columns on the fly. Think: "what columns do I
 # want out of this table?"
 
+
 def select_demo(frame: pl.DataFrame) -> pl.DataFrame:
     """Project existing and computed columns."""
     return frame.select(
@@ -94,15 +95,13 @@ print(sel.to_dict(as_series=False))
 # named ones. This is the workhorse of feature engineering: one call,
 # many derived features, all vectorized.
 
+
 def with_columns_demo(frame: pl.DataFrame) -> pl.DataFrame:
     """Add three derived features in a single context."""
     return frame.with_columns(
         (pl.col("spend") / 100).alias("spend_norm"),
         pl.col("score").rank(descending=True).alias("score_rank"),
-        pl.when(pl.col("score") >= 0.5)
-        .then(pl.lit("high"))
-        .otherwise(pl.lit("low"))
-        .alias("band"),
+        pl.when(pl.col("score") >= 0.5).then(pl.lit("high")).otherwise(pl.lit("low")).alias("band"),
     )
 
 
@@ -123,11 +122,10 @@ print(w["band"].to_list())
 # built from comparisons and combined with & | ~ (NOT and/or — Python's
 # and/or do not work on Exprs).
 
+
 def filter_demo(frame: pl.DataFrame) -> pl.DataFrame:
     """Keep high-scoring users who also spent at least 15."""
-    return frame.filter(
-        (pl.col("score") >= 0.5) & (pl.col("spend") >= 15)
-    )
+    return frame.filter((pl.col("score") >= 0.5) & (pl.col("spend") >= 15))
 
 
 # Example 5: compound predicate with & and parentheses
@@ -145,6 +143,7 @@ print(f.rows())
 # combines. Any expression that reduces many rows to one value (mean,
 # sum, count, first) can appear in .agg(). This is split-apply-combine
 # without apply().
+
 
 def groupby_demo(frame: pl.DataFrame) -> pl.DataFrame:
     """Per-user aggregates in one context."""
@@ -169,6 +168,7 @@ print(g.rows())
 # Contexts nest: filter inside a select, aggregates inside with_columns
 # (window-style). The whole chain stays one lazy graph, so the optimizer
 # sees everything before anything runs.
+
 
 def pipeline_demo(frame: pl.DataFrame) -> pl.DataFrame:
     """Filter, rank within group, and normalize in one chain."""
@@ -215,34 +215,36 @@ print(p.rows())
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     assert isinstance(expr, pl.Expr), "pl.col() must produce an Expr, not data"
-    assert expr.meta.output_name() == "score_pct", \
-        ".alias() must set the output name"
+    assert expr.meta.output_name() == "score_pct", ".alias() must set the output name"
 
     sel = select_demo(df)
-    assert sel.columns == ["user", "cost_per_point"], \
+    assert sel.columns == ["user", "cost_per_point"], (
         "select() must return exactly the projected columns"
-    assert abs(sel["cost_per_point"][0] - 10.0 / 0.9) < 1e-9, \
+    )
+    assert abs(sel["cost_per_point"][0] - 10.0 / 0.9) < 1e-9, (
         "computed column must be spend / score"
+    )
 
     w = with_columns_demo(df)
     assert w.shape == (4, 6), "with_columns must keep all rows and add 3 cols"
-    assert w["band"].to_list() == ["high", "low", "high", "low"], \
+    assert w["band"].to_list() == ["high", "low", "high", "low"], (
         "when/then/otherwise must map thresholds to bands"
-    assert w["score_rank"].to_list() == [1.0, 3.0, 2.0, 4.0], \
+    )
+    assert w["score_rank"].to_list() == [1.0, 3.0, 2.0, 4.0], (
         "rank(descending=True) must put the highest score at rank 1"
+    )
 
     f = filter_demo(df)
-    assert f.rows() == [("c", 0.7, 30)], \
-        "compound & predicate must keep only high AND spent rows"
+    assert f.rows() == [("c", 0.7, 30)], "compound & predicate must keep only high AND spent rows"
 
     g = groupby_demo(df).sort("user")
-    assert g.rows() == [("a", 0.55, 50, 2), ("b", 0.4, 20, 1), ("c", 0.7, 30, 1)], \
+    assert g.rows() == [("a", 0.55, 50, 2), ("b", 0.4, 20, 1), ("c", 0.7, 30, 1)], (
         "group_by agg must compute per-group mean/sum/count"
+    )
     assert "n_events" in g.columns, "pl.len() must count rows per group"
 
     p = pipeline_demo(df)
-    assert p.rows()[3] == ("a", 0.2, 2.0), \
-        "rank().over('user') must rank within each group"
+    assert p.rows()[3] == ("a", 0.2, 2.0), "rank().over('user') must rank within each group"
 
     print("[OK] 02-expressions: all checks passed")
 
@@ -255,4 +257,4 @@ if __name__ == "__main__":
         print("1. Expr objects are recipes; contexts (select/with_columns/filter) run them")
         print("2. select projects, with_columns transforms, filter selects rows")
         print("3. group_by().agg() is split-apply-combine without apply()")
-        _verify()   # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

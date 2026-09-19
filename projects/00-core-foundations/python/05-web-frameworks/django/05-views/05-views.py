@@ -69,29 +69,32 @@
 # blog/views.py:
 from django.shortcuts import render
 
+
 def post_list(request):
     """Render a list of blog posts."""
     # In a real app, you'd query the database here
     context = {
-        'title': 'My Blog',
-        'posts': [
-            {'id': 1, 'title': 'First Post', 'content': 'Hello!'},
-            {'id': 2, 'title': 'Second Post', 'content': 'Django is great!'},
-        ]
+        "title": "My Blog",
+        "posts": [
+            {"id": 1, "title": "First Post", "content": "Hello!"},
+            {"id": 2, "title": "Second Post", "content": "Django is great!"},
+        ],
     }
-    return render(request, 'blog/post_list.html', context)
+    return render(request, "blog/post_list.html", context)
+
 
 def post_detail(request, pk):
     """Render a single blog post."""
     context = {
-        'post': {
-            'id': pk,
-            'title': f'Post {pk}',
-            'content': f'This is the content of post {pk}',
-            'author': 'John Doe',
+        "post": {
+            "id": pk,
+            "title": f"Post {pk}",
+            "content": f"This is the content of post {pk}",
+            "author": "John Doe",
         }
     }
-    return render(request, 'blog/post_detail.html', context)
+    return render(request, "blog/post_detail.html", context)
+
 
 # ---------------------------------------------------------------------------
 # 4. Class-Based Views (CBVs)
@@ -186,40 +189,44 @@ def post_detail(request, pk):
 # 6. Handling Request Data
 # ---------------------------------------------------------------------------
 
+
 # --- GET parameters ---
 def search_view(request):
     """Access query parameters: /search/?q=django"""
-    query = request.GET.get('q', '')  # Get 'q' parameter, default ''
-    page = request.GET.get('page', 1)
+    query = request.GET.get("q", "")  # Get 'q' parameter, default ''
+    page = request.GET.get("page", 1)
     context = {
-        'query': query,
-        'page': page,
+        "query": query,
+        "page": page,
     }
-    return render(request, 'blog/search_results.html', context)
+    return render(request, "blog/search_results.html", context)
+
 
 # --- POST data ---
 def post_create(request):
     """Handle form submissions"""
-    if request.method == 'POST':
-        title = request.POST.get('title', '')
-        content = request.POST.get('content', '')
+    if request.method == "POST":
+        title = request.POST.get("title", "")
+        content = request.POST.get("content", "")
         # Process the data...
-        return HttpResponseRedirect('/blog/')
+        return HttpResponseRedirect("/blog/")
     else:
         # GET request - show form
-        return render(request, 'blog/post_form.html')
+        return render(request, "blog/post_form.html")
+
 
 # --- Request metadata ---
 def debug_view(request):
     """Access request metadata"""
     info = {
-        'method': request.method,           # 'GET', 'POST', etc.
-        'path': request.path,               # '/blog/'
-        'user': request.user,               # Current user object
-        'META': request.META,               # All headers and metadata
-        'session': request.session,         # Session data
+        "method": request.method,  # 'GET', 'POST', etc.
+        "path": request.path,  # '/blog/'
+        "user": request.user,  # Current user object
+        "META": request.META,  # All headers and metadata
+        "session": request.session,  # Session data
     }
     return JsonResponse(info)
+
 
 # ---------------------------------------------------------------------------
 # 7. View Decorators

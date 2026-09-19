@@ -36,6 +36,7 @@ in SQLite 3.35+.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, name TEXT)")
 conn.execute("ALTER TABLE t ADD COLUMN age INTEGER")
@@ -99,7 +100,9 @@ CASCADE (propagate), SET NULL (null the child column), RESTRICT
 keeps derived values consistent without application code.
 **Example**:
 ```python
-conn.execute("CREATE TABLE log (id INTEGER PRIMARY KEY, ts INTEGER, day TEXT GENERATED ALWAYS AS (date(ts, 'unixepoch')) STORED)")
+conn.execute(
+    "CREATE TABLE log (id INTEGER PRIMARY KEY, ts INTEGER, day TEXT GENERATED ALWAYS AS (date(ts, 'unixepoch')) STORED)"
+)
 conn.execute("INSERT INTO log (ts) VALUES (?)", (1750000000,))
 print(conn.execute("SELECT day FROM log").fetchone()[0])
 ```

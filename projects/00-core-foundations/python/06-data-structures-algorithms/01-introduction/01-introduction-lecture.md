@@ -72,14 +72,15 @@ An algorithm is a step-by-step procedure for solving a problem. Good algorithms 
 # Simple algorithm: Find the maximum in a list
 def find_maximum(numbers):
     """Algorithm to find the maximum value in a list."""
-    if not numbers:                    # Handle edge case
+    if not numbers:  # Handle edge case
         return None
-    
-    max_value = numbers[0]             # Step 1: Assume first is max
-    for num in numbers[1:]:            # Step 2: Compare each element
-        if num > max_value:            # Step 3: Update if larger
+
+    max_value = numbers[0]  # Step 1: Assume first is max
+    for num in numbers[1:]:  # Step 2: Compare each element
+        if num > max_value:  # Step 3: Update if larger
             max_value = num
-    return max_value                   # Step 4: Return result
+    return max_value  # Step 4: Return result
+
 
 # Time complexity: O(n) — we examine each element once
 print(find_maximum([3, 7, 2, 9, 1]))  # Output: 9
@@ -140,25 +141,28 @@ Big-O notation describes the upper bound of an algorithm's growth rate. It tells
 def get_first元素(lst):
     return lst[0]  # No matter the size, this is one operation
 
+
 # O(n) — Linear Time
 def linear_search(lst, target):
-    for item in lst:          # Loops through all n elements
+    for item in lst:  # Loops through all n elements
         if item == target:
             return True
     return False
 
+
 # O(n²) — Quadratic Time
 def bubble_sort(lst):
     n = len(lst)
-    for i in range(n):              # n iterations
-        for j in range(n - 1):      # n iterations each
+    for i in range(n):  # n iterations
+        for j in range(n - 1):  # n iterations each
             if lst[j] > lst[j + 1]:
                 lst[j], lst[j + 1] = lst[j + 1], lst[j]
+
 
 # O(log n) — Logarithmic Time
 def binary_search(sorted_lst, target):
     low, high = 0, len(sorted_lst) - 1
-    while low <= high:              # Halves search space each time
+    while low <= high:  # Halves search space each time
         mid = (low + high) // 2
         if sorted_lst[mid] == target:
             return mid
@@ -177,43 +181,46 @@ def binary_search(sorted_lst, target):
 # Example 1: Single loop — O(n)
 def example_1(n):
     count = 0
-    for i in range(n):       # Runs n times
-        count += 1            # Constant time operation
-    return count              # Total: O(n)
+    for i in range(n):  # Runs n times
+        count += 1  # Constant time operation
+    return count  # Total: O(n)
+
 
 # Example 2: Nested loops — O(n²)
 def example_2(n):
     count = 0
-    for i in range(n):       # Outer: n times
-        for j in range(n):   # Inner: n times
-            count += 1        # Total: n × n = n²
+    for i in range(n):  # Outer: n times
+        for j in range(n):  # Inner: n times
+            count += 1  # Total: n × n = n²
     return count
+
 
 # Example 3: Sequential operations — Add complexities
 def example_3(n):
     # Block A: O(n)
     for i in range(n):
         print(i)
-    
+
     # Block B: O(n²)
     for i in range(n):
         for j in range(n):
             print(i, j)
-    
+
     # Total: O(n) + O(n²) = O(n²)  (dominant term wins)
+
 
 # Example 4: Independent loops — Take the maximum
 def example_4(n):
     # Block A: O(n)
     for i in range(n):
         print(i)
-    
+
     # Block B: O(n³)
     for i in range(n):
         for j in range(n):
             for k in range(n):
                 print(i, j, k)
-    
+
     # Total: max(O(n), O(n³)) = O(n³)
 ```
 
@@ -232,17 +239,19 @@ Space complexity measures how much memory an algorithm uses relative to input si
 ```python
 # O(1) Space — Constant extra space
 def sum_list(lst):
-    total = 0              # One variable, regardless of input size
+    total = 0  # One variable, regardless of input size
     for num in lst:
         total += num
     return total
 
+
 # O(n) Space — Linear extra space
 def create_copy(lst):
-    copy = []              # Creates a new list of size n
+    copy = []  # Creates a new list of size n
     for num in lst:
         copy.append(num)
     return copy
+
 
 # O(n) Space — Recursive call stack
 def factorial(n):
@@ -265,6 +274,7 @@ def linear_search_analysis(lst, target):
         if item == target:
             return i
     return -1
+
 
 # Binary Search Analysis
 def binary_search_analysis(lst, target):
@@ -327,6 +337,7 @@ Complete Example: Analyzing Multiple Algorithms
 import time
 import random
 
+
 def measure_time(func, *args, iterations=10):
     """Measure average execution time of a function."""
     total = 0
@@ -334,8 +345,9 @@ def measure_time(func, *args, iterations=10):
         start = time.perf_counter()
         result = func(*args)
         end = time.perf_counter()
-        total += (end - start)
+        total += end - start
     return total / iterations
+
 
 # === Algorithm 1: Finding duplicate pairs — O(n²) ===
 def find_duplicates_quadratic(lst):
@@ -346,6 +358,7 @@ def find_duplicates_quadratic(lst):
             if lst[i] == lst[j]:
                 duplicates.append((lst[i], lst[j]))
     return duplicates
+
 
 # === Algorithm 2: Finding duplicates with a set — O(n) ===
 def find_duplicates_linear(lst):
@@ -359,6 +372,7 @@ def find_duplicates_linear(lst):
             seen[item] = True
     return duplicates
 
+
 # Compare performance
 sizes = [100, 500, 1000, 2000]
 print("Size | O(n²) time    | O(n) time     | Speedup")
@@ -366,11 +380,11 @@ print("-" * 55)
 
 for size in sizes:
     data = [random.randint(0, size // 2) for _ in range(size)]
-    
+
     t_quadratic = measure_time(find_duplicates_quadratic, data, iterations=5)
     t_linear = measure_time(find_duplicates_linear, data, iterations=5)
-    speedup = t_quadratic / t_linear if t_linear > 0 else float('inf')
-    
+    speedup = t_quadratic / t_linear if t_linear > 0 else float("inf")
+
     print(f"{size:5d} | {t_quadratic:11.6f}s | {t_linear:11.6f}s | {speedup:.1f}x")
 ```
 
@@ -425,7 +439,7 @@ if target in large_list:  # Scans the entire list
     pass
 
 # "in" on a set is O(1) average
-if target in large_set:   # Hash lookup
+if target in large_set:  # Hash lookup
     pass
 ```
 
@@ -455,12 +469,14 @@ def mystery_a(n):
         for j in range(n, 0, -1):
             print(i + j)
 
+
 # Snippet B
 def mystery_b(n):
     i = n
     while i > 1:
         i = i // 2
         print(i)
+
 
 # Snippet C
 def mystery_c(lst):
@@ -487,6 +503,8 @@ def has_common_element(list1, list2):
             if item1 == item2:
                 return True
     return False
+
+
 # Current: O(n²) — Can you make it O(n)?
 ```
 

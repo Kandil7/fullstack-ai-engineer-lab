@@ -36,7 +36,7 @@ from sklearn.datasets import make_classification
 X, y = make_classification(n_samples=200, n_features=10, random_state=42)
 
 model = LogisticRegression(random_state=42)
-scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
 
 print(f"CV scores: {scores}")
 print(f"Mean accuracy: {scores.mean():.4f}")
@@ -97,16 +97,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.datasets import make_classification
 import numpy as np
 
-X, y = make_classification(n_samples=200, n_features=10, 
-                           weights=[0.7, 0.3], random_state=42)
+X, y = make_classification(n_samples=200, n_features=10, weights=[0.7, 0.3], random_state=42)
 
 print(f"Original class distribution: {np.bincount(y)}")
 
 skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
 for fold, (train_idx, val_idx) in enumerate(skf.split(X, y)):
-    print(f"Fold {fold+1}: Train {np.bincount(y[train_idx])}, "
-          f"Val {np.bincount(y[val_idx])}")
+    print(f"Fold {fold + 1}: Train {np.bincount(y[train_idx])}, Val {np.bincount(y[val_idx])}")
 ```
 
 **Why stratified?**
@@ -135,13 +133,11 @@ X, y = make_classification(n_samples=200, n_features=10, random_state=42)
 # Different splits give different results
 print("Multiple holdout splits:")
 for i in range(5):
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     model = LogisticRegression(random_state=42)
     model.fit(X_train, y_train)
     acc = accuracy_score(y_test, model.predict(X_test))
-    print(f"  Split {i+1}: {acc:.4f}")
+    print(f"  Split {i + 1}: {acc:.4f}")
 ```
 
 **Pros/Cons:**
@@ -168,13 +164,13 @@ X, y = make_classification(n_samples=200, n_features=10, random_state=42)
 
 # Compare models
 models = {
-    'Logistic Regression': LogisticRegression(random_state=42),
-    'SVM': SVC(random_state=42),
-    'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42)
+    "Logistic Regression": LogisticRegression(random_state=42),
+    "SVM": SVC(random_state=42),
+    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
 }
 
 for name, model in models.items():
-    scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
     print(f"{name:25s}: {scores.mean():.4f} +/- {scores.std():.4f}")
 ```
 
@@ -214,7 +210,7 @@ X, y = make_classification(n_samples=200, n_features=10, random_state=42)
 model = LogisticRegression(random_state=42)
 
 # Try different metrics
-for metric in ['accuracy', 'f1', 'precision', 'recall', 'roc_auc']:
+for metric in ["accuracy", "f1", "precision", "recall", "roc_auc"]:
     scores = cross_val_score(model, X, y, cv=5, scoring=metric)
     print(f"{metric:12s}: {scores.mean():.4f}")
 ```
@@ -246,12 +242,9 @@ model = LogisticRegression(random_state=42)
 # This gives inflated scores
 
 # CORRECT: Use pipeline
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('model', LogisticRegression(random_state=42))
-])
+pipeline = Pipeline([("scaler", StandardScaler()), ("model", LogisticRegression(random_state=42))])
 
-scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
 print(f"Correct CV accuracy: {scores.mean():.4f}")
 ```
 
@@ -279,13 +272,15 @@ from sklearn.datasets import make_classification
 
 X, y = make_classification(n_samples=200, n_features=10, random_state=42)
 
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('pca', PCA(n_components=5)),
-    ('model', LogisticRegression(random_state=42))
-])
+pipeline = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("pca", PCA(n_components=5)),
+        ("model", LogisticRegression(random_state=42)),
+    ]
+)
 
-scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
 print(f"Pipeline CV accuracy: {scores.mean():.4f}")
 ```
 
@@ -315,7 +310,7 @@ model = LogisticRegression(random_state=42)
 
 start = time.time()
 loo = LeaveOneOut()
-scores = cross_val_score(model, X, y, cv=loo, scoring='accuracy')
+scores = cross_val_score(model, X, y, cv=loo, scoring="accuracy")
 time_taken = time.time() - start
 
 print(f"LOO CV accuracy: {scores.mean():.4f}")
@@ -385,8 +380,8 @@ kf2 = KFold(n_splits=5, shuffle=True, random_state=42)
 
 model = LogisticRegression(random_state=42)
 
-scores1 = cross_val_score(model, X, y, cv=kf1, scoring='accuracy')
-scores2 = cross_val_score(model, X, y, cv=kf2, scoring='accuracy')
+scores1 = cross_val_score(model, X, y, cv=kf1, scoring="accuracy")
+scores2 = cross_val_score(model, X, y, cv=kf2, scoring="accuracy")
 
 print(f"Scores 1: {scores1}")
 print(f"Scores 2: {scores2}")
@@ -414,32 +409,38 @@ print(f"Same results: {np.allclose(scores1, scores2)}")
 ```python
 # Basic Cross-Validation
 from sklearn.model_selection import cross_val_score
-scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+
+scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
 
 # K-Fold
 from sklearn.model_selection import KFold
+
 kf = KFold(n_splits=5, shuffle=True, random_state=42)
 for train_idx, val_idx in kf.split(X):
     X_train, X_val = X[train_idx], X[val_idx]
 
 # Stratified K-Fold
 from sklearn.model_selection import StratifiedKFold
+
 skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-scores = cross_val_score(model, X, y, cv=skf, scoring='accuracy')
+scores = cross_val_score(model, X, y, cv=skf, scoring="accuracy")
 
 # Leave-One-Out
 from sklearn.model_selection import LeaveOneOut
+
 loo = LeaveOneOut()
 scores = cross_val_score(model, X, y, cv=loo)
 
 # GridSearchCV with CV
 from sklearn.model_selection import GridSearchCV
-grid = GridSearchCV(model, param_grid, cv=5, scoring='accuracy')
+
+grid = GridSearchCV(model, param_grid, cv=5, scoring="accuracy")
 grid.fit(X, y)
 
 # Pipeline (prevents leakage)
 from sklearn.pipeline import Pipeline
-pipe = Pipeline([('scaler', StandardScaler()), ('model', model)])
+
+pipe = Pipeline([("scaler", StandardScaler()), ("model", model)])
 scores = cross_val_score(pipe, X, y, cv=5)
 ```
 

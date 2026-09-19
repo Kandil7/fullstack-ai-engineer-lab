@@ -3,14 +3,17 @@ Matplotlib Pie Charts - W3Schools Exercises
 =============================================
 Pie chart creation and customization.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -38,8 +41,15 @@ def exercise_02():
     colors = plt.cm.Set3(np.linspace(0, 1, len(sizes)))
 
     plt.figure(figsize=(7, 7))
-    plt.pie(sizes, labels=labels, explode=explode, colors=colors,
-            autopct="%1.1f%%", shadow=True, startangle=90)
+    plt.pie(
+        sizes,
+        labels=labels,
+        explode=explode,
+        colors=colors,
+        autopct="%1.1f%%",
+        shadow=True,
+        startangle=90,
+    )
     plt.title("Exercise 2: Exploded Pie Chart")
     plt.savefig("../../../outputs/matplotlib/12_exercise_02.png", dpi=100, bbox_inches="tight")
     plt.close()
@@ -54,8 +64,7 @@ def exercise_03():
     colors = plt.cm.Paired(np.linspace(0, 1, len(sizes)))
 
     plt.figure(figsize=(7, 7))
-    plt.pie(sizes, labels=labels, colors=colors, autopct="%1.1f%%",
-            pctdistance=0.85, startangle=90)
+    plt.pie(sizes, labels=labels, colors=colors, autopct="%1.1f%%", pctdistance=0.85, startangle=90)
     # Draw a white circle at the center to create donut
     centre_circle = plt.Circle((0, 0), 0.50, fc="white")
     fig = plt.gcf()
@@ -75,8 +84,12 @@ def exercise_04():
 
     plt.figure(figsize=(7, 7))
     wedges, texts, autotexts = plt.pie(
-        sizes, labels=labels, colors=colors, autopct="%1.1f%%",
-        startangle=140, textprops={"fontsize": 12}
+        sizes,
+        labels=labels,
+        colors=colors,
+        autopct="%1.1f%%",
+        startangle=140,
+        textprops={"fontsize": 12},
     )
     for t in autotexts:
         t.set_fontweight("bold")

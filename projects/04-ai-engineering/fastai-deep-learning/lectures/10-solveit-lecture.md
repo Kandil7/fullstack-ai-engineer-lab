@@ -239,7 +239,9 @@ class SideQuest:
     what_i_learned: str
     code_example: str = ""
     tags: list[str] = field(default_factory=list)
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     def to_flashcard(self) -> tuple[str, str]:
         """Generate a Q/A pair for spaced repetition."""
@@ -275,8 +277,8 @@ log.add(
     topic="BeautifulSoup parser basics",
     context="Building a web scraper, AI suggested BeautifulSoup",
     learned="BeautifulSoup parses malformed HTML into a parse tree. "
-            "Key objects: Tag, NavigableString, BeautifulSoup. "
-            "Use soup.find() and soup.find_all() for navigation.",
+    "Key objects: Tag, NavigableString, BeautifulSoup. "
+    "Use soup.find() and soup.find_all() for navigation.",
 )
 print(log.review_session())
 ```
@@ -365,7 +367,10 @@ Can you help me fix the login bug?"""
 # GOOD: structured context with explicit goal and constraints
 prompt = SharedContext(
     goal="Fix login bug: session expires after 1 second instead of 1 hour",
-    constraints=["Cannot change the token library", "Must maintain backward compatibility"],
+    constraints=[
+        "Cannot change the token library",
+        "Must maintain backward compatibility",
+    ],
     relevant_files=["src/auth.py", "src/session.py", "tests/test_auth.py"],
 ).summarize()
 ```

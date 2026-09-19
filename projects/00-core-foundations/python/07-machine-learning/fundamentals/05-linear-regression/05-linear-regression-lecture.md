@@ -118,7 +118,7 @@ denominator = np.sum((X - x_mean) ** 2)
 m = numerator / denominator
 b = y_mean - m * x_mean
 
-print(f"Slope (m): {m:.2f}")      # 200.00
+print(f"Slope (m): {m:.2f}")  # 200.00
 print(f"Intercept (b): {b:.2f}")  # 0.00
 print(f"Equation: y = {m:.2f}x + {b:.2f}")
 ```
@@ -174,9 +174,7 @@ np.random.seed(42)
 X = np.random.rand(100, 1) * 10
 y = 2 * X.squeeze() + 3 + np.random.randn(100) * 0.5
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 model = LinearRegression()
 model.fit(X_train, y_train)
@@ -195,13 +193,7 @@ print(f"RMSE on test: {rmse:.4f}")
 
 ```python
 # Features: square_feet, bedrooms, age
-X_multi = np.array([
-    [1500, 3, 10],
-    [2000, 4, 5],
-    [1200, 2, 15],
-    [1800, 3, 8],
-    [2200, 4, 3]
-])
+X_multi = np.array([[1500, 3, 10], [2000, 4, 5], [1200, 2, 15], [1800, 3, 8], [2200, 4, 3]])
 y_multi = np.array([300000, 450000, 250000, 400000, 500000])
 
 model_multi = LinearRegression()

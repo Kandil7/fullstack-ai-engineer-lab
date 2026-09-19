@@ -60,14 +60,17 @@ replaced by its value without changing the program.
 def pure_square(x: int) -> int:
     return x * x
 
+
 calls = {"n": 0}
 
+
 def impure_square(x: int) -> int:
-    calls["n"] += 1          # side effect: hidden state
+    calls["n"] += 1  # side effect: hidden state
     return x * x
 
-print(pure_square(3), pure_square(3))      # same, always
-print(impure_square(3), calls["n"])        # result same, world changed
+
+print(pure_square(3), pure_square(3))  # same, always
+print(impure_square(3), calls["n"])  # result same, world changed
 ```
 
 Output:
@@ -93,18 +96,20 @@ the promise.
 ```python
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class Chunk:
     doc_id: int
     text: str
     score: float
 
+
 c = Chunk(doc_id=1, text="attention is all you need", score=0.9)
-print(hash(c))                      # usable as dict key / set member
+print(hash(c))  # usable as dict key / set member
 try:
     c.score = 0.5
 except AttributeError as exc:
-    print(type(exc).__name__)       # FrozenInstanceError (an AttributeError)
+    print(type(exc).__name__)  # FrozenInstanceError (an AttributeError)
 ```
 
 Output:
@@ -186,8 +191,10 @@ touching the general one.
 ```python
 import functools
 
+
 def fetch(page_size: int, offset: int, limit: int) -> int:
     return min(limit - offset, page_size)
+
 
 page_50 = functools.partial(fetch, 50)
 print(page_50(offset=0, limit=200))
@@ -216,16 +223,20 @@ however you like, the result is identical.
 def compose(g, f):
     def composed(x):
         return g(f(x))
+
     return composed
+
 
 def double(x: int) -> int:
     return x * 2
 
+
 def increment(x: int) -> int:
     return x + 1
 
+
 pipeline = compose(double, increment)
-print(pipeline(3))   # (3 + 1) * 2
+print(pipeline(3))  # (3 + 1) * 2
 ```
 
 Output:
@@ -285,6 +296,7 @@ is a memory cost: O(n) stack space.
 def factorial_rec(n: int) -> int:
     return 1 if n <= 1 else n * factorial_rec(n - 1)
 
+
 try:
     factorial_rec(10_000)
 except RecursionError as exc:
@@ -317,20 +329,25 @@ impure.
 ```python
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class TextSample:
     text: str
     label: str
 
+
 def normalize(sample: TextSample) -> TextSample:
     return TextSample(text=sample.text.strip().lower(), label=sample.label)
+
 
 def tokenize(text: str) -> tuple[str, ...]:
     return tuple(text.split())
 
+
 def process_corpus(samples: list[TextSample]) -> dict[str, tuple[str, ...]]:
     """Functional core: pure, deterministic, cacheable."""
     return {s.label: tokenize(normalize(s).text) for s in samples}
+
 
 raw = [TextSample(text="  Hello World ", label="greeting")]
 print(process_corpus(raw))
@@ -358,6 +375,7 @@ def scale(samples, factor):
     for s in samples:
         s.score *= factor
 
+
 # CORRECT — new objects, inputs untouched (frozen forces this)
 def scale(sample, factor):
     return Chunk(sample.doc_id, sample.text, sample.score * factor)
@@ -366,7 +384,9 @@ def scale(sample, factor):
 ### Mistake 2: Relying on deep recursion
 ```python
 # WRONG — RecursionError at ~1000 frames; no TCO in CPython
-def fib(n): return n if n < 2 else fib(n-1) + fib(n-2)
+def fib(n):
+    return n if n < 2 else fib(n - 1) + fib(n - 2)
+
 
 # CORRECT — iterate, or use functools.lru_cache only for SHALLOW depth
 def fib_iter(n):
@@ -400,22 +420,25 @@ sorted(rows, key=operator.itemgetter(1))
 ### Mistake 5: Mutable defaults as "cache"
 ```python
 # WRONG — the default object is shared state across calls
-def cache(store={}):
-    ...
+def cache(store={}): ...
+
 
 # CORRECT — explicit memoization with lru_cache (pure)
 @functools.lru_cache(maxsize=128)
-def compute(key):
-    ...
+def compute(key): ...
 ```
 
 ### Mistake 6: Impure "pure" wrappers (hidden counters, prints)
 ```python
 # WRONG — logging inside the core makes it untestable
-def normalize(s): print("normalizing", s); return s.strip()
+def normalize(s):
+    print("normalizing", s)
+    return s.strip()
+
 
 # CORRECT — pure core, log in the shell
-def normalize(s): return s.strip()
+def normalize(s):
+    return s.strip()
 ```
 
 ## Best Practices

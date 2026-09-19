@@ -33,10 +33,10 @@ orientation; `(n,1)` is a rank-2 column. `.T` is a no-op on `(n,)`, and a
 import numpy as np
 
 v = np.arange(4)
-print(v.shape, v.T.shape)              # (4,) (4,)
-print(v[:, None].shape)                # (4, 1)
+print(v.shape, v.T.shape)  # (4,) (4,)
+print(v[:, None].shape)  # (4, 1)
 mat = np.ones((4, 3))
-print((mat + v[:, None]).shape)        # (4, 3) -- column add
+print((mat + v[:, None]).shape)  # (4, 3) -- column add
 ```
 
 **Complexity**: O(1) — reshaping a view, no data movement.
@@ -53,8 +53,8 @@ compatibility.
 ```python
 import numpy as np
 
-print(np.broadcast_shapes((3, 1), (1, 4)))   # (3, 4)
-print(np.broadcast_shapes((5,), (3, 4)))     # ValueError? no -- raises
+print(np.broadcast_shapes((3, 1), (1, 4)))  # (3, 4)
+print(np.broadcast_shapes((5,), (3, 4)))  # ValueError? no -- raises
 ```
 
 ```text
@@ -77,9 +77,9 @@ import numpy as np
 
 a = np.arange(3)
 stretched = np.broadcast_to(a[:, None], (3, 4))
-print(stretched.shape)                     # (3, 4)
-print(stretched.base is not None)          # True -- no copy
-print(stretched.flags.writeable)           # False
+print(stretched.shape)  # (3, 4)
+print(stretched.base is not None)  # True -- no copy
+print(stretched.flags.writeable)  # False
 ```
 
 **Complexity**: O(1) time and O(1) extra memory — a view.
@@ -99,7 +99,7 @@ import numpy as np
 a = np.ones((3, 1))
 b = np.ones(4)
 c = a + b
-print(c.shape)                             # (3, 4)
+print(c.shape)  # (3, 4)
 ```
 
 **Complexity**: O(result size) time, O(result size) memory for the result.
@@ -116,9 +116,9 @@ the named form of `arr[:, None]` / `arr[None, :]` slicing.
 import numpy as np
 
 v = np.arange(4)
-print(np.expand_dims(v, 1).shape)          # (4, 1)
-print(np.expand_dims(v, 0).shape)          # (1, 4)
-print(v[:, None].shape)                    # (4, 1) -- equivalent
+print(np.expand_dims(v, 1).shape)  # (4, 1)
+print(np.expand_dims(v, 0).shape)  # (1, 4)
+print(v[:, None].shape)  # (4, 1) -- equivalent
 ```
 
 **Complexity**: O(1) — view.
@@ -163,8 +163,8 @@ import numpy as np
 
 X = np.random.default_rng(0).normal(size=(6, 3))
 m = X.mean(axis=1, keepdims=True)
-print(m.shape)                             # (6, 1)
-print((X - m).shape)                       # (6, 3) -- row centered
+print(m.shape)  # (6, 1)
+print((X - m).shape)  # (6, 3) -- row centered
 ```
 
 **Complexity**: O(1) shape effect; reduction itself O(n).
@@ -182,8 +182,8 @@ stretch to match the other operand.
 import numpy as np
 
 big = np.ones((2, 5, 3))
-small = np.ones((5, 3))                    # treated as (1, 5, 3)
-print((big + small).shape)                 # (2, 5, 3)
+small = np.ones((5, 3))  # treated as (1, 5, 3)
+print((big + small).shape)  # (2, 5, 3)
 ```
 
 **Complexity**: O(1) — conceptual padding only.
@@ -201,8 +201,8 @@ a size-1 axis at that exact position: `v[:, None]` → `(n,1)`,
 import numpy as np
 
 v = np.arange(3)
-print(v[np.newaxis, :].shape)              # (1, 3)
-print(v[:, np.newaxis].shape)              # (3, 1)
+print(v[np.newaxis, :].shape)  # (1, 3)
+print(v[:, np.newaxis].shape)  # (3, 1)
 ```
 
 **Complexity**: O(1) — view.
@@ -221,8 +221,8 @@ import numpy as np
 
 labels = np.array([0, 2, 1])
 oh = (labels[:, None] == np.arange(3)).astype(np.float32)
-print(oh.shape)                            # (3, 3)
-print(oh.sum(axis=1))                      # [1. 1. 1.]
+print(oh.shape)  # (3, 3)
+print(oh.sum(axis=1))  # [1. 1. 1.]
 ```
 
 **Complexity**: O(n·k) time and memory.
@@ -241,8 +241,8 @@ import numpy as np
 a = np.arange(3)
 b = np.arange(4)
 outer = a[:, None] * b[None, :]
-print(outer.shape)                         # (3, 4)
-print(outer.nbytes, "bytes")               # 96 bytes for 3x4 float64
+print(outer.shape)  # (3, 4)
+print(outer.nbytes, "bytes")  # 96 bytes for 3x4 float64
 ```
 
 **Complexity**: O(n·m) time and O(n·m) memory — the memory is the cost.
@@ -260,7 +260,7 @@ print(outer.nbytes, "bytes")               # 96 bytes for 3x4 float64
 import numpy as np
 
 X = np.arange(12).reshape(3, 4)
-print(X.sum(axis=0).shape)                 # (4,)
+print(X.sum(axis=0).shape)  # (4,)
 print(X.sum(axis=0, keepdims=True).shape)  # (1, 4)
 ```
 
@@ -279,7 +279,7 @@ dimension leftward. This order is why `(4,)` pairs with the *last* axis of
 import numpy as np
 
 # (4,) aligns with the trailing axis of (3, 4)
-print(np.broadcast_shapes((3, 4), (4,)))   # (3, 4)
+print(np.broadcast_shapes((3, 4), (4,)))  # (3, 4)
 # (3,) clashes with the trailing 4
 try:
     np.broadcast_shapes((3, 4), (3,))
@@ -306,8 +306,8 @@ repeatedly; only the result materializes.
 ```python
 import numpy as np
 
-a = np.array([[1.0], [2.0]])               # (2, 1)
-b = np.array([[10.0, 20.0]])               # (1, 2)
+a = np.array([[1.0], [2.0]])  # (2, 1)
+b = np.array([[10.0, 20.0]])  # (1, 2)
 print(a + b)
 # [[11. 21.]
 #  [12. 22.]]
@@ -328,8 +328,8 @@ two 100k-length vectors is 80 GB of float64.
 import numpy as np
 
 a = np.arange(100_000)
-outer = a[:, None] * a[None, :]            # 100_000 x 100_000
-print(outer.nbytes / 1e9, "GB")            # 80.0 GB
+outer = a[:, None] * a[None, :]  # 100_000 x 100_000
+print(outer.nbytes / 1e9, "GB")  # 80.0 GB
 ```
 
 **Complexity**: O(n·m) memory — check before running.
@@ -372,10 +372,10 @@ import numpy as np
 
 X = np.random.default_rng(1).normal(size=(100, 3))
 # WRONG intent: row centering via column broadcast
-wrong = X - X.mean(axis=0)      # runs, but rows not centered
+wrong = X - X.mean(axis=0)  # runs, but rows not centered
 row_centered = X - X.mean(axis=1, keepdims=True)
-print(np.abs(row_centered.mean(axis=1)).max())   # ~0
-print(np.abs(wrong.mean(axis=1)).max())          # not ~0
+print(np.abs(row_centered.mean(axis=1)).max())  # ~0
+print(np.abs(wrong.mean(axis=1)).max())  # not ~0
 ```
 
 **Complexity**: O(n) per pass; the bug costs debugging hours.

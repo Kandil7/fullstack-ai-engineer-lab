@@ -22,6 +22,7 @@ import numpy as np
 # EASY PROBLEMS (20 XP)
 # ============================================================
 
+
 # Problem 1: Cosine Similarity
 # Write a function that computes the cosine similarity between two vectors.
 # cosine_sim(a, b) = (a · b) / (||a|| * ||b||)
@@ -64,6 +65,7 @@ def problem_05():
 # ============================================================
 # MEDIUM PROBLEMS (50 XP)
 # ============================================================
+
 
 # Problem 6: Embedding Cache
 # Build an EmbeddingCache class that:
@@ -146,6 +148,7 @@ def problem_10():
 # ============================================================
 # HARD PROBLEMS (100 XP)
 # ============================================================
+
 
 # Problem 11: Embedding Quality Evaluator
 # Write a function that evaluates embedding quality:

@@ -43,9 +43,7 @@ class Book(Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"))
 
     author: Mapped["Author"] = relationship(back_populates="books")
-    tags: Mapped[list["Tag"]] = relationship(
-        secondary=book_tag, back_populates="books"
-    )
+    tags: Mapped[list["Tag"]] = relationship(secondary=book_tag, back_populates="books")
 
 
 class Tag(Base):
@@ -54,9 +52,7 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     label: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
 
-    books: Mapped[list["Book"]] = relationship(
-        secondary=book_tag, back_populates="tags"
-    )
+    books: Mapped[list["Book"]] = relationship(secondary=book_tag, back_populates="tags")
 
 
 def create_review_graph(
@@ -70,23 +66,19 @@ def create_review_graph(
     Reuse the author and existing tags; create only what is missing.
     One add() persists the whole graph in dependency order.
     """
-    author = session.scalars(
-        select(Author).where(Author.name == author_name)
-    ).first()
+    author = session.scalars(select(Author).where(Author.name == author_name)).first()
     if author is None:
         author = Author(name=author_name)
-        session.add(author)          # persistent BEFORE backref wiring
+        session.add(author)  # persistent BEFORE backref wiring
 
     book = Book(title=title)
-    session.add(book)                # avoids the "not in session" SAWarning
+    session.add(book)  # avoids the "not in session" SAWarning
     book.author = author
 
     for label in tags:
-        existing = session.scalars(
-            select(Tag).where(Tag.label == label)
-        ).first()
+        existing = session.scalars(select(Tag).where(Tag.label == label)).first()
         tag = existing if existing else Tag(label=label)
-        session.add(tag)             # persistent before append
+        session.add(tag)  # persistent before append
         book.tags.append(tag)
 
     session.add(book)
@@ -96,9 +88,7 @@ def create_review_graph(
 
 def find_books_by_tag(session: Session, tag_label: str) -> list[str]:
     """Return book titles (sorted) carrying the given tag, or []."""
-    tag = session.scalars(
-        select(Tag).where(Tag.label == tag_label)
-    ).first()
+    tag = session.scalars(select(Tag).where(Tag.label == tag_label)).first()
     if tag is None:
         return []
     return sorted(b.title for b in tag.books)
@@ -106,12 +96,10 @@ def find_books_by_tag(session: Session, tag_label: str) -> list[str]:
 
 def delete_author_cascade(session: Session, author_name: str) -> int:
     """Delete an author and their books (cascade); return books removed."""
-    author = session.scalars(
-        select(Author).where(Author.name == author_name)
-    ).first()
+    author = session.scalars(select(Author).where(Author.name == author_name)).first()
     if author is None:
         return 0
-    removed = len(author.books)   # count BEFORE the delete
-    session.delete(author)        # cascade removes books + book_tag rows
+    removed = len(author.books)  # count BEFORE the delete
+    session.delete(author)  # cascade removes books + book_tag rows
     session.commit()
     return removed

@@ -105,9 +105,7 @@ np.random.seed(42)
 X = np.random.rand(200, 2) * np.array([1000, 10])  # Different scales
 y = 5 * X[:, 0] + 10 * X[:, 1] + np.random.randn(200) * 50
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Without scaling
 model_unscaled = LinearRegression()
@@ -151,10 +149,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
 
 # Create pipeline
-pipe = Pipeline([
-    ('scaler', StandardScaler()),
-    ('model', LinearRegression())
-])
+pipe = Pipeline([("scaler", StandardScaler()), ("model", LinearRegression())])
 
 # Train
 pipe.fit(X_train, y_train)
@@ -199,7 +194,7 @@ print("4. Forgetting to scale new data in production")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Feature scaling puts features on the same scale")
 print("- StandardScaler: mean=0, std=1 (good for normal data)")
@@ -207,4 +202,4 @@ print("- MinMaxScaler: 0-1 range (good for bounded values)")
 print("- RobustScaler: resistant to outliers")
 print("- Always fit scaler on training data only")
 print("- Use Pipeline for clean scaling workflow")
-print("="*60)
+print("=" * 60)

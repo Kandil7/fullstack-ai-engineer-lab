@@ -37,23 +37,21 @@ def sparse_dot(A, B) -> sp.csr_matrix:
     return (A.tocsr() @ B.tocsr()).tocsr()
 
 
-def tfidf_retrieval(docs: list[str], query: str,
-                    top_k: int = 3) -> np.ndarray:
+def tfidf_retrieval(docs: list[str], query: str, top_k: int = 3) -> np.ndarray:
     """Top-k doc indices by cosine similarity over sparse TF-IDF."""
     vec = TfidfVectorizer()
     vec.fit(docs)
-    X = vec.transform(docs)                      # csr, stays sparse
+    X = vec.transform(docs)  # csr, stays sparse
     l2 = np.asarray(X.power(2).sum(axis=1)).ravel() ** 0.5
-    Xn = sp.diags(1.0 / l2) @ X                  # unit-L2 rows
+    Xn = sp.diags(1.0 / l2) @ X  # unit-L2 rows
     q = vec.transform([query])
     ql = np.asarray(q.power(2).sum(axis=1)).ravel() ** 0.5
-    qv = (sp.diags(1.0 / ql) @ q).toarray().ravel()   # tiny query row
-    sim = np.asarray(Xn @ qv).ravel()            # cosine sims, sparse @ dense
+    qv = (sp.diags(1.0 / ql) @ q).toarray().ravel()  # tiny query row
+    sim = np.asarray(Xn @ qv).ravel()  # cosine sims, sparse @ dense
     return np.argsort(sim)[::-1][:top_k]
 
 
 def solve_sparse_system(n: int) -> np.ndarray:
     """Solve the tridiagonal (L+2I) system with spsolve."""
-    A = sp.diags([-1.0, 2.0, -1.0], [-1, 0, 1], shape=(n, n),
-                 format="csr")
+    A = sp.diags([-1.0, 2.0, -1.0], [-1, 0, 1], shape=(n, n), format="csr")
     return spsolve(A, np.ones(n))

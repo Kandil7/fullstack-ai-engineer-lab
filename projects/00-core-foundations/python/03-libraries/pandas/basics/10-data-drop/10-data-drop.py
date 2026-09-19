@@ -4,6 +4,7 @@ W3Schools: https://www.w3schools.com/python/pandas_dataframe_drop.asp
 
 The drop() method removes specified rows or columns from a DataFrame.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -11,14 +12,17 @@ import numpy as np
 # Sample data
 # ---------------------------------------------------------------------------
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
-    "Age": [25, 30, 35, 28, 22],
-    "Department": ["Engineering", "Marketing", "Engineering", "Sales", "Marketing"],
-    "Salary": [70000, 80000, 95000, 75000, 65000],
-    "Temp_Col1": [1, 2, 3, 4, 5],
-    "Temp_Col2": [10, 20, 30, 40, 50],
-}, index=["e1", "e2", "e3", "e4", "e5"])
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
+        "Age": [25, 30, 35, 28, 22],
+        "Department": ["Engineering", "Marketing", "Engineering", "Sales", "Marketing"],
+        "Salary": [70000, 80000, 95000, 75000, 65000],
+        "Temp_Col1": [1, 2, 3, 4, 5],
+        "Temp_Col2": [10, 20, 30, 40, 50],
+    },
+    index=["e1", "e2", "e3", "e4", "e5"],
+)
 
 print("Original DataFrame:")
 print(df)
@@ -99,11 +103,13 @@ print("=" * 60)
 print("Example 4: Drop Duplicates")
 print("=" * 60)
 
-df_dup = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Alice", "Charlie", "Bob"],
-    "Department": ["Engineering", "Marketing", "Engineering", "Sales", "Marketing"],
-    "Salary": [70000, 80000, 70000, 95000, 80000],
-})
+df_dup = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Alice", "Charlie", "Bob"],
+        "Department": ["Engineering", "Marketing", "Engineering", "Sales", "Marketing"],
+        "Salary": [70000, 80000, 70000, 95000, 80000],
+    }
+)
 print("DataFrame with duplicates:")
 print(df_dup)
 print()
@@ -128,11 +134,13 @@ print("=" * 60)
 print("Example 5: Drop Missing Values")
 print("=" * 60)
 
-df_nan = pd.DataFrame({
-    "A": [1, 2, np.nan, 4, 5],
-    "B": [np.nan, 2, 3, np.nan, 5],
-    "C": ["x", "y", "z", "w", "v"],
-})
+df_nan = pd.DataFrame(
+    {
+        "A": [1, 2, np.nan, 4, 5],
+        "B": [np.nan, 2, 3, np.nan, 5],
+        "C": ["x", "y", "z", "w", "v"],
+    }
+)
 print("DataFrame with NaN:")
 print(df_nan)
 print()

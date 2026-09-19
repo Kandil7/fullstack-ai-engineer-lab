@@ -24,7 +24,7 @@ idempotent.
 **Definition**: Exponentially (or otherwise) growing delay between retries to
 avoid hammering a failing service.
 ```python
-delay = base * 2 ** attempt
+delay = base * 2**attempt
 ```
 **Related**: Retry
 

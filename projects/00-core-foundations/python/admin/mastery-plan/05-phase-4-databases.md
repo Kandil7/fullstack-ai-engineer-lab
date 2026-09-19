@@ -70,7 +70,7 @@ try:
     conn = psycopg.connect(DSN, connect_timeout=2)
 except psycopg.OperationalError:
     print("[skip] Postgres not running — docker compose up -d postgres")
-    sys.exit(0)          # skip, not fail
+    sys.exit(0)  # skip, not fail
 ```
 
 ---
@@ -214,7 +214,7 @@ def _verify() -> None:
     # Always run against a throwaway schema, always clean up
     with connect() as conn:
         conn.execute("CREATE TEMP TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
-        conn.execute("INSERT INTO t (v) VALUES (?)", ("a",))         # parameterized
+        conn.execute("INSERT INTO t (v) VALUES (?)", ("a",))  # parameterized
         assert conn.execute("SELECT COUNT(*) FROM t").fetchone()[0] == 1
 
         # Assert the *plan*, not just the result — this is the senior skill

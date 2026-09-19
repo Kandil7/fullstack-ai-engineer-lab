@@ -15,6 +15,7 @@ class Dog:
     def __init__(self, name):
         self.name = name  # Instance attribute
 
+
 buddy = Dog("Buddy")
 print(buddy.name)  # Access attribute
 ```
@@ -32,6 +33,7 @@ class Car:
         self.make = make
         self.model = model
 
+
 my_car = Car("Toyota", "Camry")
 ```
 **Related:** Object, instance, blueprint
@@ -41,6 +43,7 @@ my_car = Car("Toyota", "Camry")
 ```python
 class Dog:
     species = "Canis familiaris"  # Class attribute
+
 
 buddy = Dog()
 max_dog = Dog()
@@ -85,6 +88,7 @@ class Point:
 class Dog:
     pass
 
+
 buddy = Dog()  # Instance of Dog
 max_dog = Dog()  # Another instance
 ```
@@ -96,6 +100,7 @@ max_dog = Dog()  # Another instance
 class Dog:
     def __init__(self, name):
         self.name = name  # Instance attribute
+
 
 buddy = Dog("Buddy")
 max_dog = Dog("Max")
@@ -139,6 +144,7 @@ class Dog:
 ```python
 class Dog:
     pass
+
 
 buddy = Dog()  # Object
 print(type(buddy))  # <class '__main__.Dog'>
@@ -232,6 +238,7 @@ class BankAccount:
 ```python
 from abc import ABC, abstractmethod
 
+
 class Shape(ABC):
     @abstractmethod
     def area(self):
@@ -244,6 +251,7 @@ class Animal:
     def speak(self):
         pass
 
+
 class Dog(Animal):
     def speak(self):
         return "Woof!"
@@ -254,6 +262,7 @@ class Dog(Animal):
 def make_sound(animal):
     print(animal.speak())  # Works with any Animal
 
-make_sound(Dog())   # Woof!
-make_sound(Cat())   # Meow!
+
+make_sound(Dog())  # Woof!
+make_sound(Cat())  # Meow!
 ```

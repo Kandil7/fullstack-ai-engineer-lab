@@ -220,12 +220,14 @@
 # --- Function-based view ---
 from django.shortcuts import render
 
+
 def post_list(request):
     context = {
-        'title': 'Blog Posts',
-        'posts': [],  # QuerySet or list
+        "title": "Blog Posts",
+        "posts": [],  # QuerySet or list
     }
-    return render(request, 'blog/post_list.html', context)
+    return render(request, "blog/post_list.html", context)
+
 
 # --- Class-based view ---
 # from django.views.generic import ListView

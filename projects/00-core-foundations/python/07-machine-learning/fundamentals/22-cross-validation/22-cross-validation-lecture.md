@@ -56,12 +56,14 @@ X, y = make_classification(n_samples=200, n_features=10, random_state=42)
 print("Different random splits give different accuracy scores:")
 for i in range(5):
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2  # No random_state = different each time
+        X,
+        y,
+        test_size=0.2,  # No random_state = different each time
     )
     model = LogisticRegression(random_state=42)
     model.fit(X_train, y_train)
     acc = accuracy_score(y_test, model.predict(X_test))
-    print(f"  Split {i+1}: {acc:.4f}")
+    print(f"  Split {i + 1}: {acc:.4f}")
 
 print("\nCross-validation gives more reliable estimates!")
 ```
@@ -104,7 +106,7 @@ from sklearn.datasets import make_classification
 X, y = make_classification(n_samples=200, n_features=10, random_state=42)
 
 model = LogisticRegression(random_state=42)
-cv_scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+cv_scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
 
 print(f"CV scores: {[f'{s:.4f}' for s in cv_scores]}")
 print(f"Mean: {cv_scores.mean():.4f}")
@@ -121,8 +123,7 @@ from sklearn.metrics import accuracy_score
 import numpy as np
 
 # Imbalanced dataset
-X, y = make_classification(n_samples=200, n_features=10, 
-                           weights=[0.7, 0.3], random_state=42)
+X, y = make_classification(n_samples=200, n_features=10, weights=[0.7, 0.3], random_state=42)
 
 print(f"Original class distribution: {np.bincount(y)}")
 
@@ -132,11 +133,11 @@ stratified_scores = []
 for train_idx, val_idx in skf.split(X, y):
     X_train, X_val = X[train_idx], X[val_idx]
     y_train, y_val = y[train_idx], y[val_idx]
-    
+
     # Check distribution
     train_dist = np.bincount(y_train)
     val_dist = np.bincount(y_val)
-    
+
     model = LogisticRegression(random_state=42)
     model.fit(X_train, y_train)
     score = accuracy_score(y_val, model.predict(X_val))
@@ -158,7 +159,7 @@ X, y = make_classification(n_samples=200, n_features=10, random_state=42)
 model = LogisticRegression(random_state=42)
 
 # Different metrics
-metrics = ['accuracy', 'f1', 'precision', 'recall', 'roc_auc']
+metrics = ["accuracy", "f1", "precision", "recall", "roc_auc"]
 print("Different Scoring Metrics:")
 print("-" * 35)
 
@@ -180,8 +181,8 @@ X, y = make_regression(n_samples=200, n_features=5, noise=0.5, random_state=42)
 model = LinearRegression()
 
 # Different regression metrics
-r2_scores = cross_val_score(model, X, y, cv=5, scoring='r2')
-neg_mse_scores = cross_val_score(model, X, y, cv=5, scoring='neg_mean_squared_error')
+r2_scores = cross_val_score(model, X, y, cv=5, scoring="r2")
+neg_mse_scores = cross_val_score(model, X, y, cv=5, scoring="neg_mean_squared_error")
 
 print(f"R² scores: {[f'{s:.4f}' for s in r2_scores]}")
 print(f"Mean R²: {r2_scores.mean():.4f}")
@@ -203,8 +204,8 @@ results = []
 
 print("Effect of Number of Folds:")
 for k in [3, 5, 10, 15, 20]:
-    scores = cross_val_score(model, X, y, cv=k, scoring='accuracy')
-    results.append({'k': k, 'mean': scores.mean(), 'std': scores.std()})
+    scores = cross_val_score(model, X, y, cv=k, scoring="accuracy")
+    results.append({"k": k, "mean": scores.mean(), "std": scores.std()})
     print(f"K={k:2d}: Mean={scores.mean():.4f} +/- {scores.std():.4f}")
 ```
 
@@ -238,7 +239,7 @@ print("  - Use test set only for final evaluation")
 
 ```python
 # WRONG: Using CV score as final performance
-cv_scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+cv_scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
 final_score = cv_scores.mean()  # This is for model selection only!
 
 # CORRECT: Use test set for final evaluation
@@ -256,8 +257,7 @@ from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.datasets import make_classification
 import numpy as np
 
-X, y = make_classification(n_samples=200, n_features=10, 
-                           weights=[0.7, 0.3], random_state=42)
+X, y = make_classification(n_samples=200, n_features=10, weights=[0.7, 0.3], random_state=42)
 
 # WRONG: Regular KFold on imbalanced data
 kf = KFold(n_splits=5, shuffle=True, random_state=42)
@@ -282,10 +282,7 @@ X_scaled = scaler.fit_transform(X)  # WRONG! Uses test data info
 # CORRECT: Fit scaler within CV loop
 from sklearn.pipeline import Pipeline
 
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('model', LogisticRegression())
-])
+pipeline = Pipeline([("scaler", StandardScaler()), ("model", LogisticRegression())])
 scores = cross_val_score(pipeline, X, y, cv=5)  # Correct!
 ```
 
@@ -301,19 +298,16 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score
 
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('model', LogisticRegression(random_state=42))
-])
+pipeline = Pipeline([("scaler", StandardScaler()), ("model", LogisticRegression(random_state=42))])
 
-scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
 print(f"CV accuracy: {scores.mean():.4f}")
 ```
 
 ### 2. Report Mean and Std
 
 ```python
-scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
 print(f"Accuracy: {scores.mean():.4f} +/- {scores.std():.4f}")
 ```
 
@@ -321,8 +315,8 @@ print(f"Accuracy: {scores.mean():.4f} +/- {scores.std():.4f}")
 
 ```python
 # 5 or 10 folds is usually a good balance
-scores_5 = cross_val_score(model, X, y, cv=5, scoring='accuracy')
-scores_10 = cross_val_score(model, X, y, cv=10, scoring='accuracy')
+scores_5 = cross_val_score(model, X, y, cv=5, scoring="accuracy")
+scores_10 = cross_val_score(model, X, y, cv=10, scoring="accuracy")
 
 print(f"5 folds: {scores_5.mean():.4f} +/- {scores_5.std():.4f}")
 print(f"10 folds: {scores_10.mean():.4f} +/- {scores_10.std():.4f}")
@@ -334,7 +328,7 @@ print(f"10 folds: {scores_10.mean():.4f} +/- {scores_10.std():.4f}")
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 
 skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-scores = cross_val_score(model, X, y, cv=skf, scoring='accuracy')
+scores = cross_val_score(model, X, y, cv=skf, scoring="accuracy")
 ```
 
 ---
@@ -350,13 +344,13 @@ Compare KFold vs StratifiedKFold on imbalanced data.
 2. Apply both methods
 3. Compare results
 """
+
 from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.datasets import make_classification
 import numpy as np
 
-X, y = make_classification(n_samples=200, n_features=10, 
-                           weights=[0.7, 0.3], random_state=42)
+X, y = make_classification(n_samples=200, n_features=10, weights=[0.7, 0.3], random_state=42)
 
 # Your code here
 kf = KFold(n_splits=5, shuffle=True, random_state=42)
@@ -364,8 +358,8 @@ skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
 model = LogisticRegression(random_state=42)
 
-scores_kf = cross_val_score(model, X, y, cv=kf, scoring='f1')
-scores_skf = cross_val_score(model, X, y, cv=skf, scoring='f1')
+scores_kf = cross_val_score(model, X, y, cv=kf, scoring="f1")
+scores_skf = cross_val_score(model, X, y, cv=skf, scoring="f1")
 
 print(f"KFold F1: {scores_kf.mean():.4f} +/- {scores_kf.std():.4f}")
 print(f"StratifiedKFold F1: {scores_skf.mean():.4f} +/- {scores_skf.std():.4f}")
@@ -380,6 +374,7 @@ Use cross-validation to select the best model.
 2. Use CV for fair comparison
 3. Select best model
 """
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
@@ -388,19 +383,15 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 models = {
-    'Logistic Regression': Pipeline([
-        ('scaler', StandardScaler()),
-        ('model', LogisticRegression(random_state=42))
-    ]),
-    'SVM': Pipeline([
-        ('scaler', StandardScaler()),
-        ('model', SVC(random_state=42))
-    ]),
-    'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42)
+    "Logistic Regression": Pipeline(
+        [("scaler", StandardScaler()), ("model", LogisticRegression(random_state=42))]
+    ),
+    "SVM": Pipeline([("scaler", StandardScaler()), ("model", SVC(random_state=42))]),
+    "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
 }
 
 for name, model in models.items():
-    scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
     print(f"{name:25s}: {scores.mean():.4f} +/- {scores.std():.4f}")
 ```
 
@@ -413,22 +404,17 @@ Tune hyperparameters using cross-validation.
 2. Use GridSearchCV
 3. Report best parameters
 """
+
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('svm', SVC())
-])
+pipeline = Pipeline([("scaler", StandardScaler()), ("svm", SVC())])
 
-param_grid = {
-    'svm__C': [0.1, 1, 10, 100],
-    'svm__gamma': [0.1, 1, 10]
-}
+param_grid = {"svm__C": [0.1, 1, 10, 100], "svm__gamma": [0.1, 1, 10]}
 
-grid = GridSearchCV(pipeline, param_grid, cv=5, scoring='accuracy', n_jobs=-1)
+grid = GridSearchCV(pipeline, param_grid, cv=5, scoring="accuracy", n_jobs=-1)
 grid.fit(X, y)
 
 print(f"Best parameters: {grid.best_params_}")

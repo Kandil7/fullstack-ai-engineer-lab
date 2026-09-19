@@ -34,6 +34,7 @@
 import re
 import hashlib
 
+
 class Anonymizer:
     def __init__(self):
         self.salt = "your-secret-salt"
@@ -49,10 +50,11 @@ class Anonymizer:
 
     def anonymize_ip(self, ip: str) -> str:
         """Anonymize IP address by zeroing last octet."""
-        parts = ip.split('.')
+        parts = ip.split(".")
         if len(parts) == 4:
             return f"{parts[0]}.{parts[1]}.{parts[2]}.0"
         return "[ANONYMIZED_IP]"
+
 
 # Usage
 anonymizer = Anonymizer()
@@ -86,7 +88,7 @@ class ContentFilter:
                 "message": "Content flagged: potential spam",
             },
             "pii": {
-                "patterns": [r'\d{3}-\d{2}-\d{4}'],  # SSN pattern
+                "patterns": [r"\d{3}-\d{2}-\d{4}"],  # SSN pattern
                 "action": "redact",
                 "message": "PII detected and redacted",
             },
@@ -172,15 +174,16 @@ leakage_scenarios = {
     },
 }
 
+
 def detect_data_leakage(output: str, context: dict) -> list:
     """Detect potential data leakage in AI output."""
     issues = []
 
     # Check for PII patterns
     pii_patterns = [
-        (r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', "email"),
-        (r'\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b', "ssn"),
-        (r'\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b', "phone"),
+        (r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", "email"),
+        (r"\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b", "ssn"),
+        (r"\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b", "phone"),
     ]
 
     for pattern, pii_type in pii_patterns:
@@ -253,35 +256,36 @@ false_positive_impacts = {
 class DataMasker:
     def mask_email(self, email: str) -> str:
         """Mask email address."""
-        parts = email.split('@')
+        parts = email.split("@")
         if len(parts) == 2:
             username = parts[0]
             domain = parts[1]
             if len(username) > 2:
-                masked = username[0] + '*' * (len(username) - 2) + username[-1]
+                masked = username[0] + "*" * (len(username) - 2) + username[-1]
             else:
-                masked = '*' * len(username)
+                masked = "*" * len(username)
             return f"{masked}@{domain}"
         return "***@***"
 
     def mask_phone(self, phone: str) -> str:
         """Mask phone number."""
-        digits = re.sub(r'\D', '', phone)
+        digits = re.sub(r"\D", "", phone)
         if len(digits) >= 10:
             return f"({digits[-10:-7]}) ***-{digits[-4:]}"
         return "***-***-****"
 
     def mask_credit_card(self, card: str) -> str:
         """Mask credit card number."""
-        digits = re.sub(r'\D', '', card)
+        digits = re.sub(r"\D", "", card)
         if len(digits) >= 16:
             return f"****-****-****-{digits[-4:]}"
         return "****-****-****-****"
 
+
 # Usage
 masker = DataMasker()
 print(masker.mask_email("john.doe@example.com"))  # j***e@example.com
-print(masker.mask_phone("+1-555-123-4567"))      # (555) ***-4567
+print(masker.mask_phone("+1-555-123-4567"))  # (555) ***-4567
 print(masker.mask_credit_card("4111-1111-1111-1111"))  # ****-****-****-1111
 ```
 
@@ -313,21 +317,22 @@ class OutputValidator:
 
         # Safety validation
         safety_patterns = [
-            r'ignore\s+(all\s+)?previous',
-            r'you\s+are\s+now\s+',
+            r"ignore\s+(all\s+)?previous",
+            r"you\s+are\s+now\s+",
         ]
         for pattern in safety_patterns:
             if re.search(pattern, output, re.IGNORECASE):
                 issues.append("potential_safety_issue")
 
         # Encoding validation
-        if '\x00' in output:
+        if "\x00" in output:
             issues.append("null_bytes_detected")
 
         return {
             "valid": len(issues) == 0,
             "issues": issues,
         }
+
 
 # Usage
 validator = OutputValidator()
@@ -410,13 +415,14 @@ class OutputFilterPipeline:
 ```python
 import re
 
+
 class PIIDetector:
     def __init__(self):
         self.patterns = {
-            "email": r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
-            "phone": r'\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b',
-            "ssn": r'\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b',
-            "credit_card": r'\b(?:\d{4}[-.\s]?){3}\d{4}\b',
+            "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+            "phone": r"\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b",
+            "ssn": r"\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b",
+            "credit_card": r"\b(?:\d{4}[-.\s]?){3}\d{4}\b",
         }
 
     def detect(self, text: str) -> list:
@@ -425,12 +431,15 @@ class PIIDetector:
         for pii_type, pattern in self.patterns.items():
             matches = re.findall(pattern, text)
             if matches:
-                findings.append({
-                    "type": pii_type,
-                    "count": len(matches),
-                    "samples": matches[:3],
-                })
+                findings.append(
+                    {
+                        "type": pii_type,
+                        "count": len(matches),
+                        "samples": matches[:3],
+                    }
+                )
         return findings
+
 
 # Usage
 detector = PIIDetector()
@@ -459,20 +468,18 @@ class PIIRedactor:
         # Simple regex-based redaction
         # Email
         text = re.sub(
-            r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
-            replacement, text
+            r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", replacement, text
         )
         # Phone
         text = re.sub(
-            r'\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b',
-            replacement, text
+            r"\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b",
+            replacement,
+            text,
         )
         # SSN
-        text = re.sub(
-            r'\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b',
-            replacement, text
-        )
+        text = re.sub(r"\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b", replacement, text)
         return text
+
 
 # Usage
 redactor = PIIRedactor()
@@ -513,10 +520,10 @@ pii_categories = {
 
 # PII detection patterns
 pii_patterns = {
-    "email": r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
-    "phone": r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b',
-    "ssn": r'\b\d{3}[-.]?\d{2}[-.]?\d{4}\b',
-    "credit_card": r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b',
+    "email": r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b",
+    "phone": r"\b\d{3}[-.]?\d{3}[-.]?\d{4}\b",
+    "ssn": r"\b\d{3}[-.]?\d{2}[-.]?\d{4}\b",
+    "credit_card": r"\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b",
 }
 ```
 
@@ -568,9 +575,9 @@ privacy_principles = {
 class TextRedactor:
     def __init__(self):
         self.redaction_rules = [
-            (r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', '[EMAIL]'),
-            (r'\b\d{3}[-.]?\d{2}[-.]?\d{4}\b', '[SSN]'),
-            (r'\b(?:\d{1,3}\.){3}\d{1,3}\b', '[IP]'),
+            (r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", "[EMAIL]"),
+            (r"\b\d{3}[-.]?\d{2}[-.]?\d{4}\b", "[SSN]"),
+            (r"\b(?:\d{1,3}\.){3}\d{1,3}\b", "[IP]"),
         ]
 
     def redact(self, text: str) -> str:
@@ -578,6 +585,7 @@ class TextRedactor:
         for pattern, replacement in self.redaction_rules:
             text = re.sub(pattern, replacement, text)
         return text
+
 
 # Usage
 redactor = TextRedactor()
@@ -598,6 +606,7 @@ redacted = redactor.redact(text)
 ```python
 import html
 
+
 class OutputSanitizer:
     def sanitize_for_display(self, text: str) -> str:
         """Sanitize output for HTML display."""
@@ -605,22 +614,23 @@ class OutputSanitizer:
         text = html.escape(text)
 
         # Remove script tags
-        text = re.sub(r'<script[^>]*>.*?</script>', '', text, flags=re.DOTALL)
+        text = re.sub(r"<script[^>]*>.*?</script>", "", text, flags=re.DOTALL)
 
         # Remove event handlers
-        text = re.sub(r'\bon\w+\s*=', '', text)
+        text = re.sub(r"\bon\w+\s*=", "", text)
 
         return text
 
     def sanitize_for_api(self, text: str) -> str:
         """Sanitize output for API response."""
         # Remove control characters
-        text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', text)
+        text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
 
         # Normalize whitespace
-        text = re.sub(r'\s+', ' ', text).strip()
+        text = re.sub(r"\s+", " ", text).strip()
 
         return text
+
 
 # Usage
 sanitizer = OutputSanitizer()
@@ -662,6 +672,7 @@ sensitive_data_categories = {
         "regulation": "SOC 2, ISO 27001",
     },
 }
+
 
 def classify_sensitivity(data_type: str) -> str:
     """Classify data sensitivity level."""

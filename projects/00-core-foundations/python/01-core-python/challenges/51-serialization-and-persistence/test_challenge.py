@@ -224,9 +224,7 @@ def test_insert_uses_single_bulk_call():
     rows = [(f"run-{i}", i / n) for i in range(n)]
     got = _call(mod.insert_runs, conn, rows)
     assert got == n
-    assert conn._db_calls == 1, (
-        f"expected exactly 1 DB call, got {conn._db_calls}"
-    )
+    assert conn._db_calls == 1, f"expected exactly 1 DB call, got {conn._db_calls}"
     conn.close()
 
 

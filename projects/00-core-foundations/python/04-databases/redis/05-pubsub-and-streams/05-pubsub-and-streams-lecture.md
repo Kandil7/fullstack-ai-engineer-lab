@@ -75,9 +75,11 @@ re-read any number of times — this is what "durable" means here.
 ```python
 class Stream:  # stand-in modeled on XADD/XLEN/XRANGE
     ...
-    def xadd(self, fields): ...      # returns entry id
-    def xlen(self): ...              # number of entries
+
+    def xadd(self, fields): ...  # returns entry id
+    def xlen(self): ...  # number of entries
     def xrange(self, start=0, end=-1): ...
+
 
 stream = Stream(r, "stream:ingest")
 for i in range(5):

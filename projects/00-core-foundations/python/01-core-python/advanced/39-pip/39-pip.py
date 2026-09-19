@@ -116,6 +116,7 @@ Reference: https://www.w3schools.com/python/python_pip.asp
 import sys
 import subprocess
 
+
 def check_package_installed(package_name):
     """Check if a package is installed."""
     try:
@@ -124,13 +125,14 @@ def check_package_installed(package_name):
     except ImportError:
         return False
 
+
 # Example 23: Show Python and pip info
 print("Python version:", sys.version)
 print("Python executable:", sys.executable)
 print()
 
 # Example 24: List some common packages
-common_packages = ['pip', 'setuptools', 'wheel']
+common_packages = ["pip", "setuptools", "wheel"]
 print("Checking common packages:")
 for pkg in common_packages:
     installed = check_package_installed(pkg)

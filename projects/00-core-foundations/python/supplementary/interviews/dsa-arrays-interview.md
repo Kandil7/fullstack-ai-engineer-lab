@@ -100,6 +100,7 @@ def build_prefix(nums):
         prefix[i + 1] = prefix[i] + nums[i]
     return prefix
 
+
 # Range sum query: sum of nums[i..j]
 def range_sum(prefix, i, j):
     return prefix[j + 1] - prefix[i]
@@ -320,6 +321,7 @@ def two_sum_sorted_pairs(nums, target):
 - **Shallow copy:** Copies the reference to nested objects. Modifications to nested objects affect both copies.
   ```python
   import copy
+
   shallow = copy.copy(nested_list)  # or list(nested_list) or nested_list[:]
   ```
 - **Deep copy:** Recursively copies all nested objects. Fully independent.
@@ -364,9 +366,9 @@ A monotonic array is entirely non-increasing or non-decreasing:
 def is_monotonic(nums):
     increasing = decreasing = True
     for i in range(1, len(nums)):
-        if nums[i] > nums[i-1]:
+        if nums[i] > nums[i - 1]:
             decreasing = False
-        if nums[i] < nums[i-1]:
+        if nums[i] < nums[i - 1]:
             increasing = False
     return increasing or decreasing
 ```
@@ -388,6 +390,7 @@ def two_sum(nums, target):
         seen[num] = i
     return [-1, -1]
 
+
 # Test
 assert two_sum([2, 7, 11, 15], 9) == [0, 1]
 assert two_sum([3, 2, 4], 6) == [1, 2]
@@ -401,12 +404,13 @@ Given prices[i] = price on day i, find the maximum profit from one buy and one s
 
 ```python
 def max_profit(prices):
-    min_price = float('inf')
+    min_price = float("inf")
     max_profit = 0
     for price in prices:
         min_price = min(min_price, price)
         max_profit = max(max_profit, price - min_price)
     return max_profit
+
 
 # Test
 assert max_profit([7, 1, 5, 3, 6, 4]) == 5  # buy@1, sell@6
@@ -426,6 +430,7 @@ def max_subarray(nums):
         curr_sum = max(nums[i], curr_sum + nums[i])
         max_sum = max(max_sum, curr_sum)
     return max_sum
+
 
 # Test
 assert max_subarray([-2, 1, -3, 4, -1, 2, 1, -5, 4]) == 6  # [4, -1, 2, 1]
@@ -449,6 +454,7 @@ def max_area(height):
         else:
             right -= 1
     return max_water
+
 
 # Test
 assert max_area([1, 8, 6, 2, 5, 4, 8, 3, 7]) == 49
@@ -476,6 +482,7 @@ def product_except_self(nums):
         right_product *= nums[i]
 
     return result
+
 
 # Test
 assert product_except_self([1, 2, 3, 4]) == [24, 12, 8, 6]
@@ -508,6 +515,7 @@ def trap(height):
 
     return water
 
+
 # Test
 assert trap([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]) == 6
 ```
@@ -531,8 +539,9 @@ def merge_intervals(intervals):
 
     return merged
 
+
 # Test
-assert merge_intervals([[1,3],[2,6],[8,10],[15,18]]) == [[1,6],[8,10],[15,18]]
+assert merge_intervals([[1, 3], [2, 6], [8, 10], [15, 18]]) == [[1, 6], [8, 10], [15, 18]]
 ```
 **Time: O(n log n), Space: O(n)**
 
@@ -569,8 +578,9 @@ def spiral_order(matrix):
 
     return result
 
+
 # Test
-assert spiral_order([[1,2,3],[4,5,6],[7,8,9]]) == [1,2,3,6,9,8,7,4,5]
+assert spiral_order([[1, 2, 3], [4, 5, 6], [7, 8, 9]]) == [1, 2, 3, 6, 9, 8, 7, 4, 5]
 ```
 **Time: O(m*n), Space: O(1)** excluding output
 
@@ -592,6 +602,7 @@ def subarray_sum(nums, k):
         seen[prefix_sum] = seen.get(prefix_sum, 0) + 1
 
     return count
+
 
 # Test
 assert subarray_sum([1, 1, 1], 2) == 2
@@ -619,7 +630,8 @@ def next_permutation(nums):
         nums[i], nums[j] = nums[j], nums[i]
 
     # Step 3: Reverse the suffix
-    nums[i + 1:] = reversed(nums[i + 1:])
+    nums[i + 1 :] = reversed(nums[i + 1 :])
+
 
 # Test
 nums = [1, 2, 3]

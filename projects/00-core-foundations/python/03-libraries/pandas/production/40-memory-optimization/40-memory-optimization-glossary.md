@@ -148,7 +148,8 @@ peak memory is bounded while the result equals the full-frame computation.
 ```python
 total = count = 0.0
 for chunk in pd.read_csv(f, chunksize=100_000):
-    total += chunk["y"].sum(); count += chunk["y"].count()
+    total += chunk["y"].sum()
+    count += chunk["y"].count()
 mean = total / count
 ```
 **Related**: `chunksize`

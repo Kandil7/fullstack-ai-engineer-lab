@@ -10,6 +10,7 @@ Answers with full explanations and distractor analysis at the end.
 **E1 (code-output).** What prints?
 ```python
 import numpy as np
+
 scores = np.array([0.9, 0.4, 0.7, 0.2, 0.8])
 print(scores[[3, 0, 4]])
 ```
@@ -22,6 +23,7 @@ print(scores[[3, 0, 4]])
 **E2 (code-output).** What prints?
 ```python
 import numpy as np
+
 x = np.array([1.0, -2.0, 3.0, -4.0])
 print(x[x > 0.0])
 print((x > 0.0).sum())
@@ -42,6 +44,7 @@ print((x > 0.0).sum())
 **E4 (code-output).** What prints?
 ```python
 import numpy as np
+
 x = np.arange(6)
 print(np.take(x, [7, 8], mode="wrap"))
 print(np.take(x, [-3, 9], mode="clip"))
@@ -62,6 +65,7 @@ print(np.take(x, [-3, 9], mode="clip"))
 **E6 (code-output).** What prints?
 ```python
 import numpy as np
+
 bins = np.array([0.0, 0.5, 1.0])
 print(np.digitize([0.0, 0.5, 0.75], bins))
 ```
@@ -78,6 +82,7 @@ print(np.digitize([0.0, 0.5, 0.75], bins))
 **M1 (code-output).** What prints?
 ```python
 import numpy as np
+
 M = np.arange(20.0).reshape(4, 5)
 rows = np.array([0, 3])
 cols = np.array([1, 2, 4])
@@ -100,6 +105,7 @@ print(M[np.ix_(rows, cols)][0, 1])
 **M3 (code-output).** What prints?
 ```python
 import numpy as np
+
 base = np.arange(8.0)
 a = base[::2]
 b = base[[0, 2, 4]]
@@ -122,6 +128,7 @@ print(np.shares_memory(base, b))
 **M5 (code-output).** What prints?
 ```python
 import numpy as np
+
 bins = np.array([0.0, 0.25, 0.5, 0.75, 1.0])
 v = np.array([0.05, 0.25, 0.8, 2.0, -1.0])
 print(np.searchsorted(bins, v, side="right"))
@@ -142,6 +149,7 @@ print(np.searchsorted(bins, v, side="right"))
 **M7 (code-output).** What prints?
 ```python
 import numpy as np
+
 x = np.array([-3.0, 1.0, -2.0, 4.0])
 x[x < -1.0] = -1.0
 print(x)
@@ -162,6 +170,7 @@ print(x)
 **M9 (code-output).** What prints?
 ```python
 import numpy as np
+
 x = np.array([3.0, 1.0, 2.0])
 print(np.argsort(x))
 print(x[np.argsort(x)])
@@ -179,6 +188,7 @@ print(x[np.argsort(x)])
 **H1 (code-output).** What prints?
 ```python
 import numpy as np
+
 rng = np.random.default_rng(42)
 X = rng.normal(size=(6, 4))
 S = X[rng.permutation(X.shape[0])]
@@ -201,6 +211,7 @@ print(X[0, 0] == 0.0, np.shares_memory(X, S))
 **H3 (code-output).** What prints?
 ```python
 import numpy as np
+
 bins = np.array([0.0, 0.5, 1.0])
 v = np.array([0.0, 0.5, 0.75])
 print(np.searchsorted(bins, v, side="left"))

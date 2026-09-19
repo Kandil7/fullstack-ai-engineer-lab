@@ -28,12 +28,12 @@ from vector_utils import brute_force_knn, l2_dist, make_corpus, recall_at_k
 
 rng = np.random.default_rng(11)
 
+
 # Reuse the HNSW-lite and IVF from exercise 02 (imported via module path
 # would be fragile across folders, so a compact copy lives here with
 # the same semantics).
 class HNSWLite:
-    def __init__(self, M: int = 8, ef_construction: int = 20,
-                 seed: int = 42) -> None:
+    def __init__(self, M: int = 8, ef_construction: int = 20, seed: int = 42) -> None:
         self._M = M
         self._ef = ef_construction
         self._vectors: np.ndarray | None = None
@@ -82,7 +82,7 @@ class HNSWLite:
                 visited.add(nbr)
                 nd = float(np.linalg.norm(self._vectors[nbr] - query))
                 push_candidate(candidates, (nd, nbr))
-            if len(visited) >= 4 * ef_search:      # beam budget
+            if len(visited) >= 4 * ef_search:  # beam budget
                 break
         ranked = sorted(visited, key=lambda i: dists[i])
         return ranked[:ef_search]
@@ -114,6 +114,7 @@ print(f"corpus: {vectors.shape[0]} x {vectors.shape[1]} float32")
 
 # Output:
 # corpus: 600 x 32 float32
+
 
 # ============================================================
 # 2. Memory estimation — know your bill before you build
@@ -189,6 +190,7 @@ for M in (4, 8, 16):
 # (see the table above: M=16 doubles the graph bytes). Rule of thumb:
 # pick M by memory budget, then tune ef to hit your recall floor.
 
+
 # ============================================================
 # 4. Quantization ladder: full -> int8 -> PQ -> binary
 # ============================================================
@@ -218,7 +220,7 @@ print(f"binary: 32x smaller, {binary.shape[1]} bits per vector")
 # binary: 32x smaller, 32 bits per vector
 
 # recall comparison on the SAME queries:
-q8_idx = brute_force_knn(queries, deq, k=10, metric="l2")   # int8-dequantized corpus
+q8_idx = brute_force_knn(queries, deq, k=10, metric="l2")  # int8-dequantized corpus
 print(f"recall@10 int8  = {recall_at_k(q8_idx, truth, 10):.2f}")
 bin_idx = brute_force_knn(queries, binary.astype(np.float32), k=10, metric="l2")
 print(f"recall@10 binary = {recall_at_k(bin_idx, truth, 10):.2f}")
@@ -226,6 +228,7 @@ print(f"recall@10 binary = {recall_at_k(bin_idx, truth, 10):.2f}")
 # Output:
 # recall@10 int8  = 1.00
 # recall@10 binary = 0.10
+
 
 # ============================================================
 # 5. Pre-filter vs post-filter (metadata)
@@ -237,8 +240,9 @@ def post_filter(neighbors: list[int], allowed: set) -> list[int]:
     return [i for i in neighbors if i in allowed]
 
 
-def pre_filter(neighbors: list[int], allowed: set, full: np.ndarray,
-               q: np.ndarray, k: int) -> list[int]:
+def pre_filter(
+    neighbors: list[int], allowed: set, full: np.ndarray, q: np.ndarray, k: int
+) -> list[int]:
     cands = [i for i in neighbors if i in allowed]
     if len(cands) >= k:
         return cands[:k]
@@ -264,13 +268,15 @@ print(f"post-filter queries where top-10 starves below 5 hits: {starved}/10")
 # Output:
 # post-filter queries where top-10 starves below 5 hits: 6/10
 
+
 # ============================================================
 # 6. Oversampling — the production fix for filters
 # ============================================================
 # Retrieve k * oversample neighbors, filter, then take top-k. This is
 # how real stores expose filters cheaply (plus pre-filter indexes).
-def filtered_search(index: object, q: np.ndarray, allowed: set,
-                    k: int, oversample: int) -> list[int]:
+def filtered_search(
+    index: object, q: np.ndarray, allowed: set, k: int, oversample: int
+) -> list[int]:
     # retrieve k*oversample*2 candidates so even the tail of the true
     # top-(k*oversample) is covered, THEN filter, then take top-k
     nb = index.search(q, ef_search=k * oversample * 2)
@@ -299,12 +305,15 @@ for os_ in (1, 3, 8):
 # ANN indexes serve stale data: deletes are tombstones, and clusters
 # drift as new vectors arrive. Track freshness: a query for a NEW
 # cluster lands far from every index node until rebuild.
-fresh = rng.normal(scale=0.5, size=(5, 32)) * 5   # out-of-distribution
+fresh = rng.normal(scale=0.5, size=(5, 32)) * 5  # out-of-distribution
 fresh_hits = [hns.search(f, ef_search=10)[:3] for f in fresh]
-stale_dist = np.array([l2_dist(fresh[i], vectors[hits[0]])
-                       for i, hits in enumerate(fresh_hits)]).mean()
-print(f"\nstale index: avg distance to nearest hit for fresh cluster "
-      f"= {stale_dist:.2f}  <- far = needs reindex")
+stale_dist = np.array(
+    [l2_dist(fresh[i], vectors[hits[0]]) for i, hits in enumerate(fresh_hits)]
+).mean()
+print(
+    f"\nstale index: avg distance to nearest hit for fresh cluster "
+    f"= {stale_dist:.2f}  <- far = needs reindex"
+)
 
 # Output:
 # stale index: avg distance to nearest hit for fresh cluster = 12.85  <- far = needs reindex
@@ -320,38 +329,44 @@ print(f"\nstale index: avg distance to nearest hit for fresh cluster "
 # MISTAKE: never reindexing — embeddings from a NEW model version make
 #   the old index geometrically meaningless (same corpus, new space).
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # ef sweep: recall must rise monotonically with ef at fixed M
-    assert ef_rec[40] > ef_rec[20] > ef_rec[10] > ef_rec[5], \
+    assert ef_rec[40] > ef_rec[20] > ef_rec[10] > ef_rec[5], (
         "raising ef_search must improve recall for fixed M"
+    )
 
     # M sweep at a generous ef: denser graph must not hurt
-    assert m_rec[16] >= m_rec[8] >= m_rec[4], \
-        "raising M at generous ef must not reduce recall"
+    assert m_rec[16] >= m_rec[8] >= m_rec[4], "raising M at generous ef must not reduce recall"
 
     # INT8 keeps ~perfect recall on this corpus, binary loses a lot
-    assert recall_at_k(q8_idx, truth, 10) > 0.95, \
-        "INT8 must keep near-perfect recall"
-    assert recall_at_k(bin_idx, truth, 10) < recall_at_k(q8_idx, truth, 10), \
+    assert recall_at_k(q8_idx, truth, 10) > 0.95, "INT8 must keep near-perfect recall"
+    assert recall_at_k(bin_idx, truth, 10) < recall_at_k(q8_idx, truth, 10), (
         "binary must cost more recall than INT8"
+    )
 
     # memory math: PQ codes < graph < binary < raw vectors for 1M x 1536
-    assert mem["PQ m=16 codes (MB)"] < mem["HNSW graph M=16 (MB)"] < \
-        mem["binary codes (MB)"] < mem["float32 vectors (MB)"], \
-        "memory ladder must order PQ < graph < binary < raw"
+    assert (
+        mem["PQ m=16 codes (MB)"]
+        < mem["HNSW graph M=16 (MB)"]
+        < mem["binary codes (MB)"]
+        < mem["float32 vectors (MB)"]
+    ), "memory ladder must order PQ < graph < binary < raw"
 
     # oversampling must monotonically improve filtered recall
     def os_ok(os_: int) -> int:
-        return sum(1 for q in queries
-                   if set(filtered_search(hns, q, allowed, 5, os_)) ==
-                   set(sorted(allowed, key=lambda i: l2_dist(q, vectors[i]))[:5]))
+        return sum(
+            1
+            for q in queries
+            if set(filtered_search(hns, q, allowed, 5, os_))
+            == set(sorted(allowed, key=lambda i: l2_dist(q, vectors[i]))[:5])
+        )
 
-    assert os_ok(8) >= os_ok(3) >= os_ok(1), \
-        "oversampling must not hurt filtered top-k"
+    assert os_ok(8) >= os_ok(3) >= os_ok(1), "oversampling must not hurt filtered top-k"
 
     # post-filter starvation must be real (at least one query starves)
     assert starved >= 1, "selective filters must starve post-filter top-k"

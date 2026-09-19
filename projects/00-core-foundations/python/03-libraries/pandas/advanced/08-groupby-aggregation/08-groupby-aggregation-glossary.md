@@ -39,8 +39,7 @@ df.groupby("model")
 with one or many named aggregations.
 **Example**:
 ```python
-df.groupby("model", as_index=False).agg(
-    m=("f1", "mean"), n=("f1", "count"))
+df.groupby("model", as_index=False).agg(m=("f1", "mean"), n=("f1", "count"))
 ```
 **Related**: named aggregation
 

@@ -328,13 +328,16 @@ def get_db():
     finally:
         db.close()
 
+
 # Async database dependency
 async def get_async_db():
     async with async_session() as session:
         yield session
 
+
 # Router setup
 router = APIRouter(prefix="/api/v1", tags=["api"])
+
 
 # Lifespan pattern
 @asynccontextmanager

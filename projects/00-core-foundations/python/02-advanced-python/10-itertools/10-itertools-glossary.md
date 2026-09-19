@@ -160,6 +160,7 @@ print(combs)
 
 # Compare with combinations
 from itertools import combinations
+
 no_replace = list(combinations(items, 2))
 print(no_replace)  # [(1,2), (1,3), (2,3)]  # No (1,1) etc.
 ```
@@ -344,6 +345,7 @@ print(list(islice(data, 0, 20, 3)))  # [0, 3, 6, 9, 12, 15, 18]
 
 # Limit infinite iterator
 from itertools import count
+
 limited = list(islice(count(1), 10))
 print(limited)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 ```
@@ -442,9 +444,11 @@ pairs = [(1, 2), (3, 4), (5, 6)]
 products = list(starmap(pow, pairs))
 print(products)  # [1, 81, 15625]
 
+
 # With custom function
 def add(a, b):
     return a + b
+
 
 sums = list(starmap(add, pairs))
 print(sums)  # [3, 7, 11]
@@ -551,6 +555,7 @@ print(running_max)  # [1, 2, 3, 4, 5]
 
 # Running product accumulator
 from operator import mul
+
 running_prod = list(accumulate(numbers, mul))
 print(running_prod)  # [1, 2, 6, 24, 120]
 ```
@@ -628,6 +633,7 @@ first_100 = list(islice(lazy_iter, 100))  # Only computes 100
 
 # Pipeline of lazy operations
 from itertools import filterfalse
+
 data = range(1_000_000)
 evens = filterfalse(lambda x: x % 2, data)  # Still lazy!
 limited = islice(evens, 10)  # Still lazy!
@@ -646,6 +652,7 @@ result = list(limited)  # NOW computes 10 values
 ```python
 from itertools import islice, chain
 
+
 # Process large file line by line
 def process_large_file(filename, chunk_size=1000):
     with open(filename) as f:
@@ -654,6 +661,7 @@ def process_large_file(filename, chunk_size=1000):
             if not chunk:
                 break
             process(chunk)
+
 
 # Chain multiple files
 def process_multiple_files(*filenames):
@@ -674,21 +682,22 @@ def process_multiple_files(*filenames):
 ```python
 from itertools import chain, filterfalse, starmap
 
+
 def read_data(source):
     for item in source:
         yield item
+
 
 def validate(items):
     for item in items:
         if item.get("valid"):
             yield item
 
+
 def transform(items):
     for item in items:
-        yield {
-            "name": item["name"].upper(),
-            "score": item["score"] * 100
-        }
+        yield {"name": item["name"].upper(), "score": item["score"] * 100}
+
 
 def aggregate(items):
     total = 0
@@ -697,6 +706,7 @@ def aggregate(items):
         total += item["score"]
         count += 1
     return {"total": total, "count": count, "avg": total / count}
+
 
 # Compose pipeline
 pipeline = aggregate(transform(validate(read_data(data))))

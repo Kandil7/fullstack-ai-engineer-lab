@@ -81,6 +81,7 @@ D) A shape `(4, 5)` transposed array
 
 ```python
 import numpy as np
+
 a = np.arange(3)
 b = np.arange(4)
 print((a[:, None] * b[None, :]).shape)
@@ -98,6 +99,7 @@ D) `(4, 3)`
 
 ```python
 import numpy as np
+
 v = np.arange(3)
 m = np.ones((3, 4))
 print((m + v[:, None]).shape)
@@ -115,6 +117,7 @@ D) `ValueError`
 
 ```python
 import numpy as np
+
 X = np.ones((6, 4))
 mu = X.mean(axis=1, keepdims=True)
 print((X - mu).shape)
@@ -132,6 +135,7 @@ D) `ValueError`
 
 ```python
 import numpy as np
+
 labels = np.array([0, 2, 1])
 oh = (labels[:, None] == np.arange(3)).astype(np.float32)
 print(oh.shape, oh[1].sum())
@@ -182,6 +186,7 @@ D) It raises if the target shape is not broadcast-compatible
 
 ```python
 import numpy as np
+
 a = np.ones((3, 1))
 b = np.ones((1, 4))
 c = a + b
@@ -200,6 +205,7 @@ D) `1.0 (3, 4)`
 
 ```python
 import numpy as np
+
 x = np.arange(5)
 y = np.broadcast_to(x[:, None], (5, 3))
 try:
@@ -220,6 +226,7 @@ D) `TypeError`
 
 ```python
 import numpy as np
+
 a = np.ones((2, 3))
 b = np.ones((3, 2))
 try:
@@ -262,6 +269,7 @@ D) `np.sqrt(np.sum(a) + np.sum(b))`
 
 ```python
 import numpy as np
+
 v = np.arange(4)
 try:
     np.ones((4, 3)) + v[:, None]

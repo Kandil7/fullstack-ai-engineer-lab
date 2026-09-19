@@ -17,6 +17,7 @@ Stable: Yes
 # 1. BASIC BUBBLE SORT
 # =============================================================================
 
+
 def bubble_sort(arr):
     """Basic bubble sort. O(n^2) time, O(1) space"""
     n = len(arr)
@@ -25,6 +26,7 @@ def bubble_sort(arr):
             if arr[j] > arr[j + 1]:
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
     return arr
+
 
 print("=== Basic Bubble Sort ===")
 arr = [64, 34, 25, 12, 22, 11, 90]
@@ -35,6 +37,7 @@ print(f"Sorted: {bubble_sort(arr.copy())}")
 # =============================================================================
 # 2. OPTIMIZED BUBBLE SORT
 # =============================================================================
+
 
 def bubble_sort_optimized(arr):
     """Bubble sort with early termination. O(n) best case"""
@@ -49,6 +52,7 @@ def bubble_sort_optimized(arr):
             break  # Already sorted
     return arr
 
+
 print("\n=== Optimized Bubble Sort ===")
 arr = [1, 2, 3, 4, 5]  # Already sorted
 print(f"Already sorted: {bubble_sort_optimized(arr.copy())}")
@@ -60,6 +64,7 @@ print(f"Random: {bubble_sort_optimized(arr.copy())}")
 # =============================================================================
 # 3. BUBBLE SORT WITH STEP TRACKING
 # =============================================================================
+
 
 def bubble_sort_steps(arr):
     """Bubble sort showing each step"""
@@ -73,11 +78,12 @@ def bubble_sort_steps(arr):
             if arr[j] > arr[j + 1]:
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
                 swapped = True
-                steps.append(f"Swap {arr[j+1]} and {arr[j]}: {arr.copy()}")
+                steps.append(f"Swap {arr[j + 1]} and {arr[j]}: {arr.copy()}")
         if not swapped:
             break
 
     return arr, steps
+
 
 print("\n=== Bubble Sort with Steps ===")
 arr = [5, 3, 8, 1, 2]
@@ -91,6 +97,7 @@ print(f"Final: {sorted_arr}")
 # =============================================================================
 # 4. COUNTING COMPARISONS AND SWAPS
 # =============================================================================
+
 
 def bubble_sort_counted(arr):
     """Bubble sort counting comparisons and swaps"""
@@ -112,12 +119,13 @@ def bubble_sort_counted(arr):
 
     return arr, comparisons, swaps
 
+
 print("\n=== Bubble Sort Statistics ===")
 test_cases = [
     [64, 34, 25, 12, 22, 11, 90],
     [1, 2, 3, 4, 5],
     [5, 4, 3, 2, 1],
-    [3, 1, 4, 1, 5, 9, 2, 6]
+    [3, 1, 4, 1, 5, 9, 2, 6],
 ]
 
 for arr in test_cases:
@@ -128,6 +136,7 @@ for arr in test_cases:
 # =============================================================================
 # 5. BUBBLE SORT DESCENDING
 # =============================================================================
+
 
 def bubble_sort_descending(arr):
     """Sort in descending order"""
@@ -142,6 +151,7 @@ def bubble_sort_descending(arr):
             break
     return arr
 
+
 print("\n=== Descending Bubble Sort ===")
 arr = [64, 34, 25, 12, 22, 11, 90]
 print(f"Descending: {bubble_sort_descending(arr.copy())}")
@@ -151,10 +161,12 @@ print(f"Descending: {bubble_sort_descending(arr.copy())}")
 # 6. BUBBLE SORT ON LINKED LIST
 # =============================================================================
 
+
 class Node:
     def __init__(self, data):
         self.data = data
         self.next = None
+
 
 def bubble_sort_linked_list(head):
     """Bubble sort on linked list. O(n^2)"""
@@ -173,12 +185,14 @@ def bubble_sort_linked_list(head):
 
     return head
 
+
 def linked_list_to_list(head):
     result = []
     while head:
         result.append(head.data)
         head = head.next
     return result
+
 
 print("\n=== Bubble Sort on Linked List ===")
 values = [64, 34, 25, 12, 22]
@@ -195,6 +209,7 @@ print(f"Sorted linked list: {linked_list_to_list(head)}")
 # =============================================================================
 # 7. COCKTAIL SHAKER SORT (BIDIRECTIONAL)
 # =============================================================================
+
 
 def cocktail_shaker_sort(arr):
     """Bidirectional bubble sort - sorts from both ends"""
@@ -221,6 +236,7 @@ def cocktail_shaker_sort(arr):
 
     return arr
 
+
 print("\n=== Cocktail Shaker Sort ===")
 arr = [5, 1, 4, 2, 8, 0, 2]
 print(f"Original: {arr}")
@@ -230,6 +246,7 @@ print(f"Sorted: {cocktail_shaker_sort(arr.copy())}")
 # =============================================================================
 # 8. COMB SORT
 # =============================================================================
+
 
 def comb_sort(arr):
     """Improved bubble sort using gap. O(n^2/2^p)"""
@@ -251,6 +268,7 @@ def comb_sort(arr):
 
     return arr
 
+
 print("\n=== Comb Sort ===")
 arr = [8, 4, 1, 56, 3, -44, 23, -6, 28, 0]
 print(f"Original: {arr}")
@@ -260,6 +278,7 @@ print(f"Sorted: {comb_sort(arr.copy())}")
 # =============================================================================
 # 9. ODD-EVEN SORT
 # =============================================================================
+
 
 def odd_even_sort(arr):
     """Parallel-friendly variant of bubble sort"""
@@ -283,6 +302,7 @@ def odd_even_sort(arr):
 
     return arr
 
+
 print("\n=== Odd-Even Sort ===")
 arr = [5, 3, 8, 1, 9, 2, 7]
 print(f"Original: {arr}")
@@ -292,6 +312,7 @@ print(f"Sorted: {odd_even_sort(arr.copy())}")
 # =============================================================================
 # 10. PERFORMANCE COMPARISON
 # =============================================================================
+
 
 def compare_bubble_variants():
     """Compare different bubble sort variants"""
@@ -330,10 +351,11 @@ def compare_bubble_variants():
         comb_time = time.time() - start
 
         print(f"\nn={size}:")
-        print(f"  Basic:    {basic_time*1000:.2f}ms")
-        print(f"  Optimized: {opt_time*1000:.2f}ms")
-        print(f"  Cocktail: {cocktail_time*1000:.2f}ms")
-        print(f"  Comb:     {comb_time*1000:.2f}ms")
+        print(f"  Basic:    {basic_time * 1000:.2f}ms")
+        print(f"  Optimized: {opt_time * 1000:.2f}ms")
+        print(f"  Cocktail: {cocktail_time * 1000:.2f}ms")
+        print(f"  Comb:     {comb_time * 1000:.2f}ms")
+
 
 compare_bubble_variants()
 
@@ -343,6 +365,7 @@ compare_bubble_variants()
 # =============================================================================
 
 print("\n=== Practical Examples ===")
+
 
 # Sort student grades
 def sort_grades(students):
@@ -354,9 +377,11 @@ def sort_grades(students):
                 students[j], students[j + 1] = students[j + 1], students[j]
     return students
 
+
 students = [("Alice", 85), ("Bob", 92), ("Charlie", 78), ("Diana", 95)]
 print(f"Students before: {students}")
 print(f"Students after:  {sort_grades(students)}")
+
 
 # Sort strings
 def bubble_sort_strings(arr):
@@ -367,6 +392,7 @@ def bubble_sort_strings(arr):
             if arr[j] > arr[j + 1]:
                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
     return arr
+
 
 words = ["banana", "apple", "cherry", "date"]
 print(f"\nWords before: {words}")

@@ -63,34 +63,35 @@ Radix sort is a non-comparison-based sorting algorithm that sorts integers by pr
 def radix_sort_lsd(arr):
     """
     LSD Radix Sort for non-negative integers.
-    
+
     Time Complexity: O(d × (n + b)) where d = digits, b = base
     Space Complexity: O(n + b)
-    
+
     Args:
         arr: List of non-negative integers to sort
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return arr
-    
+
     # Find maximum to determine number of digits
     max_val = max(arr)
-    
+
     # Process each digit position
     exp = 1
     while max_val // exp > 0:
         counting_sort_by_digit(arr, exp)
         exp *= 10
-    
+
     return arr
+
 
 def counting_sort_by_digit(arr, exp):
     """
     Counting sort subroutine for a specific digit position.
-    
+
     Args:
         arr: Array to sort (modified in-place)
         exp: Current digit position (1, 10, 100, ...)
@@ -98,25 +99,26 @@ def counting_sort_by_digit(arr, exp):
     n = len(arr)
     output = [0] * n
     count = [0] * 10  # Base 10 digits
-    
+
     # Count occurrences of each digit
     for num in arr:
         digit = (num // exp) % 10
         count[digit] += 1
-    
+
     # Compute cumulative counts
     for i in range(1, 10):
         count[i] += count[i - 1]
-    
+
     # Build output (backward for stability)
     for i in range(n - 1, -1, -1):
         digit = (arr[i] // exp) % 10
         output[count[digit] - 1] = arr[i]
         count[digit] -= 1
-    
+
     # Copy back to original array
     for i in range(n):
         arr[i] = output[i]
+
 
 # Example usage
 arr = [170, 45, 75, 90, 802, 24, 2, 66]
@@ -131,30 +133,31 @@ print("Sorted array:", sorted_arr)
 def radix_sort_custom_base(arr, base=16):
     """
     Radix sort with configurable base (e.g., hexadecimal).
-    
+
     Args:
         arr: List of non-negative integers to sort
         base: Number base to use (default 16 for hex)
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return arr
-    
+
     max_val = max(arr)
-    
+
     exp = 1
     while max_val // exp > 0:
         counting_sort_base(arr, exp, base)
         exp *= base
-    
+
     return arr
+
 
 def counting_sort_base(arr, exp, base):
     """
     Counting sort for specific digit in given base.
-    
+
     Args:
         arr: Array to sort
         exp: Current digit position
@@ -163,25 +166,26 @@ def counting_sort_base(arr, exp, base):
     n = len(arr)
     output = [0] * n
     count = [0] * base
-    
+
     # Count digit occurrences
     for num in arr:
         digit = (num // exp) % base
         count[digit] += 1
-    
+
     # Cumulative counts
     for i in range(1, base):
         count[i] += count[i - 1]
-    
+
     # Build output (backward for stability)
     for i in range(n - 1, -1, -1):
         digit = (arr[i] // exp) % base
         output[count[digit] - 1] = arr[i]
         count[digit] -= 1
-    
+
     # Copy back
     for i in range(n):
         arr[i] = output[i]
+
 
 # Example usage
 arr = [255, 16, 128, 64, 32, 1, 8, 4]
@@ -196,28 +200,29 @@ print("Sorted array (base 16):", sorted_arr)
 def radix_sort_msd(arr):
     """
     MSD Radix Sort for non-negative integers.
-    
+
     Processes digits from most significant to least significant.
-    
+
     Args:
         arr: List of non-negative integers to sort
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return arr
-    
+
     max_val = max(arr)
     max_digits = len(str(max_val))
-    
+
     msd_sort(arr, 0, len(arr), max_digits - 1)
     return arr
+
 
 def msd_sort(arr, start, end, digit_pos):
     """
     Recursive MSD sort for a specific digit position.
-    
+
     Args:
         arr: Array to sort
         start: Starting index
@@ -226,33 +231,34 @@ def msd_sort(arr, start, end, digit_pos):
     """
     if start >= end - 1 or digit_pos < 0:
         return
-    
+
     # Counting sort for current digit
     count = [0] * 10
     output = [0] * (end - start)
-    
+
     # Count occurrences
     for i in range(start, end):
-        digit = (arr[i] // (10 ** digit_pos)) % 10
+        digit = (arr[i] // (10**digit_pos)) % 10
         count[digit] += 1
-    
+
     # Cumulative counts
     for i in range(1, 10):
         count[i] += count[i - 1]
-    
+
     # Build output
     for i in range(end - 1, start - 1, -1):
-        digit = (arr[i] // (10 ** digit_pos)) % 10
+        digit = (arr[i] // (10**digit_pos)) % 10
         output[count[digit] - 1] = arr[i]
         count[digit] -= 1
-    
+
     # Copy back
     for i in range(start, end):
         arr[i] = output[i - start]
-    
+
     # Recursively sort subarrays
     for i in range(9):
         msd_sort(arr, start + count[i], start + count[i + 1], digit_pos - 1)
+
 
 # Example usage
 arr = [170, 45, 75, 90, 802, 24, 2, 66]
@@ -267,33 +273,34 @@ print("Sorted array:", sorted_arr)
 def radix_sort_negative(arr):
     """
     Radix sort that handles negative numbers.
-    
+
     Separates negative and non-negative numbers, sorts each,
     then combines results.
-    
+
     Args:
         arr: List of integers (including negatives) to sort
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return []
-    
+
     # Separate negative and non-negative
     negatives = [-x for x in arr if x < 0]
     non_negatives = [x for x in arr if x >= 0]
-    
+
     # Sort absolute values of negatives (in reverse)
     if negatives:
         negatives = radix_sort_lsd(negatives)
         negatives = [-x for x in reversed(negatives)]
-    
+
     # Sort non-negatives
     if non_negatives:
         non_negatives = radix_sort_lsd(non_negatives)
-    
+
     return negatives + non_negatives
+
 
 # Example usage
 arr = [-5, -1, -3, 2, 4, -2, 1, 0]
@@ -308,54 +315,56 @@ print("Sorted array:", sorted_arr)
 def radix_sort_optimized(arr, base=256):
     """
     Optimized radix sort using larger base for fewer passes.
-    
+
     Args:
         arr: List of non-negative integers to sort
         base: Base for sorting (256 for byte-level sorting)
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return arr
-    
+
     max_val = max(arr)
-    
+
     # Calculate number of passes needed
     passes = 0
     temp = max_val
     while temp > 0:
         passes += 1
         temp //= base
-    
+
     # Process each digit
     exp = 1
     for _ in range(passes):
         counting_sort_base(arr, exp, base)
         exp *= base
-    
+
     return arr
+
 
 def counting_sort_base(arr, exp, base):
     """Counting sort for specific digit in given base."""
     n = len(arr)
     output = [0] * n
     count = [0] * base
-    
+
     for num in arr:
         digit = (num // exp) % base
         count[digit] += 1
-    
+
     for i in range(1, base):
         count[i] += count[i - 1]
-    
+
     for i in range(n - 1, -1, -1):
         digit = (arr[i] // exp) % base
         output[count[digit] - 1] = arr[i]
         count[digit] -= 1
-    
+
     for i in range(n):
         arr[i] = output[i]
+
 
 # Example usage
 arr = [1000000, 500000, 100000, 50000, 10000, 5000, 1000]
@@ -370,56 +379,58 @@ print("Sorted array:", sorted_arr)
 def radix_sort_strings(arr, max_len=None):
     """
     Radix sort for strings of equal length.
-    
+
     Sorts lexicographically by processing characters from right to left.
-    
+
     Args:
         arr: List of strings to sort
         max_len: Maximum string length (if None, uses max length in array)
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return []
-    
+
     if max_len is None:
         max_len = max(len(s) for s in arr)
-    
+
     # Pad strings to equal length
     arr = [s.ljust(max_len) for s in arr]
-    
+
     # Process each character position
     for pos in range(max_len - 1, -1, -1):
         counting_sort_by_char(arr, pos)
-    
+
     # Remove padding
     return [s.rstrip() for s in arr]
+
 
 def counting_sort_by_char(arr, pos):
     """Counting sort by character at specific position."""
     n = len(arr)
     output = [0] * n
     count = [0] * 256  # ASCII characters
-    
+
     # Count occurrences
     for s in arr:
         char_code = ord(s[pos])
         count[char_code] += 1
-    
+
     # Cumulative counts
     for i in range(1, 256):
         count[i] += count[i - 1]
-    
+
     # Build output (backward for stability)
     for i in range(n - 1, -1, -1):
         char_code = ord(arr[i][pos])
         output[count[char_code] - 1] = arr[i]
         count[char_code] -= 1
-    
+
     # Copy back
     for i in range(n):
         arr[i] = output[i]
+
 
 # Example usage
 arr = ["banana", "apple", "cherry", "date", "fig"]
@@ -441,6 +452,7 @@ def radix_sort_wrong(arr):
         arr.sort(key=lambda x: (x // exp) % 10)  # Python's sort is stable, but...
         exp *= 10
     return arr
+
 
 # CORRECT: Always use stable sort (counting sort)
 def radix_sort_correct(arr):
@@ -485,6 +497,7 @@ def counting_sort_wrong(arr, exp):
     count = [0] * 10
     # ... counting and placing logic ...
     # Missing: for i in range(len(arr)): arr[i] = output[i]
+
 
 # CORRECT: Always copy output back
 def counting_sort_correct(arr, exp):

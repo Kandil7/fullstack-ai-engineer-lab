@@ -67,16 +67,20 @@ CLAIM_SCHEMA = {
         "diagnosis": {"type": "string"},
         "status": {"type": "string", "enum": ["OPEN", "REVIEW", "DENIED"]},
     },
-    "required": [...], "additionalProperties": False,
+    "required": [...],
+    "additionalProperties": False,
 }
+
 
 def extract_claim(doc_text: str, llm_client) -> ClaimRecord:
     raw = llm_client.complete(
         EXTRACT_PROMPT.format(text=doc_text),
-        response_format={"type": "json_schema",
-                         "json_schema": {"name": "claim", "strict": True,
-                                         "schema": CLAIM_SCHEMA}})
-    return ClaimRecord.model_validate_json(raw)      # L3: validate at the boundary
+        response_format={
+            "type": "json_schema",
+            "json_schema": {"name": "claim", "strict": True, "schema": CLAIM_SCHEMA},
+        },
+    )
+    return ClaimRecord.model_validate_json(raw)  # L3: validate at the boundary
 ```
 
 Output:
@@ -100,7 +104,8 @@ def extract_with_repair(doc_text: str, llm_client, *, max_repairs=2) -> ClaimRec
                 raise ExtractionFailed(doc_id=..., error=str(e))
             raw = llm_client.complete(
                 f"Your previous extraction was invalid: {e}\n"
-                f"Fix ONLY the invalid fields. Document:\n{doc_text}")
+                f"Fix ONLY the invalid fields. Document:\n{doc_text}"
+            )
     raise RuntimeError("unreachable")
 ```
 
@@ -129,9 +134,9 @@ def process_batch(docs: list[Doc], llm_client) -> dict:
             good.append(record)
         except (ValidationError, ExtractionFailed) as e:
             bad.append({"doc_id": doc.id, "reason": str(e)})
-            alert_quarantine(doc.id, e)         # human review queue
-    return {"accepted": len(good), "quarantined": len(bad),
-            "quarantine_detail": bad}
+            alert_quarantine(doc.id, e)  # human review queue
+    return {"accepted": len(good), "quarantined": len(bad), "quarantine_detail": bad}
+
 
 report = process_batch(batch, client)
 print(report)
@@ -158,10 +163,12 @@ EVALUATORS = {
     "schema_validity": lambda case, out: 1.0 if out else 0.0,
 }
 
+
 def extraction_ship_gate(candidate, suite) -> tuple[bool, dict]:
-    report = run_suite(suite, candidate, EVALUATORS)          # L20
+    report = run_suite(suite, candidate, EVALUATORS)  # L20
     ok = report.scores["field_accuracy"] >= BASELINE["field_accuracy"] - 0.01
     return ok, report.scores
+
 
 print(extraction_ship_gate(candidate_extractor, GOLDEN_SUITE))
 ```
@@ -190,8 +197,7 @@ versioning (L3) + cost (L15):
 
 ```python
 def batch_cost(records: list[dict], cost_per_m: float) -> float:
-    total_tokens = sum(r["prompt_tokens"] + r["completion_tokens"]
-                       for r in records)
+    total_tokens = sum(r["prompt_tokens"] + r["completion_tokens"] for r in records)
     return round(total_tokens / 1e6 * cost_per_m, 2)
 ```
 

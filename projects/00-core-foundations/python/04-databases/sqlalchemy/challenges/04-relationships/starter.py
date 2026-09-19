@@ -44,9 +44,7 @@ class Book(Base):
     author_id: Mapped[int] = mapped_column(ForeignKey("authors.id"))
 
     author: Mapped["Author"] = relationship(back_populates="books")
-    tags: Mapped[list["Tag"]] = relationship(
-        secondary=book_tag, back_populates="books"
-    )
+    tags: Mapped[list["Tag"]] = relationship(secondary=book_tag, back_populates="books")
 
 
 class Tag(Base):
@@ -55,9 +53,7 @@ class Tag(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     label: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
 
-    books: Mapped[list["Book"]] = relationship(
-        secondary=book_tag, back_populates="tags"
-    )
+    books: Mapped[list["Book"]] = relationship(secondary=book_tag, back_populates="tags")
 
 
 def create_review_graph(

@@ -27,7 +27,7 @@ print("diff(2):", np.diff(arr, n=2))  # [5 5 5]
 # Verify: second diff is constant for quadratic sequence
 arr2 = np.array([1, 4, 9, 16, 25])  # n^2
 print("\nn^2 sequence:", arr2)
-print("First diff:", np.diff(arr2))    # [3 5 7 9]
+print("First diff:", np.diff(arr2))  # [3 5 7 9]
 print("Second diff:", np.diff(arr2, n=2))  # [2 2 2]
 # Output:
 # diff(2): [5 5 5]
@@ -37,9 +37,7 @@ print("Second diff:", np.diff(arr2, n=2))  # [2 2 2]
 # Calculate differences in 2D arrays.
 # ============================================================
 
-arr2d = np.array([[1, 2, 3, 4],
-                   [5, 7, 9, 11],
-                   [10, 14, 18, 22]])
+arr2d = np.array([[1, 2, 3, 4], [5, 7, 9, 11], [10, 14, 18, 22]])
 
 print("\n2D Array:\n", arr2d)
 

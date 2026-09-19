@@ -50,17 +50,18 @@ By the end of this lecture, you will be able to:
 @dataclass
 class EvalCase:
     input: str
-    expected: str | None = None      # gold, for exact/rubric scoring
-    gold_sources: list[str] | None = None   # for retrieval scoring
-    should_block: bool | None = None # for guardrail scoring
+    expected: str | None = None  # gold, for exact/rubric scoring
+    gold_sources: list[str] | None = None  # for retrieval scoring
+    should_block: bool | None = None  # for guardrail scoring
     metadata: dict = field(default_factory=dict)
+
 
 @dataclass
 class EvalResult:
     suite: str
-    config: str                      # prompt/model/version being scored
+    config: str  # prompt/model/version being scored
     scores: dict[str, float]
-    cases: list[dict]                # per-case detail for debugging
+    cases: list[dict]  # per-case detail for debugging
 ```
 
 Output:
@@ -87,6 +88,7 @@ because the suite is the *referee*, not a team.
 ```python
 def exact_match_evaluator(case: EvalCase, output: str) -> float:
     return 1.0 if output.strip() == (case.expected or "").strip() else 0.0
+
 
 def groundedness_evaluator(case: EvalCase, output: str, context: str) -> float:
     """Each claim in the output must appear (or cite) the provided context."""
@@ -115,11 +117,15 @@ The most misused evaluator. The safe pattern:
 RUBRIC = """Score 1-5 on: (1) faithfulness to the source, (2) completeness,
 (3) clarity. 5 = excellent, 1 = poor."""
 
+
 def judge_scores(judge_fn, output: str, reference: str) -> dict[str, int]:
-    prompt = (f"{RUBRIC}\n\nSource:\n{reference}\n\nOutput:\n{output}\n\n"
-              f"JSON: {{\"faithfulness\": int, \"completeness\": int, \"clarity\": int}}")
+    prompt = (
+        f"{RUBRIC}\n\nSource:\n{reference}\n\nOutput:\n{output}\n\n"
+        f'JSON: {{"faithfulness": int, "completeness": int, "clarity": int}}'
+    )
     import json
-    return json.loads(judge_fn(prompt))     # L3 structured output mandatory
+
+    return json.loads(judge_fn(prompt))  # L3 structured output mandatory
 ```
 
 Output:
@@ -141,14 +147,20 @@ def run_suite(suite: list[EvalCase], candidate_fn, evaluators: dict) -> EvalResu
         output = candidate_fn(case.input)
         row = {"input": case.input, "output": output}
         for name, ev in evaluators.items():
-            s = ev(case, output) if "context" not in ev.__code__.co_varnames \
+            s = (
+                ev(case, output)
+                if "context" not in ev.__code__.co_varnames
                 else ev(case, output, case.metadata.get("context", ""))
+            )
             agg[name].append(s)
             row[name] = s
         details.append(row)
-    return EvalResult(suite=suite.name, config=candidate_fn.config,
-                      scores={k: round(sum(v)/len(v), 3) for k, v in agg.items()},
-                      cases=details)
+    return EvalResult(
+        suite=suite.name,
+        config=candidate_fn.config,
+        scores={k: round(sum(v) / len(v), 3) for k, v in agg.items()},
+        cases=details,
+    )
 ```
 
 Output:
@@ -165,11 +177,13 @@ a 0.88 accuracy with 5 specific failures names exactly what to fix.
 The decision loop (L5 extended to the whole framework):
 
 ```python
-def compare_and_gate(baseline: EvalResult, candidate: EvalResult,
-                     keys: list[str], tol: float = 0.02) -> dict:
+def compare_and_gate(
+    baseline: EvalResult, candidate: EvalResult, keys: list[str], tol: float = 0.02
+) -> dict:
     deltas = {k: round(candidate.scores[k] - baseline.scores[k], 3) for k in keys}
     regressed = {k: d for k, d in deltas.items() if d < -tol}
     return {"deltas": deltas, "pass": not regressed, "regressions": regressed}
+
 
 print(compare_and_gate(base_prompt, cand_prompt, ["accuracy", "groundedness"]))
 ```

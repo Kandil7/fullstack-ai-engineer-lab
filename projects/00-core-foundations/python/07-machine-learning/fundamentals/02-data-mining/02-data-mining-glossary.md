@@ -59,14 +59,10 @@ predictions = lof.fit_predict(all_data)
 from collections import Counter
 from itertools import combinations
 
-transactions = [
-    ['bread', 'milk'],
-    ['bread', 'butter'],
-    ['milk', 'butter']
-]
+transactions = [["bread", "milk"], ["bread", "butter"], ["milk", "butter"]]
 
 # Calculate support for {bread, milk}
-bread_milk_count = sum(1 for t in transactions if 'bread' in t and 'milk' in t)
+bread_milk_count = sum(1 for t in transactions if "bread" in t and "milk" in t)
 support = bread_milk_count / len(transactions)
 print(f"Support(bread→milk): {support:.2f}")
 ```
@@ -240,11 +236,11 @@ predictions = iso_forest.fit_predict(X)
 from sklearn.cluster import KMeans
 
 kmeans = KMeans(
-    n_clusters=3,       # Number of clusters
-    init='k-means++',   # Smart initialization
-    n_init=10,          # Run 10 times
-    max_iter=300,       # Max iterations
-    random_state=42
+    n_clusters=3,  # Number of clusters
+    init="k-means++",  # Smart initialization
+    n_init=10,  # Run 10 times
+    max_iter=300,  # Max iterations
+    random_state=42,
 )
 kmeans.fit(X)
 print(f"Labels: {kmeans.labels_}")
@@ -287,8 +283,8 @@ print(f"Lift(bread→milk): {lift:.2f}")  # 1.12 (slight positive association)
 from sklearn.neighbors import LocalOutlierFactor
 
 lof = LocalOutlierFactor(
-    n_neighbors=20,    # Number of neighbors to consider
-    contamination=0.1  # Expected proportion of outliers
+    n_neighbors=20,  # Number of neighbors to consider
+    contamination=0.1,  # Expected proportion of outliers
 )
 predictions = lof.fit_predict(X)
 anomaly_scores = lof.negative_outlier_factor_
@@ -372,8 +368,8 @@ data = np.array([[100, 0.5], [200, 1.0], [300, 1.5]])
 scaler = StandardScaler()
 scaled = scaler.fit_transform(data)
 
-print("Mean:", scaled.mean(axis=0))   # [0, 0]
-print("Std:", scaled.std(axis=0))     # [1, 1]
+print("Mean:", scaled.mean(axis=0))  # [0, 0]
+print("Std:", scaled.std(axis=0))  # [1, 1]
 ```
 
 **Related Terms:** MinMaxScaler, RobustScaler, Z-Score, Preprocessing
@@ -388,8 +384,8 @@ Support(A) = (Transactions containing A) / (Total transactions)
 
 **Example:**
 ```python
-transactions = [['bread', 'milk'], ['bread', 'butter'], ['milk', 'eggs']]
-bread_count = sum(1 for t in transactions if 'bread' in t)
+transactions = [["bread", "milk"], ["bread", "butter"], ["milk", "eggs"]]
+bread_count = sum(1 for t in transactions if "bread" in t)
 support_bread = bread_count / len(transactions)
 print(f"Support(bread): {support_bread:.2f}")  # 0.67
 ```

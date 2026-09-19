@@ -3,14 +3,17 @@ Matplotlib Pyplot Module - W3Schools Exercises
 ===============================================
 Understanding the pyplot module for quick plotting.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -38,8 +41,15 @@ def exercise_02():
     y = [3, 1, 4, 1, 5, 9, 2]
 
     plt.figure(figsize=(8, 5))
-    plt.plot(x, y, marker="o", markersize=10, markerfacecolor="red",
-             markeredgecolor="black", markeredgewidth=2)
+    plt.plot(
+        x,
+        y,
+        marker="o",
+        markersize=10,
+        markerfacecolor="red",
+        markeredgecolor="black",
+        markeredgewidth=2,
+    )
     plt.title("Exercise 2: Markers")
     plt.xlabel("Index")
     plt.ylabel("Value")

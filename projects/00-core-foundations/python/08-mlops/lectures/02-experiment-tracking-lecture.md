@@ -70,7 +70,7 @@ with mlflow.start_run(run_name="lr-grid-1e-3"):
     mlflow.log_metric("val_loss", val_loss)
     mlflow.log_metric("val_acc", 0.918)
 
-    mlflow.log_artifact("model.pt")   # copied into the artifact store
+    mlflow.log_artifact("model.pt")  # copied into the artifact store
 ```
 
 Output (conceptually):
@@ -110,11 +110,13 @@ variable being tested. Tagging adds human meaning:
 
 ```python
 with mlflow.start_run(experiment_id=1, run_name="xgb-depth-6"):
-    mlflow.set_tags({
-        "team": "churn",
-        "purpose": "depth comparison",
-        "dataset_hash": "sha256:c9a3...",
-    })
+    mlflow.set_tags(
+        {
+            "team": "churn",
+            "purpose": "depth comparison",
+            "dataset_hash": "sha256:c9a3...",
+        }
+    )
 ```
 
 Output (conceptually):
@@ -157,7 +159,7 @@ learning curves. MLflow's `log_metric(..., step=n)` appends to a series.
 
 ```python
 for epoch in range(5):
-    train_loss = 1.2 / (epoch + 1)          # mock
+    train_loss = 1.2 / (epoch + 1)  # mock
     mlflow.log_metric("train_loss", train_loss, step=epoch)
 ```
 
@@ -179,7 +181,7 @@ This is how you later answer "what trained this champion?" — click the run,
 read the artifacts.
 
 ```python
-mlflow.log_artifact("run_record.json")   # seed + data_hash + env fingerprint
+mlflow.log_artifact("run_record.json")  # seed + data_hash + env fingerprint
 mlflow.log_artifact("confusion_matrix.png")
 mlflow.log_artifact("model.pt")
 ```

@@ -42,6 +42,7 @@ USERS_DB = {
 # Exercise 1: JWT Token Generation
 # =============================================================================
 
+
 class LoginRequest(BaseModel):
     username: str
     password: str
@@ -58,7 +59,9 @@ def create_jwt_token(data: dict, expires_delta: Optional[timedelta] = None):
     payload = {
         **data,
         "iat": datetime.utcnow().timestamp(),
-        "exp": (datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))).timestamp(),
+        "exp": (
+            datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+        ).timestamp(),
     }
     # Encode header and payload
     header_b64 = base64.urlsafe_b64encode(json.dumps(header).encode()).rstrip(b"=").decode()
@@ -85,6 +88,7 @@ def login(request: LoginRequest):
 # =============================================================================
 # Exercise 2: JWT Token Validation
 # =============================================================================
+
 
 def decode_jwt_token(token: str) -> dict:
     """Decode and validate a JWT token (without signature verification for simplicity)."""

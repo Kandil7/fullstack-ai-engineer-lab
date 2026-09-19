@@ -85,11 +85,11 @@ print()  # Final newline
 # Printing Special Characters
 # ============================================================
 # Example 11: Escape characters
-print("Line1\nLine2")        # \n = newline
-print("Column1\tColumn2")    # \t = tab
-print("She said \"hello\"")  # \" = double quote
-print('It\'s a day')         # \' = single quote
-print("Backslash: \\")       # \\ = backslash
+print("Line1\nLine2")  # \n = newline
+print("Column1\tColumn2")  # \t = tab
+print('She said "hello"')  # \" = double quote
+print("It's a day")  # \' = single quote
+print("Backslash: \\")  # \\ = backslash
 
 # Output:
 # Line1
@@ -125,6 +125,7 @@ print(", ".join(fruits))
 
 # Example 15: Print with flush (useful for progress)
 import time
+
 for i in range(3):
     print(".", end="", flush=True)
     time.sleep(0.3)

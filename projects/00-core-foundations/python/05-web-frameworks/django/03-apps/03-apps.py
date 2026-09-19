@@ -52,7 +52,7 @@ INSTALLED_APPS_EXAMPLE = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Your custom apps (use the AppConfig path or app name)
-    "blog",                    # Simple way
+    "blog",  # Simple way
     # "blog.apps.BlogConfig",  # Alternative (explicit)
 ]
 

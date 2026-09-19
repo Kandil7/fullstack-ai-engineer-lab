@@ -65,6 +65,7 @@ def png_has_alpha(path: Path) -> bool:
 # figsize=(6, 4) at dpi=150 -> exactly 900 x 600 px. This is how you can
 # assert that CI exported what the spec demanded.
 
+
 def save_known_size() -> Path:
     """Save a 6x4 inch figure at 150 dpi; returns the artifact path."""
     fig, ax = plt.subplots(figsize=(6, 4))
@@ -83,6 +84,7 @@ def save_known_size() -> Path:
 # Raster (PNG) stores pixels: zoom in and it blurs. Vector (SVG/PDF)
 # stores drawing commands: infinitely sharp, and labels remain selectable
 # text. Papers and dashboards use vector; thumbnails use raster.
+
 
 def save_vector_and_raster() -> tuple[Path, Path]:
     """Export the same figure as SVG and PNG side by side."""
@@ -106,6 +108,7 @@ def save_vector_and_raster() -> tuple[Path, Path]:
 # be clipped. "tight" recomputes the bounding box from the artists, which
 # is the standard for embedding figures in reports.
 
+
 def save_tight_and_loose() -> tuple[Path, Path]:
     """Save loose and tight variants; tight should crop the canvas."""
     fig, ax = plt.subplots(figsize=(6, 4))
@@ -126,6 +129,7 @@ def save_tight_and_loose() -> tuple[Path, Path]:
 # transparent=True drops the facecolor from the raster so the figure can
 # sit on a colored slide or a dark dashboard without a white box.
 
+
 def save_transparent() -> Path:
     """Save a PNG with an alpha channel (color type 6 in IHDR)."""
     fig, ax = plt.subplots(figsize=(4, 3))
@@ -143,6 +147,7 @@ def save_transparent() -> Path:
 # The Agg backend renders to memory with no window server, which is why
 # CI can run on a bare container. Combined with fixed figsize and dpi,
 # the same script on any machine produces the same pixel dimensions.
+
 
 def save_reproducible() -> Path:
     """Export a canonical artifact used to prove byte-level determinism."""
@@ -180,14 +185,15 @@ def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     path = save_known_size()
     w, h = png_dimensions(path)
-    assert (w, h) == (900, 600), \
-        f"6in x 4in @ 150dpi must be 900x600 px, got {w}x{h}"
+    assert (w, h) == (900, 600), f"6in x 4in @ 150dpi must be 900x600 px, got {w}x{h}"
 
     svg_path, png_path = save_vector_and_raster()
-    assert svg_path.exists() and svg_path.stat().st_size > 1000, \
+    assert svg_path.exists() and svg_path.stat().st_size > 1000, (
         "SVG artifact must exist and be non-trivial"
-    assert png_path.exists() and png_path.stat().st_size > 1000, \
+    )
+    assert png_path.exists() and png_path.stat().st_size > 1000, (
         "PNG artifact must exist and be non-trivial"
+    )
     with open(svg_path, "r", encoding="utf-8") as fh:
         svg_head = fh.read(200)
     assert "<svg" in svg_head, "vector export must produce an SVG document"
@@ -195,19 +201,19 @@ def _verify() -> None:
     loose, tight = save_tight_and_loose()
     w_loose, h_loose = png_dimensions(loose)
     w_tight, h_tight = png_dimensions(tight)
-    assert w_tight <= w_loose and h_tight <= h_loose, \
+    assert w_tight <= w_loose and h_tight <= h_loose, (
         "bbox_inches='tight' must not enlarge the canvas"
-    assert (w_tight, h_tight) != (w_loose, h_loose), \
+    )
+    assert (w_tight, h_tight) != (w_loose, h_loose), (
         "tight cropping must change the pixel dimensions here"
+    )
 
     trans = save_transparent()
-    assert png_has_alpha(trans), \
-        "transparent=True must write an RGBA (color type 6) PNG"
+    assert png_has_alpha(trans), "transparent=True must write an RGBA (color type 6) PNG"
 
     repro = save_reproducible()
     w_r, h_r = png_dimensions(repro)
-    assert (w_r, h_r) == (550, 440), \
-        f"5in x 4in @ 110dpi must be 550x440 px, got {w_r}x{h_r}"
+    assert (w_r, h_r) == (550, 440), f"5in x 4in @ 110dpi must be 550x440 px, got {w_r}x{h_r}"
 
     print("[OK] 24-saving-and-export: all checks passed")
 
@@ -225,4 +231,4 @@ if __name__ == "__main__":
         print("1. pixels = inches * dpi; assert the header to prove it")
         print("2. SVG/PDF are vector; PNG is raster; pick per artifact")
         print("3. bbox_inches='tight' crops; transparent writes RGBA")
-        _verify()   # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

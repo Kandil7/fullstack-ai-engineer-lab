@@ -30,23 +30,28 @@ from collections import defaultdict
 from typing import Dict, Optional
 from dataclasses import dataclass
 
+
 @dataclass
 class RateLimitConfig:
     """Rate limit configuration."""
+
     requests_per_minute: int = 60
     requests_per_hour: int = 1000
     burst_limit: int = 10
     window_seconds: int = 60
+
 
 class RateLimiter:
     """Token bucket rate limiter."""
 
     def __init__(self, config: RateLimitConfig):
         self.config = config
-        self.buckets: Dict[str, Dict] = defaultdict(lambda: {
-            "tokens": config.burst_limit,
-            "last_refill": time.time(),
-        })
+        self.buckets: Dict[str, Dict] = defaultdict(
+            lambda: {
+                "tokens": config.burst_limit,
+                "last_refill": time.time(),
+            }
+        )
 
     def is_allowed(self, client_id: str) -> Dict:
         """Check if request is allowed under rate limit."""
@@ -57,10 +62,7 @@ class RateLimiter:
         elapsed = now - bucket["last_refill"]
         refill_rate = self.config.requests_per_minute / 60
         new_tokens = elapsed * refill_rate
-        bucket["tokens"] = min(
-            self.config.burst_limit,
-            bucket["tokens"] + new_tokens
-        )
+        bucket["tokens"] = min(self.config.burst_limit, bucket["tokens"] + new_tokens)
         bucket["last_refill"] = now
 
         # Check if token available
@@ -70,7 +72,9 @@ class RateLimiter:
                 "allowed": True,
                 "remaining": int(bucket["tokens"]),
                 "limit": self.config.burst_limit,
-                "reset_at": int(now + (self.config.burst_limit - bucket["tokens"]) / refill_rate),
+                "reset_at": int(
+                    now + (self.config.burst_limit - bucket["tokens"]) / refill_rate
+                ),
             }
         else:
             return {
@@ -79,6 +83,7 @@ class RateLimiter:
                 "limit": self.config.burst_limit,
                 "retry_after": int((1 - bucket["tokens"]) / refill_rate),
             }
+
 
 class SlidingWindowRateLimiter:
     """Sliding window rate limiter for more accurate limiting."""
@@ -95,8 +100,7 @@ class SlidingWindowRateLimiter:
 
         # Remove old requests
         self.requests[client_id] = [
-            t for t in self.requests[client_id]
-            if t > window_start
+            t for t in self.requests[client_id] if t > window_start
         ]
 
         if len(self.requests[client_id]) < self.max_requests:
@@ -215,25 +219,31 @@ def get_user(user_id: str):
         for endpoint in api_endpoints:
             # Check for common vulnerabilities
             if not endpoint.get("rate_limited"):
-                findings.append({
-                    "api": "API4",
-                    "endpoint": endpoint["path"],
-                    "issue": "Missing rate limiting",
-                })
+                findings.append(
+                    {
+                        "api": "API4",
+                        "endpoint": endpoint["path"],
+                        "issue": "Missing rate limiting",
+                    }
+                )
 
             if not endpoint.get("auth_required"):
-                findings.append({
-                    "api": "API2",
-                    "endpoint": endpoint["path"],
-                    "issue": "Missing authentication",
-                })
+                findings.append(
+                    {
+                        "api": "API2",
+                        "endpoint": endpoint["path"],
+                        "issue": "Missing authentication",
+                    }
+                )
 
             if endpoint.get("returns_sensitive_data"):
-                findings.append({
-                    "api": "API3",
-                    "endpoint": endpoint["path"],
-                    "issue": "Exposes sensitive properties",
-                })
+                findings.append(
+                    {
+                        "api": "API3",
+                        "endpoint": endpoint["path"],
+                        "issue": "Exposes sensitive properties",
+                    }
+                )
 
         return findings
 ```
@@ -249,8 +259,10 @@ from typing import Optional, List
 app = FastAPI()
 security = HTTPBearer()
 
+
 class SecureAIRequest(BaseModel):
     """Secure AI request schema."""
+
     prompt: str = Field(..., min_length=1, max_length=4096)
     model: str = Field(default="gpt-4", pattern="^(gpt-3.5-turbo|gpt-4)$")
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
@@ -259,17 +271,20 @@ class SecureAIRequest(BaseModel):
     class Config:
         extra = "forbid"  # Reject extra fields
 
+
 class SecureAIResponse(BaseModel):
     """Secure AI response schema."""
+
     response: str
     model: str
     usage: dict
     safety_score: float
 
+
 @app.post("/v1/chat/completions", response_model=SecureAIResponse)
 async def chat_completion(
     request: SecureAIRequest,
-    credentials: HTTPAuthorizationCredentials = Security(security)
+    credentials: HTTPAuthorizationCredentials = Security(security),
 ):
     """Secure AI chat completion endpoint."""
     # Validate token
@@ -294,10 +309,9 @@ async def chat_completion(
 
     return sanitized_response
 
+
 @app.get("/v1/models")
-async def list_models(
-    credentials: HTTPAuthorizationCredentials = Security(security)
-):
+async def list_models(credentials: HTTPAuthorizationCredentials = Security(security)):
     """List available models with proper authorization."""
     user = await validate_token(credentials.credentials)
     if not user:
@@ -307,10 +321,10 @@ async def list_models(
     models = get_user_models(user.id)
     return {"models": models}
 
+
 @app.delete("/v1/api-keys/{key_id}")
 async def revoke_api_key(
-    key_id: str,
-    credentials: HTTPAuthorizationCredentials = Security(security)
+    key_id: str, credentials: HTTPAuthorizationCredentials = Security(security)
 ):
     """Revoke API key with proper authorization."""
     user = await validate_token(credentials.credentials)
@@ -331,15 +345,16 @@ async def revoke_api_key(
 from pydantic import BaseModel, Field, validator
 import re
 
+
 class AIRequestValidator:
     """Validate AI API requests."""
 
     # Dangerous patterns in prompts
     INJECTION_PATTERNS = [
-        r'ignore\s+(all\s+)?previous',
-        r'you\s+are\s+now\s+',
-        r'\[SYSTEM\]',
-        r'<\|im_start\|>',
+        r"ignore\s+(all\s+)?previous",
+        r"you\s+are\s+now\s+",
+        r"\[SYSTEM\]",
+        r"<\|im_start\|>",
     ]
 
     def validate_prompt(self, prompt: str) -> dict:
@@ -356,7 +371,7 @@ class AIRequestValidator:
                 issues.append("potential_injection")
 
         # Control character check
-        if re.search(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', prompt):
+        if re.search(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", prompt):
             issues.append("control_characters")
 
         return {
@@ -388,9 +403,11 @@ from typing import Dict, Optional
 from dataclasses import dataclass
 from collections import defaultdict
 
+
 @dataclass
 class APIRequestLog:
     """Log entry for API request."""
+
     timestamp: datetime
     method: str
     path: str
@@ -401,16 +418,19 @@ class APIRequestLog:
     request_size: int
     response_size: int
 
+
 class APIMonitor:
     """Monitor API usage and detect anomalies."""
 
     def __init__(self):
         self.request_logs: list = []
-        self.user_stats: Dict[str, Dict] = defaultdict(lambda: {
-            "requests": 0,
-            "errors": 0,
-            "last_request": None,
-        })
+        self.user_stats: Dict[str, Dict] = defaultdict(
+            lambda: {
+                "requests": 0,
+                "errors": 0,
+                "last_request": None,
+            }
+        )
 
     def log_request(self, log: APIRequestLog):
         """Log an API request."""
@@ -432,8 +452,7 @@ class APIMonitor:
 
         # Get recent requests
         recent_logs = [
-            log for log in self.request_logs
-            if log.timestamp.timestamp() > window_start
+            log for log in self.request_logs if log.timestamp.timestamp() > window_start
         ]
 
         # Check for unusual patterns
@@ -445,23 +464,27 @@ class APIMonitor:
         # Detect high request rates
         for user_id, count in user_request_counts.items():
             if count > 100:  # More than 100 requests in window
-                anomalies.append({
-                    "type": "high_request_rate",
-                    "user_id": user_id,
-                    "request_count": count,
-                    "time_window": time_window_minutes,
-                })
+                anomalies.append(
+                    {
+                        "type": "high_request_rate",
+                        "user_id": user_id,
+                        "request_count": count,
+                        "time_window": time_window_minutes,
+                    }
+                )
 
         # Detect high error rates
         for user_id, stats in self.user_stats.items():
             if stats["requests"] > 10:
                 error_rate = stats["errors"] / stats["requests"]
                 if error_rate > 0.5:  # More than 50% errors
-                    anomalies.append({
-                        "type": "high_error_rate",
-                        "user_id": user_id,
-                        "error_rate": error_rate,
-                    })
+                    anomalies.append(
+                        {
+                            "type": "high_error_rate",
+                            "user_id": user_id,
+                            "error_rate": error_rate,
+                        }
+                    )
 
         return anomalies
 
@@ -471,16 +494,22 @@ class APIMonitor:
         window_start = now.timestamp() - (time_window_hours * 3600)
 
         recent_logs = [
-            log for log in self.request_logs
-            if log.timestamp.timestamp() > window_start
+            log for log in self.request_logs if log.timestamp.timestamp() > window_start
         ]
 
         return {
             "total_requests": len(recent_logs),
             "unique_users": len(set(log.user_id for log in recent_logs if log.user_id)),
-            "avg_response_time": sum(log.response_time for log in recent_logs) / len(recent_logs) if recent_logs else 0,
-            "error_rate": sum(1 for log in recent_logs if log.status_code >= 400) / len(recent_logs) if recent_logs else 0,
+            "avg_response_time": sum(log.response_time for log in recent_logs)
+            / len(recent_logs)
+            if recent_logs
+            else 0,
+            "error_rate": sum(1 for log in recent_logs if log.status_code >= 400)
+            / len(recent_logs)
+            if recent_logs
+            else 0,
         }
+
 
 # Usage
 monitor = APIMonitor()

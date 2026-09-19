@@ -19,9 +19,7 @@ import sys
 from pathlib import Path
 
 TARGET = "solution" if os.environ.get("CHALLENGE_USE_SOLUTION") == "1" else "starter"
-_spec = importlib.util.spec_from_file_location(
-    TARGET, Path(__file__).parent / f"{TARGET}.py"
-)
+_spec = importlib.util.spec_from_file_location(TARGET, Path(__file__).parent / f"{TARGET}.py")
 mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(mod)
 
@@ -134,8 +132,9 @@ class TestGatherResults:
 
     def test_all_fail(self) -> None:
         failures = [mod.RetryableError("1"), mod.FatalError("2")]
-        results, group = mod.gather_results([lambda: (_ for _ in ()).throw(failures[0]),
-                                             lambda: (_ for _ in ()).throw(failures[1])])
+        results, group = mod.gather_results(
+            [lambda: (_ for _ in ()).throw(failures[0]), lambda: (_ for _ in ()).throw(failures[1])]
+        )
         assert results == []
         assert group is not None
         assert len(group.exceptions) == 2
@@ -143,10 +142,12 @@ class TestGatherResults:
     def test_mixed_keeps_order_and_identity(self) -> None:
         e1 = mod.RetryableError("a fail")
         e3 = ValueError("non-hierarchy exception")
-        calls = [lambda: "ok1",
-                 lambda: (_ for _ in ()).throw(e1),
-                 lambda: "ok2",
-                 lambda: (_ for _ in ()).throw(e3)]
+        calls = [
+            lambda: "ok1",
+            lambda: (_ for _ in ()).throw(e1),
+            lambda: "ok2",
+            lambda: (_ for _ in ()).throw(e3),
+        ]
         results, group = mod.gather_results(calls)
         assert results == ["ok1", "ok2"]
         assert group is not None

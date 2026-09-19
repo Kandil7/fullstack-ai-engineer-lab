@@ -33,6 +33,7 @@ from typing import Callable, Optional
 # timeout bounds the damage: fail fast, return the fallback, free the
 # worker. Rule: every outbound call has an explicit timeout.
 
+
 def call_with_timeout(fn: Callable[[], str], timeout: float) -> str:
     """Simulated timeout wrapper (real code: httpx timeout=..., async wait_for)."""
     start = time.monotonic()
@@ -55,7 +56,7 @@ t0 = time.monotonic()
 try:
     call_with_timeout(lambda: slow_provider(0.3), timeout=0.05)
 except TimeoutError as e:
-    print(f"timeout fired after {(time.monotonic()-t0)*1000:.0f}ms: {e}")
+    print(f"timeout fired after {(time.monotonic() - t0) * 1000:.0f}ms: {e}")
 print()
 
 # ============================================================
@@ -65,9 +66,14 @@ print()
 # jitter (don't synchronize). The classic retry-storm: 1000 clients
 # all retry at the same instant after a blip.
 
-def retry_with_backoff(fn: Callable[[], str], attempts: int = 4,
-                       base_delay: float = 0.02, jitter: float = 0.005,
-                       rng: random.Random | None = None) -> str:
+
+def retry_with_backoff(
+    fn: Callable[[], str],
+    attempts: int = 4,
+    base_delay: float = 0.02,
+    jitter: float = 0.005,
+    rng: random.Random | None = None,
+) -> str:
     rng = rng or random.Random()
     last: Exception | None = None
     for attempt in range(attempts):
@@ -75,12 +81,14 @@ def retry_with_backoff(fn: Callable[[], str], attempts: int = 4,
             return fn()
         except Exception as e:
             last = e
-            delay = base_delay * (2 ** attempt) + rng.uniform(0, jitter)
+            delay = base_delay * (2**attempt) + rng.uniform(0, jitter)
             time.sleep(delay)
     raise last  # type: ignore[misc]
 
 
 flaky = {"calls": 0}
+
+
 def flaky_provider() -> str:
     flaky["calls"] += 1
     if flaky["calls"] <= 2:
@@ -101,19 +109,20 @@ print()
 # The breaker converts a slow-motion outage into fast failures that
 # protect the whole system.
 
+
 class CircuitBreaker:
     def __init__(self, failure_threshold: int = 3, cooldown: float = 0.1) -> None:
         self.threshold = failure_threshold
         self.cooldown = cooldown
         self.failures = 0
-        self.state = "closed"          # closed | open | half-open
+        self.state = "closed"  # closed | open | half-open
         self._opened_at = 0.0
 
     def allow(self) -> bool:
         now = time.monotonic()
         if self.state == "open":
             if now - self._opened_at >= self.cooldown:
-                self.state = "half-open"     # probe with one call
+                self.state = "half-open"  # probe with one call
                 return True
             return False
         return True
@@ -142,10 +151,13 @@ def guarded_call(breaker: CircuitBreaker, fn: Callable[[], str]) -> str:
 
 
 dead = {"fail": True}
+
+
 def dying_provider() -> str:
     if dead["fail"]:
         raise ConnectionError("downstream is down")
     return "ok"
+
 
 breaker = CircuitBreaker(failure_threshold=2, cooldown=0.05)
 print("=== 3. Circuit breaker ===")
@@ -153,7 +165,7 @@ for i in range(3):
     try:
         guarded_call(breaker, dying_provider)
     except RuntimeError as e:
-        print(f"call {i+1}: fast-fail ({e})")
+        print(f"call {i + 1}: fast-fail ({e})")
     except ConnectionError:
         pass
 print(f"state after 2 failures: {breaker.state}")
@@ -171,6 +183,7 @@ print()
 # One slow dependency should not exhaust the shared pool. Bulkheads
 # give each dependency its own concurrency/thread budget — a blast
 # wall between dependencies.
+
 
 class Bulkhead:
     def __init__(self, slots: int) -> None:
@@ -191,7 +204,7 @@ print("=== 4. Bulkheads ===")
 retrieval = Bulkhead(2)
 for i in range(3):
     got = retrieval.try_acquire()
-    print(f"  retrieval slot {i+1}: {'acquired' if got else 'rejected (bulkhead full)'}")
+    print(f"  retrieval slot {i + 1}: {'acquired' if got else 'rejected (bulkhead full)'}")
     if got:
         retrieval.release()
 print()
@@ -202,8 +215,8 @@ print()
 # When the premium path fails, degrade gracefully: cached results,
 # a cheaper model, a smaller context. The product stays usable.
 
-def generate_with_fallback(primary: Callable[[], str],
-                           fallback: Callable[[], str]) -> str:
+
+def generate_with_fallback(primary: Callable[[], str], fallback: Callable[[], str]) -> str:
     try:
         return primary()
     except Exception:
@@ -235,6 +248,7 @@ print()
 # MISTAKE: one shared pool for all dependencies
 # CORRECT: bulkheads per dependency
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -251,18 +265,21 @@ def _verify() -> None:
 
     # 2. Retry succeeds after transient failures
     calls = {"n": 0}
+
     def flaky2() -> str:
         calls["n"] += 1
         if calls["n"] <= 2:
             raise ConnectionError("blip")
         return "ok"
+
     assert retry_with_backoff(flaky2) == "ok"
     assert calls["n"] == 3, "two retries then success"
 
     # 3. Circuit breaker trips and recovers
     b = CircuitBreaker(failure_threshold=2, cooldown=0.02)
     assert b.allow() is True, "closed allows"
-    b.record_failure(); b.record_failure()
+    b.record_failure()
+    b.record_failure()
     assert b.state == "open", "trips after threshold"
     assert b.allow() is False, "open fast-fails"
     time.sleep(0.03)
@@ -280,6 +297,7 @@ def _verify() -> None:
     # 5. Fallback on failure
     def boom() -> str:
         raise RuntimeError("down")
+
     assert generate_with_fallback(boom, lambda: "cached") == "cached"
 
     print("[OK] 47-resilience-patterns: all checks passed")
@@ -295,4 +313,4 @@ if __name__ == "__main__":
         print("3. Circuit breaker: fast-fail, probe, recover")
         print("4. Bulkheads isolate dependencies; fallbacks degrade")
         print("5. The goal: one dependency's failure != your outage")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

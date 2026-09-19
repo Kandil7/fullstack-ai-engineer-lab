@@ -161,8 +161,9 @@ layers and leak).
 
 ```python
 import os
+
 MODEL_PATH = os.environ.get("MODEL_PATH", "/model/model.pkl")
-DB_URL = os.environ["DATABASE_URL"]   # from the orchestration layer, not the image
+DB_URL = os.environ["DATABASE_URL"]  # from the orchestration layer, not the image
 ```
 
 Output (conceptually):

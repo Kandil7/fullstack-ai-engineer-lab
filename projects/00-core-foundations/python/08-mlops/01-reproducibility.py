@@ -33,6 +33,7 @@ import numpy as np
 # Set every RNG at process start, in one place. NumPy and Python's
 # random are separate streams - seeding only one is a bug.
 
+
 def seed_all(seed: int = 42) -> None:
     """Pin every RNG used by this process."""
     random.seed(seed)
@@ -56,10 +57,12 @@ assert a == b, "same seed must reproduce the same stream"
 # Record versions of the code, the data, and the libraries that
 # produced a run. A run without these three is unreproducible.
 
+
 def capture_environment() -> dict[str, str]:
     """Return a fingerprint of the runtime environment."""
     import platform
     import sys as _sys
+
     return {
         "python": platform.python_version(),
         "platform": platform.platform(),
@@ -82,6 +85,7 @@ assert "python" in env and "seed" in env
 # Hash the *content* of a dataset, not its filename. Two files with
 # the same name but different bytes must produce different versions.
 
+
 def data_fingerprint(data: np.ndarray) -> str:
     """Content-addressed hash of a numpy array (deterministic bytes)."""
     return hashlib.sha256(np.ascontiguousarray(data).tobytes()).hexdigest()[:16]
@@ -103,9 +107,11 @@ assert data_fingerprint(X1) == data_fingerprint(X1.copy()), "same bytes -> same 
 # Example 4: the same pipeline, two machines, different numbers.
 # The fix is not a different random state - it is capturing state.
 
+
 @dataclass
 class RunRecord:
     """Everything needed to re-run one training job."""
+
     seed: int
     data_hash: str
     env: dict = field(default_factory=dict)
@@ -125,6 +131,7 @@ assert model_a_accuracy == model_b_accuracy, "seeded runs must match"
 rng = np.random.default_rng()  # fresh entropy each process
 drifted = [round(rng.random(), 3) for _ in range(3)]
 print(f"  unseeded drift sample: {drifted}  (differs each run)")
+
 
 # ============================================================
 # Production Pattern
@@ -163,8 +170,9 @@ def _verify() -> None:
     X = np.arange(12).reshape(4, 3)
     h1 = data_fingerprint(X)
     assert h1 == data_fingerprint(X.copy()), "copy must hash identically"
-    assert h1 != data_fingerprint(X.astype(np.float64) if X.dtype != np.float64 else X), \
+    assert h1 != data_fingerprint(X.astype(np.float64) if X.dtype != np.float64 else X), (
         "changed bytes must change the hash"
+    )
 
     rec = run_reproducibly(5, X)
     assert rec.seed == 5 and rec.metrics["rows"] == 4, "run record must capture state"

@@ -33,8 +33,10 @@
 ```python
 import numpy as np
 
-def create_adversarial_example(model, x: np.ndarray, y: int,
-                                epsilon: float = 0.1) -> np.ndarray:
+
+def create_adversarial_example(
+    model, x: np.ndarray, y: int, epsilon: float = 0.1
+) -> np.ndarray:
     """Create adversarial example using FGSM."""
     # Compute gradient
     gradient = compute_gradient(model, x, y)
@@ -46,6 +48,7 @@ def create_adversarial_example(model, x: np.ndarray, y: int,
     x_adv = np.clip(x_adv, 0, 1)
 
     return x_adv
+
 
 # Example usage
 x = np.random.rand(28, 28)  # Random image
@@ -73,8 +76,7 @@ class RobustnessEvaluator:
     def __init__(self, model):
         self.model = model
 
-    def evaluate_robustness(self, test_data: list,
-                            epsilon: float = 0.1) -> dict:
+    def evaluate_robustness(self, test_data: list, epsilon: float = 0.1) -> dict:
         """Evaluate model robustness against FGSM attack."""
         correct_clean = 0
         correct_adv = 0
@@ -109,8 +111,7 @@ class RobustnessEvaluator:
 
 **Example**:
 ```python
-def adversarial_training(model, train_data, epochs: int = 10,
-                         epsilon: float = 0.1):
+def adversarial_training(model, train_data, epochs: int = 10, epsilon: float = 0.1):
     """Train model with adversarial examples."""
     for epoch in range(epochs):
         for x, y in train_data:
@@ -139,15 +140,16 @@ class BackdoorAttack:
         self.trigger = np.ones((trigger_size, trigger_size))
         self.target_label = target_label
 
-    def poison_dataset(self, dataset: list,
-                       poison_rate: float = 0.1) -> list:
+    def poison_dataset(self, dataset: list, poison_rate: float = 0.1) -> list:
         """Add backdoor triggers to training data."""
         poisoned = []
         for x, y in dataset:
             if np.random.random() < poison_rate:
                 # Add trigger to image
                 x_backdoored = x.copy()
-                x_backdoored[:self.trigger.shape[0], :self.trigger.shape[1]] = self.trigger
+                x_backdoored[: self.trigger.shape[0], : self.trigger.shape[1]] = (
+                    self.trigger
+                )
 
                 # Change label to target
                 poisoned.append((x_backdoored, self.target_label))
@@ -165,7 +167,7 @@ class BackdoorAttack:
         for x, y in test_data:
             # Test with trigger
             x_triggered = x.copy()
-            x_triggered[:self.trigger.shape[0], :self.trigger.shape[1]] = self.trigger
+            x_triggered[: self.trigger.shape[0], : self.trigger.shape[1]] = self.trigger
             pred_triggered = model.predict(x_triggered.reshape(1, -1))
 
             if pred_triggered[0] == self.target_label:
@@ -208,8 +210,7 @@ class DataPoisoningAttack:
                 poisoned.append((x, y))
         return poisoned
 
-    def clean_label_attack(self, dataset: list,
-                           target_label: int) -> list:
+    def clean_label_attack(self, dataset: list, target_label: int) -> list:
         """Create poisoned samples with correct labels but wrong features."""
         poisoned = []
         for x, y in dataset:
@@ -232,8 +233,7 @@ class DataPoisoningAttack:
 
 **Example**:
 ```python
-def detect_distribution_shift(train_data: list,
-                               test_data: list) -> dict:
+def detect_distribution_shift(train_data: list, test_data: list) -> dict:
     """Detect distribution shift between datasets."""
     train_features = np.array([x.flatten() for x, _ in train_data])
     test_features = np.array([x.flatten() for x, _ in test_data])
@@ -266,8 +266,7 @@ def detect_distribution_shift(train_data: list,
 
 **Example**:
 ```python
-def evasion_attack(model, x: np.ndarray, y: int,
-                   method: str = "fgsm") -> np.ndarray:
+def evasion_attack(model, x: np.ndarray, y: int, method: str = "fgsm") -> np.ndarray:
     """Perform evasion attack on model."""
     if method == "fgsm":
         return fgsm_attack(model, x, y)
@@ -277,6 +276,7 @@ def evasion_attack(model, x: np.ndarray, y: int,
         return carlini_wagner_attack(model, x, y)
     else:
         raise ValueError(f"Unknown attack method: {method}")
+
 
 def fgsm_attack(model, x, y, epsilon=0.1):
     """Fast Gradient Sign Method."""
@@ -295,8 +295,7 @@ def fgsm_attack(model, x, y, epsilon=0.1):
 
 **Example**:
 ```python
-def fgsm_attack(model, x: np.ndarray, y: int,
-                epsilon: float = 0.1) -> np.ndarray:
+def fgsm_attack(model, x: np.ndarray, y: int, epsilon: float = 0.1) -> np.ndarray:
     """
     Fast Gradient Sign Method attack.
 
@@ -313,9 +312,7 @@ def fgsm_attack(model, x: np.ndarray, y: int,
     with tf.GradientTape() as tape:
         tape.watch(x_tensor)
         prediction = model(x_tensor)
-        loss = tf.keras.losses.sparse_categorical_crossentropy(
-            y, prediction
-        )
+        loss = tf.keras.losses.sparse_categorical_crossentropy(y, prediction)
 
     # Get gradient
     gradient = tape.gradient(loss, x_tensor)
@@ -389,8 +386,9 @@ class ModelInversionAttack:
     def __init__(self, model):
         self.model = model
 
-    def reconstruct_input(self, target_class: int,
-                          n_iterations: int = 1000) -> np.ndarray:
+    def reconstruct_input(
+        self, target_class: int, n_iterations: int = 1000
+    ) -> np.ndarray:
         """Reconstruct input for a target class."""
         # Start with random noise
         x = np.random.rand(10)
@@ -441,8 +439,7 @@ class MembershipInferenceAttack:
             "confidence": confidence,
         }
 
-    def evaluate_attack(self, member_data: list,
-                        non_member_data: list) -> dict:
+    def evaluate_attack(self, member_data: list, non_member_data: list) -> dict:
         """Evaluate membership inference attack accuracy."""
         correct = 0
         total = len(member_data) + len(non_member_data)
@@ -473,9 +470,14 @@ class MembershipInferenceAttack:
 
 **Example**:
 ```python
-def pgd_attack(model, x: np.ndarray, y: int,
-               epsilon: float = 0.1, num_steps: int = 10,
-               step_size: float = 0.01) -> np.ndarray:
+def pgd_attack(
+    model,
+    x: np.ndarray,
+    y: int,
+    epsilon: float = 0.1,
+    num_steps: int = 10,
+    step_size: float = 0.01,
+) -> np.ndarray:
     """
     Projected Gradient Descent attack.
 
@@ -517,8 +519,7 @@ def pgd_attack(model, x: np.ndarray, y: int,
 
 **Example**:
 ```python
-def measure_perturbation(x_original: np.ndarray,
-                         x_adversarial: np.ndarray) -> dict:
+def measure_perturbation(x_original: np.ndarray, x_adversarial: np.ndarray) -> dict:
     """Measure perturbation between original and adversarial."""
     diff = x_adversarial - x_original
 
@@ -528,6 +529,7 @@ def measure_perturbation(x_original: np.ndarray,
         "linf_norm": np.max(np.abs(diff)),  # Maximum change
         "mean_change": np.mean(np.abs(diff)),
     }
+
 
 # Example
 x = np.random.rand(28, 28)
@@ -568,7 +570,9 @@ class RobustnessTestSuite:
         return results
 
     def test_clean_accuracy(self, data):
-        correct = sum(1 for x, y in data if self.model.predict(x.reshape(1, -1))[0] == y)
+        correct = sum(
+            1 for x, y in data if self.model.predict(x.reshape(1, -1))[0] == y
+        )
         return correct / len(data)
 
     def test_adversarial(self, data):
@@ -584,11 +588,13 @@ class RobustnessTestSuite:
         return {"shift_accuracy": 0.75}  # Simplified
 
     def _compute_overall_score(self, results):
-        return np.mean([
-            results["clean_accuracy"],
-            results["adversarial_robustness"]["fgsm_accuracy"],
-            results["noise_robustness"]["noise_0.1_accuracy"],
-        ])
+        return np.mean(
+            [
+                results["clean_accuracy"],
+                results["adversarial_robustness"]["fgsm_accuracy"],
+                results["noise_robustness"]["noise_0.1_accuracy"],
+            ]
+        )
 ```
 
 **Related Terms**: Adversarial Robustness, Testing, Evaluation
@@ -618,12 +624,14 @@ class TriggerGenerator:
         else:
             raise ValueError(f"Unknown pattern type: {pattern_type}")
 
-    def apply_trigger(self, x: np.ndarray, trigger: np.ndarray,
-                      position: tuple = (0, 0)) -> np.ndarray:
+    def apply_trigger(
+        self, x: np.ndarray, trigger: np.ndarray, position: tuple = (0, 0)
+    ) -> np.ndarray:
         """Apply trigger to input."""
         x_triggered = x.copy()
-        x_triggered[position[0]:position[0]+self.size,
-                   position[1]:position[1]+self.size] = trigger
+        x_triggered[
+            position[0] : position[0] + self.size, position[1] : position[1] + self.size
+        ] = trigger
         return x_triggered
 ```
 

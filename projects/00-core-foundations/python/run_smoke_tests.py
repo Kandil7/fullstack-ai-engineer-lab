@@ -35,7 +35,10 @@ SKIP_FILES = {
 
 # Directories to skip entirely
 SKIP_DIRECTORIES = {
-    ".git", "__pycache__", ".mimocode", ".idea",
+    ".git",
+    "__pycache__",
+    ".mimocode",
+    ".idea",
     "django",  # Django not installed - reference only (R7)
     "outputs",  # Exercise outputs - regenerated on run
 }
@@ -74,9 +77,14 @@ def smoke_test_file(rel_path: str, verify: bool = False) -> tuple[bool, str]:
 
     # Step 1: Check syntax (explicit UTF-8 encoding)
     compile_result = subprocess.run(
-        [sys.executable, "-c",
-         f"import io; compile(io.open({repr(full)}, 'r', encoding='utf-8').read(), {repr(rel_path)}, 'exec')"],
-        capture_output=True, text=True, timeout=15,
+        [
+            sys.executable,
+            "-c",
+            f"import io; compile(io.open({repr(full)}, 'r', encoding='utf-8').read(), {repr(rel_path)}, 'exec')",
+        ],
+        capture_output=True,
+        text=True,
+        timeout=15,
     )
     if compile_result.returncode != 0:
         msg = compile_result.stderr.strip() or compile_result.stdout.strip()
@@ -94,7 +102,9 @@ def smoke_test_file(rel_path: str, verify: bool = False) -> tuple[bool, str]:
         env["MPLBACKEND"] = "Agg"
         run_result = subprocess.run(
             cmd,
-            capture_output=True, text=True, timeout=FILE_TIMEOUT,
+            capture_output=True,
+            text=True,
+            timeout=FILE_TIMEOUT,
             env=env,
         )
         if run_result.returncode != 0:
@@ -139,23 +149,24 @@ def run_phase(phase_dir: str, label: str, verify: bool = False) -> tuple[int, in
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Smoke test runner for Python learning module"
+    parser = argparse.ArgumentParser(description="Smoke test runner for Python learning module")
+    parser.add_argument(
+        "--phase", type=int, choices=range(1, 10), help="Run only a specific phase (1-9)"
     )
-    parser.add_argument("--phase", type=int, choices=range(1, 10),
-                        help="Run only a specific phase (1-9)")
-    parser.add_argument("--file", type=str,
-                        help="Run a single file (relative path)")
-    parser.add_argument("--list", action="store_true",
-                        help="List all discovered files without running")
-    parser.add_argument("--all", action="store_true",
-                        help="Run all phases (default)")
-    parser.add_argument("--verify", action="store_true",
-                        help="Pass --verify to each exercise file to run _verify()")
-    parser.add_argument("--clean-outputs", action="store_true",
-                        help="Clean outputs/ directory before running tests")
-    parser.add_argument("--timeout", type=int, default=30,
-                        help="Per-file timeout in seconds (default: 30)")
+    parser.add_argument("--file", type=str, help="Run a single file (relative path)")
+    parser.add_argument(
+        "--list", action="store_true", help="List all discovered files without running"
+    )
+    parser.add_argument("--all", action="store_true", help="Run all phases (default)")
+    parser.add_argument(
+        "--verify", action="store_true", help="Pass --verify to each exercise file to run _verify()"
+    )
+    parser.add_argument(
+        "--clean-outputs", action="store_true", help="Clean outputs/ directory before running tests"
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=30, help="Per-file timeout in seconds (default: 30)"
+    )
     args = parser.parse_args()
 
     global FILE_TIMEOUT
@@ -163,6 +174,7 @@ def main():
 
     if args.clean_outputs:
         import shutil
+
         outputs_dir = os.path.join(HERE, "outputs")
         if os.path.isdir(outputs_dir):
             shutil.rmtree(outputs_dir)

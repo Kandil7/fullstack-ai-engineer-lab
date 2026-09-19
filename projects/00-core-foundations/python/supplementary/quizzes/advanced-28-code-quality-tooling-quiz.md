@@ -95,8 +95,8 @@ D) Deleting the rule from the linter's documentation
 **What is the output of this code?**
 ```python
 def suppressed_lines(source):
-    return {i + 1 for i, line in enumerate(source.splitlines())
-            if "# noqa" in line}
+    return {i + 1 for i, line in enumerate(source.splitlines()) if "# noqa" in line}
+
 
 src = "x = 1  # noqa\n\ny = 2\n"
 print(sorted(suppressed_lines(src)))
@@ -128,9 +128,14 @@ D) They are the same tool with different names
 ```python
 def find_bare_excepts(source):
     tree = ast.parse(source)
-    return [h.lineno for node in ast.walk(tree)
-            if isinstance(node, ast.Try)
-            for h in node.handlers if h.type is None]
+    return [
+        h.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Try)
+        for h in node.handlers
+        if h.type is None
+    ]
+
 
 src = "try:\n    x()\nexcept ValueError:\n    pass\nexcept:\n    pass\n"
 print(find_bare_excepts(src))
@@ -149,6 +154,7 @@ D) `[]`
 **Which tool would flag this code in a CI pipeline?**
 ```python
 import pickle
+
 model = pickle.load(open("uploaded_model.pkl", "rb"))
 ```
 
@@ -166,6 +172,7 @@ D) pip-audit — pickle is a known vulnerable library
 ```python
 import ast
 
+
 def complexity(src):
     tree = ast.parse(src)
     fn = tree.body[0]
@@ -176,6 +183,7 @@ def complexity(src):
         elif isinstance(child, ast.If):
             n += 1
     return 1 + n
+
 
 src = "def f(x):\n    if x and y or z:\n        return 1\n    return 0\n"
 print(complexity(src))
@@ -207,11 +215,15 @@ D) Because `ast.parse` deletes the source string
 ```python
 import ast
 
+
 def docstring_check(src):
     tree = ast.parse(src)
-    return [(n.lineno, n.name) for n in ast.walk(tree)
-            if isinstance(n, ast.FunctionDef)
-            and ast.get_docstring(n) is None]
+    return [
+        (n.lineno, n.name)
+        for n in ast.walk(tree)
+        if isinstance(n, ast.FunctionDef) and ast.get_docstring(n) is None
+    ]
+
 
 src = 'def a():\n    """Has a doc."""\n    pass\n\ndef b():\n    pass\n'
 print(docstring_check(src))
@@ -275,6 +287,7 @@ def gate(source):
     violations = [(1, "B006"), (2, "E722")]
     return [v for v in violations if v[0] not in suppressed]
 
+
 print(gate("def f(x=[]):\n    pass\n"))
 ```
 
@@ -305,12 +318,14 @@ D) Delete the generated files from the repository
 ```python
 import ast
 
+
 def count_decisions(node):
     n = 0
     for child in ast.walk(node):
         if isinstance(child, (ast.For, ast.While)):
             n += 1
     return n
+
 
 tree = ast.parse("def f():\n    for i in range(3):\n        pass\n    while False:\n        pass\n")
 print(1 + count_decisions(tree.body[0]))

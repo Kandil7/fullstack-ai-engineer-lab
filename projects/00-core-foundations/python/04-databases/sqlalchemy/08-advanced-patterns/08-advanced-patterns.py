@@ -92,6 +92,7 @@ class Experiment(Base):
 # vectors transparently.
 # Complexity: bind/result conversion O(dim) per row.
 
+
 class VectorType(TypeDecorator):
     """Stores an embedding (list[float]) as raw float32 bytes.
 
@@ -140,6 +141,7 @@ class Embedding(Base):
 # The pattern here is optimistic locking: every UPDATE bumps the
 # version column, so a stale client write can be detected by
 # comparing versions (WHERE ... AND version = :expected).
+
 
 @event.listens_for(Experiment, "before_update")
 def _bump_version(mapper, connection, target) -> None:
@@ -193,9 +195,7 @@ with new_session() as session:
     session.commit()
 
 with new_session() as session:
-    loaded = session.scalars(
-        select(Embedding).where(Embedding.chunk_id == "chunk-1")
-    ).one()
+    loaded = session.scalars(select(Embedding).where(Embedding.chunk_id == "chunk-1")).one()
     print(f"vector round-trip: {loaded.vector}")
 
 # Output:
@@ -209,9 +209,7 @@ with new_session() as session:
 # ============================================================
 # Example 4: update triggers before_update -> version 1 -> 2
 with new_session() as session:
-    exp = session.scalars(
-        select(Experiment).where(Experiment.name == "bert-run-1")
-    ).one()
+    exp = session.scalars(select(Experiment).where(Experiment.name == "bert-run-1")).one()
     exp.score = 0.95
     session.commit()
     print(f"version after one update: {exp.version}")
@@ -229,10 +227,7 @@ with new_session() as session:
 # the price of speed.
 
 # Example 5: bulk insert of 5 experiments in one round trip
-bulk_rows = [
-    {"name": f"grid-{i}", "model": "bert", "score": 0.80 + i / 100.0}
-    for i in range(5)
-]
+bulk_rows = [{"name": f"grid-{i}", "model": "bert", "score": 0.80 + i / 100.0} for i in range(5)]
 with new_session() as session:
     session.bulk_insert_mappings(Experiment, bulk_rows)
     session.commit()
@@ -244,10 +239,7 @@ with new_session() as session:
 
 # Example 6: bulk update — promote every leader in one statement
 with new_session() as session:
-    rows = [
-        {"id": exp.id, "score": 0.99}
-        for exp in session.scalars(select(Experiment)).all()
-    ]
+    rows = [{"id": exp.id, "score": 0.99} for exp in session.scalars(select(Experiment)).all()]
     session.bulk_update_mappings(Experiment, rows)
     session.commit()
 
@@ -292,20 +284,17 @@ with new_session() as session:
 
 # Example 8: per-model rank of every experiment
 with new_session() as session:
-    stmt = (
-        select(
-            Experiment.name,
-            Experiment.model,
-            Experiment.score,
-            func.row_number()
-            .over(
-                partition_by=Experiment.model,
-                order_by=Experiment.score.desc(),
-            )
-            .label("rank_in_model"),
+    stmt = select(
+        Experiment.name,
+        Experiment.model,
+        Experiment.score,
+        func.row_number()
+        .over(
+            partition_by=Experiment.model,
+            order_by=Experiment.score.desc(),
         )
-        .order_by(Experiment.model, "rank_in_model")
-    )
+        .label("rank_in_model"),
+    ).order_by(Experiment.model, "rank_in_model")
     for name, model, score, rank in session.execute(stmt):
         print(f"#{rank} {model}: {name} ({score:.2f})")
 
@@ -322,6 +311,7 @@ with new_session() as session:
 # The shipping shape: a query function that returns the top run per
 # model family, plus a version-guarded update that refuses stale
 # writes (optimistic locking with the event-bumped version).
+
 
 def top_per_model(session: Session, k: int = 1) -> list[tuple[str, str, float]]:
     """Return the top-k experiments per model family.
@@ -385,23 +375,18 @@ def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     with new_session() as session:
         # 1. Hybrid property agrees between Python and SQL contexts
-        exp = session.scalars(
-            select(Experiment).where(Experiment.name == "bert-run-1")
-        ).one()
+        exp = session.scalars(select(Experiment).where(Experiment.name == "bert-run-1")).one()
         assert exp.is_leader is True, "instance hybrid must be True for 0.95"
-        sql_leaders = session.scalars(
-            select(Experiment).where(Experiment.is_leader)
-        ).all()
-        assert all(e.is_leader for e in sql_leaders), \
+        sql_leaders = session.scalars(select(Experiment).where(Experiment.is_leader)).all()
+        assert all(e.is_leader for e in sql_leaders), (
             "SQL-side hybrid must match instance-side logic"
+        )
 
         # 2. Custom type round-trips byte-exactly
         vec = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
         session.add(Embedding(chunk_id="verify-vec", vector=vec))
         session.commit()
-        loaded = session.scalars(
-            select(Embedding).where(Embedding.chunk_id == "verify-vec")
-        ).one()
+        loaded = session.scalars(select(Embedding).where(Embedding.chunk_id == "verify-vec")).one()
         assert loaded.vector == vec, "VectorType must round-trip floats exactly"
 
         # 3. before_update event bumps version
@@ -415,9 +400,7 @@ def _verify() -> None:
             [{"name": f"bulk-{i}", "model": "gpt2", "score": 0.5} for i in range(3)],
         )
         session.commit()
-        bulk = session.scalars(
-            select(Experiment).where(Experiment.name.like("bulk-%"))
-        ).all()
+        bulk = session.scalars(select(Experiment).where(Experiment.name.like("bulk-%"))).all()
         assert len(bulk) == 3, "bulk_insert_mappings must insert all rows"
 
         # 5. returning() returns the generated PK
@@ -428,24 +411,24 @@ def _verify() -> None:
         )
         rid = session.execute(stmt).scalar_one()
         session.commit()
-        assert session.get(Experiment, rid) is not None, \
+        assert session.get(Experiment, rid) is not None, (
             "returning() id must reference a persisted row"
+        )
 
         # 6. Window rank: exactly one #1 per model family
         tops = top_per_model(session, k=1)
         models_seen = {m for _, m, _ in tops}
-        assert len(tops) == len(models_seen), \
-            "top_per_model must return exactly one row per model"
+        assert len(tops) == len(models_seen), "top_per_model must return exactly one row per model"
 
         # 7. Optimistic locking: stale version write is refused
-        exp = session.scalars(
-            select(Experiment).where(Experiment.name == "bert-run-1")
-        ).one()
+        exp = session.scalars(select(Experiment).where(Experiment.name == "bert-run-1")).one()
         current_version = exp.version
-        assert update_if_version(session, exp.id, current_version, 0.97) is True, \
+        assert update_if_version(session, exp.id, current_version, 0.97) is True, (
             "matching version must update"
-        assert update_if_version(session, exp.id, current_version, 0.5) is False, \
+        )
+        assert update_if_version(session, exp.id, current_version, 0.5) is False, (
             "stale version must be refused"
+        )
 
     print("[OK] 08-advanced-patterns: all checks passed")
 

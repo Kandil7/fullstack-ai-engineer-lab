@@ -66,14 +66,17 @@ size depends on: baseline rate (control), minimum effect you care about
 import math
 from scipy import stats
 
-def min_sample_size(baseline: float, effect: float, alpha: float = 0.05,
-                    power: float = 0.80) -> int:
+
+def min_sample_size(
+    baseline: float, effect: float, alpha: float = 0.05, power: float = 0.80
+) -> int:
     """Per-group sample size for a two-proportion z-test."""
     z_alpha = stats.norm.ppf(1 - alpha / 2)
     z_beta = stats.norm.ppf(power)
     p_bar = (baseline + baseline + effect) / 2
     var = 2 * p_bar * (1 - p_bar)
-    return int(math.ceil((z_alpha + z_beta) ** 2 * var / effect ** 2))
+    return int(math.ceil((z_alpha + z_beta) ** 2 * var / effect**2))
+
 
 print("sample size per group:", min_sample_size(baseline=0.10, effect=0.02))
 ```
@@ -95,19 +98,27 @@ test is a 2×2 contingency table + chi-squared:
 ```python
 from scipy import stats
 
-def ab_proportion_test(control_success: int, control_total: int,
-                       treat_success: int, treat_total: int) -> dict:
+
+def ab_proportion_test(
+    control_success: int, control_total: int, treat_success: int, treat_total: int
+) -> dict:
     """Chi-squared test on conversion rates. Returns p-value + verdict."""
-    table = [[control_success, control_total - control_success],
-             [treat_success, treat_total - treat_success]]
+    table = [
+        [control_success, control_total - control_success],
+        [treat_success, treat_total - treat_success],
+    ]
     chi2, p, _, _ = stats.chi2_contingency(table)
     c_rate = control_success / control_total
     t_rate = treat_success / treat_total
     lift = (t_rate - c_rate) / c_rate if c_rate else float("nan")
-    return {"control_rate": round(c_rate, 4), "treatment_rate": round(t_rate, 4),
-            "lift": round(lift, 4), "p": round(p, 4),
-            "verdict": "treatment wins" if (p < 0.05 and t_rate > c_rate)
-                       else "no significant win"}
+    return {
+        "control_rate": round(c_rate, 4),
+        "treatment_rate": round(t_rate, 4),
+        "lift": round(lift, 4),
+        "p": round(p, 4),
+        "verdict": "treatment wins" if (p < 0.05 and t_rate > c_rate) else "no significant win",
+    }
+
 
 print(ab_proportion_test(410, 4000, 452, 4000))
 ```
@@ -129,14 +140,18 @@ When the metric is a mean (revenue per user, session time), use a t-test:
 ```python
 from scipy import stats
 
+
 def ab_t_test(control: list[float], treatment: list[float]) -> dict:
     """Two-sample t-test on a continuous outcome."""
     t_stat, p = stats.ttest_ind(treatment, control, equal_var=False)
-    return {"control_mean": round(float(np.mean(control)), 4),
-            "treatment_mean": round(float(np.mean(treatment)), 4),
-            "p": round(float(p), 4),
-            "verdict": "treatment wins" if (p < 0.05 and np.mean(treatment) > np.mean(control))
-                       else "no significant win"}
+    return {
+        "control_mean": round(float(np.mean(control)), 4),
+        "treatment_mean": round(float(np.mean(treatment)), 4),
+        "p": round(float(p), 4),
+        "verdict": "treatment wins"
+        if (p < 0.05 and np.mean(treatment) > np.mean(control))
+        else "no significant win",
+    }
 ```
 
 Output (conceptually):
@@ -175,6 +190,7 @@ def guardrail_check(primary_pass: bool, guardrails: dict[str, bool]) -> tuple[bo
     """Promotion requires primary + all guardrails green."""
     failures = [g for g, ok in guardrails.items() if not ok]
     return (primary_pass and not failures), failures
+
 
 print(guardrail_check(True, {"latency": True, "error_rate": True}))
 print(guardrail_check(True, {"latency": False}))

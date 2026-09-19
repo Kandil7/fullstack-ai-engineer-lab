@@ -44,8 +44,9 @@ By the end of this lecture, you will be able to:
 ```python
 async def token_stream(text, chunk=2):
     for i in range(0, len(text), chunk):
-        yield text[i:i + chunk]
+        yield text[i : i + chunk]
         await asyncio.sleep(0.01)
+
 
 @app.get("/stream/text")
 async def stream_text():
@@ -69,12 +70,14 @@ async def sse_generator(n=5):
         yield f"data: {json.dumps(event)}\n\n"
         await asyncio.sleep(0.01)
 
+
 @app.get("/stream/events")
 async def stream_events():
-    return StreamingResponse(sse_generator(),
-                             media_type="text/event-stream",
-                             headers={"Cache-Control": "no-cache",
-                                      "X-Accel-Buffering": "no"})
+    return StreamingResponse(
+        sse_generator(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 ```
 
 Output:
@@ -120,7 +123,7 @@ chunks — gives the loop room to slow the producer to the consumer's rate.
 async def backpressured_stream():
     for i in range(10):
         yield f"chunk {i}\n"
-        await asyncio.sleep(0.005)     # pace = backpressure
+        await asyncio.sleep(0.005)  # pace = backpressure
 ```
 
 Output:

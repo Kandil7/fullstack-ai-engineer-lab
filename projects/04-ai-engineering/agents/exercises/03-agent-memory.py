@@ -36,14 +36,16 @@ import heapq
 # SECTION 1: Working Memory (In-Context)
 # ============================================================
 
+
 @dataclass
 class MemoryEntry:
     """A single memory entry with metadata."""
+
     id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     content: str = ""
-    role: str = "user"          # "user", "assistant", "system", "tool"
+    role: str = "user"  # "user", "assistant", "system", "tool"
     timestamp: datetime = field(default_factory=datetime.now)
-    importance: float = 0.5     # 0.0 to 1.0
+    importance: float = 0.5  # 0.0 to 1.0
     access_count: int = 0
     last_accessed: datetime = field(default_factory=datetime.now)
     metadata: dict = field(default_factory=dict)
@@ -98,12 +100,7 @@ class WorkingMemory:
 
     def add(self, content: str, role: str = "user", importance: float = 0.5, **kwargs):
         """Add a message to working memory."""
-        entry = MemoryEntry(
-            content=content,
-            role=role,
-            importance=importance,
-            **kwargs
-        )
+        entry = MemoryEntry(content=content, role=role, importance=importance, **kwargs)
         self.messages.append(entry)
         self._enforce_limits()
 
@@ -119,7 +116,10 @@ class WorkingMemory:
             self.messages = system_msgs + non_system[-keep_count:]
 
         # Second limit: token estimate
-        while self.current_token_count() > self.max_tokens_estimate and len(self.messages) > 2:
+        while (
+            self.current_token_count() > self.max_tokens_estimate
+            and len(self.messages) > 2
+        ):
             # Find least important message to evict
             non_system = [m for m in self.messages if m.role != "system"]
             if not non_system:
@@ -160,15 +160,20 @@ class WorkingMemory:
             "messages": len(self.messages),
             "estimated_tokens": self.current_token_count(),
             "max_tokens": self.max_tokens_estimate,
-            "utilization": round(self.current_token_count() / self.max_tokens_estimate, 2),
-            "roles": {role: sum(1 for m in self.messages if m.role == role)
-                      for role in set(m.role for m in self.messages)},
+            "utilization": round(
+                self.current_token_count() / self.max_tokens_estimate, 2
+            ),
+            "roles": {
+                role: sum(1 for m in self.messages if m.role == role)
+                for role in set(m.role for m in self.messages)
+            },
         }
 
 
 # ============================================================
 # SECTION 2: Short-Term Memory (Buffer-Based)
 # ============================================================
+
 
 class ShortTermMemory:
     """
@@ -182,7 +187,9 @@ class ShortTermMemory:
         self.entries: list[MemoryEntry] = []
         self._access_order: deque = deque()
 
-    def store(self, content: str, role: str = "user", importance: float = 0.5, **metadata):
+    def store(
+        self, content: str, role: str = "user", importance: float = 0.5, **metadata
+    ):
         """Store a memory entry."""
         entry = MemoryEntry(
             content=content,
@@ -211,13 +218,19 @@ class ShortTermMemory:
             overlap = len(query_words & content_words)
             if overlap > 0:
                 # Combine relevance with recency
-                recency_score = 1.0 / (1.0 + (datetime.now() - entry.timestamp).total_seconds() / 300)
-                final_score = overlap * 0.7 + recency_score * 0.3 + entry.importance * 0.2
+                recency_score = 1.0 / (
+                    1.0 + (datetime.now() - entry.timestamp).total_seconds() / 300
+                )
+                final_score = (
+                    overlap * 0.7 + recency_score * 0.3 + entry.importance * 0.2
+                )
                 scored.append((final_score, entry))
         scored.sort(key=lambda x: -x[0])
         return [entry for _, entry in scored[:top_k]]
 
-    def search_by_importance(self, min_importance: float = 0.7, top_k: int = 10) -> list[MemoryEntry]:
+    def search_by_importance(
+        self, min_importance: float = 0.7, top_k: int = 10
+    ) -> list[MemoryEntry]:
         """Get the most important memories."""
         important = [e for e in self.entries if e.importance >= min_importance]
         important.sort(key=lambda e: -e.importance)
@@ -228,13 +241,14 @@ class ShortTermMemory:
         now = datetime.now()
         # Remove expired entries
         self.entries = [
-            e for e in self.entries
+            e
+            for e in self.entries
             if (now - e.timestamp).total_seconds() < self.ttl_seconds
         ]
         # If still over limit, remove least important
         if len(self.entries) > self.max_entries:
             self.entries.sort(key=lambda e: (e.importance, e.timestamp))
-            self.entries = self.entries[-self.max_entries:]
+            self.entries = self.entries[-self.max_entries :]
 
     def get_conversation_history(self, last_n: int = 20) -> list[dict]:
         """Get formatted conversation history."""
@@ -258,8 +272,8 @@ class ShortTermMemory:
             summary_parts.append(f"[{entry.role}]: {entry.content[:100]}")
 
         summary = MemoryEntry(
-            content=f"Previous conversation summary ({len(old_entries)} messages): " +
-                    "; ".join(summary_parts[:5]),
+            content=f"Previous conversation summary ({len(old_entries)} messages): "
+            + "; ".join(summary_parts[:5]),
             role="system",
             importance=0.8,
             metadata={"type": "summary", "original_count": len(old_entries)},
@@ -271,6 +285,7 @@ class ShortTermMemory:
 # ============================================================
 # SECTION 3: Long-Term Memory (Vector Store)
 # ============================================================
+
 
 class SimpleVectorStore:
     """
@@ -291,6 +306,7 @@ class SimpleVectorStore:
         # Create a deterministic seed from text
         seed = int(hashlib.md5(text.encode()).hexdigest()[:8], 16)
         import random
+
         rng = random.Random(seed)
         vector = [rng.gauss(0, 1) for _ in range(dimension)]
         # Normalize
@@ -313,13 +329,15 @@ class SimpleVectorStore:
         """Add a vector to the store."""
         vector = self.simple_embed(content, self.dimension)
         entry_id = id or str(uuid.uuid4())[:8]
-        self.vectors.append({
-            "id": entry_id,
-            "vector": vector,
-            "content": content,
-            "metadata": metadata or {},
-            "created_at": datetime.now().isoformat(),
-        })
+        self.vectors.append(
+            {
+                "id": entry_id,
+                "vector": vector,
+                "content": content,
+                "metadata": metadata or {},
+                "created_at": datetime.now().isoformat(),
+            }
+        )
 
     def search(self, query: str, top_k: int = 5, threshold: float = 0.0) -> list[dict]:
         """Search for similar content using cosine similarity."""
@@ -364,13 +382,16 @@ class SimpleVectorStore:
         return {
             "total_entries": len(self.vectors),
             "dimension": self.dimension,
-            "memory_estimate_kb": round(len(self.vectors) * self.dimension * 8 / 1024, 2),
+            "memory_estimate_kb": round(
+                len(self.vectors) * self.dimension * 8 / 1024, 2
+            ),
         }
 
 
 # ============================================================
 # SECTION 4: Hierarchical Memory System
 # ============================================================
+
 
 class HierarchicalMemory:
     """
@@ -385,7 +406,9 @@ class HierarchicalMemory:
         self._promotion_threshold = 3  # Access count to promote
         self._demotion_threshold = timedelta(hours=1)
 
-    def store(self, content: str, role: str = "user", importance: float = 0.5, **metadata):
+    def store(
+        self, content: str, role: str = "user", importance: float = 0.5, **metadata
+    ):
         """Store information in the appropriate memory layer."""
         # Always add to working memory
         self.working.add(content, role=role, importance=importance, **metadata)
@@ -394,7 +417,9 @@ class HierarchicalMemory:
 
         # High-importance items go directly to long-term
         if importance >= 0.8:
-            self.long_term.add(content, metadata={**metadata, "role": role, "importance": importance})
+            self.long_term.add(
+                content, metadata={**metadata, "role": role, "importance": importance}
+            )
 
     def retrieve(self, query: str, layers: list[str] = None) -> dict:
         """Retrieve information from all memory layers."""
@@ -418,10 +443,12 @@ class HierarchicalMemory:
             if entry.access_count >= self._promotion_threshold:
                 self.long_term.add(
                     entry.content,
-                    metadata={"role": entry.role, "importance": entry.importance}
+                    metadata={"role": entry.role, "importance": entry.importance},
                 )
 
-    def get_context_for_llm(self, query: str = "", max_tokens: int = 3000) -> list[dict]:
+    def get_context_for_llm(
+        self, query: str = "", max_tokens: int = 3000
+    ) -> list[dict]:
         """
         Build the optimal context window for an LLM call.
         Combines working memory with relevant long-term memories.
@@ -436,12 +463,15 @@ class HierarchicalMemory:
         if query:
             long_term_results = self.long_term.search(query, top_k=3, threshold=0.1)
             if long_term_results:
-                context.append({
-                    "role": "system",
-                    "content": "Relevant memories:\n" + "\n".join(
-                        f"- {r['content'][:200]}" for r in long_term_results
-                    )
-                })
+                context.append(
+                    {
+                        "role": "system",
+                        "content": "Relevant memories:\n"
+                        + "\n".join(
+                            f"- {r['content'][:200]}" for r in long_term_results
+                        ),
+                    }
+                )
 
         return context
 
@@ -474,6 +504,7 @@ class HierarchicalMemory:
 # ============================================================
 # SECTION 5: Conversation History Manager
 # ============================================================
+
 
 class ConversationManager:
     """
@@ -528,7 +559,9 @@ class ConversationManager:
         )
         return summary
 
-    def get_context(self, max_tokens: int = 4000, include_summaries: bool = True) -> list[dict]:
+    def get_context(
+        self, max_tokens: int = 4000, include_summaries: bool = True
+    ) -> list[dict]:
         """Build context window with optional summaries."""
         context = []
 
@@ -545,8 +578,10 @@ class ConversationManager:
             msg_tokens = len(msg.content) // 4
             if token_count + msg_tokens > max_tokens:
                 break
-            context.insert(-len([c for c in context if c["role"] != "system"]) or len(context),
-                          {"role": msg.role, "content": msg.content})
+            context.insert(
+                -len([c for c in context if c["role"] != "system"]) or len(context),
+                {"role": msg.role, "content": msg.content},
+            )
             token_count += msg_tokens
 
         return context
@@ -577,6 +612,7 @@ class ConversationManager:
 # SECTION 6: Memory Retrieval Strategies
 # ============================================================
 
+
 class RetrievalStrategy:
     """Different strategies for retrieving relevant memories."""
 
@@ -596,7 +632,9 @@ class RetrievalStrategy:
         return sorted(memories, key=lambda m: m.access_count, reverse=True)[:top_k]
 
     @staticmethod
-    def relevant(memories: list[MemoryEntry], query: str, top_k: int = 5) -> list[MemoryEntry]:
+    def relevant(
+        memories: list[MemoryEntry], query: str, top_k: int = 5
+    ) -> list[MemoryEntry]:
         """Most relevant memories by keyword matching."""
         query_words = set(query.lower().split())
         scored = []
@@ -609,7 +647,9 @@ class RetrievalStrategy:
         return [mem for _, mem in scored[:top_k]]
 
     @staticmethod
-    def combined(memories: list[MemoryEntry], query: str, top_k: int = 5) -> list[MemoryEntry]:
+    def combined(
+        memories: list[MemoryEntry], query: str, top_k: int = 5
+    ) -> list[MemoryEntry]:
         """Combined scoring: relevance + recency + importance."""
         now = datetime.now()
         scored = []
@@ -623,10 +663,7 @@ class RetrievalStrategy:
             frequency = min(mem.access_count / 10.0, 1.0)
 
             combined_score = (
-                relevance * 0.4 +
-                recency * 0.2 +
-                importance * 0.3 +
-                frequency * 0.1
+                relevance * 0.4 + recency * 0.2 + importance * 0.3 + frequency * 0.1
             )
             scored.append((combined_score, mem))
 
@@ -637,6 +674,7 @@ class RetrievalStrategy:
 # ============================================================
 # SECTION 7: Running the Exercises
 # ============================================================
+
 
 def exercise_1_working_memory():
     """Exercise 3.1: Working memory operations."""
@@ -653,7 +691,11 @@ def exercise_1_working_memory():
         ("user", "How does deep learning differ?", 0.6),
         ("assistant", "Deep learning uses neural networks with many layers.", 0.7),
         ("user", "What are transformers?", 0.5),
-        ("assistant", "Transformers are attention-based architectures for sequence processing.", 0.7),
+        (
+            "assistant",
+            "Transformers are attention-based architectures for sequence processing.",
+            0.7,
+        ),
     ]
 
     for role, content, importance in messages:
@@ -735,7 +777,11 @@ def exercise_3_vector_store():
     print(f"\n  Store stats: {store.get_stats()}")
 
     # Search
-    queries = ["How do neural networks work?", "Finding similar content", "Language models"]
+    queries = [
+        "How do neural networks work?",
+        "Finding similar content",
+        "Language models",
+    ]
     for query in queries:
         results = store.search(query, top_k=3)
         print(f"\n  Search '{query}':")
@@ -756,11 +802,23 @@ def exercise_4_hierarchical_memory():
         ("user", "I'm building a RAG system", 0.6),
         ("assistant", "Great! RAG combines retrieval and generation.", 0.7),
         ("user", "What vector DB should I use?", 0.7),
-        ("assistant", "ChromaDB is good for prototyping, Pinecone for production.", 0.8),
+        (
+            "assistant",
+            "ChromaDB is good for prototyping, Pinecone for production.",
+            0.8,
+        ),
         ("user", "How do I chunk documents?", 0.6),
-        ("assistant", "Use overlapping windows of 500-1000 tokens with 200 token overlap.", 0.9),
+        (
+            "assistant",
+            "Use overlapping windows of 500-1000 tokens with 200 token overlap.",
+            0.9,
+        ),
         ("user", "What about embeddings?", 0.5),
-        ("assistant", "text-embedding-3-small is a good balance of cost and quality.", 0.8),
+        (
+            "assistant",
+            "text-embedding-3-small is a good balance of cost and quality.",
+            0.8,
+        ),
     ]
 
     for role, content, importance in interactions:
@@ -802,11 +860,23 @@ def exercise_5_conversation_manager():
         ("user", "What is async/await?", 0.6),
         ("assistant", "Async/await enables cooperative concurrency in Python.", 0.8),
         ("user", "Tell me about metaclasses", 0.5),
-        ("assistant", "Metaclasses are classes of classes that control class creation.", 0.7),
+        (
+            "assistant",
+            "Metaclasses are classes of classes that control class creation.",
+            0.7,
+        ),
         ("user", "What are descriptors?", 0.5),
-        ("assistant", "Descriptors define __get__, __set__, __delete__ for attribute access.", 0.7),
+        (
+            "assistant",
+            "Descriptors define __get__, __set__, __delete__ for attribute access.",
+            0.7,
+        ),
         ("user", "How about context managers?", 0.6),
-        ("assistant", "Context managers use __enter__/__exit__ for resource management.", 0.8),
+        (
+            "assistant",
+            "Context managers use __enter__/__exit__ for resource management.",
+            0.8,
+        ),
     ]
 
     for role, content, importance in conversation:
@@ -818,7 +888,11 @@ def exercise_5_conversation_manager():
     context = manager.get_context(max_tokens=500)
     print(f"\n  Context ({len(context)} messages):")
     for msg in context:
-        prefix = "[SUMMARY] " if msg["role"] == "system" and "Previous" in msg["content"] else ""
+        prefix = (
+            "[SUMMARY] "
+            if msg["role"] == "system" and "Previous" in msg["content"]
+            else ""
+        )
         print(f"    {prefix}[{msg['role']}]: {msg['content'][:60]}...")
 
     # Search
@@ -836,12 +910,32 @@ def exercise_6_retrieval_strategies():
 
     # Create test memories
     memories = [
-        MemoryEntry(content="Python is great for data science", importance=0.8, access_count=10),
-        MemoryEntry(content="Machine learning requires large datasets", importance=0.7, access_count=5),
-        MemoryEntry(content="Deep learning uses neural networks", importance=0.9, access_count=15),
-        MemoryEntry(content="NLP processes natural language text", importance=0.6, access_count=3),
-        MemoryEntry(content="Computer vision analyzes images", importance=0.5, access_count=2),
-        MemoryEntry(content="Reinforcement learning uses rewards", importance=0.7, access_count=7),
+        MemoryEntry(
+            content="Python is great for data science", importance=0.8, access_count=10
+        ),
+        MemoryEntry(
+            content="Machine learning requires large datasets",
+            importance=0.7,
+            access_count=5,
+        ),
+        MemoryEntry(
+            content="Deep learning uses neural networks",
+            importance=0.9,
+            access_count=15,
+        ),
+        MemoryEntry(
+            content="NLP processes natural language text",
+            importance=0.6,
+            access_count=3,
+        ),
+        MemoryEntry(
+            content="Computer vision analyzes images", importance=0.5, access_count=2
+        ),
+        MemoryEntry(
+            content="Reinforcement learning uses rewards",
+            importance=0.7,
+            access_count=7,
+        ),
     ]
 
     query = "machine learning neural networks"
@@ -923,13 +1017,15 @@ def exercise_7_memory_patterns():
             return sorted(self.entries, key=lambda e: -e.importance)[:n]
 
     im = ImportanceMemory(5)
-    for i, (content, imp) in enumerate([
-        ("Low importance note", 0.2),
-        ("Critical error message", 0.9),
-        ("Routine update", 0.3),
-        ("Key decision", 0.8),
-        ("Minor detail", 0.1),
-    ]):
+    for i, (content, imp) in enumerate(
+        [
+            ("Low importance note", 0.2),
+            ("Critical error message", 0.9),
+            ("Routine update", 0.3),
+            ("Key decision", 0.8),
+            ("Minor detail", 0.1),
+        ]
+    ):
         im.add(content, imp)
         print(f"    Added '{content[:20]}...' (imp={imp}): {len(im.entries)} entries")
 
@@ -945,12 +1041,14 @@ def exercise_7_memory_patterns():
             self.episodes: list[dict] = []
 
         def record_event(self, event: str, context: dict = None):
-            self.episodes.append({
-                "event": event,
-                "context": context or {},
-                "timestamp": datetime.now().isoformat(),
-                "episode_id": len(self.episodes),
-            })
+            self.episodes.append(
+                {
+                    "event": event,
+                    "context": context or {},
+                    "timestamp": datetime.now().isoformat(),
+                    "episode_id": len(self.episodes),
+                }
+            )
 
         def recall_by_context(self, key: str, value: str) -> list[dict]:
             return [ep for ep in self.episodes if ep["context"].get(key) == value]
@@ -959,9 +1057,13 @@ def exercise_7_memory_patterns():
             return self.episodes[-n:]
 
     em = EpisodicMemory()
-    em.record_event("Started coding session", {"project": "rag-app", "language": "python"})
+    em.record_event(
+        "Started coding session", {"project": "rag-app", "language": "python"}
+    )
     em.record_event("Fixed bug in parser", {"project": "rag-app", "language": "python"})
-    em.record_event("Deployed to production", {"project": "rag-app", "environment": "prod"})
+    em.record_event(
+        "Deployed to production", {"project": "rag-app", "environment": "prod"}
+    )
     em.record_event("Wrote tests", {"project": "rag-app", "language": "python"})
 
     print(f"    Total episodes: {len(em.episodes)}")

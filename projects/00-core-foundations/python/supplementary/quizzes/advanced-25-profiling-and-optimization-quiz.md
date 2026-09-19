@@ -105,6 +105,7 @@ def dedup(items):
             out.append(item)
     return out
 
+
 print(dedup(["a", "b", "a", "c"]))
 ```
 
@@ -146,6 +147,7 @@ D) 1 call — the root only
 ```python
 memo = {}
 
+
 def fib(n):
     if n in memo:
         return memo[n]
@@ -153,6 +155,7 @@ def fib(n):
         return n
     memo[n] = fib(n - 1) + fib(n - 2)
     return memo[n]
+
 
 print(fib(10), len(memo))
 ```
@@ -284,8 +287,10 @@ def naive(n):
         total += i
     return total
 
+
 def fast(n):
     return n * (n - 1) // 2
+
 
 print(naive(10_000) == fast(10_000), fast(5))
 ```

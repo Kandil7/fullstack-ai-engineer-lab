@@ -17,17 +17,30 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 from sqlalchemy import (
-    create_engine, Column, Integer, String, Text, Boolean,
-    DateTime, ForeignKey, func, or_
+    create_engine,
+    Column,
+    Integer,
+    String,
+    Text,
+    Boolean,
+    DateTime,
+    ForeignKey,
+    func,
+    or_,
 )
 from sqlalchemy.orm import (
-    declarative_base, Session, sessionmaker,
-    relationship, joinedload, selectinload
+    declarative_base,
+    Session,
+    sessionmaker,
+    relationship,
+    joinedload,
+    selectinload,
 )
 
 app = FastAPI(title="ORM Exercises")
 
 import pathlib
+
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{pathlib.Path(__file__).parent.parent.parent.parent / 'outputs' / 'dbs' / 'exercises_19.db'}"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -37,6 +50,7 @@ Base = declarative_base()
 # ============================================================
 # Exercise 19.1: SQLAlchemy Model Definitions
 # ============================================================
+
 
 class User(Base):
     __tablename__ = "users"
@@ -104,6 +118,7 @@ def get_db():
 # ============================================================
 # Pydantic Models
 # ============================================================
+
 
 class UserCreate(BaseModel):
     username: str
@@ -174,6 +189,7 @@ class UserPublic(BaseModel):
 # Exercise 19.3: CRUD with ORM
 # ============================================================
 
+
 def fake_hash_password(password: str) -> str:
     """Simulate password hashing for demo purposes."""
     return f"hashed_{password}"
@@ -181,15 +197,13 @@ def fake_hash_password(password: str) -> str:
 
 @app.post("/users", response_model=UserResponse, status_code=201)
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(
-        (User.username == user.username) | (User.email == user.email)
-    ).first()
+    existing = (
+        db.query(User).filter((User.username == user.username) | (User.email == user.email)).first()
+    )
     if existing:
         raise HTTPException(status_code=400, detail="Username or email already exists")
     db_user = User(
-        username=user.username,
-        email=user.email,
-        hashed_password=fake_hash_password(user.password)
+        username=user.username, email=user.email, hashed_password=fake_hash_password(user.password)
     )
     db.add(db_user)
     db.commit()
@@ -200,28 +214,28 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
         email=db_user.email,
         is_active=db_user.is_active,
         created_at=db_user.created_at,
-        post_count=0
+        post_count=0,
     )
 
 
 @app.get("/users", response_model=List[UserResponse])
 async def list_users(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(10, ge=1, le=100),
-    db: Session = Depends(get_db)
+    skip: int = Query(0, ge=0), limit: int = Query(10, ge=1, le=100), db: Session = Depends(get_db)
 ):
     users = db.query(User).offset(skip).limit(limit).all()
     result = []
     for user in users:
         post_count = db.query(func.count(Post.id)).filter(Post.author_id == user.id).scalar()
-        result.append(UserResponse(
-            id=user.id,
-            username=user.username,
-            email=user.email,
-            is_active=user.is_active,
-            created_at=user.created_at,
-            post_count=post_count or 0
-        ))
+        result.append(
+            UserResponse(
+                id=user.id,
+                username=user.username,
+                email=user.email,
+                is_active=user.is_active,
+                created_at=user.created_at,
+                post_count=post_count or 0,
+            )
+        )
     return result
 
 
@@ -237,7 +251,7 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
         email=user.email,
         is_active=user.is_active,
         created_at=user.created_at,
-        post_count=post_count or 0
+        post_count=post_count or 0,
     )
 
 
@@ -259,7 +273,7 @@ async def update_user(user_id: int, user_update: UserCreate, db: Session = Depen
         email=db_user.email,
         is_active=db_user.is_active,
         created_at=db_user.created_at,
-        post_count=post_count or 0
+        post_count=post_count or 0,
     )
 
 
@@ -274,6 +288,7 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
 
 
 # Post endpoints
+
 
 @app.post("/users/{user_id}/posts", response_model=PostResponse, status_code=201)
 async def create_post(user_id: int, post: PostCreate, db: Session = Depends(get_db)):
@@ -298,9 +313,7 @@ async def list_user_posts(user_id: int, db: Session = Depends(get_db)):
 
 @app.get("/posts", response_model=List[PostResponse])
 async def list_published_posts(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1, le=100),
-    db: Session = Depends(get_db)
+    skip: int = Query(0, ge=0), limit: int = Query(20, ge=1, le=100), db: Session = Depends(get_db)
 ):
     posts = db.query(Post).filter(Post.published == True).offset(skip).limit(limit).all()
     return [PostResponse(**{c: getattr(p, c) for c in PostResponse.model_fields}) for p in posts]
@@ -308,20 +321,27 @@ async def list_published_posts(
 
 @app.get("/posts/{post_id}", response_model=PostDetail)
 async def get_post(post_id: int, db: Session = Depends(get_db)):
-    post = db.query(Post).options(
-        joinedload(Post.author),
-        selectinload(Post.comments)
-    ).filter(Post.id == post_id).first()
+    post = (
+        db.query(Post)
+        .options(joinedload(Post.author), selectinload(Post.comments))
+        .filter(Post.id == post_id)
+        .first()
+    )
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
-    author = UserPublic(id=post.author.id, username=post.author.username, email=post.author.email) if post.author else None
-    comments = [CommentResponse(**{c: getattr(cm, c) for c in CommentResponse.model_fields}) for cm in post.comments]
+    author = (
+        UserPublic(id=post.author.id, username=post.author.username, email=post.author.email)
+        if post.author
+        else None
+    )
+    comments = [
+        CommentResponse(**{c: getattr(cm, c) for c in CommentResponse.model_fields})
+        for cm in post.comments
+    ]
 
     return PostDetail(
-        **{c: getattr(post, c) for c in PostResponse.model_fields},
-        author=author,
-        comments=comments
+        **{c: getattr(post, c) for c in PostResponse.model_fields}, author=author, comments=comments
     )
 
 
@@ -330,7 +350,7 @@ async def update_post(
     post_id: int,
     post_update: PostCreate,
     user_id: int = Header(alias="X-User-Id"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     db_post = db.query(Post).filter(Post.id == post_id).first()
     if not db_post:
@@ -347,9 +367,7 @@ async def update_post(
 
 @app.delete("/posts/{post_id}")
 async def delete_post(
-    post_id: int,
-    user_id: int = Header(alias="X-User-Id"),
-    db: Session = Depends(get_db)
+    post_id: int, user_id: int = Header(alias="X-User-Id"), db: Session = Depends(get_db)
 ):
     db_post = db.query(Post).filter(Post.id == post_id).first()
     if not db_post:
@@ -363,12 +381,13 @@ async def delete_post(
 
 # Comment endpoints
 
+
 @app.post("/posts/{post_id}/comments", response_model=CommentResponse, status_code=201)
 async def create_comment(
     post_id: int,
     comment: CommentCreate,
     user_id: int = Header(alias="X-User-Id"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     post = db.query(Post).filter(Post.id == post_id).first()
     if not post:
@@ -387,27 +406,37 @@ async def create_comment(
 # Exercise 19.4: Query Optimization with Joins
 # ============================================================
 
+
 @app.get("/feed", response_model=List[PostDetail])
 async def get_feed(db: Session = Depends(get_db)):
     """Get latest 20 published posts with author info (eager loaded)."""
-    posts = db.query(Post).options(
-        joinedload(Post.author),
-        selectinload(Post.comments)
-    ).filter(
-        Post.published == True
-    ).order_by(
-        Post.created_at.desc()
-    ).limit(20).all()
+    posts = (
+        db.query(Post)
+        .options(joinedload(Post.author), selectinload(Post.comments))
+        .filter(Post.published == True)
+        .order_by(Post.created_at.desc())
+        .limit(20)
+        .all()
+    )
 
     result = []
     for post in posts:
-        author = UserPublic(id=post.author.id, username=post.author.username, email=post.author.email) if post.author else None
-        comments = [CommentResponse(**{c: getattr(cm, c) for c in CommentResponse.model_fields}) for cm in post.comments]
-        result.append(PostDetail(
-            **{c: getattr(post, c) for c in PostResponse.model_fields},
-            author=author,
-            comments=comments
-        ))
+        author = (
+            UserPublic(id=post.author.id, username=post.author.username, email=post.author.email)
+            if post.author
+            else None
+        )
+        comments = [
+            CommentResponse(**{c: getattr(cm, c) for c in CommentResponse.model_fields})
+            for cm in post.comments
+        ]
+        result.append(
+            PostDetail(
+                **{c: getattr(post, c) for c in PostResponse.model_fields},
+                author=author,
+                comments=comments,
+            )
+        )
     return result
 
 
@@ -424,17 +453,14 @@ async def get_stats(db: Session = Depends(get_db)):
 async def search_posts(q: str = Query(..., min_length=1), db: Session = Depends(get_db)):
     """Search posts by title/content using multiple terms."""
     terms = q.split()
-    conditions = [
-        or_(
-            Post.title.contains(term),
-            Post.content.contains(term)
-        )
-        for term in terms
-    ]
-    posts = db.query(Post).filter(
-        Post.published == True,
-        or_(*conditions)
-    ).order_by(Post.created_at.desc()).limit(20).all()
+    conditions = [or_(Post.title.contains(term), Post.content.contains(term)) for term in terms]
+    posts = (
+        db.query(Post)
+        .filter(Post.published == True, or_(*conditions))
+        .order_by(Post.created_at.desc())
+        .limit(20)
+        .all()
+    )
     return [PostResponse(**{c: getattr(p, c) for c in PostResponse.model_fields}) for p in posts]
 
 

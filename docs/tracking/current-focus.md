@@ -5,13 +5,13 @@
 > ⚠️ A staleness test in `tests/repo-structure/validate.ps1` fails the suite if this file is
 > more than 8 days old. It went five weeks stale under the previous plan.
 
-**Last updated:** 2026-08-02
+**Last updated:** 2026-09-19
 
 ---
 
 ## Active Window
 
-**Week 0** — 2026-08-03 → 2026-08-05 (2–3 days)
+**Week 0** — 2026-09-19 → 2026-09-21 (2–3 days)
 
 **Plan:** [Active Track — 10-Week AI Engineer](../roadmap/active-track-10-week.md)
 (adopted 2026-08-02 by [ADR-0004](../decisions/0004-adopt-10-week-ai-engineer-track.md))

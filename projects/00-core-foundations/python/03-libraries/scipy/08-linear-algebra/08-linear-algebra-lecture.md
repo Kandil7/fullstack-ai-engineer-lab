@@ -96,7 +96,7 @@ x = spsolve(A_sparse, b)
 print(f"Sparse solution (first 5): {x[:5]}")
 
 # Sparse eigenvalues
-eigenvalues_sparse = eigsh(A_sparse, k=3, which='SM')[0]
+eigenvalues_sparse = eigsh(A_sparse, k=3, which="SM")[0]
 print(f"Smallest 3 eigenvalues: {eigenvalues_sparse}")
 ```
 

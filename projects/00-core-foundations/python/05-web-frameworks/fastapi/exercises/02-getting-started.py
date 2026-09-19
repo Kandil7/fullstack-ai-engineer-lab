@@ -152,6 +152,7 @@ def status_server_error():
 #   - Use await request.json() for POST body
 # =============================================================================
 
+
 @app.api_route("/inspect", methods=["GET", "POST"])
 async def inspect_request(request: Request):
     """Inspect and return details about the incoming request."""

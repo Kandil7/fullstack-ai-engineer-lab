@@ -17,10 +17,9 @@ import ast
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Set
 
 # Directories that are never analyzed (mirrors DocumentLoader.exclude_patterns).
-DEFAULT_EXCLUDE_DIRS: Set[str] = {
+DEFAULT_EXCLUDE_DIRS: set[str] = {
     ".git",
     ".hg",
     ".svn",
@@ -39,7 +38,7 @@ DEFAULT_EXCLUDE_DIRS: Set[str] = {
 }
 
 # Extension -> language label for the file-types / languages tables.
-EXTENSION_LANGUAGES: Dict[str, str] = {
+EXTENSION_LANGUAGES: dict[str, str] = {
     ".py": "python",
     ".pyi": "python",
     ".js": "javascript",
@@ -94,7 +93,7 @@ class FileStats:
     functions: int = 0
     classes: int = 0
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return {
             "path": self.path,
             "language": self.language,
@@ -120,9 +119,9 @@ class RepoStats:
     total_classes: int = 0
     file_types: Counter = field(default_factory=Counter)
     languages: Counter = field(default_factory=Counter)
-    files: List[FileStats] = field(default_factory=list)
+    files: list[FileStats] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> dict[str, object]:
         return {
             "root": self.root,
             "total_files": self.total_files,
@@ -139,7 +138,7 @@ class RepoStats:
 class RepoAnalyzer:
     """Walk a repository and compute statistics."""
 
-    def __init__(self, exclude_dirs: Optional[Set[str]] = None):
+    def __init__(self, exclude_dirs: set[str] | None = None) -> None:
         self.exclude_dirs = exclude_dirs or set(DEFAULT_EXCLUDE_DIRS)
 
     # ------------------------------------------------------------------ public
@@ -170,7 +169,7 @@ class RepoAnalyzer:
 
         return stats
 
-    def analyze_file(self, path: Path) -> Optional[FileStats]:
+    def analyze_file(self, path: Path) -> FileStats | None:
         """Analyze a single file. Returns None for unsupported or unreadable files."""
         ext = path.suffix.lower()
         language = EXTENSION_LANGUAGES.get(ext)
@@ -234,7 +233,7 @@ class RepoAnalyzer:
         return functions, classes
 
     @staticmethod
-    def _count_lines_python(lines: List[str]) -> tuple[int, int, int]:
+    def _count_lines_python(lines: list[str]) -> tuple[int, int, int]:
         """Split lines into (code, blank, comment) for Python."""
         code = 0
         blank = 0
@@ -250,7 +249,7 @@ class RepoAnalyzer:
         return code, blank, comment
 
     @staticmethod
-    def _count_lines_generic(lines: List[str]) -> tuple[int, int, int]:
+    def _count_lines_generic(lines: list[str]) -> tuple[int, int, int]:
         """Split lines into (code, blank, comment) using # / // comment heuristics."""
         code = 0
         blank = 0
@@ -266,6 +265,6 @@ class RepoAnalyzer:
         return code, blank, comment
 
 
-def analyze_repository(root: Path, exclude_dirs: Optional[Set[str]] = None) -> RepoStats:
+def analyze_repository(root: Path, exclude_dirs: set[str] | None = None) -> RepoStats:
     """Convenience wrapper around :class:`RepoAnalyzer`."""
     return RepoAnalyzer(exclude_dirs=exclude_dirs).analyze(root)

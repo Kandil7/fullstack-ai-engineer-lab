@@ -72,15 +72,20 @@ within tolerance. The eval set is **frozen and never touched by training** —
 it is the referee both sides agree to.
 
 ```python
-def eval_gate(candidate: dict, champion: dict, key: str = "val_acc",
-              tol: float = 0.0) -> tuple[bool, str]:
+def eval_gate(
+    candidate: dict, champion: dict, key: str = "val_acc", tol: float = 0.0
+) -> tuple[bool, str]:
     """Candidate passes only if it beats the champion (within tolerance)."""
     c = candidate[key]
     ch = champion[key]
     passed = c >= ch - tol
-    reason = (f"PASS: candidate {c:.4f} >= champion {ch:.4f} - {tol}"
-              if passed else f"FAIL: candidate {c:.4f} < champion {ch:.4f}")
+    reason = (
+        f"PASS: candidate {c:.4f} >= champion {ch:.4f} - {tol}"
+        if passed
+        else f"FAIL: candidate {c:.4f} < champion {ch:.4f}"
+    )
     return passed, reason
+
 
 print(eval_gate({"val_acc": 0.921}, {"val_acc": 0.918}))
 print(eval_gate({"val_acc": 0.905}, {"val_acc": 0.918}))

@@ -22,7 +22,7 @@ print("Example 1: Non-linear Relationship")
 # Simulated data: growth that slows down
 np.random.seed(42)
 X = np.linspace(0, 10, 100).reshape(-1, 1)
-y = 0.5 * X.squeeze()**2 - 3 * X.squeeze() + 10 + np.random.randn(100) * 2
+y = 0.5 * X.squeeze() ** 2 - 3 * X.squeeze() + 10 + np.random.randn(100) * 2
 
 print("This data follows a quadratic pattern (parabola)")
 print("Simple linear regression won't fit well")
@@ -88,20 +88,15 @@ results = []
 for degree in degrees:
     poly = PolynomialFeatures(degree=degree, include_bias=False)
     X_poly = poly.fit_transform(X)
-    
+
     model = LinearRegression()
     model.fit(X_poly, y)
-    
+
     y_pred = model.predict(X_poly)
     r2 = r2_score(y, y_pred)
     rmse = np.sqrt(mean_squared_error(y, y_pred))
-    
-    results.append({
-        'degree': degree,
-        'r2': r2,
-        'rmse': rmse,
-        'n_features': X_poly.shape[1]
-    })
+
+    results.append({"degree": degree, "r2": r2, "rmse": rmse, "n_features": X_poly.shape[1]})
     print(f"Degree {degree}: R^2={r2:.4f}, RMSE={rmse:.4f}, Features={X_poly.shape[1]}")
 
 # ============================================================
@@ -133,9 +128,7 @@ print("Overfitting: Model memorizes noise instead of learning pattern")
 # information into model selection and inflates the reported score.
 # The untouched test set is used ONCE at the end to report final performance.
 print("\nExample 8: Proper Degree Selection")
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 best_degree = 1
 best_cv_r2 = -np.inf
@@ -146,11 +139,9 @@ for degree in range(1, 8):
     X_train_poly = poly.fit_transform(X_train)
 
     # 5-fold cross-validation R^2 on the training data
-    cv_r2 = cross_val_score(
-        LinearRegression(), X_train_poly, y_train, cv=5, scoring='r2'
-    ).mean()
+    cv_r2 = cross_val_score(LinearRegression(), X_train_poly, y_train, cv=5, scoring="r2").mean()
 
-    results_cv.append({'degree': degree, 'cv_r2': cv_r2})
+    results_cv.append({"degree": degree, "cv_r2": cv_r2})
 
     if cv_r2 > best_cv_r2:
         best_cv_r2 = cv_r2
@@ -209,11 +200,11 @@ print("3. Multicollinearity with high-degree terms")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Polynomial regression fits curved relationships")
 print("- Use PolynomialFeatures to create x^2, x³, etc.")
 print("- Choose degree based on test performance")
 print("- Higher degrees risk overfitting")
 print("- Always evaluate on test set")
-print("="*60)
+print("=" * 60)

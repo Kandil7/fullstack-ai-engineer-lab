@@ -35,11 +35,12 @@ import structlog
 # A JSON log line is a machine-readable record: timestamp, level,
 # event, plus any key=value context. Grep becomes a query.
 
+
 def configure_json_logging() -> structlog.stdlib.BoundLogger:
     """Configure structlog to emit JSON lines with timestamps."""
     structlog.configure(
         processors=[
-            structlog.contextvars.merge_contextvars,   # correlation id
+            structlog.contextvars.merge_contextvars,  # correlation id
             structlog.processors.add_log_level,
             structlog.processors.TimeStamper(fmt="iso"),
             structlog.processors.JSONRenderer(),
@@ -63,6 +64,7 @@ print()
 # once; every log line in that request (and its awaited children)
 # carries it automatically — no manual passing through call stacks.
 
+
 def bind_request_id(request_id: str | None = None) -> str:
     request_id = request_id or str(uuid.uuid4())[:12]
     structlog.contextvars.clear_contextvars()
@@ -74,7 +76,7 @@ def handle_request(path: str) -> None:
     """Simulates a request handler: binds the id, then logs + awaits."""
     rid = bind_request_id()
     logger.info("handler_start", path=path)
-    _call_inference(path)          # same context -> same request_id
+    _call_inference(path)  # same context -> same request_id
     logger.info("handler_done", path=path)
 
 
@@ -85,7 +87,7 @@ def _call_inference(path: str) -> None:
 
 print("=== 2. Correlation IDs ===")
 handle_request("/generate")
-handle_request("/embed")           # different request -> different id
+handle_request("/embed")  # different request -> different id
 print()
 
 # ============================================================
@@ -97,8 +99,8 @@ print()
 
 PII_KEYS = {"email", "password", "api_key", "token", "prompt", "phone"}
 
-def redact_pii(logger: structlog.stdlib.BoundLogger, method_name: str,
-               event_dict: dict) -> dict:
+
+def redact_pii(logger: structlog.stdlib.BoundLogger, method_name: str, event_dict: dict) -> dict:
     """Processor: replace any PII-keyed value with '[REDACTED]'."""
     for key in list(event_dict):
         lowered = key.lower()
@@ -133,6 +135,7 @@ print()
 # DEBUG lines are dropped before formatting (cheap), while a
 # per-key sampling rate controls the costly lines.
 
+
 def should_sample(rate: float, key: str) -> bool:
     """Deterministic sampling: ~rate fraction of keys pass."""
     return int(uuid.uuid5(uuid.NAMESPACE_URL, key).hex, 16) % 10000 < rate * 10000
@@ -162,6 +165,7 @@ print()
 #   is the cheapest debugging tool you own
 # CORRECT: logger.exception() inside except
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -170,6 +174,7 @@ def _verify() -> None:
 
     # 1. JSONRenderer produces parseable JSON
     import io
+
     buf = io.StringIO()
     h = logging.StreamHandler(buf)
     root = logging.getLogger()
@@ -179,15 +184,15 @@ def _verify() -> None:
     try:
         root.setLevel(logging.INFO)
         structlog.configure(
-            processors=[structlog.processors.add_log_level,
-                        structlog.processors.JSONRenderer()],
+            processors=[structlog.processors.add_log_level, structlog.processors.JSONRenderer()],
             wrapper_class=structlog.stdlib.BoundLogger,
         )
         structlog.get_logger().info("hello", answer=42)
         line = buf.getvalue().strip()
         obj = json.loads(line)
-        assert obj["event"] == "hello" and obj["answer"] == 42, \
+        assert obj["event"] == "hello" and obj["answer"] == 42, (
             "log line must be valid JSON with event + context"
+        )
         assert "timestamp" not in obj or True  # TimeStamper optional
     finally:
         root.level, root.handlers = old_level, old_handlers
@@ -201,6 +206,7 @@ def _verify() -> None:
     # 3. PII redaction processor
     redact_logger = configure_with_redaction()
     import io as _io
+
     buf = _io.StringIO()
     h = logging.StreamHandler(buf)
     root = logging.getLogger()
@@ -237,4 +243,4 @@ if __name__ == "__main__":
         print("2. Correlation IDs ride contextvars through async calls")
         print("3. PII redaction at the processor boundary")
         print("4. INFO in prod; sample the expensive events")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

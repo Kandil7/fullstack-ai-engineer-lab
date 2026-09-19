@@ -32,17 +32,21 @@ from typing import Dict, Any, Optional
 from dataclasses import dataclass
 from enum import Enum
 
+
 class LogLevel(Enum):
     """Security log levels."""
+
     DEBUG = "debug"
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
     CRITICAL = "critical"
 
+
 @dataclass
 class SecurityEvent:
     """Security event log entry."""
+
     timestamp: datetime
     event_type: str
     severity: LogLevel
@@ -51,6 +55,7 @@ class SecurityEvent:
     ip_address: Optional[str]
     details: Dict[str, Any]
     event_id: str
+
 
 class SecurityLogger:
     """Comprehensive security logging system."""
@@ -63,17 +68,17 @@ class SecurityLogger:
         # Console handler
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.INFO)
-        console_handler.setFormatter(logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        ))
+        console_handler.setFormatter(
+            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        )
         self.logger.addHandler(console_handler)
 
         # File handler
         file_handler = logging.FileHandler(f"security_{service_name}.log")
         file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        ))
+        file_handler.setFormatter(
+            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        )
         self.logger.addHandler(file_handler)
 
     def log_event(self, event: SecurityEvent):
@@ -100,8 +105,9 @@ class SecurityLogger:
         else:
             self.logger.info(json.dumps(log_entry))
 
-    def log_authentication(self, user_id: str, success: bool,
-                          ip_address: str, method: str):
+    def log_authentication(
+        self, user_id: str, success: bool, ip_address: str, method: str
+    ):
         """Log authentication attempt."""
         event = SecurityEvent(
             timestamp=datetime.utcnow(),
@@ -118,8 +124,9 @@ class SecurityLogger:
         )
         self.log_event(event)
 
-    def log_authorization(self, user_id: str, resource: str,
-                         action: str, allowed: bool):
+    def log_authorization(
+        self, user_id: str, resource: str, action: str, allowed: bool
+    ):
         """Log authorization decision."""
         event = SecurityEvent(
             timestamp=datetime.utcnow(),
@@ -137,8 +144,9 @@ class SecurityLogger:
         )
         self.log_event(event)
 
-    def log_data_access(self, user_id: str, data_type: str,
-                       access_type: str, record_count: int):
+    def log_data_access(
+        self, user_id: str, data_type: str, access_type: str, record_count: int
+    ):
         """Log data access."""
         event = SecurityEvent(
             timestamp=datetime.utcnow(),
@@ -156,9 +164,9 @@ class SecurityLogger:
         )
         self.log_event(event)
 
-    def log_security_violation(self, violation_type: str,
-                               details: Dict[str, Any],
-                               ip_address: str = None):
+    def log_security_violation(
+        self, violation_type: str, details: Dict[str, Any], ip_address: str = None
+    ):
         """Log a security violation."""
         event = SecurityEvent(
             timestamp=datetime.utcnow(),
@@ -175,14 +183,19 @@ class SecurityLogger:
         )
         self.log_event(event)
 
+
 # Usage
 logger = SecurityLogger("ai-api")
 logger.log_authentication("user123", True, "192.168.1.100", "password")
 logger.log_data_access("user123", "training_data", "read", 1000)
-logger.log_security_violation("prompt_injection", {
-    "user_id": "user456",
-    "input_preview": "Ignore all previous...",
-}, "10.0.0.50")
+logger.log_security_violation(
+    "prompt_injection",
+    {
+        "user_id": "user456",
+        "input_preview": "Ignore all previous...",
+    },
+    "10.0.0.50",
+)
 ```
 
 ### 2. Anomaly Detection
@@ -192,6 +205,7 @@ import numpy as np
 from typing import List, Dict
 from collections import defaultdict
 from datetime import datetime, timedelta
+
 
 class AnomalyDetector:
     """Detect anomalous behavior in AI systems."""
@@ -222,14 +236,16 @@ class AnomalyDetector:
         is_anomaly = z_score > 3  # 3 standard deviations
 
         if is_anomaly:
-            self.alerts.append({
-                "timestamp": datetime.utcnow().isoformat(),
-                "metric": metric_name,
-                "value": value,
-                "z_score": z_score,
-                "baseline_mean": baseline["mean"],
-                "baseline_std": baseline["std"],
-            })
+            self.alerts.append(
+                {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "metric": metric_name,
+                    "value": value,
+                    "z_score": z_score,
+                    "baseline_mean": baseline["mean"],
+                    "baseline_std": baseline["std"],
+                }
+            )
 
         return {
             "anomaly": is_anomaly,
@@ -237,19 +253,21 @@ class AnomalyDetector:
             "threshold": 3.0,
         }
 
+
 class RequestAnomalyDetector:
     """Detect anomalous API request patterns."""
 
     def __init__(self):
-        self.user_patterns: Dict[str, Dict] = defaultdict(lambda: {
-            "request_times": [],
-            "endpoints": defaultdict(int),
-            "error_count": 0,
-            "total_count": 0,
-        })
+        self.user_patterns: Dict[str, Dict] = defaultdict(
+            lambda: {
+                "request_times": [],
+                "endpoints": defaultdict(int),
+                "error_count": 0,
+                "total_count": 0,
+            }
+        )
 
-    def record_request(self, user_id: str, endpoint: str,
-                      status_code: int):
+    def record_request(self, user_id: str, endpoint: str, status_code: int):
         """Record a user request."""
         pattern = self.user_patterns[user_id]
         pattern["request_times"].append(datetime.utcnow())
@@ -258,8 +276,7 @@ class RequestAnomalyDetector:
         if status_code >= 400:
             pattern["error_count"] += 1
 
-    def detect_brute_force(self, user_id: str,
-                           time_window_minutes: int = 5) -> Dict:
+    def detect_brute_force(self, user_id: str, time_window_minutes: int = 5) -> Dict:
         """Detect brute force attack attempts."""
         pattern = self.user_patterns[user_id]
         now = datetime.utcnow()
@@ -278,15 +295,13 @@ class RequestAnomalyDetector:
             "threshold": 10,
         }
 
-    def detect_scraping(self, user_id: str,
-                        time_window_minutes: int = 1) -> Dict:
+    def detect_scraping(self, user_id: str, time_window_minutes: int = 1) -> Dict:
         """Detect scraping behavior."""
         pattern = self.user_patterns[user_id]
         now = datetime.utcnow()
         window_start = now - timedelta(minutes=time_window_minutes)
 
-        recent_requests = sum(1 for t in pattern["request_times"]
-                            if t > window_start)
+        recent_requests = sum(1 for t in pattern["request_times"] if t > window_start)
 
         # High request rate to many different endpoints
         unique_endpoints = len(pattern["endpoints"])
@@ -320,12 +335,15 @@ from typing import Callable, List, Dict
 from datetime import datetime
 from enum import Enum
 
+
 class AlertSeverity(Enum):
     """Alert severity levels."""
+
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
     CRITICAL = "critical"
+
 
 class AlertManager:
     """Manage security alerts."""
@@ -335,15 +353,22 @@ class AlertManager:
         self.alert_history: List[Dict] = []
         self.notification_channels: List[Callable] = []
 
-    def add_rule(self, name: str, condition: Callable,
-                 severity: AlertSeverity, message_template: str):
+    def add_rule(
+        self,
+        name: str,
+        condition: Callable,
+        severity: AlertSeverity,
+        message_template: str,
+    ):
         """Add an alert rule."""
-        self.alert_rules.append({
-            "name": name,
-            "condition": condition,
-            "severity": severity,
-            "message_template": message_template,
-        })
+        self.alert_rules.append(
+            {
+                "name": name,
+                "condition": condition,
+                "severity": severity,
+                "message_template": message_template,
+            }
+        )
 
     def add_notification_channel(self, channel: Callable):
         """Add a notification channel (email, slack, etc.)."""
@@ -377,10 +402,12 @@ class AlertManager:
     def get_alert_summary(self, hours: int = 24) -> Dict:
         """Get summary of alerts in time window."""
         from datetime import timedelta
+
         cutoff = datetime.utcnow() - timedelta(hours=hours)
 
         recent_alerts = [
-            a for a in self.alert_history
+            a
+            for a in self.alert_history
             if datetime.fromisoformat(a["timestamp"]) > cutoff
         ]
 
@@ -394,6 +421,7 @@ class AlertManager:
             "time_window_hours": hours,
         }
 
+
 # Usage
 alert_manager = AlertManager()
 
@@ -402,19 +430,21 @@ alert_manager.add_rule(
     name="high_error_rate",
     condition=lambda m: m.get("error_rate", 0) > 0.1,
     severity=AlertSeverity.WARNING,
-    message_template="High error rate: {error_rate:.2%}"
+    message_template="High error rate: {error_rate:.2%}",
 )
 
 alert_manager.add_rule(
     name="critical_security_violation",
     condition=lambda m: m.get("security_violations", 0) > 0,
     severity=AlertSeverity.CRITICAL,
-    message_template="Security violation detected: {violation_type}"
+    message_template="Security violation detected: {violation_type}",
 )
+
 
 # Add notification channels
 def log_alert(alert: Dict):
     print(f"ALERT [{alert['severity']}]: {alert['message']}")
+
 
 alert_manager.add_notification_channel(log_alert)
 
@@ -430,14 +460,17 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 from enum import Enum
 
+
 class IncidentStatus(Enum):
     """Incident status."""
+
     DETECTED = "detected"
     INVESTIGATING = "investigating"
     CONTAINED = "contained"
     ERADICATED = "eradicated"
     RECOVERED = "recovered"
     CLOSED = "closed"
+
 
 class SecurityIncident:
     """Security incident management."""
@@ -457,31 +490,36 @@ class SecurityIncident:
         """Update incident status."""
         self.status = new_status
         self.updated_at = datetime.utcnow()
-        self.timeline.append({
-            "timestamp": self.updated_at.isoformat(),
-            "event": "status_change",
-            "new_status": new_status.value,
-            "note": note,
-        })
+        self.timeline.append(
+            {
+                "timestamp": self.updated_at.isoformat(),
+                "event": "status_change",
+                "new_status": new_status.value,
+                "note": note,
+            }
+        )
 
-    def add_evidence(self, evidence_type: str, description: str,
-                    data: Dict):
+    def add_evidence(self, evidence_type: str, description: str, data: Dict):
         """Add evidence to incident."""
-        self.evidence.append({
-            "type": evidence_type,
-            "description": description,
-            "data": data,
-            "timestamp": datetime.utcnow().isoformat(),
-        })
+        self.evidence.append(
+            {
+                "type": evidence_type,
+                "description": description,
+                "data": data,
+                "timestamp": datetime.utcnow().isoformat(),
+            }
+        )
 
     def add_action(self, action: str, owner: str, result: str = ""):
         """Record an action taken."""
-        self.actions_taken.append({
-            "action": action,
-            "owner": owner,
-            "result": result,
-            "timestamp": datetime.utcnow().isoformat(),
-        })
+        self.actions_taken.append(
+            {
+                "action": action,
+                "owner": owner,
+                "result": result,
+                "timestamp": datetime.utcnow().isoformat(),
+            }
+        )
 
     def get_summary(self) -> Dict:
         """Get incident summary."""
@@ -495,8 +533,10 @@ class SecurityIncident:
             "timeline_entries": len(self.timeline),
             "evidence_count": len(self.evidence),
             "actions_count": len(self.actions_taken),
-            "duration_hours": (datetime.utcnow() - self.created_at).total_seconds() / 3600,
+            "duration_hours": (datetime.utcnow() - self.created_at).total_seconds()
+            / 3600,
         }
+
 
 class IncidentResponsePlan:
     """Incident response procedures."""
@@ -602,11 +642,12 @@ class IncidentResponsePlan:
             "sl_hours": 168,  # 1 week
         }
 
+
 # Usage
 incident = SecurityIncident(
     incident_id="INC-2024-001",
     title="Prompt Injection Attack Detected",
-    severity="high"
+    severity="high",
 )
 
 incident.update_status(IncidentStatus.INVESTIGATING, "Starting investigation")
@@ -621,6 +662,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List
 from collections import defaultdict
 
+
 class SecurityDashboard:
     """Security monitoring dashboard."""
 
@@ -628,13 +670,14 @@ class SecurityDashboard:
         self.metrics = defaultdict(list)
         self.incidents: List[Dict] = []
 
-    def record_metric(self, metric_name: str, value: float,
-                     timestamp: datetime = None):
+    def record_metric(self, metric_name: str, value: float, timestamp: datetime = None):
         """Record a security metric."""
-        self.metrics[metric_name].append({
-            "value": value,
-            "timestamp": timestamp or datetime.utcnow(),
-        })
+        self.metrics[metric_name].append(
+            {
+                "value": value,
+                "timestamp": timestamp or datetime.utcnow(),
+            }
+        )
 
     def get_dashboard_data(self, hours: int = 24) -> Dict:
         """Get dashboard data for time window."""
@@ -655,14 +698,12 @@ class SecurityDashboard:
         return {
             "total_requests": len(self.metrics.get("requests", [])),
             "total_errors": len(self.metrics.get("errors", [])),
-            "total_incidents": len([
-                i for i in self.incidents
-                if i["timestamp"] > cutoff
-            ]),
-            "active_incidents": len([
-                i for i in self.incidents
-                if i["status"] != "closed"
-            ]),
+            "total_incidents": len(
+                [i for i in self.incidents if i["timestamp"] > cutoff]
+            ),
+            "active_incidents": len(
+                [i for i in self.incidents if i["status"] != "closed"]
+            ),
         }
 
     def _get_metrics_summary(self, cutoff: datetime) -> Dict:
@@ -681,10 +722,7 @@ class SecurityDashboard:
 
     def _get_recent_incidents(self, cutoff: datetime) -> List[Dict]:
         """Get recent incidents."""
-        return [
-            i for i in self.incidents
-            if i["timestamp"] > cutoff
-        ][:10]
+        return [i for i in self.incidents if i["timestamp"] > cutoff][:10]
 
     def _get_recent_alerts(self, cutoff: datetime) -> List[Dict]:
         """Get recent alerts."""
@@ -700,7 +738,9 @@ class SecurityDashboard:
                 recent = [v["value"] for v in values if v["timestamp"] > cutoff]
                 if len(recent) >= 2:
                     trends[metric_name] = {
-                        "trend": "increasing" if recent[-1] > recent[0] else "decreasing",
+                        "trend": "increasing"
+                        if recent[-1] > recent[0]
+                        else "decreasing",
                         "change": recent[-1] - recent[0],
                     }
         return trends
@@ -771,14 +811,16 @@ class ThreatIntelligence:
         # Find suspicious patterns
         for ip, ip_events in by_ip.items():
             if len(ip_events) > 10:
-                correlations.append({
-                    "type": "high_activity_ip",
-                    "ip": ip,
-                    "event_count": len(ip_events),
-                    "time_span": (
-                        ip_events[-1]["timestamp"] - ip_events[0]["timestamp"]
-                    ).total_seconds(),
-                })
+                correlations.append(
+                    {
+                        "type": "high_activity_ip",
+                        "ip": ip,
+                        "event_count": len(ip_events),
+                        "time_span": (
+                            ip_events[-1]["timestamp"] - ip_events[0]["timestamp"]
+                        ).total_seconds(),
+                    }
+                )
 
         return correlations
 ```

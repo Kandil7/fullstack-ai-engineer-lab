@@ -43,8 +43,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 import numpy as np
 
-X, y = make_classification(n_samples=300, n_features=2, 
-                           n_redundant=0, random_state=42)
+X, y = make_classification(n_samples=300, n_features=2, n_redundant=0, random_state=42)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -106,18 +105,14 @@ from sklearn.pipeline import Pipeline
 from sklearn.datasets import make_classification
 import numpy as np
 
-X, y = make_classification(n_samples=300, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=300, n_features=10, n_informative=5, random_state=42)
 
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('knn', KNeighborsClassifier())
-])
+pipeline = Pipeline([("scaler", StandardScaler()), ("knn", KNeighborsClassifier())])
 
 print("Effect of K:")
 for k in range(1, 16):
     pipeline.set_params(knn__n_neighbors=k)
-    scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+    scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
     print(f"  K={k:2d}: {scores.mean():.4f}")
 ```
 
@@ -143,17 +138,15 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 from sklearn.datasets import make_classification
 
-X, y = make_classification(n_samples=300, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=300, n_features=10, n_informative=5, random_state=42)
 
-metrics = ['euclidean', 'manhattan', 'chebyshev', 'minkowski']
+metrics = ["euclidean", "manhattan", "chebyshev", "minkowski"]
 
 for metric in metrics:
-    pipeline = Pipeline([
-        ('scaler', StandardScaler()),
-        ('knn', KNeighborsClassifier(n_neighbors=5, metric=metric))
-    ])
-    scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+    pipeline = Pipeline(
+        [("scaler", StandardScaler()), ("knn", KNeighborsClassifier(n_neighbors=5, metric=metric))]
+    )
+    scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
     print(f"{metric:>12}: {scores.mean():.4f}")
 ```
 
@@ -214,7 +207,7 @@ dist_manual = np.sum(np.abs(x - y))
 print(f"Manual Manhattan distance: {dist_manual:.4f}")
 
 # Sklearn
-dist_sklearn = pairwise_distances([x], [y], metric='manhattan')[0, 0]
+dist_sklearn = pairwise_distances([x], [y], metric="manhattan")[0, 0]
 print(f"Sklearn Manhattan distance: {dist_sklearn:.4f}")
 ```
 
@@ -263,15 +256,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 from sklearn.datasets import make_classification
 
-X, y = make_classification(n_samples=300, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=300, n_features=10, n_informative=5, random_state=42)
 
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('knn', KNeighborsClassifier(n_neighbors=5, weights='uniform'))
-])
+pipeline = Pipeline(
+    [("scaler", StandardScaler()), ("knn", KNeighborsClassifier(n_neighbors=5, weights="uniform"))]
+)
 
-scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
 print(f"Uniform weights: {scores.mean():.4f}")
 ```
 
@@ -291,15 +282,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 from sklearn.datasets import make_classification
 
-X, y = make_classification(n_samples=300, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=300, n_features=10, n_informative=5, random_state=42)
 
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('knn', KNeighborsClassifier(n_neighbors=5, weights='distance'))
-])
+pipeline = Pipeline(
+    [("scaler", StandardScaler()), ("knn", KNeighborsClassifier(n_neighbors=5, weights="distance"))]
+)
 
-scores = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+scores = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
 print(f"Distance weights: {scores.mean():.4f}")
 ```
 
@@ -331,6 +320,7 @@ print(f"Majority vote prediction: {prediction}")
 
 # Manual calculation
 from collections import Counter
+
 counts = Counter(neighbor_labels)
 manual_prediction = counts.most_common(1)[0][0]
 print(f"Manual majority vote: {manual_prediction}")
@@ -362,7 +352,7 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-knn_reg = KNeighborsRegressor(n_neighbors=5, weights='distance')
+knn_reg = KNeighborsRegressor(n_neighbors=5, weights="distance")
 knn_reg.fit(X_train_scaled, y_train)
 
 y_pred = knn_reg.predict(X_test_scaled)
@@ -387,16 +377,17 @@ np.random.seed(42)
 # Generate random points in different dimensions
 for d in [2, 10, 50, 100]:
     X = np.random.randn(100, d)
-    
+
     # Calculate distances
     from sklearn.metrics import pairwise_distances
+
     distances = pairwise_distances(X)
-    
+
     # Get max and min distances (excluding diagonal)
     np.fill_diagonal(distances, np.inf)
     max_dist = distances.min(axis=1).max()
     min_dist = distances.min(axis=1).min()
-    
+
     ratio = max_dist / min_dist
     print(f"Dimensions={d:3d}: Max/Min distance ratio={ratio:.2f}")
 # As dimensions increase, ratio approaches 1
@@ -424,19 +415,15 @@ from sklearn.pipeline import Pipeline
 from sklearn.datasets import make_classification
 import numpy as np
 
-X, y = make_classification(n_samples=300, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=300, n_features=10, n_informative=5, random_state=42)
 
 # Without scaling
 knn_unscaled = KNeighborsClassifier(n_neighbors=5)
-scores_unscaled = cross_val_score(knn_unscaled, X, y, cv=5, scoring='accuracy')
+scores_unscaled = cross_val_score(knn_unscaled, X, y, cv=5, scoring="accuracy")
 
 # With scaling
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('knn', KNeighborsClassifier(n_neighbors=5))
-])
-scores_scaled = cross_val_score(pipeline, X, y, cv=5, scoring='accuracy')
+pipeline = Pipeline([("scaler", StandardScaler()), ("knn", KNeighborsClassifier(n_neighbors=5))])
+scores_scaled = cross_val_score(pipeline, X, y, cv=5, scoring="accuracy")
 
 print(f"Without scaling: {scores_unscaled.mean():.4f}")
 print(f"With scaling: {scores_scaled.mean():.4f}")
@@ -473,23 +460,22 @@ fig, axes = plt.subplots(1, 3, figsize=(15, 4))
 for ax, k in zip(axes, [1, 5, 20]):
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(X_scaled, y)
-    
+
     # Create mesh grid
     h = 0.1
     x_min, x_max = X_scaled[:, 0].min() - 1, X_scaled[:, 0].max() + 1
     y_min, y_max = X_scaled[:, 1].min() - 1, X_scaled[:, 1].max() + 1
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-                         np.arange(y_min, y_max, h))
-    
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+
     Z = knn.predict(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
-    
+
     ax.contourf(xx, yy, Z, alpha=0.4, cmap=plt.cm.RdYlBu)
-    ax.scatter(X_scaled[:, 0], X_scaled[:, 1], c=y, cmap=plt.cm.RdYlBu, edgecolors='black')
-    ax.set_title(f'K={k}')
+    ax.scatter(X_scaled[:, 0], X_scaled[:, 1], c=y, cmap=plt.cm.RdYlBu, edgecolors="black")
+    ax.set_title(f"K={k}")
 
 plt.tight_layout()
-plt.savefig('knn_decision_boundaries.png', dpi=100)
+plt.savefig("knn_decision_boundaries.png", dpi=100)
 plt.show()
 ```
 
@@ -518,12 +504,14 @@ plt.show()
 ```python
 # KNN Classification
 from sklearn.neighbors import KNeighborsClassifier
-knn = KNeighborsClassifier(n_neighbors=5, weights='distance', metric='euclidean')
+
+knn = KNeighborsClassifier(n_neighbors=5, weights="distance", metric="euclidean")
 knn.fit(X_train_scaled, y_train)
 y_pred = knn.predict(X_test_scaled)
 
 # KNN Regression
 from sklearn.neighbors import KNeighborsRegressor
+
 knn_reg = KNeighborsRegressor(n_neighbors=5)
 knn_reg.fit(X_train_scaled, y_train)
 
@@ -534,13 +522,15 @@ prediction = np.bincount(y_train[k_nearest]).argmax()
 
 # Feature Scaling (ESSENTIAL)
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # Pipeline
 from sklearn.pipeline import Pipeline
-pipe = Pipeline([('scaler', StandardScaler()), ('knn', KNeighborsClassifier())])
+
+pipe = Pipeline([("scaler", StandardScaler()), ("knn", KNeighborsClassifier())])
 ```
 
 ---

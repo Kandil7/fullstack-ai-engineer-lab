@@ -30,6 +30,7 @@
 **Example**:
 ```python
 from scipy.spatial.distance import cdist
+
 dists = cdist(Q, X, metric="euclidean")
 top = np.argsort(dists, axis=1)[:, :k]
 ```
@@ -63,6 +64,7 @@ brute force.
 **Example**:
 ```python
 from scipy.spatial import cKDTree
+
 tree = cKDTree(points)
 dist, idx = tree.query(queries, k=3)
 ```
@@ -79,7 +81,7 @@ Indexing it like a matrix silently yields wrong values.
 
 **Example**:
 ```python
-D = squareform(pdist(X))     # convert first
+D = squareform(pdist(X))  # convert first
 ```
 
 **Complexity**: O(n²) memory.
@@ -214,7 +216,7 @@ change meaning.
 
 **Example**:
 ```python
-cdist([a], [2 * a], "cosine")[0, 0]        # 0.0
+cdist([a], [2 * a], "cosine")[0, 0]  # 0.0
 ```
 
 **Complexity**: —.

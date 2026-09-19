@@ -30,7 +30,7 @@ import tracemalloc
 import weakref
 
 random.seed(42)
-os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
+os.environ.setdefault("MPLBACKEND", "Agg")  # never open a GUI window
 
 # ============================================================
 # 1. Reference Counting
@@ -38,6 +38,7 @@ os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
 # CPython frees an object the moment its refcount hits zero: deterministic,
 # immediate, no background thread. sys.getrefcount(x) returns the count
 # PLUS one for the temporary argument passed to getrefcount itself.
+
 
 class Token:
     """A tiny object we can watch die via a weakref callback."""
@@ -70,6 +71,7 @@ def demo_refcount() -> None:
 # can never free them. The generational collector (gc) finds unreachable
 # cycles in periodic passes. Complexity: gc runs O(1) amortized per
 # allocation, with full scans on demand.
+
 
 class Node:
     """A doubly-linked node: classic cycle material."""
@@ -110,6 +112,7 @@ def demo_cycle() -> None:
 # disable/enable. Most code should never touch it -- the defaults are
 # right -- but it is the diagnostic tool when memory grows suspiciously.
 
+
 def demo_gc_module() -> None:
     """Introspect the collector and the graph."""
     a, _ = build_cycle("probe")
@@ -131,6 +134,7 @@ def demo_gc_module() -> None:
 # A weakref dies with its target. WeakValueDictionary is the safe cache:
 # entries vanish automatically when the value is garbage. That is how you
 # cache embeddings without unbounded growth.
+
 
 def demo_weakref() -> None:
     """weakref.ref dies with the owner; WeakValueDictionary self-cleans."""
@@ -157,6 +161,7 @@ def demo_weakref() -> None:
 # relying on __del__ for anything you care about; prefer context
 # managers and atexit.
 
+
 class Fragile:
     """Demonstrates why __del__ should not hold important resources."""
 
@@ -177,8 +182,8 @@ def demo_del_pitfall() -> None:
 
     a = Fragile("cyc-a")
     b = Fragile("cyc-b")
-    a.other = b                    # type: ignore[attr-defined]
-    b.other = a                    # type: ignore[attr-defined]
+    a.other = b  # type: ignore[attr-defined]
+    b.other = a  # type: ignore[attr-defined]
     print(f"  cycle member closed BEFORE gc.collect(): {a.closed}")
     gc.collect()
     print(f"  cycle member closed AFTER gc.collect(): {a.closed}")
@@ -197,7 +202,7 @@ def demo_del_pitfall() -> None:
 # suspicious block and the growth is the leak's size. This is the first
 # tool to reach for when RSS climbs.
 
-_LEAK_HOLDER: list[list[int]] = []   # module-level cache that never clears
+_LEAK_HOLDER: list[list[int]] = []  # module-level cache that never clears
 
 
 def leaky_work() -> None:
@@ -212,7 +217,7 @@ def measure_growth(work: object, repeats: int) -> int:
     gc.collect()
     before = tracemalloc.take_snapshot()
     for _ in range(repeats):
-        work()                       # type: ignore[operator]
+        work()  # type: ignore[operator]
     gc.collect()
     after = tracemalloc.take_snapshot()
     growth = sum(s.size_diff for s in after.compare_to(before, "filename"))
@@ -234,6 +239,7 @@ def demo_tracemalloc() -> int:
 # so equality comparisons become pointer comparisons. Great for many
 # repeated identifiers (column names, prompt labels), terrible as a
 # general memory strategy -- interned strings are never freed.
+
 
 def demo_interning() -> None:
     """Small ints are singletons; sys.intern makes strings singletons.
@@ -266,6 +272,7 @@ def demo_interning() -> None:
 # sys.getsizeof(x) reports the container only -- never its contents.
 # A deep size must walk the object graph.
 
+
 def deep_size(obj: object, seen: set[int] | None = None) -> int:
     """Recursively total the size of an object and its contents."""
     if seen is None:
@@ -275,8 +282,7 @@ def deep_size(obj: object, seen: set[int] | None = None) -> int:
     seen.add(id(obj))
     size = sys.getsizeof(obj)
     if isinstance(obj, dict):
-        size += sum(deep_size(k, seen) + deep_size(v, seen)
-                    for k, v in obj.items())
+        size += sum(deep_size(k, seen) + deep_size(v, seen) for k, v in obj.items())
     elif isinstance(obj, (list, tuple, set, frozenset)):
         size += sum(deep_size(item, seen) for item in obj)
     return size
@@ -317,13 +323,11 @@ def _verify() -> None:
     # 1. A cycle survives `del` -- refcounting alone cannot collect it.
     a, ref = build_cycle("verify")
     del a
-    assert ref() is not None, \
-        "cycle must survive del: refcount cannot see cyclic references"
+    assert ref() is not None, "cycle must survive del: refcount cannot see cyclic references"
 
     # 2. gc.collect() finds the unreachable cycle.
     gc.collect()
-    assert ref() is None, \
-        "gc.collect() must collect an unreachable reference cycle"
+    assert ref() is None, "gc.collect() must collect an unreachable reference cycle"
 
     # 3. weakref dies with its owner (no cycle involved).
     obj = Token("v")
@@ -341,8 +345,7 @@ def _verify() -> None:
     assert len(d) == 1, "cache must hold the entry while the value lives"
     del strong
     gc.collect()
-    assert len(d) == 0, \
-        "WeakValueDictionary must drop entries whose values died"
+    assert len(d) == 0, "WeakValueDictionary must drop entries whose values died"
     temp = Token("temp")
     d[2] = temp
     del temp
@@ -351,23 +354,26 @@ def _verify() -> None:
 
     # 5. tracemalloc reports growth for a known leak.
     growth = measure_growth(leaky_work, 3)
-    assert growth > 50_000, \
+    assert growth > 50_000, (
         "tracemalloc must report retained growth for leaky_work (got %d)" % growth
+    )
 
     # 6. Interning: small ints are singletons, larger ones are not.
     a, b = 256, 256
     base = 256
-    c = base + 1                    # runtime-computed: NOT constant-folded
+    c = base + 1  # runtime-computed: NOT constant-folded
     d = base + 1
     assert a is b, "256 must be a singleton (interned small int)"
     assert c is not d, "257 must NOT be a singleton when runtime-computed"
-    assert sys.intern("xyz") is sys.intern("xyz"), \
+    assert sys.intern("xyz") is sys.intern("xyz"), (
         "sys.intern must canonicalize equal strings to one object"
+    )
 
     # 7. sys.getsizeof is shallow; deep_size sees the contents.
     data = {"chunks": [list(range(100)) for _ in range(5)], "meta": "x" * 1000}
-    assert deep_size(data) > sys.getsizeof(data), \
+    assert deep_size(data) > sys.getsizeof(data), (
         "deep size must exceed shallow size for nested containers"
+    )
 
     # 8. The gc module tracks container objects.
     probe, _ = build_cycle("probe")

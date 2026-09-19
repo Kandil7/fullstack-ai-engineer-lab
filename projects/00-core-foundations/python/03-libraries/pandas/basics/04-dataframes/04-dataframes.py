@@ -6,6 +6,7 @@ A DataFrame is a 2-dimensional labeled data structure with columns of
 potentially different types. Think of it as a spreadsheet, SQL table,
 or a dict of Series objects.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -108,11 +109,13 @@ print("=" * 60)
 
 # Create a bigger DataFrame
 np.random.seed(0)
-big_df = pd.DataFrame({
-    "id": range(1, 101),
-    "value": np.random.randn(100).round(2),
-    "category": np.random.choice(["A", "B", "C"], 100),
-})
+big_df = pd.DataFrame(
+    {
+        "id": range(1, 101),
+        "value": np.random.randn(100).round(2),
+        "category": np.random.choice(["A", "B", "C"], 100),
+    }
+)
 
 print(f"Shape: {big_df.shape}")
 print(f"Size: {big_df.size}")

@@ -27,19 +27,19 @@ plt.figure(figsize=(12, 5))
 
 # Contour lines
 plt.subplot(1, 2, 1)
-plt.contour(X, Y, Z, levels=20, cmap='viridis')
-plt.colorbar(label='Z value')
-plt.title('Contour Lines')
-plt.xlabel('X')
-plt.ylabel('Y')
+plt.contour(X, Y, Z, levels=20, cmap="viridis")
+plt.colorbar(label="Z value")
+plt.title("Contour Lines")
+plt.xlabel("X")
+plt.ylabel("Y")
 
 # Filled contour
 plt.subplot(1, 2, 2)
-plt.contourf(X, Y, Z, levels=20, cmap='viridis')
-plt.colorbar(label='Z value')
-plt.title('Filled Contour')
-plt.xlabel('X')
-plt.ylabel('Y')
+plt.contourf(X, Y, Z, levels=20, cmap="viridis")
+plt.colorbar(label="Z value")
+plt.title("Filled Contour")
+plt.xlabel("X")
+plt.ylabel("Y")
 
 plt.tight_layout()
 plt.show()
@@ -52,17 +52,22 @@ plt.show()
 ```python
 # Custom levels
 levels = np.linspace(0, 1, 10)
-CS = plt.contour(X, Y, Z, levels=levels, colors='black', linewidths=1)
-plt.clabel(CS, inline=True, fontsize=10, fmt='%.2f')
+CS = plt.contour(X, Y, Z, levels=levels, colors="black", linewidths=1)
+plt.clabel(CS, inline=True, fontsize=10, fmt="%.2f")
 
 # Combined contourf + contour
-plt.contourf(X, Y, Z, levels=20, cmap='RdYlBu_r')
-CS = plt.contour(X, Y, Z, levels=5, colors='black', linewidths=0.5)
+plt.contourf(X, Y, Z, levels=20, cmap="RdYlBu_r")
+CS = plt.contour(X, Y, Z, levels=5, colors="black", linewidths=0.5)
 plt.clabel(CS, inline=True, fontsize=10)
 
 # Custom colormap with discrete levels
-plt.contourf(X, Y, Z, levels=[0, 0.2, 0.4, 0.6, 0.8, 1.0],
-             colors=['#d73027', '#fc8d59', '#fee08b', '#d9ef8b', '#91cf60'])
+plt.contourf(
+    X,
+    Y,
+    Z,
+    levels=[0, 0.2, 0.4, 0.6, 0.8, 1.0],
+    colors=["#d73027", "#fc8d59", "#fee08b", "#d9ef8b", "#91cf60"],
+)
 ```
 
 ---

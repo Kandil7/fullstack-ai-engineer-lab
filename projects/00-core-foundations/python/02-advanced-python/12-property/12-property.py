@@ -13,6 +13,7 @@ import math
 # 1. Basic Property
 # =============================================================================
 
+
 class Circle:
     """Circle with property-controlled radius."""
 
@@ -39,7 +40,7 @@ class Circle:
     @property
     def area(self) -> float:
         """Computed property - area."""
-        return math.pi * self._radius ** 2
+        return math.pi * self._radius**2
 
     @property
     def circumference(self) -> float:
@@ -53,6 +54,7 @@ class Circle:
 # =============================================================================
 # 2. Property with Caching
 # =============================================================================
+
 
 class ExpensiveCalculation:
     """Demonstrate caching with property."""
@@ -93,6 +95,7 @@ class ExpensiveCalculation:
 # 3. Property with Validation
 # =============================================================================
 
+
 class Temperature:
     """Temperature with unit conversion and validation."""
 
@@ -112,11 +115,11 @@ class Temperature:
 
     @property
     def fahrenheit(self) -> float:
-        return self._celsius * 9/5 + 32
+        return self._celsius * 9 / 5 + 32
 
     @fahrenheit.setter
     def fahrenheit(self, value: float):
-        self.celsius = (value - 32) * 5/9
+        self.celsius = (value - 32) * 5 / 9
 
     @property
     def kelvin(self) -> float:
@@ -133,6 +136,7 @@ class Temperature:
 # =============================================================================
 # 4. Property with Read-Only
 # =============================================================================
+
 
 class BankAccount:
     """Bank account with read-only balance history."""
@@ -174,6 +178,7 @@ class BankAccount:
 # 5. Property Decorator Pattern
 # =============================================================================
 
+
 def cached_property(func):
     """Decorator to create a cached property."""
     attr_name = f"_cached_{func.__name__}"
@@ -212,6 +217,7 @@ class DataAnalyzer:
 # =============================================================================
 # 6. Property with Deletion
 # =============================================================================
+
 
 class CachedData:
     """Data with deletable cached properties."""

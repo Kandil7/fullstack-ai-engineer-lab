@@ -104,9 +104,9 @@ padding.
 
 ```python
 row = tokz("TEXT1: abatement; TEXT2: eliminating process")
-row["input_ids"][:8]     # [1, 54453, 435, ...]  integer ids
+row["input_ids"][:8]  # [1, 54453, 435, ...]  integer ids
 row["attention_mask"][:8]  # [1, 1, 1, ...]        1 = real token, 0 = pad
-tokz.vocab_size            # e.g. 128100 — size of the vocabulary
+tokz.vocab_size  # e.g. 128100 — size of the vocabulary
 ```
 
 Tokenization + numericalization together are the *only* preprocessing text needs
@@ -123,6 +123,7 @@ def make_input(df):
     # one string carries anchor, target, and context
     return "TEXT1: " + df.context + "; TEXT2: " + df.target + "; ANC1: " + df.anchor
 
+
 # label 'score' in {0.0, 0.25, 0.5, 0.75, 1.0} — predicted as a regression value
 ```
 
@@ -138,25 +139,40 @@ Hugging Face gives a clean, batteries-included loop:
 ```python
 from datasets import Dataset
 
-ds = Dataset.from_pandas(df)            # pandas -> HF Dataset
-def tok_func(x): return tokz(x["input"])
-tok_ds = ds.map(tok_func, batched=True) # tokenize the whole dataset lazily
+ds = Dataset.from_pandas(df)  # pandas -> HF Dataset
+
+
+def tok_func(x):
+    return tokz(x["input"])
+
+
+tok_ds = ds.map(tok_func, batched=True)  # tokenize the whole dataset lazily
 tok_ds = tok_ds.rename_columns({"score": "labels"})  # Trainer expects 'labels'
 ```
 
 Then model, arguments, and trainer:
 
 ```python
-from transformers import (AutoModelForSequenceClassification,
-                          TrainingArguments, Trainer)
+from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer
 
 model = AutoModelForSequenceClassification.from_pretrained(model_nm, num_labels=1)
-args  = TrainingArguments("out", learning_rate=8e-5, per_device_train_batch_size=64,
-                          num_train_epochs=4, evaluation_strategy="epoch",
-                          fp16=True, report_to="none")
-trainer = Trainer(model, args, train_dataset=dds["train"],
-                  eval_dataset=dds["test"], tokenizer=tokz,
-                  compute_metrics=corr_metric)
+args = TrainingArguments(
+    "out",
+    learning_rate=8e-5,
+    per_device_train_batch_size=64,
+    num_train_epochs=4,
+    evaluation_strategy="epoch",
+    fp16=True,
+    report_to="none",
+)
+trainer = Trainer(
+    model,
+    args,
+    train_dataset=dds["train"],
+    eval_dataset=dds["test"],
+    tokenizer=tokz,
+    compute_metrics=corr_metric,
+)
 trainer.train()
 ```
 
@@ -169,7 +185,12 @@ a model that looks great and is useless.
 
 ```python
 import numpy as np
-def corr(preds, labels): return np.corrcoef(preds.flatten(), labels)[0][1]
+
+
+def corr(preds, labels):
+    return np.corrcoef(preds.flatten(), labels)[0][1]
+
+
 def corr_metric(eval_pred):
     preds, labels = eval_pred
     return {"pearson": corr(preds, labels)}
@@ -233,23 +254,30 @@ error │\                              /  ← overfitting
 Fine-tune DeBERTa on U.S. Patent Phrase-to-Phrase Matching.
 Mirrors fast.ai lesson 4 (Hugging Face Transformers, not fastai.text).
 """
+
 import numpy as np
 import pandas as pd
 from datasets import Dataset
-from transformers import (AutoTokenizer, AutoModelForSequenceClassification,
-                          TrainingArguments, Trainer)
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+    TrainingArguments,
+    Trainer,
+)
 
 MODEL_NM = "microsoft/deberta-v3-small"
 
 # 1. Load and FRAME: fold anchor/target/context into one input string
 df = pd.read_csv("train.csv")
-df["input"] = ("TEXT1: " + df.context + "; TEXT2: "
-               + df.target + "; ANC1: " + df.anchor)
+df["input"] = "TEXT1: " + df.context + "; TEXT2: " + df.target + "; ANC1: " + df.anchor
 
 # 2. Tokenize + numericalize via the pretrained tokenizer
 tokz = AutoTokenizer.from_pretrained(MODEL_NM)
+
+
 def tok_func(x):
-    return tokz(x["input"])                     # -> input_ids + attention_mask
+    return tokz(x["input"])  # -> input_ids + attention_mask
+
 
 ds = Dataset.from_pandas(df).rename_column("score", "labels")
 tok_ds = ds.map(tok_func, batched=True)
@@ -258,28 +286,37 @@ tok_ds = ds.map(tok_func, batched=True)
 #    (grouped split — here shown simply; prefer GroupShuffleSplit in practice)
 dds = tok_ds.train_test_split(test_size=0.25, seed=42)
 
+
 # 4. Model = regression head (num_labels=1) on the pretrained backbone
 def corr(preds, labels):
     return {"pearson": np.corrcoef(preds.flatten(), labels)[0][1]}
+
+
 def compute_metrics(eval_pred):
     return corr(eval_pred.predictions, eval_pred.label_ids)
 
+
 args = TrainingArguments(
     output_dir="patent-out",
-    learning_rate=8e-5,          # small LR for fine-tuning
+    learning_rate=8e-5,  # small LR for fine-tuning
     per_device_train_batch_size=64,
     per_device_eval_batch_size=128,
-    num_train_epochs=4,          # few epochs — overfitting comes fast
+    num_train_epochs=4,  # few epochs — overfitting comes fast
     weight_decay=0.01,
     evaluation_strategy="epoch",
-    fp16=True,                   # mixed precision on GPU
+    fp16=True,  # mixed precision on GPU
     report_to="none",
 )
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_NM, num_labels=1)
-trainer = Trainer(model, args, train_dataset=dds["train"],
-                  eval_dataset=dds["test"], tokenizer=tokz,
-                  compute_metrics=compute_metrics)
-trainer.train()   # watch eval pearson each epoch — stop if it starts falling
+trainer = Trainer(
+    model,
+    args,
+    train_dataset=dds["train"],
+    eval_dataset=dds["test"],
+    tokenizer=tokz,
+    compute_metrics=compute_metrics,
+)
+trainer.train()  # watch eval pearson each epoch — stop if it starts falling
 ```
 
 ### Example 2: Inspecting Tokenization Before You Trust It
@@ -289,6 +326,7 @@ trainer.train()   # watch eval pearson each epoch — stop if it starts falling
 Always look at what the tokenizer does BEFORE training.
 Silent tokenization surprises are a common source of bad models.
 """
+
 from transformers import AutoTokenizer
 
 tokz = AutoTokenizer.from_pretrained("microsoft/deberta-v3-small")
@@ -298,7 +336,7 @@ enc = tokz(sample)
 
 print("tokens :", tokz.convert_ids_to_tokens(enc["input_ids"])[:12])
 print("ids    :", enc["input_ids"][:12])
-print("special:", tokz.all_special_tokens)   # ['[CLS]', '[SEP]', '[PAD]', ...]
+print("special:", tokz.all_special_tokens)  # ['[CLS]', '[SEP]', '[PAD]', ...]
 print("length :", len(enc["input_ids"]), "tokens")
 
 # Decode round-trips ids back to text — confirms nothing was mangled
@@ -312,6 +350,7 @@ print("decoded:", tokz.decode(enc["input_ids"]))
 Random splits leak grouped data. Keep every 'anchor' fully in one side so
 the validation score reflects unseen anchors — like the real test set.
 """
+
 import pandas as pd
 from sklearn.model_selection import GroupShuffleSplit
 
@@ -340,6 +379,7 @@ train, valid = train_test_split(df, test_size=0.25)
 
 # GOOD: keep each group (anchor) entirely on one side
 from sklearn.model_selection import GroupShuffleSplit
+
 gss = GroupShuffleSplit(test_size=0.25, random_state=42)
 tr, va = next(gss.split(df, groups=df.anchor))
 ```

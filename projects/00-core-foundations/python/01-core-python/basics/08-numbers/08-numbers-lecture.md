@@ -30,7 +30,7 @@ zero = 0
 large = 999_999_999_999_999_999  # Underscores for readability
 
 # Very large integers (no overflow!)
-huge = 10 ** 100  # Googol
+huge = 10**100  # Googol
 print(huge)
 ```
 
@@ -77,13 +77,13 @@ print(z1 + z2)  # (4+6j)
 a = 10
 b = 3
 
-print(a + b)   # Addition: 13
-print(a - b)   # Subtraction: 7
-print(a * b)   # Multiplication: 30
-print(a / b)   # Division: 3.3333...
+print(a + b)  # Addition: 13
+print(a - b)  # Subtraction: 7
+print(a * b)  # Multiplication: 30
+print(a / b)  # Division: 3.3333...
 print(a // b)  # Floor Division: 3
-print(a % b)   # Modulus: 1
-print(a ** b)  # Exponent: 1000
+print(a % b)  # Modulus: 1
+print(a**b)  # Exponent: 1000
 ```
 
 ### 3.5 Mathematical Functions
@@ -91,7 +91,7 @@ print(a ** b)  # Exponent: 1000
 **Built-in functions:**
 ```python
 x = -5
-print(abs(x))     # Absolute value: 5
+print(abs(x))  # Absolute value: 5
 print(round(3.14159, 2))  # Round to 2 decimals: 3.14
 print(min(1, 2, 3))  # Minimum: 1
 print(max(1, 2, 3))  # Maximum: 3
@@ -101,13 +101,13 @@ print(max(1, 2, 3))  # Maximum: 3
 ```python
 import math
 
-print(math.pi)        # 3.141592653589793
-print(math.e)         # 2.718281828459045
+print(math.pi)  # 3.141592653589793
+print(math.e)  # 2.718281828459045
 print(math.sqrt(16))  # Square root: 4.0
-print(math.pow(2, 3)) # Power: 8.0
-print(math.floor(3.7)) # Floor: 3
+print(math.pow(2, 3))  # Power: 8.0
+print(math.floor(3.7))  # Floor: 3
 print(math.ceil(3.2))  # Ceiling: 4
-print(math.log(100, 10)) # Log base 10: 2.0
+print(math.log(100, 10))  # Log base 10: 2.0
 ```
 
 ## 4. Code Examples
@@ -119,14 +119,15 @@ def calculator():
     """Simple calculator"""
     num1 = float(input("Enter first number: "))
     num2 = float(input("Enter second number: "))
-    
+
     print(f"Addition: {num1} + {num2} = {num1 + num2}")
     print(f"Subtraction: {num1} - {num2} = {num1 - num2}")
     print(f"Multiplication: {num1} * {num2} = {num1 * num2}")
     print(f"Division: {num1} / {num2} = {num1 / num2}")
     print(f"Floor Division: {num1} // {num2} = {num1 // num2}")
     print(f"Modulus: {num1} % {num2} = {num1 % num2}")
-    print(f"Exponent: {num1} ** {num2} = {num1 ** num2}")
+    print(f"Exponent: {num1} ** {num2} = {num1**num2}")
+
 
 calculator()
 ```
@@ -137,7 +138,7 @@ import math
 
 # Circle calculations
 radius = 5
-area = math.pi * radius ** 2
+area = math.pi * radius**2
 circumference = 2 * math.pi * radius
 
 print(f"Radius: {radius}")
@@ -162,7 +163,8 @@ print(round(0.1 + 0.2, 1) == 0.3)  # True
 
 # Solution 2: Use decimal module
 from decimal import Decimal
-print(Decimal('0.1') + Decimal('0.2') == Decimal('0.3'))  # True
+
+print(Decimal("0.1") + Decimal("0.2") == Decimal("0.3"))  # True
 ```
 
 ### Example 4: Number Formatting
@@ -196,6 +198,7 @@ print(0.1 + 0.2 == 0.3)  # False!
 
 # Right - use tolerance or Decimal
 import math
+
 print(math.isclose(0.1 + 0.2, 0.3))  # True
 ```
 
@@ -216,7 +219,8 @@ print(0.7 % 0.1)  # 0.09999999999999964 (precision issue)
 
 # Solution - use Decimal for precise calculations
 from decimal import Decimal
-print(Decimal('0.7') % Decimal('0.1'))  # 0.0
+
+print(Decimal("0.7") % Decimal("0.1"))  # 0.0
 ```
 
 ### Mistake 4: Missing Import
@@ -226,6 +230,7 @@ print(math.sqrt(16))  # NameError!
 
 # Right - import first
 import math
+
 print(math.sqrt(16))  # 4.0
 ```
 

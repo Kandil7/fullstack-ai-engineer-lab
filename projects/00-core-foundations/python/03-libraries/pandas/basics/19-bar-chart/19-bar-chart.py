@@ -5,9 +5,11 @@ W3Schools: https://www.w3schools.com/python/pandas_plotting_bar.asp
 Bar charts compare quantities across categories. They are one of the most
 common chart types for categorical data.
 """
+
 import pandas as pd
 import numpy as np
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
@@ -21,10 +23,12 @@ print("=" * 60)
 print("Example 1: Vertical Bar Chart")
 print("=" * 60)
 
-df = pd.DataFrame({
-    "Fruit": ["Apple", "Banana", "Cherry", "Date", "Elderberry"],
-    "Sales": [450, 320, 280, 150, 90],
-})
+df = pd.DataFrame(
+    {
+        "Fruit": ["Apple", "Banana", "Cherry", "Date", "Elderberry"],
+        "Sales": [450, 320, 280, 150, 90],
+    }
+)
 
 print("Fruit Sales:")
 print(df)
@@ -50,17 +54,19 @@ print("=" * 60)
 print("Example 2: Horizontal Bar Chart")
 print("=" * 60)
 
-df2 = pd.DataFrame({
-    "Language": ["Python", "JavaScript", "Java", "C++", "Go", "Rust"],
-    "GitHub_Repos": [1500000, 1800000, 900000, 400000, 250000, 150000],
-})
+df2 = pd.DataFrame(
+    {
+        "Language": ["Python", "JavaScript", "Java", "C++", "Go", "Rust"],
+        "GitHub_Repos": [1500000, 1800000, 900000, 400000, 250000, 150000],
+    }
+)
 
 fig, ax = plt.subplots(figsize=(8, 5))
 df2.plot.barh(x="Language", y="GitHub_Repos", ax=ax, color="coral", edgecolor="white")
 ax.set_title("GitHub Repositories by Language")
 ax.set_xlabel("Number of Repositories")
 ax.set_ylabel("")
-ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f"{x/1e6:.1f}M"))
+ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f"{x / 1e6:.1f}M"))
 ax.grid(True, alpha=0.3, axis="x")
 path2 = os.path.join(tempfile.gettempdir(), "pandas_ex19_bar2.png")
 fig.savefig(path2, dpi=100, bbox_inches="tight")
@@ -76,12 +82,15 @@ print("=" * 60)
 print("Example 3: Grouped Bar Chart")
 print("=" * 60)
 
-df3 = pd.DataFrame({
-    "Q1": [120, 90, 150, 80],
-    "Q2": [130, 110, 140, 95],
-    "Q3": [145, 100, 160, 110],
-    "Q4": [160, 125, 175, 130],
-}, index=["Product A", "Product B", "Product C", "Product D"])
+df3 = pd.DataFrame(
+    {
+        "Q1": [120, 90, 150, 80],
+        "Q2": [130, 110, 140, 95],
+        "Q3": [145, 100, 160, 110],
+        "Q4": [160, 125, 175, 130],
+    },
+    index=["Product A", "Product B", "Product C", "Product D"],
+)
 
 print("Quarterly Sales:")
 print(df3)
@@ -109,11 +118,14 @@ print("=" * 60)
 print("Example 4: Stacked Bar Chart")
 print("=" * 60)
 
-df4 = pd.DataFrame({
-    "Online": [60, 45, 70, 55],
-    "In-Store": [40, 55, 30, 45],
-    "Phone": [20, 15, 25, 20],
-}, index=["Jan", "Feb", "Mar", "Apr"])
+df4 = pd.DataFrame(
+    {
+        "Online": [60, 45, 70, 55],
+        "In-Store": [40, 55, 30, 45],
+        "Phone": [20, 15, 25, 20],
+    },
+    index=["Jan", "Feb", "Mar", "Apr"],
+)
 
 print("Sales by Channel:")
 print(df4)
@@ -141,13 +153,17 @@ print("=" * 60)
 print("Example 5: Bar Chart with Value Labels")
 print("=" * 60)
 
-df5 = pd.DataFrame({
-    "Country": ["USA", "China", "Japan", "Germany", "UK"],
-    "GDP_Trillion": [25.5, 18.3, 4.2, 4.1, 3.1],
-})
+df5 = pd.DataFrame(
+    {
+        "Country": ["USA", "China", "Japan", "Germany", "UK"],
+        "GDP_Trillion": [25.5, 18.3, 4.2, 4.1, 3.1],
+    }
+)
 
 fig, ax = plt.subplots(figsize=(8, 5))
-bars = df5.plot.bar(x="Country", y="GDP_Trillion", ax=ax, color="#2ecc71", edgecolor="white", legend=False)
+bars = df5.plot.bar(
+    x="Country", y="GDP_Trillion", ax=ax, color="#2ecc71", edgecolor="white", legend=False
+)
 ax.set_title("GDP by Country (2024)")
 ax.set_ylabel("GDP (Trillion USD)")
 ax.set_xlabel("")
@@ -161,7 +177,9 @@ for bar in ax.patches:
         xy=(bar.get_x() + bar.get_width() / 2, height),
         xytext=(0, 3),
         textcoords="offset points",
-        ha="center", va="bottom", fontsize=9,
+        ha="center",
+        va="bottom",
+        fontsize=9,
     )
 
 plt.xticks(rotation=0)

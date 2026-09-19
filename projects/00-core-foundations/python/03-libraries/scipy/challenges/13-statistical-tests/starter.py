@@ -17,7 +17,8 @@ def multiple_comparisons(pvals: np.ndarray, method: str) -> np.ndarray:
     raise NotImplementedError
 
 
-def ab_report(control: np.ndarray, treatment: np.ndarray,
-              paired: bool = False) -> tuple[float, float, str, str]:
+def ab_report(
+    control: np.ndarray, treatment: np.ndarray, paired: bool = False
+) -> tuple[float, float, str, str]:
     """Return (p, effect_size, test_name, decision)."""
     raise NotImplementedError

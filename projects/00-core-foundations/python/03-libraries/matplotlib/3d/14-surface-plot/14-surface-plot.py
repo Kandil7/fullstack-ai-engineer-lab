@@ -3,14 +3,17 @@ Matplotlib Surface Plots - W3Schools Exercises
 ================================================
 3D surface rendering with shading and colormaps.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -87,7 +90,7 @@ def exercise_04():
     x = np.linspace(-3, 3, 50)
     y = np.linspace(-3, 3, 50)
     X, Y = np.meshgrid(x, y)
-    Z = X**2 * np.exp(-X**2 - Y**2) * 3
+    Z = X**2 * np.exp(-(X**2) - Y**2) * 3
 
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(111, projection="3d")

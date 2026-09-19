@@ -37,10 +37,11 @@
 **Example**:
 ```python
 from pathlib import Path
+
 p = Path("data") / "train.csv"
-print(p.exists())      # True/False — syscall
-print(p.read_text())   # File content — syscall
-p.write_text("new")    # Syscall
+print(p.exists())  # True/False — syscall
+print(p.read_text())  # File content — syscall
+p.write_text("new")  # Syscall
 ```
 
 **Complexity**: Construction O(1), I/O methods O(file size)
@@ -53,6 +54,7 @@ p.write_text("new")    # Syscall
 **Example**:
 ```python
 from pathlib import PurePath
+
 p = PurePath("a") / "b" / "c"  # No syscall
 print(p.name)  # "c" — pure computation
 ```
@@ -215,9 +217,9 @@ if p.exists() and p.is_file():
 **Example**:
 ```python
 st = Path("model.pt").stat()
-print(st.st_size)      # File size in bytes
-print(st.st_mtime)     # Modification timestamp (float)
-print(st.st_mode)      # Permissions
+print(st.st_size)  # File size in bytes
+print(st.st_mtime)  # Modification timestamp (float)
+print(st.st_mode)  # Permissions
 ```
 
 **Complexity**: O(1) syscall
@@ -229,8 +231,8 @@ print(st.st_mode)      # Permissions
 
 **Example**:
 ```python
-Path("model_final.pt").stem      # "model_final"
-Path("archive.tar.gz").stem      # "archive.tar" (only last suffix removed)
+Path("model_final.pt").stem  # "model_final"
+Path("archive.tar.gz").stem  # "archive.tar" (only last suffix removed)
 ```
 
 **Complexity**: O(1)
@@ -242,9 +244,9 @@ Path("archive.tar.gz").stem      # "archive.tar" (only last suffix removed)
 
 **Example**:
 ```python
-Path("model.pt").suffix      # ".pt"
-Path("data.csv").suffix      # ".csv"
-Path("README").suffix        # "" (empty)
+Path("model.pt").suffix  # ".pt"
+Path("data.csv").suffix  # ".csv"
+Path("README").suffix  # "" (empty)
 ```
 
 **Complexity**: O(1)
@@ -256,8 +258,8 @@ Path("README").suffix        # "" (empty)
 
 **Example**:
 ```python
-Path("model.pt").suffixes       # [".pt"]
-Path("archive.tar.gz").suffixes # [".tar", ".gz"]
+Path("model.pt").suffixes  # [".pt"]
+Path("archive.tar.gz").suffixes  # [".tar", ".gz"]
 ```
 
 **Complexity**: O(1)
@@ -270,7 +272,7 @@ Path("archive.tar.gz").suffixes # [".tar", ".gz"]
 **Example**:
 ```python
 Path("/home/user/file.txt").parent  # Path("/home/user")
-Path("file.txt").parent             # Path(".")
+Path("file.txt").parent  # Path(".")
 ```
 
 **Complexity**: O(1)
@@ -295,8 +297,8 @@ list(p.parents)  # [/home/user/project, /home/user, /home, /]
 
 **Example**:
 ```python
-Path("/home/user/file.txt").name   # "file.txt"
-Path("/home/user/").name           # "user"
+Path("/home/user/file.txt").name  # "file.txt"
+Path("/home/user/").name  # "user"
 ```
 
 **Complexity**: O(1)
@@ -308,9 +310,9 @@ Path("/home/user/").name           # "user"
 
 **Example**:
 ```python
-Path("a/b/c").parts           # ("a", "b", "c")
-Path("/a/b/c").parts          # ("/", "a", "b", "c")
-Path("a//b/./c").parts        # ("a", "b", "c") — normalized
+Path("a/b/c").parts  # ("a", "b", "c")
+Path("/a/b/c").parts  # ("/", "a", "b", "c")
+Path("a//b/./c").parts  # ("a", "b", "c") — normalized
 ```
 
 **Complexity**: O(k) where k = components

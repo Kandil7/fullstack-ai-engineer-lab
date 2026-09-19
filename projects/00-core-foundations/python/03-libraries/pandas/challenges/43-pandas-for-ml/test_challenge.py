@@ -16,9 +16,7 @@ import os
 from pathlib import Path
 
 TARGET = "solution" if os.environ.get("CHALLENGE_USE_SOLUTION") == "1" else "starter"
-_spec = importlib.util.spec_from_file_location(
-    TARGET, Path(__file__).parent / f"{TARGET}.py"
-)
+_spec = importlib.util.spec_from_file_location(TARGET, Path(__file__).parent / f"{TARGET}.py")
 mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(mod)
 
@@ -70,11 +68,11 @@ class TestFitScaleTrainTest:
     def test_known_values(self) -> None:
         X_train = pd.DataFrame({"x": [0.0, 2.0]})
         X_test = pd.DataFrame({"x": [0.0, 10.0]})
-        tr_s, te_s, fitted = mod.fit_scale_train_test(
-            X_train, X_test, StandardScaler())
+        tr_s, te_s, fitted = mod.fit_scale_train_test(X_train, X_test, StandardScaler())
         # train mean 1, std 1 -> test 0 -> -1.0, test 10 -> 9.0
-        assert np.allclose(te_s["x"].tolist(), [-1.0, 9.0]), \
+        assert np.allclose(te_s["x"].tolist(), [-1.0, 9.0]), (
             "test must be scaled by TRAIN mean/std, not pooled"
+        )
 
     def test_returns_fitted_scaler(self) -> None:
         X_train = pd.DataFrame({"x": [0.0, 2.0]})
@@ -93,8 +91,7 @@ class TestFitScaleTrainTest:
     def test_multi_column(self) -> None:
         X_train = pd.DataFrame({"a": [0.0, 2.0], "b": [10.0, 20.0]})
         X_test = pd.DataFrame({"a": [0.0, 10.0], "b": [15.0, 30.0]})
-        tr_s, te_s, _ = mod.fit_scale_train_test(
-            X_train, X_test, StandardScaler())
+        tr_s, te_s, _ = mod.fit_scale_train_test(X_train, X_test, StandardScaler())
         assert te_s.shape == (2, 2)
         assert np.allclose(te_s["a"].tolist(), [-1.0, 9.0])
 
@@ -111,8 +108,7 @@ class TestPipelines:
     """Gold: no-leak beats leaky on unseen-data rmse."""
 
     @staticmethod
-    def _linear_df(n: int = 100, noise: float = 1.0,
-                   slope: float = 2.0) -> pd.DataFrame:
+    def _linear_df(n: int = 100, noise: float = 1.0, slope: float = 2.0) -> pd.DataFrame:
         rng = np.random.RandomState(7)
         x = np.linspace(0, 10, n)
         y = slope * x + rng.normal(0, noise, n)
@@ -120,33 +116,27 @@ class TestPipelines:
 
     def test_no_leak_beats_leaky(self) -> None:
         df = self._linear_df(100, noise=1.0)
-        _, rmse_clean, _ = mod.evaluate_no_leak_pipeline(
-            df, "y", 0.6, StandardScaler())
-        _, rmse_leaky, _ = mod.evaluate_leaky_pipeline(
-            df, "y", 0.6, StandardScaler())
-        assert rmse_clean < rmse_leaky, \
+        _, rmse_clean, _ = mod.evaluate_no_leak_pipeline(df, "y", 0.6, StandardScaler())
+        _, rmse_leaky, _ = mod.evaluate_leaky_pipeline(df, "y", 0.6, StandardScaler())
+        assert rmse_clean < rmse_leaky, (
             f"no-leak {rmse_clean:.4f} should beat leaky {rmse_leaky:.4f}"
+        )
 
     def test_perfect_linear_near_zero_rmse(self) -> None:
         df = self._linear_df(100, noise=0.0, slope=3.0)
-        _, rmse, _ = mod.evaluate_no_leak_pipeline(
-            df, "y", 0.6, StandardScaler(), alpha=1e-12)
+        _, rmse, _ = mod.evaluate_no_leak_pipeline(df, "y", 0.6, StandardScaler(), alpha=1e-12)
         assert rmse < 1e-9
 
     def test_constant_target_finite(self) -> None:
         rng = np.random.RandomState(1)
-        df = pd.DataFrame({"x": rng.uniform(0, 1, 50),
-                           "y": np.full(50, 42.0)})
-        _, rmse_clean, _ = mod.evaluate_no_leak_pipeline(
-            df, "y", 0.6, StandardScaler())
-        _, rmse_leaky, _ = mod.evaluate_leaky_pipeline(
-            df, "y", 0.6, StandardScaler())
+        df = pd.DataFrame({"x": rng.uniform(0, 1, 50), "y": np.full(50, 42.0)})
+        _, rmse_clean, _ = mod.evaluate_no_leak_pipeline(df, "y", 0.6, StandardScaler())
+        _, rmse_leaky, _ = mod.evaluate_leaky_pipeline(df, "y", 0.6, StandardScaler())
         assert np.isfinite(rmse_clean) and np.isfinite(rmse_leaky)
 
     def test_scaled_test_contains_prediction_column(self) -> None:
         df = self._linear_df(100, noise=0.5)
-        _, _, scaled_test = mod.evaluate_no_leak_pipeline(
-            df, "y", 0.6, StandardScaler())
+        _, _, scaled_test = mod.evaluate_no_leak_pipeline(df, "y", 0.6, StandardScaler())
         assert "prediction" in scaled_test.columns
         assert "y" in scaled_test.columns
         assert len(scaled_test) == 40
@@ -158,8 +148,9 @@ class TestPipelines:
         df = self._linear_df(100, noise=0.0)
         _, _, clean = mod.evaluate_no_leak_pipeline(df, "y", 0.5, StandardScaler())
         _, _, leaky = mod.evaluate_leaky_pipeline(df, "y", 0.5, StandardScaler())
-        assert not np.allclose(clean["x"].to_numpy(), leaky["x"].to_numpy()), \
+        assert not np.allclose(clean["x"].to_numpy(), leaky["x"].to_numpy()), (
             "pooled scaling must shift the test features"
+        )
 
     def test_rmse_returns_float(self) -> None:
         df = self._linear_df(50, noise=0.5)

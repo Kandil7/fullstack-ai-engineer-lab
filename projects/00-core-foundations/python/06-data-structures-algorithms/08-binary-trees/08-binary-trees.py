@@ -21,8 +21,10 @@ from collections import deque
 # 1. BINARY TREE IMPLEMENTATION
 # =============================================================================
 
+
 class TreeNode:
     """A node in a binary tree"""
+
     def __init__(self, data):
         self.data = data
         self.left = None
@@ -162,6 +164,7 @@ class BinaryTree:
 
     def is_balanced(self, node):
         """Check if tree is balanced. O(n)"""
+
         def check_height(n):
             if not n:
                 return 0
@@ -172,6 +175,7 @@ class BinaryTree:
             if abs(left - right) > 1:
                 return -1
             return 1 + max(left, right)
+
         return check_height(node) != -1
 
     def is_complete(self, root):
@@ -201,8 +205,9 @@ class BinaryTree:
             return depth == level
         if not root.left or not root.right:
             return False
-        return (self.is_perfect(root.left, depth, level + 1) and
-                self.is_perfect(root.right, depth, level + 1))
+        return self.is_perfect(root.left, depth, level + 1) and self.is_perfect(
+            root.right, depth, level + 1
+        )
 
     # ---- DISPLAY ----
 
@@ -253,6 +258,7 @@ print(f"Perfect:   {tree.is_perfect(tree.root)}")
 # 2. BUILD TREE FROM TRAVERSALS
 # =============================================================================
 
+
 def build_from_pre_in(preorder, inorder):
     """Build tree from preorder and inorder traversals. O(n)"""
     if not preorder or not inorder:
@@ -261,10 +267,11 @@ def build_from_pre_in(preorder, inorder):
     root = TreeNode(preorder[0])
     mid = inorder.index(preorder[0])
 
-    root.left = build_from_pre_in(preorder[1:mid + 1], inorder[:mid])
-    root.right = build_from_pre_in(preorder[mid + 1:], inorder[mid + 1:])
+    root.left = build_from_pre_in(preorder[1 : mid + 1], inorder[:mid])
+    root.right = build_from_pre_in(preorder[mid + 1 :], inorder[mid + 1 :])
 
     return root
+
 
 def build_from_post_in(postorder, inorder):
     """Build tree from postorder and inorder traversals. O(n)"""
@@ -275,9 +282,10 @@ def build_from_post_in(postorder, inorder):
     mid = inorder.index(postorder[-1])
 
     root.left = build_from_post_in(postorder[:mid], inorder[:mid])
-    root.right = build_from_post_in(postorder[mid:-1], inorder[mid + 1:])
+    root.right = build_from_post_in(postorder[mid:-1], inorder[mid + 1 :])
 
     return root
+
 
 print("\n=== Build Tree from Traversals ===")
 preorder = [1, 2, 4, 5, 3, 6, 7]
@@ -292,6 +300,7 @@ print(f"  Inorder: {tree2.inorder(tree2.root)}")
 # =============================================================================
 # 3. MORRIS TRAVERSAL (O(1) space)
 # =============================================================================
+
 
 def morris_inorder(root):
     """Inorder traversal using Morris method. O(n) time, O(1) space"""
@@ -317,6 +326,7 @@ def morris_inorder(root):
 
     return result
 
+
 print("\n=== Morris Traversal ===")
 print(f"Morris inorder: {morris_inorder(tree.root)}")
 
@@ -324,6 +334,7 @@ print(f"Morris inorder: {morris_inorder(tree.root)}")
 # =============================================================================
 # 4. ZIGZAG TRAVERSAL
 # =============================================================================
+
 
 def zigzag_traversal(root):
     """Zigzag level order traversal. O(n)"""
@@ -355,6 +366,7 @@ def zigzag_traversal(root):
 
     return result
 
+
 print("\n=== Zigzag Traversal ===")
 print(f"Zigzag: {zigzag_traversal(tree.root)}")
 
@@ -362,6 +374,7 @@ print(f"Zigzag: {zigzag_traversal(tree.root)}")
 # =============================================================================
 # 5. BOUNDARY TRAVERSAL
 # =============================================================================
+
 
 def boundary_traversal(root):
     """Boundary traversal: left boundary + leaves + right boundary. O(n)"""
@@ -404,6 +417,7 @@ def boundary_traversal(root):
 
     return result
 
+
 print("\n=== Boundary Traversal ===")
 print(f"Boundary: {boundary_traversal(tree.root)}")
 
@@ -411,6 +425,7 @@ print(f"Boundary: {boundary_traversal(tree.root)}")
 # =============================================================================
 # 6. DIAMETER OF TREE
 # =============================================================================
+
 
 def diameter(root):
     """Diameter: longest path between any two nodes. O(n)"""
@@ -427,6 +442,7 @@ def diameter(root):
     height(root)
     return max_diameter[0]
 
+
 print("\n=== Diameter ===")
 print(f"Diameter: {diameter(tree.root)}")
 
@@ -434,6 +450,7 @@ print(f"Diameter: {diameter(tree.root)}")
 # =============================================================================
 # 7. VERTICAL ORDER TRAVERSAL
 # =============================================================================
+
 
 def vertical_order(root):
     """Vertical order traversal. O(n log n)"""
@@ -460,6 +477,7 @@ def vertical_order(root):
 
     return [column_table[col] for col in range(min_col, max_col + 1)]
 
+
 print("\n=== Vertical Order ===")
 print(f"Vertical: {vertical_order(tree.root)}")
 
@@ -467,6 +485,7 @@ print(f"Vertical: {vertical_order(tree.root)}")
 # =============================================================================
 # 8. TOP VIEW AND BOTTOM VIEW
 # =============================================================================
+
 
 def top_view(root):
     """Top view of tree. O(n)"""
@@ -488,6 +507,7 @@ def top_view(root):
 
     return [column_table[k] for k in sorted(column_table.keys())]
 
+
 def bottom_view(root):
     """Bottom view of tree. O(n)"""
     if not root:
@@ -507,6 +527,7 @@ def bottom_view(root):
 
     return [column_table[k] for k in sorted(column_table.keys())]
 
+
 print("\n=== Top and Bottom View ===")
 print(f"Top view:    {top_view(tree.root)}")
 print(f"Bottom view: {bottom_view(tree.root)}")
@@ -515,6 +536,7 @@ print(f"Bottom view: {bottom_view(tree.root)}")
 # =============================================================================
 # 9. RIGHT/LEFT VIEW
 # =============================================================================
+
 
 def right_view(root):
     """Right side view of tree. O(n)"""
@@ -537,6 +559,7 @@ def right_view(root):
 
     return result
 
+
 def left_view(root):
     """Left side view of tree. O(n)"""
     if not root:
@@ -558,6 +581,7 @@ def left_view(root):
 
     return result
 
+
 print("\n=== Right and Left View ===")
 print(f"Right view: {right_view(tree.root)}")
 print(f"Left view:  {left_view(tree.root)}")
@@ -567,14 +591,17 @@ print(f"Left view:  {left_view(tree.root)}")
 # 10. TREE PATH SUM
 # =============================================================================
 
+
 def has_path_sum(root, target_sum):
     """Check if any root-to-leaf path sums to target. O(n)"""
     if not root:
         return False
     if not root.left and not root.right:
         return root.data == target_sum
-    return (has_path_sum(root.left, target_sum - root.data) or
-            has_path_sum(root.right, target_sum - root.data))
+    return has_path_sum(root.left, target_sum - root.data) or has_path_sum(
+        root.right, target_sum - root.data
+    )
+
 
 def all_path_sums(root, target_sum, path=None, result=None):
     """Find all root-to-leaf paths with given sum. O(n^2)"""
@@ -596,6 +623,7 @@ def all_path_sums(root, target_sum, path=None, result=None):
     path.pop()
 
     return result
+
 
 print("\n=== Path Sum ===")
 print(f"Has path sum 18: {has_path_sum(tree.root, 18)}")

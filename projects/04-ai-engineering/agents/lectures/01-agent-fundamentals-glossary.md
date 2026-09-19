@@ -44,7 +44,7 @@
 action = {
     "name": "search_web",
     "input": "best practices for Python agents",
-    "description": "Search the web for information"
+    "description": "Search the web for information",
 }
 
 # Execution of an action
@@ -63,10 +63,10 @@ result = execute_action(action)
 ```python
 class Agent:
     def __init__(self, llm, tools, memory):
-        self.llm = llm           # The reasoning engine
-        self.tools = tools       # Available actions
-        self.memory = memory     # Past experiences
-    
+        self.llm = llm  # The reasoning engine
+        self.tools = tools  # Available actions
+        self.memory = memory  # Past experiences
+
     def run(self, goal):
         while not self.is_done():
             observation = self.perceive()
@@ -133,24 +133,25 @@ def agent_loop(agent, goal, max_iterations=10):
 class AutonomyLevel:
     # Level 0: No autonomy — human does everything
     MANUAL = 0
-    
+
     # Level 1: Agent suggests, human decides
     SUGGESTIONS = 1
-    
+
     # Level 2: Agent acts, human can override
     SUPERVISED = 2
-    
+
     # Level 3: Agent acts, human reviews after
     AUTONOMOUS_WITH_REVIEW = 3
-    
+
     # Level 4: Full autonomy, no human needed
     FULL = 4
+
 
 # Example: Agent with approval requirement
 class SupervisedAgent:
     def __init__(self, require_approval_for=None):
         self.require_approval = require_approval_for or []
-    
+
     def execute_action(self, action):
         if action.name in self.require_approval:
             if not human_approve(action):
@@ -173,12 +174,13 @@ class SupervisedAgent:
 # The "brain" of our agent
 brain = ChatOpenAI(model="gpt-4")
 
+
 def think(brain, context):
     """Use the brain to reason about what to do."""
     prompt = f"""
     You are an AI agent. Current context:
     {context}
-    
+
     What should you do next? Respond with:
     Thought: <your reasoning>
     Action: <action name>
@@ -200,25 +202,24 @@ def think(brain, context):
 ```python
 class AgentContext:
     def __init__(self):
-        self.system_prompt = ""      # Permanent instructions
-        self.conversation = []       # Chat history
-        self.tool_results = []       # Outputs from tools
-        self.memory = []             # Long-term memory
-        self.environment = {}        # External state
-    
+        self.system_prompt = ""  # Permanent instructions
+        self.conversation = []  # Chat history
+        self.tool_results = []  # Outputs from tools
+        self.memory = []  # Long-term memory
+        self.environment = {}  # External state
+
     def to_messages(self):
         """Convert context to LLM messages format."""
         messages = [{"role": "system", "content": self.system_prompt}]
         messages.extend(self.conversation)
         return messages
-    
+
     def add_observation(self, observation):
         """Add new information to context."""
         self.tool_results.append(observation)
-        self.conversation.append({
-            "role": "user",
-            "content": f"Observation: {observation}"
-        })
+        self.conversation.append(
+            {"role": "user", "content": f"Observation: {observation}"}
+        )
 ```
 
 **Related terms:** Context Window, Memory, Prompt
@@ -234,15 +235,15 @@ class AgentContext:
 def manage_context(messages, max_tokens=4000):
     """
     Ensure messages fit within the context window.
-    
+
     Strategy: Keep system prompt + most recent messages.
     """
     # Always keep system prompt
     system_msg = messages[0]
-    
+
     # Calculate remaining tokens for history
     remaining_tokens = max_tokens - count_tokens(system_msg["content"])
-    
+
     # Add messages from most recent, skipping oldest
     history = []
     for msg in reversed(messages[1:]):
@@ -252,8 +253,9 @@ def manage_context(messages, max_tokens=4000):
             remaining_tokens -= msg_tokens
         else:
             break
-    
+
     return [system_msg] + history
+
 
 def count_tokens(text):
     """Estimate token count."""
@@ -280,9 +282,10 @@ response2 = llm.generate("What is 2+2?")
 # Making it more deterministic
 response = llm.generate(
     "What is 2+2?",
-    temperature=0,      # More deterministic
-    seed=42              # Reproducible (if supported)
+    temperature=0,  # More deterministic
+    seed=42,  # Reproducible (if supported)
 )
+
 
 # Fully deterministic (no LLM involved)
 def deterministic_agent(goal):
@@ -311,28 +314,28 @@ class Environment:
     def __init__(self):
         self.state = {}
         self.observers = []
-    
+
     def perceive(self):
         """Agent observes the environment."""
         return {
             "time": datetime.now(),
             "state": self.state,
-            "available_actions": self.get_actions()
+            "available_actions": self.get_actions(),
         }
-    
+
     def execute(self, action):
         """Agent acts on the environment."""
         # Apply the action
         new_state = self.apply_action(action)
         self.state = new_state
-        
+
         # Return observation
         return {
             "action_taken": action,
             "new_state": new_state,
-            "reward": self.calculate_reward(action)
+            "reward": self.calculate_reward(action),
         }
-    
+
     def apply_action(self, action):
         """Apply an action and return new state."""
         # Implementation depends on the environment
@@ -352,6 +355,7 @@ class Environment:
 from dataclasses import dataclass
 from typing import List
 
+
 @dataclass
 class TraceStep:
     step_number: int
@@ -360,11 +364,12 @@ class TraceStep:
     action_input: str
     observation: str
 
+
 @dataclass
 class ExecutionTrace:
     goal: str
     steps: List[TraceStep]
-    
+
     def print_trace(self):
         """Pretty-print the execution trace."""
         print(f"Goal: {self.goal}\n")
@@ -373,7 +378,7 @@ class ExecutionTrace:
             print(f"  Thought: {step.thought}")
             print(f"  Action: {step.action}({step.action_input})")
             print(f"  Observation: {step.observation}\n")
-    
+
     def to_dict(self):
         """Serialize trace for logging."""
         return {
@@ -384,17 +389,21 @@ class ExecutionTrace:
                     "thought": s.thought,
                     "action": s.action,
                     "input": s.action_input,
-                    "result": s.observation
+                    "result": s.observation,
                 }
                 for s in self.steps
-            ]
+            ],
         }
 
+
 # Usage
-trace = ExecutionTrace(goal="Find weather", steps=[
-    TraceStep(1, "Need weather data", "search", "Paris weather", "22°C sunny"),
-    TraceStep(2, "Have the answer", "finish", "22°C sunny", "Done"),
-])
+trace = ExecutionTrace(
+    goal="Find weather",
+    steps=[
+        TraceStep(1, "Need weather data", "search", "Paris weather", "22°C sunny"),
+        TraceStep(2, "Have the answer", "finish", "22°C sunny", "Done"),
+    ],
+)
 trace.print_trace()
 ```
 
@@ -420,19 +429,16 @@ tools = [
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "city": {
-                        "type": "string",
-                        "description": "City name"
-                    },
+                    "city": {"type": "string", "description": "City name"},
                     "units": {
                         "type": "string",
                         "enum": ["celsius", "fahrenheit"],
-                        "description": "Temperature units"
-                    }
+                        "description": "Temperature units",
+                    },
                 },
-                "required": ["city"]
-            }
-        }
+                "required": ["city"],
+            },
+        },
     }
 ]
 
@@ -441,7 +447,7 @@ response = client.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "What's the weather in Paris?"}],
     tools=tools,
-    tool_choice="auto"
+    tool_choice="auto",
 )
 
 # Response includes function call
@@ -509,7 +515,7 @@ class GoalManager:
 class HumanInTheLoopAgent:
     def __init__(self, approval_required_actions=None):
         self.approval_required = approval_required_actions or []
-    
+
     def execute_with_approval(self, action):
         """Execute action, asking for human approval if needed."""
         if action.name in self.approval_required:
@@ -517,9 +523,9 @@ class HumanInTheLoopAgent:
             print(f"Action: {action.name}")
             print(f"Input: {action.input}")
             print(f"Reasoning: {action.thought}")
-            
+
             response = input("Approve? (yes/no/modify): ")
-            
+
             if response.lower() == "yes":
                 return action.execute()
             elif response.lower() == "modify":
@@ -528,8 +534,9 @@ class HumanInTheLoopAgent:
                 return action.execute()
             else:
                 return "Action cancelled by user"
-        
+
         return action.execute()
+
 
 # Usage
 agent = HumanInTheLoopAgent(
@@ -553,27 +560,28 @@ class KnowledgeRetriever:
     def __init__(self, vector_store, web_search=None):
         self.vector_store = vector_store
         self.web_search = web_search
-    
+
     def retrieve(self, query: str, sources: list = None) -> dict:
         """
         Retrieve relevant knowledge from multiple sources.
-        
+
         Args:
             query: What to search for
             sources: List of sources to query (default: all)
         """
         results = {}
         sources = sources or ["vector_store", "web"]
-        
+
         if "vector_store" in sources:
             docs = self.vector_store.search(query, k=5)
             results["documents"] = docs
-        
+
         if "web" in sources and self.web_search:
             web_results = self.web_search(query)
             results["web"] = web_results
-        
+
         return results
+
 
 # Usage in agent
 retriever = KnowledgeRetriever(vector_store)
@@ -597,27 +605,27 @@ from openai import OpenAI
 # Basic LLM call
 client = OpenAI()
 
+
 def llm_reason(context: str) -> str:
     """Use LLM for agent reasoning."""
     response = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": "You are an AI agent. Think step by step."},
-            {"role": "user", "content": context}
+            {"role": "user", "content": context},
         ],
-        temperature=0.7  # Balance creativity and consistency
+        temperature=0.7,  # Balance creativity and consistency
     )
     return response.choices[0].message.content
+
 
 # LLM with structured output
 def llm_plan(goal: str) -> dict:
     """LLM generates a structured plan."""
     response = client.chat.completions.create(
         model="gpt-4",
-        messages=[
-            {"role": "user", "content": f"Create a plan for: {goal}"}
-        ],
-        response_format={"type": "json_object"}  # JSON mode
+        messages=[{"role": "user", "content": f"Create a plan for: {goal}"}],
+        response_format={"type": "json_object"},  # JSON mode
     )
     return json.loads(response.choices[0].message.content)
 ```
@@ -636,20 +644,20 @@ def llm_plan(goal: str) -> dict:
 ```python
 class AgentMemory:
     def __init__(self, max_short_term=10, long_term_db=None):
-        self.short_term = []           # Recent interactions
-        self.long_term = long_term_db   # Persistent storage
-    
+        self.short_term = []  # Recent interactions
+        self.long_term = long_term_db  # Persistent storage
+
     def store_short_term(self, item):
         """Store in working memory (limited size)."""
         self.short_term.append(item)
         if len(self.short_term) > self.max_short_term:
             self.short_term.pop(0)  # Remove oldest
-    
+
     def store_long_term(self, key, value, importance=0.5):
         """Store in persistent memory."""
         if self.long_term:
             self.long_term.store(key, value, importance)
-    
+
     def recall(self, query: str, scope: str = "short") -> list:
         """Retrieve relevant memories."""
         if scope == "short":
@@ -657,10 +665,11 @@ class AgentMemory:
         elif scope == "long" and self.long_term:
             return self.long_term.search(query)
         return []
-    
+
     def summarize(self) -> str:
         """Get a summary of important memories."""
         return "\n".join(str(m) for m in self.short_term[-5:])
+
 
 # Usage
 memory = AgentMemory(max_short_term=10)
@@ -686,27 +695,28 @@ class Observation:
         self.source = source
         self.success = success
         self.metadata = metadata or {}
-    
+
     def __str__(self):
         status = "✓" if self.success else "✗"
         return f"[{status}] {self.source}: {self.content[:100]}"
+
 
 # Observations in agent loop
 def agent_step(agent, action):
     # Execute action
     raw_result = agent.tools[action.name](action.input)
-    
+
     # Create observation
     observation = Observation(
         content=raw_result,
         source=action.name,
         success=not raw_result.startswith("Error"),
-        metadata={"action": action, "timestamp": time.time()}
+        metadata={"action": action, "timestamp": time.time()},
     )
-    
+
     # Feed observation back to agent
     agent.context.add_observation(observation)
-    
+
     return observation
 ```
 
@@ -725,11 +735,11 @@ def agent_step(agent, action):
 class AgentPerception:
     def __init__(self):
         self.sensors = {}  # Different perception channels
-    
+
     def add_sensor(self, name, func):
         """Register a new perception channel."""
         self.sensors[name] = func
-    
+
     def perceive(self) -> dict:
         """Gather all available information."""
         observations = {}
@@ -740,15 +750,18 @@ class AgentPerception:
                 observations[name] = {"error": str(e)}
         return observations
 
+
 # Example sensors
 def read_user_input():
     """Perceive user's message."""
     return input("You: ")
 
+
 def read_tool_output():
     """Perceive results from tool execution."""
     # Read from tool output buffer
     pass
+
 
 def read_environment():
     """Perceive environment state."""
@@ -769,21 +782,42 @@ def plan_with_llm(goal: str, llm) -> list:
     """Use LLM to generate a plan."""
     response = llm.generate(f"""
     Create a step-by-step plan to achieve: {goal}
-    
+
     Return a JSON list of steps, each with:
     - description: What to do
     - tools: Which tools to use
     - dependencies: Steps that must complete first
     """)
-    
+
     return json.loads(response)
+
 
 # Example output
 plan = [
-    {"step": 1, "description": "Gather requirements", "tools": ["ask_user"], "dependencies": []},
-    {"step": 2, "description": "Research solutions", "tools": ["search", "read_docs"], "dependencies": [1]},
-    {"step": 3, "description": "Implement solution", "tools": ["write_code"], "dependencies": [2]},
-    {"step": 4, "description": "Test and verify", "tools": ["run_tests"], "dependencies": [3]}
+    {
+        "step": 1,
+        "description": "Gather requirements",
+        "tools": ["ask_user"],
+        "dependencies": [],
+    },
+    {
+        "step": 2,
+        "description": "Research solutions",
+        "tools": ["search", "read_docs"],
+        "dependencies": [1],
+    },
+    {
+        "step": 3,
+        "description": "Implement solution",
+        "tools": ["write_code"],
+        "dependencies": [2],
+    },
+    {
+        "step": 4,
+        "description": "Test and verify",
+        "tools": ["run_tests"],
+        "dependencies": [3],
+    },
 ]
 ```
 
@@ -802,34 +836,35 @@ plan = [
 def agent_reason(context: dict, llm) -> str:
     """
     Agent reasons about the current situation.
-    
+
     This is the 'Think' step in ReAct.
     """
     prompt = f"""
-    You are an AI agent working on: {context['goal']}
-    
-    Current state: {context['current_state']}
-    Available tools: {context['available_tools']}
-    History so far: {context['history']}
-    
+    You are an AI agent working on: {context["goal"]}
+
+    Current state: {context["current_state"]}
+    Available tools: {context["available_tools"]}
+    History so far: {context["history"]}
+
     Think about what you should do next.
     Consider:
     1. What information do you have?
     2. What information do you need?
     3. Which tool can help you get it?
     4. What's the most efficient approach?
-    
+
     Respond with your reasoning.
     """
-    
+
     return llm.generate(prompt)
+
 
 # Chain-of-Thought reasoning
 def chain_of_thought(question: str, llm) -> str:
     """Explicit step-by-step reasoning."""
     prompt = f"""
     Question: {question}
-    
+
     Let's think step by step:
     Step 1: 
     Step 2: 
@@ -854,21 +889,22 @@ def chain_of_thought(question: str, llm) -> str:
 @dataclass
 class AgentState:
     """Complete representation of agent state."""
+
     # Agent internals
     goal: str
     plan: list
     current_step: int
-    
+
     # Memory
     short_term_memory: list
     long_term_memory: dict
-    
+
     # Environment
     environment: dict
-    
+
     # Conversation
     messages: list
-    
+
     def snapshot(self) -> dict:
         """Create a snapshot of current state."""
         return {
@@ -877,9 +913,9 @@ class AgentState:
             "current_step": self.current_step,
             "memory_size": len(self.short_term_memory),
             "message_count": len(self.messages),
-            "timestamp": time.time()
+            "timestamp": time.time(),
         }
-    
+
     def restore(self, snapshot: dict):
         """Restore state from a snapshot."""
         self.goal = snapshot["goal"]
@@ -901,14 +937,16 @@ class AgentState:
 ```python
 from typing import Callable
 
+
 class Tool:
-    def __init__(self, name: str, description: str, func: Callable, 
-                 parameters: dict = None):
+    def __init__(
+        self, name: str, description: str, func: Callable, parameters: dict = None
+    ):
         self.name = name
         self.description = description
         self.func = func
         self.parameters = parameters or {}
-    
+
     def execute(self, **kwargs) -> str:
         """Execute the tool with given parameters."""
         try:
@@ -917,15 +955,18 @@ class Tool:
         except Exception as e:
             return f"Error: {str(e)}"
 
+
 # Registering tools
 def search(query: str) -> str:
     """Search the web."""
     # Implementation...
     return "Search results..."
 
+
 def calculate(expression: str) -> str:
     """Evaluate math."""
     return str(eval(expression))
+
 
 tools = [
     Tool("search", "Search the web", search, {"query": {"type": "string"}}),
@@ -945,17 +986,19 @@ tools = [
 ```python
 import tiktoken
 
+
 def count_tokens(text: str, model: str = "gpt-4") -> int:
     """Count tokens in text."""
     encoding = tiktoken.encoding_for_model(model)
     return len(encoding.encode(text))
+
 
 # Token awareness
 def manage_token_budget(messages: list, max_tokens: int = 4000):
     """Ensure messages fit within token budget."""
     total = 0
     kept = []
-    
+
     for msg in reversed(messages):
         msg_tokens = count_tokens(msg["content"])
         if total + msg_tokens <= max_tokens:
@@ -963,8 +1006,9 @@ def manage_token_budget(messages: list, max_tokens: int = 4000):
             total += msg_tokens
         else:
             break
-    
+
     return kept, total
+
 
 # Usage
 text = "AI agents are autonomous systems"

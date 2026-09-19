@@ -31,6 +31,7 @@ next_product_id = 1
 # =============================================================================
 class UserCreate(BaseModel):
     """User creation model."""
+
     name: str = Field(..., min_length=1, max_length=100)
     email: str = Field(..., pattern=r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
     age: int = Field(ge=0, le=150, default=18)
@@ -38,6 +39,7 @@ class UserCreate(BaseModel):
 
 class ProductCreate(BaseModel):
     """Product creation model."""
+
     name: str = Field(..., min_length=1, max_length=200)
     price: float = Field(gt=0, description="Price must be positive")
     in_stock: bool = True
@@ -68,6 +70,7 @@ def create_product(product: ProductCreate):
 # =============================================================================
 class OrderItem(BaseModel):
     """Item within an order."""
+
     product_id: int
     quantity: int = Field(ge=1, le=100)
     unit_price: float = Field(gt=0)
@@ -75,6 +78,7 @@ class OrderItem(BaseModel):
 
 class OrderCreate(BaseModel):
     """Order creation with nested items."""
+
     customer_name: str = Field(..., min_length=1)
     items: list[OrderItem] = Field(..., min_length=1)
     shipping_address: str
@@ -99,6 +103,7 @@ def create_order(order: OrderCreate):
 # =============================================================================
 class UserProfile(BaseModel):
     """User profile update model."""
+
     name: Optional[str] = None
     email: Optional[str] = None
     notify: bool = True
@@ -106,6 +111,7 @@ class UserProfile(BaseModel):
 
 class ReviewCreate(BaseModel):
     """Product review model."""
+
     rating: int = Field(ge=1, le=5)
     comment: str = Field(..., min_length=1, max_length=1000)
 

@@ -34,9 +34,11 @@ from fastai.vision.all import *
 
 path = untar_data(URLs.PETS) / "images"
 
+
 def is_cat(fname: str) -> bool:
     # In the Oxford-IIIT Pets dataset, cat breeds start with an uppercase letter.
     return fname[0].isupper()
+
 
 dls = ImageDataLoaders.from_name_func(
     path,
@@ -80,9 +82,9 @@ In **traditional programming** a human writes explicit rules: `inputs → progra
 ```python
 # Conceptual pseudocode of Samuel's loop.
 def train_step(inputs, targets, weights):
-    results = model(inputs, weights)          # inputs + weights -> results
-    performance = loss(results, targets)      # measure how good
-    weights = update(weights, performance)    # improve the weights
+    results = model(inputs, weights)  # inputs + weights -> results
+    performance = loss(results, targets)  # measure how good
+    weights = update(weights, performance)  # improve the weights
     return weights
 ```
 
@@ -121,16 +123,16 @@ Models train on **batches** of data, not one image at a time. A `DataLoaders` bu
 
 ```python
 dls = ImageDataLoaders.from_name_func(
-    path,                       # root folder of images
-    get_image_files(path),     # list of image paths
-    valid_pct=0.2,             # hold out 20% for validation
-    seed=42,                   # reproducible split
-    label_func=is_cat,         # how to derive a label from a filename
-    item_tfms=Resize(224),     # resize every item to 224x224
-    bs=64,                     # batch size (images per step)
+    path,  # root folder of images
+    get_image_files(path),  # list of image paths
+    valid_pct=0.2,  # hold out 20% for validation
+    seed=42,  # reproducible split
+    label_func=is_cat,  # how to derive a label from a filename
+    item_tfms=Resize(224),  # resize every item to 224x224
+    bs=64,  # batch size (images per step)
 )
 
-dls.show_batch(max_n=6)        # sanity-check your data + labels visually
+dls.show_batch(max_n=6)  # sanity-check your data + labels visually
 ```
 
 `ImageDataLoaders` is a high-level factory. Under the hood it uses the flexible **DataBlock** API, which you will meet in a later lecture.
@@ -142,11 +144,11 @@ A `Learner` ties together three things: the `DataLoaders`, the model architectur
 ```python
 learn = vision_learner(
     dls,
-    resnet34,               # architecture (18/34/50/101/152 variants exist)
-    metrics=error_rate,     # human-readable score, printed each epoch
+    resnet34,  # architecture (18/34/50/101/152 variants exist)
+    metrics=error_rate,  # human-readable score, printed each epoch
 )
 
-learn.fine_tune(2)          # transfer-learning training schedule
+learn.fine_tune(2)  # transfer-learning training schedule
 ```
 
 Two terms that are easy to confuse:
@@ -167,7 +169,7 @@ print(f"Prediction: {pred_class}; confidence: {probs[pred_idx]:.4f}")
 # Where does the model go wrong?
 interp = ClassificationInterpretation.from_learner(learn)
 interp.plot_confusion_matrix(figsize=(6, 6))
-interp.plot_top_losses(9)   # the 9 most confidently-wrong images
+interp.plot_top_losses(9)  # the 9 most confidently-wrong images
 ```
 
 `learn.predict` returns a triple: the decoded label, its index, and the full probability tensor across classes.
@@ -190,8 +192,9 @@ fastai **always** holds out a validation set (`valid_pct=0.2` above) and reports
 ```python
 # The validation split is not optional in fastai — it is baked in.
 dls = ImageDataLoaders.from_name_func(
-    path, get_image_files(path),
-    valid_pct=0.2,   # 20% held out and NEVER trained on
+    path,
+    get_image_files(path),
+    valid_pct=0.2,  # 20% held out and NEVER trained on
     seed=42,
     label_func=is_cat,
     item_tfms=Resize(224),
@@ -207,6 +210,7 @@ dls = ImageDataLoaders.from_name_func(
 End-to-end image classifier on the Oxford-IIIT Pets dataset.
 Faithful to the fastai 2.7.x API.
 """
+
 from fastai.vision.all import *
 
 
@@ -238,7 +242,7 @@ def train_classifier(dls: DataLoaders, epochs: int = 1) -> Learner:
 
 if __name__ == "__main__":
     dls = build_pet_dls()
-    dls.show_batch(max_n=6)          # visual sanity check
+    dls.show_batch(max_n=6)  # visual sanity check
     learn = train_classifier(dls, epochs=1)
 
     # Report final validation metric
@@ -252,6 +256,7 @@ if __name__ == "__main__":
 """
 Use a trained Learner to predict on a new image and inspect mistakes.
 """
+
 from fastai.vision.all import *
 
 
@@ -284,11 +289,14 @@ if __name__ == "__main__":
 fastai gives every domain a nearly identical high-level workflow:
 build DataLoaders -> build Learner -> fine_tune / fit.
 """
+
 # --- Vision (segmentation) ---------------------------------------------
 from fastai.vision.all import *
+
 camvid = untar_data(URLs.CAMVID_TINY)
 dls_seg = SegmentationDataLoaders.from_label_func(
-    camvid, bs=8,
+    camvid,
+    bs=8,
     fnames=get_image_files(camvid / "images"),
     label_func=lambda o: camvid / "labels" / f"{o.stem}_P{o.suffix}",
     codes=np.loadtxt(camvid / "codes.txt", dtype=str),
@@ -298,6 +306,7 @@ learn_seg = unet_learner(dls_seg, resnet34)
 
 # --- Text (sentiment) --------------------------------------------------
 from fastai.text.all import *
+
 imdb = untar_data(URLs.IMDB)
 dls_txt = TextDataLoaders.from_folder(imdb, valid="test")
 learn_txt = text_classifier_learner(dls_txt, AWD_LSTM, metrics=accuracy)
@@ -305,9 +314,12 @@ learn_txt = text_classifier_learner(dls_txt, AWD_LSTM, metrics=accuracy)
 
 # --- Tabular -----------------------------------------------------------
 from fastai.tabular.all import *
+
 adult = untar_data(URLs.ADULT_SAMPLE)
 dls_tab = TabularDataLoaders.from_csv(
-    adult / "adult.csv", path=adult, y_names="salary",
+    adult / "adult.csv",
+    path=adult,
+    y_names="salary",
     cat_names=["workclass", "education", "marital-status"],
     cont_names=["age", "fnlwgt", "education-num"],
     procs=[Categorify, FillMissing, Normalize],
@@ -317,6 +329,7 @@ learn_tab = tabular_learner(dls_tab, metrics=accuracy)
 
 # --- Collaborative filtering ------------------------------------------
 from fastai.collab import *
+
 ratings = pd.read_csv(untar_data(URLs.ML_SAMPLE) / "ratings.csv")
 dls_collab = CollabDataLoaders.from_df(ratings, bs=64)
 learn_collab = collab_learner(dls_collab, y_range=(0.5, 5.5))
@@ -329,13 +342,13 @@ learn_collab = collab_learner(dls_collab, y_range=(0.5, 5.5))
 
 ```python
 # ❌ BAD: measuring on data the model trained on hides overfitting
-learn.fine_tune(20)                 # train a lot
-preds, _ = learn.get_preds(dl=dls.train)   # peeking at TRAINING data
+learn.fine_tune(20)  # train a lot
+preds, _ = learn.get_preds(dl=dls.train)  # peeking at TRAINING data
 # "Wow, 100% accuracy!" — meaningless, the model memorized these.
 
 # ✅ GOOD: always evaluate on the held-out validation set
 learn.fine_tune(1)
-loss, err = learn.validate()        # uses the validation DataLoader
+loss, err = learn.validate()  # uses the validation DataLoader
 print(f"validation error_rate={err:.4f}")
 ```
 
@@ -344,14 +357,21 @@ print(f"validation error_rate={err:.4f}")
 ```python
 # ❌ BAD: no validation set -> no way to detect overfitting
 dls = ImageDataLoaders.from_name_func(
-    path, get_image_files(path), valid_pct=0.0,   # everything is training
-    label_func=is_cat, item_tfms=Resize(224),
+    path,
+    get_image_files(path),
+    valid_pct=0.0,  # everything is training
+    label_func=is_cat,
+    item_tfms=Resize(224),
 )
 
 # ✅ GOOD: hold out a reproducible validation set
 dls = ImageDataLoaders.from_name_func(
-    path, get_image_files(path), valid_pct=0.2, seed=42,
-    label_func=is_cat, item_tfms=Resize(224),
+    path,
+    get_image_files(path),
+    valid_pct=0.2,
+    seed=42,
+    label_func=is_cat,
+    item_tfms=Resize(224),
 )
 ```
 
@@ -360,11 +380,11 @@ dls = ImageDataLoaders.from_name_func(
 ```python
 # ❌ BAD: throwing away pretrained knowledge, then wondering why it's slow/bad
 learn = vision_learner(dls, resnet34, pretrained=False, metrics=error_rate)
-learn.fit_one_cycle(1)              # random init needs tons of data + time
+learn.fit_one_cycle(1)  # random init needs tons of data + time
 
 # ✅ GOOD: leverage transfer learning (pretrained=True is the default)
 learn = vision_learner(dls, resnet34, metrics=error_rate)
-learn.fine_tune(1)                  # adapts ImageNet features to your task
+learn.fine_tune(1)  # adapts ImageNet features to your task
 ```
 
 ## Best Practices

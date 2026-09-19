@@ -15,12 +15,12 @@ from datetime import datetime
 # 1. Basic Logging
 # =============================================================================
 
+
 def demo_basic_logging():
     """Demonstrate basic logging setup."""
     # Basic configuration
     logging.basicConfig(
-        level=logging.DEBUG,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     logger = logging.getLogger(__name__)
@@ -36,6 +36,7 @@ def demo_basic_logging():
 # 2. Logging Levels
 # =============================================================================
 
+
 def demo_logging_levels():
     """Demonstrate different logging levels."""
     logger = logging.getLogger("levels_demo")
@@ -46,9 +47,7 @@ def demo_logging_levels():
     handler.setLevel(logging.DEBUG)
 
     # Create formatter
-    formatter = logging.Formatter(
-        '%(levelname)-8s %(message)s'
-    )
+    formatter = logging.Formatter("%(levelname)-8s %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
@@ -66,6 +65,7 @@ def demo_logging_levels():
 # 3. Custom Formatter
 # =============================================================================
 
+
 def demo_custom_formatter():
     """Demonstrate custom log formatting."""
     logger = logging.getLogger("custom_format")
@@ -73,8 +73,8 @@ def demo_custom_formatter():
 
     # Detailed format
     detailed_formatter = logging.Formatter(
-        fmt='%(asctime)s | %(name)s | %(levelname)-8s | %(funcName)s:%(lineno)d | %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        fmt="%(asctime)s | %(name)s | %(levelname)-8s | %(funcName)s:%(lineno)d | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
 
     handler = logging.StreamHandler()
@@ -93,6 +93,7 @@ def demo_custom_formatter():
 # 4. Multiple Handlers
 # =============================================================================
 
+
 def demo_multiple_handlers():
     """Demonstrate using multiple handlers."""
     import tempfile
@@ -104,16 +105,14 @@ def demo_multiple_handlers():
     # Console handler (INFO and above)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
-    console_format = logging.Formatter('%(levelname)s: %(message)s')
+    console_format = logging.Formatter("%(levelname)s: %(message)s")
     console_handler.setFormatter(console_format)
 
     # File handler (DEBUG and above)
     temp_file = tempfile.mktemp(suffix=".log")
     file_handler = logging.FileHandler(temp_file)
     file_handler.setLevel(logging.DEBUG)
-    file_format = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
+    file_format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     file_handler.setFormatter(file_format)
 
     logger.addHandler(console_handler)
@@ -134,6 +133,7 @@ def demo_multiple_handlers():
 # 5. Logger Hierarchy
 # =============================================================================
 
+
 def demo_logger_hierarchy():
     """Demonstrate logger hierarchy and propagation."""
     # Parent logger
@@ -141,7 +141,7 @@ def demo_logger_hierarchy():
     parent_logger.setLevel(logging.DEBUG)
 
     handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter('%(name)s - %(message)s'))
+    handler.setFormatter(logging.Formatter("%(name)s - %(message)s"))
     parent_logger.addHandler(handler)
 
     # Child loggers
@@ -159,6 +159,7 @@ def demo_logger_hierarchy():
 # 6. Practical Application Logger
 # =============================================================================
 
+
 class ApplicationLogger:
     """Reusable application logger setup."""
 
@@ -174,18 +175,16 @@ class ApplicationLogger:
         # Console handler
         console = logging.StreamHandler()
         console.setLevel(logging.INFO)
-        console.setFormatter(logging.Formatter(
-            '%(levelname)s: %(message)s'
-        ))
+        console.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
         self.logger.addHandler(console)
 
         # File handler if specified
         if log_file:
             file_handler = logging.FileHandler(log_file)
             file_handler.setLevel(logging.DEBUG)
-            file_handler.setFormatter(logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-            ))
+            file_handler.setFormatter(
+                logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+            )
             self.logger.addHandler(file_handler)
 
     def info(self, msg: str):
@@ -228,6 +227,7 @@ def demo_application_logger():
         app_log.logger.removeHandler(h)
 
     import os
+
     if os.path.exists(temp_file):
         os.remove(temp_file)
 
@@ -236,13 +236,14 @@ def demo_application_logger():
 # 7. Exception Logging
 # =============================================================================
 
+
 def demo_exception_logging():
     """Demonstrate logging exceptions with traceback."""
     logger = logging.getLogger("exception_demo")
     logger.setLevel(logging.DEBUG)
 
     handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+    handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
     logger.addHandler(handler)
 
     def risky_operation():

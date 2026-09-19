@@ -63,6 +63,7 @@ class APIGateway:
 
         return {"status": 200, "service": route["service"]}
 
+
 # Usage
 gateway = APIGateway()
 gateway.add_middleware(lambda r: {"allowed": r.get("auth")})
@@ -81,6 +82,7 @@ gateway.add_route("/api/v1/chat", "ai-service", ["POST"])
 ```python
 import secrets
 import hashlib
+
 
 class APIKeyManager:
     def __init__(self):
@@ -105,6 +107,7 @@ class APIKeyManager:
         if key_hash not in self.keys:
             return {"valid": False, "error": "Invalid key"}
         return {"valid": True, **self.keys[key_hash]}
+
 
 # Usage
 manager = APIKeyManager()
@@ -147,6 +150,7 @@ class RateLimit:
             "remaining": 0,
             "retry_after": self.window_seconds,
         }
+
 
 # Usage
 rate_limit = RateLimit(max_requests=100, window_seconds=60)
@@ -214,6 +218,7 @@ def get_order(order_id: str):
     # Any user can access any order by guessing order IDs
     return db.get_order(order_id)
 
+
 # SECURE: With object-level authorization
 @app.get("/api/orders/{order_id}")
 @require_auth
@@ -273,6 +278,7 @@ security_headers = {
     "Pragma": "no-cache",
 }
 
+
 @app.middleware("http")
 async def add_security_headers(request, call_next):
     response = await call_next(request)
@@ -318,11 +324,14 @@ owasp_api_top_10 = {
 from collections import defaultdict
 import time
 
+
 class TokenBucketRateLimiter:
     def __init__(self, capacity: int, refill_rate: float):
         self.capacity = capacity
         self.refill_rate = refill_rate
-        self.buckets = defaultdict(lambda: {"tokens": capacity, "last_refill": time.time()})
+        self.buckets = defaultdict(
+            lambda: {"tokens": capacity, "last_refill": time.time()}
+        )
 
     def allow_request(self, client_id: str) -> bool:
         """Check if request should be allowed."""
@@ -332,8 +341,7 @@ class TokenBucketRateLimiter:
         # Refill tokens
         elapsed = now - bucket["last_refill"]
         bucket["tokens"] = min(
-            self.capacity,
-            bucket["tokens"] + elapsed * self.refill_rate
+            self.capacity, bucket["tokens"] + elapsed * self.refill_rate
         )
         bucket["last_refill"] = now
 
@@ -341,6 +349,7 @@ class TokenBucketRateLimiter:
             bucket["tokens"] -= 1
             return True
         return False
+
 
 # Usage
 limiter = TokenBucketRateLimiter(capacity=100, refill_rate=10)
@@ -360,17 +369,19 @@ print(limiter.allow_request("user123"))  # True
 from pydantic import BaseModel, Field, validator
 import re
 
+
 class APIRequest(BaseModel):
     """Validated API request."""
+
     prompt: str = Field(..., min_length=1, max_length=4096)
     model: str = Field(default="gpt-4", pattern="^(gpt-3.5-turbo|gpt-4)$")
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
 
-    @validator('prompt')
+    @validator("prompt")
     def validate_prompt(cls, v):
         # Check for injection patterns
-        if re.search(r'ignore\s+(all\s+)?previous', v, re.IGNORECASE):
-            raise ValueError('Potential prompt injection detected')
+        if re.search(r"ignore\s+(all\s+)?previous", v, re.IGNORECASE):
+            raise ValueError("Potential prompt injection detected")
         return v
 
     class Config:
@@ -402,6 +413,7 @@ class ResponseFilter:
                 filtered[key] = value
         return filtered
 
+
 # Usage
 filter = ResponseFilter()
 response = {"user": "john", "password": "secret123", "email": "john@example.com"}
@@ -425,12 +437,14 @@ def fetch_url(url: str):
     response = requests.get(url)  # Attacker can access internal services!
     return response.text
 
+
 # SECURE: URL validation
 import ipaddress
 from urllib.parse import urlparse
 
 ALLOWED_HOSTS = ["api.example.com", "cdn.example.com"]
 BLOCKED_RANGES = ["127.0.0.0/8", "10.0.0.0/8", "192.168.0.0/16"]
+
 
 def is_safe_url(url: str) -> bool:
     """Validate URL is safe to fetch."""
@@ -443,6 +457,7 @@ def is_safe_url(url: str) -> bool:
 
         # Check against blocked IP ranges
         import socket
+
         ip = socket.gethostbyname(parsed.hostname)
         for blocked in BLOCKED_RANGES:
             if ipaddress.ip_address(ip) in ipaddress.ip_network(blocked):
@@ -451,6 +466,7 @@ def is_safe_url(url: str) -> bool:
         return True
     except Exception:
         return False
+
 
 @app.post("/api/fetch")
 def fetch_url(url: str):
@@ -487,6 +503,7 @@ class Throttler:
         self.last_request_time[client_id] = now
         return {"throttled": False}
 
+
 # Usage
 throttler = Throttler(requests_per_second=10)
 result = throttler.should_throttle("user123")
@@ -504,6 +521,7 @@ print(f"Throttled: {result['throttled']}")
 **Example**:
 ```python
 import time
+
 
 class TokenBucket:
     def __init__(self, capacity: int, refill_rate: float):
@@ -528,6 +546,7 @@ class TokenBucket:
         new_tokens = elapsed * self.refill_rate
         self.tokens = min(self.capacity, self.tokens + new_tokens)
         self.last_refill = now
+
 
 # Usage
 bucket = TokenBucket(capacity=100, refill_rate=10)

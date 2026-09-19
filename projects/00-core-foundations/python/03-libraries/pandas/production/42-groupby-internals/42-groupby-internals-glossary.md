@@ -86,8 +86,7 @@ source column, and function on one line — the reviewable feature-table
 pattern.
 **Example**:
 ```python
-df.groupby("user_id").agg(total=("amount", "sum"),
-                          count=("amount", "count"))
+df.groupby("user_id").agg(total=("amount", "sum"), count=("amount", "count"))
 ```
 **Related**: `agg`
 

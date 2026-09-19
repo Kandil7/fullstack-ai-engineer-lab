@@ -47,7 +47,7 @@ import pandas as pd
 
 idx = pd.date_range("2024-01-01", periods=10, freq="h")
 ts = pd.Series(np.arange(10, dtype=float), index=idx)
-print(ts.index.dtype, ts.index.freq)          # datetime64[ns] <Hour>
+print(ts.index.dtype, ts.index.freq)  # datetime64[ns] <Hour>
 
 biz = pd.date_range("2024-01-01", periods=5, freq="B")
 print(biz.strftime("%Y-%m-%d").tolist())
@@ -65,11 +65,12 @@ datetime64[ns] <Hour>
 aggregation. The label defaults to the **end** of the bucket.
 
 ```python
-daily = pd.Series(np.arange(1, 15, dtype=float),
-                  index=pd.date_range("2024-01-01", periods=14, freq="D"))
+daily = pd.Series(
+    np.arange(1, 15, dtype=float), index=pd.date_range("2024-01-01", periods=14, freq="D")
+)
 weekly = daily.resample("W").mean()
-print(weekly.round(2).tolist())                       # [4.0, 11.0]
-print(weekly.index.strftime("%Y-%m-%d").tolist())     # week ends
+print(weekly.round(2).tolist())  # [4.0, 11.0]
+print(weekly.index.strftime("%Y-%m-%d").tolist())  # week ends
 ```
 
 ```text
@@ -89,7 +90,7 @@ produce identical results.
 ```python
 by_resample = daily.resample("W").mean()
 by_grouper = daily.groupby(pd.Grouper(freq="W")).mean()
-print(by_resample.equals(by_grouper))                 # True
+print(by_resample.equals(by_grouper))  # True
 ```
 
 ```text
@@ -107,9 +108,9 @@ the standard "as-of" fill for feature tables.
 
 ```python
 hourly = daily.asfreq("h").ffill()
-print(len(hourly))                                    # 313
-print(hourly.loc["2024-01-02 01:00"])                 # 2.0 (Jan 2 value)
-print(hourly.notna().all())                           # True
+print(len(hourly))  # 313
+print(hourly.loc["2024-01-02 01:00"])  # 2.0 (Jan 2 value)
+print(hourly.notna().all())  # True
 ```
 
 ```text
@@ -125,11 +126,10 @@ from t-1. That is the entire no-leakage mechanism — at time t you may only
 know t-1. `diff` is `value - shifted`, `pct_change` is the relative delta.
 
 ```python
-s = pd.Series([10.0, 20.0, 30.0, 50.0],
-              index=pd.date_range("2024-01-01", periods=4, freq="D"))
-print(s.shift(1).tolist())     # [nan, 10.0, 20.0, 30.0]
-print(s.shift(-1).tolist())    # [20.0, 30.0, 50.0, nan]
-print(s.diff().tolist())       # [nan, 10.0, 10.0, 20.0]
+s = pd.Series([10.0, 20.0, 30.0, 50.0], index=pd.date_range("2024-01-01", periods=4, freq="D"))
+print(s.shift(1).tolist())  # [nan, 10.0, 20.0, 30.0]
+print(s.shift(-1).tolist())  # [20.0, 30.0, 50.0, nan]
+print(s.diff().tolist())  # [nan, 10.0, 10.0, 20.0]
 print(s.pct_change().round(3).tolist())  # [nan, 1.0, 0.5, 0.667]
 ```
 
@@ -148,8 +148,8 @@ window: `rolling(k).mean().shift(1)`.
 
 ```python
 prices = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0])
-print(prices.rolling(3).mean().tolist())          # [nan, nan, 2.0, 3.0, 4.0]
-print(prices.rolling(3).mean().shift(1).tolist()) # [nan, nan, nan, 2.0, 3.0]
+print(prices.rolling(3).mean().tolist())  # [nan, nan, 2.0, 3.0, 4.0]
+print(prices.rolling(3).mean().shift(1).tolist())  # [nan, nan, nan, 2.0, 3.0]
 ```
 
 ```text
@@ -169,9 +169,9 @@ aware index to another zone. The instant (`timestamp()`) never changes.
 naive = pd.Timestamp("2024-01-01 00:00")
 utc = naive.tz_localize("UTC")
 nyc = utc.tz_convert("America/New_York")
-print(utc)                       # 2024-01-01 00:00:00+00:00
-print(nyc)                       # 2023-12-31 19:00:00-05:00
-print(utc.timestamp() == nyc.timestamp())   # True
+print(utc)  # 2024-01-01 00:00:00+00:00
+print(nyc)  # 2023-12-31 19:00:00-05:00
+print(utc.timestamp() == nyc.timestamp())  # True
 ```
 
 ```text

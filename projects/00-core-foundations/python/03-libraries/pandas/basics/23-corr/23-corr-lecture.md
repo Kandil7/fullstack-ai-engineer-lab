@@ -41,19 +41,21 @@ import seaborn as sns
 # Sample data
 np.random.seed(42)
 n = 200
-df = pd.DataFrame({
-    'study_hours': np.random.uniform(1, 10, n),
-    'exam_score': np.random.uniform(40, 100, n),
-    'attendance': np.random.uniform(50, 100, n),
-    'sleep_hours': np.random.uniform(4, 10, n)
-})
+df = pd.DataFrame(
+    {
+        "study_hours": np.random.uniform(1, 10, n),
+        "exam_score": np.random.uniform(40, 100, n),
+        "attendance": np.random.uniform(50, 100, n),
+        "sleep_hours": np.random.uniform(4, 10, n),
+    }
+)
 # Add realistic correlations
-df['exam_score'] = df['study_hours'] * 5 + df['attendance'] * 0.3 + np.random.normal(0, 8, n) + 20
-df['exam_score'] = df['exam_score'].clip(0, 100)
-df['sleep_hours'] = 10 - df['study_hours'] * 0.3 + np.random.normal(0, 1, n)
+df["exam_score"] = df["study_hours"] * 5 + df["attendance"] * 0.3 + np.random.normal(0, 8, n) + 20
+df["exam_score"] = df["exam_score"].clip(0, 100)
+df["sleep_hours"] = 10 - df["study_hours"] * 0.3 + np.random.normal(0, 1, n)
 
 # Correlation between two variables
-r = df['study_hours'].corr(df['exam_score'])
+r = df["study_hours"].corr(df["exam_score"])
 print(f"Pearson r: {r:.3f}")
 # Pearson r: 0.712
 ```
@@ -83,7 +85,7 @@ print(corr_matrix)
 
 ```python
 # Default — measures linear relationship
-df.corr(method='pearson')
+df.corr(method="pearson")
 ```
 
 ### 4.2 Spearman (Rank-based)
@@ -91,14 +93,14 @@ df.corr(method='pearson')
 ```python
 # Measures monotonic relationship (not necessarily linear)
 # Better for non-normal data or ordinal variables
-df.corr(method='spearman')
+df.corr(method="spearman")
 ```
 
 ### 4.3 Kendall (Rank Concordance)
 
 ```python
 # More robust with small samples and ties
-df.corr(method='kendall')
+df.corr(method="kendall")
 ```
 
 ### 4.4 When to Use Which
@@ -119,15 +121,16 @@ df.corr(method='kendall')
 fig, ax = plt.subplots(figsize=(8, 6))
 sns.heatmap(
     corr_matrix,
-    annot=True,          # Show values
-    cmap='RdBu_r',      # Red-Blue colormap
-    center=0,            # Center colormap at 0
-    vmin=-1, vmax=1,    # Fixed range
-    fmt='.2f',           # 2 decimal places
-    square=True,         # Square cells
-    linewidths=0.5       # Cell borders
+    annot=True,  # Show values
+    cmap="RdBu_r",  # Red-Blue colormap
+    center=0,  # Center colormap at 0
+    vmin=-1,
+    vmax=1,  # Fixed range
+    fmt=".2f",  # 2 decimal places
+    square=True,  # Square cells
+    linewidths=0.5,  # Cell borders
 )
-ax.set_title('Correlation Matrix Heatmap')
+ax.set_title("Correlation Matrix Heatmap")
 plt.tight_layout()
 plt.show()
 ```
@@ -136,8 +139,8 @@ plt.show()
 
 ```python
 # Scatter plots for all variable pairs
-sns.pairplot(df, diag_kind='kde')
-plt.suptitle('Pair Plot of All Variables', y=1.02)
+sns.pairplot(df, diag_kind="kde")
+plt.suptitle("Pair Plot of All Variables", y=1.02)
 plt.tight_layout()
 plt.show()
 ```
@@ -149,16 +152,8 @@ plt.show()
 mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
 
 fig, ax = plt.subplots(figsize=(8, 6))
-sns.heatmap(
-    corr_matrix,
-    mask=mask,
-    annot=True,
-    cmap='RdBu_r',
-    center=0,
-    fmt='.2f',
-    square=True
-)
-ax.set_title('Correlation Matrix (Lower Triangle)')
+sns.heatmap(corr_matrix, mask=mask, annot=True, cmap="RdBu_r", center=0, fmt=".2f", square=True)
+ax.set_title("Correlation Matrix (Lower Triangle)")
 plt.tight_layout()
 plt.show()
 ```
@@ -175,14 +170,17 @@ def get_top_correlations(corr_matrix, n=5):
     """Return top N correlated pairs (excluding self-correlation)."""
     pairs = []
     for i in range(len(corr_matrix.columns)):
-        for j in range(i+1, len(corr_matrix.columns)):
-            pairs.append({
-                'var1': corr_matrix.columns[i],
-                'var2': corr_matrix.columns[j],
-                'correlation': corr_matrix.iloc[i, j]
-            })
+        for j in range(i + 1, len(corr_matrix.columns)):
+            pairs.append(
+                {
+                    "var1": corr_matrix.columns[i],
+                    "var2": corr_matrix.columns[j],
+                    "correlation": corr_matrix.iloc[i, j],
+                }
+            )
     result = pd.DataFrame(pairs)
-    return result.sort_values('correlation', key=abs, ascending=False).head(n)
+    return result.sort_values("correlation", key=abs, ascending=False).head(n)
+
 
 print(get_top_correlations(corr_matrix))
 ```
@@ -197,10 +195,10 @@ print(get_top_correlations(corr_matrix))
 # Spurious correlation
 x = np.arange(100)
 y = x * 2 + np.random.normal(0, 5, 100)
-z = x ** 2 + np.random.normal(0, 100, 100)
+z = x**2 + np.random.normal(0, 100, 100)
 
-print(f"Correlation(x, y): {np.corrcoef(x, y)[0,1]:.3f}")  # Strong
-print(f"Correlation(x, z): {np.corrcoef(x, z)[0,1]:.3f}")  # Also strong!
+print(f"Correlation(x, y): {np.corrcoef(x, y)[0, 1]:.3f}")  # Strong
+print(f"Correlation(x, z): {np.corrcoef(x, z)[0, 1]:.3f}")  # Also strong!
 # But z has a non-linear relationship with x
 ```
 
@@ -210,7 +208,7 @@ print(f"Correlation(x, z): {np.corrcoef(x, z)[0,1]:.3f}")  # Also strong!
 
 ```python
 # One-hot encode categorical variables
-df_titanic = sns.load_dataset('titanic')
+df_titanic = sns.load_dataset("titanic")
 
 # Select numeric columns
 numeric_cols = df_titanic.select_dtypes(include=[np.number])
@@ -219,7 +217,7 @@ numeric_cols = df_titanic.select_dtypes(include=[np.number])
 corr = numeric_cols.corr()
 
 # Correlation with target variable
-print(corr['survived'].sort_values(ascending=False))
+print(corr["survived"].sort_values(ascending=False))
 # survived    1.000000
 # fare        0.257307
 # parch       0.081629
@@ -236,6 +234,7 @@ print(corr['survived'].sort_values(ascending=False))
 # Control for a third variable
 from scipy import stats
 
+
 def partial_corr(df, x, y, control):
     """Calculate partial correlation controlling for a third variable."""
     # Residuals of x on control
@@ -249,8 +248,9 @@ def partial_corr(df, x, y, control):
     # Correlation of residuals
     return np.corrcoef(residuals_x, residuals_y)[0, 1]
 
+
 # Correlation between study hours and exam score, controlling for attendance
-pc = partial_corr(df, 'study_hours', 'exam_score', 'attendance')
+pc = partial_corr(df, "study_hours", "exam_score", "attendance")
 print(f"Partial correlation (controlling for attendance): {pc:.3f}")
 ```
 

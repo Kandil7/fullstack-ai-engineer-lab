@@ -74,8 +74,13 @@ body — a security and operational failure.
 `title`, `status`, `detail`, `instance`, plus extensions.
 **Example**:
 ```python
-{"type": "about:blank", "title": "Not found", "status": 404,
- "detail": "Item 5 does not exist", "instance": "/items/5"}
+{
+    "type": "about:blank",
+    "title": "Not found",
+    "status": 404,
+    "detail": "Item 5 does not exist",
+    "instance": "/items/5",
+}
 ```
 **Related**: Envelope
 

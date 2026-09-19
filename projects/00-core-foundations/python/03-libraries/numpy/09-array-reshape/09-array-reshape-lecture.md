@@ -25,7 +25,7 @@ By the end of this lecture, you will be able to:
 import numpy as np
 
 arr = np.arange(12)
-print(arr)        # [ 0  1  2  3  4  5  6  7  8  9 10 11]
+print(arr)  # [ 0  1  2  3  4  5  6  7  8  9 10 11]
 print(arr.shape)  # (12,)
 
 # Reshape to 3×4
@@ -47,7 +47,7 @@ print(arr_4x3.shape)  # (4, 3)
 
 # Reshape to 3D
 arr_3d = arr.reshape(2, 3, 2)
-print(arr_3d.shape)   # (2, 3, 2)
+print(arr_3d.shape)  # (2, 3, 2)
 ```
 
 ### 1.2 Using `-1` for Auto-calculation
@@ -56,10 +56,10 @@ print(arr_3d.shape)   # (2, 3, 2)
 arr = np.arange(12)
 
 # Let NumPy calculate one dimension
-arr_3x4 = arr.reshape(3, -1)   # (3, 4)
-arr_4x3 = arr.reshape(-1, 3)   # (4, 3)
-arr_2x6 = arr.reshape(2, -1)   # (2, 6)
-arr_6x2 = arr.reshape(-1, 2)   # (6, 2)
+arr_3x4 = arr.reshape(3, -1)  # (3, 4)
+arr_4x3 = arr.reshape(-1, 3)  # (4, 3)
+arr_2x6 = arr.reshape(2, -1)  # (2, 6)
+arr_6x2 = arr.reshape(-1, 2)  # (6, 2)
 
 print(arr_3x4.shape)  # (3, 4)
 print(arr_4x3.shape)  # (4, 3)
@@ -84,7 +84,7 @@ print(arr.shape)  # (2, 3)
 # ravel returns a flattened view
 flat = arr.ravel()
 print(flat.shape)  # (12,)
-print(flat)        # [1 2 3 4 5 6]
+print(flat)  # [1 2 3 4 5 6]
 
 # ravel shares memory with original
 print(np.shares_memory(arr, flat))  # True
@@ -104,7 +104,7 @@ arr = np.array([[1, 2, 3], [4, 5, 6]])
 # flatten returns a copy
 flat = arr.flatten()
 print(flat.shape)  # (6,)
-print(flat)        # [1 2 3 4 5 6]
+print(flat)  # [1 2 3 4 5 6]
 
 # flatten does NOT share memory
 print(np.shares_memory(arr, flat))  # False
@@ -232,15 +232,15 @@ print(arr)
 #  [ 8  9 10 11]]
 
 # C order (row-major, default)
-flat_c = arr.reshape(-1, order='C')
+flat_c = arr.reshape(-1, order="C")
 print(flat_c)  # [ 0  1  2  3  4  5  6  7  8  9 10 11]
 
 # F order (column-major)
-flat_f = arr.reshape(-1, order='F')
+flat_f = arr.reshape(-1, order="F")
 print(flat_f)  # [ 0  4  8  1  5  9  2  6 10  3  7 11]
 
 # A order (preserve memory layout)
-flat_a = arr.reshape(-1, order='A')
+flat_a = arr.reshape(-1, order="A")
 ```
 
 ---
@@ -434,7 +434,7 @@ flat_copy = arr.flatten()
 flat_view[0] = 999
 flat_copy[0] = 888
 
-print(f"After modifying ravel: arr[0,0] = {arr[0,0]}")  # 999
+print(f"After modifying ravel: arr[0,0] = {arr[0, 0]}")  # 999
 print(f"After modifying flatten: flat_copy[0] = {flat_copy[0]}")  # 888
 ```
 

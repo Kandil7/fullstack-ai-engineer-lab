@@ -20,7 +20,7 @@ x = 5  # This is an inline comment
 # Calculate the area of a circle
 radius = 7
 pi = 3.14159
-area = pi * radius ** 2
+area = pi * radius**2
 print(f"Area of circle with radius {radius}: {area:.2f}")
 # Output: Area of circle with radius 7: 153.94
 
@@ -46,10 +46,10 @@ assigned to anything, it's effectively ignored.
 x = 10  # This still runs fine
 
 # Example 4: Using single triple quotes
-'''
+"""
 Another multi-line comment style.
 Useful for longer explanations.
-'''
+"""
 y = 20
 
 # ============================================================
@@ -58,46 +58,50 @@ y = 20
 # Docstrings are special comments that describe what a
 # module, function, or class does.
 
+
 # Example 5: Function docstring
 def calculate_bmi(weight_kg, height_m):
     """
     Calculate Body Mass Index (BMI).
-    
+
     Parameters:
         weight_kg (float): Weight in kilograms
         height_m (float): Height in meters
-    
+
     Returns:
         float: BMI value
-    
+
     Example:
         >>> calculate_bmi(70, 1.75)
         22.86
     """
-    bmi = weight_kg / (height_m ** 2)
+    bmi = weight_kg / (height_m**2)
     return round(bmi, 2)
+
 
 result = calculate_bmi(70, 1.75)
 print(f"BMI: {result}")
 # Output: BMI: 22.86
 
+
 # Example 6: Class docstring
 class Dog:
     """
     A simple Dog class to demonstrate class docstrings.
-    
+
     Attributes:
         name (str): The name of the dog
         breed (str): The breed of the dog
     """
-    
+
     def __init__(self, name, breed):
         self.name = name
         self.breed = breed
-    
+
     def bark(self):
         """Return the dog's bark sound."""
         return f"{self.name} says Woof!"
+
 
 dog = Dog("Rex", "Labrador")
 print(dog.bark())

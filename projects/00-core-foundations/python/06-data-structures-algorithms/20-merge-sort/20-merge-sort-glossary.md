@@ -178,30 +178,31 @@
 def merge_sort(arr):
     """
     Basic merge sort implementation.
-    
+
     Time Complexity: O(n log n)
     Space Complexity: O(n)
-    
+
     Args:
         arr: List to sort
-    
+
     Returns:
         Sorted list
     """
     if len(arr) <= 1:
         return arr
-    
+
     mid = len(arr) // 2
     left = merge_sort(arr[:mid])
     right = merge_sort(arr[mid:])
-    
+
     return merge(left, right)
+
 
 def merge(left, right):
     """Merge two sorted arrays."""
     result = []
     i = j = 0
-    
+
     while i < len(left) and j < len(right):
         if left[i] <= right[j]:
             result.append(left[i])
@@ -209,10 +210,11 @@ def merge(left, right):
         else:
             result.append(right[j])
             j += 1
-    
+
     result.extend(left[i:])
     result.extend(right[j:])
     return result
+
 
 # Example usage
 arr = [38, 27, 43, 3, 9, 82, 10]
@@ -226,21 +228,22 @@ def merge_sort_inplace(arr, left=0, right=None):
     """In-place merge sort."""
     if right is None:
         right = len(arr)
-    
+
     if right - left > 1:
         mid = (left + right) // 2
         merge_sort_inplace(arr, left, mid)
         merge_sort_inplace(arr, mid, right)
         merge_inplace(arr, left, mid, right)
 
+
 def merge_inplace(arr, left, mid, right):
     """Merge two sorted subarrays in-place."""
     left_arr = arr[left:mid]
     right_arr = arr[mid:right]
-    
+
     i = j = 0
     k = left
-    
+
     while i < len(left_arr) and j < len(right_arr):
         if left_arr[i] <= right_arr[j]:
             arr[k] = left_arr[i]
@@ -249,16 +252,17 @@ def merge_inplace(arr, left, mid, right):
             arr[k] = right_arr[j]
             j += 1
         k += 1
-    
+
     while i < len(left_arr):
         arr[k] = left_arr[i]
         i += 1
         k += 1
-    
+
     while j < len(right_arr):
         arr[k] = right_arr[j]
         j += 1
         k += 1
+
 
 # Example usage
 arr = [38, 27, 43, 3, 9, 82, 10]
@@ -273,18 +277,19 @@ def merge_sort_bottom_up(arr):
     """Bottom-up merge sort (iterative)."""
     n = len(arr)
     size = 1
-    
+
     while size < n:
         for left in range(0, n, 2 * size):
             mid = min(left + size, n)
             right = min(left + 2 * size, n)
-            
+
             if mid < right:
                 merge_inplace(arr, left, mid, right)
-        
+
         size *= 2
-    
+
     return arr
+
 
 # Example usage
 arr = [38, 27, 43, 3, 9, 82, 10]
@@ -299,31 +304,33 @@ class ListNode:
         self.val = val
         self.next = next
 
+
 def merge_sort_linked_list(head):
     """Merge sort for linked lists."""
     if not head or not head.next:
         return head
-    
+
     # Find middle
     slow, fast = head, head.next
     while fast and fast.next:
         slow = slow.next
         fast = fast.next.next
-    
+
     mid = slow.next
     slow.next = None
-    
+
     # Sort halves
     left = merge_sort_linked_list(head)
     right = merge_sort_linked_list(mid)
-    
+
     return merge_linked_lists(left, right)
+
 
 def merge_linked_lists(l1, l2):
     """Merge two sorted linked lists."""
     dummy = ListNode(0)
     current = dummy
-    
+
     while l1 and l2:
         if l1.val <= l2.val:
             current.next = l1
@@ -332,7 +339,7 @@ def merge_linked_lists(l1, l2):
             current.next = l2
             l2 = l2.next
         current = current.next
-    
+
     current.next = l1 or l2
     return dummy.next
 ```
@@ -343,31 +350,32 @@ def merge_linked_lists(l1, l2):
 def count_inversions(arr):
     """
     Count inversions using merge sort.
-    
+
     Inversion: pair (i,j) where i < j and arr[i] > arr[j]
-    
+
     Args:
         arr: List to count inversions
-    
+
     Returns:
         Tuple (sorted_array, inversion_count)
     """
     if len(arr) <= 1:
         return arr, 0
-    
+
     mid = len(arr) // 2
     left, left_inv = count_inversions(arr[:mid])
     right, right_inv = count_inversions(arr[mid:])
     merged, split_inv = merge_count(left, right)
-    
+
     return merged, left_inv + right_inv + split_inv
+
 
 def merge_count(left, right):
     """Merge and count split inversions."""
     result = []
     i = j = 0
     inversions = 0
-    
+
     while i < len(left) and j < len(right):
         if left[i] <= right[j]:
             result.append(left[i])
@@ -376,10 +384,11 @@ def merge_count(left, right):
             result.append(right[j])
             inversions += len(left) - i
             j += 1
-    
+
     result.extend(left[i:])
     result.extend(right[j:])
     return result, inversions
+
 
 # Example usage
 arr = [2, 4, 1, 3, 5]

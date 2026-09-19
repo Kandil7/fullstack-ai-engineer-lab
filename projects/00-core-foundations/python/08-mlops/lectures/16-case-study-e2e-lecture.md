@@ -152,13 +152,13 @@ versions of every station. Its shape is the pattern to internalize:
 ```python
 def run_release(data_bytes: bytes, config: dict) -> dict:
     """One release through the full pipeline (mock stations)."""
-    data_version = content_hash(data_bytes)                # L1, L3
-    validate(data_bytes, schema)                           # L10
-    metrics = train(data_bytes, seed=config["seed"])       # L1, L2
+    data_version = content_hash(data_bytes)  # L1, L3
+    validate(data_bytes, schema)  # L10
+    metrics = train(data_bytes, seed=config["seed"])  # L1, L2
     assert metrics["val_acc"] >= champion_metrics["val_acc"]  # L12 gate
-    version = register("churn-predictor", metrics)         # L4
-    artifact = package(version)                            # L5
-    ab = ab_test(artifact)                                 # L14
+    version = register("churn-predictor", metrics)  # L4
+    artifact = package(version)  # L5
+    ab = ab_test(artifact)  # L14
     decision = "promote" if ab["verdict"] == "win" else "hold"
     return {"version": version, "decision": decision, "metrics": metrics}
 ```

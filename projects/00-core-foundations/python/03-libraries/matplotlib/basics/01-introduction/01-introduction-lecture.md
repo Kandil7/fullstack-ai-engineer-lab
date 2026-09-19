@@ -146,12 +146,12 @@ y = np.sin(x)
 fig, ax = plt.subplots(figsize=(8, 5))
 
 # Plot
-ax.plot(x, y, label='sin(x)', color='blue', linewidth=2)
+ax.plot(x, y, label="sin(x)", color="blue", linewidth=2)
 
 # Customize
-ax.set_title('First Plot: Sine Wave', fontsize=14, fontweight='bold')
-ax.set_xlabel('x (radians)', fontsize=12)
-ax.set_ylabel('sin(x)', fontsize=12)
+ax.set_title("First Plot: Sine Wave", fontsize=14, fontweight="bold")
+ax.set_xlabel("x (radians)", fontsize=12)
+ax.set_ylabel("sin(x)", fontsize=12)
 ax.legend()
 ax.grid(True, alpha=0.3)
 
@@ -188,13 +188,13 @@ Figure (the entire window/page)
 ### Key Objects
 
 ```python
-fig = plt.figure(figsize=(8, 6))          # The canvas
-ax = fig.add_subplot(111)                  # One subplot (1 row, 1 col, index 1)
+fig = plt.figure(figsize=(8, 6))  # The canvas
+ax = fig.add_subplot(111)  # One subplot (1 row, 1 col, index 1)
 # OR
 fig, ax = plt.subplots(2, 2, figsize=(10, 8))  # 2×2 grid of subplots
 
 print(type(fig))  # <class 'matplotlib.figure.Figure'>
-print(type(ax))   # <class 'matplotlib.axes._subplots.AxesSubplot'>
+print(type(ax))  # <class 'matplotlib.axes._subplots.AxesSubplot'>
 ```
 
 ---
@@ -213,9 +213,9 @@ ax.plot(x, y)
 ax.set_title("Sine Wave")
 
 # Save before show() - save clears the figure
-fig.savefig('sine_wave.png', dpi=300, bbox_inches='tight')
-fig.savefig('sine_wave.pdf', dpi=300, bbox_inches='tight')
-fig.savefig('sine_wave.svg', dpi=300, bbox_inches='tight')
+fig.savefig("sine_wave.png", dpi=300, bbox_inches="tight")
+fig.savefig("sine_wave.pdf", dpi=300, bbox_inches="tight")
+fig.savefig("sine_wave.svg", dpi=300, bbox_inches="tight")
 
 plt.show()
 ```
@@ -254,13 +254,13 @@ import matplotlib.pyplot as plt
 print(plt.style.available)
 
 # Use a style
-plt.style.use('ggplot')
+plt.style.use("ggplot")
 
 # OR with context manager
-with plt.style.context('seaborn-v0_8-darkgrid'):
+with plt.style.context("seaborn-v0_8-darkgrid"):
     fig, ax = plt.subplots()
     ax.plot([1, 2, 3], [1, 4, 2])
-    ax.set_title('Seaborn Dark Grid Style')
+    ax.set_title("Seaborn Dark Grid Style")
 ```
 
 ### Popular Styles

@@ -45,9 +45,8 @@ By the end of this lecture, you will be able to:
 
 ```python
 @app.get("/api/offset")
-def offset_page(limit: int = Query(20, ge=1, le=100),
-                offset: int = Query(0, ge=0)):
-    items = DB[offset:offset + limit]
+def offset_page(limit: int = Query(20, ge=1, le=100), offset: int = Query(0, ge=0)):
+    items = DB[offset : offset + limit]
     return {"items": items, "total": len(DB)}
 ```
 
@@ -80,14 +79,15 @@ page N+1 can skip or repeat rows. This is "the offset problem."
 
 ```python
 @app.get("/api/keyset")
-def keyset_page(limit: int = Query(20, ge=1, le=100),
-                cursor: str | None = None):
+def keyset_page(limit: int = Query(20, ge=1, le=100), cursor: str | None = None):
     start = int(cursor) if cursor else -1
     items = [r for r in DB if r["id"] > start][:limit]
     last_id = items[-1]["id"] if items else start
-    return {"items": items,
-            "next_cursor": str(last_id) if len(items) == limit else None,
-            "has_more": len(items) == limit}
+    return {
+        "items": items,
+        "next_cursor": str(last_id) if len(items) == limit else None,
+        "has_more": len(items) == limit,
+    }
 ```
 
 Output:
@@ -118,10 +118,11 @@ id tiebreaker, equal scores produce unstable page boundaries.
 
 ```python
 @app.get("/api/search")
-def search(name_contains: str | None = None,
-           min_score: int | None = None,
-           sort: str = Query("id", pattern="^(id|score|name)$")):
-    ...
+def search(
+    name_contains: str | None = None,
+    min_score: int | None = None,
+    sort: str = Query("id", pattern="^(id|score|name)$"),
+): ...
 ```
 
 Output:
@@ -170,7 +171,7 @@ on large tables, often the single most expensive part of a list endpoint. Trade:
 ### Mistake 1: Deep offset on large tables
 ```python
 # WRONG — page 100k scans 100k rows
-items = DB[offset:offset + limit]
+items = DB[offset : offset + limit]
 # CORRECT — keyset/cursor for anything beyond a few thousand rows
 ```
 

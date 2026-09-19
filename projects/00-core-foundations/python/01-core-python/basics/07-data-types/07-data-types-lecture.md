@@ -95,6 +95,7 @@ print(type(result))  # <class 'float'>
 def greet(name: str) -> str:
     return f"Hello, {name}!"
 
+
 def add(x: int, y: int) -> int:
     return x + y
 ```
@@ -103,8 +104,10 @@ def add(x: int, y: int) -> int:
 ```python
 from typing import List, Dict, Optional
 
+
 def process_items(items: List[str]) -> Dict[str, int]:
     return {item: len(item) for item in items}
+
 
 def find_user(user_id: int) -> Optional[str]:
     if user_id == 1:
@@ -124,7 +127,7 @@ negative = -42
 # Float
 pi = 3.14159
 scientific = 1.6e-19  # 1.6 × 10^-19
-infinity = float('inf')
+infinity = float("inf")
 
 # Complex
 complex_num = 3 + 4j
@@ -136,7 +139,7 @@ print(complex_num.imag)  # 4.0
 ```python
 # String creation
 name = "Alice"
-greeting = 'Hello, World!'
+greeting = "Hello, World!"
 multi_line = """This is a
 multi-line string"""
 
@@ -164,7 +167,7 @@ if is_active:
 
 # Boolean values are subclasses of int
 print(True + True)  # 2
-print(True * 10)    # 10
+print(True * 10)  # 10
 ```
 
 ### Example 4: Type Conversion
@@ -174,7 +177,7 @@ num_str = "42"
 num_int = int(num_str)
 num_float = float(num_str)
 
-print(num_int)    # 42
+print(num_int)  # 42
 print(num_float)  # 42.0
 
 # Number to string
@@ -205,7 +208,8 @@ print(0.1 + 0.2)  # 0.30000000000000004
 
 # Right - use decimal module for precision
 from decimal import Decimal
-print(Decimal('0.1') + Decimal('0.2'))  # 0.3
+
+print(Decimal("0.1") + Decimal("0.2"))  # 0.3
 ```
 
 ### Mistake 3: Mutable Default Arguments
@@ -215,8 +219,10 @@ def append_to(item, lst=[]):
     lst.append(item)
     return lst
 
+
 print(append_to(1))  # [1]
 print(append_to(2))  # [1, 2] - Bug!
+
 
 # Right - use None
 def append_to(item, lst=None):

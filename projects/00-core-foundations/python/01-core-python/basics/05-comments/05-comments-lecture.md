@@ -52,9 +52,10 @@ def greet(name):
     """Greet a person by name."""
     return f"Hello, {name}!"
 
+
 class User:
     """A class to represent a user."""
-    
+
     def __init__(self, name, age):
         """Initialize user with name and age."""
         self.name = name
@@ -120,6 +121,7 @@ def calculate_area(length, width):
     area = length * width
     return area
 
+
 # Example usage
 result = calculate_area(5, 3)
 print(f"Area: {result}")  # Output: Area: 15
@@ -166,9 +168,11 @@ Date: 2024
 Version: 1.0
 """
 
+
 def add(a, b):
     """Return the sum of a and b."""
     return a + b
+
 
 def subtract(a, b):
     """Return the difference of a and b."""
@@ -266,6 +270,7 @@ def add(a, b):
     result = a + b  # Store result
     # Return result
     return result  # Return the result
+
 
 # Good - concise comments
 def add(a, b):

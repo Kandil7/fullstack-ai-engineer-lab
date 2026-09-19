@@ -73,11 +73,14 @@ class Registry:
     def __init_subclass__(cls, **kwargs):
         Registry._r[cls.__name__] = cls
 
+
 class A(Registry):
     pass
 
+
 class B(A):
     pass
+
 
 print(sorted(Registry._r))
 ```
@@ -152,6 +155,7 @@ D) Requires a metaclass
 ```python
 def make_point(name):
     return type(name, (), {"x": 0, "y": 0})
+
 
 PointA = make_point("PointA")
 PointB = make_point("PointB")

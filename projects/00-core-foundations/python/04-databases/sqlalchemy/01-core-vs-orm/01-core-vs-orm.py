@@ -156,6 +156,7 @@ with engine.connect() as conn:
 # with Core, then analytics read them with plain selects. No ORM objects
 # needed for a load-then-query pipeline — object overhead buys nothing.
 
+
 def load_metrics(rows: list[dict[str, Any]]) -> int:
     """Bulk-insert metric rows, returning how many were written.
 
@@ -190,22 +191,25 @@ def _verify() -> None:
         assert [r[0] for r in rows] == ["bolt"], "text() bound params must filter"
 
         # 2. Core select expression compiles and matches expected names
-        names = conn.execute(
-            select(widgets.c.name)
-            .where(widgets.c.name.in_(["part-0", "part-1"]))
-            .order_by(widgets.c.qty.desc())
-        ).scalars().all()
+        names = (
+            conn.execute(
+                select(widgets.c.name)
+                .where(widgets.c.name.in_(["part-0", "part-1"]))
+                .order_by(widgets.c.qty.desc())
+            )
+            .scalars()
+            .all()
+        )
         assert names == ["part-1", "part-0"], "Core select must order and filter"
 
         # 3. Bulk load actually inserted all rows
-        count = conn.execute(
-            select(widgets.c.id).where(widgets.c.name.like("part-%"))
-        ).all()
+        count = conn.execute(select(widgets.c.id).where(widgets.c.name.like("part-%"))).all()
         assert len(count) == BULK_N, "bulk insert must write every row"
 
         # 4. engine connect round-trip works (Connection is alive)
-        assert conn.execute(text("SELECT 42")).scalar_one() == 42, \
+        assert conn.execute(text("SELECT 42")).scalar_one() == 42, (
             "round-trip SELECT must return the constant"
+        )
 
     # 5. Production pattern: load_metrics returns row count and rows land
     written = load_metrics(
@@ -216,12 +220,12 @@ def _verify() -> None:
     )
     assert written == 2, "load_metrics must report rows written"
     with engine.connect() as conn:
-        assert conn.execute(
-            text("SELECT COUNT(*) FROM metrics")
-        ).scalar_one() == 2, "metrics must be persisted"
-        assert conn.execute(
-            text("SELECT value FROM metrics WHERE metric = 'f1'")
-        ).scalar_one() == 89, "metrics values must round-trip"
+        assert conn.execute(text("SELECT COUNT(*) FROM metrics")).scalar_one() == 2, (
+            "metrics must be persisted"
+        )
+        assert (
+            conn.execute(text("SELECT value FROM metrics WHERE metric = 'f1'")).scalar_one() == 89
+        ), "metrics values must round-trip"
 
     print("[OK] 01-core-vs-orm: all checks passed")
 

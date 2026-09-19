@@ -51,6 +51,7 @@ D) The sum of negative values
 
 ```python
 import numpy as np
+
 x = np.array([-2.0, 3.0, -1.0])
 print(np.where(x > 0, x, 0.0))
 ```
@@ -87,6 +88,7 @@ D) `(12,)`
 
 ```python
 import numpy as np
+
 A = np.arange(9).reshape(3, 3)
 print(np.einsum("ii->", A))
 ```
@@ -103,6 +105,7 @@ D) `3`
 
 ```python
 import numpy as np
+
 vals = np.array([1.0, -2.0, 3.0, -4.0])
 vals[vals < 0] = 0.0
 print(vals)
@@ -131,6 +134,7 @@ D) `np.einsum("ij,jk->ik", batch, B)`
 
 ```python
 import numpy as np
+
 x = np.array([0.5, 2.0, -1.5])
 print(np.clip(x, 0.0, 1.0))
 ```
@@ -168,6 +172,7 @@ D) It converts to float32 by default
 
 ```python
 import numpy as np
+
 a = np.array([1, 2, 3])
 b = np.array([10, 20, 30])
 print(np.einsum("i,i->", a, b))
@@ -195,6 +200,7 @@ D) `len(vals[np.logical_and(vals, 10)])`
 
 ```python
 import numpy as np
+
 X = np.random.default_rng(0).normal(size=(10_000, 4))
 out = np.where(X > 0, X, -X)
 print(np.allclose(out, np.abs(X)))
@@ -212,6 +218,7 @@ D) `nan`
 
 ```python
 import numpy as np
+
 x = np.array([1.0, 2.0, 3.0])
 y = np.where(x > 1, np.where(x > 2, "big", "mid"), "small")
 print(y)
@@ -240,6 +247,7 @@ D) `(X - X.mean(axis=1)[None, :]) / X.std(axis=1)[None, :]`
 
 ```python
 import numpy as np
+
 arr = np.arange(6).reshape(2, 3)
 out = np.einsum("ij->ji", arr)
 print(out)
@@ -268,6 +276,7 @@ D) It is never necessary — ragged data can always be padded for free
 
 ```python
 import numpy as np
+
 x = np.array([1.0, -1.0])
 mask = x > 0
 print(np.where(mask, x, x * 10).sum())

@@ -41,7 +41,7 @@ conn.executemany(
         ("v2", 1, 30.0, 0.80),
         ("v2", 1, 28.0, 0.85),
         ("v2", 0, 33.0, 0.55),
-        ("v2", 0, 29.0, None),   # abstained -> confidence NULL
+        ("v2", 0, 29.0, None),  # abstained -> confidence NULL
     ],
 )
 
@@ -58,7 +58,9 @@ print("=== 1. Whole-Table Aggregates ===")
 row = conn.execute(
     "SELECT COUNT(*), COUNT(correct), SUM(correct), AVG(latency_ms), MIN(latency_ms), MAX(latency_ms) FROM predictions"
 ).fetchone()
-print(f"rows={row[0]} non-null correct={row[1]} correct_sum={row[2]} avg_lat={row[3]:.1f} min={row[4]} max={row[5]}")
+print(
+    f"rows={row[0]} non-null correct={row[1]} correct_sum={row[2]} avg_lat={row[3]:.1f} min={row[4]} max={row[5]}"
+)
 row = conn.execute("SELECT COUNT(*), COUNT(confidence) FROM predictions").fetchone()
 print(f"COUNT(*)={row[0]} vs COUNT(confidence)={row[1]}  <- NULLs dropped by COUNT(col)")
 print()
@@ -143,6 +145,7 @@ print()
 #
 # MISTAKE: GROUP BY with SELECT * — group keys and aggregates only
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -161,14 +164,17 @@ def _verify() -> None:
         assert (row[0], row[1]) == (6, 5), "COUNT(col) must exclude NULLs"
 
         # 2. SUM/AVG ignore NULLs
-        assert conn.execute("SELECT SUM(v) FROM t").fetchone()[0] == 36, \
+        assert conn.execute("SELECT SUM(v) FROM t").fetchone()[0] == 36, (
             "SUM must add non-NULL values"
-        assert conn.execute("SELECT AVG(v) FROM t").fetchone()[0] == 7.2, \
+        )
+        assert conn.execute("SELECT AVG(v) FROM t").fetchone()[0] == 7.2, (
             "AVG must divide by the non-NULL count (36 / 5)"
+        )
 
         # 3. MIN/MAX are NULL-aware
-        assert conn.execute("SELECT MIN(v), MAX(v) FROM t").fetchone() == (1, 20), \
+        assert conn.execute("SELECT MIN(v), MAX(v) FROM t").fetchone() == (1, 20), (
             "MIN/MAX must ignore NULLs"
+        )
 
         # 4. GROUP BY computes per-group aggregates
         rows = conn.execute("SELECT g, COUNT(*) FROM t GROUP BY g ORDER BY g").fetchall()
@@ -186,8 +192,9 @@ def _verify() -> None:
         assert rows == [("b", 2)], "WHERE must filter before grouping"
 
         # 6. COALESCE makes AVG treat NULLs as a chosen value
-        assert conn.execute("SELECT AVG(COALESCE(v, 0)) FROM t").fetchone()[0] == 6.0, \
+        assert conn.execute("SELECT AVG(COALESCE(v, 0)) FROM t").fetchone()[0] == 6.0, (
             "COALESCE inside aggregate must substitute NULLs (36 / 6)"
+        )
     finally:
         conn.close()
     print("[OK] 06-aggregation: all checks passed")
@@ -202,4 +209,4 @@ if __name__ == "__main__":
         print("2. GROUP BY runs aggregates per group")
         print("3. WHERE filters rows, HAVING filters groups")
         print("4. AVG/SUM ignore NULLs unless you COALESCE them")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

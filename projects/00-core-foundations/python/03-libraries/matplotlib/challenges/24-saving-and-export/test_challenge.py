@@ -11,6 +11,7 @@ import os
 import struct
 
 import matplotlib
+
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
@@ -61,6 +62,7 @@ def _parse_header(path):
 
 # ---------------------------------------------------------------- bronze
 
+
 def test_bronze_dpi_contract(tmp_path):
     fig = _plain_fig(figsize=(6, 4))
     w, h = solution.save_fig_png(fig, str(tmp_path / "a.png"), 150)
@@ -88,6 +90,7 @@ def test_bronze_starter_raises(tmp_path):
 
 
 # ---------------------------------------------------------------- silver
+
 
 def test_silver_png_report(tmp_path):
     fig = _plain_fig(figsize=(4, 3))
@@ -125,19 +128,20 @@ def test_silver_starter_raises(tmp_path):
 
 # ---------------------------------------------------------------- gold
 
+
 def test_gold_tight_crops_edge_figure(tmp_path):
     fig = _edge_hugging_fig()
-    assert solution.tight_crops(
-        fig, str(tmp_path / "loose.png"), str(tmp_path / "tight.png"), 100
-    ) is True
+    assert (
+        solution.tight_crops(fig, str(tmp_path / "loose.png"), str(tmp_path / "tight.png"), 100)
+        is True
+    )
 
 
 def test_gold_files_differ(tmp_path):
     fig = _edge_hugging_fig()
     loose, tight = str(tmp_path / "loose.png"), str(tmp_path / "tight.png")
     solution.tight_crops(fig, loose, tight, 100)
-    assert _parse_header(loose) != _parse_header(tight), \
-        "cropping must change the exported pixels"
+    assert _parse_header(loose) != _parse_header(tight), "cropping must change the exported pixels"
 
 
 def test_gold_header_based():
@@ -149,7 +153,9 @@ def test_gold_header_based():
 
 def test_gold_starter_raises(tmp_path):
     with pytest.raises(NotImplementedError):
-        starter.tight_crops(_edge_hugging_fig(), str(tmp_path / "l.png"), str(tmp_path / "t.png"), 100)
+        starter.tight_crops(
+            _edge_hugging_fig(), str(tmp_path / "l.png"), str(tmp_path / "t.png"), 100
+        )
 
 
 if __name__ == "__main__":

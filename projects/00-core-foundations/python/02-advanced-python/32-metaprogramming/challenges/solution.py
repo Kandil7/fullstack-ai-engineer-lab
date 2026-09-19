@@ -14,6 +14,7 @@ from typing import Any, Callable, get_type_hints
 # Bronze: Auto-Registering Tools
 # ============================================================
 
+
 class Tool:
     """Base class: every subclass registers itself by class name."""
 
@@ -33,17 +34,17 @@ class Tool:
 # Silver: Signature -> JSON Schema
 # ============================================================
 
+
 def schema_for(fn: Callable[..., object]) -> dict[str, object]:
     """Build an LLM function-calling schema from the signature."""
     sig = inspect.signature(fn)
     try:
         hints = get_type_hints(fn)
-    except Exception:                          # noqa: BLE001 - unresolvable
+    except Exception:  # noqa: BLE001 - unresolvable
         hints = {}
     schema: dict[str, object] = {
         "name": fn.__name__,
-        "description": (fn.__doc__ or "").strip().splitlines()[0]
-                       if fn.__doc__ else "",
+        "description": (fn.__doc__ or "").strip().splitlines()[0] if fn.__doc__ else "",
         "parameters": {"type": "object", "properties": {}},
     }
     type_map = {

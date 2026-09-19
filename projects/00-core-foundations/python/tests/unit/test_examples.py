@@ -38,7 +38,9 @@ def test_practice_all_imports():
     """Test that practice_all.py can be imported."""
     result = subprocess.run(
         [sys.executable, "-c", "import practice_all; print('OK')"],
-        capture_output=True, text=True, timeout=10,
+        capture_output=True,
+        text=True,
+        timeout=10,
         cwd=str(PROJECT_ROOT / "01-core-python"),
     )
     assert result.returncode == 0, result.stderr[:200]
@@ -49,7 +51,9 @@ def test_practice_no_solutions_imports():
     """Test that practice_no_solutions.py can be imported."""
     result = subprocess.run(
         [sys.executable, "-c", "import practice_no_solutions; print('OK')"],
-        capture_output=True, text=True, timeout=10,
+        capture_output=True,
+        text=True,
+        timeout=10,
         cwd=str(PROJECT_ROOT / "01-core-python"),
     )
     assert result.returncode == 0, result.stderr[:200]

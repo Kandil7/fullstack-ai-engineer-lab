@@ -4,6 +4,7 @@ W3Schools: https://www.w3schools.com/python/pandas_dataframe_loc.asp
 
 Learn to select specific rows and columns from a DataFrame.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -11,13 +12,16 @@ import numpy as np
 # Sample data
 # ---------------------------------------------------------------------------
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
-    "Department": ["Engineering", "Marketing", "Engineering", "Sales", "Marketing"],
-    "Age": [25, 30, 35, 28, 22],
-    "Salary": [70000, 80000, 95000, 75000, 65000],
-    "Rating": [4.5, 3.8, 4.9, 4.2, 3.5],
-}, index=["emp1", "emp2", "emp3", "emp4", "emp5"])
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
+        "Department": ["Engineering", "Marketing", "Engineering", "Sales", "Marketing"],
+        "Age": [25, 30, 35, 28, 22],
+        "Salary": [70000, 80000, 95000, 75000, 65000],
+        "Rating": [4.5, 3.8, 4.9, 4.2, 3.5],
+    },
+    index=["emp1", "emp2", "emp3", "emp4", "emp5"],
+)
 
 print("Original DataFrame:")
 print(df)

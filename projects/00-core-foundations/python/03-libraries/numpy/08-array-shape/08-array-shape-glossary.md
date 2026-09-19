@@ -34,7 +34,7 @@ A dimension of an array. For 2D arrays: axis 0 = rows, axis 1 = columns.
 import numpy as np
 
 arr = np.array([[1, 2, 3], [4, 5, 6]])
-print(arr.shape)     # (2, 3)
+print(arr.shape)  # (2, 3)
 print(arr.shape[0])  # 2 (rows = axis 0)
 print(arr.shape[1])  # 3 (columns = axis 1)
 
@@ -59,12 +59,12 @@ result = arr + 5  # (3,) + () → (3,)
 
 # 1D broadcasting
 a = np.array([[1, 2, 3], [4, 5, 6]])  # (2, 3)
-b = np.array([10, 20, 30])             # (3,)
+b = np.array([10, 20, 30])  # (3,)
 c = a + b  # (2, 3) + (3,) → (2, 3)
 
 # Rules: align from right, prepend 1s to smaller
 a = np.zeros((3, 4))
-b = np.zeros((4,))       # → (1, 4) → (3, 4)
+b = np.zeros((4,))  # → (1, 4) → (3, 4)
 c = a + b
 ```
 
@@ -103,13 +103,13 @@ Array shapes that can be broadcast together.
 ```python
 # Compatible
 a = np.zeros((3, 4))
-b = np.zeros((4,))        # Broadcasts to (3, 4)
-c = np.zeros((3, 1))      # Broadcasts to (3, 4)
-d = np.zeros((2, 3, 4))   # Broadcasts to (2, 3, 4)
+b = np.zeros((4,))  # Broadcasts to (3, 4)
+c = np.zeros((3, 1))  # Broadcasts to (3, 4)
+d = np.zeros((2, 3, 4))  # Broadcasts to (2, 3, 4)
 
 # Incompatible
 a = np.zeros((3, 4))
-b = np.zeros((3, 2))      # Cannot broadcast!
+b = np.zeros((3, 2))  # Cannot broadcast!
 ```
 
 **Related:** broadcasting, shape
@@ -122,10 +122,9 @@ b = np.zeros((3, 2))      # Cannot broadcast!
 A 2D array.
 
 ```python
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6]])
+matrix = np.array([[1, 2, 3], [4, 5, 6]])
 print(matrix.shape)  # (2, 3)
-print(matrix.ndim)   # 2
+print(matrix.ndim)  # 2
 
 # Square matrix
 square = np.eye(3)
@@ -154,9 +153,9 @@ col = arr[:, np.newaxis]
 print(col.shape)  # (5, 1)
 
 # For broadcasting
-a = np.array([1, 2, 3])      # (3,)
-b = np.array([10, 20])       # (2,)
-c = a[:, np.newaxis] + b     # (3, 2)
+a = np.array([1, 2, 3])  # (3,)
+b = np.array([10, 20])  # (2,)
+c = a[:, np.newaxis] + b  # (3, 2)
 ```
 
 **Related:** reshape, dimension expansion
@@ -214,7 +213,7 @@ A 2D array with shape (1, n).
 arr = np.array([1, 2, 3, 4, 5])
 row = arr.reshape(1, -1)
 print(row.shape)  # (1, 5)
-print(row)        # [[1 2 3 4 5]]
+print(row)  # [[1 2 3 4 5]]
 
 # Using np.newaxis
 row = arr[np.newaxis, :]
@@ -233,12 +232,12 @@ A 0-dimensional array.
 ```python
 scalar = np.array(42)
 print(scalar.shape)  # ()
-print(scalar.ndim)   # 0
-print(scalar.size)   # 1
+print(scalar.ndim)  # 0
+print(scalar.size)  # 1
 
 # Scalar operations
-print(scalar + 10)   # 52
-print(scalar * 2)    # 84
+print(scalar + 10)  # 52
+print(scalar * 2)  # 84
 ```
 
 **Related:** vector, matrix
@@ -307,7 +306,7 @@ A 3D or higher-dimensional array.
 ```python
 tensor = np.zeros((2, 3, 4))
 print(tensor.shape)  # (2, 3, 4)
-print(tensor.ndim)   # 3
+print(tensor.ndim)  # 3
 
 # Common tensor shapes
 # Image batch: (batch, height, width, channels)
@@ -325,17 +324,17 @@ print(batch.shape)  # (32, 100, 200, 3)
 import numpy as np
 
 # Common patterns
-print(f"Scalar: {np.array(42).shape}")           # ()
-print(f"Vector: {np.array([1, 2, 3]).shape}")    # (3,)
-print(f"Matrix: {np.zeros((3, 4)).shape}")       # (3, 4)
-print(f"Tensor: {np.zeros((2, 3, 4)).shape}")    # (2, 3, 4)
+print(f"Scalar: {np.array(42).shape}")  # ()
+print(f"Vector: {np.array([1, 2, 3]).shape}")  # (3,)
+print(f"Matrix: {np.zeros((3, 4)).shape}")  # (3, 4)
+print(f"Tensor: {np.zeros((2, 3, 4)).shape}")  # (2, 3, 4)
 
 # Adding dimensions
 arr = np.array([1, 2, 3])
-print(f"Row:    {arr.reshape(1, -1).shape}")     # (1, 3)
-print(f"Col:    {arr.reshape(-1, 1).shape}")     # (3, 1)
+print(f"Row:    {arr.reshape(1, -1).shape}")  # (1, 3)
+print(f"Col:    {arr.reshape(-1, 1).shape}")  # (3, 1)
 
 # Removing dimensions
 arr = np.zeros((1, 3, 1, 4))
-print(f"Squeeze: {np.squeeze(arr).shape}")        # (3, 4)
+print(f"Squeeze: {np.squeeze(arr).shape}")  # (3, 4)
 ```

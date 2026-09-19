@@ -15,6 +15,7 @@ When to use: When stable sort is needed, linked lists
 # 1. BASIC MERGE SORT
 # =============================================================================
 
+
 def merge_sort(arr):
     """Basic merge sort. O(n log n) time, O(n) space"""
     if len(arr) <= 1:
@@ -25,6 +26,7 @@ def merge_sort(arr):
     right = merge_sort(arr[mid:])
 
     return merge(left, right)
+
 
 def merge(left, right):
     """Merge two sorted arrays"""
@@ -43,6 +45,7 @@ def merge(left, right):
     result.extend(right[j:])
     return result
 
+
 print("=== Basic Merge Sort ===")
 arr = [38, 27, 43, 3, 9, 82, 10]
 print(f"Original: {arr}")
@@ -52,6 +55,7 @@ print(f"Sorted: {merge_sort(arr)}")
 # =============================================================================
 # 2. IN-PLACE MERGE SORT
 # =============================================================================
+
 
 def merge_sort_inplace(arr, low=0, high=None):
     """In-place merge sort using O(1) extra space"""
@@ -65,6 +69,7 @@ def merge_sort_inplace(arr, low=0, high=None):
         merge_inplace(arr, low, mid, high)
 
     return arr
+
 
 def merge_inplace(arr, low, mid, high):
     """Merge without extra space (gap method)"""
@@ -80,6 +85,7 @@ def merge_inplace(arr, low, mid, high):
             break
         gap = (gap + 1) // 2
 
+
 print("\n=== In-Place Merge Sort ===")
 arr = [38, 27, 43, 3, 9, 82, 10]
 print(f"Sorted: {merge_sort_inplace(arr.copy())}")
@@ -88,6 +94,7 @@ print(f"Sorted: {merge_sort_inplace(arr.copy())}")
 # =============================================================================
 # 3. MERGE SORT WITH STEPS
 # =============================================================================
+
 
 def merge_sort_steps(arr):
     """Merge sort showing each merge step"""
@@ -108,6 +115,7 @@ def merge_sort_steps(arr):
     result = _merge_sort(arr)
     return result, steps
 
+
 print("\n=== Merge Sort with Steps ===")
 arr = [38, 27, 43, 3, 9]
 sorted_arr, steps = merge_sort_steps(arr)
@@ -120,6 +128,7 @@ print(f"Final: {sorted_arr}")
 # 4. BOTTOM-UP MERGE SORT
 # =============================================================================
 
+
 def merge_sort_bottom_up(arr):
     """Iterative merge sort - no recursion"""
     n = len(arr)
@@ -131,14 +140,15 @@ def merge_sort_bottom_up(arr):
             end = min(start + 2 * size - 1, n - 1)
 
             if mid < end:
-                left = arr[start:mid + 1]
-                right = arr[mid + 1:end + 1]
+                left = arr[start : mid + 1]
+                right = arr[mid + 1 : end + 1]
                 merged = merge(left, right)
-                arr[start:start + len(merged)] = merged
+                arr[start : start + len(merged)] = merged
 
         size *= 2
 
     return arr
+
 
 print("\n=== Bottom-Up Merge Sort ===")
 arr = [38, 27, 43, 3, 9, 82, 10]
@@ -148,6 +158,7 @@ print(f"Sorted: {merge_sort_bottom_up(arr.copy())}")
 # =============================================================================
 # 5. MERGE SORT DESCENDING
 # =============================================================================
+
 
 def merge_sort_descending(arr):
     """Sort in descending order"""
@@ -159,6 +170,7 @@ def merge_sort_descending(arr):
     right = merge_sort_descending(arr[mid:])
 
     return merge_desc(left, right)
+
 
 def merge_desc(left, right):
     """Merge two arrays in descending order"""
@@ -177,6 +189,7 @@ def merge_desc(left, right):
     result.extend(right[j:])
     return result
 
+
 print("\n=== Descending Merge Sort ===")
 arr = [38, 27, 43, 3, 9, 82, 10]
 print(f"Descending: {merge_sort_descending(arr)}")
@@ -186,10 +199,12 @@ print(f"Descending: {merge_sort_descending(arr)}")
 # 6. MERGE SORT ON LINKED LIST
 # =============================================================================
 
+
 class Node:
     def __init__(self, data):
         self.data = data
         self.next = None
+
 
 def merge_sort_linked_list(head):
     """Merge sort on linked list. O(n log n)"""
@@ -210,6 +225,7 @@ def merge_sort_linked_list(head):
 
     return merge_linked_lists(left, right)
 
+
 def merge_linked_lists(l1, l2):
     """Merge two sorted linked lists"""
     dummy = Node(0)
@@ -227,12 +243,14 @@ def merge_linked_lists(l1, l2):
     current.next = l1 if l1 else l2
     return dummy.next
 
+
 def linked_list_to_list(head):
     result = []
     while head:
         result.append(head.data)
         head = head.next
     return result
+
 
 print("\n=== Merge Sort Linked List ===")
 values = [38, 27, 43, 3, 9]
@@ -250,6 +268,7 @@ print(f"Sorted: {linked_list_to_list(head)}")
 # 7. COUNTING INVERSIONS
 # =============================================================================
 
+
 def count_inversions(arr):
     """Count inversions using merge sort. O(n log n)"""
     if len(arr) <= 1:
@@ -261,6 +280,7 @@ def count_inversions(arr):
     merged, split_inv = merge_count(left, right)
 
     return merged, left_inv + right_inv + split_inv
+
 
 def merge_count(left, right):
     """Merge and count split inversions"""
@@ -281,6 +301,7 @@ def merge_count(left, right):
     result.extend(right[j:])
     return result, inversions
 
+
 print("\n=== Count Inversions ===")
 arr = [2, 4, 1, 3, 5]
 sorted_arr, inversions = count_inversions(arr)
@@ -293,6 +314,7 @@ print(f"Sorted: {sorted_arr}")
 # 8. EXTERNAL MERGE SORT (LARGE FILES)
 # =============================================================================
 
+
 def external_merge_sort(files, chunk_size=3):
     """Simulate external merge sort for large data"""
     import heapq
@@ -300,12 +322,13 @@ def external_merge_sort(files, chunk_size=3):
     # Create sorted chunks
     chunks = []
     for i in range(0, len(files), chunk_size):
-        chunk = sorted(files[i:i + chunk_size])
+        chunk = sorted(files[i : i + chunk_size])
         chunks.append(iter(chunk))
 
     # Merge chunks using heap
     result = list(heapq.merge(*chunks))
     return result
+
 
 print("\n=== External Merge Sort ===")
 data = [38, 27, 43, 3, 9, 82, 10, 15, 28, 41]
@@ -316,6 +339,7 @@ print(f"Sorted: {external_merge_sort(data)}")
 # =============================================================================
 # 9. MERGE K SORTED ARRAYS
 # =============================================================================
+
 
 def merge_k_sorted(arrays):
     """Merge k sorted arrays. O(N log k)"""
@@ -338,12 +362,9 @@ def merge_k_sorted(arrays):
 
     return result
 
+
 print("\n=== Merge K Sorted Arrays ===")
-arrays = [
-    [1, 4, 7],
-    [2, 5, 8],
-    [3, 6, 9]
-]
+arrays = [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
 print(f"Arrays: {arrays}")
 print(f"Merged: {merge_k_sorted(arrays)}")
 
@@ -351,6 +372,7 @@ print(f"Merged: {merge_k_sorted(arrays)}")
 # =============================================================================
 # 10. MERGE SORT PERFORMANCE
 # =============================================================================
+
 
 def analyze_merge_sort():
     """Analyze merge sort performance"""
@@ -377,8 +399,9 @@ def analyze_merge_sort():
         bottom_time = time.time() - start
 
         print(f"\nn={size}:")
-        print(f"  Top-down:  {top_time*1000:.2f}ms")
-        print(f"  Bottom-up: {bottom_time*1000:.2f}ms")
+        print(f"  Top-down:  {top_time * 1000:.2f}ms")
+        print(f"  Bottom-up: {bottom_time * 1000:.2f}ms")
+
 
 analyze_merge_sort()
 
@@ -388,6 +411,7 @@ analyze_merge_sort()
 # =============================================================================
 
 print("\n=== Practical Applications ===")
+
 
 # Sort custom objects
 def merge_sort_by_key(arr, key_func):
@@ -412,10 +436,12 @@ def merge_sort_by_key(arr, key_func):
     result.extend(right[j:])
     return result
 
+
 students = [("Alice", 85), ("Bob", 92), ("Charlie", 78), ("Diana", 85)]
 print(f"Students: {students}")
 sorted_students = merge_sort_by_key(students, lambda x: x[1])
 print(f"Sorted by grade: {sorted_students}")
+
 
 # Find median using merge sort
 def find_median(arr):
@@ -426,6 +452,7 @@ def find_median(arr):
         return sorted_arr[n // 2]
     else:
         return (sorted_arr[n // 2 - 1] + sorted_arr[n // 2]) / 2
+
 
 arr = [3, 1, 4, 1, 5, 9, 2, 6]
 print(f"\nArray: {arr}")

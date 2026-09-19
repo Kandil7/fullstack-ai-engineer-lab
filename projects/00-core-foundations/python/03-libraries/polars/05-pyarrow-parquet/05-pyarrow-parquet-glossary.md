@@ -31,6 +31,7 @@ schema — the in-memory interchange object of the Arrow ecosystem.
 **Example**:
 ```python
 import pyarrow as pa
+
 t = pa.table({"id": pa.array([1, 2]), "ok": pa.array([True, False])})
 print(t.num_rows, t.num_columns)
 ```
@@ -52,6 +53,7 @@ same buffers — no conversion, O(1).
 ```python
 import pyarrow as pa
 import polars as pl
+
 t = pa.table({"x": pa.array([1.0, 2.0])})
 df = pl.from_arrow(t)
 print(df.shape)
@@ -74,6 +76,7 @@ view of the same data.
 ```python
 import polars as pl
 import numpy as np
+
 s = pl.Series("v", [1.0, 2.0])
 a = s.to_numpy(allow_copy=False)
 print(np.shares_memory(s.to_numpy(), a))

@@ -15,13 +15,13 @@ import numpy as np
 arr = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
 # Total sum
-print("sum():", np.sum(arr))       # 55
-print("arr.sum():", arr.sum())     # 55
+print("sum():", np.sum(arr))  # 55
+print("arr.sum():", arr.sum())  # 55
 
 # Sum along axis
 arr2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 print("\n2D Array:\n", arr2d)
-print("Sum all:", arr2d.sum())           # 45
+print("Sum all:", arr2d.sum())  # 45
 print("Sum rows (axis=1):", arr2d.sum(axis=1))  # [ 6 15 24]
 print("Sum cols (axis=0):", arr2d.sum(axis=0))  # [12 15 18]
 
@@ -137,11 +137,13 @@ print("\nDaily sales:", daily_sales)
 print("Weekly total:", daily_sales.sum())
 print("Running total:", np.cumsum(daily_sales))
 
+
 # Moving average (using cumsum)
 def moving_average(arr, window):
     cumsum = np.cumsum(arr)
     cumsum = np.insert(cumsum, 0, 0)
     return (cumsum[window:] - cumsum[:-window]) / window
+
 
 prices = np.array([100, 102, 101, 103, 105, 104, 106, 108, 107, 109])
 ma3 = moving_average(prices, 3)

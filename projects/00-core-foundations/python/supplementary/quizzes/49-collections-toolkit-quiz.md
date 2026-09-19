@@ -33,6 +33,7 @@ D) O(n log n)
 **What is the output of this code?**
 ```python
 from collections import deque
+
 d = deque(maxlen=3)
 for x in [1, 2, 3, 4, 5]:
     d.append(x)
@@ -52,6 +53,7 @@ D) [4, 5]
 **What is the output of this code?**
 ```python
 import heapq
+
 h = []
 for x in [5, 1, 3]:
     heapq.heappush(h, x)
@@ -83,6 +85,7 @@ D) O(n + k)
 **What is the output of this code?**
 ```python
 import bisect
+
 xs = [1, 3, 5, 7, 7, 9]
 print(bisect.bisect_left(xs, 7), bisect.bisect_right(xs, 7))
 ```
@@ -100,6 +103,7 @@ D) 3 3
 **What is the output of this code?**
 ```python
 from collections import Counter
+
 freq = Counter(["a", "b", "a", "c", "a"])
 print(freq.most_common(2))
 ```
@@ -130,6 +134,7 @@ D) `heapq` priority queue
 **What is the output of this code?**
 ```python
 from collections import defaultdict
+
 d = defaultdict(list)
 x = d.get("missing")
 print(x, "missing" in d)
@@ -148,6 +153,7 @@ D) None True
 **What is the output of this code?**
 ```python
 from collections import ChainMap
+
 cfg = ChainMap({"lr": 1e-4}, {"lr": 1e-3, "seed": 0})
 print(cfg["lr"], cfg["seed"])
 ```
@@ -177,6 +183,7 @@ D) `scores.sort(reverse=True)` then slice
 **What is the output of this code?**
 ```python
 import heapq
+
 pq = []
 heapq.heappush(pq, (3, "embed"))
 heapq.heappush(pq, (1, "health"))
@@ -197,6 +204,7 @@ D) (1, health)
 **What is the output of this code?**
 ```python
 import bisect
+
 xs = [10, 20, 40]
 bisect.insort(xs, 30)
 print(xs)
@@ -227,6 +235,7 @@ D) `heap[-1]` is always the maximum
 **What is the output of this code?**
 ```python
 from collections import Counter
+
 a = Counter(x=2, y=1)
 b = Counter(y=3, z=1)
 print(dict(a + b))
@@ -257,6 +266,7 @@ D) When you need O(1) insert
 **What is the output of this code?**
 ```python
 import heapq
+
 h = [5, 1, 3]
 heapq.heapify(h)
 print(heapq.heappop(h), heapq.heappop(h))
@@ -288,6 +298,7 @@ D) `deque(tokens, maxlen=k)`
 **What is the output of this code?**
 ```python
 from collections import defaultdict
+
 d = defaultdict(int)
 d["a"] += 1
 d["b"] += 1
@@ -321,6 +332,7 @@ D) `Counter` — counts are unordered
 **What is the output of this code?**
 ```python
 from collections import OrderedDict
+
 od = OrderedDict(a=1, b=2, c=3)
 od.move_to_end("a")
 od.popitem(last=False)

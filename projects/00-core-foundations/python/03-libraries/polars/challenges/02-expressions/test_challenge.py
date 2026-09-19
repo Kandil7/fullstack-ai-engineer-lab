@@ -28,9 +28,7 @@ starter = _load("starter_02", os.path.join(HERE, "starter.py"))
 
 def _small_frame() -> pl.DataFrame:
     return pl.DataFrame(
-        {"user": ["a", "b", "c", "a"],
-         "score": [0.9, 0.4, 0.7, 0.2],
-         "spend": [10, 20, 30, 40]}
+        {"user": ["a", "b", "c", "a"], "score": [0.9, 0.4, 0.7, 0.2], "spend": [10, 20, 30, 40]}
     )
 
 
@@ -44,6 +42,7 @@ def _assert_expression_pure():
 
 
 # ---------------------------------------------------------------- bronze
+
 
 def test_bronze_basic_filter():
     out = solution.filter_and_project(_small_frame(), 0.5, 15.0)
@@ -67,6 +66,7 @@ def test_bronze_starter_raises():
 
 
 # ---------------------------------------------------------------- silver
+
 
 def test_silver_band_values():
     out = solution.derive_features(_small_frame())
@@ -95,6 +95,7 @@ def test_silver_starter_raises():
 
 # ---------------------------------------------------------------- gold
 
+
 def test_gold_window_features_small():
     out = solution.group_ranked_features(_small_frame())
     row_a = out.filter(pl.col("user") == "a").row(0)
@@ -117,14 +118,17 @@ def test_gold_sorted_by_user():
 def test_gold_large_scale():
     rng = __import__("numpy").random.default_rng(42)
     n = 200_000
-    df = pl.DataFrame({
-        "user": [f"u{rng.integers(0, 10_000)}" for _ in range(n)],
-        "spend": rng.uniform(0.0, 100.0, n),
-    })
+    df = pl.DataFrame(
+        {
+            "user": [f"u{rng.integers(0, 10_000)}" for _ in range(n)],
+            "spend": rng.uniform(0.0, 100.0, n),
+        }
+    )
     out = solution.group_ranked_features(df)
     assert out.height == 10_000, "one row per user"
-    assert abs(out["spend_total"].sum() - df["spend"].sum()) < 1e-6, \
+    assert abs(out["spend_total"].sum() - df["spend"].sum()) < 1e-6, (
         "spend_total must partition the total spend"
+    )
 
 
 def test_gold_expression_pure():

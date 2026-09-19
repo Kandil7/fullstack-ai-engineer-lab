@@ -15,10 +15,10 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent  # python/
 
 # Files that cannot (or should not) be executed in a test run.
 DEFAULT_SKIP = {
-    "practice_all.py",          # interactive
-    "practice_no_solutions.py", # interactive
-    "39-pip.py",                # runs pip commands
-    "40-virtualenv.py",         # creates virtualenvs
+    "practice_all.py",  # interactive
+    "practice_no_solutions.py",  # interactive
+    "39-pip.py",  # runs pip commands
+    "40-virtualenv.py",  # creates virtualenvs
     "__init__.py",
 }
 
@@ -36,10 +36,7 @@ def discover_phase_files(phase_dir: str, skip: set[str] | None = None) -> list[P
     phase_path = PROJECT_ROOT / phase_dir
     if not phase_path.is_dir():
         return []
-    return sorted(
-        f for f in phase_path.iterdir()
-        if f.suffix == ".py" and f.name not in skip
-    )
+    return sorted(f for f in phase_path.iterdir() if f.suffix == ".py" and f.name not in skip)
 
 
 def compile_check(path: Path) -> bool:
@@ -59,6 +56,9 @@ def run_py_file(path: Path, timeout: int = 90) -> subprocess.CompletedProcess:
     env = {**os.environ, "PYTHONIOENCODING": "utf-8", "MPLBACKEND": "Agg"}
     return subprocess.run(
         [sys.executable, str(path)],
-        capture_output=True, text=True, timeout=timeout,
-        cwd=str(PROJECT_ROOT), env=env,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        cwd=str(PROJECT_ROOT),
+        env=env,
     )

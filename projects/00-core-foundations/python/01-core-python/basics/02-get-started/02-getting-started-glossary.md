@@ -42,7 +42,8 @@ deactivate
 ```python
 # Python automatically compiles to bytecode
 import py_compile
-py_compile.compile('script.py')
+
+py_compile.compile("script.py")
 
 # Bytecode files appear in __pycache__/
 # script.cpython-312.pyc
@@ -145,6 +146,7 @@ where python  # Windows
 ```python
 # Find Python interpreter path
 import sys
+
 print(sys.executable)
 # Output: /usr/bin/python3 or C:\Python312\python.exe
 ```
@@ -187,10 +189,12 @@ pip list --user
 ```python
 # Import entire module
 import math
+
 print(math.pi)
 
 # Import specific function
 from math import sqrt
+
 print(sqrt(16))
 
 # Import with alias
@@ -326,6 +330,7 @@ python-dotenv==1.0.0
 # Save as script.py
 def main():
     print("Running in script mode")
+
 
 if __name__ == "__main__":
     main()

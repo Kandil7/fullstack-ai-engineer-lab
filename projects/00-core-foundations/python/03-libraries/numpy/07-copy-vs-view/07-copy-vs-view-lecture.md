@@ -30,18 +30,18 @@ arr = np.array([10, 20, 30, 40, 50])
 
 # Slicing creates a view
 view = arr[1:3]
-print(view)       # [20 30]
+print(view)  # [20 30]
 
 # View shares memory with original
 print(np.shares_memory(arr, view))  # True
 
 # Modify the view
 view[0] = 999
-print(arr)        # [ 10 999  30  40  50] — original modified!
+print(arr)  # [ 10 999  30  40  50] — original modified!
 
 # Modify the original
 arr[2] = 777
-print(view)       # [999 777] — view modified!
+print(view)  # [999 777] — view modified!
 ```
 
 ### 1.2 View Attributes
@@ -58,7 +58,7 @@ print(view.dtype == arr.dtype)  # True
 
 # View has different shape
 print(view.shape)  # (2,)
-print(arr.shape)   # (5,)
+print(arr.shape)  # (5,)
 ```
 
 ---
@@ -74,18 +74,18 @@ arr = np.array([10, 20, 30, 40, 50])
 
 # Explicit copy using .copy()
 copy = arr[1:3].copy()
-print(copy)       # [20 30]
+print(copy)  # [20 30]
 
 # Copy does NOT share memory
 print(np.shares_memory(arr, copy))  # False
 
 # Modify the copy
 copy[0] = 999
-print(arr)        # [10 20 30 40 50] — original unchanged!
+print(arr)  # [10 20 30 40 50] — original unchanged!
 
 # Modify the original
 arr[2] = 777
-print(copy)       # [20 30] — copy unchanged!
+print(copy)  # [20 30] — copy unchanged!
 ```
 
 ### 2.2 np.copy()
@@ -164,7 +164,7 @@ arr = np.arange(20).reshape(4, 5)
 
 # Non-contiguous slice
 view = arr[::2, ::2]
-print(view.flags['C_CONTIGUOUS'])  # False
+print(view.flags["C_CONTIGUOUS"])  # False
 
 # reshape on non-contiguous array may create copy
 copy = view.reshape(4)
@@ -212,12 +212,12 @@ view = arr[1:3]
 copy = arr[1:3].copy()
 
 # Method 1: np.shares_memory()
-print(np.shares_memory(arr, view))   # True
-print(np.shares_memory(arr, copy))   # False
+print(np.shares_memory(arr, view))  # True
+print(np.shares_memory(arr, copy))  # False
 
 # Method 2: Check base attribute
-print(view.base is arr)   # True
-print(copy.base is arr)   # False
+print(view.base is arr)  # True
+print(copy.base is arr)  # False
 
 # Method 3: Check memory address
 print(arr.ctypes.data == view.ctypes.data)  # True
@@ -306,12 +306,12 @@ copy = arr[1:4].copy()
 view[0] = 999
 
 # Question: What is arr now? What about copy?
-print(f"arr: {arr}")      # [ 10 999  30  40  50]
-print(f"copy: {copy}")    # [20 30 40]
+print(f"arr: {arr}")  # [ 10 999  30  40  50]
+print(f"copy: {copy}")  # [20 30 40]
 
 # Verify memory sharing
-print(f"shares_memory(arr, view): {np.shares_memory(arr, view)}")   # True
-print(f"shares_memory(arr, copy): {np.shares_memory(arr, copy)}")   # False
+print(f"shares_memory(arr, view): {np.shares_memory(arr, view)}")  # True
+print(f"shares_memory(arr, copy): {np.shares_memory(arr, copy)}")  # False
 ```
 
 ### Exercise 2: Operations Creating Views

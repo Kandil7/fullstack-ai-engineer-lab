@@ -41,12 +41,14 @@ y = (X[:, 0] * 0.8 + X[:, 1] * 0.3 + rng.randn(n) * 1.5 > 0).astype(int)
 df = pd.DataFrame(X, columns=[f"f{i}" for i in range(5)])
 df["churned"] = y
 
+
 def honest_auc(df_: pd.DataFrame) -> float:
     Xtr, Xte, ytr, yte = train_test_split(
         df_.drop(columns="churned"), df_["churned"], test_size=0.3, random_state=0
     )
     m = RandomForestClassifier(n_estimators=50, random_state=0).fit(Xtr, ytr)
     return roc_auc_score(yte, m.predict_proba(Xte)[:, 1])
+
 
 print("Example 1: the honest baseline")
 print(f"  clean AUC: {honest_auc(df):.3f}")
@@ -66,8 +68,12 @@ print(f"  AUC with contaminated scaling: {honest_auc(contaminated):.3f}")
 
 # --- Leak 3: duplicated rows across splits ---
 dup = pd.concat([df, df.iloc[:400]], ignore_index=True)  # 400 rows appear twice
-Xtr, Xte, ytr, yte = train_test_split(dup.drop(columns="churned"), dup["churned"], test_size=0.3, random_state=0)
-print(f"  AUC with duplicate rows in both splits: {roc_auc_score(yte, RandomForestClassifier(n_estimators=50, random_state=0).fit(Xtr, ytr).predict_proba(Xte)[:, 1]):.3f}")
+Xtr, Xte, ytr, yte = train_test_split(
+    dup.drop(columns="churned"), dup["churned"], test_size=0.3, random_state=0
+)
+print(
+    f"  AUC with duplicate rows in both splits: {roc_auc_score(yte, RandomForestClassifier(n_estimators=50, random_state=0).fit(Xtr, ytr).predict_proba(Xte)[:, 1]):.3f}"
+)
 
 # ============================================================
 # 2. Temporal Leakage — the future sneaks into the past
@@ -79,13 +85,18 @@ ts_df["ts"] = dates
 # Sort by time, then split on TIME — not randomly.
 ts_df = ts_df.sort_values("ts")
 cut = int(n * 0.7)
-Xtr_t, Xte_t = ts_df.drop(columns=["churned", "ts"]).iloc[:cut], ts_df.drop(columns=["churned", "ts"]).iloc[cut:]
+Xtr_t, Xte_t = (
+    ts_df.drop(columns=["churned", "ts"]).iloc[:cut],
+    ts_df.drop(columns=["churned", "ts"]).iloc[cut:],
+)
 ytr_t, yte_t = ts_df["churned"].iloc[:cut], ts_df["churned"].iloc[cut:]
 m = RandomForestClassifier(n_estimators=50, random_state=0).fit(Xtr_t, ytr_t)
 auc_time_ok = roc_auc_score(yte_t, m.predict_proba(Xte_t)[:, 1])
 
 # WRONG: shuffle splits leak future rows into the training window
-Xtr, Xte, ytr, yte = train_test_split(ts_df.drop(columns=["churned", "ts"]), ts_df["churned"], test_size=0.3, random_state=0)
+Xtr, Xte, ytr, yte = train_test_split(
+    ts_df.drop(columns=["churned", "ts"]), ts_df["churned"], test_size=0.3, random_state=0
+)
 m = RandomForestClassifier(n_estimators=50, random_state=0).fit(Xtr, ytr)
 auc_time_leaky = roc_auc_score(yte, m.predict_proba(Xte)[:, 1])
 
@@ -104,8 +115,13 @@ patients = np.repeat(np.arange(n // 10), 10)
 gdf = df.copy()
 gdf["patient"] = patients
 
-Xtr, Xte, ytr, yte = train_test_split(gdf.drop(columns="churned"), gdf["churned"], test_size=0.3, random_state=0)
-auc_group_leaky = roc_auc_score(yte, RandomForestClassifier(n_estimators=50, random_state=0).fit(Xtr, ytr).predict_proba(Xte)[:, 1])
+Xtr, Xte, ytr, yte = train_test_split(
+    gdf.drop(columns="churned"), gdf["churned"], test_size=0.3, random_state=0
+)
+auc_group_leaky = roc_auc_score(
+    yte,
+    RandomForestClassifier(n_estimators=50, random_state=0).fit(Xtr, ytr).predict_proba(Xte)[:, 1],
+)
 
 gs = GroupShuffleSplit(n_splits=1, test_size=0.3, random_state=0)
 tr_idx, te_idx = next(gs.split(gdf.drop(columns="churned"), gdf["churned"], groups=gdf["patient"]))
@@ -137,8 +153,15 @@ def _verify() -> None:
     # The leaky target column must be a much better predictor than honest data
     auc_leaky_col = None
     lk = df_leaky.copy()
-    Xtr, Xte, ytr, yte = train_test_split(lk.drop(columns="churned"), lk["churned"], test_size=0.3, random_state=0)
-    auc_leaky_col = roc_auc_score(yte, RandomForestClassifier(n_estimators=50, random_state=0).fit(Xtr, ytr).predict_proba(Xte)[:, 1])
+    Xtr, Xte, ytr, yte = train_test_split(
+        lk.drop(columns="churned"), lk["churned"], test_size=0.3, random_state=0
+    )
+    auc_leaky_col = roc_auc_score(
+        yte,
+        RandomForestClassifier(n_estimators=50, random_state=0)
+        .fit(Xtr, ytr)
+        .predict_proba(Xte)[:, 1],
+    )
     assert auc_leaky_col is not None and auc_leaky_col > 0.9, "target-leak column must inflate AUC"
     assert 0.5 < auc_time_ok < auc_time_leaky + 1e-9 or True  # temporal split present
     assert hasattr(gs, "n_splits")

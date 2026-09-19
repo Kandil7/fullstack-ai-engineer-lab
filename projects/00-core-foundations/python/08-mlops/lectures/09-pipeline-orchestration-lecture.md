@@ -65,13 +65,16 @@ order, in parallel where independent, and with state tracked per task.
 def ingest() -> str:
     return "data/raw/2026-08-02.csv"
 
+
 @task
 def preprocess(raw_path: str) -> str:
     return f"{raw_path}.clean.parquet"
 
+
 @task
 def train(clean_path: str) -> str:
     return "model/artifacts/churn-v3.pkl"
+
 
 # flow wires the dependencies
 flow = ingest() >> preprocess >> train  # conceptual
@@ -91,17 +94,20 @@ declares that a task whose inputs are unchanged should be skipped.
 ```python
 from prefect import flow, task
 
+
 @task(retries=2, retry_delay_seconds=10, cache_policy=None)
 def ingest(url: str) -> str:
     # idempotent: downloading the same source twice yields the same file
     return "data/raw/dataset.csv"
 
+
 @flow(log_prints=True)
 def train_pipeline(source_url: str) -> str:
     raw = ingest(source_url)
-    clean = preprocess(raw)          # also a @task
+    clean = preprocess(raw)  # also a @task
     model_path = train(clean)
     return model_path
+
 
 if __name__ == "__main__":
     train_pipeline("s3://bucket/source.csv")
@@ -134,7 +140,7 @@ from datetime import datetime
 
 with DAG(
     dag_id="churn_retrain",
-    schedule="0 2 * * *",              # daily at 02:00
+    schedule="0 2 * * *",  # daily at 02:00
     start_date=datetime(2026, 1, 1),
     catchup=False,
 ) as dag:
@@ -189,10 +195,11 @@ def ingest(url: str) -> str:
     # transient network errors auto-retry with backoff
     ...
 
+
 @task
 def validate(df_path: str) -> bool:
     if not schema_ok(df_path):
-        raise ValueError("schema violation")   # NOT retryable — data problem
+        raise ValueError("schema violation")  # NOT retryable — data problem
 ```
 
 Output (conceptually):
@@ -216,8 +223,8 @@ tracking system, linking the run to the model registry entry.
 def record_run(data_hash: str, metrics: dict) -> None:
     # write RunRecord JSON into MLflow/W&B (Lecture 02)
     import json
-    json.dump({"data_hash": data_hash, "metrics": metrics},
-              open("outputs/run_record.json", "w"))
+
+    json.dump({"data_hash": data_hash, "metrics": metrics}, open("outputs/run_record.json", "w"))
 ```
 
 Output (conceptually):

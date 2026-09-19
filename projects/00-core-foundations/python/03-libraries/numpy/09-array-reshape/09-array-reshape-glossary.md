@@ -58,11 +58,11 @@ Memory layout where elements are stored in adjacent locations.
 
 ```python
 arr = np.arange(12).reshape(3, 4)
-print(arr.flags['C_CONTIGUOUS'])  # True
+print(arr.flags["C_CONTIGUOUS"])  # True
 
 # Non-contiguous slice
 arr_nc = arr[::2]
-print(arr_nc.flags['C_CONTIGUOUS'])  # False
+print(arr_nc.flags["C_CONTIGUOUS"])  # False
 ```
 
 **Related:** view, reshape, strides
@@ -94,7 +94,7 @@ arr = np.array([[1, 2, 3], [4, 5, 6]])
 
 flat = arr.flatten()
 print(flat.shape)  # (6,)
-print(flat)        # [1 2 3 4 5 6]
+print(flat)  # [1 2 3 4 5 6]
 
 # Always a copy
 print(np.shares_memory(arr, flat))  # False
@@ -139,11 +139,11 @@ Memory layout for reshape: 'C' (row-major), 'F' (column-major), 'A' (preserve).
 arr = np.arange(12).reshape(3, 4)
 
 # C order (row-major, default)
-flat_c = arr.reshape(-1, order='C')
+flat_c = arr.reshape(-1, order="C")
 print(flat_c)  # [ 0  1  2  3  4  5  6  7  8  9 10 11]
 
 # F order (column-major)
-flat_f = arr.reshape(-1, order='F')
+flat_f = arr.reshape(-1, order="F")
 print(flat_f)  # [ 0  4  8  1  5  9  2  6 10  3  7 11]
 ```
 
@@ -230,8 +230,8 @@ Tuple of array dimensions.
 ```python
 arr = np.zeros((3, 4))
 print(arr.shape)  # (3, 4)
-print(arr.ndim)   # 2
-print(arr.size)   # 12
+print(arr.ndim)  # 2
+print(arr.size)  # 12
 ```
 
 **Related:** reshape, ndim, size

@@ -28,9 +28,7 @@ def _load(name: str):
     """
     parent = Path(__file__).parent.name.replace("-", "_")
     modname = f"{name}_{parent}"
-    spec = importlib.util.spec_from_file_location(
-        modname, Path(__file__).parent / f"{name}.py"
-    )
+    spec = importlib.util.spec_from_file_location(modname, Path(__file__).parent / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[modname] = module
     spec.loader.exec_module(module)
@@ -125,9 +123,7 @@ class TestBestF1PerModel:
 
 class TestMetricLeaderboard:
     def test_filters_by_min_value(self, session):
-        assert solution.metric_leaderboard(session, "f1", 0.90, 5) == [
-            ("gpt-finetune-1", 0.93)
-        ]
+        assert solution.metric_leaderboard(session, "f1", 0.90, 5) == [("gpt-finetune-1", 0.93)]
 
     def test_sorts_descending_and_limits(self, session):
         assert solution.metric_leaderboard(session, "f1", 0.80, 2) == [
@@ -143,9 +139,7 @@ class TestMetricLeaderboard:
         """A 'f1-micro' metric must not match metric == 'f1'."""
         session.add(solution.EvalMetric(experiment_id=1, metric="f1-micro", value=0.99))
         session.commit()
-        assert solution.metric_leaderboard(session, "f1", 0.90, 5) == [
-            ("gpt-finetune-1", 0.93)
-        ]
+        assert solution.metric_leaderboard(session, "f1", 0.90, 5) == [("gpt-finetune-1", 0.93)]
 
     def test_empty_result_when_nothing_qualifies(self, session):
         assert solution.metric_leaderboard(session, "f1", 1.0, 5) == []

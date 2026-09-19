@@ -45,9 +45,12 @@ SELECT, WHERE, or HAVING.
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE orders (id INTEGER PRIMARY KEY, amount REAL)")
-conn.executemany("INSERT INTO orders (id, amount) VALUES (?, ?)", [(1, 100.0), (2, 50.0), (3, 75.0)])
+conn.executemany(
+    "INSERT INTO orders (id, amount) VALUES (?, ?)", [(1, 100.0), (2, 50.0), (3, 75.0)]
+)
 print(conn.execute("SELECT (SELECT AVG(amount) FROM orders) AS avg_order").fetchone()[0])
 ```
 
@@ -63,8 +66,10 @@ that prevents row explosion: pre-aggregate inside the subquery, then join.
 ```python
 conn.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)")
 conn.executemany("INSERT INTO users (id, name) VALUES (?, ?)", [(1, "ada"), (2, "bob"), (3, "cyn")])
-conn.executemany("INSERT INTO orders (id, user_id, amount) VALUES (?, ?, ?)",
-                 [(1, 1, 100.0), (2, 1, 50.0), (3, 2, 75.0)])
+conn.executemany(
+    "INSERT INTO orders (id, user_id, amount) VALUES (?, ?, ?)",
+    [(1, 1, 100.0), (2, 1, 50.0), (3, 2, 75.0)],
+)
 rows = conn.execute("""
     SELECT u.name, t.total
     FROM users u
@@ -157,8 +162,10 @@ itself — walking one level per iteration.
 
 ```python
 conn.execute("CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, manager_id INTEGER)")
-conn.executemany("INSERT INTO employees (id, name, manager_id) VALUES (?, ?, ?)",
-                 [(1, "ceo", None), (2, "eng", 1), (3, "intern", 2), (4, "junior", 2)])
+conn.executemany(
+    "INSERT INTO employees (id, name, manager_id) VALUES (?, ?, ?)",
+    [(1, "ceo", None), (2, "eng", 1), (3, "intern", 2), (4, "junior", 2)],
+)
 rows = conn.execute("""
     WITH RECURSIVE team AS (
         SELECT id, name, manager_id, 0 AS depth
@@ -188,7 +195,11 @@ rows — three-valued logic: `x NOT IN (NULL)` is never true.
 conn.execute("CREATE TABLE p (id INTEGER PRIMARY KEY, a_id INTEGER)")
 conn.executemany("INSERT INTO p (id, a_id) VALUES (?, ?)", [(1, 1), (2, None)])
 print(conn.execute("SELECT COUNT(*) FROM users WHERE id NOT IN (SELECT a_id FROM p)").fetchone()[0])
-print(conn.execute("SELECT COUNT(*) FROM users WHERE NOT EXISTS (SELECT 1 FROM p WHERE p.a_id = users.id)").fetchone()[0])
+print(
+    conn.execute(
+        "SELECT COUNT(*) FROM users WHERE NOT EXISTS (SELECT 1 FROM p WHERE p.a_id = users.id)"
+    ).fetchone()[0]
+)
 ```
 
 ```

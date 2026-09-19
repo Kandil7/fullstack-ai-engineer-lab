@@ -31,7 +31,7 @@ import tracemalloc
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 
 random.seed(42)
-os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
+os.environ.setdefault("MPLBACKEND", "Agg")  # never open a GUI window
 
 # ============================================================
 # 1. The Two Workloads
@@ -41,9 +41,10 @@ os.environ.setdefault("MPLBACKEND", "Agg")   # never open a GUI window
 # picklable, importable functions are mandatory (closures crash spawn).
 # Complexity: io_task is O(1) wall-clock (~delay); cpu_task is O(n) work.
 
+
 def io_task(delay: float) -> float:
     """Simulate one I/O-bound unit: a network round-trip of `delay` seconds."""
-    time.sleep(delay)          # sleep releases the GIL, so threads can overlap
+    time.sleep(delay)  # sleep releases the GIL, so threads can overlap
     return delay
 
 
@@ -62,6 +63,7 @@ def cpu_task(n: int) -> int:
 # Processes: real parallelism, pays spawn cost. Async: cooperative, one
 # thread, thousands of tasks. The last three share one signature so the
 # comparison is apples-to-apples.
+
 
 def run_sequential(delays: list[float]) -> float:
     """Run I/O tasks one at a time. Complexity: O(k) wall-clock."""
@@ -136,8 +138,9 @@ def run_cpu_processes(chunks: list[int], workers: int = 4) -> float:
 # CPU work must be big enough to amortize Windows process spawn (~0.3-0.5s
 # for 4 workers) or the "processes win" claim becomes unmeasurable.
 
-_CPU_TOTAL: int = 24_000_000          # iterations split across 4 workers
-_CPU_CHUNK: int = _CPU_TOTAL // 4     # per-worker share
+_CPU_TOTAL: int = 24_000_000  # iterations split across 4 workers
+_CPU_CHUNK: int = _CPU_TOTAL // 4  # per-worker share
+
 
 def demo_io_comparison() -> dict[str, float]:
     """Measure 50 tiny I/O tasks (50 x 0.01s) four ways."""
@@ -156,7 +159,7 @@ def demo_io_comparison() -> dict[str, float]:
 
 def demo_cpu_comparison() -> dict[str, float]:
     """Measure the same arithmetic chunked across 4 workers."""
-    chunks = [_CPU_CHUNK] * 4          # 24M iterations total, ~1.5s sequential
+    chunks = [_CPU_CHUNK] * 4  # 24M iterations total, ~1.5s sequential
     results: dict[str, float] = {}
     print("\n--- CPU-bound: 24M pure arithmetic iterations ---")
     results["sequential"] = run_cpu_sequential(chunks)
@@ -175,10 +178,13 @@ def demo_cpu_comparison() -> dict[str, float]:
 # native stack reservation each once started. 1000 processes are ~10-30 GB:
 # each one is a full interpreter. This is WHY async wins at scale.
 
+
 async def _make_tasks(count: int) -> list[asyncio.Task[None]]:
     """Create `count` idle tasks inside a running loop."""
+
     async def _noop() -> None:
         return None
+
     return [asyncio.create_task(_noop()) for _ in range(count)]
 
 
@@ -186,15 +192,17 @@ def traced_delta(create: object, count: int) -> int:
     """Return traced bytes created by `create(count)`, in a clean trace."""
     tracemalloc.start()
     before = tracemalloc.take_snapshot()
-    if create is _make_tasks:                          # async needs a loop
+    if create is _make_tasks:  # async needs a loop
+
         async def _inner() -> int:
             tasks = await _make_tasks(count)
             for t in tasks:
                 t.cancel()
             return 0
+
         asyncio.run(_inner())
     else:
-        objs = create(count)                           # type: ignore[operator]
+        objs = create(count)  # type: ignore[operator]
         del objs
     after = tracemalloc.take_snapshot()
     tracemalloc.stop()
@@ -218,7 +226,9 @@ def demo_memory_comparison(verbose: bool = True) -> tuple[int, int, int]:
     if verbose:
         print(f"  asyncio tasks  : ~{tasks_mem // 1024:>5} KB")
         print(f"  threads        : ~{threads_mem // 1024:>5} KB + ~8 MB stack each when started")
-        print(f"  process shells : ~{processes_mem // 1024:>5} KB + full interpreter (~10-30 MB) each when started")
+        print(
+            f"  process shells : ~{processes_mem // 1024:>5} KB + full interpreter (~10-30 MB) each when started"
+        )
         print(f"  -> 1000 processes would be ~10-30 GB; 1000 tasks fit in <1 MB")
     return tasks_mem, threads_mem, processes_mem
 
@@ -260,38 +270,41 @@ def _verify() -> None:
         threaded_total = sum(pool.map(cpu_task, chunks))
     with ProcessPoolExecutor(max_workers=4) as pool:
         processed_total = sum(pool.map(cpu_task, chunks))
-    assert threaded_total == expected, \
-        "threaded CPU result must equal the sequential result"
-    assert processed_total == expected, \
-        "process CPU result must equal the sequential result"
+    assert threaded_total == expected, "threaded CPU result must equal the sequential result"
+    assert processed_total == expected, "process CPU result must equal the sequential result"
 
     # 2. Threads beat sequential on I/O (sleeps overlap: ~7x on the bench).
     delays = [0.01] * 50
     seq_io = run_sequential(delays)
     thr_io = run_threads(delays)
-    assert thr_io < seq_io * 0.5, \
+    assert thr_io < seq_io * 0.5, (
         "threads must beat sequential on I/O-bound work (got %s vs %s)" % (thr_io, seq_io)
+    )
 
     # 3. Threads do NOT beat sequential on CPU (the GIL).
     seq_cpu = run_cpu_sequential(chunks)
     thr_cpu = run_cpu_threads(chunks)
-    assert thr_cpu >= seq_cpu * 0.85, \
+    assert thr_cpu >= seq_cpu * 0.85, (
         "threads must NOT beat sequential on CPU-bound work (GIL): %s vs %s" % (thr_cpu, seq_cpu)
+    )
 
     # 4. Processes DO beat sequential on CPU (spawn cost amortized).
     proc_cpu = run_cpu_processes(chunks)
-    assert proc_cpu < seq_cpu * 0.85, \
+    assert proc_cpu < seq_cpu * 0.85, (
         "processes must beat sequential on CPU-bound work: %s vs %s" % (proc_cpu, seq_cpu)
+    )
 
     # 5. Async uses the least memory per unit of concurrency.
     tasks_mem, threads_mem, _ = demo_memory_comparison(verbose=False)
-    assert tasks_mem < threads_mem, \
+    assert tasks_mem < threads_mem, (
         "async tasks must use less traced memory than threads: %s vs %s" % (tasks_mem, threads_mem)
+    )
 
     # 6. Async overlaps I/O like threads do.
     async_io = run_async(delays)
-    assert async_io < seq_io * 0.5, \
+    assert async_io < seq_io * 0.5, (
         "async must beat sequential on I/O-bound work (got %s vs %s)" % (async_io, seq_io)
+    )
 
     print("\n[OK] 21-concurrency-comparison: all checks passed")
 
@@ -307,10 +320,14 @@ if __name__ == "__main__":
         cpu_times = demo_cpu_comparison()
         demo_memory_comparison()
         print("\n--- Decision ---")
-        print("  I/O-bound  -> async (or threads for sync code): %.3fs vs %.3fs sequential"
-              % (io_times["async"], io_times["sequential"]))
-        print("  CPU-bound  -> processes: %.3fs vs %.3fs sequential"
-              % (cpu_times["processes"], cpu_times["sequential"]))
+        print(
+            "  I/O-bound  -> async (or threads for sync code): %.3fs vs %.3fs sequential"
+            % (io_times["async"], io_times["sequential"])
+        )
+        print(
+            "  CPU-bound  -> processes: %.3fs vs %.3fs sequential"
+            % (cpu_times["processes"], cpu_times["sequential"])
+        )
         print("  threads on CPU -> no help: %.3fs (GIL)" % cpu_times["threads"])
         print("\n1. Threads overlap I/O waits; processes run CPU in parallel.")
         print("2. Processes pay spawn cost; keep CPU work big enough to amortize it.")

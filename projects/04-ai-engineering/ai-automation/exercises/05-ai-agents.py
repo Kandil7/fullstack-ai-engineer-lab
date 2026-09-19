@@ -24,9 +24,11 @@ from enum import Enum
 # 1. Agent Configuration
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class AgentConfig:
     """Configuration for an AI agent."""
+
     name: str = "Agent"
     model: str = "gpt-4o-mini"
     temperature: float = 0.7
@@ -39,9 +41,11 @@ class AgentConfig:
 # 2. Tool System
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class Tool:
     """A tool that an agent can use."""
+
     name: str
     description: str
     parameters: dict[str, Any]
@@ -96,9 +100,11 @@ class ToolRegistry:
 # 3. Agent Memory
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class MemoryEntry:
     """A single memory entry."""
+
     content: str
     timestamp: float
     entry_type: str  # "observation", "thought", "action", "result"
@@ -172,10 +178,11 @@ class AgentMemory:
 # 4. ReAct Agent Pattern
 # ---------------------------------------------------------------------------
 
+
 class ReActAgent:
     """
     ReAct (Reasoning + Acting) agent pattern.
-    
+
     The agent follows a Thought → Action → Observation loop:
     1. Thought: Reason about what to do
     2. Action: Choose and execute a tool
@@ -228,6 +235,7 @@ If you don't need a tool, go directly to Final Answer."""
     def _llm_call(self, messages: list[dict]) -> str:
         """Make an LLM API call."""
         from openai import OpenAI
+
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         response = client.chat.completions.create(
@@ -257,7 +265,9 @@ If you don't need a tool, go directly to Final Answer."""
             messages.append({"role": "assistant", "content": response})
 
             # Check for final answer
-            final_match = re.search(r"Final Answer:\s*(.*?)(?:\n|$)", response, re.DOTALL)
+            final_match = re.search(
+                r"Final Answer:\s*(.*?)(?:\n|$)", response, re.DOTALL
+            )
             if final_match:
                 answer = final_match.group(1).strip()
                 self.memory.add(answer, entry_type="answer")
@@ -267,10 +277,12 @@ If you don't need a tool, go directly to Final Answer."""
             action = self._parse_action(response)
             if action is None:
                 # No action found, ask LLM to provide final answer
-                messages.append({
-                    "role": "user",
-                    "content": "Please provide your Final Answer now.",
-                })
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": "Please provide your Final Answer now.",
+                    }
+                )
                 continue
 
             tool_name, args = action
@@ -280,10 +292,12 @@ If you don't need a tool, go directly to Final Answer."""
             result = self.tools.execute(tool_name, **args)
             self.memory.add(f"Result: {result}", entry_type="result")
 
-            messages.append({
-                "role": "user",
-                "content": f"Observation: {result}\n\nWhat should you do next?",
-            })
+            messages.append(
+                {
+                    "role": "user",
+                    "content": f"Observation: {result}\n\nWhat should you do next?",
+                }
+            )
 
         return "Max iterations reached without completing the task."
 
@@ -292,10 +306,11 @@ If you don't need a tool, go directly to Final Answer."""
 # 5. Tool-Calling Agent (Modern Pattern)
 # ---------------------------------------------------------------------------
 
+
 class ToolCallingAgent:
     """
     Modern tool-coding agent using OpenAI's function calling.
-    
+
     More reliable than ReAct for structured tool use because
     the LLM outputs structured JSON for tool calls.
     """
@@ -308,10 +323,14 @@ class ToolCallingAgent:
     def run(self, task: str) -> str:
         """Execute a task using tool calling."""
         from openai import OpenAI
+
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         messages = [
-            {"role": "system", "content": self.config.system_prompt or f"You are {self.config.name}."},
+            {
+                "role": "system",
+                "content": self.config.system_prompt or f"You are {self.config.name}.",
+            },
             {"role": "user", "content": task},
         ]
 
@@ -346,11 +365,13 @@ class ToolCallingAgent:
                 result = self.tools.execute(tool_name, **args)
                 self.memory.add(f"Result: {result}", entry_type="result")
 
-                messages.append({
-                    "role": "tool",
-                    "tool_call_id": tool_call.id,
-                    "content": result,
-                })
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tool_call.id,
+                        "content": result,
+                    }
+                )
 
         return "Max iterations reached."
 
@@ -359,10 +380,11 @@ class ToolCallingAgent:
 # 6. Planning Agent
 # ---------------------------------------------------------------------------
 
+
 class PlanningAgent:
     """
     Agent that creates a plan before execution.
-    
+
     Workflow:
     1. Analyze the task
     2. Create a step-by-step plan
@@ -377,7 +399,9 @@ class PlanningAgent:
 
     def _create_plan(self, task: str) -> list[str]:
         """Create a plan for the task."""
-        tool_list = "\n".join(f"- {t.name}: {t.description}" for t in self.tools.list_tools())
+        tool_list = "\n".join(
+            f"- {t.name}: {t.description}" for t in self.tools.list_tools()
+        )
 
         prompt = f"""Create a step-by-step plan to complete this task.
 
@@ -392,6 +416,7 @@ Return ONLY a JSON array of step descriptions. Example:
 Plan:"""
 
         from openai import OpenAI
+
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         response = client.chat.completions.create(
@@ -433,6 +458,7 @@ If no tool is needed, provide the result directly.
 Response:"""
 
         from openai import OpenAI
+
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         response = client.chat.completions.create(
@@ -486,6 +512,7 @@ Response:"""
 # 7. Multi-Agent System
 # ---------------------------------------------------------------------------
 
+
 class AgentRole(Enum):
     PLANNER = "planner"
     EXECUTOR = "executor"
@@ -496,6 +523,7 @@ class AgentRole(Enum):
 @dataclass
 class AgentMessage:
     """Message between agents."""
+
     sender: str
     receiver: str
     content: str
@@ -505,7 +533,7 @@ class AgentMessage:
 class MultiAgentSystem:
     """
     Orchestrate multiple specialized agents.
-    
+
     Architecture:
     - Coordinator: Routes tasks and manages workflow
     - Planner: Creates execution plans
@@ -535,11 +563,13 @@ class MultiAgentSystem:
         agent = ReActAgent(config, tools or ToolRegistry())
         self.agents[name] = agent
 
-    def send_message(self, sender: str, receiver: str, content: str,
-                     msg_type: str = "task"):
+    def send_message(
+        self, sender: str, receiver: str, content: str, msg_type: str = "task"
+    ):
         """Send a message between agents."""
-        msg = AgentMessage(sender=sender, receiver=receiver,
-                          content=content, message_type=msg_type)
+        msg = AgentMessage(
+            sender=sender, receiver=receiver, content=content, message_type=msg_type
+        )
         self.message_queue.append(msg)
 
     def get_messages(self, receiver: str) -> list[AgentMessage]:
@@ -553,7 +583,9 @@ class MultiAgentSystem:
         # Step 1: Coordinator analyzes the task
         coordinator = self.agents.get("coordinator")
         if coordinator:
-            analysis = coordinator.run(f"Analyze this task and break it into subtasks: {task}")
+            analysis = coordinator.run(
+                f"Analyze this task and break it into subtasks: {task}"
+            )
             results["analysis"] = analysis
 
         # Step 2: Planner creates a plan
@@ -582,6 +614,7 @@ class MultiAgentSystem:
 # ---------------------------------------------------------------------------
 # 8. Built-in Tools
 # ---------------------------------------------------------------------------
+
 
 def create_default_tools() -> ToolRegistry:
     """Create a registry with common tools."""
@@ -626,57 +659,68 @@ def create_default_tools() -> ToolRegistry:
         except Exception as e:
             return f"Error: {e}"
 
-    registry.register(Tool(
-        name="calculator",
-        description="Evaluate mathematical expressions. Input should be a valid math expression.",
-        parameters={
-            "type": "object",
-            "properties": {
-                "expression": {"type": "string", "description": "Math expression to evaluate"}
+    registry.register(
+        Tool(
+            name="calculator",
+            description="Evaluate mathematical expressions. Input should be a valid math expression.",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "expression": {
+                        "type": "string",
+                        "description": "Math expression to evaluate",
+                    }
+                },
+                "required": ["expression"],
             },
-            "required": ["expression"],
-        },
-        function=calculator,
-    ))
+            function=calculator,
+        )
+    )
 
-    registry.register(Tool(
-        name="search_knowledge",
-        description="Search a knowledge base for information.",
-        parameters={
-            "type": "object",
-            "properties": {
-                "query": {"type": "string", "description": "Search query"}
+    registry.register(
+        Tool(
+            name="search_knowledge",
+            description="Search a knowledge base for information.",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Search query"}
+                },
+                "required": ["query"],
             },
-            "required": ["query"],
-        },
-        function=search_knowledge,
-    ))
+            function=search_knowledge,
+        )
+    )
 
-    registry.register(Tool(
-        name="web_search",
-        description="Search the web for information.",
-        parameters={
-            "type": "object",
-            "properties": {
-                "query": {"type": "string", "description": "Search query"}
+    registry.register(
+        Tool(
+            name="web_search",
+            description="Search the web for information.",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Search query"}
+                },
+                "required": ["query"],
             },
-            "required": ["query"],
-        },
-        function=web_search,
-    ))
+            function=web_search,
+        )
+    )
 
-    registry.register(Tool(
-        name="code_executor",
-        description="Execute Python code. Set a 'result' variable for the output.",
-        parameters={
-            "type": "object",
-            "properties": {
-                "code": {"type": "string", "description": "Python code to execute"}
+    registry.register(
+        Tool(
+            name="code_executor",
+            description="Execute Python code. Set a 'result' variable for the output.",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "code": {"type": "string", "description": "Python code to execute"}
+                },
+                "required": ["code"],
             },
-            "required": ["code"],
-        },
-        function=code_executor,
-    ))
+            function=code_executor,
+        )
+    )
 
     return registry
 
@@ -684,6 +728,7 @@ def create_default_tools() -> ToolRegistry:
 # ---------------------------------------------------------------------------
 # 9. Demo Functions
 # ---------------------------------------------------------------------------
+
 
 def demo_tool_registry():
     """Demo: Creating and using tools."""
@@ -816,8 +861,16 @@ def demo_planning_agent():
             "Verify the result",
         ],
         "results": [
-            {"step": 1, "description": "Calculate sum", "result": "[Used calculator] 5050"},
-            {"step": 2, "description": "Calculate average", "result": "[Used calculator] 50.5"},
+            {
+                "step": 1,
+                "description": "Calculate sum",
+                "result": "[Used calculator] 5050",
+            },
+            {
+                "step": 2,
+                "description": "Calculate average",
+                "result": "[Used calculator] 50.5",
+            },
             {"step": 3, "description": "Verify", "result": "Average of 1-100 is 50.5"},
         ],
         "completed": True,
@@ -825,7 +878,7 @@ def demo_planning_agent():
 
     print(f"\nExample plan execution:")
     print(f"Task: {simulated_plan['task']}")
-    for step in simulated_plan['results']:
+    for step in simulated_plan["results"]:
         print(f"  Step {step['step']}: {step['result']}")
 
 
@@ -860,7 +913,9 @@ def demo_multi_agent():
 
     # Message passing demo
     system.send_message("coordinator", "planner", "Plan this task: Build a chatbot")
-    system.send_message("planner", "coordinator", "Step 1: Set up env, Step 2: Build UI")
+    system.send_message(
+        "planner", "coordinator", "Step 1: Set up env, Step 2: Build UI"
+    )
     system.send_message("coordinator", "executor", "Execute: Set up environment")
 
     print(f"\nMessages in queue: {len(system.message_queue)}")

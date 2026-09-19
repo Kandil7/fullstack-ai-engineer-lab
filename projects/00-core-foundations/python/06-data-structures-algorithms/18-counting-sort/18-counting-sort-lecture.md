@@ -66,35 +66,36 @@ Copy the sorted output back to the original array.
 def counting_sort(arr):
     """
     Basic counting sort for non-negative integers.
-    
+
     Time Complexity: O(n + k) where k is the range of input
     Space Complexity: O(n + k) for output and count arrays
-    
+
     Args:
         arr: List of non-negative integers to sort
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return arr
-    
+
     # Find range of input
     max_val = max(arr)
-    
+
     # Initialize count array
     count = [0] * (max_val + 1)
-    
+
     # Count occurrences
     for num in arr:
         count[num] += 1
-    
+
     # Build sorted array
     sorted_arr = []
     for i in range(len(count)):
         sorted_arr.extend([i] * count[i])
-    
+
     return sorted_arr
+
 
 # Example usage
 arr = [4, 2, 2, 8, 3, 3, 1]
@@ -109,35 +110,36 @@ print("Sorted array:", sorted_arr)
 def counting_sort_inplace(arr):
     """
     In-place counting sort that modifies the original array.
-    
+
     Uses cumulative counts to place elements directly.
-    
+
     Args:
         arr: List of non-negative integers to sort (modified in-place)
     """
     if not arr:
         return
-    
+
     max_val = max(arr)
-    
+
     # Count occurrences
     count = [0] * (max_val + 1)
     for num in arr:
         count[num] += 1
-    
+
     # Compute cumulative counts
     for i in range(1, len(count)):
         count[i] += count[i - 1]
-    
+
     # Build output array (traverse backwards for stability)
     output = [0] * len(arr)
     for i in range(len(arr) - 1, -1, -1):
         output[count[arr[i]] - 1] = arr[i]
         count[arr[i]] -= 1
-    
+
     # Copy back to original array
     for i in range(len(arr)):
         arr[i] = output[i]
+
 
 # Example usage
 arr = [4, 2, 2, 8, 3, 3, 1]
@@ -152,36 +154,37 @@ print("Sorted array:", arr)
 def counting_sort_with_negatives(arr):
     """
     Counting sort that handles negative numbers.
-    
+
     Shifts all values to non-negative range before sorting.
-    
+
     Args:
         arr: List of integers (including negatives) to sort
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return arr
-    
+
     min_val = min(arr)
     max_val = max(arr)
-    
+
     # Shift range to start from 0
     shift = -min_val
     range_size = max_val - min_val + 1
-    
+
     # Count occurrences
     count = [0] * range_size
     for num in arr:
         count[num + shift] += 1
-    
+
     # Build sorted array
     sorted_arr = []
     for i in range(range_size):
         sorted_arr.extend([i - shift] * count[i])
-    
+
     return sorted_arr
+
 
 # Example usage
 arr = [-5, -1, -3, 2, 4, -2, 1, 0]
@@ -196,48 +199,49 @@ print("Sorted array:", sorted_arr)
 def counting_sort_by_key(arr, key_func):
     """
     Counting sort for objects using a key function.
-    
+
     Sorts objects based on integer keys extracted by key_func.
-    
+
     Args:
         arr: List of objects to sort
         key_func: Function that extracts integer key from object
-    
+
     Returns:
         Sorted list of objects
     """
     if not arr:
         return arr
-    
+
     # Find range of keys
     keys = [key_func(item) for item in arr]
     min_key = min(keys)
     max_key = max(keys)
-    
+
     # Count occurrences of each key
     count = [0] * (max_key - min_key + 1)
     for key in keys:
         count[key - min_key] += 1
-    
+
     # Compute cumulative counts
     for i in range(1, len(count)):
         count[i] += count[i - 1]
-    
+
     # Build output (traverse backwards for stability)
     output = [None] * len(arr)
     for i in range(len(arr) - 1, -1, -1):
         key = key_func(arr[i])
         output[count[key - min_key] - 1] = arr[i]
         count[key - min_key] -= 1
-    
+
     return output
+
 
 # Example usage: Sort students by age
 students = [
     {"name": "Alice", "age": 25},
     {"name": "Bob", "age": 22},
     {"name": "Charlie", "age": 25},
-    {"name": "Diana", "age": 21}
+    {"name": "Diana", "age": 21},
 ]
 
 print("Original students:")
@@ -257,40 +261,41 @@ for s in sorted_students:
 def counting_sort_with_range(arr, min_val, max_val):
     """
     Counting sort with specified range.
-    
+
     Useful when range is known beforehand.
-    
+
     Args:
         arr: List of integers to sort
         min_val: Minimum expected value
         max_val: Maximum expected value
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return arr
-    
+
     # Validate range
     if min_val > max_val:
         raise ValueError("min_val must be <= max_val")
-    
+
     # Initialize count array
     range_size = max_val - min_val + 1
     count = [0] * range_size
-    
+
     # Count occurrences
     for num in arr:
         if num < min_val or num > max_val:
             raise ValueError(f"Element {num} out of range [{min_val}, {max_val}]")
         count[num - min_val] += 1
-    
+
     # Build sorted array
     sorted_arr = []
     for i in range(range_size):
         sorted_arr.extend([i + min_val] * count[i])
-    
+
     return sorted_arr
+
 
 # Example usage
 arr = [15, 12, 18, 14, 16, 13, 17, 19]
@@ -304,35 +309,35 @@ print("Sorted array:", sorted_arr)
 def counting_sort_optimized(arr):
     """
     Optimized counting sort with multiple improvements.
-    
+
     1. Uses array indexing instead of extend for better performance
     2. Handles empty and single-element arrays
     3. Skips counting if array is already sorted
-    
+
     Args:
         arr: List of non-negative integers to sort
-    
+
     Returns:
         Sorted list
     """
     n = len(arr)
-    
+
     # Handle edge cases
     if n <= 1:
         return arr[:]
-    
+
     # Check if already sorted
     is_sorted = all(arr[i] <= arr[i + 1] for i in range(n - 1))
     if is_sorted:
         return arr[:]
-    
+
     max_val = max(arr)
-    
+
     # Count occurrences
     count = [0] * (max_val + 1)
     for num in arr:
         count[num] += 1
-    
+
     # Build output array
     output = [0] * n
     index = 0
@@ -340,8 +345,9 @@ def counting_sort_optimized(arr):
         for _ in range(count[i]):
             output[index] = i
             index += 1
-    
+
     return output
+
 
 # Example usage
 arr = [6, 0, 2, 0, 1, 3, 4, 6, 1, 3, 2]
@@ -359,6 +365,7 @@ def counting_sort_wrong(arr):
     max_val = max(arr)  # ValueError: max() arg is an empty sequence
     count = [0] * (max_val + 1)
     # ...
+
 
 # CORRECT: Check for empty array
 def counting_sort_correct(arr):

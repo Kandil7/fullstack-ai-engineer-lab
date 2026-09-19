@@ -57,7 +57,7 @@ print(f"J₀(1) = {special.jv(0, 1):.4f}")  # Bessel function of first kind
 print(f"Y₀(1) = {special.yv(0, 1):.4f}")  # Bessel function of second kind
 
 # Gamma function
-print(f"Γ(5) = {special.gamma(5):.1f}")     # 4! = 24
+print(f"Γ(5) = {special.gamma(5):.1f}")  # 4! = 24
 print(f"Γ(0.5) = {special.gamma(0.5):.4f}")  # √π
 
 # Error function

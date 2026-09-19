@@ -48,6 +48,7 @@ def main(argv: list[str] | None = None) -> str:
         return "rag_utils 1.2.0"
     return f"indexing {len(args)} sources"
 
+
 print(main(["--version"]))
 print(main(["docs/"]))
 ```
@@ -64,8 +65,10 @@ indexing 1 sources
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
 
+
 def matches(req: str, version: str) -> bool:
     return Version(version) in SpecifierSet(req)
+
 
 print(matches("numpy>=1.26,<3", "1.26.4"), matches("numpy>=1.26,<3", "3.0.0"))
 ```
@@ -107,10 +110,11 @@ print(sorted(extras), extras["dev"][0])
 **Definition**: A file recording the *exact* resolved versions — `numpy==1.26.4` — produced by `uv lock` / `pip freeze`. The manifest allows a range; the lockfile records the present. CI and prod install from the lockfile so every environment is byte-identical.
 **Example**:
 ```python
-manifest = "numpy>=1.26,<3"        # what we allow
-lockfile = {"numpy": "1.26.4"}     # what we got
+manifest = "numpy>=1.26,<3"  # what we allow
+lockfile = {"numpy": "1.26.4"}  # what we got
 
 from packaging.specifiers import SpecifierSet
+
 print(Version_ok := SpecifierSet(manifest).contains(lockfile["numpy"], prereleases=True))
 ```
 ```text
@@ -144,6 +148,7 @@ def normalize(v: str) -> tuple[int, ...]:
         parts.append(0)
     return tuple(parts)
 
+
 print(normalize("1.26") == normalize("1.26.0"))
 ```
 ```text
@@ -161,6 +166,7 @@ def parse(v: str) -> tuple[int, int, int, int]:
     while len(parts) < 3:
         parts.append(0)
     return (parts[0], parts[1], parts[2], int(rc) if rc else 2**63)
+
 
 print(parse("1.2.0rc1") < parse("1.2.0"))
 ```
@@ -226,6 +232,7 @@ def bump(v: str, kind: str) -> str:
     if kind == "minor":
         return f"{major}.{minor + 1}.0"
     return f"{major}.{minor}.{patch + 1}"
+
 
 print(bump("1.2.0", "major"), bump("1.2.0", "minor"), bump("1.2.0", "patch"))
 ```

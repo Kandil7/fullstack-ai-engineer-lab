@@ -68,6 +68,7 @@ D) Seeds prevent memory leaks
 
 ```python
 import random
+
 rng = random.Random(42)
 a = rng.shuffle(["a", "b", "c"])
 rng2 = random.Random(42)
@@ -108,6 +109,7 @@ def bisect_bad(configs, bad_from):
         else:
             lo = mid + 1
     return lo
+
 
 print(bisect_bad([f"c{i}" for i in range(100)], 42))
 ```

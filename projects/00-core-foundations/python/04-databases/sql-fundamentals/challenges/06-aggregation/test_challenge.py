@@ -11,12 +11,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
 starter_spec = importlib.util.spec_from_file_location(
-    "starter", Path(__file__).parent / "starter.py")
+    "starter", Path(__file__).parent / "starter.py"
+)
 starter_module = importlib.util.module_from_spec(starter_spec)
 starter_spec.loader.exec_module(starter_module)
 
 solution_spec = importlib.util.spec_from_file_location(
-    "solution", Path(__file__).parent / "solution.py")
+    "solution", Path(__file__).parent / "solution.py"
+)
 solution_module = importlib.util.module_from_spec(solution_spec)
 solution_spec.loader.exec_module(solution_module)
 
@@ -26,21 +28,30 @@ import pytest
 def fresh_conn() -> sqlite3.Connection:
     conn = sqlite3.connect(":memory:")
     conn.execute(
-        "CREATE TABLE runs (id INTEGER PRIMARY KEY, model TEXT, experiment TEXT, metric REAL)")
+        "CREATE TABLE runs (id INTEGER PRIMARY KEY, model TEXT, experiment TEXT, metric REAL)"
+    )
     conn.executemany(
         "INSERT INTO runs (model, experiment, metric) VALUES (?, ?, ?)",
-        [("bert", "e1", 0.9), ("bert", "e1", 0.8), ("gpt", "e1", 0.7)])
+        [("bert", "e1", 0.9), ("bert", "e1", 0.8), ("gpt", "e1", 0.7)],
+    )
     return conn
 
 
 def test_data_conn() -> sqlite3.Connection:
     conn = sqlite3.connect(":memory:")
     conn.execute(
-        "CREATE TABLE runs (id INTEGER PRIMARY KEY, model TEXT, experiment TEXT, metric REAL)")
+        "CREATE TABLE runs (id INTEGER PRIMARY KEY, model TEXT, experiment TEXT, metric REAL)"
+    )
     conn.executemany(
         "INSERT INTO runs (model, experiment, metric) VALUES (?, ?, ?)",
-        [("bert", "e1", 0.9), ("bert", "e1", 0.1), ("bert", "e2", 0.8),
-         ("gpt", "e1", 0.6), ("gpt", "e2", 0.3)])
+        [
+            ("bert", "e1", 0.9),
+            ("bert", "e1", 0.1),
+            ("bert", "e2", 0.8),
+            ("gpt", "e1", 0.6),
+            ("gpt", "e2", 0.3),
+        ],
+    )
     return conn
 
 

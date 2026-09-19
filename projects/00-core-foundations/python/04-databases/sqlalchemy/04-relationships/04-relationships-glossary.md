@@ -29,8 +29,10 @@ Core `Table` suffices when it has no extra columns.
 **Example**:
 ```python
 from sqlalchemy import Column, ForeignKey, Table
+
 book_tag = Table(
-    "book_tag", Base.metadata,
+    "book_tag",
+    Base.metadata,
     Column("book_id", ForeignKey("books.id"), primary_key=True),
     Column("tag_id", ForeignKey("tags.id"), primary_key=True),
 )
@@ -46,6 +48,7 @@ the other sees it immediately.
 class Author(Base):
     books: Mapped[list["Book"]] = relationship(back_populates="author")
 
+
 class Book(Base):
     author: Mapped["Author"] = relationship(back_populates="books")
 ```
@@ -57,9 +60,7 @@ what happens to children when the parent is saved or deleted. `all,
 delete-orphan` is the one-to-many standard.
 **Example**:
 ```python
-books: Mapped[list["Book"]] = relationship(
-    back_populates="author", cascade="all, delete-orphan"
-)
+books: Mapped[list["Book"]] = relationship(back_populates="author", cascade="all, delete-orphan")
 ```
 **Related**: delete-orphan, save-update
 
@@ -80,7 +81,7 @@ query on first attribute access. Correctness-friendly; the seed of N+1
 (topic 06).
 **Example**:
 ```python
-print(len(author.books))   # fires a SELECT the first time
+print(len(author.books))  # fires a SELECT the first time
 ```
 **Related**: relationship(), one-to-many
 
@@ -89,9 +90,7 @@ print(len(author.books))   # fires a SELECT the first time
 association table and `secondary=` on both `relationship()`s.
 **Example**:
 ```python
-tags: Mapped[list["Tag"]] = relationship(
-    secondary=book_tag, back_populates="books"
-)
+tags: Mapped[list["Tag"]] = relationship(secondary=book_tag, back_populates="books")
 ```
 **Related**: association table, secondary
 
@@ -152,7 +151,7 @@ preferred for clarity.
 persists the whole graph — author, books, tags — in dependency order.
 **Example**:
 ```python
-session.add(book)      # persists book + author + tags
+session.add(book)  # persists book + author + tags
 session.commit()
 ```
 **Related**: cascade, save-update

@@ -43,6 +43,7 @@ call, and the first call attaches an `EXPIRE` so the window self-clears.
 ```python
 from redis_client import RedisClient, ManualClock
 
+
 class FixedWindowLimiter:
     def __init__(self, client, limit, window_s):
         self._c, self._limit, self._window = client, limit, window_s
@@ -53,6 +54,7 @@ class FixedWindowLimiter:
         if count == 1:
             self._c.expire(key, self._window)
         return count <= self._limit
+
 
 clock = ManualClock(start=0.0)
 fw = FixedWindowLimiter(RedisClient(clock=clock), limit=3, window_s=60)

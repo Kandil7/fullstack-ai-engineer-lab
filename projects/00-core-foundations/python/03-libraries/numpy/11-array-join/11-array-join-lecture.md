@@ -35,11 +35,9 @@ print(result)  # [1 2 3 4 5 6]
 ### 1.2 2D Arrays
 
 ```python
-arr1 = np.array([[1, 2, 3],
-                 [4, 5, 6]])
+arr1 = np.array([[1, 2, 3], [4, 5, 6]])
 
-arr2 = np.array([[7, 8, 9],
-                 [10, 11, 12]])
+arr2 = np.array([[7, 8, 9], [10, 11, 12]])
 
 # Concatenate along axis 0 (rows)
 result = np.concatenate([arr1, arr2], axis=0)
@@ -219,7 +217,7 @@ print(result.shape)  # (2, 5)
 # Build array row by row
 rows = []
 for i in range(5):
-    rows.append(np.arange(i*3, (i+1)*3))
+    rows.append(np.arange(i * 3, (i + 1) * 3))
 
 result = np.vstack(rows)
 print(result)
@@ -233,9 +231,7 @@ print(result)
 ### 5.2 Adding Borders
 
 ```python
-arr = np.array([[1, 2, 3],
-                [4, 5, 6],
-                [7, 8, 9]])
+arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Add row of zeros at top and bottom
 border_row = np.zeros((1, 3), dtype=int)
@@ -279,7 +275,7 @@ print(result.shape)  # (1, 6)
 ### Mistake 2: Shape Mismatch
 ```python
 arr1 = np.array([[1, 2], [3, 4]])  # (2, 2)
-arr2 = np.array([[5, 6, 7]])        # (1, 3)
+arr2 = np.array([[5, 6, 7]])  # (1, 3)
 
 # np.concatenate([arr1, arr2], axis=0)  # ValueError!
 # np.concatenate([arr1, arr2], axis=1)  # ValueError!
@@ -376,9 +372,7 @@ print(identity)
 
 ### Exercise 4: Adding Borders
 ```python
-arr = np.array([[1, 2, 3],
-                [4, 5, 6],
-                [7, 8, 9]])
+arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Add border of 9s around the array
 border = np.full((1, 3), 9, dtype=int)

@@ -34,6 +34,7 @@ doubt, parenthesize.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v INTEGER)")
 conn.executemany("INSERT INTO t (v) VALUES (?)", [(1,), (5,), (9,), (15,)])
@@ -56,8 +57,11 @@ v <= 10`. NULLs never satisfy it.
 THEN val ELSE other END`. NULLs fall through to ELSE.
 **Example**:
 ```python
-print(conn.execute(
-    "SELECT id, CASE WHEN v < 10 THEN 'low' ELSE 'high' END AS bucket FROM t ORDER BY id").fetchall())
+print(
+    conn.execute(
+        "SELECT id, CASE WHEN v < 10 THEN 'low' ELSE 'high' END AS bucket FROM t ORDER BY id"
+    ).fetchall()
+)
 ```
 ```text
 [(1, 'low'), (2, 'low'), (3, 'low'), (4, 'high')]
@@ -78,8 +82,11 @@ conn.execute("CREATE TABLE orders (id INTEGER PRIMARY KEY, cust TEXT)")
 conn.execute("CREATE TABLE payments (order_id INTEGER, amt REAL)")
 conn.execute("INSERT INTO orders (cust) VALUES (?)", ("alice",))
 conn.execute("INSERT INTO payments (order_id, amt) VALUES (?, ?)", (1, 9.99))
-print(conn.execute(
-    "SELECT cust FROM orders o WHERE EXISTS (SELECT 1 FROM payments p WHERE p.order_id = o.id)").fetchall())
+print(
+    conn.execute(
+        "SELECT cust FROM orders o WHERE EXISTS (SELECT 1 FROM payments p WHERE p.order_id = o.id)"
+    ).fetchall()
+)
 ```
 ```text
 [('alice',)]

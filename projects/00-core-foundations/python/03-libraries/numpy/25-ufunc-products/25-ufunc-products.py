@@ -15,13 +15,13 @@ import numpy as np
 arr = np.array([1, 2, 3, 4, 5])
 
 # Total product
-print("prod():", np.prod(arr))       # 120
-print("arr.prod():", arr.prod())     # 120
+print("prod():", np.prod(arr))  # 120
+print("arr.prod():", arr.prod())  # 120
 
 # Product along axis
 arr2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 print("\n2D Array:\n", arr2d)
-print("Product all:", arr2d.prod())              # 362880
+print("Product all:", arr2d.prod())  # 362880
 print("Product rows (axis=1):", arr2d.prod(axis=1))  # [  6 120 504]
 print("Product cols (axis=0):", arr2d.prod(axis=0))  # [ 28  80 162]
 
@@ -139,7 +139,7 @@ print(f"Final amount: ${final:.2f}")
 stock_returns = np.array([1.10, 0.95, 1.05, 1.08, 0.98])
 portfolio_return = np.prod(stock_returns)
 print(f"\nStock returns: {stock_returns}")
-print(f"Total return: {portfolio_return:.4f} ({(portfolio_return-1)*100:.2f}%)")
+print(f"Total return: {portfolio_return:.4f} ({(portfolio_return - 1) * 100:.2f}%)")
 
 # Probability of independent events
 event_probs = np.array([0.8, 0.9, 0.7, 0.85])
@@ -154,7 +154,7 @@ print(f"\n{n}! = {factorial}")
 
 # Geometric mean
 data = np.array([10, 100, 1000])
-geometric_mean = np.prod(data) ** (1/len(data))
+geometric_mean = np.prod(data) ** (1 / len(data))
 print(f"\nData: {data}")
 print(f"Geometric mean: {geometric_mean:.2f}")
 print(f"Using log: {np.exp(np.mean(np.log(data))):.2f}")

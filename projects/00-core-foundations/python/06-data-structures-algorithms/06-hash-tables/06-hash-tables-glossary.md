@@ -15,8 +15,8 @@
 ```python
 # Bucket structure (chaining)
 buckets = [
-    [("alice", 90)],           # bucket 0
-    [],                         # bucket 1 (empty)
+    [("alice", 90)],  # bucket 0
+    [],  # bucket 1 (empty)
     [("bob", 85), ("carol", 92)],  # bucket 2 (collision → chain)
 ]
 ```
@@ -69,9 +69,10 @@ Key "carol" → hash → index 3  ← Collision!
 def hash_function(key, table_size):
     return hash(key) % table_size
 
+
 # Python's built-in hash
-print(hash("hello"))    # e.g., 234234234
-print(hash(42))         # 42
+print(hash("hello"))  # e.g., 234234234
+print(hash(42))  # 42
 print(hash((1, 2, 3)))  # Some integer
 ```
 
@@ -81,7 +82,7 @@ print(hash((1, 2, 3)))  # Some integer
 
 ```python
 # hash_code → bucket_index
-hash_code = hash(key)          # Raw hash code
+hash_code = hash(key)  # Raw hash code
 bucket_index = hash_code % table_size  # Mapped to array index
 ```
 
@@ -117,9 +118,9 @@ unique.discard(1)
 ```python
 # Hash table operations
 ht = {}
-ht["key"] = "value"    # Insert: O(1)
-val = ht["key"]        # Lookup: O(1)
-del ht["key"]          # Delete: O(1)
+ht["key"] = "value"  # Insert: O(1)
+val = ht["key"]  # Lookup: O(1)
+del ht["key"]  # Delete: O(1)
 ```
 
 ### Hashing
@@ -139,9 +140,9 @@ del ht["key"]          # Delete: O(1)
 ```python
 # Valid keys (hashable)
 d = {}
-d["name"] = "Alice"     # str key
-d[42] = "answer"        # int key
-d[(1, 2)] = "tuple"     # tuple key
+d["name"] = "Alice"  # str key
+d[42] = "answer"  # int key
+d[(1, 2)] = "tuple"  # tuple key
 
 # Invalid keys (unhashable)
 # d[[1, 2]] = "list"    # TypeError!
@@ -177,9 +178,10 @@ Example: 10 entries in 16 buckets → α = 0.625
 def probe(index, attempt, table_size):
     return (index + attempt) % table_size
 
+
 # Quadratic probing
 def quadratic_probe(index, attempt, table_size):
-    return (index + attempt ** 2) % table_size
+    return (index + attempt**2) % table_size
 ```
 
 ---
@@ -195,6 +197,7 @@ def quadratic_probe(index, attempt, table_size):
 # Linear probing: check next slot sequentially
 def linear_probe(hash_val, attempt, size):
     return (hash_val + attempt) % size
+
 
 # Probing sequence: hash, hash+1, hash+2, hash+3, ...
 ```

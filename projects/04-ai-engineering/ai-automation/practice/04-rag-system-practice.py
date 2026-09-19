@@ -23,6 +23,7 @@ from typing import Any
 # EASY PROBLEMS (20 XP)
 # ============================================================
 
+
 # Problem 1: Fixed-Size Chunker
 # Write a function that splits text into chunks of a fixed character size.
 # - chunk_text(text, chunk_size=500) → list of strings
@@ -76,6 +77,7 @@ def problem_05():
 # ============================================================
 # MEDIUM PROBLEMS (50 XP)
 # ============================================================
+
 
 # Problem 6: Recursive Text Splitter
 # Write a recursive chunking function that:
@@ -134,6 +136,7 @@ def problem_10():
 # HARD PROBLEMS (100 XP)
 # ============================================================
 
+
 # Problem 11: Reranker
 # Write a Reranker class that:
 # - Takes initial retrieval results (from vector search)
@@ -145,8 +148,13 @@ class Reranker:
     def __init__(self, lambda_param: float = 0.5):
         pass  # Write your code here
 
-    def rerank(self, query: str, documents: list[str],
-               embeddings: list[list[float]], top_k: int = 5):
+    def rerank(
+        self,
+        query: str,
+        documents: list[str],
+        embeddings: list[list[float]],
+        top_k: int = 5,
+    ):
         pass  # Write your code here
 
 

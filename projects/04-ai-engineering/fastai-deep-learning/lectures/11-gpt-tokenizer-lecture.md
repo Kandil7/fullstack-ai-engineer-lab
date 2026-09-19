@@ -138,7 +138,7 @@ import tiktoken
 
 enc = tiktoken.get_encoding("gpt2")
 tokens = enc.encode("hello world")
-print(tokens)       # [31373, 995]  — two tokens
+print(tokens)  # [31373, 995]  — two tokens
 print(enc.decode(tokens))  # "hello world"
 
 # GPT-4 uses "cl100k_base" with a different pre-tokenization regex
@@ -155,7 +155,10 @@ Before BPE, GPT tokenizers split text into "words" using a carefully designed re
 import regex
 
 # GPT-2's pre-tokenization pattern (simplified)
-GPT2_SPLIT_PATTERN = r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
+GPT2_SPLIT_PATTERN = (
+    r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
+)
+
 
 def gpt2_pretokenize(text: str) -> list[str]:
     """Split text into 'words' that become the units for BPE."""
@@ -255,7 +258,7 @@ class CharTokenizer:
 
 # Usage:
 tokenizer = CharTokenizer("hello world")
-print(tokenizer.encode("world"))   # [5, 4, 6, 3, 2]
+print(tokenizer.encode("world"))  # [5, 4, 6, 3, 2]
 print(tokenizer.decode([5, 4, 6, 3, 2]))  # "world"
 ```
 
@@ -296,7 +299,7 @@ class BPE:
         merged: list[int] = []
         i = 0
         while i < len(ids):
-            if i < len(ids) - 1 and (ids[i], ids[i+1]) == pair:
+            if i < len(ids) - 1 and (ids[i], ids[i + 1]) == pair:
                 merged.append(new_idx)
                 i += 2
             else:
@@ -314,9 +317,11 @@ class BPE:
             stats = self._get_stats(ids)
             if not stats:
                 break
-            (most_common_pair, _), = stats.most_common(1)
+            ((most_common_pair, _),) = stats.most_common(1)
             self.merges[most_common_pair] = next_idx
-            self._vocab[next_idx] = self._vocab[most_common_pair[0]] + self._vocab[most_common_pair[1]]
+            self._vocab[next_idx] = (
+                self._vocab[most_common_pair[0]] + self._vocab[most_common_pair[1]]
+            )
             ids = self._merge(ids, most_common_pair, next_idx)
             next_idx += 1
 
@@ -422,7 +427,8 @@ def token_budget_analysis() -> None:
             "and make decisions with minimal human intervention. " * 5
         ),
         "Code snippet": 'def hello(name: str) -> str:\n    return f"Hello, {name}!"\n\nprint(hello("world"))',
-        "Chinese text": "机器学习是数据分析的一种方法，它自动化了分析模型的构建过程。" * 10,
+        "Chinese text": "机器学习是数据分析的一种方法，它自动化了分析模型的构建过程。"
+        * 10,
         "Mixed content": "Python 是一种优秀的编程语言。Machine learning is fun! 2024年。",
     }
 
@@ -454,7 +460,7 @@ tokens = enc.encode(text)
 # GOOD: always check token count separately from character count
 n_tokens = len(enc.encode(text))
 n_chars = len(text)
-print(f"{n_tokens} tokens for {n_chars} characters (ratio: {n_tokens/n_chars:.2f})")
+print(f"{n_tokens} tokens for {n_chars} characters (ratio: {n_tokens / n_chars:.2f})")
 ```
 
 ### Mistake 2: Using the Wrong Tokenizer for a Model

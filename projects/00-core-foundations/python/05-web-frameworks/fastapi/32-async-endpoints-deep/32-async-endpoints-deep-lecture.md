@@ -43,10 +43,11 @@ By the end of this lecture, you will be able to:
 
 ```python
 @app.get("/sync")
-def sync_endpoint(): ...        # runs in a worker thread (threadpool)
+def sync_endpoint(): ...  # runs in a worker thread (threadpool)
+
 
 @app.get("/async")
-async def async_endpoint(): ... # runs ON the event loop
+async def async_endpoint(): ...  # runs ON the event loop
 ```
 
 Output:
@@ -68,7 +69,7 @@ request progresses**.
 ```python
 @app.get("/async/blocking")
 async def async_blocking():
-    time.sleep(0.05)        # BAD: blocks the loop for 50ms
+    time.sleep(0.05)  # BAD: blocks the loop for 50ms
     return {"ok": True}
 ```
 
@@ -86,7 +87,7 @@ concurrency.
 ```python
 @app.get("/sync")
 def sync_endpoint():
-    time.sleep(0.05)        # OK: runs in a thread, loop stays free
+    time.sleep(0.05)  # OK: runs in a thread, loop stays free
     return {"ok": True}
 ```
 
@@ -103,6 +104,7 @@ threads. This is why "just make it `def`" is often the right fix.
 
 ```python
 from fastapi.concurrency import run_in_threadpool
+
 
 @app.get("/async/threaded")
 async def async_threaded():
@@ -122,8 +124,8 @@ that runs the callable in the pool.
 ## 5. Measuring the Cost — Blocking Serializes
 
 ```python
-await asyncio.gather(*[async_correct_body() for _ in range(4)])   # ~1x
-await asyncio.gather(*[blocked_body() for _ in range(4)])          # ~4x
+await asyncio.gather(*[async_correct_body() for _ in range(4)])  # ~1x
+await asyncio.gather(*[blocked_body() for _ in range(4)])  # ~4x
 ```
 
 Output:

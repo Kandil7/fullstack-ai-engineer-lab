@@ -66,10 +66,10 @@ Always use raw strings (`r""`) for regex patterns:
 
 ```python
 # Without raw string - backslashes need escaping
-pattern1 = "\\d+"    # Matches digits
+pattern1 = "\\d+"  # Matches digits
 
 # With raw string - backslashes are literal
-pattern2 = r"\d+"    # Same pattern, cleaner syntax
+pattern2 = r"\d+"  # Same pattern, cleaner syntax
 
 # Both work the same way
 print(re.findall(pattern1, "abc123def"))  # ['123']
@@ -90,12 +90,12 @@ import re
 text = "The price is 42 dollars"
 
 # Search for digits
-match = re.search(r'\d+', text)
+match = re.search(r"\d+", text)
 
 if match:
-    print(f"Found: {match.group()}")    # Found: 42
+    print(f"Found: {match.group()}")  # Found: 42
     print(f"Position: {match.start()}")  # Position: 14
-    print(f"End: {match.end()}")         # End: 16
+    print(f"End: {match.end()}")  # End: 16
 ```
 
 ### `re.match()` - Match at Start
@@ -108,11 +108,11 @@ import re
 text = "Hello, World!"
 
 # This will match
-match = re.match(r'Hello', text)
+match = re.match(r"Hello", text)
 print(match.group())  # Hello
 
 # This will NOT match (pattern not at start)
-match = re.match(r'World', text)
+match = re.match(r"World", text)
 print(match)  # None
 ```
 
@@ -126,11 +126,11 @@ import re
 text = "2 apples, 3 oranges, 5 bananas"
 
 # Find all numbers
-numbers = re.findall(r'\d+', text)
+numbers = re.findall(r"\d+", text)
 print(numbers)  # ['2', '3', '5']
 
 # Find all words
-words = re.findall(r'[a-z]+', text.lower())
+words = re.findall(r"[a-z]+", text.lower())
 print(words)  # ['apples', 'oranges', 'bananas']
 ```
 
@@ -143,7 +143,7 @@ import re
 
 text = "2 apples, 3 oranges, 5 bananas"
 
-for match in re.finditer(r'\d+', text):
+for match in re.finditer(r"\d+", text):
     print(f"Number {match.group()} at position {match.start()}")
 # Number 2 at position 0
 # Number 3 at position 9
@@ -160,14 +160,16 @@ import re
 text = "Call me at 555-123-4567 or 555-987-6543"
 
 # Replace phone numbers with a placeholder
-redacted = re.sub(r'\d{3}-\d{3}-\d{4}', '[PHONE]', text)
+redacted = re.sub(r"\d{3}-\d{3}-\d{4}", "[PHONE]", text)
 print(redacted)  # Call me at [PHONE] or [PHONE]
+
 
 # Using a function for dynamic replacement
 def double_number(match):
     return str(int(match.group()) * 2)
 
-result = re.sub(r'\d+', double_number, "a1 b2 c3")
+
+result = re.sub(r"\d+", double_number, "a1 b2 c3")
 print(result)  # a2 b4 c6
 ```
 
@@ -181,7 +183,7 @@ import re
 text = "apple; orange, banana  cherry"
 
 # Split by semicolon, comma, or multiple spaces
-parts = re.split(r'[;,]\s*|\s{2,}', text)
+parts = re.split(r"[;,]\s*|\s{2,}", text)
 print(parts)  # ['apple', 'orange', 'banana', 'cherry']
 ```
 
@@ -213,25 +215,25 @@ Metacharacters have special meaning in regex patterns.
 import re
 
 # . (any character)
-print(re.findall(r'h.t', 'hat hot hit hut'))  # ['hat', 'hot', 'hit', 'hut']
+print(re.findall(r"h.t", "hat hot hit hut"))  # ['hat', 'hot', 'hit', 'hut']
 
 # ^ (start of string)
-print(re.findall(r'^\w+', 'Hello World'))  # ['Hello']
+print(re.findall(r"^\w+", "Hello World"))  # ['Hello']
 
 # $ (end of string)
-print(re.findall(r'\w+$', 'Hello World'))  # ['World']
+print(re.findall(r"\w+$", "Hello World"))  # ['World']
 
 # * (zero or more)
-print(re.findall(r'go*d', 'gd god good goood'))  # ['gd', 'god', 'good', 'goood']
+print(re.findall(r"go*d", "gd god good goood"))  # ['gd', 'god', 'good', 'goood']
 
 # + (one or more)
-print(re.findall(r'go+d', 'gd god good goood'))  # ['god', 'good', 'goood']
+print(re.findall(r"go+d", "gd god good goood"))  # ['god', 'good', 'goood']
 
 # ? (zero or one)
-print(re.findall(r'colou?r', 'color colour'))  # ['color', 'colour']
+print(re.findall(r"colou?r", "color colour"))  # ['color', 'colour']
 
 # | (alternation)
-print(re.findall(r'cat|dog', 'I have a cat and a dog'))  # ['cat', 'dog']
+print(re.findall(r"cat|dog", "I have a cat and a dog"))  # ['cat', 'dog']
 ```
 
 ---
@@ -259,16 +261,18 @@ import re
 text = "Phone: (555) 123-4567, Email: test@example.com"
 
 # Find digits
-print(re.findall(r'\d+', text))  # ['555', '123', '4567']
+print(re.findall(r"\d+", text))  # ['555', '123', '4567']
 
 # Find word characters
-print(re.findall(r'\w+', text))  # ['Phone', '555', '123', '4567', 'Email', 'test', 'example', 'com']
+print(
+    re.findall(r"\w+", text)
+)  # ['Phone', '555', '123', '4567', 'Email', 'test', 'example', 'com']
 
 # Find non-word characters (special chars)
-print(re.findall(r'\W+', text))  # [': ', '() ', '-', ', ', ': ', '@', '.']
+print(re.findall(r"\W+", text))  # [': ', '() ', '-', ', ', ': ', '@', '.']
 
 # Find whitespace
-print(re.findall(r'\s+', text))  # [' ', ' ', ' ', ' ', ' ', ' ', ' ']
+print(re.findall(r"\s+", text))  # [' ', ' ', ' ', ' ', ' ', ' ', ' ']
 ```
 
 ### Custom Character Classes
@@ -277,19 +281,21 @@ print(re.findall(r'\s+', text))  # [' ', ' ', ' ', ' ', ' ', ' ', ' ']
 import re
 
 # Vowels only
-print(re.findall(r'[aeiou]', 'Hello World'))  # ['e', 'o', 'o']
+print(re.findall(r"[aeiou]", "Hello World"))  # ['e', 'o', 'o']
 
 # Range: lowercase letters
-print(re.findall(r'[a-z]', 'Hello World'))  # ['e', 'l', 'l', 'o', 'o', 'r', 'l', 'd']
+print(re.findall(r"[a-z]", "Hello World"))  # ['e', 'l', 'l', 'o', 'o', 'r', 'l', 'd']
 
 # Range: digits
-print(re.findall(r'[0-9]', 'abc123def456'))  # ['1', '2', '3', '4', '5', '6']
+print(re.findall(r"[0-9]", "abc123def456"))  # ['1', '2', '3', '4', '5', '6']
 
 # Negated class (not vowels)
-print(re.findall(r'[^aeiou]', 'Hello'))  # ['H', 'l', 'l']
+print(re.findall(r"[^aeiou]", "Hello"))  # ['H', 'l', 'l']
 
 # Combined ranges
-print(re.findall(r'[a-zA-Z0-9]', 'Hello World 123!'))  # ['H', 'e', 'l', 'l', 'o', 'W', 'o', 'r', 'l', 'd', '1', '2', '3']
+print(
+    re.findall(r"[a-zA-Z0-9]", "Hello World 123!")
+)  # ['H', 'e', 'l', 'l', 'o', 'W', 'o', 'r', 'l', 'd', '1', '2', '3']
 ```
 
 ---
@@ -314,14 +320,14 @@ Quantifiers specify how many times a character or group can appear.
 ```python
 import re
 
-text = '<div>Hello</div><div>World</div>'
+text = "<div>Hello</div><div>World</div>"
 
 # Greedy (default) - matches as much as possible
-greedy = re.findall(r'<div>.*</div>', text)
+greedy = re.findall(r"<div>.*</div>", text)
 print(greedy)  # ['<div>Hello</div><div>World</div>']
 
 # Lazy (non-greedy) - matches as little as possible
-lazy = re.findall(r'<div>.*?</div>', text)
+lazy = re.findall(r"<div>.*?</div>", text)
 print(lazy)  # ['<div>Hello</div>', '<div>World</div>']
 
 # Add ? after quantifier to make it lazy
@@ -336,17 +342,17 @@ print(lazy)  # ['<div>Hello</div>', '<div>World</div>']
 import re
 
 # Exactly 3 digits
-print(re.findall(r'\d{3}', '12 123 1234 12345'))  # ['123', '234', '234', '345']
+print(re.findall(r"\d{3}", "12 123 1234 12345"))  # ['123', '234', '234', '345']
 
 # At least 3 digits
-print(re.findall(r'\d{3,}', '12 123 1234 12345'))  # ['123', '1234', '12345']
+print(re.findall(r"\d{3,}", "12 123 1234 12345"))  # ['123', '1234', '12345']
 
 # Between 3 and 5 digits
-print(re.findall(r'\d{3,5}', '12 123 1234 12345'))  # ['123', '1234', '12345']
+print(re.findall(r"\d{3,5}", "12 123 1234 12345"))  # ['123', '1234', '12345']
 
 # Email validation pattern
-email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
-emails = re.findall(email_pattern, 'Contact: test@example.com or user@domain.org')
+email_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+emails = re.findall(email_pattern, "Contact: test@example.com or user@domain.org")
 print(emails)  # ['test@example.com', 'user@domain.org']
 ```
 
@@ -363,11 +369,11 @@ import re
 
 # Simple group
 text = "John Smith, Jane Doe"
-names = re.findall(r'(\w+) (\w+)', text)
+names = re.findall(r"(\w+) (\w+)", text)
 print(names)  # [('John', 'Smith'), ('Jane', 'Doe')]
 
 # Access groups from match object
-match = re.search(r'(\w+) (\w+)', text)
+match = re.search(r"(\w+) (\w+)", text)
 if match:
     print(match.group(0))  # Full match: "John Smith"
     print(match.group(1))  # First group: "John"
@@ -381,12 +387,12 @@ import re
 
 # Named groups using (?P<name>...)
 text = "Date: 2024-01-15"
-match = re.search(r'(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})', text)
+match = re.search(r"(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})", text)
 
 if match:
-    print(match.group('year'))   # 2024
-    print(match.group('month'))  # 01
-    print(match.group('day'))    # 15
+    print(match.group("year"))  # 2024
+    print(match.group("month"))  # 01
+    print(match.group("day"))  # 15
 ```
 
 ### Non-Capturing Groups
@@ -396,11 +402,11 @@ import re
 
 # (?:...) groups without capturing
 text = "http://example.com https://secure.com"
-urls = re.findall(r'https?://(?:www\.)?([^/\s]+)', text)
+urls = re.findall(r"https?://(?:www\.)?([^/\s]+)", text)
 print(urls)  # ['example.com', 'secure.com']
 
 # Without non-capturing group, we'd get extra matches
-urls_bad = re.findall(r'https?://(www\.)?([^/\s]+)', text)
+urls_bad = re.findall(r"https?://(www\.)?([^/\s]+)", text)
 print(urls_bad)  # [('www.', 'example.com'), (None, 'secure.com')]
 ```
 
@@ -412,12 +418,12 @@ import re
 # Backreference: \1 refers to first group
 text = "hello hello world world"
 # Find repeated words
-repeated = re.findall(r'(\w+)\s+\1', text)
+repeated = re.findall(r"(\w+)\s+\1", text)
 print(repeated)  # ['hello', 'world']
 
 # Using in substitution
 text = "John Smith"
-result = re.sub(r'(\w+) (\w+)', r'\2, \1', text)
+result = re.sub(r"(\w+) (\w+)", r"\2, \1", text)
 print(result)  # Smith, John
 ```
 
@@ -444,27 +450,30 @@ import re
 
 # IGNORECASE
 text = "Hello HELLO hello"
-print(re.findall(r'hello', text, re.IGNORECASE))  # ['Hello', 'HELLO', 'hello']
+print(re.findall(r"hello", text, re.IGNORECASE))  # ['Hello', 'HELLO', 'hello']
 
 # MULTILINE
 text = """First line
 Second line
 Third line"""
-print(re.findall(r'^\w+', text, re.MULTILINE))  # ['First', 'Second', 'Third']
+print(re.findall(r"^\w+", text, re.MULTILINE))  # ['First', 'Second', 'Third']
 
 # DOTALL
 text = """Line 1
 Line 2"""
-print(re.findall(r'Line.*?1', text, re.DOTALL))  # ['Line 1']
+print(re.findall(r"Line.*?1", text, re.DOTALL))  # ['Line 1']
 
 # VERBOSE (readable patterns)
-phone_pattern = re.compile(r"""
+phone_pattern = re.compile(
+    r"""
     (\d{3})     # Area code
     [-.\s]?     # Optional separator
     (\d{3})     # First 3 digits
     [-.\s]?     # Optional separator
     (\d{4})     # Last 4 digits
-""", re.VERBOSE)
+""",
+    re.VERBOSE,
+)
 
 match = phone_pattern.search("Call: 555-123-4567")
 if match:
@@ -481,15 +490,10 @@ For repeated use, compile patterns for better performance.
 import re
 
 # Compile a pattern once
-email_pattern = re.compile(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}')
+email_pattern = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
 
 # Use multiple times
-emails = [
-    "test@example.com",
-    "invalid@",
-    "user@domain.org",
-    "not-an-email"
-]
+emails = ["test@example.com", "invalid@", "user@domain.org", "not-an-email"]
 
 for email in emails:
     if email_pattern.match(email):
@@ -509,7 +513,7 @@ for email in emails:
 ```python
 import re
 
-pattern = re.compile(r'\d+')
+pattern = re.compile(r"\d+")
 
 # Same methods as re module
 print(pattern.search("abc123"))  # Match object
@@ -536,14 +540,14 @@ pattern = r"\d+"
 ```python
 import re
 
-text = '<b>bold</b> and <i>italic</i>'
+text = "<b>bold</b> and <i>italic</i>"
 
 # BAD - greedy, misses second tag
-print(re.findall(r'<.*>', text))
+print(re.findall(r"<.*>", text))
 # ['<b>bold</b> and <i>italic</i>']
 
 # GOOD - lazy matching
-print(re.findall(r'<.*?>', text))
+print(re.findall(r"<.*?>", text))
 # ['<b>', '</b>', '<i>', '</i>']
 ```
 
@@ -555,10 +559,10 @@ import re
 text = "abc123"
 
 # BAD - matches anywhere
-print(re.findall(r'\d', text))  # ['1', '2', '3']
+print(re.findall(r"\d", text))  # ['1', '2', '3']
 
 # GOOD - if you want full string match
-print(re.fullmatch(r'\w+\d+', text))  # Match object
+print(re.fullmatch(r"\w+\d+", text))  # Match object
 ```
 
 ### 4. Overusing Regex
@@ -566,7 +570,7 @@ print(re.fullmatch(r'\w+\d+', text))  # Match object
 ```python
 # BAD - regex for simple operations
 text = "Hello World"
-result = re.sub(r'\s+', '_', text)
+result = re.sub(r"\s+", "_", text)
 
 # GOOD - string method is simpler
 result = text.replace(" ", "_")
@@ -594,17 +598,19 @@ result = text.replace(" ", "_")
 ```python
 import re
 
+
 def validate_phone(phone):
     """Validate US phone numbers in various formats."""
-    pattern = r'^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$'
+    pattern = r"^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$"
     return bool(re.match(pattern, phone))
 
+
 # Test cases
-print(validate_phone("555-123-4567"))     # True
-print(validate_phone("(555) 123-4567"))   # True
-print(validate_phone("555.123.4567"))     # True
-print(validate_phone("5551234567"))       # True
-print(validate_phone("123-45"))           # False
+print(validate_phone("555-123-4567"))  # True
+print(validate_phone("(555) 123-4567"))  # True
+print(validate_phone("555.123.4567"))  # True
+print(validate_phone("5551234567"))  # True
+print(validate_phone("123-45"))  # False
 ```
 
 ### Exercise 2: Extract Data from Text
@@ -612,19 +618,21 @@ print(validate_phone("123-45"))           # False
 ```python
 import re
 
+
 def extract_log_info(log_line):
     """Extract timestamp and message from log line."""
-    pattern = r'\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\] (.+)'
+    pattern = r"\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\] (.+)"
     match = re.match(pattern, log_line)
     if match:
         return match.group(1), match.group(2)
     return None
 
+
 # Test
 log = "[2024-01-15 10:30:45] Server started successfully"
 timestamp, message = extract_log_info(log)
-print(f"Time: {timestamp}")    # Time: 2024-01-15 10:30:45
-print(f"Message: {message}")   # Message: Server started successfully
+print(f"Time: {timestamp}")  # Time: 2024-01-15 10:30:45
+print(f"Message: {message}")  # Message: Server started successfully
 ```
 
 ### Exercise 3: Find and Replace
@@ -632,17 +640,17 @@ print(f"Message: {message}")   # Message: Server started successfully
 ```python
 import re
 
+
 def mask_sensitive(text):
     """Mask credit card numbers and SSNs."""
     # Mask credit cards (16 digits)
-    text = re.sub(r'\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b', 
-                  '****-****-****-****', text)
-    
+    text = re.sub(r"\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b", "****-****-****-****", text)
+
     # Mask SSNs (9 digits with dashes)
-    text = re.sub(r'\b\d{3}-\d{2}-\d{4}\b', 
-                  '***-**-****', text)
-    
+    text = re.sub(r"\b\d{3}-\d{2}-\d{4}\b", "***-**-****", text)
+
     return text
+
 
 # Test
 sensitive = "Card: 4111-1111-1111-1111, SSN: 123-45-6789"

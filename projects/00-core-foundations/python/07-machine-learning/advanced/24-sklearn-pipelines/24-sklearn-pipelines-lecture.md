@@ -15,8 +15,8 @@ object with a single `fit` / `predict` interface:
 
 ```python
 pipe = Pipeline([("scale", StandardScaler()), ("clf", LogisticRegression())])
-pipe.fit(X_train, y_train)          # fit EVERY step on train only
-pipe.predict(X_test)                # reuse fitted steps on test
+pipe.fit(X_train, y_train)  # fit EVERY step on train only
+pipe.predict(X_test)  # reuse fitted steps on test
 ```
 
 Because each step is fit **inside** the pipeline, no test information can leak
@@ -28,13 +28,25 @@ fit a scaler or encoder on the full dataset.
 Real data mixes numerics and categoricals, each needing its own treatment:
 
 ```python
-preprocessor = ColumnTransformer([
-    ("num", Pipeline([("impute", SimpleImputer(strategy="median")),
-                      ("scale", StandardScaler())]), ["age", "income"]),
-    ("cat", Pipeline([("impute", SimpleImputer(strategy="most_frequent")),
-                      ("onehot", OneHotEncoder(handle_unknown="ignore"))]),
-            ["plan", "region"]),
-])
+preprocessor = ColumnTransformer(
+    [
+        (
+            "num",
+            Pipeline([("impute", SimpleImputer(strategy="median")), ("scale", StandardScaler())]),
+            ["age", "income"],
+        ),
+        (
+            "cat",
+            Pipeline(
+                [
+                    ("impute", SimpleImputer(strategy="most_frequent")),
+                    ("onehot", OneHotEncoder(handle_unknown="ignore")),
+                ]
+            ),
+            ["plan", "region"],
+        ),
+    ]
+)
 ```
 
 - Numeric columns: impute → scale.
@@ -49,7 +61,7 @@ Production transforms (outlier clipping, custom text features) belong in
 ```python
 class ClipOutliers(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
-        self.low_ = np.quantile(X, 0.01, axis=0)   # learned on TRAIN only
+        self.low_ = np.quantile(X, 0.01, axis=0)  # learned on TRAIN only
         self.high_ = np.quantile(X, 0.99, axis=0)
         return self
 
@@ -66,10 +78,12 @@ guarantee is automatic.
 for example, raw features **plus** engineered polynomials:
 
 ```python
-FeatureUnion([
-    ("raw", FunctionTransformer()),
-    ("poly", FunctionTransformer(add_age_squared, validate=False)),
-])
+FeatureUnion(
+    [
+        ("raw", FunctionTransformer()),
+        ("poly", FunctionTransformer(add_age_squared, validate=False)),
+    ]
+)
 ```
 
 ## 5. Tuning the Whole Pipeline
@@ -82,13 +96,15 @@ honest scores.
 ## 6. Real-World Use Case — Loan Default Risk
 
 ```python
-full = Pipeline([
-    ("prep", ColumnTransformer([...])),
-    ("clf", RandomForestClassifier(n_estimators=200, random_state=0)),
-])
+full = Pipeline(
+    [
+        ("prep", ColumnTransformer([...])),
+        ("clf", RandomForestClassifier(n_estimators=200, random_state=0)),
+    ]
+)
 grid = GridSearchCV(full, {"clf__max_depth": [5, 10], "clf__n_estimators": [100, 200]}, cv=5)
-grid.fit(X_train, y_train)                    # one object, no leakage
-prob = grid.predict_proba(X_loan)             # deploy the whole pipeline
+grid.fit(X_train, y_train)  # one object, no leakage
+prob = grid.predict_proba(X_loan)  # deploy the whole pipeline
 ```
 
 ## Key Takeaways

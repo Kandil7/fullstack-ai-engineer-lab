@@ -38,8 +38,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 logger = logging.getLogger("content_moderation")
 
@@ -48,8 +47,10 @@ logger = logging.getLogger("content_moderation")
 # Section 1: Content Categories & Severity
 # =============================================================================
 
+
 class ContentCategory(Enum):
     """Categories of content that may need moderation."""
+
     SAFE = auto()
     HATE_SPEECH = auto()
     VIOLENCE = auto()
@@ -63,16 +64,18 @@ class ContentCategory(Enum):
 
 class SeverityLevel(Enum):
     """Severity levels for content violations."""
+
     NONE = 0
-    LOW = 1       # Mildly inappropriate, may be acceptable in context
-    MEDIUM = 2    # Clearly inappropriate, should be flagged
-    HIGH = 3      # Severely inappropriate, should be blocked
+    LOW = 1  # Mildly inappropriate, may be acceptable in context
+    MEDIUM = 2  # Clearly inappropriate, should be flagged
+    HIGH = 3  # Severely inappropriate, should be blocked
     CRITICAL = 4  # Illegal or extremely harmful, block + report
 
 
 @dataclass
 class ModerationResult:
     """Result of a content moderation check."""
+
     category: ContentCategory
     severity: SeverityLevel
     confidence: float  # 0.0 - 1.0
@@ -94,6 +97,7 @@ class ModerationResult:
 @dataclass
 class ModerationDecision:
     """Final moderation decision combining multiple category checks."""
+
     content_id: str
     is_allowed: bool
     overall_severity: SeverityLevel
@@ -106,6 +110,7 @@ class ModerationDecision:
 # =============================================================================
 # Section 2: Base Moderator (Abstract)
 # =============================================================================
+
 
 class ContentModerator(ABC):
     """Abstract base class for content moderators."""
@@ -125,6 +130,7 @@ class ContentModerator(ABC):
 # =============================================================================
 # Section 3: Hate Speech Detection
 # =============================================================================
+
 
 class HateSpeechModerator(ContentModerator):
     """
@@ -174,20 +180,25 @@ class HateSpeechModerator(ContentModerator):
 
             if flagged_terms:
                 severity = self.severity_map.get(group_name, SeverityLevel.MEDIUM)
-                results.append(ModerationResult(
-                    category=self.category,
-                    severity=severity,
-                    confidence=min(len(flagged_terms) * 0.3 + 0.4, 0.95),
-                    details=f"Hate speech detected: {group_name}",
-                    flagged_terms=flagged_terms[:5],
-                    recommended_action="block" if severity.value >= SeverityLevel.HIGH.value else "flag",
-                ))
+                results.append(
+                    ModerationResult(
+                        category=self.category,
+                        severity=severity,
+                        confidence=min(len(flagged_terms) * 0.3 + 0.4, 0.95),
+                        details=f"Hate speech detected: {group_name}",
+                        flagged_terms=flagged_terms[:5],
+                        recommended_action="block"
+                        if severity.value >= SeverityLevel.HIGH.value
+                        else "flag",
+                    )
+                )
         return results
 
 
 # =============================================================================
 # Section 4: Violence Detection
 # =============================================================================
+
 
 class ViolenceModerator(ContentModerator):
     """
@@ -237,20 +248,25 @@ class ViolenceModerator(ContentModerator):
 
             if flagged_terms:
                 severity = self.severity_map.get(group_name, SeverityLevel.MEDIUM)
-                results.append(ModerationResult(
-                    category=self.category,
-                    severity=severity,
-                    confidence=min(len(flagged_terms) * 0.25 + 0.45, 0.95),
-                    details=f"Violence detected: {group_name}",
-                    flagged_terms=flagged_terms[:5],
-                    recommended_action="block" if severity.value >= SeverityLevel.HIGH.value else "flag",
-                ))
+                results.append(
+                    ModerationResult(
+                        category=self.category,
+                        severity=severity,
+                        confidence=min(len(flagged_terms) * 0.25 + 0.45, 0.95),
+                        details=f"Violence detected: {group_name}",
+                        flagged_terms=flagged_terms[:5],
+                        recommended_action="block"
+                        if severity.value >= SeverityLevel.HIGH.value
+                        else "flag",
+                    )
+                )
         return results
 
 
 # =============================================================================
 # Section 5: Sexual Content Detection
 # =============================================================================
+
 
 class SexualContentModerator(ContentModerator):
     """
@@ -290,14 +306,16 @@ class SexualContentModerator(ContentModerator):
             minor_matches.extend(matches)
 
         if minor_matches:
-            results.append(ModerationResult(
-                category=self.category,
-                severity=SeverityLevel.CRITICAL,
-                confidence=0.95,
-                details="Exploitation of minors detected",
-                flagged_terms=minor_matches[:3],
-                recommended_action="block",
-            ))
+            results.append(
+                ModerationResult(
+                    category=self.category,
+                    severity=SeverityLevel.CRITICAL,
+                    confidence=0.95,
+                    details="Exploitation of minors detected",
+                    flagged_terms=minor_matches[:3],
+                    recommended_action="block",
+                )
+            )
             return results  # Immediate return for highest severity
 
         # Check for explicit content
@@ -315,15 +333,19 @@ class SexualContentModerator(ContentModerator):
             severity = SeverityLevel.MEDIUM if is_educational else SeverityLevel.HIGH
             confidence = 0.5 if is_educational else 0.85
 
-            results.append(ModerationResult(
-                category=self.category,
-                severity=severity,
-                confidence=confidence,
-                details=f"Sexual content detected{' (educational context)' if is_educational else ''}",
-                flagged_terms=explicit_matches[:3],
-                context_notes="Educational context detected" if is_educational else "",
-                recommended_action="flag" if is_educational else "block",
-            ))
+            results.append(
+                ModerationResult(
+                    category=self.category,
+                    severity=severity,
+                    confidence=confidence,
+                    details=f"Sexual content detected{' (educational context)' if is_educational else ''}",
+                    flagged_terms=explicit_matches[:3],
+                    context_notes="Educational context detected"
+                    if is_educational
+                    else "",
+                    recommended_action="flag" if is_educational else "block",
+                )
+            )
 
         return results
 
@@ -331,6 +353,7 @@ class SexualContentModerator(ContentModerator):
 # =============================================================================
 # Section 6: Self-Harm Detection
 # =============================================================================
+
 
 class SelfHarmModerator(ContentModerator):
     """
@@ -386,15 +409,17 @@ class SelfHarmModerator(ContentModerator):
                 crisis_info = "\n".join(
                     f"  {k}: {v}" for k, v in self.CRISIS_RESOURCES.items()
                 )
-                results.append(ModerationResult(
-                    category=self.category,
-                    severity=severity,
-                    confidence=min(len(flagged_terms) * 0.25 + 0.5, 0.95),
-                    details=f"Self-harm content detected: {group_name}",
-                    flagged_terms=flagged_terms[:5],
-                    context_notes=f"Crisis resources:\n{crisis_info}",
-                    recommended_action="block_with_support",
-                ))
+                results.append(
+                    ModerationResult(
+                        category=self.category,
+                        severity=severity,
+                        confidence=min(len(flagged_terms) * 0.25 + 0.5, 0.95),
+                        details=f"Self-harm content detected: {group_name}",
+                        flagged_terms=flagged_terms[:5],
+                        context_notes=f"Crisis resources:\n{crisis_info}",
+                        recommended_action="block_with_support",
+                    )
+                )
         return results
 
 
@@ -402,9 +427,11 @@ class SelfHarmModerator(ContentModerator):
 # Section 7: Custom Content Policy Engine
 # =============================================================================
 
+
 @dataclass
 class PolicyRule:
     """A custom content policy rule."""
+
     rule_id: str
     name: str
     category: ContentCategory
@@ -471,14 +498,18 @@ class CustomPolicyEngine:
                         break
 
                 if not exception_hit:
-                    results.append(ModerationResult(
-                        category=rule.category,
-                        severity=rule.severity,
-                        confidence=min(len(flagged_terms) * 0.2 + 0.5, 0.9),
-                        details=f"Custom policy violation: {rule.name}",
-                        flagged_terms=flagged_terms[:5],
-                        recommended_action="block" if rule.severity.value >= SeverityLevel.HIGH.value else "flag",
-                    ))
+                    results.append(
+                        ModerationResult(
+                            category=rule.category,
+                            severity=rule.severity,
+                            confidence=min(len(flagged_terms) * 0.2 + 0.5, 0.9),
+                            details=f"Custom policy violation: {rule.name}",
+                            flagged_terms=flagged_terms[:5],
+                            recommended_action="block"
+                            if rule.severity.value >= SeverityLevel.HIGH.value
+                            else "flag",
+                        )
+                    )
 
         return results
 
@@ -486,6 +517,7 @@ class CustomPolicyEngine:
 # =============================================================================
 # Section 8: Moderation Pipeline
 # =============================================================================
+
 
 class ModerationPipeline:
     """
@@ -505,7 +537,9 @@ class ModerationPipeline:
         self.moderators.append(moderator)
         logger.info(f"Added moderator: {moderator.__class__.__name__}")
 
-    def moderate(self, text: str, content_id: Optional[str] = None) -> ModerationDecision:
+    def moderate(
+        self, text: str, content_id: Optional[str] = None
+    ) -> ModerationDecision:
         """
         Run the full moderation pipeline on the given text.
 
@@ -588,6 +622,7 @@ class ModerationPipeline:
 # Section 9: Output Formatter
 # =============================================================================
 
+
 class ModerationFormatter:
     """Formats moderation results for display or API responses."""
 
@@ -607,7 +642,9 @@ class ModerationFormatter:
             lines.append("\nViolations:")
             for i, result in enumerate(decision.category_results, 1):
                 lines.append(f"  {i}. [{result.category.name}] {result.details}")
-                lines.append(f"     Severity: {result.severity.name} | Confidence: {result.confidence:.0%}")
+                lines.append(
+                    f"     Severity: {result.severity.name} | Confidence: {result.confidence:.0%}"
+                )
                 if result.flagged_terms:
                     terms = ", ".join(str(t)[:30] for t in result.flagged_terms[:3])
                     lines.append(f"     Flagged: {terms}")
@@ -643,6 +680,7 @@ class ModerationFormatter:
 # Section 10: Demonstration & Testing
 # =============================================================================
 
+
 def demo_hate_speech_detection():
     """Demonstrate hate speech detection."""
     print("\n" + "=" * 72)
@@ -660,7 +698,7 @@ def demo_hate_speech_detection():
 
     for i, text in enumerate(test_cases, 1):
         results = moderator.check(text)
-        print(f"\n  [{i}] \"{text[:60]}{'...' if len(text) > 60 else ''}\"")
+        print(f'\n  [{i}] "{text[:60]}{"..." if len(text) > 60 else ""}"')
         if results:
             for r in results:
                 print(f"      [!] {r.severity.name}: {r.details}")
@@ -687,7 +725,7 @@ def demo_violence_detection():
 
     for i, text in enumerate(test_cases, 1):
         results = moderator.check(text)
-        print(f"\n  [{i}] \"{text[:60]}{'...' if len(text) > 60 else ''}\"")
+        print(f'\n  [{i}] "{text[:60]}{"..." if len(text) > 60 else ""}"')
         if results:
             for r in results:
                 print(f"      [!] {r.severity.name}: {r.details}")
@@ -714,7 +752,7 @@ def demo_self_harm_detection():
 
     for i, text in enumerate(test_cases, 1):
         results = moderator.check(text)
-        print(f"\n  [{i}] \"{text[:60]}{'...' if len(text) > 60 else ''}\"")
+        print(f'\n  [{i}] "{text[:60]}{"..." if len(text) > 60 else ""}"')
         if results:
             for r in results:
                 print(f"      [!] {r.severity.name}: {r.details}")
@@ -733,32 +771,36 @@ def demo_custom_policies():
     engine = CustomPolicyEngine()
 
     # Add custom rules
-    engine.add_rule(PolicyRule(
-        rule_id="no_competitor_mentions",
-        name="No Competitor Mentions",
-        category=ContentCategory.CUSTOM_POLICY,
-        severity=SeverityLevel.LOW,
-        patterns=[
-            r"(?i)(competitor\s+(a|b|c)|rival\s+company)",
-            r"(?i)(buy\s+from|use|try)\s+(competitor|rival)\s+(product|service)",
-        ],
-        exceptions=[
-            r"(?i)(market\s+research|competitive\s+analysis|benchmark)",
-        ],
-        description="Prevent mentions of competitor products in support channels",
-    ))
+    engine.add_rule(
+        PolicyRule(
+            rule_id="no_competitor_mentions",
+            name="No Competitor Mentions",
+            category=ContentCategory.CUSTOM_POLICY,
+            severity=SeverityLevel.LOW,
+            patterns=[
+                r"(?i)(competitor\s+(a|b|c)|rival\s+company)",
+                r"(?i)(buy\s+from|use|try)\s+(competitor|rival)\s+(product|service)",
+            ],
+            exceptions=[
+                r"(?i)(market\s+research|competitive\s+analysis|benchmark)",
+            ],
+            description="Prevent mentions of competitor products in support channels",
+        )
+    )
 
-    engine.add_rule(PolicyRule(
-        rule_id="no_pricing_leaks",
-        name="No Pricing Information Leaks",
-        category=ContentCategory.CUSTOM_POLICY,
-        severity=SeverityLevel.HIGH,
-        patterns=[
-            r"(?i)(internal\s+price|cost\s+price|wholesale\s+price|margin\s+is)",
-            r"(?i)(we\s+pay|our\s+cost|manufacturing\s+cost)\s+\$?\d+",
-        ],
-        description="Prevent leakage of internal pricing information",
-    ))
+    engine.add_rule(
+        PolicyRule(
+            rule_id="no_pricing_leaks",
+            name="No Pricing Information Leaks",
+            category=ContentCategory.CUSTOM_POLICY,
+            severity=SeverityLevel.HIGH,
+            patterns=[
+                r"(?i)(internal\s+price|cost\s+price|wholesale\s+price|margin\s+is)",
+                r"(?i)(we\s+pay|our\s+cost|manufacturing\s+cost)\s+\$?\d+",
+            ],
+            description="Prevent leakage of internal pricing information",
+        )
+    )
 
     test_cases = [
         "Our product costs $99.99 for consumers.",
@@ -770,7 +812,7 @@ def demo_custom_policies():
 
     for i, text in enumerate(test_cases, 1):
         results = engine.check(text)
-        print(f"\n  [{i}] \"{text[:60]}{'...' if len(text) > 60 else ''}\"")
+        print(f'\n  [{i}] "{text[:60]}{"..." if len(text) > 60 else ""}"')
         if results:
             for r in results:
                 print(f"      [!] {r.severity.name}: {r.details}")
@@ -792,17 +834,19 @@ def demo_full_pipeline():
     pipeline.add_moderator(SelfHarmModerator())
 
     # Add custom policy
-    pipeline.policy_engine.add_rule(PolicyRule(
-        rule_id="no_pii",
-        name="No PII in Public Channels",
-        category=ContentCategory.CUSTOM_POLICY,
-        severity=SeverityLevel.MEDIUM,
-        patterns=[
-            r"\b\d{3}[-.]?\d{2}[-.]?\d{4}\b",  # SSN-like
-            r"\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b",  # Credit card-like
-        ],
-        description="Prevent sharing of PII in public channels",
-    ))
+    pipeline.policy_engine.add_rule(
+        PolicyRule(
+            rule_id="no_pii",
+            name="No PII in Public Channels",
+            category=ContentCategory.CUSTOM_POLICY,
+            severity=SeverityLevel.MEDIUM,
+            patterns=[
+                r"\b\d{3}[-.]?\d{2}[-.]?\d{4}\b",  # SSN-like
+                r"\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b",  # Credit card-like
+            ],
+            description="Prevent sharing of PII in public channels",
+        )
+    )
 
     formatter = ModerationFormatter()
     test_cases = [
@@ -817,7 +861,7 @@ def demo_full_pipeline():
     for i, text in enumerate(test_cases, 1):
         decision = pipeline.moderate(text, content_id=f"test_{i:03d}")
         status = "[OK] ALLOWED" if decision.is_allowed else "[X] BLOCKED"
-        print(f"\n  [{i}] \"{text[:55]}{'...' if len(text) > 55 else ''}\"")
+        print(f'\n  [{i}] "{text[:55]}{"..." if len(text) > 55 else ""}"')
         print(f"      {status} | Severity: {decision.overall_severity.name}")
         print(f"      Action: {decision.action_taken}")
         if decision.category_results:

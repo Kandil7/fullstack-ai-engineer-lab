@@ -51,7 +51,7 @@ The demo at line ~505 calls it **sequentially on one thread**:
 
 ```python
 for i in range(5):
-    buffer.produce(i)      # capacity is 3 → 4th call blocks on not_full.wait()
+    buffer.produce(i)  # capacity is 3 → 4th call blocks on not_full.wait()
 ```
 With capacity 3, the 4th `produce` waits for a consumer that will never run,
 because the consumer loop is *after* the producer loop on the same thread.
@@ -177,6 +177,7 @@ papers over the issue and still breaks for a learner running the file directly.
    ```python
    try:
        import seaborn as sns
+
        HAS_SEABORN = True
    except ImportError:
        HAS_SEABORN = False

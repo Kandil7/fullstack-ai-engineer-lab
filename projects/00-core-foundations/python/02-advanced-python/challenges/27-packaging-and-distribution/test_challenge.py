@@ -96,14 +96,10 @@ class TestMatchesRequirement:
 
 class TestLatestCompatible:
     def test_skips_newer_major(self):
-        assert target.latest_compatible(
-            ["1.9.9", "1.10.0", "2.0.0rc1"], ">=1.9,<2"
-        ) == "1.10.0"
+        assert target.latest_compatible(["1.9.9", "1.10.0", "2.0.0rc1"], ">=1.9,<2") == "1.10.0"
 
     def test_final_beats_rc(self):
-        assert target.latest_compatible(
-            ["1.0.0", "1.2.0rc1", "1.2.0"], ">=1.1"
-        ) == "1.2.0"
+        assert target.latest_compatible(["1.0.0", "1.2.0rc1", "1.2.0"], ">=1.1") == "1.2.0"
 
     def test_none_matches(self):
         assert target.latest_compatible(["1.0.0"], ">=2.0") is None

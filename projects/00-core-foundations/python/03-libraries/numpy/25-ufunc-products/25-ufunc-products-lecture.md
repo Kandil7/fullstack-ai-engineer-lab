@@ -35,13 +35,13 @@ import numpy as np
 arr = np.array([1, 2, 3, 4, 5])
 
 # Total product
-print("prod():", np.prod(arr))       # 120
-print("arr.prod():", arr.prod())     # 120
+print("prod():", np.prod(arr))  # 120
+print("arr.prod():", arr.prod())  # 120
 
 # Product along axis
 arr2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 print("\n2D Array:\n", arr2d)
-print("Product all:", arr2d.prod())              # 362880
+print("Product all:", arr2d.prod())  # 362880
 print("Product rows (axis=1):", arr2d.prod(axis=1))  # [  6 120 504]
 print("Product cols (axis=0):", arr2d.prod(axis=0))  # [ 28  80 162]
 
@@ -148,7 +148,7 @@ print(f"Final amount: ${final:.2f}")
 stock_returns = np.array([1.10, 0.95, 1.05, 1.08, 0.98])
 portfolio_return = np.prod(stock_returns)
 print(f"\nStock returns: {stock_returns}")
-print(f"Total return: {portfolio_return:.4f} ({(portfolio_return-1)*100:.2f}%)")
+print(f"Total return: {portfolio_return:.4f} ({(portfolio_return - 1) * 100:.2f}%)")
 
 # Probability of independent events
 event_probs = np.array([0.8, 0.9, 0.7, 0.85])
@@ -163,7 +163,7 @@ print(f"\n{n}! = {factorial}")
 
 # Geometric mean
 data = np.array([10, 100, 1000])
-geometric_mean = np.prod(data) ** (1/len(data))
+geometric_mean = np.prod(data) ** (1 / len(data))
 print(f"\nData: {data}")
 print(f"Geometric mean: {geometric_mean:.2f}")
 print(f"Using log: {np.exp(np.mean(np.log(data))):.2f}")
@@ -222,11 +222,13 @@ print(f"P(at least one): {at_least_one:.4f}")
 ```python
 import numpy as np
 
+
 def factorial(n):
     """Calculate factorial using cumulative product."""
     if n == 0 or n == 1:
         return 1
     return np.prod(np.arange(2, n + 1))
+
 
 # Calculate factorials
 for n in range(11):
@@ -246,7 +248,7 @@ import numpy as np
 data = np.array([2, 8, 4])
 
 # Method 1: Direct calculation
-geo_mean_direct = np.prod(data) ** (1/len(data))
+geo_mean_direct = np.prod(data) ** (1 / len(data))
 
 # Method 2: Using logarithms (more numerically stable)
 geo_mean_log = np.exp(np.mean(np.log(data)))
@@ -270,16 +272,16 @@ returns = np.array([1.15, 0.92, 1.08, 1.22])  # 15%, -8%, 8%, 22%
 weights = np.array([0.3, 0.25, 0.25, 0.2])
 
 # Calculate portfolio return
-portfolio_return = np.prod(returns ** weights)
+portfolio_return = np.prod(returns**weights)
 print("Stock returns:", returns)
 print("Weights:", weights)
-print(f"Portfolio return: {portfolio_return:.4f} ({(portfolio_return-1)*100:.2f}%)")
+print(f"Portfolio return: {portfolio_return:.4f} ({(portfolio_return - 1) * 100:.2f}%)")
 
 # Multi-period returns
 period_returns = np.array([1.05, 0.98, 1.02, 1.07, 0.99])
 total_return = np.prod(period_returns)
 print(f"\nPeriod returns: {period_returns}")
-print(f"Total return: {total_return:.4f} ({(total_return-1)*100:.2f}%)")
+print(f"Total return: {total_return:.4f} ({(total_return - 1) * 100:.2f}%)")
 ```
 
 ---
@@ -321,7 +323,7 @@ import numpy as np
 arr = np.array([1, 2, 3, 4, 5])
 
 # Different operations
-print("Sum:", np.sum(arr))      # 15
+print("Sum:", np.sum(arr))  # 15
 print("Product:", np.prod(arr))  # 120
 ```
 

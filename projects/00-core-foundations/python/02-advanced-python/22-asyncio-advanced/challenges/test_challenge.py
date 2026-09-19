@@ -54,9 +54,7 @@ class TestPipeline:
     def test_bounded_small_queue(self):
         processed, max_observed = target.pipeline(["a"] * 20, 2)
         assert processed == 20
-        assert max_observed == 2, (
-            f"queue grew to {max_observed}: unbounded list, no backpressure"
-        )
+        assert max_observed == 2, f"queue grew to {max_observed}: unbounded list, no backpressure"
 
     def test_bounded_larger_queue(self):
         processed, max_observed = target.pipeline(["a"] * 10, 5)
@@ -78,9 +76,7 @@ class TestRunBatch:
     def test_middle_failure(self):
         completed, cancelled = target.run_batch(5, 2)
         assert completed == 2
-        assert cancelled == 2, (
-            f"cancelled {cancelled}: gather-based batches cancel nothing"
-        )
+        assert cancelled == 2, f"cancelled {cancelled}: gather-based batches cancel nothing"
 
     def test_first_failure(self):
         completed, cancelled = target.run_batch(3, 0)

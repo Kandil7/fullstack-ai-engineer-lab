@@ -12,12 +12,14 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 
+
 def _load(name: str):
     spec = importlib.util.spec_from_file_location(name, HERE / f"{name}.py")
     mod = importlib.util.module_from_spec(spec)
     sys.modules[name] = mod
     spec.loader.exec_module(mod)
     return mod
+
 
 solution = _load("solution")
 import pytest
@@ -31,9 +33,7 @@ class TestParseKeyValue:
         assert solution.parse_key_value(["--epochs", "10"]) == {"epochs": "10"}
 
     def test_mixed(self):
-        assert solution.parse_key_value(["--data", "x", "--seed=42"]) == {
-            "data": "x", "seed": "42"
-        }
+        assert solution.parse_key_value(["--data", "x", "--seed=42"]) == {"data": "x", "seed": "42"}
 
     def test_empty(self):
         assert solution.parse_key_value([]) == {}
@@ -50,7 +50,8 @@ class TestParseKeyValue:
 class TestResolve:
     def test_earlier_wins(self):
         assert solution.resolve([{"lr": "1e-4"}, {"lr": "1e-3", "seed": "0"}]) == {
-            "lr": "1e-4", "seed": "0"
+            "lr": "1e-4",
+            "seed": "0",
         }
 
     def test_none_layers_skipped(self):

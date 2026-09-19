@@ -106,11 +106,14 @@ semantic_results = client.search(
     collection_name="documents",
     query_vector=embedding,
     limit=20,
-    query_filter=Filter(must=[FieldCondition(key="language", match=MatchValue(value="en"))])
+    query_filter=Filter(
+        must=[FieldCondition(key="language", match=MatchValue(value="en"))]
+    ),
 )
 
 # Keyword search via payload filtering + sparse vectors (Qdrant 1.7+)
 # or via external BM25 index
+
 
 # Reciprocal Rank Fusion
 def rrf_fusion(semantic_hits, keyword_hits, k=60):

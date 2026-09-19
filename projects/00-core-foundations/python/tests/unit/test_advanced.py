@@ -15,6 +15,4 @@ PHASE2_FILES = discover_phase_files("02-advanced-python")
 def test_advanced_example_runs(filepath):
     """Every advanced example must execute without errors."""
     result = run_py_file(filepath, timeout=120)
-    assert result.returncode == 0, (
-        f"{filepath.name} failed:\n{result.stderr[-500:]}"
-    )
+    assert result.returncode == 0, f"{filepath.name} failed:\n{result.stderr[-500:]}"

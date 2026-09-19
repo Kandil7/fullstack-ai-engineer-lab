@@ -44,9 +44,11 @@ D) Only when the task calls `task.cancel()` itself
 ```python
 import asyncio
 
+
 async def main():
     async with asyncio.timeout(0.05):
         await asyncio.sleep(0.2)
+
 
 try:
     asyncio.run(main())
@@ -68,6 +70,7 @@ D) `CancelledError`
 ```python
 import asyncio
 
+
 async def main():
     sem = asyncio.Semaphore(2)
     in_flight = 0
@@ -83,6 +86,7 @@ async def main():
 
     await asyncio.gather(*(call() for _ in range(6)))
     print(peak)
+
 
 asyncio.run(main())
 ```
@@ -125,6 +129,7 @@ D) `await time.sleep(1)`
 ```python
 import asyncio
 
+
 class Tokens:
     def __init__(self, words):
         self._words = words
@@ -140,8 +145,10 @@ class Tokens:
         self._i += 1
         return w
 
+
 async def main():
     print([w async for w in Tokens(["a", "b"])])
+
 
 asyncio.run(main())
 ```
@@ -172,11 +179,13 @@ D) The queue silently drops items
 ```python
 import asyncio
 
+
 async def main():
     q = asyncio.Queue()
     await q.put(1)
     await q.put(2)
     print(q.get_nowait(), q.get_nowait())
+
 
 asyncio.run(main())
 ```
@@ -219,6 +228,7 @@ D) Gather retries failed tasks; TaskGroup does not
 ```python
 import asyncio
 
+
 async def main():
     task = asyncio.create_task(asyncio.sleep(10))
     await asyncio.sleep(0.01)
@@ -227,6 +237,7 @@ async def main():
         await task
     except asyncio.CancelledError:
         print("cancelled")
+
 
 asyncio.run(main())
 ```
@@ -257,11 +268,13 @@ D) It is the async replacement for `time.sleep`
 ```python
 import asyncio
 
+
 async def main():
     async with asyncio.TaskGroup() as g:
         g.create_task(asyncio.sleep(0.1))
         raise KeyError("boom")
     print("unreachable")
+
 
 try:
     asyncio.run(main())
@@ -309,6 +322,7 @@ D) Move the flush before the first `await`
 ```python
 import asyncio
 
+
 async def main():
     async def producer():
         for i in range(4):
@@ -324,6 +338,7 @@ async def main():
 
     q = asyncio.Queue()
     await asyncio.gather(producer(), consumer())
+
 
 asyncio.run(main())
 ```
@@ -366,12 +381,14 @@ D) `asyncio.to_thread` per document
 ```python
 import asyncio
 
+
 async def main():
     start = asyncio.get_event_loop().time()
     async with asyncio.TaskGroup() as g:
         g.create_task(asyncio.sleep(0.05))
         g.create_task(asyncio.sleep(0.05))
     print(round(asyncio.get_event_loop().time() - start, 2))
+
 
 asyncio.run(main())
 ```

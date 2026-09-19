@@ -63,12 +63,22 @@ floats = pd.Series(np.random.uniform(0, 1, 100_000))
 ints_small = pd.to_numeric(ints, downcast="integer")
 floats_small = pd.to_numeric(floats, downcast="float")
 
-print("int64 memory:", ints.memory_usage(deep=True),
-      "-> downcast:", ints_small.memory_usage(deep=True),
-      "dtype:", ints_small.dtype)
-print("float64 memory:", floats.memory_usage(deep=True),
-      "-> downcast:", floats_small.memory_usage(deep=True),
-      "dtype:", floats_small.dtype)
+print(
+    "int64 memory:",
+    ints.memory_usage(deep=True),
+    "-> downcast:",
+    ints_small.memory_usage(deep=True),
+    "dtype:",
+    ints_small.dtype,
+)
+print(
+    "float64 memory:",
+    floats.memory_usage(deep=True),
+    "-> downcast:",
+    floats_small.memory_usage(deep=True),
+    "dtype:",
+    floats_small.dtype,
+)
 
 # Output:
 # int64 memory: 400132 -> downcast: 100132 dtype: int8
@@ -93,8 +103,12 @@ print(f"Low cardinality savings: {savings:.1%}")
 # Example 4: high cardinality -- category can lose
 high_card = pd.Series([f"user_{i:06d}" for i in range(100_000)])
 high_card_cat = high_card.astype("category")
-print("High-card object:", high_card.memory_usage(deep=True),
-      "| category:", high_card_cat.memory_usage(deep=True))
+print(
+    "High-card object:",
+    high_card.memory_usage(deep=True),
+    "| category:",
+    high_card_cat.memory_usage(deep=True),
+)
 
 # Output:
 # Low cardinality savings: 98.1%
@@ -110,17 +124,21 @@ print("High-card object:", high_card.memory_usage(deep=True),
 # unique-count is a small fraction of rows.
 
 # Example 5: build a wide, wasteful frame, then fix it
-waste = pd.DataFrame({
-    "user_id": np.random.randint(1, 50_000, 100_000),
-    "score": np.random.uniform(0, 1, 100_000),
-    "tier": np.random.choice(["free", "pro", "enterprise"], 100_000),
-    "is_active": np.random.choice([True, False], 100_000),
-    "region": np.random.choice(["us", "eu", "ap", "latam", "mea"], 100_000),
-})
+waste = pd.DataFrame(
+    {
+        "user_id": np.random.randint(1, 50_000, 100_000),
+        "score": np.random.uniform(0, 1, 100_000),
+        "tier": np.random.choice(["free", "pro", "enterprise"], 100_000),
+        "is_active": np.random.choice([True, False], 100_000),
+        "region": np.random.choice(["us", "eu", "ap", "latam", "mea"], 100_000),
+    }
+)
+
 
 def audit(frame: pd.DataFrame) -> pd.Series:
     """Per-column memory usage, deep (objects counted)."""
     return frame.memory_usage(deep=True)
+
 
 def optimize_dtypes(frame: pd.DataFrame) -> pd.DataFrame:
     """Right-size every column without changing its values."""
@@ -135,20 +153,27 @@ def optimize_dtypes(frame: pd.DataFrame) -> pd.DataFrame:
             continue  # bool is already 1 byte
         elif pd.api.types.is_object_dtype(col_type):
             n_unique = out[col].nunique()
-            if n_unique / len(out) < 0.1:      # low cardinality heuristic
+            if n_unique / len(out) < 0.1:  # low cardinality heuristic
                 out[col] = out[col].astype("category")
     return out
+
 
 before = audit(waste).sum()
 fixed = optimize_dtypes(waste)
 after = audit(fixed).sum()
-print("Before:", before, "bytes | After:", after,
-      "bytes | Saved:", f"{1 - after / before:.1%}")
-print("user_id dtype:", fixed["user_id"].dtype,
-      "| score dtype:", fixed["score"].dtype,
-      "| tier dtype:", fixed["tier"].dtype,
-      "| is_active dtype:", fixed["is_active"].dtype,
-      "| region dtype:", fixed["region"].dtype)
+print("Before:", before, "bytes | After:", after, "bytes | Saved:", f"{1 - after / before:.1%}")
+print(
+    "user_id dtype:",
+    fixed["user_id"].dtype,
+    "| score dtype:",
+    fixed["score"].dtype,
+    "| tier dtype:",
+    fixed["tier"].dtype,
+    "| is_active dtype:",
+    fixed["is_active"].dtype,
+    "| region dtype:",
+    fixed["region"].dtype,
+)
 
 # Output:
 # Before: 11946390 bytes | After: 1100835 bytes | Saved: 90.8%
@@ -169,9 +194,11 @@ print("user_id dtype:", fixed["user_id"].dtype,
 for col in waste.columns:
     if waste[col].dtype == np.float64 and fixed[col].dtype == np.float32:
         max_rounding = float(np.abs(waste[col] - fixed[col]).max())
-        print(f"{col}: exact values={bool((waste[col] == fixed[col]).all())} "
-              f"| allclose={np.allclose(waste[col], fixed[col], atol=1e-6)} "
-              f"| max rounding {max_rounding:.2e}")
+        print(
+            f"{col}: exact values={bool((waste[col] == fixed[col]).all())} "
+            f"| allclose={np.allclose(waste[col], fixed[col], atol=1e-6)} "
+            f"| max rounding {max_rounding:.2e}"
+        )
     else:
         print(f"{col}: exact values={bool((waste[col] == fixed[col]).all())}")
 
@@ -191,10 +218,12 @@ for col in waste.columns:
 # stays bounded by the chunk size, not the file size.
 
 # Example 7: build a CSV and read it in chunks
-csv_text = pd.DataFrame({
-    "x": np.arange(1000),
-    "y": np.random.randn(1000).round(3),
-}).to_csv(index=False)
+csv_text = pd.DataFrame(
+    {
+        "x": np.arange(1000),
+        "y": np.random.randn(1000).round(3),
+    }
+).to_csv(index=False)
 
 full = pd.read_csv(io.StringIO(csv_text))
 chunked = pd.concat(
@@ -202,6 +231,7 @@ chunked = pd.concat(
     ignore_index=True,
 )
 print("Chunked read equals full read:", full.equals(chunked))
+
 
 # Example 8: streamed aggregation -- same result, bounded memory
 def streamed_mean(text: str, col: str, chunksize: int) -> float:
@@ -213,8 +243,13 @@ def streamed_mean(text: str, col: str, chunksize: int) -> float:
         count += int(chunk[col].count())
     return total / count
 
-print("Full mean:", round(float(full["y"].mean()), 6),
-      "| Streamed mean:", round(streamed_mean(csv_text, "y", 250), 6))
+
+print(
+    "Full mean:",
+    round(float(full["y"].mean()), 6),
+    "| Streamed mean:",
+    round(streamed_mean(csv_text, "y", 250), 6),
+)
 
 # Output:
 # Chunked read equals full read: True
@@ -247,51 +282,53 @@ print("Full mean:", round(float(full["y"].mean()), 6),
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # Category uses dramatically less memory for low-cardinality strings.
-    assert cat_series.memory_usage(deep=True) < obj_series.memory_usage(deep=True), \
+    assert cat_series.memory_usage(deep=True) < obj_series.memory_usage(deep=True), (
         "category must be smaller than object for low cardinality"
+    )
     assert savings > 0.5, "low-cardinality category must save >50%"
 
     # Downcasting actually shrinks the memory footprint.
-    assert ints_small.memory_usage(deep=True) < ints.memory_usage(deep=True), \
+    assert ints_small.memory_usage(deep=True) < ints.memory_usage(deep=True), (
         "int downcast must reduce memory"
-    assert floats_small.memory_usage(deep=True) < floats.memory_usage(deep=True), \
+    )
+    assert floats_small.memory_usage(deep=True) < floats.memory_usage(deep=True), (
         "float downcast must reduce memory"
+    )
     assert floats_small.dtype == np.dtype("float32"), "float must land on float32"
 
     # The optimized frame is strictly smaller than the original.
     assert after < before, "optimization must reduce total memory"
 
     # Integers, booleans, and categories must survive byte-for-byte.
-    assert bool((waste["user_id"] == fixed["user_id"]).all()), \
+    assert bool((waste["user_id"] == fixed["user_id"]).all()), (
         "int downcast must preserve integer values exactly"
-    assert bool((waste["tier"] == fixed["tier"]).all()), \
+    )
+    assert bool((waste["tier"] == fixed["tier"]).all()), (
         "category conversion must preserve string values exactly"
-    assert bool((waste["is_active"] == fixed["is_active"]).all()), \
-        "bool column must be untouched"
-    assert bool((waste["region"] == fixed["region"]).all()), \
-        "region category must preserve values"
+    )
+    assert bool((waste["is_active"] == fixed["is_active"]).all()), "bool column must be untouched"
+    assert bool((waste["region"] == fixed["region"]).all()), "region category must preserve values"
 
     # Floats round at float32 precision -- allowed within tolerance.
-    assert np.allclose(waste["score"], fixed["score"], atol=1e-6), \
+    assert np.allclose(waste["score"], fixed["score"], atol=1e-6), (
         "float32 downcast must stay within 1e-6"
-    assert not waste["score"].equals(fixed["score"]), \
+    )
+    assert not waste["score"].equals(fixed["score"]), (
         "float64->float32 must round (the precision cost must exist)"
+    )
 
     # The user_id column (50k unique, int range) must be downcast to int32.
-    assert fixed["user_id"].dtype == np.dtype("int32"), \
-        "user_id range fits in int32"
+    assert fixed["user_id"].dtype == np.dtype("int32"), "user_id range fits in int32"
 
     # Low-cardinality strings must become categorical.
-    assert str(fixed["tier"].dtype) == "category", \
-        "tier must be optimized to category"
-    assert str(fixed["region"].dtype) == "category", \
-        "region must be optimized to category"
+    assert str(fixed["tier"].dtype) == "category", "tier must be optimized to category"
+    assert str(fixed["region"].dtype) == "category", "region must be optimized to category"
 
     # Chunked reading and streamed aggregation equal the full-frame results.
     assert full.equals(chunked), "chunked concat must equal full read"
-    assert abs(streamed_mean(csv_text, "y", 250)
-               - float(full["y"].mean())) < 1e-9, \
+    assert abs(streamed_mean(csv_text, "y", 250) - float(full["y"].mean())) < 1e-9, (
         "streamed mean must equal full mean"
+    )
 
     print("[OK] 40-memory-optimization: all checks passed")
 
@@ -304,4 +341,4 @@ if __name__ == "__main__":
         print("1. deep=True is the only honest memory count.")
         print("2. Downcast ints/floats + categorize low-cardinality strings.")
         print("3. Chunked reads bound peak memory for huge files.")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

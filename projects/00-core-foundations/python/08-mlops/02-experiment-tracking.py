@@ -30,6 +30,7 @@ from typing import Any
 # A run is one training job: params (inputs) + metrics (outputs) +
 # artifacts (files) + metadata (who/when).
 
+
 @dataclass
 class Run:
     run_id: str
@@ -57,6 +58,7 @@ class Run:
 # ============================================================
 # The API mirrors MLflow's three log_* methods so the mental model
 # transfers directly to the real tool.
+
 
 class ExperimentTracker:
     def __init__(self) -> None:
@@ -119,6 +121,7 @@ print("  - wall-clock start/end times (non-deterministic)")
 print("  - absolute machine paths (breaks portability)")
 print("  - full training datasets (store hashes instead)")
 print("  - raw customer data (PII in the audit log = leak)")
+
 
 # ============================================================
 # Production Pattern

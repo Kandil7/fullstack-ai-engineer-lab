@@ -14,12 +14,14 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 
+
 def _load(name: str):
     spec = importlib.util.spec_from_file_location(name, HERE / f"{name}.py")
     mod = importlib.util.module_from_spec(spec)
     sys.modules[name] = mod  # required: dataclasses/etc. look up __module__
     spec.loader.exec_module(mod)
     return mod
+
 
 solution = _load("solution")
 import pytest
@@ -82,7 +84,7 @@ class TestRecordStore:
         store = solution.RecordStore(3)
         store.add("a", (1.0, 2.0, 3.0))
         with pytest.raises(ValueError):
-            store.add("b", (1.0, 2.0))          # wrong dim
+            store.add("b", (1.0, 2.0))  # wrong dim
         with pytest.raises(ValueError):
             store.add("c", (1.0, float("nan"), 3.0))
 
@@ -97,7 +99,7 @@ class TestRecordStore:
         store = solution.RecordStore(1)
         store.add("a", (1.0,))
         assert store.top_k(0) == []
-        assert store.top_k(10)[0].id == "a"      # k > n is safe
+        assert store.top_k(10)[0].id == "a"  # k > n is safe
 
     def test_empty_store(self):
         assert solution.RecordStore(1).top_k(1) == []

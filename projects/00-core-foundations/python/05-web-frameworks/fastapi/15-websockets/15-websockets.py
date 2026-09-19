@@ -104,7 +104,9 @@ async def direct_message(websocket: WebSocket):
     Send JSON: {"to": "user_id", "message": "hello"}
     """
     await websocket.accept()
-    await websocket.send_text(json.dumps({"status": "connected", "message": "Send JSON with 'to' and 'message' fields"}))
+    await websocket.send_text(
+        json.dumps({"status": "connected", "message": "Send JSON with 'to' and 'message' fields"})
+    )
 
     try:
         while True:
@@ -115,14 +117,21 @@ async def direct_message(websocket: WebSocket):
                 content = msg.get("message", "")
 
                 if target and content:
-                    await manager.send_to_user(target, json.dumps({
-                        "from": "anonymous",
-                        "message": content,
-                        "timestamp": datetime.now().isoformat(),
-                    }))
+                    await manager.send_to_user(
+                        target,
+                        json.dumps(
+                            {
+                                "from": "anonymous",
+                                "message": content,
+                                "timestamp": datetime.now().isoformat(),
+                            }
+                        ),
+                    )
                     await websocket.send_text(json.dumps({"status": "sent", "to": target}))
                 else:
-                    await websocket.send_text(json.dumps({"error": "Missing 'to' or 'message' field"}))
+                    await websocket.send_text(
+                        json.dumps({"error": "Missing 'to' or 'message' field"})
+                    )
             except json.JSONDecodeError:
                 await websocket.send_text(json.dumps({"error": "Invalid JSON"}))
     except WebSocketDisconnect:
@@ -146,15 +155,23 @@ async def notifications(websocket: WebSocket):
                 cmd = json.loads(data)
                 if cmd.get("action") == "subscribe":
                     topic = cmd.get("topic", "general")
-                    await websocket.send_text(json.dumps({
-                        "status": "subscribed",
-                        "topic": topic,
-                    }))
+                    await websocket.send_text(
+                        json.dumps(
+                            {
+                                "status": "subscribed",
+                                "topic": topic,
+                            }
+                        )
+                    )
                 elif cmd.get("action") == "ping":
-                    await websocket.send_text(json.dumps({
-                        "status": "pong",
-                        "timestamp": datetime.now().isoformat(),
-                    }))
+                    await websocket.send_text(
+                        json.dumps(
+                            {
+                                "status": "pong",
+                                "timestamp": datetime.now().isoformat(),
+                            }
+                        )
+                    )
             except json.JSONDecodeError:
                 pass
     except WebSocketDisconnect:
@@ -191,6 +208,7 @@ Browser JavaScript test:
     ws.send("Hello WebSocket!");
 """
 
+
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
     try:
@@ -225,6 +243,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

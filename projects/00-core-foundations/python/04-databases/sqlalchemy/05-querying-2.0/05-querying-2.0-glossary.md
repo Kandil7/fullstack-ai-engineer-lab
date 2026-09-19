@@ -32,9 +32,9 @@ table can be joined to itself (parent/child, duplicate detection).
 **Example**:
 ```python
 from sqlalchemy.orm import aliased
+
 parent = aliased(PromptTemplate)
-stmt = select(PromptTemplate.name, parent.name).join(
-    parent, PromptTemplate.parent_id == parent.id)
+stmt = select(PromptTemplate.name, parent.name).join(parent, PromptTemplate.parent_id == parent.id)
 ```
 **Related**: join(), self-referential (topic 04)
 
@@ -44,8 +44,8 @@ ANDs; `and_` is for inside `or_` or for building predicates dynamically.
 **Example**:
 ```python
 from sqlalchemy import and_
-stmt = select(Experiment).where(
-    and_(Experiment.model == "bert", Experiment.status == "done"))
+
+stmt = select(Experiment).where(and_(Experiment.model == "bert", Experiment.status == "done"))
 ```
 **Related**: or_, where()
 
@@ -78,6 +78,7 @@ rows = session.execute(select(Experiment.name, Experiment.status)).all()
 **Example**:
 ```python
 from sqlalchemy import func
+
 stmt = select(Experiment.model, func.max(EvalMetric.value)).group_by(Experiment.model)
 ```
 **Related**: group_by, execute()
@@ -143,6 +144,7 @@ stmt = select(Experiment).order_by(Experiment.id).limit(20).offset(40)
 **Example**:
 ```python
 from sqlalchemy import or_
+
 stmt = select(Experiment).where(or_(Experiment.status == "running", Experiment.model == "gpt2"))
 ```
 **Related**: and_, where()
@@ -182,9 +184,9 @@ composite keys lexicographically — the multi-column keyset cursor.
 **Example**:
 ```python
 from sqlalchemy import tuple_
+
 cursor = (last_id, last_name)
-stmt = select(Experiment).where(
-    tuple_(Experiment.id, Experiment.name) > cursor)
+stmt = select(Experiment).where(tuple_(Experiment.id, Experiment.name) > cursor)
 ```
 **Related**: keyset
 

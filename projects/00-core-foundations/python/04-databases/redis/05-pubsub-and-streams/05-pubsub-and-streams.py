@@ -69,6 +69,7 @@ print(f"A also got: {sub_a.get_message()} (A subscribed before doc-2)")
 # Stand-in: we model a stream as a list of entries plus per-group
 # delivery bookkeeping.
 
+
 class Stream:
     def __init__(self, client: RedisClient, name: str) -> None:
         self._c = client
@@ -101,18 +102,21 @@ class ConsumerGroup:
     def read(self, consumer: str, count: int = 10) -> list:
         pos = int(self._c.hget(f"{self._s._name}:grp:{self._g}", "pos") or 0)
         entries = self._s.xrange(pos, pos + count - 1)
-        self._c.hset(f"{self._s._name}:grp:{self._g}",
-                     {"pos": str(pos + len(entries))})
-        self._c.hset(f"{self._s._name}:grp:{self._g}",
-                     {"pending": str(int(self._c.hget(
-                         f"{self._s._name}:grp:{self._g}", "pending") or 0)
-                         + len(entries))})
+        self._c.hset(f"{self._s._name}:grp:{self._g}", {"pos": str(pos + len(entries))})
+        self._c.hset(
+            f"{self._s._name}:grp:{self._g}",
+            {
+                "pending": str(
+                    int(self._c.hget(f"{self._s._name}:grp:{self._g}", "pending") or 0)
+                    + len(entries)
+                )
+            },
+        )
         return entries
 
     def ack(self, consumer: str, entry_id: str) -> None:
         pending = int(self._c.hget(f"{self._s._name}:grp:{self._g}", "pending") or 0)
-        self._c.hset(f"{self._s._name}:grp:{self._g}",
-                     {"pending": str(max(0, pending - 1))})
+        self._c.hset(f"{self._s._name}:grp:{self._g}", {"pending": str(max(0, pending - 1))})
 
     def pending(self) -> int:
         return int(self._c.hget(f"{self._s._name}:grp:{self._g}", "pending") or 0)
@@ -181,6 +185,7 @@ print(f"pending after 1 ack: {group.pending()}")
 # MISTAKE: assuming exactly-once delivery.
 # CORRECT: design every consumer idempotent.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
@@ -189,8 +194,7 @@ def _verify() -> None:
     assert delivered == 2, "PUBLISH must return the subscriber count"
 
     # each subscriber got the message exactly once, then the queue drains
-    assert sub_a.get_message() is None, \
-        "Subscriber queue must be empty after one get per message"
+    assert sub_a.get_message() is None, "Subscriber queue must be empty after one get per message"
 
     # late subscriber missed nothing it was subscribed for, but pub/sub
     # never replays history — the stream exists precisely for that
@@ -198,16 +202,14 @@ def _verify() -> None:
 
     # consumer group: no double delivery across members
     ids = [e[0] for e in w1] + [e[0] for e in w2]
-    assert len(ids) == len(set(ids)) == 5, \
-        "Group delivery must partition entries without overlap"
+    assert len(ids) == len(set(ids)) == 5, "Group delivery must partition entries without overlap"
 
     # ack bookkeeping
     assert group.pending() == 4, "ACK must decrement the pending count"
 
     # replay: xrange re-reads entries the group already consumed
     replay = stream.xrange(0, 1)
-    assert replay[0][0] == "1-0", \
-        "Streams must allow replay from any offset (pub/sub cannot)"
+    assert replay[0][0] == "1-0", "Streams must allow replay from any offset (pub/sub cannot)"
 
     # at-least-once semantics: unacked entry remains available to workers
     unacked = group.pending()

@@ -20,6 +20,7 @@ from passlib.context import CryptContext
 # is not installed, while keeping the teaching code unchanged.
 try:
     from jose import JWTError, jwt
+
     JOSE_AVAILABLE = True
 except ImportError:
     JWTError = Exception
@@ -212,6 +213,7 @@ Testing with curl:
     curl -X POST "http://127.0.0.1:8000/logout/?refresh_token=<OLD_REFRESH_TOKEN>"
 """
 
+
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
     try:
@@ -225,7 +227,9 @@ def _verify():
     try:
         pwd_context.hash("verify-password")
     except Exception:
-        print("[skip] password hashing unavailable (passlib/bcrypt issue: pip install passlib[bcrypt])")
+        print(
+            "[skip] password hashing unavailable (passlib/bcrypt issue: pip install passlib[bcrypt])"
+        )
         return
 
     client = TestClient(app)
@@ -278,6 +282,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

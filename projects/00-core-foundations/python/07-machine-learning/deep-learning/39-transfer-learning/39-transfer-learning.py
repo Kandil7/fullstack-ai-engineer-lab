@@ -27,6 +27,7 @@ from torch.utils.data import TensorDataset, DataLoader
 
 torch.manual_seed(0)
 
+
 # ============================================================
 # 1. The source task — train a "pretrained" backbone
 # ============================================================
@@ -36,8 +37,10 @@ class Backbone(nn.Module):
     def __init__(self, in_dim: int, hidden: int, feat_dim: int):
         super().__init__()
         self.features = nn.Sequential(
-            nn.Linear(in_dim, hidden), nn.ReLU(),
-            nn.Linear(hidden, hidden), nn.ReLU(),
+            nn.Linear(in_dim, hidden),
+            nn.ReLU(),
+            nn.Linear(hidden, hidden),
+            nn.ReLU(),
             nn.Linear(hidden, feat_dim),
         )
         self.head = nn.Linear(feat_dim, 1)
@@ -80,7 +83,7 @@ tgt_ds = make_task(200, 20, seed=2)
 tgt_loader = DataLoader(tgt_ds, batch_size=32, shuffle=True)
 
 transfer = Backbone(20, 64, 32)
-transfer.load_state_dict(backbone.state_dict())   # start from pretrained weights
+transfer.load_state_dict(backbone.state_dict())  # start from pretrained weights
 
 # FREEZE the feature extractor — only the head trains
 for p in transfer.features.parameters():
@@ -88,7 +91,7 @@ for p in transfer.features.parameters():
 trainable = sum(p.numel() for p in transfer.parameters() if p.requires_grad)
 total = sum(p.numel() for p in transfer.parameters())
 print(f"\nExample 2: freeze backbone, train only head")
-print(f"  trainable params: {trainable:,} / {total:,}  ({(trainable/total*100):.1f}%)")
+print(f"  trainable params: {trainable:,} / {total:,}  ({(trainable / total * 100):.1f}%)")
 
 opt2 = torch.optim.Adam(filter(lambda p: p.requires_grad, transfer.parameters()), lr=1e-3)
 for epoch in range(20):
@@ -103,7 +106,7 @@ print(f"  fine-tuned on 200 target samples: loss {loss.item():.4f}")
 # ============================================================
 # 3. Compare: train from scratch on the small target set
 # ============================================================
-scratch = Backbone(20, 64, 32)   # random init
+scratch = Backbone(20, 64, 32)  # random init
 opt3 = torch.optim.Adam(scratch.parameters(), lr=1e-3)
 for epoch in range(20):
     scratch.train()
@@ -129,7 +132,7 @@ print("  -> pretrained features generalize better on small data")
 # ============================================================
 print("\nExample 4: feature extraction mode")
 with torch.no_grad():
-    feats = transfer.features(xt)     # embedding vectors, no head
+    feats = transfer.features(xt)  # embedding vectors, no head
 print(f"  500 samples -> {tuple(feats.shape)} embedding vectors (32-dim)")
 print("  embeddings feed downstream: retrieval, clustering, linear probes")
 
@@ -141,7 +144,7 @@ sched = torch.optim.lr_scheduler.StepLR(opt2, step_size=10, gamma=0.1)
 print(f"  StepLR halves LR every 10 epochs (fine-tune: small LR, gentle decay)")
 print(f"  current LR: {sched.get_last_lr()}")
 for _ in range(10):
-    sched.step()   # simulate 10 epochs -> LR drops by gamma
+    sched.step()  # simulate 10 epochs -> LR drops by gamma
 print(f"  after 10 epochs: {sched.get_last_lr()}")
 
 # ============================================================

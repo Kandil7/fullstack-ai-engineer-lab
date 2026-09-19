@@ -31,6 +31,7 @@ loggers, level filtering, handlers, and formatters.
 **Example**:
 ```python
 import logging
+
 logging.basicConfig(level=logging.INFO)
 logging.info("ready")
 ```
@@ -79,7 +80,7 @@ logger.setLevel(logging.DEBUG)
 mirrors the import path, enabling per-package control.
 **Example**:
 ```python
-logger = logging.getLogger(__name__)   # e.g. "app.retriever"
+logger = logging.getLogger(__name__)  # e.g. "app.retriever"
 ```
 **Related**: Logger, propagation
 
@@ -116,11 +117,14 @@ and formatters from a single declarative dict.
 **Example**:
 ```python
 import logging.config
-logging.config.dictConfig({
-    "version": 1,
-    "handlers": {"h": {"class": "logging.StreamHandler"}},
-    "root": {"handlers": ["h"], "level": "INFO"},
-})
+
+logging.config.dictConfig(
+    {
+        "version": 1,
+        "handlers": {"h": {"class": "logging.StreamHandler"}},
+        "root": {"handlers": ["h"], "level": "INFO"},
+    }
+)
 ```
 **Related**: Handler, Formatter
 
@@ -146,8 +150,8 @@ traceback, enabling `logger.error("x", exc_info=True)` outside except blocks.
 only when the record actually passes the level filter.
 **Example**:
 ```python
-logger.debug("sizes: %s", [len(c) for c in chunks])   # lazy
-logger.debug(f"sizes: {[len(c) for c in chunks]}")    # eager — avoid
+logger.debug("sizes: %s", [len(c) for c in chunks])  # lazy
+logger.debug(f"sizes: {[len(c) for c in chunks]}")  # eager — avoid
 ```
 **Related**: DEBUG, cost of logging
 
@@ -166,7 +170,7 @@ into every call via `process()`.
 **Example**:
 ```python
 log = logging.LoggerAdapter(logging.getLogger("rag"), {"rid": "7ac9"})
-log.info("started")   # every record carries rid=7ac9
+log.info("started")  # every record carries rid=7ac9
 ```
 **Related**: `extra`, correlation IDs
 
@@ -175,7 +179,7 @@ log.info("started")   # every record carries rid=7ac9
 and their handlers — the usual cause of duplicate lines.
 **Example**:
 ```python
-logger.propagate = False   # stop bubbling to the root's handlers
+logger.propagate = False  # stop bubbling to the root's handlers
 ```
 **Related**: Logger, duplicate output
 

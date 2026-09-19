@@ -42,10 +42,12 @@ Every task you will ever parallelize is mostly one of two things: it spends its 
 ```python
 import time
 
+
 def io_task(delay: float) -> float:
     """I/O-bound: the CPU is idle while we wait on something else."""
-    time.sleep(delay)          # releases the GIL: other threads can run
+    time.sleep(delay)  # releases the GIL: other threads can run
     return delay
+
 
 def cpu_task(n: int) -> int:
     """CPU-bound: pure arithmetic, the GIL is held for the whole loop."""
@@ -71,10 +73,13 @@ The Global Interpreter Lock is a mutex inside CPython that allows **exactly one 
 import threading
 
 shared = 0
+
+
 def increment() -> None:
     global shared
     for _ in range(1_000_000):
         shared += 1
+
 
 threads = [threading.Thread(target=increment) for _ in range(4)]
 for t in threads:
@@ -124,9 +129,11 @@ Threads are the right tool when the work is I/O-bound **and** the code is synchr
 ```python
 from concurrent.futures import ThreadPoolExecutor
 
+
 def fetch_one(url: str) -> str:
-    time.sleep(0.01)          # simulated HTTP
+    time.sleep(0.01)  # simulated HTTP
     return f"ok:{url}"
+
 
 urls = [f"http://api/{i}" for i in range(50)]
 with ThreadPoolExecutor(max_workers=8) as pool:
@@ -149,15 +156,17 @@ When the GIL blocks parallel CPU work, processes escape it entirely: each worker
 ```python
 from concurrent.futures import ProcessPoolExecutor
 
+
 def crunch(n: int) -> int:
     total = 0
     for i in range(n):
         total += i * i
     return total
 
+
 with ProcessPoolExecutor(max_workers=4) as pool:
     totals = list(pool.map(crunch, [6_000_000] * 4))
-print(sum(totals) > 0)   # the pool worked; 4x speedup for big enough n
+print(sum(totals) > 0)  # the pool worked; 4x speedup for big enough n
 ```
 
 ```
@@ -175,13 +184,16 @@ Async runs thousands of tasks on one thread by **cooperation**: each task yields
 ```python
 import asyncio
 
+
 async def fetch(name: str, delay: float) -> str:
-    await asyncio.sleep(delay)      # yields: the loop runs other tasks
+    await asyncio.sleep(delay)  # yields: the loop runs other tasks
     return f"{name}:done"
+
 
 async def main() -> None:
     results = await asyncio.gather(*(fetch(f"t{i}", 0.01) for i in range(50)))
     print(len(results), results[0])
+
 
 asyncio.run(main())
 ```
@@ -218,8 +230,10 @@ The entire comparison above uses two classes that share one interface: `map()`, 
 ```python
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 
+
 def work(n: int) -> int:
     return n * n
+
 
 for Executor in (ThreadPoolExecutor, ProcessPoolExecutor):
     with Executor(max_workers=4) as pool:

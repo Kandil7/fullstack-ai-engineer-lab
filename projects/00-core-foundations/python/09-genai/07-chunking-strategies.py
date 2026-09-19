@@ -29,12 +29,13 @@ from dataclasses import dataclass
 # Simple, predictable, but splits mid-sentence and separates related
 # content. The baseline every other strategy is compared against.
 
+
 def fixed_chunks(text: str, size: int = 300, overlap: int = 50) -> list[str]:
     """Chunk by character count with optional overlap."""
     if not text:
         return []
     step = size - overlap
-    return [text[i:i + size] for i in range(0, max(1, len(text)), step)]
+    return [text[i : i + size] for i in range(0, max(1, len(text)), step)]
 
 
 # Example 1: fixed chunking with overlap
@@ -68,8 +69,10 @@ assert len(chunks_with_overlap) > len(chunks_no_overlap), "overlap adds chunks"
 # then words - only going smaller when a piece is still too big.
 # Keeps semantic units intact far more often than fixed slicing.
 
+
 def recursive_split(text: str, max_size: int = 300) -> list[str]:
     """Split on paragraphs -> sentences -> words to fit max_size."""
+
     def split_on(separators: list[str], s: str) -> list[str]:
         parts = [s]
         for sep in separators:
@@ -96,12 +99,14 @@ def recursive_split(text: str, max_size: int = 300) -> list[str]:
 
 
 # Example 3: recursive keeps sentences whole
-para_doc = ("This is the first sentence about pandas. "
-            "Here is a second sentence with more detail. "
-            "Finally, a third sentence to round out the paragraph. "
-            "\n\n"
-            "A brand new paragraph begins here. "
-            "It contains its own complete thoughts and ideas. ") * 3
+para_doc = (
+    "This is the first sentence about pandas. "
+    "Here is a second sentence with more detail. "
+    "Finally, a third sentence to round out the paragraph. "
+    "\n\n"
+    "A brand new paragraph begins here. "
+    "It contains its own complete thoughts and ideas. "
+) * 3
 r_chunks = recursive_split(para_doc, max_size=200)
 print("\nExample 3: recursive chunking")
 print(f"  {len(para_doc)} chars -> {len(r_chunks)} chunks")
@@ -113,6 +118,7 @@ print(f"  first chunk: {r_chunks[0][:80]}...")
 # Chunks retrieved in isolation lose their source. Attach metadata
 # (source, section, page) so the generator can cite and the user can
 # trust.
+
 
 @dataclass
 class Chunk:
@@ -137,6 +143,7 @@ assert c.with_metadata().startswith("[docs/training.md | 3-loss | #7] ")
 # ============================================================
 # The practical metric: does the answer to a known question survive
 # inside a single chunk? Answer-recall over a labeled set.
+
 
 @dataclass
 class ChunkEvalCase:
@@ -171,8 +178,10 @@ assert rec_ov >= rec_no_ov, "overlap rescues straddling answers"
 # The production chunker: recursive split + overlap + metadata, with
 # a measured eval set dictating the parameters - never guess.
 
-def production_chunker(text: str, source: str, max_size: int = 300,
-                       overlap: int = 40) -> list[Chunk]:
+
+def production_chunker(
+    text: str, source: str, max_size: int = 300, overlap: int = 40
+) -> list[Chunk]:
     pieces = recursive_split(text, max_size=max_size)
     chunks: list[Chunk] = []
     for i, piece in enumerate(pieces):

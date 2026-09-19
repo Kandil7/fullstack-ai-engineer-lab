@@ -79,8 +79,8 @@ rng = np.random.default_rng(42)
 f64 = rng.normal(size=(500, 500))
 f32 = f64.astype(np.float32)
 
-print(np.allclose(f32, f64, rtol=1e-5))   # True
-print(f64.nbytes, "->", f32.nbytes)       # 2000000 -> 1000000
+print(np.allclose(f32, f64, rtol=1e-5))  # True
+print(f64.nbytes, "->", f32.nbytes)  # 2000000 -> 1000000
 ```
 
 ```
@@ -106,11 +106,11 @@ conversion to an array.
 u = np.array([255], dtype=np.uint8)
 with np.errstate(over="ignore"):
     wrapped = u + np.uint8(1)
-print(int(wrapped[0]))                    # 0 -- wrapped silently
+print(int(wrapped[0]))  # 0 -- wrapped silently
 
 with np.errstate(over="ignore"):
     big = np.float64(1e308) * 10.0
-print(np.isinf(big))                      # True -- overflowed
+print(np.isinf(big))  # True -- overflowed
 ```
 
 ```
@@ -133,14 +133,14 @@ arithmetic, but `inf - inf` is `nan`.
 
 ```python
 x = np.array([1.0, np.nan, 3.0])
-print(np.nan != np.nan)      # True
-print(x.sum())               # nan -- poisoned
-print(np.isnan(x))           # [False  True False]
-print(np.nanmean(x))         # 2.0 -- skips the nan
+print(np.nan != np.nan)  # True
+print(x.sum())  # nan -- poisoned
+print(np.isnan(x))  # [False  True False]
+print(np.nanmean(x))  # 2.0 -- skips the nan
 
 y = np.array([1.0, np.inf])
-print(y.sum())               # inf
-print(np.inf - np.inf)       # nan
+print(y.sum())  # inf
+print(np.inf - np.inf)  # nan
 ```
 
 ```
@@ -169,12 +169,12 @@ sum rounds differently. `np.isclose` compares with a tolerance:
 ```python
 a = 0.1 + 0.2
 b = 0.3
-print(a == b)                       # False
-print(np.isclose(a, b))             # True
-print(np.allclose(np.array([a]), np.array([b])))   # True
+print(a == b)  # False
+print(np.isclose(a, b))  # True
+print(np.allclose(np.array([a]), np.array([b])))  # True
 
 # atol is the guard near zero:
-print(np.isclose(1e-12, 0.0, rtol=1e-5))            # False
+print(np.isclose(1e-12, 0.0, rtol=1e-5))  # False
 print(np.isclose(1e-12, 0.0, rtol=1e-5, atol=1e-12))  # True
 ```
 
@@ -204,10 +204,10 @@ rec = np.zeros(3, dtype=[("score", np.float32), ("id", np.int32)])
 rec["score"] = [0.9, 0.4, 0.7]
 rec["id"] = [7, 3, 11]
 
-print(rec["score"])                     # [0.9 0.4 0.7]
-print(rec[1])                           # (0.4, 3)
+print(rec["score"])  # [0.9 0.4 0.7]
+print(rec[1])  # (0.4, 3)
 print(np.sort(rec, order="score")["id"])  # [ 3 11  7]
-print(rec.nbytes)                       # 24 = 3 * (4 + 4)
+print(rec.nbytes)  # 24 = 3 * (4 + 4)
 ```
 
 ```
@@ -234,9 +234,9 @@ with surprises worth memorizing:
 i = np.arange(3, dtype=np.int64)
 f = np.arange(3, dtype=np.float32)
 
-print((i + f).dtype)          # float64 -- float32 cannot hold int64
-print((i + 0.5).dtype)        # float64 -- python float is weak
-print((i + 1).dtype)          # int64   -- python int stays weak
+print((i + f).dtype)  # float64 -- float32 cannot hold int64
+print((i + 0.5).dtype)  # float64 -- python float is weak
+print((i + 1).dtype)  # int64   -- python int stays weak
 ```
 
 ```
@@ -251,7 +251,7 @@ requires `unsafe` — and truncates toward zero.
 
 ```python
 x = np.array([1.9, -2.7])
-print(x.astype(np.int64, casting="unsafe"))   # [ 1 -2]
+print(x.astype(np.int64, casting="unsafe"))  # [ 1 -2]
 try:
     x.astype(np.int64, casting="safe")
 except TypeError as e:
@@ -277,12 +277,13 @@ several percent.
 def cast_weights_for_serving(weights):
     return weights.astype(np.float16)
 
+
 w64 = np.random.default_rng(42).normal(size=(1024, 1024))
 w16 = cast_weights_for_serving(w64)
 rel_err = np.abs(w16.astype(np.float64) - w64) / (np.abs(w64) + 1e-12)
-print(w16.dtype)                          # float16
-print(w64.nbytes, "->", w16.nbytes)       # 8388608 -> 2097152
-print(round(float(rel_err.max()), 4))     # 0.0457 worst-case
+print(w16.dtype)  # float16
+print(w64.nbytes, "->", w16.nbytes)  # 8388608 -> 2097152
+print(round(float(rel_err.max()), 4))  # 0.0457 worst-case
 ```
 
 ```

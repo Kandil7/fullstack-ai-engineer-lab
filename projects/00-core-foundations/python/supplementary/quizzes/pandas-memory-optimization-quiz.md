@@ -254,6 +254,7 @@ rounding, int wraparound, category losses) before trusting the result.
 
 ```python
 import numpy as np, pandas as pd
+
 s = pd.Series([0.1, 0.2, 0.3], dtype="float64")
 t = s.astype("float32")
 print(abs(t.iloc[0] - s.iloc[0]))

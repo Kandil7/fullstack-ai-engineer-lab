@@ -16,14 +16,78 @@ Reference: https://www.w3schools.com/python/python_mongodb_aggregation.asp
 # ============================================================
 
 orders = [
-    {"_id": 1, "customer": "Alice", "product": "Laptop", "price": 999.99, "quantity": 1, "date": "2024-01-15", "category": "Electronics"},
-    {"_id": 2, "customer": "Bob", "product": "Mouse", "price": 29.99, "quantity": 2, "date": "2024-01-16", "category": "Electronics"},
-    {"_id": 3, "customer": "Alice", "product": "Keyboard", "price": 79.99, "quantity": 1, "date": "2024-01-17", "category": "Electronics"},
-    {"_id": 4, "customer": "Charlie", "product": "Desk", "price": 299.99, "quantity": 1, "date": "2024-01-18", "category": "Furniture"},
-    {"_id": 5, "customer": "Bob", "product": "Chair", "price": 199.99, "quantity": 1, "date": "2024-01-19", "category": "Furniture"},
-    {"_id": 6, "customer": "Diana", "product": "Monitor", "price": 399.99, "quantity": 2, "date": "2024-01-20", "category": "Electronics"},
-    {"_id": 7, "customer": "Alice", "product": "Lamp", "price": 49.99, "quantity": 3, "date": "2024-01-21", "category": "Furniture"},
-    {"_id": 8, "customer": "Charlie", "product": "Bookshelf", "price": 149.99, "quantity": 1, "date": "2024-01-22", "category": "Furniture"}
+    {
+        "_id": 1,
+        "customer": "Alice",
+        "product": "Laptop",
+        "price": 999.99,
+        "quantity": 1,
+        "date": "2024-01-15",
+        "category": "Electronics",
+    },
+    {
+        "_id": 2,
+        "customer": "Bob",
+        "product": "Mouse",
+        "price": 29.99,
+        "quantity": 2,
+        "date": "2024-01-16",
+        "category": "Electronics",
+    },
+    {
+        "_id": 3,
+        "customer": "Alice",
+        "product": "Keyboard",
+        "price": 79.99,
+        "quantity": 1,
+        "date": "2024-01-17",
+        "category": "Electronics",
+    },
+    {
+        "_id": 4,
+        "customer": "Charlie",
+        "product": "Desk",
+        "price": 299.99,
+        "quantity": 1,
+        "date": "2024-01-18",
+        "category": "Furniture",
+    },
+    {
+        "_id": 5,
+        "customer": "Bob",
+        "product": "Chair",
+        "price": 199.99,
+        "quantity": 1,
+        "date": "2024-01-19",
+        "category": "Furniture",
+    },
+    {
+        "_id": 6,
+        "customer": "Diana",
+        "product": "Monitor",
+        "price": 399.99,
+        "quantity": 2,
+        "date": "2024-01-20",
+        "category": "Electronics",
+    },
+    {
+        "_id": 7,
+        "customer": "Alice",
+        "product": "Lamp",
+        "price": 49.99,
+        "quantity": 3,
+        "date": "2024-01-21",
+        "category": "Furniture",
+    },
+    {
+        "_id": 8,
+        "customer": "Charlie",
+        "product": "Bookshelf",
+        "price": 149.99,
+        "quantity": 1,
+        "date": "2024-01-22",
+        "category": "Furniture",
+    },
 ]
 
 # ============================================================
@@ -38,6 +102,7 @@ orders = [
 #     {$group: {_id: "$customer", total: {$sum: "$price"}}}
 # ])
 
+
 # Example 1: Simple aggregation pipeline
 def aggregate(collection, pipeline):
     """Execute an aggregation pipeline"""
@@ -45,7 +110,7 @@ def aggregate(collection, pipeline):
     for stage in pipeline:
         stage_type = stage[0]
         stage_args = stage[1] if len(stage) > 1 else {}
-        
+
         if stage_type == "$match":
             result = agg_match(result, stage_args)
         elif stage_type == "$group":
@@ -60,8 +125,9 @@ def aggregate(collection, pipeline):
             result = result[:limit]
         elif stage_type == "$unwind":
             result = agg_unwind(result, stage_args)
-    
+
     return result
+
 
 # ============================================================
 # $match Stage
@@ -69,6 +135,7 @@ def aggregate(collection, pipeline):
 
 # Example 2: Filter documents
 # MongoDB equivalent: {$match: {category: "Electronics"}}
+
 
 def agg_match(collection, query):
     """Filter documents matching the query"""
@@ -95,6 +162,7 @@ def agg_match(collection, query):
             results.append(doc)
     return results
 
+
 # Filter electronics only
 pipeline = [("$match", {"category": "Electronics"})]
 result = aggregate(orders, pipeline)
@@ -109,25 +177,26 @@ for order in result:
 # Example 3: Group and aggregate
 # MongoDB equivalent: {$group: {_id: "$customer", total: {$sum: "$price"}}}
 
+
 def agg_group(collection, group_spec):
     """Group documents by field and apply accumulator"""
     group_field = group_spec["_id"].replace("$", "")
     accumulators = {k: v for k, v in group_spec.items() if k != "_id"}
-    
+
     groups = {}
     for doc in collection:
         key = doc.get(group_field, "unknown")
         if key not in groups:
             groups[key] = []
         groups[key].append(doc)
-    
+
     results = []
     for key, docs in groups.items():
         result = {"_id": key}
         for acc_name, acc_spec in accumulators.items():
             field = acc_spec.get("field", "").replace("$", "")
             op = acc_spec.get("op", "sum")
-            
+
             if op == "sum":
                 result[acc_name] = sum(doc.get(field, 0) for doc in docs)
             elif op == "avg":
@@ -139,19 +208,23 @@ def agg_group(collection, group_spec):
                 result[acc_name] = max(doc.get(field, 0) for doc in docs)
             elif op == "count":
                 result[acc_name] = len(docs)
-        
+
         results.append(result)
-    
+
     return results
+
 
 # Group by customer and sum total
 pipeline = [
     ("$match", {}),
-    ("$group", {
-        "_id": "$customer",
-        "total": {"op": "sum", "field": "$price"},
-        "order_count": {"op": "count"}
-    })
+    (
+        "$group",
+        {
+            "_id": "$customer",
+            "total": {"op": "sum", "field": "$price"},
+            "order_count": {"op": "count"},
+        },
+    ),
 ]
 result = aggregate(orders, pipeline)
 print("\nOrders by customer:")
@@ -165,6 +238,7 @@ for r in result:
 # Example 4: Sort results
 # MongoDB equivalent: {$sort: {total: -1}}
 
+
 def agg_sort(collection, sort_spec):
     """Sort documents by field(s)"""
     items = list(collection)
@@ -172,14 +246,12 @@ def agg_sort(collection, sort_spec):
         items.sort(key=lambda x: x.get(field, 0), reverse=(direction == -1))
     return items
 
+
 # Sort by total descending
 pipeline = [
     ("$match", {}),
-    ("$group", {
-        "_id": "$customer",
-        "total": {"op": "sum", "field": "$price"}
-    }),
-    ("$sort", {"total": -1})
+    ("$group", {"_id": "$customer", "total": {"op": "sum", "field": "$price"}}),
+    ("$sort", {"total": -1}),
 ]
 result = aggregate(orders, pipeline)
 print("\nCustomers sorted by total (highest first):")
@@ -192,6 +264,7 @@ for r in result:
 
 # Example 5: Reshape documents
 # MongoDB equivalent: {$project: {name: 1, total: 1, _id: 0}}
+
 
 def agg_project(collection, project_spec):
     """Reshape documents based on projection"""
@@ -216,23 +289,21 @@ def agg_project(collection, project_spec):
                 src = include[1:]
                 if src in doc:
                     projected[field] = doc[src]
-        
+
         # Always include _id unless explicitly excluded
         if "_id" not in project_spec or project_spec.get("_id") != 0:
             projected["_id"] = doc["_id"]
-        
+
         results.append(projected)
     return results
+
 
 # Project name and total
 # MongoDB equivalent: {$project: {_id: 0, customer: "$_id", total: 1}}
 pipeline = [
     ("$match", {}),
-    ("$group", {
-        "_id": "$customer",
-        "total": {"op": "sum", "field": "$price"}
-    }),
-    ("$project", {"_id": 0, "customer": "$_id", "total": 1})
+    ("$group", {"_id": "$customer", "total": {"op": "sum", "field": "$price"}}),
+    ("$project", {"_id": 0, "customer": "$_id", "total": 1}),
 ]
 result = aggregate(orders, pipeline)
 print("\nProjected (name + total):")
@@ -245,6 +316,7 @@ for r in result:
 
 # Example 6: Deconstruct array field
 # MongoDB equivalent: {$unwind: "$tags"}
+
 
 def agg_unwind(collection, unwind_spec):
     """Unwind an array field into separate documents"""
@@ -260,10 +332,11 @@ def agg_unwind(collection, unwind_spec):
             results.append(doc)
     return results
 
+
 # Example with tags
 products = [
     {"_id": 1, "name": "Laptop", "tags": ["electronics", "computers"]},
-    {"_id": 2, "name": "Mouse", "tags": ["electronics", "accessories"]}
+    {"_id": 2, "name": "Mouse", "tags": ["electronics", "accessories"]},
 ]
 
 pipeline = [("$unwind", {"path": "$tags"})]
@@ -287,13 +360,16 @@ for r in result:
 
 pipeline = [
     ("$match", {"category": "Electronics"}),
-    ("$group", {
-        "_id": "$customer",
-        "total_spent": {"op": "sum", "field": "$price"},
-        "items_bought": {"op": "sum", "field": "$quantity"}
-    }),
+    (
+        "$group",
+        {
+            "_id": "$customer",
+            "total_spent": {"op": "sum", "field": "$price"},
+            "items_bought": {"op": "sum", "field": "$quantity"},
+        },
+    ),
     ("$sort", {"total_spent": -1}),
-    ("$limit", 3)
+    ("$limit", 3),
 ]
 result = aggregate(orders, pipeline)
 print("\nTop 3 electronics buyers:")
@@ -306,12 +382,15 @@ for r in result:
 
 # Example 8: Average order value by customer
 pipeline = [
-    ("$group", {
-        "_id": "$customer",
-        "avg_order": {"op": "avg", "field": "$price"},
-        "order_count": {"op": "count"}
-    }),
-    ("$sort", {"avg_order": -1})
+    (
+        "$group",
+        {
+            "_id": "$customer",
+            "avg_order": {"op": "avg", "field": "$price"},
+            "order_count": {"op": "count"},
+        },
+    ),
+    ("$sort", {"avg_order": -1}),
 ]
 result = aggregate(orders, pipeline)
 print("\nAverage order value by customer:")
@@ -320,11 +399,14 @@ for r in result:
 
 # Example 9: Min and max prices
 pipeline = [
-    ("$group", {
-        "_id": "$category",
-        "min_price": {"op": "min", "field": "$price"},
-        "max_price": {"op": "max", "field": "$price"}
-    })
+    (
+        "$group",
+        {
+            "_id": "$category",
+            "min_price": {"op": "min", "field": "$price"},
+            "max_price": {"op": "max", "field": "$price"},
+        },
+    )
 ]
 result = aggregate(orders, pipeline)
 print("\nPrice range by category:")
@@ -351,6 +433,7 @@ print("""
 10. Complex analytics can be built by chaining stages
 """)
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
@@ -361,60 +444,92 @@ def _verify() -> None:
     assert len(elec) == 4
 
     # $group: sum + count accumulators
-    by_customer = aggregate(orders, [
-        ("$group", {
-            "_id": "$customer",
-            "total": {"op": "sum", "field": "$price"},
-            "order_count": {"op": "count"}
-        })
-    ])
+    by_customer = aggregate(
+        orders,
+        [
+            (
+                "$group",
+                {
+                    "_id": "$customer",
+                    "total": {"op": "sum", "field": "$price"},
+                    "order_count": {"op": "count"},
+                },
+            )
+        ],
+    )
     by_customer = {r["_id"]: r for r in by_customer}
     assert by_customer["Alice"]["order_count"] == 3
     assert abs(by_customer["Alice"]["total"] - 1129.97) < 1e-6
     assert abs(by_customer["Bob"]["total"] - 229.98) < 1e-6
 
     # $sort descending by total
-    ranked = aggregate(orders, [
-        ("$group", {"_id": "$customer", "total": {"op": "sum", "field": "$price"}}),
-        ("$sort", {"total": -1})
-    ])
+    ranked = aggregate(
+        orders,
+        [
+            ("$group", {"_id": "$customer", "total": {"op": "sum", "field": "$price"}}),
+            ("$sort", {"total": -1}),
+        ],
+    )
     assert ranked[0]["_id"] == "Alice"
 
     # $project with field reference (regression for R6: "$_id" rename)
-    proj = aggregate(orders, [
-        ("$group", {"_id": "$customer", "total": {"op": "sum", "field": "$price"}}),
-        ("$project", {"_id": 0, "customer": "$_id", "total": 1})
-    ])
+    proj = aggregate(
+        orders,
+        [
+            ("$group", {"_id": "$customer", "total": {"op": "sum", "field": "$price"}}),
+            ("$project", {"_id": 0, "customer": "$_id", "total": 1}),
+        ],
+    )
     assert all(set(r.keys()) == {"customer", "total"} for r in proj)
     assert {r["customer"] for r in proj} == {"Alice", "Bob", "Charlie", "Diana"}
 
     # $unwind deconstructs arrays
     unwound = aggregate(products, [("$unwind", {"path": "$tags"})])
     assert len(unwound) == 4
-    assert [r["tags"] for r in unwound] == ["electronics", "computers", "electronics", "accessories"]
+    assert [r["tags"] for r in unwound] == [
+        "electronics",
+        "computers",
+        "electronics",
+        "accessories",
+    ]
 
     # $limit stage
     limited = aggregate(orders, [("$match", {}), ("$limit", 3)])
     assert len(limited) == 3
 
     # multi-stage pipeline: match -> group -> sort -> limit
-    top = aggregate(orders, [
-        ("$match", {"category": "Electronics"}),
-        ("$group", {
-            "_id": "$customer",
-            "total_spent": {"op": "sum", "field": "$price"},
-            "items_bought": {"op": "sum", "field": "$quantity"}
-        }),
-        ("$sort", {"total_spent": -1}),
-        ("$limit", 3)
-    ])
+    top = aggregate(
+        orders,
+        [
+            ("$match", {"category": "Electronics"}),
+            (
+                "$group",
+                {
+                    "_id": "$customer",
+                    "total_spent": {"op": "sum", "field": "$price"},
+                    "items_bought": {"op": "sum", "field": "$quantity"},
+                },
+            ),
+            ("$sort", {"total_spent": -1}),
+            ("$limit", 3),
+        ],
+    )
     assert top[0]["_id"] == "Alice" and top[0]["items_bought"] == 2
 
     # avg / min / max accumulators
-    avg = aggregate(orders, [
-        ("$group", {"_id": "$category", "min_price": {"op": "min", "field": "$price"},
-                    "max_price": {"op": "max", "field": "$price"}})
-    ])
+    avg = aggregate(
+        orders,
+        [
+            (
+                "$group",
+                {
+                    "_id": "$category",
+                    "min_price": {"op": "min", "field": "$price"},
+                    "max_price": {"op": "max", "field": "$price"},
+                },
+            )
+        ],
+    )
     by_cat = {r["_id"]: r for r in avg}
     assert by_cat["Electronics"]["min_price"] == 29.99
     assert by_cat["Electronics"]["max_price"] == 999.99

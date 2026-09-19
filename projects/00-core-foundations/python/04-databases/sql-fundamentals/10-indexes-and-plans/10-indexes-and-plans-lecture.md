@@ -40,6 +40,7 @@ By the end of this lecture, you will be able to:
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE logs (id INTEGER PRIMARY KEY, level TEXT, user_id INTEGER)")
 # (100k rows inserted)
@@ -108,7 +109,11 @@ within each level. Consequences:
 
 ```python
 conn.execute("CREATE INDEX idx_logs_level_user ON logs(level, user_id)")
-print(conn.execute("EXPLAIN QUERY PLAN SELECT * FROM logs WHERE user_id = 5 AND level = 'error'").fetchall())
+print(
+    conn.execute(
+        "EXPLAIN QUERY PLAN SELECT * FROM logs WHERE user_id = 5 AND level = 'error'"
+    ).fetchall()
+)
 print(conn.execute("EXPLAIN QUERY PLAN SELECT * FROM logs WHERE user_id = 5").fetchall())
 ```
 

@@ -15,8 +15,10 @@ from queue import Queue
 # 1. Basic Thread
 # =============================================================================
 
+
 def demo_basic_thread():
     """Demonstrate basic thread creation."""
+
     def worker(name: str, delay: float):
         print(f"  [{name}] Starting")
         time.sleep(delay)
@@ -40,6 +42,7 @@ def demo_basic_thread():
 # 2. Thread with Return Value
 # =============================================================================
 
+
 class ThreadResult:
     """Helper to capture thread return value."""
 
@@ -62,10 +65,11 @@ class ThreadResult:
 
 def demo_thread_return():
     """Capture return values from threads."""
+
     def compute_square(n: int, result: ThreadResult):
         try:
             time.sleep(0.1)
-            result.set_result(n ** 2)
+            result.set_result(n**2)
         except Exception as e:
             result.set_exception(e)
 
@@ -88,6 +92,7 @@ def demo_thread_return():
 # =============================================================================
 # 3. Lock and RLock
 # =============================================================================
+
 
 class Counter:
     """Thread-safe counter using Lock."""
@@ -160,6 +165,7 @@ class BankAccount:
 # 4. Semaphore
 # =============================================================================
 
+
 def demo_semaphore():
     """Demonstrate Semaphore for limiting concurrency."""
     semaphore = threading.Semaphore(2)  # Max 2 concurrent
@@ -183,6 +189,7 @@ def demo_semaphore():
 # =============================================================================
 # 5. Producer-Consumer
 # =============================================================================
+
 
 def demo_producer_consumer():
     """Producer-consumer pattern with Queue."""
@@ -225,6 +232,7 @@ def demo_producer_consumer():
 # 6. Event and Condition
 # =============================================================================
 
+
 def demo_event():
     """Demonstrate Event for thread coordination."""
     event = threading.Event()
@@ -252,6 +260,7 @@ def demo_event():
 # =============================================================================
 # 7. Thread Pool (concurrent.futures)
 # =============================================================================
+
 
 def demo_thread_pool():
     """Demonstrate ThreadPoolExecutor."""

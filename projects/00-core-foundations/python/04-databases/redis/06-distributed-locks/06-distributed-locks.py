@@ -32,6 +32,7 @@ from redis_client import ManualClock, RedisClient, get_client
 # separate EXPIRE would leak a permanent lock if the process died between
 # the two calls.
 
+
 def acquire(lock_name: str, token: str, ttl_s: float, client: RedisClient) -> bool:
     """SET lock NX PX in one shot; token proves ownership."""
     return client.set(f"lock:{lock_name}", token, nx=True, ex=ttl_s)
@@ -63,7 +64,7 @@ print(f"worker-b acquired: {acquired_2} (NX rejects second holder)")
 # worker-a dies mid-job; the lock expires and worker-b takes over.
 # Without expiry, the job would be stuck forever.
 
-clock.advance(31)   # lock TTL (30s) elapses
+clock.advance(31)  # lock TTL (30s) elapses
 print(f"after expiry, lock exists? {lc.exists('lock:job:embed')}")
 
 # Output:
@@ -100,6 +101,7 @@ print(f"worker-b own release:   {release('job:embed', 'worker-b', lc)} (must be 
 # the resource (DB) rejects any write whose token is older than the last
 # accepted one. Locks alone cannot fix paused-process races.
 
+
 def next_token() -> int:
     next_token._n = getattr(next_token, "_n", 0) + 1
     return next_token._n
@@ -119,7 +121,7 @@ def fenced_write(data: str, token: int, db: dict) -> bool:
 
 tok_a = next_token()
 lock.update({"holder": "a", "token": tok_a})
-fenced_write("a: result", tok_a, fenced_db)     # a writes with token 1
+fenced_write("a: result", tok_a, fenced_db)  # a writes with token 1
 
 lock.update({"holder": "b", "token": next_token()})
 fenced_write("b: result", lock["token"], fenced_db)
@@ -168,6 +170,7 @@ print(f"db data: {fenced_db['data']}")
 # MISTAKE: defaulting to Redlock for a simple cache stampede.
 # CORRECT: one Redis lock + TTL + jitter is usually enough.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
@@ -184,25 +187,21 @@ def _verify() -> None:
     # stale release must not delete a lock held by someone else
     assert release("l:1", "a", vc) is True, "owner releases its own lock"
     assert acquire("l:1", "b", 10, vc) is True, "lock reusable after release"
-    assert release("l:1", "ghost", vc) is False, \
-        "non-owner release must be rejected"
+    assert release("l:1", "ghost", vc) is False, "non-owner release must be rejected"
 
     # fencing: stale tokens are rejected by the resource
     fresh_db = {"last_token": 0}
     t1 = next_token()
     assert fenced_write("first", t1, fresh_db) is True, "first write accepted"
-    assert fenced_write("stale", t1, fresh_db) is False, \
-        "replayed token must be rejected"
-    assert fenced_write("new", next_token(), fresh_db) is True, \
-        "newer token accepted"
+    assert fenced_write("stale", t1, fresh_db) is False, "replayed token must be rejected"
+    assert fenced_write("new", next_token(), fresh_db) is True, "newer token accepted"
 
     # crash timeout: lock becomes acquirable after TTL
     ck = ManualClock(start=50.0)
     cc: RedisClient = RedisClient(clock=ck)
     acquire("l:2", "a", 5, cc)
     ck.advance(6)
-    assert acquire("l:2", "b", 5, cc) is True, \
-        "expired lock must be acquirable by a new holder"
+    assert acquire("l:2", "b", 5, cc) is True, "expired lock must be acquirable by a new holder"
 
     print("[OK] 06-distributed-locks: all checks passed")
 

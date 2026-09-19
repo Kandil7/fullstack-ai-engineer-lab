@@ -29,7 +29,7 @@ mixed = (1, "hello", 3.14, True)
 
 # Single element tuple (note the comma)
 single = (5,)  # This is a tuple
-not_tuple = (5)  # This is just an integer!
+not_tuple = 5  # This is just an integer!
 
 # From other iterables
 chars = tuple("hello")  # ('h', 'e', 'l', 'l', 'o')
@@ -53,14 +53,14 @@ Access elements using indices (0-based).
 fruits = ("apple", "banana", "cherry", "date")
 
 # Indexing
-print(fruits[0])   # apple
+print(fruits[0])  # apple
 print(fruits[-1])  # date (last element)
 
 # Slicing
-print(fruits[0:2])   # ('apple', 'banana')
-print(fruits[1:3])   # ('banana', 'cherry')
-print(fruits[:2])    # ('apple', 'banana')
-print(fruits[2:])    # ('cherry', 'date')
+print(fruits[0:2])  # ('apple', 'banana')
+print(fruits[1:3])  # ('banana', 'cherry')
+print(fruits[:2])  # ('apple', 'banana')
+print(fruits[2:])  # ('cherry', 'date')
 ```
 
 ### 3.4 Tuple Methods
@@ -94,9 +94,9 @@ repeated = tuple1 * 3  # (1, 2, 3, 1, 2, 3, 1, 2, 3)
 ```python
 numbers = (1, 2, 3, 4, 5)
 
-print(3 in numbers)      # True
+print(3 in numbers)  # True
 print(6 not in numbers)  # True
-print(len(numbers))      # 5
+print(len(numbers))  # 5
 ```
 
 ### 3.6 Tuple Unpacking
@@ -119,9 +119,9 @@ print(x, y)  # 10 5
 
 # Star unpacking
 first, *middle, last = (1, 2, 3, 4, 5)
-print(first)   # 1
+print(first)  # 1
 print(middle)  # [2, 3, 4]
-print(last)    # 5
+print(last)  # 5
 ```
 
 ### 3.7 Named Tuples
@@ -131,15 +131,15 @@ Tuples with named fields for better readability.
 from collections import namedtuple
 
 # Define named tuple
-Point = namedtuple('Point', ['x', 'y'])
+Point = namedtuple("Point", ["x", "y"])
 
 # Create instance
 p = Point(10, 20)
 print(p.x, p.y)  # 10 20
 
 # Access by name or index
-print(p[0])      # 10
-print(p.x)       # 10
+print(p[0])  # 10
+print(p.x)  # 10
 ```
 
 ## 4. Code Examples
@@ -150,7 +150,7 @@ print(p.x)       # 10
 fruits = ("apple", "banana", "cherry")
 
 # Access elements
-print(fruits[0])   # apple
+print(fruits[0])  # apple
 print(fruits[-1])  # cherry
 
 # Slice
@@ -185,7 +185,7 @@ print(f"First: {first}, Middle: {middle}, Last: {last}")
 from collections import namedtuple
 
 # Define named tuple
-Student = namedtuple('Student', ['name', 'age', 'grade'])
+Student = namedtuple("Student", ["name", "age", "grade"])
 
 # Create instances
 alice = Student("Alice", 20, "A")
@@ -206,7 +206,7 @@ print(alice_dict)
 locations = {
     (40.7128, -74.0060): "New York",
     (51.5074, -0.1278): "London",
-    (35.6762, 139.6503): "Tokyo"
+    (35.6762, 139.6503): "Tokyo",
 }
 
 # Access using tuple key
@@ -218,7 +218,7 @@ print(locations[(51.5074, -0.1278)])  # London
 ### Mistake 1: Forgetting the Comma for Single Elements
 ```python
 # Wrong - not a tuple
-not_tuple = (5)
+not_tuple = 5
 print(type(not_tuple))  # <class 'int'>
 
 # Right - use comma

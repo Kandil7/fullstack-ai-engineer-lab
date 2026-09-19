@@ -38,8 +38,7 @@ from typing import Optional, Any
 from collections import defaultdict
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 logger = logging.getLogger("data_privacy")
 
@@ -48,8 +47,10 @@ logger = logging.getLogger("data_privacy")
 # Section 1: Core Types
 # =============================================================================
 
+
 class PIIType(Enum):
     """Types of personally identifiable information."""
+
     NAME = auto()
     EMAIL = auto()
     PHONE = auto()
@@ -68,29 +69,32 @@ class PIIType(Enum):
 
 class AnonymizationMethod(Enum):
     """Methods for anonymizing data."""
-    MASKING = auto()         # Replace with fixed characters
-    HASHING = auto()         # One-way hash
-    PSEUDONYMIZATION = auto() # Replace with pseudonym
+
+    MASKING = auto()  # Replace with fixed characters
+    HASHING = auto()  # One-way hash
+    PSEUDONYMIZATION = auto()  # Replace with pseudonym
     GENERALIZATION = auto()  # Reduce precision
-    SUPPRESSION = auto()     # Remove entirely
+    SUPPRESSION = auto()  # Remove entirely
     NOISE_ADDITION = auto()  # Add statistical noise
-    K_ANONYMITY = auto()     # Group into k-sized equivalence classes
-    L_DIVERSITY = auto()     # Ensure l distinct values per class
-    T_CLOSURENESS = auto()   # Limit distribution skew
+    K_ANONYMITY = auto()  # Group into k-sized equivalence classes
+    L_DIVERSITY = auto()  # Ensure l distinct values per class
+    T_CLOSURENESS = auto()  # Limit distribution skew
 
 
 class PrivacyLevel(Enum):
     """Privacy protection levels."""
-    PUBLIC = 0        # No protection needed
-    INTERNAL = 1      # Basic masking
+
+    PUBLIC = 0  # No protection needed
+    INTERNAL = 1  # Basic masking
     CONFIDENTIAL = 2  # Strong anonymization
-    RESTRICTED = 3    # Full suppression + audit
-    TOP_SECRET = 4    # Maximum protection
+    RESTRICTED = 3  # Full suppression + audit
+    TOP_SECRET = 4  # Maximum protection
 
 
 @dataclass
 class PIIMatch:
     """A detected PII instance in text."""
+
     pii_type: PIIType
     value: str
     start: int
@@ -102,6 +106,7 @@ class PIIMatch:
 @dataclass
 class AnonymizationResult:
     """Result of an anonymization operation."""
+
     method: AnonymizationMethod
     original: str
     anonymized: str
@@ -113,6 +118,7 @@ class AnonymizationResult:
 @dataclass
 class PrivacyAuditEntry:
     """Audit log entry for privacy operations."""
+
     timestamp: float
     operation: str
     pii_types: list[str]
@@ -124,6 +130,7 @@ class PrivacyAuditEntry:
 # =============================================================================
 # Section 2: PII Detection Engine
 # =============================================================================
+
 
 class PIIDetector:
     """
@@ -146,16 +153,12 @@ class PIIDetector:
             PIIType.PHONE: re.compile(
                 r"(?:\+?1[-.\s]?)?(?:\(?\d{3}\)?[-.\s]?)\d{3}[-.\s]?\d{4}\b"
             ),
-            PIIType.SSN: re.compile(
-                r"\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b"
-            ),
+            PIIType.SSN: re.compile(r"\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b"),
             PIIType.CREDIT_CARD: re.compile(
                 r"\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|"
                 r"3[47][0-9]{13}|6(?:011|5[0-9]{2})[0-9]{12})\b"
             ),
-            PIIType.IP_ADDRESS: re.compile(
-                r"\b(?:\d{1,3}\.){3}\d{1,3}\b"
-            ),
+            PIIType.IP_ADDRESS: re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"),
             PIIType.DATE_OF_BIRTH: re.compile(
                 r"\b(?:0[1-9]|1[0-2])[/.-](?:0[1-9]|[12]\d|3[01])[/.-]"
                 r"(?:19|20)\d{2}\b"
@@ -171,9 +174,7 @@ class PIIDetector:
             PIIType.MEDICAL_RECORD: re.compile(
                 r"(?i)(?:MRN|medical\s+record|patient\s+id)[\s:=]+[A-Z0-9-]{6,20}"
             ),
-            PIIType.PASSPORT: re.compile(
-                r"\b[A-Z]{1,2}\d{6,9}\b"
-            ),
+            PIIType.PASSPORT: re.compile(r"\b[A-Z]{1,2}\d{6,9}\b"),
             PIIType.DRIVER_LICENSE: re.compile(
                 r"(?i)(?:driver'?s?\s+license|DL)[\s:=]+[A-Z0-9-]{6,20}"
             ),
@@ -193,14 +194,16 @@ class PIIDetector:
                 end = min(len(text), match.end() + 20)
                 context = text[start:end]
 
-                matches.append(PIIMatch(
-                    pii_type=pii_type,
-                    value=match.group(),
-                    start=match.start(),
-                    end=match.end(),
-                    confidence=confidence,
-                    context=context,
-                ))
+                matches.append(
+                    PIIMatch(
+                        pii_type=pii_type,
+                        value=match.group(),
+                        start=match.start(),
+                        end=match.end(),
+                        confidence=confidence,
+                        context=context,
+                    )
+                )
 
         # Sort by position and remove overlaps (keep highest confidence)
         matches.sort(key=lambda m: (m.start, -m.confidence))
@@ -281,20 +284,23 @@ class PIIDetector:
                 # Check if numeric fields contain PII-like values
                 text = str(value)
                 if len(text) == 9 and text.isdigit():
-                    all_matches.append(PIIMatch(
-                        pii_type=PIIType.SSN,
-                        value=text,
-                        start=0,
-                        end=len(text),
-                        confidence=0.6,
-                        context=f"field={key}",
-                    ))
+                    all_matches.append(
+                        PIIMatch(
+                            pii_type=PIIType.SSN,
+                            value=text,
+                            start=0,
+                            end=len(text),
+                            confidence=0.6,
+                            context=f"field={key}",
+                        )
+                    )
         return all_matches
 
 
 # =============================================================================
 # Section 3: Data Anonymization Engine
 # =============================================================================
+
 
 class AnonymizationEngine:
     """
@@ -339,14 +345,18 @@ class AnonymizationEngine:
         anonymized = text
         for match in sorted_matches:
             anonymized_value = self._apply_method(match.value, match.pii_type, method)
-            results.append(AnonymizationResult(
-                method=method,
-                original=match.value,
-                anonymized=anonymized_value,
-                pii_type=match.pii_type,
-                reversible=method == AnonymizationMethod.PSEUDONYMIZATION,
-            ))
-            anonymized = anonymized[:match.start] + anonymized_value + anonymized[match.end:]
+            results.append(
+                AnonymizationResult(
+                    method=method,
+                    original=match.value,
+                    anonymized=anonymized_value,
+                    pii_type=match.pii_type,
+                    reversible=method == AnonymizationMethod.PSEUDONYMIZATION,
+                )
+            )
+            anonymized = (
+                anonymized[: match.start] + anonymized_value + anonymized[match.end :]
+            )
 
         return anonymized, results
 
@@ -405,7 +415,11 @@ class AnonymizationEngine:
                 return f"{parts[0]}.{parts[1]}.XXX.XXX"
             return "XXX.XXX.XXX.XXX"
         else:
-            return value[0] + "*" * max(len(value) - 2, 1) + value[-1] if len(value) > 1 else "***"
+            return (
+                value[0] + "*" * max(len(value) - 2, 1) + value[-1]
+                if len(value) > 1
+                else "***"
+            )
 
     def _hash(self, value: str) -> str:
         """Apply salted hash to a value."""
@@ -465,7 +479,10 @@ class AnonymizationEngine:
             parts = value.split(".")
             if len(parts) == 4:
                 try:
-                    noisy = [str(max(0, min(255, int(p) + random.randint(-5, 5)))) for p in parts]
+                    noisy = [
+                        str(max(0, min(255, int(p) + random.randint(-5, 5))))
+                        for p in parts
+                    ]
                     return ".".join(noisy)
                 except ValueError:
                     pass
@@ -479,6 +496,7 @@ class AnonymizationEngine:
 # =============================================================================
 # Section 4: Differential Privacy
 # =============================================================================
+
 
 class DifferentialPrivacy:
     """
@@ -538,7 +556,9 @@ class DifferentialPrivacy:
         if self.privacy_budget_used >= self.epsilon:
             return value
 
-        sigma = (sensitivity * math.sqrt(2 * math.log(1.25 / self.delta))) / self.epsilon
+        sigma = (
+            sensitivity * math.sqrt(2 * math.log(1.25 / self.delta))
+        ) / self.epsilon
         noise = random.gauss(0, sigma)
 
         self.privacy_budget_used += self.epsilon / 100
@@ -612,6 +632,7 @@ class DifferentialPrivacy:
 # =============================================================================
 # Section 5: Data Masking Strategies
 # =============================================================================
+
 
 class DataMasker:
     """
@@ -751,6 +772,7 @@ class DataMasker:
 # Section 6: GDPR Compliance Patterns
 # =============================================================================
 
+
 class GDPRCompliance:
     """
     Implements GDPR compliance patterns for data handling.
@@ -786,14 +808,16 @@ class GDPRCompliance:
         }
         self.consent_records[user_id] = consent_record
 
-        self.processing_log.append(PrivacyAuditEntry(
-            timestamp=time.time(),
-            operation="consent_recorded",
-            pii_types=[],
-            data_hash=hashlib.sha256(user_id.encode()).hexdigest()[:16],
-            user_id=user_id,
-            details=f"Consent {'given' if consent_given else 'denied'} for: {', '.join(purposes)}",
-        ))
+        self.processing_log.append(
+            PrivacyAuditEntry(
+                timestamp=time.time(),
+                operation="consent_recorded",
+                pii_types=[],
+                data_hash=hashlib.sha256(user_id.encode()).hexdigest()[:16],
+                user_id=user_id,
+                details=f"Consent {'given' if consent_given else 'denied'} for: {', '.join(purposes)}",
+            )
+        )
 
         logger.info(f"Consent recorded for user {user_id[:8]}...: {consent_given}")
         return consent_record
@@ -818,14 +842,16 @@ class GDPRCompliance:
             del data_store[user_id]
 
         # Log the erasure
-        self.processing_log.append(PrivacyAuditEntry(
-            timestamp=time.time(),
-            operation="right_to_erasure",
-            pii_types=erased_fields,
-            data_hash=hashlib.sha256(user_id.encode()).hexdigest()[:16],
-            user_id=user_id,
-            details=f"Erased {len(erased_fields)} field(s): {', '.join(erased_fields[:5])}",
-        ))
+        self.processing_log.append(
+            PrivacyAuditEntry(
+                timestamp=time.time(),
+                operation="right_to_erasure",
+                pii_types=erased_fields,
+                data_hash=hashlib.sha256(user_id.encode()).hexdigest()[:16],
+                user_id=user_id,
+                details=f"Erased {len(erased_fields)} field(s): {', '.join(erased_fields[:5])}",
+            )
+        )
 
         logger.info(f"Right to erasure executed for user {user_id[:8]}...")
         return {
@@ -852,8 +878,7 @@ class GDPRCompliance:
             },
             "personal_data": user_data,
             "consent_history": [
-                r for r in self.consent_records.values()
-                if r["user_id"] == user_id
+                r for r in self.consent_records.values() if r["user_id"] == user_id
             ],
             "processing_history": [
                 {
@@ -866,14 +891,16 @@ class GDPRCompliance:
             ],
         }
 
-        self.processing_log.append(PrivacyAuditEntry(
-            timestamp=time.time(),
-            operation="data_export",
-            pii_types=[],
-            data_hash=hashlib.sha256(user_id.encode()).hexdigest()[:16],
-            user_id=user_id,
-            details=f"Exported {len(user_data)} field(s)",
-        ))
+        self.processing_log.append(
+            PrivacyAuditEntry(
+                timestamp=time.time(),
+                operation="data_export",
+                pii_types=[],
+                data_hash=hashlib.sha256(user_id.encode()).hexdigest()[:16],
+                user_id=user_id,
+                details=f"Exported {len(user_data)} field(s)",
+            )
+        )
 
         return export
 
@@ -924,6 +951,7 @@ class GDPRCompliance:
 # =============================================================================
 # Section 7: Privacy-Preserving Data Collection
 # =============================================================================
+
 
 class PrivacyPreservingCollector:
     """
@@ -1001,13 +1029,15 @@ class PrivacyPreservingCollector:
         }
 
         # Log collection
-        self.collection_log.append({
-            "user_id": hashlib.sha256(user_id.encode()).hexdigest()[:8],
-            "purpose": purpose,
-            "pii_detected": len(pii_matches),
-            "pii_handled": pii_handled,
-            "timestamp": time.time(),
-        })
+        self.collection_log.append(
+            {
+                "user_id": hashlib.sha256(user_id.encode()).hexdigest()[:8],
+                "purpose": purpose,
+                "pii_detected": len(pii_matches),
+                "pii_handled": pii_handled,
+                "timestamp": time.time(),
+            }
+        )
 
         return {
             "status": "collected",
@@ -1021,7 +1051,8 @@ class PrivacyPreservingCollector:
         """Remove data that has exceeded retention period."""
         now = time.time()
         expired_keys = [
-            key for key, data in self.data_store.items()
+            key
+            for key, data in self.data_store.items()
             if data.get("_retention_until", 0) < now
         ]
 
@@ -1033,9 +1064,7 @@ class PrivacyPreservingCollector:
 
         return len(expired_keys)
 
-    def aggregate_stats(
-        self, field: str, operation: str = "count"
-    ) -> Optional[float]:
+    def aggregate_stats(self, field: str, operation: str = "count") -> Optional[float]:
         """
         Aggregate data without exposing individual records.
 
@@ -1073,6 +1102,7 @@ class PrivacyPreservingCollector:
 # =============================================================================
 # Section 8: Privacy Audit Logger
 # =============================================================================
+
 
 class PrivacyAuditLogger:
     """
@@ -1133,6 +1163,7 @@ class PrivacyAuditLogger:
 # Section 9: Demonstration & Testing
 # =============================================================================
 
+
 def demo_pii_detection():
     """Demonstrate PII detection."""
     print("\n" + "=" * 72)
@@ -1151,10 +1182,12 @@ def demo_pii_detection():
 
     for i, text in enumerate(test_texts, 1):
         matches = detector.detect(text)
-        print(f"\n  [{i}] \"{text[:60]}{'...' if len(text) > 60 else ''}\"")
+        print(f'\n  [{i}] "{text[:60]}{"..." if len(text) > 60 else ""}"')
         if matches:
             for m in matches:
-                print(f"      {m.pii_type.name}: \"{m.value}\" (conf: {m.confidence:.0%})")
+                print(
+                    f'      {m.pii_type.name}: "{m.value}" (conf: {m.confidence:.0%})'
+                )
         else:
             print("      [OK] No PII detected")
 
@@ -1179,14 +1212,14 @@ def demo_anonymization():
         ("Suppression", AnonymizationMethod.SUPPRESSION),
     ]
 
-    print(f"\n  Original: \"{text}\"")
+    print(f'\n  Original: "{text}"')
     for method_name, method in methods:
         anonymized, ops = engine.anonymize(text, matches, method)
         print(f"\n  {method_name}:")
-        print(f"    \"{anonymized}\"")
+        print(f'    "{anonymized}"')
         if ops:
             for op in ops[:3]:
-                print(f"    - {op.pii_type.name}: \"{op.original}\" -> \"{op.anonymized}\"")
+                print(f'    - {op.pii_type.name}: "{op.original}" -> "{op.anonymized}"')
 
 
 def demo_differential_privacy():
@@ -1247,14 +1280,24 @@ def demo_data_masking():
 
     for value, pii_type, description in test_cases:
         masked = masker.mask_field(value, pii_type, "partial")
-        print(f"  {description:20s} | {pii_type.name:15s} | \"{value}\" -> \"{masked}\"")
+        print(f'  {description:20s} | {pii_type.name:15s} | "{value}" -> "{masked}"')
 
     # Dataset masking
     print(f"\n  Dataset Masking:")
     dataset = [
-        {"name": "Alice Johnson", "email": "alice@example.com", "phone": "555-0101", "age": 30},
+        {
+            "name": "Alice Johnson",
+            "email": "alice@example.com",
+            "phone": "555-0101",
+            "age": 30,
+        },
         {"name": "Bob Smith", "email": "bob@acme.com", "phone": "555-0202", "age": 25},
-        {"name": "Carol White", "email": "carol@test.org", "phone": "555-0303", "age": 35},
+        {
+            "name": "Carol White",
+            "email": "carol@test.org",
+            "phone": "555-0303",
+            "age": 35,
+        },
     ]
 
     field_configs = {
@@ -1284,9 +1327,15 @@ def demo_gdpr_compliance():
     gdpr.record_consent("user_002", ["marketing"], False)
 
     # Check consent
-    print(f"  User 001 marketing consent: {gdpr.check_consent('user_001', 'marketing')}")
-    print(f"  User 002 marketing consent: {gdpr.check_consent('user_002', 'marketing')}")
-    print(f"  User 002 analytics consent: {gdpr.check_consent('user_002', 'analytics')}")
+    print(
+        f"  User 001 marketing consent: {gdpr.check_consent('user_001', 'marketing')}"
+    )
+    print(
+        f"  User 002 marketing consent: {gdpr.check_consent('user_002', 'marketing')}"
+    )
+    print(
+        f"  User 002 analytics consent: {gdpr.check_consent('user_002', 'analytics')}"
+    )
 
     # Data minimization check
     print(f"\n  Data Minimization Check (purpose: newsletter):")
@@ -1299,7 +1348,11 @@ def demo_gdpr_compliance():
     # Right to erasure
     print(f"\n  Right to Erasure:")
     data_store = {
-        "user_001": {"name": "Alice", "email": "alice@example.com", "phone": "555-0101"},
+        "user_001": {
+            "name": "Alice",
+            "email": "alice@example.com",
+            "phone": "555-0101",
+        },
         "user_002": {"name": "Bob", "email": "bob@example.com", "phone": "555-0202"},
     }
     erasure_result = gdpr.right_to_erasure("user_001", data_store)
@@ -1329,18 +1382,30 @@ def demo_privacy_preserving_collection():
 
     # Collect data
     print("\n  Data Collection:")
-    result1 = collector.collect("user_a", {
-        "name": "Alice Smith",
-        "email": "alice@example.com",
-        "page_views": 42,
-    }, "analytics", gdpr)
-    print(f"  User A: {result1['status']} | PII handled: {result1.get('pii_handled', [])}")
+    result1 = collector.collect(
+        "user_a",
+        {
+            "name": "Alice Smith",
+            "email": "alice@example.com",
+            "page_views": 42,
+        },
+        "analytics",
+        gdpr,
+    )
+    print(
+        f"  User A: {result1['status']} | PII handled: {result1.get('pii_handled', [])}"
+    )
 
-    result2 = collector.collect("user_b", {
-        "name": "Bob Jones",
-        "email": "bob@test.com",
-        "page_views": 15,
-    }, "newsletter", gdpr)
+    result2 = collector.collect(
+        "user_b",
+        {
+            "name": "Bob Jones",
+            "email": "bob@test.com",
+            "page_views": 15,
+        },
+        "newsletter",
+        gdpr,
+    )
     print(f"  User B: {result2['status']} | Reason: {result2.get('reason', 'N/A')}")
 
     # Aggregate stats (without exposing individual data)
@@ -1356,7 +1421,9 @@ def demo_privacy_preserving_collection():
     print(f"\n  Data Portability Export:")
     export = gdpr.export_user_data("user_a", collector.data_store)
     print(f"    Fields exported: {list(export.get('personal_data', {}).keys())}")
-    print(f"    Processing history entries: {len(export.get('processing_history', []))}")
+    print(
+        f"    Processing history entries: {len(export.get('processing_history', []))}"
+    )
 
 
 def demo_audit_logging():
@@ -1410,7 +1477,9 @@ def demo_audit_logging():
     print("\n  Audit Log Entries:")
     all_entries = logger_instance.query()
     for entry in all_entries:
-        print(f"    [{entry.operation}] User: {entry.user_id or 'N/A'} | Types: {entry.pii_types}")
+        print(
+            f"    [{entry.operation}] User: {entry.user_id or 'N/A'} | Types: {entry.pii_types}"
+        )
 
     # Query by operation
     deletion_entries = logger_instance.query(operation="data_deletion")

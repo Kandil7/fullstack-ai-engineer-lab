@@ -15,6 +15,7 @@ import math
 # 1. Classes to Test
 # =============================================================================
 
+
 class Calculator:
     """Simple calculator for testing."""
 
@@ -33,7 +34,7 @@ class Calculator:
         return a / b
 
     def power(self, a: float, b: float) -> float:
-        return a ** b
+        return a**b
 
 
 class BankAccount:
@@ -96,6 +97,7 @@ class UserService:
 # =============================================================================
 # 2. Test Cases
 # =============================================================================
+
 
 class TestCalculator(unittest.TestCase):
     """Test Calculator class."""
@@ -172,6 +174,7 @@ class TestBankAccount(unittest.TestCase):
 # 3. Mock Objects
 # =============================================================================
 
+
 class TestUserService(unittest.TestCase):
     """Test UserService with mocked EmailService."""
 
@@ -202,15 +205,16 @@ class TestUserService(unittest.TestCase):
 # 4. Patching
 # =============================================================================
 
+
 class TestWithPatch(unittest.TestCase):
     """Test using patch decorator."""
 
-    @patch('builtins.print')
+    @patch("builtins.print")
     def test_print_called(self, mock_print):
         print("Hello, World!")
         mock_print.assert_called_once_with("Hello, World!")
 
-    @patch.object(EmailService, 'send_email', return_value=True)
+    @patch.object(EmailService, "send_email", return_value=True)
     def test_email_send(self, mock_send):
         service = EmailService()
         result = service.send_email("test@example.com", "Hi", "Hello")
@@ -221,6 +225,7 @@ class TestWithPatch(unittest.TestCase):
 # =============================================================================
 # 5. Parameterized Tests
 # =============================================================================
+
 
 class TestParameterized(unittest.TestCase):
     """Demonstrate parameterized testing."""
@@ -253,6 +258,7 @@ class TestParameterized(unittest.TestCase):
 # 6. setUp and tearDown
 # =============================================================================
 
+
 class TestWithFixtures(unittest.TestCase):
     """Test with setup and teardown."""
 
@@ -279,6 +285,7 @@ class TestWithFixtures(unittest.TestCase):
 # =============================================================================
 # 7. Test Organization
 # =============================================================================
+
 
 class TestStringOperations(unittest.TestCase):
     """Organized string tests."""

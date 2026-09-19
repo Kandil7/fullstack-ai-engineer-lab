@@ -52,15 +52,11 @@ class TestIoOverlap:
     def test_overlaps_fast(self):
         elapsed = target.run_io_overlap(8, 0.05)
         assert elapsed > 0
-        assert elapsed < 8 * 0.05 * 0.6, (
-            f"sequential took {elapsed:.3f}s; overlap must beat 0.24s"
-        )
+        assert elapsed < 8 * 0.05 * 0.6, f"sequential took {elapsed:.3f}s; overlap must beat 0.24s"
 
     def test_overlaps_more(self):
         elapsed = target.run_io_overlap(16, 0.05)
-        assert elapsed < 16 * 0.05 * 0.6, (
-            f"sequential took {elapsed:.3f}s; overlap must beat 0.48s"
-        )
+        assert elapsed < 16 * 0.05 * 0.6, f"sequential took {elapsed:.3f}s; overlap must beat 0.48s"
 
 
 class TestCpuWorker:

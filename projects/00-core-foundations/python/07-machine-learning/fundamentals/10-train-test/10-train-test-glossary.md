@@ -68,7 +68,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LinearRegression
 
 model = LinearRegression()
-scores = cross_val_score(model, X, y, cv=5, scoring='r2')
+scores = cross_val_score(model, X, y, cv=5, scoring="r2")
 
 print(f"Fold scores: {scores}")
 print(f"Mean: {scores.mean():.4f} ± {scores.std():.4f}")
@@ -93,6 +93,7 @@ print(f"Mean: {scores.mean():.4f} ± {scores.std():.4f}")
 ```python
 # WRONG: Leakage
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)  # Uses ALL data
 X_train, X_test = train_test_split(X_scaled, test_size=0.2)
@@ -146,14 +147,10 @@ if train_r2 - test_r2 > 0.1:
 **Example:**
 ```python
 # Split into train+val and holdout
-X_temp, X_holdout, y_temp, y_holdout = train_test_split(
-    X, y, test_size=0.1, random_state=42
-)
+X_temp, X_holdout, y_temp, y_holdout = train_test_split(X, y, test_size=0.1, random_state=42)
 
 # Split temp into train and validation
-X_train, X_val, y_train, y_val = train_test_split(
-    X_temp, y_temp, test_size=0.2, random_state=42
-)
+X_train, X_val, y_train, y_val = train_test_split(X_temp, y_temp, test_size=0.2, random_state=42)
 
 print(f"Train: {len(X_train)}")
 print(f"Validation: {len(X_val)}")
@@ -177,7 +174,7 @@ from sklearn.linear_model import LinearRegression
 model = LinearRegression()
 kf = KFold(n_splits=5, shuffle=True, random_state=42)
 
-scores = cross_val_score(model, X, y, cv=kf, scoring='r2')
+scores = cross_val_score(model, X, y, cv=kf, scoring="r2")
 print(f"5-Fold CV scores: {scores}")
 print(f"Mean R²: {scores.mean():.4f} ± {scores.std():.4f}")
 ```
@@ -203,7 +200,7 @@ train_acc = overfit.score(X_train, y_train)
 test_acc = overfit.score(X_test, y_test)
 
 print(f"Train accuracy: {train_acc:.4f}")  # 100%
-print(f"Test accuracy: {test_acc:.4f}")    # Lower
+print(f"Test accuracy: {test_acc:.4f}")  # Lower
 print(f"Gap: {train_acc - test_acc:.4f}")  # Large gap = overfitting
 ```
 
@@ -250,9 +247,7 @@ print(f"With stratify: {np.bincount(y_test_strat)}")
 
 **Example:**
 ```python
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Train on training set
 model = LinearRegression()
@@ -287,10 +282,11 @@ from sklearn.model_selection import train_test_split
 
 # Basic split
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y,
-    test_size=0.2,      # 20% for testing
-    random_state=42,     # Reproducible
-    stratify=y           # Maintain class proportions (classification)
+    X,
+    y,
+    test_size=0.2,  # 20% for testing
+    random_state=42,  # Reproducible
+    stratify=y,  # Maintain class proportions (classification)
 )
 
 print(f"Training: {X_train.shape}, {y_train.shape}")
@@ -318,7 +314,7 @@ train_r2 = model.score(X_train, y_train)
 test_r2 = model.score(X_test, y_test)
 
 print(f"Train R²: {train_r2:.4f}")  # Low
-print(f"Test R²: {test_r2:.4f}")    # Also low
+print(f"Test R²: {test_r2:.4f}")  # Also low
 ```
 
 **Signs:**
@@ -359,7 +355,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 # Cross-validation workflow
 from sklearn.linear_model import LinearRegression
+
 model = LinearRegression()
-scores = cross_val_score(model, X, y, cv=5, scoring='r2')
+scores = cross_val_score(model, X, y, cv=5, scoring="r2")
 print(f"Mean R²: {scores.mean():.4f} ± {scores.std():.4f}")
 ```

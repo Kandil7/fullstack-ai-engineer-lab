@@ -100,9 +100,9 @@ X = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
 y = np.array([0, 1, 0, 1])
 
 print(f"Features shape: {X.shape}")  # (4, 2)
-print(f"Target shape: {y.shape}")     # (4,)
+print(f"Target shape: {y.shape}")  # (4,)
 print(f"First sample features: {X[0]}")  # [1, 2]
-print(f"First sample target: {y[0]}")     # 0
+print(f"First sample target: {y[0]}")  # 0
 ```
 
 **Explanation:**
@@ -115,12 +115,14 @@ print(f"First sample target: {y[0]}")     # 0
 ```python
 # House price prediction example
 # Features: square_feet, bedrooms, age
-house_features = np.array([
-    [1500, 3, 10],   # House 1: 1500 sqft, 3 bedrooms, 10 years old
-    [2000, 4, 5],    # House 2
-    [1200, 2, 15],   # House 3
-    [1800, 3, 8]     # House 4
-])
+house_features = np.array(
+    [
+        [1500, 3, 10],  # House 1: 1500 sqft, 3 bedrooms, 10 years old
+        [2000, 4, 5],  # House 2
+        [1200, 2, 15],  # House 3
+        [1800, 3, 8],  # House 4
+    ]
+)
 
 # Target: price
 house_prices = np.array([300000, 450000, 250000, 400000])
@@ -144,7 +146,7 @@ X_train, X_test = X[:split_index], X[split_index:]
 y_train, y_test = y[:split_index], y[split_index:]
 
 print(f"Training set: {len(X_train)} samples")  # 80
-print(f"Test set: {len(X_test)} samples")        # 20
+print(f"Test set: {len(X_test)} samples")  # 20
 ```
 
 ### Example 4: Using train_test_split
@@ -154,15 +156,16 @@ from sklearn.model_selection import train_test_split
 
 # Proper split with scikit-learn
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y,
-    test_size=0.2,      # 20% for testing
-    random_state=42      # For reproducibility
+    X,
+    y,
+    test_size=0.2,  # 20% for testing
+    random_state=42,  # For reproducibility
 )
 
 print(f"Training features: {X_train.shape}")  # (80, 2)
-print(f"Test features: {X_test.shape}")        # (20, 2)
-print(f"Training targets: {y_train.shape}")    # (80,)
-print(f"Test targets: {y_test.shape}")         # (20,)
+print(f"Test features: {X_test.shape}")  # (20, 2)
+print(f"Training targets: {y_train.shape}")  # (80,)
+print(f"Test targets: {y_test.shape}")  # (20,)
 ```
 
 ### Example 5: Stratified Split
@@ -171,17 +174,13 @@ print(f"Test targets: {y_test.shape}")         # (20,)
 from sklearn.datasets import make_classification
 
 X, y = make_classification(
-    n_samples=1000, n_features=10,
-    n_informative=5, n_redundant=2,
-    random_state=42
+    n_samples=1000, n_features=10, n_informative=5, n_redundant=2, random_state=42
 )
 
 print(f"Original class distribution: {np.bincount(y)}")
 
 # Without stratify
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 print(f"Without stratify: Train {np.bincount(y_train)}, Test {np.bincount(y_test)}")
 
 # With stratify — maintains class proportions
@@ -202,10 +201,10 @@ print(f"With stratify: Train {np.bincount(y_train)}, Test {np.bincount(y_test)}"
 import pandas as pd
 
 data = {
-    'square_feet': [1500, 2000, 1200, 1800, 2200],
-    'bedrooms': [3, 4, 2, 3, 4],
-    'age': [10, 5, 15, 8, 3],
-    'price': [300000, 450000, 250000, 400000, 500000]
+    "square_feet": [1500, 2000, 1200, 1800, 2200],
+    "bedrooms": [3, 4, 2, 3, 4],
+    "age": [10, 5, 15, 8, 3],
+    "price": [300000, 450000, 250000, 400000, 500000],
 }
 
 df = pd.DataFrame(data)
@@ -219,8 +218,8 @@ print(df)
 ### Example 7: DataFrame Operations
 
 ```python
-print("Shape:", df.shape)           # (5, 4)
-print("Columns:", list(df.columns)) # ['square_feet', 'bedrooms', 'age', 'price']
+print("Shape:", df.shape)  # (5, 4)
+print("Columns:", list(df.columns))  # ['square_feet', 'bedrooms', 'age', 'price']
 print("\nFirst 3 rows:")
 print(df.head(3))
 
@@ -236,10 +235,10 @@ print(df.describe())
 
 ```python
 # Select feature columns
-X = df[['square_feet', 'bedrooms', 'age']].values
+X = df[["square_feet", "bedrooms", "age"]].values
 
 # Select target column
-y = df['price'].values
+y = df["price"].values
 
 print("Features (X):")
 print(X[:3])
@@ -256,7 +255,7 @@ iris = load_iris()
 
 # Convert to DataFrame for easy exploration
 iris_df = pd.DataFrame(iris.data, columns=iris.feature_names)
-iris_df['species'] = iris.target
+iris_df["species"] = iris.target
 
 print("Iris dataset:")
 print(iris_df.head())
@@ -276,8 +275,8 @@ print(f"Target names: {iris.target_names}")
 # y = df['target_column']                # Just the target column
 
 # For this example, we'll create a CSV and load it
-df.to_csv('houses.csv', index=False)
-df_loaded = pd.read_csv('houses.csv')
+df.to_csv("houses.csv", index=False)
+df_loaded = pd.read_csv("houses.csv")
 print(df_loaded.head())
 ```
 

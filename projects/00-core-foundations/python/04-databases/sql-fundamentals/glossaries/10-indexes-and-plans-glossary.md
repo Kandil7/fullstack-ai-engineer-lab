@@ -38,6 +38,7 @@ the data; the engine keeps it updated on every write.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE events (id INTEGER PRIMARY KEY, model TEXT, latency REAL)")
 conn.execute("CREATE INDEX idx_model ON events(model)")

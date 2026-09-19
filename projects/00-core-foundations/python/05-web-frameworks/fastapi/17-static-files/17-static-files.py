@@ -45,7 +45,9 @@ with open("static/images/README.txt", "w") as f:
     f.write("Place image files here (PNG, JPG, SVG, etc.)")
 
 with open("static/downloads/data.csv", "w") as f:
-    f.write("name,price,category\nLaptop,999.99,Electronics\nPhone,699.99,Electronics\nBook,19.99,Education\n")
+    f.write(
+        "name,price,category\nLaptop,999.99,Electronics\nPhone,699.99,Electronics\nBook,19.99,Education\n"
+    )
 
 
 # ----- Mount static files directory -----
@@ -144,12 +146,14 @@ def list_files():
         for filename in filenames:
             filepath = os.path.join(root, filename)
             rel_path = os.path.relpath(filepath, "static")
-            files.append({
-                "name": filename,
-                "path": f"/static/{rel_path}",
-                "size": os.path.getsize(filepath),
-                "type": "file",
-            })
+            files.append(
+                {
+                    "name": filename,
+                    "path": f"/static/{rel_path}",
+                    "size": os.path.getsize(filepath),
+                    "type": "file",
+                }
+            )
     return {"files": files, "total": len(files)}
 
 
@@ -190,6 +194,7 @@ Testing with curl:
     http://127.0.0.1:8000/
     http://127.0.0.1:8000/static/css/style.css
 """
+
 
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
@@ -242,6 +247,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

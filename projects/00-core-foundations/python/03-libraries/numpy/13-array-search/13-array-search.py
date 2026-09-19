@@ -83,11 +83,11 @@ idx = np.searchsorted(arr, 55)
 print("Index for 55:", idx)  # 5 (after all elements)
 
 # Right side insertion
-idx = np.searchsorted(arr, 30, side='right')
+idx = np.searchsorted(arr, 30, side="right")
 print("Index for 30 (right):", idx)  # 3
 
-idx = np.searchsorted(arr, 30, side='left')
-print("Index for 30 (left):", idx)   # 2
+idx = np.searchsorted(arr, 30, side="left")
+print("Index for 30 (left):", idx)  # 2
 # Output:
 # Index for 25: 2
 # Index for 35: 3
@@ -105,13 +105,13 @@ arr = np.array([10, 25, 30, 45, 50, 15, 35])
 
 # Find index of maximum
 max_idx = np.argmax(arr)
-print("\nIndex of max:", max_idx)     # 4
-print("Max value:", arr[max_idx])     # 50
+print("\nIndex of max:", max_idx)  # 4
+print("Max value:", arr[max_idx])  # 50
 
 # Find index of minimum
 min_idx = np.argmin(arr)
-print("Index of min:", min_idx)       # 0
-print("Min value:", arr[min_idx])     # 10
+print("Index of min:", min_idx)  # 0
+print("Min value:", arr[min_idx])  # 10
 
 # For 2D arrays, argmax/argmin flatten by default
 arr2d = np.array([[1, 5, 3], [4, 2, 6]])

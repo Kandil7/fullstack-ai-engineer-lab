@@ -33,8 +33,9 @@ orders_db: dict = {}
 
 # --- Users Router ---
 
-users_router = APIRouter(prefix="/users", tags=["users"],
-                         responses={404: {"description": "Not found"}})
+users_router = APIRouter(
+    prefix="/users", tags=["users"], responses={404: {"description": "Not found"}}
+)
 
 
 @users_router.get("/")
@@ -67,8 +68,9 @@ async def delete_user(user_id: str):
 
 # --- Products Router ---
 
-products_router = APIRouter(prefix="/products", tags=["products"],
-                            responses={404: {"description": "Not found"}})
+products_router = APIRouter(
+    prefix="/products", tags=["products"], responses={404: {"description": "Not found"}}
+)
 
 
 @products_router.get("/")
@@ -101,8 +103,9 @@ async def update_product(product_id: str, product: dict):
 
 # --- Orders Router ---
 
-orders_router = APIRouter(prefix="/orders", tags=["orders"],
-                          responses={404: {"description": "Not found"}})
+orders_router = APIRouter(
+    prefix="/orders", tags=["orders"], responses={404: {"description": "Not found"}}
+)
 
 
 @orders_router.get("/")
@@ -172,13 +175,15 @@ async def get_current_user(authorization: str = Header(default="")):
 
 def require_role(role: str):
     """Factory function creating role-checking dependencies."""
+
     async def role_checker(user: dict = Depends(get_current_user)):
         if user["role"] != role:
             raise HTTPException(
                 status_code=403,
-                detail=f"Role '{role}' required, but user has role '{user['role']}'"
+                detail=f"Role '{role}' required, but user has role '{user['role']}'",
             )
         return user
+
     return role_checker
 
 
@@ -193,8 +198,7 @@ async def public_products():
 
 
 # Users router - auth required
-users_router2 = APIRouter(prefix="/users", tags=["users"],
-                          dependencies=[Depends(get_current_user)])
+users_router2 = APIRouter(prefix="/users", tags=["users"], dependencies=[Depends(get_current_user)])
 
 
 @users_router2.get("/me")
@@ -204,8 +208,9 @@ async def get_profile(user: dict = Depends(get_current_user)):
 
 
 # Admin router - admin role required
-admin_router = APIRouter(prefix="/admin", tags=["admin"],
-                         dependencies=[Depends(require_role("admin"))])
+admin_router = APIRouter(
+    prefix="/admin", tags=["admin"], dependencies=[Depends(require_role("admin"))]
+)
 
 
 @admin_router.get("/users")
@@ -245,6 +250,7 @@ v2_users = APIRouter(prefix="/users", tags=["users"])
 # Sample data
 addresses_db: dict = {}
 reviews_db: dict = {}
+
 
 # V1 user address endpoints
 @v1_user_addresses.get("/")
@@ -300,7 +306,7 @@ async def list_v2_users(page: int = 1, per_page: int = 10):
             {"id": 2, "username": "bob", "profile_url": "/api/v2/users/2"},
         ],
         "meta": {"total": 2, "page": page, "per_page": per_page},
-        "_links": {"self": f"/api/v2/users?page={page}&per_page={per_page}", "next": None}
+        "_links": {"self": f"/api/v2/users?page={page}&per_page={per_page}", "next": None},
     }
 
 
@@ -350,16 +356,12 @@ async def public_rate_limit(request: Request, call_next):
     now = time.time()
 
     # Clean old entries
-    rate_limit_store[client_ip] = [
-        t for t in rate_limit_store.get(client_ip, [])
-        if now - t < 60
-    ]
+    rate_limit_store[client_ip] = [t for t in rate_limit_store.get(client_ip, []) if now - t < 60]
 
     # Check rate limit (10 requests/minute)
     if len(rate_limit_store.get(client_ip, [])) >= 10:
         return JSONResponse(
-            status_code=429,
-            content={"detail": "Rate limit exceeded. Try again in 60 seconds."}
+            status_code=429, content={"detail": "Rate limit exceeded. Try again in 60 seconds."}
         )
 
     rate_limit_store.setdefault(client_ip, []).append(now)
@@ -448,14 +450,16 @@ async def v2_list_items(page: int = 1, per_page: int = 10):
 
     items_with_links = []
     for item in page_items:
-        items_with_links.append({
-            **item,
-            "_links": {
-                "self": f"/api/v2/items/{item['id']}",
-                "update": {"method": "PUT", "href": f"/api/v2/items/{item['id']}"},
-                "delete": {"method": "DELETE", "href": f"/api/v2/items/{item['id']}"},
+        items_with_links.append(
+            {
+                **item,
+                "_links": {
+                    "self": f"/api/v2/items/{item['id']}",
+                    "update": {"method": "PUT", "href": f"/api/v2/items/{item['id']}"},
+                    "delete": {"method": "DELETE", "href": f"/api/v2/items/{item['id']}"},
+                },
             }
-        })
+        )
 
     total_pages = (total + per_page - 1) // per_page
     next_page = f"/api/v2/items?page={page + 1}&per_page={per_page}" if page < total_pages else None
@@ -467,7 +471,7 @@ async def v2_list_items(page: int = 1, per_page: int = 10):
             "self": f"/api/v2/items?page={page}&per_page={per_page}",
             "next": next_page,
             "first": "/api/v2/items?page=1&per_page=10",
-        }
+        },
     }
 
 
@@ -482,7 +486,7 @@ async def v2_get_item(item_id: int):
         "_links": {
             "self": f"/api/v2/items/{item_id}",
             "collection": "/api/v2/items",
-        }
+        },
     }
 
 

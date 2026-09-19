@@ -81,18 +81,20 @@ print(counter1 | counter2)  # Counter({'a': 3, 'b': 2})
 def analyze_text(text):
     words = text.lower().split()
     word_freq = Counter(words)
-    
+
     print(f"Total words: {sum(word_freq.values())}")
     print(f"Unique words: {len(word_freq)}")
     print(f"Most common: {word_freq.most_common(3)}")
-    
+
     # Find words appearing only once
     rare_words = [word for word, count in word_freq.items() if count == 1]
     print(f"Rare words: {rare_words}")
 
+
 # DNA sequence analysis
 def analyze_dna(sequence):
     return Counter(sequence)
+
 
 dna = "ATCGATCGATCG"
 print(analyze_dna(dna))  # Counter({'A': 3, 'T': 3, 'C': 3, 'G': 3})
@@ -197,9 +199,7 @@ Person = namedtuple("Person", "name age email")
 
 # With defaults
 PersonWithDefaults = namedtuple(
-    "PersonWithDefaults", 
-    ["name", "age", "email"], 
-    defaults=["unknown@example.com"]
+    "PersonWithDefaults", ["name", "age", "email"], defaults=["unknown@example.com"]
 )
 
 p1 = PersonWithDefaults("Alice", 30)
@@ -328,7 +328,7 @@ command_line = {"color": "blue"}
 config = ChainMap(command_line, environment, defaults)
 
 print(config["color"])  # blue (from command_line)
-print(config["user"])   # admin (from environment)
+print(config["user"])  # admin (from environment)
 print(config["debug"])  # True (from environment)
 ```
 
@@ -341,9 +341,10 @@ def example_scope():
     scope = ChainMap(
         {"local_var": local_var},  # Local scope
         {"global_var": "global"},  # Global scope
-        {"builtin_var": "builtin"}  # Built-in scope
+        {"builtin_var": "builtin"},  # Built-in scope
     )
     print(scope["local_var"])  # local
+
 
 # Settings management
 class Settings:
@@ -352,10 +353,10 @@ class Settings:
         self.user_settings = {}
         self.temp_settings = {}
         self._chain = ChainMap(self.temp_settings, self.user_settings, self.defaults)
-    
+
     def get(self, key):
         return self._chain[key]
-    
+
     def set_temp(self, key, value):
         self.temp_settings[key] = value
 ```
@@ -503,10 +504,12 @@ import sys
 
 PointNT = namedtuple("Point", ["x", "y"])
 
+
 class PointDict:
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
 
 nt = PointNT(1, 2)
 pd = PointDict(1, 2)
@@ -551,6 +554,7 @@ class LRUCache:
     Implement an LRU cache using OrderedDict.
     Should support get(key) and put(key, value) operations.
     """
+
     def __init__(self, capacity):
         # Your code here
         pass

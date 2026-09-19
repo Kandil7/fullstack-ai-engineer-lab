@@ -75,11 +75,13 @@ embedded = [
 def read_post_relational(post_id: int) -> dict:
     """SQL-style: post, then author lookup, then comments (3 reads)."""
     post = next(p for p in relational["posts"] if p["post_id"] == post_id)
-    author = next(a for a in relational["authors"]
-                  if a["author_id"] == post["author_id"])
+    author = next(a for a in relational["authors"] if a["author_id"] == post["author_id"])
     comments = [c for c in relational["comments"] if c["post_id"] == post_id]
-    return {"title": post["title"], "author": author["name"],
-            "comments": [c["text"] for c in comments]}
+    return {
+        "title": post["title"],
+        "author": author["name"],
+        "comments": [c["text"] for c in comments],
+    }
 
 
 def read_post_embedded(post_id: int) -> dict:
@@ -103,19 +105,25 @@ print("embedded read   (1 lookup): ", read_post_embedded(1)["title"])
 #              growth, or independent updates (author name changes ->
 #              embed means updating every post).
 
-def should_embed(*, read_together: bool, bounded: bool,
-                 independent_lifecycle: bool) -> bool:
+
+def should_embed(*, read_together: bool, bounded: bool, independent_lifecycle: bool) -> bool:
     """Embed only when all three hold."""
     return read_together and bounded and not independent_lifecycle
 
 
 decisions = [
-    ("post + comments", should_embed(read_together=True, bounded=False,
-                                     independent_lifecycle=False)),
-    ("author embedded in post", should_embed(read_together=True, bounded=True,
-                                             independent_lifecycle=True)),
-    ("order + line items", should_embed(read_together=True, bounded=True,
-                                        independent_lifecycle=False)),
+    (
+        "post + comments",
+        should_embed(read_together=True, bounded=False, independent_lifecycle=False),
+    ),
+    (
+        "author embedded in post",
+        should_embed(read_together=True, bounded=True, independent_lifecycle=True),
+    ),
+    (
+        "order + line items",
+        should_embed(read_together=True, bounded=True, independent_lifecycle=False),
+    ),
 ]
 for name, embed in decisions:
     print(f"{name}: {'EMBED' if embed else 'REFERENCE'}")
@@ -133,6 +141,7 @@ for name, embed in decisions:
 # reads in a pure referenced design (1 for posts + 50 author lookups),
 # vs 50 reads with the author embedded.
 
+
 def read_count_referenced(n_posts: int) -> int:
     return n_posts + 1  # 1 query for the list + 1 per post's author
 
@@ -141,8 +150,10 @@ def read_count_embedded(n_posts: int) -> int:
     return n_posts  # one document per post, author included
 
 
-print(f"\n50 posts: referenced reads = {read_count_referenced(50)}, "
-      f"embedded reads = {read_count_embedded(50)}")
+print(
+    f"\n50 posts: referenced reads = {read_count_referenced(50)}, "
+    f"embedded reads = {read_count_embedded(50)}"
+)
 
 # Output:
 # 50 posts: referenced reads = 51, embedded reads = 50
@@ -189,6 +200,7 @@ print(f"all docs have 'price'? {all(required_fields(d, ['price']) for d in polym
 # The cost: every index slows writes and burns memory. Indexes must
 # be chosen for the QUERIES you actually run, exactly like SQL.
 
+
 def build_index(collection, field):
     """Stand-in: index = {field_value: [doc, ...]}"""
     idx = {}
@@ -213,6 +225,7 @@ print(f"lookup 'omar@x.com': {email_index.get('omar@x.com')}")
 # transactions exist (replica sets, since 4.0) but are the exception:
 # they are slower, need retry logic, and are a sign the model fights
 # the workload. The stand-in shows the two semantics.
+
 
 class MiniTransaction:
     """All-or-nothing over a list of writes: commit or rollback."""
@@ -249,8 +262,10 @@ print(f"\nafter rollback, _id 9 present? {any(d['_id'] == 9 for d in polymorphic
 # belong in a relational store. MongoDB wins when the read shape is
 # "give me this whole document" and the schema is genuinely unstable.
 
-def recommend_db(*, heavy_joins: bool, strict_acid: bool,
-                 flexible_schema: bool, analytics: bool) -> str:
+
+def recommend_db(
+    *, heavy_joins: bool, strict_acid: bool, flexible_schema: bool, analytics: bool
+) -> str:
     """Pick a database family from the workload's hard requirements."""
     if heavy_joins or strict_acid or analytics:
         return "SQL (Postgres)"
@@ -260,14 +275,22 @@ def recommend_db(*, heavy_joins: bool, strict_acid: bool,
 
 
 cases = [
-    ("order system (ACID, joins)", dict(heavy_joins=True, strict_acid=True,
-                                        flexible_schema=False, analytics=False)),
-    ("log ingestion (varying fields)", dict(heavy_joins=False, strict_acid=False,
-                                            flexible_schema=True, analytics=False)),
-    ("bi reporting (aggregations)", dict(heavy_joins=True, strict_acid=False,
-                                         flexible_schema=False, analytics=True)),
-    ("content app, read-by-id", dict(heavy_joins=False, strict_acid=False,
-                                     flexible_schema=False, analytics=False)),
+    (
+        "order system (ACID, joins)",
+        dict(heavy_joins=True, strict_acid=True, flexible_schema=False, analytics=False),
+    ),
+    (
+        "log ingestion (varying fields)",
+        dict(heavy_joins=False, strict_acid=False, flexible_schema=True, analytics=False),
+    ),
+    (
+        "bi reporting (aggregations)",
+        dict(heavy_joins=True, strict_acid=False, flexible_schema=False, analytics=True),
+    ),
+    (
+        "content app, read-by-id",
+        dict(heavy_joins=False, strict_acid=False, flexible_schema=False, analytics=False),
+    ),
 ]
 for name, req in cases:
     print(f"{name}: {recommend_db(**req)}")
@@ -296,6 +319,7 @@ for name, req in cases:
 # MISTAKE: choosing MongoDB because SQL is "boring".
 # CORRECT: choose by join/ACID/analytics needs; Mongo for flexible,
 #          read-with-parent workloads.
+
 
 # ============================================================
 # Self-Verification  (MANDATORY)
@@ -338,12 +362,18 @@ def _verify() -> None:
     assert polymorphic == snap, "rollback must restore the collection"
 
     # honest recommendations
-    assert recommend_db(heavy_joins=True, strict_acid=True,
-                        flexible_schema=False, analytics=False) == "SQL (Postgres)"
-    assert recommend_db(heavy_joins=False, strict_acid=False,
-                        flexible_schema=True, analytics=False) == "MongoDB"
-    assert recommend_db(heavy_joins=True, strict_acid=False,
-                        flexible_schema=False, analytics=True) == "SQL (Postgres)"
+    assert (
+        recommend_db(heavy_joins=True, strict_acid=True, flexible_schema=False, analytics=False)
+        == "SQL (Postgres)"
+    )
+    assert (
+        recommend_db(heavy_joins=False, strict_acid=False, flexible_schema=True, analytics=False)
+        == "MongoDB"
+    )
+    assert (
+        recommend_db(heavy_joins=True, strict_acid=False, flexible_schema=False, analytics=True)
+        == "SQL (Postgres)"
+    )
 
     print("[OK] 12-mongo-vs-sql: all checks passed")
 

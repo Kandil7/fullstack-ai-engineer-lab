@@ -7,9 +7,11 @@ Integrating matplotlib in Tkinter, PyQt, Dash, Streamlit, and Jupyter.
 
 import pathlib
 import matplotlib
+
 OUTPUT_DIR = pathlib.Path(__file__).parent.parent.parent.parent / "outputs" / "matplotlib"
 import pathlib
-matplotlib.use('Agg')  # Non-interactive backend for saving
+
+matplotlib.use("Agg")  # Non-interactive backend for saving
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -21,7 +23,7 @@ print("=" * 60)
 print("1. TKINTER EMBEDDING (CODE TEMPLATE)")
 print("=" * 60)
 
-tkinter_code = '''
+tkinter_code = """
 import tkinter as tk
 from tkinter import ttk
 import matplotlib
@@ -91,7 +93,7 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = PlotApp(root)
     root.mainloop()
-'''
+"""
 
 print(tkinter_code)
 print()
@@ -104,7 +106,7 @@ print("=" * 60)
 print("2. PYQT EMBEDDING (CODE TEMPLATE)")
 print("=" * 60)
 
-pyqt_code = '''
+pyqt_code = """
 import sys
 import numpy as np
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, 
@@ -176,7 +178,7 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
-'''
+"""
 
 print(pyqt_code)
 print()
@@ -189,7 +191,7 @@ print("=" * 60)
 print("3. DASH WEB DASHBOARDS (CODE TEMPLATE)")
 print("=" * 60)
 
-dash_code = '''
+dash_code = """
 import dash
 from dash import dcc, html, Input, Output, callback
 import plotly.graph_objs as go
@@ -306,7 +308,7 @@ def update_dist_plot(func, freq, amp):
 
 if __name__ == '__main__':
     app.run_server(debug=True, port=8050)
-'''
+"""
 
 print(dash_code)
 print()
@@ -319,7 +321,7 @@ print("=" * 60)
 print("4. STREAMLIT (CODE TEMPLATE)")
 print("=" * 60)
 
-streamlit_code = '''
+streamlit_code = """
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
@@ -476,15 +478,16 @@ with tab3:
 
 # Code display
 with st.expander("View Source Code"):
-    st.code('''
+    st.code("""
 import numpy as np
+
 x = np.linspace(0, 10, 500)
 y = amp * np.sin(freq * x + phase)
-''', language='python')
+""", language='python')
 
 st.sidebar.markdown("---")
 st.sidebar.info("Built with Streamlit + Matplotlib/Plotly")
-'''
+"""
 
 print(streamlit_code)
 print()
@@ -497,7 +500,7 @@ print("=" * 60)
 print("5. JUPYTER INTERACTIVE WIDGETS")
 print("=" * 60)
 
-jupyter_code = '''
+jupyter_code = """
 # In Jupyter Notebook/Lab:
 # %matplotlib widget  # for interactive matplotlib
 # or %matplotlib ipympl
@@ -617,7 +620,7 @@ class PlotController:
 
 controller = PlotController()
 controller.show()
-'''
+"""
 
 print(jupyter_code)
 print()

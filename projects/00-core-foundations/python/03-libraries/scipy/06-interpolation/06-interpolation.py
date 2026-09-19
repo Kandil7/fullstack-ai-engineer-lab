@@ -12,11 +12,17 @@ Topics:
 """
 
 import numpy as np
+
 # Ensure output directory exists (Tier 0 fix: Windows + CI)
 import os
-os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
+os.makedirs(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy",
+    exist_ok=True,
+)
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import interpolate
@@ -37,9 +43,9 @@ x_fine = np.linspace(0, 10, 300)
 
 # Different interpolation methods
 methods = {
-    "Linear":     interpolate.interp1d(x_data, y_data, kind="linear", fill_value="extrapolate"),
-    "Cubic":      interpolate.interp1d(x_data, y_data, kind="cubic", fill_value="extrapolate"),
-    "Quadratic":  interpolate.interp1d(x_data, y_data, kind="quadratic", fill_value="extrapolate"),
+    "Linear": interpolate.interp1d(x_data, y_data, kind="linear", fill_value="extrapolate"),
+    "Cubic": interpolate.interp1d(x_data, y_data, kind="cubic", fill_value="extrapolate"),
+    "Quadratic": interpolate.interp1d(x_data, y_data, kind="quadratic", fill_value="extrapolate"),
 }
 
 fig, ax = plt.subplots(figsize=(10, 5))
@@ -57,8 +63,13 @@ ax.set_ylabel("y")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_1d_interp.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_1d_interp.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_1d_interp.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_1d_interp.png"
+)
 
 # Print interpolation values at specific points
 test_points = [1.5, 3.7, 6.2, 8.9]
@@ -94,7 +105,7 @@ y_ak = spline_ak(x_test)
 y_true_full = np.sin(x_test)
 
 # Compute spline derivatives
-dy_natural = spline_natural(x_test, 1)   # First derivative
+dy_natural = spline_natural(x_test, 1)  # First derivative
 d2y_natural = spline_natural(x_test, 2)  # Second derivative
 
 fig, axes = plt.subplots(2, 1, figsize=(10, 7))
@@ -113,8 +124,13 @@ axes[1].set_xlabel("x")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_spline.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_spline.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_spline.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_spline.png"
+)
 
 # Evaluate spline coefficients
 print(f"Spline has {len(spline_natural.c)} coefficient sets")
@@ -134,9 +150,7 @@ X, Y = np.meshgrid(x_2d, y_2d)
 Z = np.sin(X) * np.cos(Y) + 0.1 * X
 
 # Create interpolation function
-interp_2d = interpolate.RegularGridInterpolator(
-    (y_2d, x_2d), Z, method="cubic"
-)
+interp_2d = interpolate.RegularGridInterpolator((y_2d, x_2d), Z, method="cubic")
 
 # Evaluate on a finer grid
 x_fine_2d = np.linspace(0, 5, 100)
@@ -155,8 +169,13 @@ im1 = axes[1].pcolormesh(X_fine, Y_fine, Z_fine, cmap="viridis", shading="auto")
 axes[1].set_title("Interpolated (100Ã—100)")
 plt.colorbar(im1, ax=axes[1], shrink=0.8)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_2d_interp.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_2d_interp.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_2d_interp.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_2d_interp.png"
+)
 
 # Interpolate specific points
 query_points = np.array([[1.5, 2.0], [3.0, 4.0], [0.5, 1.0]])
@@ -180,10 +199,7 @@ y_scattered = np.random.uniform(0, 5, n_scattered)
 z_scattered = np.sin(x_scattered) * np.cos(y_scattered) + 0.1 * x_scattered
 
 # RBF interpolation
-rbf_interp = interpolate.Rbf(
-    x_scattered, y_scattered, z_scattered,
-    function="multiquadric"
-)
+rbf_interp = interpolate.Rbf(x_scattered, y_scattered, z_scattered, function="multiquadric")
 
 # Evaluate on fine grid
 x_rbf = np.linspace(0, 5, 100)
@@ -210,8 +226,13 @@ im2 = axes[2].pcolormesh(X_rbf, Y_rbf, np.abs(Z_rbf - Z_true), cmap="hot", shadi
 axes[2].set_title("Absolute Error")
 plt.colorbar(im2, ax=axes[2], shrink=0.8)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_rbf.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_rbf.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_rbf.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_rbf.png"
+)
 
 print(f"Max interpolation error: {np.abs(Z_rbf - Z_true).max():.6f}")
 
@@ -230,7 +251,9 @@ values_irregular = np.sin(t_irregular) + 0.3 * np.random.randn(n_samples)
 
 # Resample to regular time grid
 t_regular = np.linspace(0, 10, 200)
-interp_func = interpolate.interp1d(t_irregular, values_irregular, kind="cubic", fill_value="extrapolate")
+interp_func = interpolate.interp1d(
+    t_irregular, values_irregular, kind="cubic", fill_value="extrapolate"
+)
 values_regular = interp_func(t_regular)
 
 fig, ax = plt.subplots(figsize=(10, 4))
@@ -242,12 +265,16 @@ ax.set_ylabel("Value")
 ax.legend()
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_resample.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_resample.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_resample.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_06_resample.png"
+)
 
 print(f"\nOriginal samples: {n_samples}")
 print(f"Resampled points: {len(t_regular)}")
 
 print("\n[OK] SciPy interpolation covered!")
 print("   Next: 07-optimization.py for optimization algorithms.")
-

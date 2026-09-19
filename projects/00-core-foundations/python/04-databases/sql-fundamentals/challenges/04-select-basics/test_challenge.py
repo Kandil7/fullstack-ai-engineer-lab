@@ -11,12 +11,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
 starter_spec = importlib.util.spec_from_file_location(
-    "starter", Path(__file__).parent / "starter.py")
+    "starter", Path(__file__).parent / "starter.py"
+)
 starter_module = importlib.util.module_from_spec(starter_spec)
 starter_spec.loader.exec_module(starter_module)
 
 solution_spec = importlib.util.spec_from_file_location(
-    "solution", Path(__file__).parent / "solution.py")
+    "solution", Path(__file__).parent / "solution.py"
+)
 solution_module = importlib.util.module_from_spec(solution_spec)
 solution_spec.loader.exec_module(solution_module)
 
@@ -25,11 +27,11 @@ import pytest
 
 def fresh_conn() -> sqlite3.Connection:
     conn = sqlite3.connect(":memory:")
-    conn.execute(
-        "CREATE TABLE models (id INTEGER PRIMARY KEY, name TEXT, epoch INT, metric REAL)")
+    conn.execute("CREATE TABLE models (id INTEGER PRIMARY KEY, name TEXT, epoch INT, metric REAL)")
     conn.executemany(
         "INSERT INTO models (name, epoch, metric) VALUES (?, ?, ?)",
-        [("bert", 1, 0.9), ("gpt", 2, 0.8), ("llm", 3, 0.7), ("t5", 4, 0.85)])
+        [("bert", 1, 0.9), ("gpt", 2, 0.8), ("llm", 3, 0.7), ("t5", 4, 0.85)],
+    )
     return conn
 
 
@@ -45,8 +47,7 @@ class TestTopN:
 
     def test_tie_break_by_name(self):
         conn = fresh_conn()
-        conn.execute(
-            "INSERT INTO models (name, epoch, metric) VALUES ('aaa', 9, 0.8)")
+        conn.execute("INSERT INTO models (name, epoch, metric) VALUES ('aaa', 9, 0.8)")
         result = solution_module.top_n(conn, 5)
         # bert 0.9, t5 0.85, aaa 0.8, gpt 0.8, llm 0.7 — aaa before gpt on the tie
         assert [name for name, _ in result] == ["bert", "t5", "aaa", "gpt", "llm"]
@@ -60,14 +61,12 @@ class TestMetricReport:
     def test_report_with_scores(self):
         conn = fresh_conn()
         result = solution_module.metric_report(conn)
-        assert result["report"] == [
-            ("bert", 90.0), ("t5", 85.0), ("gpt", 80.0), ("llm", 70.0)]
+        assert result["report"] == [("bert", 90.0), ("t5", 85.0), ("gpt", 80.0), ("llm", 70.0)]
         assert result["distinct_names"] == 4
 
     def test_distinct_names(self):
         conn = fresh_conn()
-        conn.execute(
-            "INSERT INTO models (name, epoch, metric) VALUES ('bert', 5, 0.99)")
+        conn.execute("INSERT INTO models (name, epoch, metric) VALUES ('bert', 5, 0.99)")
         result = solution_module.metric_report(conn)
         assert result["distinct_names"] == 4
 

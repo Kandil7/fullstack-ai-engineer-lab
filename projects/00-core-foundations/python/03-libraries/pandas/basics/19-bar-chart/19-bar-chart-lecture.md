@@ -25,16 +25,18 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-df = pd.DataFrame({
-    'product': ['Laptop', 'Phone', 'Tablet', 'Watch', 'Headphones'],
-    'revenue': [45000, 38000, 22000, 15000, 12000]
-})
+df = pd.DataFrame(
+    {
+        "product": ["Laptop", "Phone", "Tablet", "Watch", "Headphones"],
+        "revenue": [45000, 38000, 22000, 15000, 12000],
+    }
+)
 
 # Vertical bar chart (Pandas)
-df.plot.bar(x='product', y='revenue', figsize=(10, 6), legend=False)
-plt.title('Revenue by Product')
-plt.xlabel('Product')
-plt.ylabel('Revenue ($)')
+df.plot.bar(x="product", y="revenue", figsize=(10, 6), legend=False)
+plt.title("Revenue by Product")
+plt.xlabel("Product")
+plt.ylabel("Revenue ($)")
 plt.tight_layout()
 plt.show()
 ```
@@ -43,11 +45,11 @@ plt.show()
 
 ```python
 fig, ax = plt.subplots(figsize=(10, 6))
-bars = ax.bar(df['product'], df['revenue'], color='steelblue', edgecolor='white')
-ax.set_title('Revenue by Product')
-ax.set_xlabel('Product')
-ax.set_ylabel('Revenue ($)')
-ax.grid(axis='y', alpha=0.3)
+bars = ax.bar(df["product"], df["revenue"], color="steelblue", edgecolor="white")
+ax.set_title("Revenue by Product")
+ax.set_xlabel("Product")
+ax.set_ylabel("Revenue ($)")
+ax.grid(axis="y", alpha=0.3)
 plt.tight_layout()
 plt.show()
 ```
@@ -58,10 +60,10 @@ plt.show()
 
 ```python
 fig, ax = plt.subplots(figsize=(10, 6))
-ax.barh(df['product'], df['revenue'], color='steelblue', edgecolor='white')
-ax.set_title('Revenue by Product')
-ax.set_xlabel('Revenue ($)')
-ax.set_ylabel('Product')
+ax.barh(df["product"], df["revenue"], color="steelblue", edgecolor="white")
+ax.set_title("Revenue by Product")
+ax.set_xlabel("Revenue ($)")
+ax.set_ylabel("Product")
 ax.invert_yaxis()  # Largest on top
 plt.tight_layout()
 plt.show()
@@ -73,21 +75,23 @@ plt.show()
 
 ```python
 # Multi-category data
-df_grouped = pd.DataFrame({
-    'product': ['Laptop', 'Phone', 'Tablet', 'Watch'],
-    'Q1': [12000, 15000, 8000, 5000],
-    'Q2': [15000, 12000, 7000, 4500],
-    'Q3': [18000, 11000, 7000, 5500]
-})
+df_grouped = pd.DataFrame(
+    {
+        "product": ["Laptop", "Phone", "Tablet", "Watch"],
+        "Q1": [12000, 15000, 8000, 5000],
+        "Q2": [15000, 12000, 7000, 4500],
+        "Q3": [18000, 11000, 7000, 5500],
+    }
+)
 
 # Pandas grouped bar
-df_grouped.plot.bar(x='product', figsize=(10, 6))
-plt.title('Revenue by Product and Quarter')
-plt.xlabel('Product')
-plt.ylabel('Revenue ($)')
+df_grouped.plot.bar(x="product", figsize=(10, 6))
+plt.title("Revenue by Product and Quarter")
+plt.xlabel("Product")
+plt.ylabel("Revenue ($)")
 plt.xticks(rotation=0)
-plt.legend(title='Quarter')
-plt.grid(axis='y', alpha=0.3)
+plt.legend(title="Quarter")
+plt.grid(axis="y", alpha=0.3)
 plt.tight_layout()
 plt.show()
 ```
@@ -97,19 +101,19 @@ plt.show()
 ```python
 fig, ax = plt.subplots(figsize=(12, 6))
 
-x = np.arange(len(df_grouped['product']))
+x = np.arange(len(df_grouped["product"]))
 width = 0.25
 
-bars1 = ax.bar(x - width, df_grouped['Q1'], width, label='Q1', color='#3498db')
-bars2 = ax.bar(x, df_grouped['Q2'], width, label='Q2', color='#e74c3c')
-bars3 = ax.bar(x + width, df_grouped['Q3'], width, label='Q3', color='#2ecc71')
+bars1 = ax.bar(x - width, df_grouped["Q1"], width, label="Q1", color="#3498db")
+bars2 = ax.bar(x, df_grouped["Q2"], width, label="Q2", color="#e74c3c")
+bars3 = ax.bar(x + width, df_grouped["Q3"], width, label="Q3", color="#2ecc71")
 
 ax.set_xticks(x)
-ax.set_xticklabels(df_grouped['product'])
-ax.set_title('Revenue by Product and Quarter')
-ax.set_ylabel('Revenue ($)')
-ax.legend(title='Quarter')
-ax.grid(axis='y', alpha=0.3)
+ax.set_xticklabels(df_grouped["product"])
+ax.set_title("Revenue by Product and Quarter")
+ax.set_ylabel("Revenue ($)")
+ax.legend(title="Quarter")
+ax.grid(axis="y", alpha=0.3)
 
 plt.tight_layout()
 plt.show()
@@ -120,14 +124,15 @@ plt.show()
 ## 5. Stacked Bar Chart
 
 ```python
-df_grouped.plot.bar(x='product', stacked=True, figsize=(10, 6),
-                     color=['#3498db', '#e74c3c', '#2ecc71'])
-plt.title('Revenue by Product (Stacked)')
-plt.xlabel('Product')
-plt.ylabel('Revenue ($)')
+df_grouped.plot.bar(
+    x="product", stacked=True, figsize=(10, 6), color=["#3498db", "#e74c3c", "#2ecc71"]
+)
+plt.title("Revenue by Product (Stacked)")
+plt.xlabel("Product")
+plt.ylabel("Revenue ($)")
 plt.xticks(rotation=0)
-plt.legend(title='Quarter')
-plt.grid(axis='y', alpha=0.3)
+plt.legend(title="Quarter")
+plt.grid(axis="y", alpha=0.3)
 plt.tight_layout()
 plt.show()
 ```
@@ -138,24 +143,24 @@ plt.show()
 
 ```python
 fig, ax = plt.subplots(figsize=(10, 6))
-bars = ax.bar(df['product'], df['revenue'], color='steelblue', edgecolor='white')
+bars = ax.bar(df["product"], df["revenue"], color="steelblue", edgecolor="white")
 
 # Add value labels on top of each bar
 for bar in bars:
     height = bar.get_height()
     ax.text(
-        bar.get_x() + bar.get_width() / 2.,  # x position
-        height + 500,                          # y position (above bar)
-        f'${height:,.0f}',                     # label text
-        ha='center',                           # horizontal alignment
-        va='bottom',                           # vertical alignment
+        bar.get_x() + bar.get_width() / 2.0,  # x position
+        height + 500,  # y position (above bar)
+        f"${height:,.0f}",  # label text
+        ha="center",  # horizontal alignment
+        va="bottom",  # vertical alignment
         fontsize=10,
-        fontweight='bold'
+        fontweight="bold",
     )
 
-ax.set_title('Revenue by Product')
-ax.set_ylabel('Revenue ($)')
-ax.set_ylim(0, max(df['revenue']) * 1.15)  # Extra space for labels
+ax.set_title("Revenue by Product")
+ax.set_ylabel("Revenue ($)")
+ax.set_ylim(0, max(df["revenue"]) * 1.15)  # Extra space for labels
 plt.tight_layout()
 plt.show()
 ```
@@ -168,12 +173,12 @@ plt.show()
 fig, ax = plt.subplots(figsize=(10, 6))
 
 # Color bars based on value
-colors = ['#e74c3c' if v < 20000 else '#2ecc71' for v in df['revenue']]
-bars = ax.bar(df['product'], df['revenue'], color=colors, edgecolor='white')
+colors = ["#e74c3c" if v < 20000 else "#2ecc71" for v in df["revenue"]]
+bars = ax.bar(df["product"], df["revenue"], color=colors, edgecolor="white")
 
-ax.set_title('Revenue by Product (Red < $20K, Green >= $20K)')
-ax.set_ylabel('Revenue ($)')
-ax.grid(axis='y', alpha=0.3)
+ax.set_title("Revenue by Product (Red < $20K, Green >= $20K)")
+ax.set_ylabel("Revenue ($)")
+ax.grid(axis="y", alpha=0.3)
 plt.tight_layout()
 plt.show()
 ```
@@ -184,15 +189,15 @@ plt.show()
 
 ```python
 # Convert to percentages
-df_pct = df_grouped.set_index('product')
+df_pct = df_grouped.set_index("product")
 df_pct = df_pct.div(df_pct.sum(axis=1), axis=0) * 100
 
-df_pct.plot.bar(stacked=True, figsize=(10, 6), color=['#3498db', '#e74c3c', '#2ecc71'])
-plt.title('Revenue Distribution by Quarter (%)')
-plt.xlabel('Product')
-plt.ylabel('Percentage (%)')
+df_pct.plot.bar(stacked=True, figsize=(10, 6), color=["#3498db", "#e74c3c", "#2ecc71"])
+plt.title("Revenue Distribution by Quarter (%)")
+plt.xlabel("Product")
+plt.ylabel("Percentage (%)")
 plt.xticks(rotation=0)
-plt.legend(title='Quarter', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.legend(title="Quarter", bbox_to_anchor=(1.05, 1), loc="upper left")
 plt.tight_layout()
 plt.show()
 ```

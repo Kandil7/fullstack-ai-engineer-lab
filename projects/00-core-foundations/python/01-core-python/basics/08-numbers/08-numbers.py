@@ -20,7 +20,7 @@ print(f"y = {y}, type: {type(y).__name__}")
 print(f"z = {z}, type: {type(z).__name__}")
 
 # Integers have unlimited precision in Python!
-huge = 10 ** 100  # A googol
+huge = 10**100  # A googol
 print(f"Huge number: {huge}")
 print(f"Digits: {len(str(huge))}")
 
@@ -29,9 +29,9 @@ population = 7_900_000_000
 print(f"Population: {population}")
 
 # Different bases
-binary = 0b1010      # Binary (base 2)
-octal = 0o17         # Octal (base 8)
-hexadecimal = 0xFF   # Hexadecimal (base 16)
+binary = 0b1010  # Binary (base 2)
+octal = 0o17  # Octal (base 8)
+hexadecimal = 0xFF  # Hexadecimal (base 16)
 
 print(f"\nBinary 0b1010 = {binary}")
 print(f"Octal 0o17 = {octal}")
@@ -62,8 +62,8 @@ print(f"y = {y}")
 print(f"z = {z}")
 
 # Floats can also be in scientific notation
-a = 35e3    # 35 * 10^3 = 35000.0
-b = 12E4    # 12 * 10^4 = 120000.0
+a = 35e3  # 35 * 10^3 = 35000.0
+b = 12e4  # 12 * 10^4 = 120000.0
 
 print(f"35e3 = {a}")
 print(f"12E4 = {b}")

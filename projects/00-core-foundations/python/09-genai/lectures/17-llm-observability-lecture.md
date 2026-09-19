@@ -51,17 +51,18 @@ A trace is the complete record of one call (or one agent run — a tree of
 calls). The minimal capture:
 
 ```python
-def traced_call(llm_client, messages, *, trace_id, user_id,
-                metadata=None, pii_filter=redact) -> dict:
+def traced_call(
+    llm_client, messages, *, trace_id, user_id, metadata=None, pii_filter=redact
+) -> dict:
     """Complete a call AND capture the observability record."""
     t0 = time.perf_counter()
     resp = llm_client.complete(messages)
     latency_ms = (time.perf_counter() - t0) * 1000
     trace = {
         "trace_id": trace_id,
-        "user_id": user_id,                       # hashed if needed
+        "user_id": user_id,  # hashed if needed
         "model": resp.model,
-        "prompt": pii_filter(messages),           # redact PII before logging
+        "prompt": pii_filter(messages),  # redact PII before logging
         "completion": pii_filter(resp.content),
         "prompt_tokens": resp.prompt_tokens,
         "completion_tokens": resp.completion_tokens,
@@ -70,7 +71,7 @@ def traced_call(llm_client, messages, *, trace_id, user_id,
         "metadata": metadata or {},
         "ts": int(time.time()),
     }
-    log_trace(trace)                              # → Langfuse/LangSmith/JSONL
+    log_trace(trace)  # → Langfuse/LangSmith/JSONL
     return resp
 ```
 
@@ -92,8 +93,10 @@ answer, the trace_id is the breadcrumb to every record:
 ```python
 import uuid
 
+
 def new_trace_id() -> str:
     return f"tr_{uuid.uuid4().hex[:16]}"
+
 
 # HTTP layer: X-Trace-ID header → LLM trace → agent trace → log lines
 # Incident flow: user says "wrong answer" → trace_id → replay the trace
@@ -122,10 +125,12 @@ PII_PATTERNS = [
     (re.compile(r"\b\d{3}-\d{2}-\d{4}\b"), "[SSN]"),
 ]
 
+
 def redact(text: str) -> str:
     for pattern, repl in PII_PATTERNS:
         text = pattern.sub(repl, text)
     return text
+
 
 print(redact("card 4111 1111 1111 1111 for user a@b.com"))
 ```
@@ -175,6 +180,7 @@ def drift_flag(daily: list[float], baseline: float, threshold: float = 0.15) -> 
     avg = sum(daily[-7:]) / len(daily[-7:])
     return abs(avg - baseline) / max(abs(baseline), 1e-9) > threshold
 
+
 print(drift_flag([0.04, 0.05, 0.12, 0.18, 0.21, 0.22, 0.24], 0.05))
 ```
 
@@ -192,9 +198,11 @@ the L20 evaluation harness:
 ```python
 import random
 
+
 def sample_for_review(trace: dict, rate: float = 0.05) -> bool:
     """Deterministic-ish sampling: keep a fraction for quality review."""
     return random.random() < rate
+
 
 # sampled traces → human or LLM-judge review (L20) → quality report
 # + flagged traces (refusals, high cost, errors) always sampled

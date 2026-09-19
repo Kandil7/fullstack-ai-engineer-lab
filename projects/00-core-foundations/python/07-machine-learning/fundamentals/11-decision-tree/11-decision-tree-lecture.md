@@ -77,13 +77,10 @@ from sklearn.model_selection import train_test_split
 
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=200, n_features=4, n_informative=3,
-    n_redundant=1, n_classes=2, random_state=42
+    n_samples=200, n_features=4, n_informative=3, n_redundant=1, n_classes=2, random_state=42
 )
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 print(f"Features: {X.shape[1]}")
 print(f"Samples: {X.shape[0]}")
@@ -112,12 +109,12 @@ print(f"Tree depth: {clf.get_depth()}")
 
 ```python
 # Gini impurity (default)
-clf_gini = DecisionTreeClassifier(criterion='gini', random_state=42)
+clf_gini = DecisionTreeClassifier(criterion="gini", random_state=42)
 clf_gini.fit(X_train, y_train)
 acc_gini = accuracy_score(y_test, clf_gini.predict(X_test))
 
 # Entropy
-clf_entropy = DecisionTreeClassifier(criterion='entropy', random_state=42)
+clf_entropy = DecisionTreeClassifier(criterion="entropy", random_state=42)
 clf_entropy.fit(X_train, y_train)
 acc_entropy = accuracy_score(y_test, clf_entropy.predict(X_test))
 
@@ -158,8 +155,7 @@ importances = clf.feature_importances_
 feature_names = [f"Feature {i}" for i in range(X.shape[1])]
 
 print("Feature importances:")
-for name, importance in sorted(zip(feature_names, importances), 
-                              key=lambda x: x[1], reverse=True):
+for name, importance in sorted(zip(feature_names, importances), key=lambda x: x[1], reverse=True):
     print(f"  {name}: {importance:.4f}")
 ```
 

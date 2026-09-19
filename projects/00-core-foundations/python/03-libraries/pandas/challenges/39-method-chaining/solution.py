@@ -24,11 +24,7 @@ def chain_filter_assign(frame: pd.DataFrame, min_spend: float) -> pd.DataFrame:
 
     The input frame must not be modified.
     """
-    return (
-        frame
-        .query("spend > @min_spend")
-        .assign(log_spend=lambda d: np.log1p(d["spend"]))
-    )
+    return frame.query("spend > @min_spend").assign(log_spend=lambda d: np.log1p(d["spend"]))
 
 
 def feature_chain(frame: pd.DataFrame) -> pd.DataFrame:
@@ -37,8 +33,7 @@ def feature_chain(frame: pd.DataFrame) -> pd.DataFrame:
     rank must be computed on the FILTERED frame (use a callable).
     """
     return (
-        frame
-        .copy()
+        frame.copy()
         .dropna()
         .query("plan == 'free' and spend > 0")
         .assign(
@@ -50,8 +45,7 @@ def feature_chain(frame: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def add_rank_after_filter(frame: pd.DataFrame, filter_expr: str,
-                          col: str) -> pd.DataFrame:
+def add_rank_after_filter(frame: pd.DataFrame, filter_expr: str, col: str) -> pd.DataFrame:
     """Query the frame, then add a descending rank computed post-filter."""
     filtered = frame.query(filter_expr)
     return filtered.assign(rank=filtered[col].rank(ascending=False))

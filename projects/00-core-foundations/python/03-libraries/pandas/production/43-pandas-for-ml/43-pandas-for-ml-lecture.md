@@ -45,12 +45,14 @@ import pandas as pd
 
 np.random.seed(42)
 
-raw = pd.DataFrame({
-    "user_id": np.arange(1, 101),
-    "signup": pd.date_range("2023-01-01", periods=100, freq="D"),
-    "plan": np.random.choice(["free", "pro", "enterprise"], 100),
-    "age": np.random.randint(18, 70, 100).astype(float),
-})
+raw = pd.DataFrame(
+    {
+        "user_id": np.arange(1, 101),
+        "signup": pd.date_range("2023-01-01", periods=100, freq="D"),
+        "plan": np.random.choice(["free", "pro", "enterprise"], 100),
+        "age": np.random.randint(18, 70, 100).astype(float),
+    }
+)
 
 engineered = raw.assign(
     days_since_epoch=lambda d: (d["signup"] - pd.Timestamp("2023-01-01")).dt.days,
@@ -80,8 +82,8 @@ test_cat = pd.DataFrame({"plan": ["free", "pro"]})
 
 train_d = pd.get_dummies(train_cat, prefix="plan")
 test_d = pd.get_dummies(test_cat, prefix="plan")
-print(train_d.columns.tolist())   # ['plan_enterprise', 'plan_free', 'plan_pro']
-print(test_d.columns.tolist())    # ['plan_free', 'plan_pro']
+print(train_d.columns.tolist())  # ['plan_enterprise', 'plan_free', 'plan_pro']
+print(test_d.columns.tolist())  # ['plan_free', 'plan_pro']
 
 test_aligned = test_d.reindex(columns=train_d.columns, fill_value=0)
 print(test_aligned.columns.tolist())
@@ -133,14 +135,16 @@ For time-ordered data, a random split leaks the future into training. Use a
 chronological cutoff: train on the past, test on the future.
 
 ```python
-time_series = pd.DataFrame({
-    "date": pd.date_range("2024-01-01", periods=100, freq="D"),
-    "value": np.random.RandomState(3).normal(size=100).cumsum(),
-})
+time_series = pd.DataFrame(
+    {
+        "date": pd.date_range("2024-01-01", periods=100, freq="D"),
+        "value": np.random.RandomState(3).normal(size=100).cumsum(),
+    }
+)
 cutoff = pd.Timestamp("2024-03-15")
 train_ts = time_series[time_series["date"] < cutoff]
 test_ts = time_series[time_series["date"] >= cutoff]
-print(len(train_ts), len(test_ts))   # 74 26 (2024 is a leap year)
+print(len(train_ts), len(test_ts))  # 74 26 (2024 is a leap year)
 ```
 
 ```text
@@ -160,7 +164,7 @@ at the last moment, keep the names next to the matrix, assert shapes.
 X = engineered[["days_since_epoch", "is_pro", "is_enterprise", "age"]].to_numpy()
 y = engineered["age_squared"].to_numpy()
 
-print(X.shape, X.dtype, y.shape)   # (100, 4) float64 (100,)
+print(X.shape, X.dtype, y.shape)  # (100, 4) float64 (100,)
 print(X[0].tolist())
 ```
 
@@ -179,16 +183,20 @@ in a serving pipeline.
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 
-pipe_df = pd.DataFrame({
-    "amount": np.random.uniform(10, 1000, 20),
-    "region": np.random.choice(["us", "eu", "ap"], 20),
-})
-transformer = ColumnTransformer([
-    ("scale", StandardScaler(), ["amount"]),
-    ("onehot", OneHotEncoder(drop="first"), ["region"]),
-])
+pipe_df = pd.DataFrame(
+    {
+        "amount": np.random.uniform(10, 1000, 20),
+        "region": np.random.choice(["us", "eu", "ap"], 20),
+    }
+)
+transformer = ColumnTransformer(
+    [
+        ("scale", StandardScaler(), ["amount"]),
+        ("onehot", OneHotEncoder(drop="first"), ["region"]),
+    ]
+)
 transformed = transformer.fit_transform(pipe_df)
-print(transformed.shape)   # (20, 3)
+print(transformed.shape)  # (20, 3)
 ```
 
 ```text
@@ -205,8 +213,9 @@ feature_names, y)`, never looking at `y` to build `X`. Split first; fit on
 train; transform train and test separately.
 
 ```python
-def prepare_features(frame: pd.DataFrame, ref_date: pd.Timestamp,
-                     target: str) -> tuple[np.ndarray, list[str], np.ndarray]:
+def prepare_features(
+    frame: pd.DataFrame, ref_date: pd.Timestamp, target: str
+) -> tuple[np.ndarray, list[str], np.ndarray]:
     feats = frame.assign(
         days_since_ref=lambda d: (d["signup"] - ref_date).dt.days,
         is_pro=lambda d: (d["plan"] == "pro").astype(int),
@@ -227,7 +236,8 @@ and what reindexes serving-time dummies.
 
 ```python
 # WRONG — test statistics leak into training
-scaler.fit(X_all); X_all = scaler.transform(X_all)
+scaler.fit(X_all)
+X_all = scaler.transform(X_all)
 # CORRECT — fit on train only
 scaler.fit(X_train)
 X_train = scaler.transform(X_train)
@@ -249,7 +259,8 @@ test_d.reindex(columns=train_d.columns, fill_value=0)
 # WRONG — the future leaks into training
 train_test_split(X, y, random_state=42)
 # CORRECT — chronological cutoff
-train = df[df["date"] < cutoff]; test = df[df["date"] >= cutoff]
+train = df[df["date"] < cutoff]
+test = df[df["date"] >= cutoff]
 ```
 
 ### Mistake 4: carrying the index into numpy

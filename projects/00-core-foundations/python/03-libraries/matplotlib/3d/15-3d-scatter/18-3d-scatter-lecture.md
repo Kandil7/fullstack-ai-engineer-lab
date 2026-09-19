@@ -24,12 +24,12 @@ y = np.random.randn(n)
 z = np.random.randn(n)
 
 fig = plt.figure(figsize=(10, 8))
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter(x, y, z, c='steelblue', s=20, alpha=0.6)
-ax.set_title('3D Scatter Plot')
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
+ax = fig.add_subplot(111, projection="3d")
+ax.scatter(x, y, z, c="steelblue", s=20, alpha=0.6)
+ax.set_title("3D Scatter Plot")
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
+ax.set_zlabel("Z")
 plt.show()
 ```
 
@@ -39,14 +39,22 @@ plt.show()
 
 ```python
 # Encode 5 dimensions: X, Y, Z, color (category), size (value)
-colors = ['red', 'green', 'blue']
+colors = ["red", "green", "blue"]
 sizes = np.random.uniform(10, 100, n)
 
-for i, (label, color) in enumerate(zip(['A', 'B', 'C'], colors)):
-    mask = (cluster == i)
-    ax.scatter(x[mask], y[mask], z[mask],
-               c=color, s=sizes[mask], alpha=0.7,
-               label=label, edgecolors='black', linewidth=0.5)
+for i, (label, color) in enumerate(zip(["A", "B", "C"], colors)):
+    mask = cluster == i
+    ax.scatter(
+        x[mask],
+        y[mask],
+        z[mask],
+        c=color,
+        s=sizes[mask],
+        alpha=0.7,
+        label=label,
+        edgecolors="black",
+        linewidth=0.5,
+    )
 
 ax.legend()
 ```
@@ -58,9 +66,11 @@ ax.legend()
 ```python
 import matplotlib.animation as animation
 
+
 def animate(frame):
     ax.view_init(elev=30, azim=frame)
-    return fig,
+    return (fig,)
+
 
 ani = animation.FuncAnimation(fig, animate, frames=360, interval=50)
 # ani.save('rotation.gif', fps=20)

@@ -31,6 +31,7 @@ first-class equivalent; logic should be rewritten as expressions.
 **Example**:
 ```python
 import pandas as pd
+
 s = pd.Series([1.0, 2.0, 3.0])
 print(s.apply(lambda v: v * 2 if v > 1 else 0.0).tolist())
 ```
@@ -46,6 +47,7 @@ brackets selects rows. Polars uses `filter(expr)` instead.
 **Example**:
 ```python
 import pandas as pd
+
 df = pd.DataFrame({"a": [1, 2, 3]})
 print(df[df["a"] > 1]["a"].tolist())
 ```
@@ -61,6 +63,7 @@ string dicts.
 **Example**:
 ```python
 import pandas as pd
+
 df = pd.DataFrame({"k": ["a", "b"], "v": [1, 2]})
 print(df.groupby("k").agg(total=("v", "sum")).reset_index().values.tolist())
 ```
@@ -86,6 +89,7 @@ how="left")`. Polars equivalent: `a.join(b, on="k", how="left")`.
 **Example**:
 ```python
 import pandas as pd
+
 a = pd.DataFrame({"k": [1, 2], "x": [10, 20]})
 b = pd.DataFrame({"k": [1, 2], "y": [100, 200]})
 print(a.merge(b, on="k").shape)

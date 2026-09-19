@@ -80,6 +80,7 @@ explicit message only when the default diff is not self-explanatory.
 ```python
 import pytest
 
+
 def test_invalid_input_raises():
     with pytest.raises(ValueError, match="must be positive"):
         parse_config("lr=-1")
@@ -96,12 +97,15 @@ testing the happy path.
 ## 5. Parameterization — One Test, Many Cases
 
 ```python
-@pytest.mark.parametrize("text,expected", [
-    ("a,b,c", ["a", "b", "c"]),
-    ("", []),
-    ("a", ["a"]),
-    (" a , b ", ["a", "b"]),
-])
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("a,b,c", ["a", "b", "c"]),
+        ("", []),
+        ("a", ["a"]),
+        (" a , b ", ["a", "b"]),
+    ],
+)
 def test_split_csv(text, expected):
     assert split_csv(text) == expected
 ```
@@ -117,13 +121,16 @@ built-in per-test temp directory, `monkeypatch` mutates environment safely.
 ```python
 import pytest
 
+
 @pytest.fixture
 def chunker():
     return Chunker(max_chars=300, overlap=50)
 
-@pytest.fixture(scope="session")        # expensive once per session
+
+@pytest.fixture(scope="session")  # expensive once per session
 def dataset_path(tmp_path_factory):
     return tmp_path_factory.mktemp("data")
+
 
 def test_chunk_boundaries(chunker):
     chunks = chunker.split("a" * 1000)
@@ -139,6 +146,7 @@ The AI-engineer rule: never call a paid or flaky API in a unit test. Mock it.
 
 ```python
 from unittest.mock import patch, Mock
+
 
 def test_call_retries_on_429():
     fake = Mock(side_effect=[RateLimitError("429"), "ok"])
@@ -204,7 +212,7 @@ def test_golden_prompt():
 
 ```python
 # WRONG — testing the implementation, not the contract
-assert result is not None           # trivially true
+assert result is not None  # trivially true
 # CORRECT
 assert result == expected
 ```
@@ -230,7 +238,7 @@ resp = openai.ChatCompletion.create(...)
 # WRONG
 assert score == 0.9
 # CORRECT
-assert abs(score - 0.9) < 1e-6   # or pytest.approx(0.9)
+assert abs(score - 0.9) < 1e-6  # or pytest.approx(0.9)
 ```
 
 ### Mistake 5: Catching exceptions in the test instead of asserting them

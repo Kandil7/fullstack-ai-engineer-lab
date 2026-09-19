@@ -57,11 +57,11 @@ shape is what matters.
 
 ```python
 async def get_db() -> AsyncDB:
-    await db.connect()          # acquire for THIS request
+    await db.connect()  # acquire for THIS request
     try:
-        yield db                # handler uses it
+        yield db  # handler uses it
     finally:
-        await db.close()        # always released, even on error
+        await db.close()  # always released, even on error
 ```
 
 Output:
@@ -78,7 +78,7 @@ automatically — including on exceptions.
 A transaction should span exactly one request (or one unit of work):
 
 ```python
-async with session.begin():          # or explicit commit/rollback
+async with session.begin():  # or explicit commit/rollback
     await session.execute(...)
 # committed or rolled back with the block
 ```
@@ -95,8 +95,10 @@ roll back; let the session close in `finally` regardless.
 
 ```python
 def recommend_pool_size(workers, concurrency_per_worker=10):
-    return {"pool_size": workers * concurrency_per_worker,
-            "max_overflow": workers * concurrency_per_worker // 2}
+    return {
+        "pool_size": workers * concurrency_per_worker,
+        "max_overflow": workers * concurrency_per_worker // 2,
+    }
 ```
 
 Output:

@@ -47,11 +47,11 @@ folder. You feed it a source with `.dataloaders(path)` to get `DataLoaders`.
 from fastai.vision.all import *
 
 dls = DataBlock(
-    blocks=(ImageBlock, CategoryBlock),   # x is an image, y is a category
-    get_items=get_image_files,            # how to list inputs
+    blocks=(ImageBlock, CategoryBlock),  # x is an image, y is a category
+    get_items=get_image_files,  # how to list inputs
     splitter=RandomSplitter(valid_pct=0.2, seed=42),
-    get_y=parent_label,                   # label = parent folder name
-    item_tfms=Resize(460),                # per-item, CPU
+    get_y=parent_label,  # label = parent folder name
+    item_tfms=Resize(460),  # per-item, CPU
     batch_tfms=aug_transforms(size=224, min_scale=0.75),  # per-batch, GPU
 ).dataloaders(path, bs=64)
 
@@ -81,8 +81,8 @@ you catch label or sizing bugs early.
 ```python
 dls.train.show_batch(max_n=4, nrows=1)  # augmented training images
 dls.valid.show_batch(max_n=4, nrows=1)  # validation images (no random aug)
-print(dls.vocab)                        # the ordered list of class names
-len(dls.train_ds), len(dls.valid_ds)    # item counts per split
+print(dls.vocab)  # the ordered list of class names
+len(dls.train_ds), len(dls.valid_ds)  # item counts per split
 ```
 
 `dls.vocab` is the mapping between the integer the model predicts and the human
@@ -103,7 +103,7 @@ edges and repeated interpolation you get from many small transforms.
 
 ```python
 # Presizing: big on CPU, augment + shrink on GPU
-item_tfms  = Resize(460)                               # step 1 (CPU)
+item_tfms = Resize(460)  # step 1 (CPU)
 batch_tfms = aug_transforms(size=224, min_scale=0.75)  # step 2 (GPU)
 ```
 
@@ -125,7 +125,7 @@ with sensible defaults.
 
 ```python
 item_tfms = RandomResizedCrop(224, min_scale=0.3)  # aggressive random crops
-batch_tfms = aug_transforms(mult=1.0)              # rotate/warp/light/flip
+batch_tfms = aug_transforms(mult=1.0)  # rotate/warp/light/flip
 
 # Visualize the SAME image augmented 4 different ways:
 dls.train.show_batch(max_n=4, nrows=1, unique=True)
@@ -144,10 +144,10 @@ fine anyway.
 
 ```python
 learn = vision_learner(dls, resnet18, metrics=error_rate)
-learn.fine_tune(2)                       # a quick first pass is enough
+learn.fine_tune(2)  # a quick first pass is enough
 
 interp = ClassificationInterpretation.from_learner(learn)
-interp.plot_top_losses(5, nrows=1)       # the model's most confident mistakes
+interp.plot_top_losses(5, nrows=1)  # the model's most confident mistakes
 ```
 
 ```
@@ -184,13 +184,13 @@ Training and serving are separate worlds. `learn.export()` pickles the model
 required — and `predict` on new inputs.
 
 ```python
-learn.export("model.pkl")               # writes to learn.path/model.pkl
+learn.export("model.pkl")  # writes to learn.path/model.pkl
 
 # ... later, in a totally separate process / server ...
 inf = load_learner("model.pkl")
 pred_class, pred_idx, probs = inf.predict("unknown.jpg")
-print(pred_class)                        # e.g. 'grizzly'
-print(probs[pred_idx].item())            # confidence for that class
+print(pred_class)  # e.g. 'grizzly'
+print(probs[pred_idx].item())  # confidence for that class
 ```
 
 `predict` returns a 3-tuple: the **label string**, the **index into the vocab**,
@@ -225,24 +225,24 @@ from fastai.vision.all import *
 
 # Assume `path` holds subfolders per class, e.g. path/grizzly, path/black, path/teddy
 bears = DataBlock(
-    blocks=(ImageBlock, CategoryBlock),          # inputs are images, targets categories
-    get_items=get_image_files,                   # recursively collect image paths
+    blocks=(ImageBlock, CategoryBlock),  # inputs are images, targets categories
+    get_items=get_image_files,  # recursively collect image paths
     splitter=RandomSplitter(valid_pct=0.2, seed=42),  # reproducible 80/20 split
-    get_y=parent_label,                          # label from the containing folder
-    item_tfms=Resize(460),                       # presize step 1 (CPU, uniform size)
+    get_y=parent_label,  # label from the containing folder
+    item_tfms=Resize(460),  # presize step 1 (CPU, uniform size)
     batch_tfms=aug_transforms(size=224, min_scale=0.75),  # step 2 (GPU augment+crop)
 )
 
-dls = bears.dataloaders(path, bs=32)             # build the DataLoaders
-dls.show_batch(max_n=6)                          # sanity-check images + labels
+dls = bears.dataloaders(path, bs=32)  # build the DataLoaders
+dls.show_batch(max_n=6)  # sanity-check images + labels
 
 learn = vision_learner(dls, resnet18, metrics=error_rate)
-learn.fine_tune(4)                               # quick baseline model
+learn.fine_tune(4)  # quick baseline model
 
 # Use the model to surface bad data
 interp = ClassificationInterpretation.from_learner(learn)
-interp.plot_confusion_matrix()                   # where classes get confused
-interp.plot_top_losses(6, nrows=2)               # most-confident mistakes -> likely noise
+interp.plot_confusion_matrix()  # where classes get confused
+interp.plot_top_losses(6, nrows=2)  # most-confident mistakes -> likely noise
 ```
 
 ### Example 2: Export and single-image inference
@@ -252,7 +252,8 @@ from fastai.vision.all import load_learner
 from pathlib import Path
 
 # --- training side (run once, on a GPU box) ---
-learn.export("bear_classifier.pkl")              # bundles model + transforms
+learn.export("bear_classifier.pkl")  # bundles model + transforms
+
 
 # --- serving side (CPU is fine, no fastai training imports needed) ---
 def classify_image(img_path: str) -> dict[str, float]:
@@ -261,6 +262,7 @@ def classify_image(img_path: str) -> dict[str, float]:
     pred, idx, probs = inf.predict(img_path)
     # zip the vocab against the probability tensor for a readable result
     return {cls: float(p) for cls, p in zip(inf.dls.vocab, probs)}
+
 
 print(classify_image("mystery_bear.jpg"))
 # {'black': 0.02, 'grizzly': 0.95, 'teddy': 0.03}
@@ -273,24 +275,26 @@ import gradio as gr
 from fastai.vision.all import load_learner
 from PIL import Image
 
-learn = load_learner("bear_classifier.pkl")      # load once at startup
+learn = load_learner("bear_classifier.pkl")  # load once at startup
 labels = learn.dls.vocab
+
 
 def predict(img: Image.Image) -> dict[str, float]:
     """Gradio passes a PIL image; return label->confidence for gr.Label."""
     _, _, probs = learn.predict(img)
     return {labels[i]: float(probs[i]) for i in range(len(labels))}
 
+
 demo = gr.Interface(
     fn=predict,
-    inputs=gr.Image(type="pil"),                 # matches the PIL arg above
-    outputs=gr.Label(num_top_classes=3),         # shows top-3 with bars
+    inputs=gr.Image(type="pil"),  # matches the PIL arg above
+    outputs=gr.Label(num_top_classes=3),  # shows top-3 with bars
     title="Bear Classifier",
     examples=["grizzly.jpg", "black.jpg", "teddy.jpg"],
 )
 
 if __name__ == "__main__":
-    demo.launch()   # local server; on Hugging Face Spaces, Spaces runs this for you
+    demo.launch()  # local server; on Hugging Face Spaces, Spaces runs this for you
 ```
 
 ---
@@ -302,29 +306,33 @@ if __name__ == "__main__":
 block = DataBlock(item_tfms=aug_transforms(size=224))  # wrong stage!
 
 # ✅ GOOD: uniform resize on CPU, augment on the GPU in batch_tfms
-block = DataBlock(item_tfms=Resize(460),
-                  batch_tfms=aug_transforms(size=224, min_scale=0.75))
+block = DataBlock(
+    item_tfms=Resize(460), batch_tfms=aug_transforms(size=224, min_scale=0.75)
+)
 ```
 
 ```python
 # ❌ BAD: hand-clean every image before you have any model to guide you
 #   (slow, subjective, and wasted on data the model already handles)
-clean_all_images_manually(path)   # then train
+clean_all_images_manually(path)  # then train
 
 # ✅ GOOD: train a quick model, then clean the images it fails on
 learn.fine_tune(2)
 interp = ClassificationInterpretation.from_learner(learn)
-interp.plot_top_losses(5)         # relabel/delete only these, then retrain
+interp.plot_top_losses(5)  # relabel/delete only these, then retrain
 ```
 
 ```python
 # ❌ BAD: re-load the learner on every request inside the predict function
 def predict(img):
-    learn = load_learner("model.pkl")   # unpickles from disk every call — slow
+    learn = load_learner("model.pkl")  # unpickles from disk every call — slow
     return learn.predict(img)
+
 
 # ✅ GOOD: load once at startup, reuse the in-memory learner
 learn = load_learner("model.pkl")
+
+
 def predict(img):
     return learn.predict(img)
 ```

@@ -91,8 +91,7 @@ import ast
 source = "def f(a=[]):\n    return a\n"
 tree = ast.parse(source)
 node = tree.body[0]
-print(type(node).__name__, "with defaults:",
-      [type(d).__name__ for d in node.args.defaults])
+print(type(node).__name__, "with defaults:", [type(d).__name__ for d in node.args.defaults])
 ```
 
 Output:
@@ -110,7 +109,7 @@ walk over the same tree.
 ## 3. Rule: Mutable Default Arguments (B006)
 
 ```python
-def append_item(store=[]):   # B006: the SAME list is shared across calls
+def append_item(store=[]):  # B006: the SAME list is shared across calls
     store.append(len(store))
     return store
 ```
@@ -129,6 +128,7 @@ def find_mutable_defaults(source):
                 if isinstance(default, (ast.List, ast.Dict, ast.Set)):
                     hits.append((node.lineno, node.name))
     return hits
+
 
 print(find_mutable_defaults("def f(a=[]): pass\ndef g(a=None): pass"))
 ```
@@ -152,11 +152,17 @@ not stop the process* — the most expensive bug a bare except can hide.
 ```python
 import ast
 
+
 def find_bare_excepts(source):
     tree = ast.parse(source)
-    return [h.lineno for node in ast.walk(tree)
-            if isinstance(node, ast.Try)
-            for h in node.handlers if h.type is None]
+    return [
+        h.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Try)
+        for h in node.handlers
+        if h.type is None
+    ]
+
 
 src = "try:\n    risky()\nexcept:\n    pass\n"
 print(find_bare_excepts(src))
@@ -183,21 +189,24 @@ untestable and should be split.
 ```python
 import ast
 
+
 def count_decisions(node):
     n = 0
     for child in ast.walk(node):
-        if isinstance(child, (ast.If, ast.For, ast.While,
-                              ast.ExceptHandler, ast.IfExp)):
+        if isinstance(child, (ast.If, ast.For, ast.While, ast.ExceptHandler, ast.IfExp)):
             n += 1
         elif isinstance(child, ast.BoolOp):
             n += len(child.values) - 1
     return n
 
-src = ("def tangled(a, b):\n"
-       "    if a and b or a:\n"
-       "        for i in range(10):\n"
-       "            if i % 2:\n"
-       "                return i\n")
+
+src = (
+    "def tangled(a, b):\n"
+    "    if a and b or a:\n"
+    "        for i in range(10):\n"
+    "            if i % 2:\n"
+    "                return i\n"
+)
 tree = ast.parse(src)
 fn = tree.body[0]
 print(f"complexity: {1 + count_decisions(fn)}")
@@ -226,9 +235,12 @@ hides the change.
 ```python
 def missing_docstrings(source):
     tree = ast.parse(source)
-    return [(n.lineno, n.name) for n in ast.walk(tree)
-            if isinstance(n, (ast.FunctionDef, ast.ClassDef))
-            and ast.get_docstring(n) is None]
+    return [
+        (n.lineno, n.name)
+        for n in ast.walk(tree)
+        if isinstance(n, (ast.FunctionDef, ast.ClassDef)) and ast.get_docstring(n) is None
+    ]
+
 
 print(missing_docstrings("def f():\n    pass\n"))
 ```
@@ -260,8 +272,8 @@ z = 3  # noqa        -- blanket: suppresses EVERY rule on this line (weakest)
 
 ```python
 def suppressed_lines(source):
-    return {i + 1 for i, line in enumerate(source.splitlines())
-            if "# noqa" in line}
+    return {i + 1 for i, line in enumerate(source.splitlines()) if "# noqa" in line}
+
 
 src = "def f(x=[]):  # noqa: B006 - API contract requires a shared list\n"
 print(sorted(suppressed_lines(src)))
@@ -290,11 +302,13 @@ from dataclasses import dataclass, field
 
 RULES = ("B006", "E722", "C901", "D100", "E501", "W291")
 
+
 @dataclass
 class LintConfig:
     select: set[str] = field(default_factory=lambda: set(RULES))
     ignore: set[str] = field(default_factory=set)
     max_complexity: int = 10
+
 
 cfg = LintConfig(ignore={"E722"})
 print("active rules:", sorted(cfg.select - cfg.ignore))
@@ -320,6 +334,7 @@ passes lint and crashes at runtime — mypy finds it before merge.
 
 ```python
 from typing import Optional
+
 
 def mean(values: list[float]) -> float:
     if not values:

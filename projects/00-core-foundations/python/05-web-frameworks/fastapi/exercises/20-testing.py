@@ -26,13 +26,16 @@ app = FastAPI(title="Testing Exercises")
 
 items_db: dict = {}
 
+
 class Item(BaseModel):
     name: str
     price: float
     description: str = ""
 
+
 class ItemResponse(Item):
     id: str
+
 
 @app.post("/items", response_model=ItemResponse, status_code=201)
 async def create_item(item: Item):
@@ -40,15 +43,18 @@ async def create_item(item: Item):
     items_db[item_id] = item.model_dump()
     return {"id": item_id, **item.model_dump()}
 
+
 @app.get("/items", response_model=List[ItemResponse])
 async def list_items():
     return [{"id": k, **v} for k, v in items_db.items()]
+
 
 @app.get("/items/{item_id}", response_model=ItemResponse)
 async def get_item(item_id: str):
     if item_id not in items_db:
         raise HTTPException(status_code=404, detail="Item not found")
     return {"id": item_id, **items_db[item_id]}
+
 
 @app.delete("/items/{item_id}")
 async def delete_item(item_id: str):
@@ -61,6 +67,7 @@ async def delete_item(item_id: str):
 # ============================================================
 # Exercise 20.1: Basic Test Setup
 # ============================================================
+
 
 @pytest.fixture
 def client():
@@ -80,11 +87,9 @@ def populated_client(client):
 
 def test_create_item_happy_path(client):
     """Test creating an item with valid data."""
-    response = client.post("/items", json={
-        "name": "Widget",
-        "price": 9.99,
-        "description": "A useful widget"
-    })
+    response = client.post(
+        "/items", json={"name": "Widget", "price": 9.99, "description": "A useful widget"}
+    )
     assert response.status_code == 201
     data = response.json()
     assert data["name"] == "Widget"
@@ -138,6 +143,7 @@ def test_delete_item(client):
 # Exercise 20.2: Testing Pydantic Models
 # ============================================================
 
+
 def test_item_valid_data():
     """Test Item model with all fields provided."""
     item = Item(name="Widget", price=9.99, description="A widget")
@@ -183,6 +189,7 @@ def test_item_description_optional():
 # ============================================================
 # Exercise 20.3: Testing Error Handling
 # ============================================================
+
 
 def test_404_not_found(client):
     """Test GET for non-existent item returns 404."""
@@ -234,24 +241,31 @@ def test_error_response_format(client):
 # Exercise 20.4: Parameterized Tests
 # ============================================================
 
-@pytest.mark.parametrize("name,price,expected_status", [
-    ("Widget", 9.99, 201),
-    ("Gadget", 19.99, 201),
-    ("Doohickey", 4.99, 201),
-    ("Thingamajig", 99.99, 201),
-    ("", 5.0, 201),  # empty string name is valid (string length > 0)
-])
+
+@pytest.mark.parametrize(
+    "name,price,expected_status",
+    [
+        ("Widget", 9.99, 201),
+        ("Gadget", 19.99, 201),
+        ("Doohickey", 4.99, 201),
+        ("Thingamajig", 99.99, 201),
+        ("", 5.0, 201),  # empty string name is valid (string length > 0)
+    ],
+)
 def test_create_various_items(client, name, price, expected_status):
     """Test creating items with various valid names and prices."""
     response = client.post("/items", json={"name": name, "price": price})
     assert response.status_code == expected_status
 
 
-@pytest.mark.parametrize("name,price", [
-    ("Negative Widget", -1.0),
-    ("Zero Price", 0.0),
-    ("Very Large Price", 999999999.99),
-])
+@pytest.mark.parametrize(
+    "name,price",
+    [
+        ("Negative Widget", -1.0),
+        ("Zero Price", 0.0),
+        ("Very Large Price", 999999999.99),
+    ],
+)
 def test_create_items_edge_prices(client, name, price):
     """Test creating items with edge case prices."""
     response = client.post("/items", json={"name": name, "price": price})
@@ -262,6 +276,7 @@ def test_create_items_edge_prices(client, name, price):
 # ============================================================
 # Exercise 20.5: Integration Tests with Fixtures
 # ============================================================
+
 
 def test_full_crud_workflow(client):
     """Test complete CRUD lifecycle: create -> read -> list -> delete -> verify."""

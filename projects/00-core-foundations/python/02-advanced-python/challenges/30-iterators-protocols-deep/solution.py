@@ -5,6 +5,7 @@ Mapping base, and the ABC supplies get/keys/values/items/eq. Snapshot
 precomputes its hash once (O(n) construction, O(1) hashes later) so the
 hash/eq contract holds forever — the object is immutable.
 """
+
 from __future__ import annotations
 
 from collections.abc import Iterator, Mapping

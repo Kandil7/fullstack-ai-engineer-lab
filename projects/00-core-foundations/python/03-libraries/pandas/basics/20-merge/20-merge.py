@@ -5,6 +5,7 @@ W3Schools: https://www.w3schools.com/python/pandas_dataframe_merge.asp
 Merge combines DataFrames based on common columns or indices, similar
 to SQL JOIN operations.
 """
+
 import pandas as pd
 import numpy as np
 
@@ -12,22 +13,28 @@ import numpy as np
 # Sample data
 # ---------------------------------------------------------------------------
 
-employees = pd.DataFrame({
-    "emp_id": [1, 2, 3, 4, 5],
-    "name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
-    "dept_id": [101, 102, 101, 103, 102],
-})
+employees = pd.DataFrame(
+    {
+        "emp_id": [1, 2, 3, 4, 5],
+        "name": ["Alice", "Bob", "Charlie", "Diana", "Eve"],
+        "dept_id": [101, 102, 101, 103, 102],
+    }
+)
 
-departments = pd.DataFrame({
-    "dept_id": [101, 102, 103, 104],
-    "dept_name": ["Engineering", "Marketing", "Sales", "HR"],
-    "budget": [500000, 300000, 400000, 200000],
-})
+departments = pd.DataFrame(
+    {
+        "dept_id": [101, 102, 103, 104],
+        "dept_name": ["Engineering", "Marketing", "Sales", "HR"],
+        "budget": [500000, 300000, 400000, 200000],
+    }
+)
 
-salaries = pd.DataFrame({
-    "emp_id": [1, 2, 3, 6],
-    "salary": [95000, 80000, 102000, 75000],
-})
+salaries = pd.DataFrame(
+    {
+        "emp_id": [1, 2, 3, 6],
+        "salary": [95000, 80000, 102000, 75000],
+    }
+)
 
 print("Employees:")
 print(employees)
@@ -105,14 +112,18 @@ print("=" * 60)
 print("Example 5: Merge on Different Column Names")
 print("=" * 60)
 
-left_df = pd.DataFrame({
-    "id": [1, 2, 3],
-    "value": ["a", "b", "c"],
-})
-right_df = pd.DataFrame({
-    "identifier": [2, 3, 4],
-    "score": [10, 20, 30],
-})
+left_df = pd.DataFrame(
+    {
+        "id": [1, 2, 3],
+        "value": ["a", "b", "c"],
+    }
+)
+right_df = pd.DataFrame(
+    {
+        "identifier": [2, 3, 4],
+        "score": [10, 20, 30],
+    }
+)
 
 merged = pd.merge(left_df, right_df, left_on="id", right_on="identifier", how="inner")
 print("Merge with different column names:")
@@ -127,15 +138,21 @@ print("=" * 60)
 print("Example 6: Merge on Index")
 print("=" * 60)
 
-df_a = pd.DataFrame({
-    "A": [1, 2, 3],
-    "B": ["x", "y", "z"],
-}, index=["k1", "k2", "k3"])
+df_a = pd.DataFrame(
+    {
+        "A": [1, 2, 3],
+        "B": ["x", "y", "z"],
+    },
+    index=["k1", "k2", "k3"],
+)
 
-df_b = pd.DataFrame({
-    "C": [10, 20, 30],
-    "D": ["a", "b", "c"],
-}, index=["k2", "k3", "k4"])
+df_b = pd.DataFrame(
+    {
+        "C": [10, 20, 30],
+        "D": ["a", "b", "c"],
+    },
+    index=["k2", "k3", "k4"],
+)
 
 merged_idx = pd.merge(df_a, df_b, left_index=True, right_index=True, how="outer")
 print("Merge on index (outer):")
@@ -151,10 +168,8 @@ print("Example 7: Multi-Table Merge Chain")
 print("=" * 60)
 
 # Chain multiple merges
-full = (
-    employees
-    .merge(departments, on="dept_id", how="left")
-    .merge(salaries, on="emp_id", how="left")
+full = employees.merge(departments, on="dept_id", how="left").merge(
+    salaries, on="emp_id", how="left"
 )
 print("Full employee info:")
 print(full)

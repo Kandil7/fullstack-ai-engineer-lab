@@ -79,23 +79,49 @@ Then write and run this validator against the lecture's JSONL schema (create the
 
 ```python
 import json
+
 required = {"question", "answer", "contexts", "ground_truth", "category", "difficulty"}
 
 lines = [
-    {"question": "What is the refund policy?", "answer": "Refunds within 30 days with receipt.",
-     "contexts": ["Refund Policy: Items may be returned within 30 days with receipt."],
-     "ground_truth": "Full refund within 30 days with receipt.", "category": "policy", "difficulty": "easy"},
-    {"question": "What is the refund policy?", "answer": "You can return items up to 30 days after purchase if you keep the receipt.",
-     "contexts": ["Refund Policy: Items may be returned within 30 days with receipt."],
-     "ground_truth": "Full refund within 30 days with receipt.", "category": "policy", "difficulty": "easy"},
-    {"question": "How do I authenticate?", "answer": "Use a Bearer token.",
-     "contexts": ["Authentication: Include Authorization: Bearer <token> in requests."],
-     "ground_truth": "API requires Bearer token in Authorization header.", "category": "auth", "difficulty": "easy"},
+    {
+        "question": "What is the refund policy?",
+        "answer": "Refunds within 30 days with receipt.",
+        "contexts": [
+            "Refund Policy: Items may be returned within 30 days with receipt."
+        ],
+        "ground_truth": "Full refund within 30 days with receipt.",
+        "category": "policy",
+        "difficulty": "easy",
+    },
+    {
+        "question": "What is the refund policy?",
+        "answer": "You can return items up to 30 days after purchase if you keep the receipt.",
+        "contexts": [
+            "Refund Policy: Items may be returned within 30 days with receipt."
+        ],
+        "ground_truth": "Full refund within 30 days with receipt.",
+        "category": "policy",
+        "difficulty": "easy",
+    },
+    {
+        "question": "How do I authenticate?",
+        "answer": "Use a Bearer token.",
+        "contexts": [
+            "Authentication: Include Authorization: Bearer <token> in requests."
+        ],
+        "ground_truth": "API requires Bearer token in Authorization header.",
+        "category": "auth",
+        "difficulty": "easy",
+    },
 ]
 assert all(set(line) == required for line in lines), "schema mismatch"
-assert all(isinstance(line["contexts"], list) and line["contexts"] for line in lines), "contexts must be non-empty lists"
+assert all(isinstance(line["contexts"], list) and line["contexts"] for line in lines), (
+    "contexts must be non-empty lists"
+)
 qs = [l["question"] for l in lines]
-assert len(qs) == len(set(qs)), f"duplicate questions: {[q for q in qs if qs.count(q) > 1]}"
+assert len(qs) == len(set(qs)), (
+    f"duplicate questions: {[q for q in qs if qs.count(q) > 1]}"
+)
 print("schema OK; lines:", len(lines))
 ```
 
@@ -204,11 +230,12 @@ Write a snapshot test for the current prompt. Read `projects/04-ai-engineering/d
 
 ```python
 import hashlib, sys
+
 sys.path.insert(0, r"projects/04-ai-engineering/devmate/src")
 from devmate.retrieve.rag import RAG_SYSTEM_PROMPT
 
 assert "Use ONLY the information provided in the context" in RAG_SYSTEM_PROMPT
-assert "[Source" in RAG_SYSTEM_PROMPT          # citation instruction is part of the contract
+assert "[Source" in RAG_SYSTEM_PROMPT  # citation instruction is part of the contract
 version = hashlib.sha1(RAG_SYSTEM_PROMPT.encode()).hexdigest()[:10]
 print("prompt version:", version)
 ```
@@ -259,10 +286,10 @@ Compute per-category deltas: factual −2 pts, procedural −4, debugging **+24 
 ref = {"factual": 8, "procedural": 6, "debugging": 4, "architecture": 4, "edge": 3}
 recent = {"factual": 6, "procedural": 4, "debugging": 8, "architecture": 1, "edge": 1}
 ref_t, rec_t = sum(ref.values()), sum(recent.values())
-deltas = {c: recent[c]/rec_t - ref[c]/ref_t for c in ref}
+deltas = {c: recent[c] / rec_t - ref[c] / ref_t for c in ref}
 assert abs(deltas["debugging"] - 0.24) < 1e-9, deltas
 assert abs(deltas["architecture"] - (-0.11)) < 1e-9
-print({c: round(v*100, 1) for c, v in deltas.items()})
+print({c: round(v * 100, 1) for c, v in deltas.items()})
 ```
 
 Expected: `{'factual': -2.0, 'procedural': -4.0, 'debugging': 24.0, 'architecture': -11.0, 'edge': -7.0}`.
@@ -393,7 +420,13 @@ Check: factual = 8, procedural = 6, debugging = 4, architecture = 4, edge = 3 �
 
 ```python
 cats = {}  # fill from your final table
-assert cats == {"factual": 8, "procedural": 6, "debugging": 4, "architecture": 4, "edge": 3}
+assert cats == {
+    "factual": 8,
+    "procedural": 6,
+    "debugging": 4,
+    "architecture": 4,
+    "edge": 3,
+}
 print("category budget OK:", cats)
 ```
 
@@ -503,10 +536,12 @@ def context_precision_at_k(retrieved, relevant, k):
     top_k = retrieved[:k]
     return sum(1 for c in top_k if c in relevant) / k
 
-r1 = ["A", "B", "C", "D", "E"]; rel = {"A", "C"}
+
+r1 = ["A", "B", "C", "D", "E"]
+rel = {"A", "C"}
 assert context_precision_at_k(r1, rel, 5) == 0.4
 assert context_precision_at_k(["C", "A", "B", "D", "E"], rel, 2) == 1.0
-assert context_precision_at_k(r1, rel, 3) == 2/3
+assert context_precision_at_k(r1, rel, 3) == 2 / 3
 assert context_precision_at_k(r1, rel, 1) == 1.0
 print("precision@k OK")
 ```
@@ -559,8 +594,9 @@ The lesson: recall@5 = 0.79 in the lecture baseline is only meaningful if someon
 def context_recall(retrieved, all_relevant):
     return len(set(retrieved) & set(all_relevant)) / len(all_relevant)
 
-assert context_recall(["c1","c2","c5","c6"], ["c1","c2","c3","c4"]) == 0.5
-assert context_recall(["c1","c2","c5","c6"], ["c1"]) == 1.0   # the trap
+
+assert context_recall(["c1", "c2", "c5", "c6"], ["c1", "c2", "c3", "c4"]) == 0.5
+assert context_recall(["c1", "c2", "c5", "c6"], ["c1"]) == 1.0  # the trap
 print("recall OK")
 ```
 
@@ -619,9 +655,10 @@ def faithfulness(claims):  # claims = list[bool] supported?
     total = len(claims)
     return sum(claims) / total if total else 1.0
 
+
 assert faithfulness([True, True, False, False]) == 0.5
 assert faithfulness([True, True, True]) == 1.0
-assert faithfulness([]) == 1.0          # zero-claims rule
+assert faithfulness([]) == 1.0  # zero-claims rule
 assert faithfulness([False]) == 0.0
 print("faithfulness OK")
 ```
@@ -674,12 +711,17 @@ Claim granularity calibration. An answer's claims can be split coarsely (2 claim
 
 ```python
 import math
+
+
 def cosine(u, v):
-    return sum(a*b for a, b in zip(u, v)) / (math.sqrt(sum(x*x for x in u)) * math.sqrt(sum(x*x for x in v)))
+    return sum(a * b for a, b in zip(u, v)) / (
+        math.sqrt(sum(x * x for x in u)) * math.sqrt(sum(x * x for x in v))
+    )
+
 
 q, good, short = (1.0, 0.0), (0.8, 0.6), (0.95, 0.05)
 assert abs(cosine(q, good) - 0.80) < 1e-9
-assert abs(cosine(q, short) - 0.9986) < 1e-3   # short beats good
+assert abs(cosine(q, short) - 0.9986) < 1e-3  # short beats good
 print("relevancy OK — short answer scores", round(cosine(q, short), 4))
 ```
 
@@ -743,24 +785,31 @@ Judge responses to parse:
 
 ```python
 import re
+
+
 def parse_claims(text):
     claims = []
     for line in text.splitlines():
         m = re.match(r"Claim \d+: .+ - SUPPORTED: (YES|NO)", line)
         if not m:
-            print("WARN unparseable:", line); continue
+            print("WARN unparseable:", line)
+            continue
         claims.append(m.group(1) == "YES")
     return claims
+
 
 def faithfulness(claims):
     return sum(claims) / len(claims) if claims else 1.0
 
+
 r1 = "Claim 1: stores query embeddings - SUPPORTED: YES\nClaim 2: returns cached results above a threshold - SUPPORTED: YES\nClaim 3: fastest component - SUPPORTED: NO\nClaim 4: compresses with zlib - SUPPORTED: NO"
-r2 = "Claim 1: stores query embeddings YES\nClaim 2: compresses payloads - SUPPORTED: NO"
+r2 = (
+    "Claim 1: stores query embeddings YES\nClaim 2: compresses payloads - SUPPORTED: NO"
+)
 r3 = ""
 assert faithfulness(parse_claims(r1)) == 0.5
-assert faithfulness(parse_claims(r2)) == 0.0      # malformed line skipped
-assert faithfulness(parse_claims(r3)) == 1.0      # zero claims
+assert faithfulness(parse_claims(r2)) == 0.0  # malformed line skipped
+assert faithfulness(parse_claims(r3)) == 1.0  # zero claims
 print("judge parsing OK")
 ```
 
@@ -811,17 +860,20 @@ Normalization: score/10. Parse cases: `"7"` → 0.7; `"8/10"` → strip to 8 →
 
 ```python
 import re
+
+
 def parse_score(text):
     m = re.search(r"(\d{1,2})(?:/10)?", text.strip())
     if not m:
         print("WARN non-numeric judge output:", text)
         return 0.5
-    return min(max(int(m.group(1)) / 10.0, 0.0), 1.0)   # clamp
+    return min(max(int(m.group(1)) / 10.0, 0.0), 1.0)  # clamp
+
 
 assert parse_score("7") == 0.7
 assert parse_score("8/10") == 0.8
-assert parse_score("Good") == 0.5      # fallback + WARN
-assert parse_score("11") == 1.0        # clamp
+assert parse_score("Good") == 0.5  # fallback + WARN
+assert parse_score("11") == 1.0  # clamp
 print("relevancy parsing OK")
 ```
 
@@ -922,34 +974,65 @@ Write the loop skeleton with a fake pipeline (no network, no store):
 
 ```python
 import json
+
+
 def fake_pipeline(question):
-    return {"answer": f"Answer to: {question}", "context_ids": ["c1", "c2"],
-            "latency_ms": 100.0, "cost_usd": 0.001}
+    return {
+        "answer": f"Answer to: {question}",
+        "context_ids": ["c1", "c2"],
+        "latency_ms": 100.0,
+        "cost_usd": 0.001,
+    }
+
 
 def run_evaluation(dataset, pipeline):
     results = []
     for item in dataset:
         r = pipeline(item["question"])
-        results.append({
-            "question": item["question"],
-            "category": item["category"],
-            "answer": r["answer"],
-            "context_ids": r["context_ids"],
-            "precision_at_5": 0.4,          # placeholder — real metric in 4.3a
-            "faithfulness": 0.5,            # placeholder — real judge in 4.4a
-            "latency_ms": r["latency_ms"],
-            "cost_usd": r["cost_usd"],
-        })
+        results.append(
+            {
+                "question": item["question"],
+                "category": item["category"],
+                "answer": r["answer"],
+                "context_ids": r["context_ids"],
+                "precision_at_5": 0.4,  # placeholder — real metric in 4.3a
+                "faithfulness": 0.5,  # placeholder — real judge in 4.4a
+                "latency_ms": r["latency_ms"],
+                "cost_usd": r["cost_usd"],
+            }
+        )
     return results
 
+
 ds = [
-    {"question": "q1", "category": "factual", "contexts": ["c1"], "ground_truth": "g1", "difficulty": "easy"},
-    {"question": "q2", "category": "debugging", "contexts": ["c2"], "ground_truth": "g2", "difficulty": "hard"},
-    {"question": "q3", "category": "edge", "contexts": ["c3"], "ground_truth": "g3", "difficulty": "medium"},
+    {
+        "question": "q1",
+        "category": "factual",
+        "contexts": ["c1"],
+        "ground_truth": "g1",
+        "difficulty": "easy",
+    },
+    {
+        "question": "q2",
+        "category": "debugging",
+        "contexts": ["c2"],
+        "ground_truth": "g2",
+        "difficulty": "hard",
+    },
+    {
+        "question": "q3",
+        "category": "edge",
+        "contexts": ["c3"],
+        "ground_truth": "g3",
+        "difficulty": "medium",
+    },
 ]
 results = run_evaluation(ds, fake_pipeline)
 assert len(results) == 3
-assert all({"question", "category", "answer", "latency_ms", "cost_usd"} <= set(r) for r in results)
+assert all(
+    {"question", "category", "answer", "latency_ms", "cost_usd"} <= set(r)
+    for r in results
+)
 assert all(r["latency_ms"] == 100.0 for r in results)
 print("loop OK; per-question rows:", len(results))
 ```
@@ -1014,12 +1097,17 @@ Note the lesson: mean (3.1) is above p50 (2.0) — one outlier pulls it. The rep
 
 ```python
 import statistics, numpy as np
-lat = [1.0, 1.5, 2.0, 3.0, 8.0]; cost = [0.01, 0.02, 0.01, 0.03, 0.08]
+
+lat = [1.0, 1.5, 2.0, 3.0, 8.0]
+cost = [0.01, 0.02, 0.01, 0.03, 0.08]
 assert abs(statistics.mean(lat) - 3.1) < 1e-9
 assert np.percentile(lat, 50) == 2.0
 assert abs(np.percentile(lat, 95) - 7.0) < 1e-9
 assert abs(sum(cost) - 0.15) < 1e-9
-report = {"num_questions": 5, "aggregate": {"latency_p50_s": 2.0, "latency_p95_s": 7.0, "total_cost_usd": 0.15}}
+report = {
+    "num_questions": 5,
+    "aggregate": {"latency_p50_s": 2.0, "latency_p95_s": 7.0, "total_cost_usd": 0.15},
+}
 print("aggregation OK:", report)
 ```
 
@@ -1081,7 +1169,12 @@ Apply the lecture's rules to three reports. Baseline (week-3 case study): contex
 ```python
 def compare(bl, new, metric_threshold=-0.05, improvement=0.02, per_q=-0.1):
     regressions, improvements, q_regressions = [], [], []
-    for m in ["context_precision", "context_recall", "faithfulness", "answer_relevancy"]:
+    for m in [
+        "context_precision",
+        "context_recall",
+        "faithfulness",
+        "answer_relevancy",
+    ]:
         d = new[m] - bl[m]
         if d < metric_threshold:
             regressions.append((m, bl[m], new[m], d))
@@ -1089,11 +1182,32 @@ def compare(bl, new, metric_threshold=-0.05, improvement=0.02, per_q=-0.1):
             improvements.append((m, bl[m], new[m], d))
     return regressions, improvements, q_regressions
 
-bl = {"context_precision": 0.83, "context_recall": 0.79, "faithfulness": 0.91, "answer_relevancy": 0.88}
-A = {"context_precision": 0.84, "context_recall": 0.80, "faithfulness": 0.90, "answer_relevancy": 0.87}
-B = {"context_precision": 0.83, "context_recall": 0.79, "faithfulness": 0.82, "answer_relevancy": 0.88}
-C = {"context_precision": 0.83, "context_recall": 0.79, "faithfulness": 0.94, "answer_relevancy": 0.88}
-assert compare(bl, A)[0] == []                      # PASS
+
+bl = {
+    "context_precision": 0.83,
+    "context_recall": 0.79,
+    "faithfulness": 0.91,
+    "answer_relevancy": 0.88,
+}
+A = {
+    "context_precision": 0.84,
+    "context_recall": 0.80,
+    "faithfulness": 0.90,
+    "answer_relevancy": 0.87,
+}
+B = {
+    "context_precision": 0.83,
+    "context_recall": 0.79,
+    "faithfulness": 0.82,
+    "answer_relevancy": 0.88,
+}
+C = {
+    "context_precision": 0.83,
+    "context_recall": 0.79,
+    "faithfulness": 0.94,
+    "answer_relevancy": 0.88,
+}
+assert compare(bl, A)[0] == []  # PASS
 r, i, _ = compare(bl, B)
 assert any(m == "faithfulness" for m, _, _, _ in r)  # FAIL: faithfulness -0.09
 assert any(m == "faithfulness" for m, _, _, _ in compare(bl, C)[1])  # improvement +0.03
@@ -1272,8 +1386,12 @@ Read `src/devmate/obs/tracing.py` — `_export_span_to_langfuse` already maps: s
 
 ```python
 span.attributes = {
-    "model": "gpt-4o-mini", "prompt_tokens": 800, "completion_tokens": 300,
-    "total_tokens": 1100, "cost_usd": 0.0003, "latency_ms": 450.0,
+    "model": "gpt-4o-mini",
+    "prompt_tokens": 800,
+    "completion_tokens": 300,
+    "total_tokens": 1100,
+    "cost_usd": 0.0003,
+    "latency_ms": 450.0,
 }
 ```
 
@@ -1337,8 +1455,13 @@ The track's case study: in week 5, DevMate's users started asking *"fix bug in..
 
 ```python
 import math
+
+
 def cosine(u, v):
-    return sum(a*b for a, b in zip(u, v)) / (math.sqrt(sum(x*x for x in u)) * math.sqrt(sum(x*x for x in v)))
+    return sum(a * b for a, b in zip(u, v)) / (
+        math.sqrt(sum(x * x for x in u)) * math.sqrt(sum(x * x for x in v))
+    )
+
 
 ref = [(1.0, 0.0), (0.9, 0.1), (0.95, 0.05)]
 recent = [(0.6, 0.8), (0.5, 0.86), (0.7, 0.7)]

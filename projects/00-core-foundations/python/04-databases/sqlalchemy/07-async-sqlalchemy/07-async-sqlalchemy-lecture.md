@@ -58,6 +58,7 @@ from sqlalchemy.pool import StaticPool
 
 async_engine = create_async_engine("sqlite+aiosqlite://", poolclass=StaticPool)
 
+
 async def demo_core_roundtrip() -> int:
     async with async_engine.connect() as conn:
         return (await conn.execute(text("SELECT 1"))).scalar_one()
@@ -77,8 +78,10 @@ sync Session methods on it.
 from sqlalchemy import String, select
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+
 class Base(DeclarativeBase):
     pass
+
 
 class Prediction(Base):
     __tablename__ = "predictions"
@@ -88,6 +91,7 @@ class Prediction(Base):
     latency_ms: Mapped[int] = mapped_column(nullable=False)
     status: Mapped[str] = mapped_column(String(12), default="ok")
 
+
 async def demo_async_session() -> None:
     async with AsyncSession(async_engine) as session:
         session.add(Prediction(model="bert", input_hash="hash-0001", latency_ms=42))
@@ -95,6 +99,8 @@ async def demo_async_session() -> None:
         rows = await session.scalars(select(Prediction))
         for row in rows:
             print(f"async read: {row.model} {row.input_hash} {row.latency_ms}ms")
+
+
 # Output:
 # async read: bert hash-0001 42ms
 ```
@@ -110,14 +116,13 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 AsyncSessionLocal = async_sessionmaker(async_engine, expire_on_commit=False)
 
+
 async def demo_sessionmaker() -> list[str]:
     async with AsyncSessionLocal() as session:
         session.add(Prediction(model="gpt2", input_hash="hash-0002", latency_ms=88))
         await session.commit()
     async with AsyncSessionLocal() as session:
-        names = await session.scalars(
-            select(Prediction.model).order_by(Prediction.model)
-        )
+        names = await session.scalars(select(Prediction.model).order_by(Prediction.model))
         return list(names)
 ```
 
@@ -135,6 +140,7 @@ ORM internals run on the async loop without deadlocking it.
 def _count_models_sync(session: AsyncSession) -> int:
     """Sync-style helper; run inside run_sync."""
     return len(list(session.scalars(select(Prediction.model)).all()))
+
 
 async def demo_greenlet_bridge() -> int:
     async with AsyncSessionLocal() as session:
@@ -177,11 +183,12 @@ guaranteed, so a later request on the same engine still works.
 ```python
 async def ingest_predictions(rows: list[dict]) -> int:
     async with AsyncSessionLocal() as session:
-        session.add_all([
-            Prediction(model=r["model"], input_hash=r["input_hash"],
-                       latency_ms=r["latency_ms"])
-            for r in rows
-        ])
+        session.add_all(
+            [
+                Prediction(model=r["model"], input_hash=r["input_hash"], latency_ms=r["latency_ms"])
+                for r in rows
+            ]
+        )
         await session.commit()
         return len(rows)
 ```

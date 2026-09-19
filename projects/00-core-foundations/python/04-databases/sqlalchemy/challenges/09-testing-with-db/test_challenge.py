@@ -29,9 +29,7 @@ def _load(name: str):
     """
     parent = Path(__file__).parent.name.replace("-", "_")
     modname = f"{name}_{parent}"
-    spec = importlib.util.spec_from_file_location(
-        modname, Path(__file__).parent / f"{name}.py"
-    )
+    spec = importlib.util.spec_from_file_location(modname, Path(__file__).parent / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[modname] = module
     spec.loader.exec_module(module)
@@ -87,9 +85,7 @@ class TestMakeExperiment:
             s.commit()
         with Session(bind=engine) as s:
             loaded = s.scalars(
-                select(solution.Experiment).where(
-                    solution.Experiment.name == "factory-run"
-                )
+                select(solution.Experiment).where(solution.Experiment.name == "factory-run")
             ).one()
             assert loaded.score == 0.75 and loaded.config == {}
 
@@ -125,9 +121,7 @@ class TestTransactionalSession:
         gen = solution.transactional_session(engine)
         session = next(gen)
         try:
-            session.add_all(
-                [solution.make_experiment("t1-a"), solution.make_experiment("t1-b")]
-            )
+            session.add_all([solution.make_experiment("t1-a"), solution.make_experiment("t1-b")])
             seen = len(session.scalars(select(solution.Experiment.id)).all())
             assert seen == 2, "rows must be visible inside the test"
         finally:
@@ -136,9 +130,7 @@ class TestTransactionalSession:
     def test_rollback_after_close(self, engine):
         gen = solution.transactional_session(engine)
         session = next(gen)
-        session.add_all(
-            [solution.make_experiment("t1-a"), solution.make_experiment("t1-b")]
-        )
+        session.add_all([solution.make_experiment("t1-a"), solution.make_experiment("t1-b")])
         gen.close()
         assert _count(engine) == 0, "closing the fixture must roll back writes"
 

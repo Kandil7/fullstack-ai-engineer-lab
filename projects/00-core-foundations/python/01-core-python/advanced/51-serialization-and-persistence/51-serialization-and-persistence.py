@@ -40,6 +40,7 @@ payload = {"pair": (1, 2), "name": "qwen"}
 encoded = json.dumps(payload)
 print(f"Tuple became: {type(json.loads(encoded)['pair']).__name__}")
 
+
 # Example 2: custom serialization for datetime and sets
 def default_encoder(obj):
     if isinstance(obj, datetime):
@@ -118,6 +119,7 @@ with tempfile.TemporaryDirectory() as tmp:
 # exactly why unpickling untrusted data is arbitrary code execution. Use
 # pickle ONLY for your own trusted artifacts, never for anything user-supplied.
 
+
 # Example 5: round-trip a custom object
 class ModelCard:
     def __init__(self, name: str, params_m: int) -> None:
@@ -167,6 +169,7 @@ with tempfile.TemporaryDirectory() as tmp:
 # Output:
 # High-score runs: [('augmented', 0.85)]
 
+
 # ============================================================
 # 6. Production Pattern — Versioned JSONL Writer
 # ============================================================
@@ -212,13 +215,15 @@ with tempfile.TemporaryDirectory() as tmp:
 # CORRECT:
 #   good = json.dumps({"tags": sorted({"a"})})
 
+
 # ============================================================
 # Self-Verification
 # ============================================================
 def _verify() -> None:
     # JSON tuple -> list
-    assert json.loads(json.dumps({"p": (1, 2)}))["p"] == [1, 2], \
+    assert json.loads(json.dumps({"p": (1, 2)}))["p"] == [1, 2], (
         "JSON has no tuples; they become lists"
+    )
 
     # Custom encoder/decoder round-trip
     blob2 = {"t": datetime(2026, 1, 1, 12, 0), "s": {1, 2}}
@@ -257,8 +262,7 @@ def _verify() -> None:
         p = Path(tmp) / "d.jsonl"
         append_jsonl(p, [{"i": 0}])
         append_jsonl(p, [{"i": 1}, {"i": 2}])
-        assert sum(1 for _ in p.open(encoding="utf-8")) == 3, \
-            "append must not overwrite"
+        assert sum(1 for _ in p.open(encoding="utf-8")) == 3, "append must not overwrite"
 
     print("[OK] 51-serialization-and-persistence: all checks passed")
 

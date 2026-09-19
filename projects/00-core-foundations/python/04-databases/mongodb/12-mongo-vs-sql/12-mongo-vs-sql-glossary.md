@@ -78,8 +78,7 @@ atomic — it either fully applies or not at all, regardless of crashes.
 **Example**:
 ```python
 # one $inc + $set + $push on the same document is all-or-nothing
-update_one(users, {"_id": 1},
-           {"$inc": {"age": 1}, "$push": {"scores": 100}})
+update_one(users, {"_id": 1}, {"$inc": {"age": 1}, "$push": {"scores": 100}})
 ```
 ```text
 # across two documents this is NOT atomic by default
@@ -131,6 +130,7 @@ def build_index(collection, field):
             idx.setdefault(doc[field], []).append(doc)
     return idx
 
+
 email_index = build_index([{"_id": 1, "email": "a@x.com"}], "email")
 print(email_index["a@x.com"][0]["_id"])  # -> 1
 ```
@@ -161,6 +161,7 @@ the list plus N queries for each child reference.
 ```python
 def read_count_referenced(n_posts):
     return n_posts + 1  # 1 list + 1 author lookup per post
+
 
 print(read_count_referenced(50))  # -> 51
 ```

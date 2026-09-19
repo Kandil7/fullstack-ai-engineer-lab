@@ -14,9 +14,9 @@ Reference: https://www.w3schools.com/python/python_variables.asp
 # In Python, you don't need to declare the type - it's inferred.
 
 # Example 1: Basic variable assignment
-x = 5           # integer
-y = "Hello"     # string
-z = 3.14        # float
+x = 5  # integer
+y = "Hello"  # string
+z = 3.14  # float
 is_active = True  # boolean
 
 print(f"x = {x}, type: {type(x).__name__}")
@@ -34,10 +34,10 @@ print(f"is_active = {is_active}, type: {type(is_active).__name__}")
 # Variable Naming Rules
 # ============================================================
 # Valid names:
-my_var = 1          # snake_case (recommended)
-_private = 2        # leading underscore
-myVar2 = 3          # camelCase (not recommended but valid)
-MAX_SIZE = 100      # UPPER_CASE for constants
+my_var = 1  # snake_case (recommended)
+_private = 2  # leading underscore
+myVar2 = 3  # camelCase (not recommended but valid)
+MAX_SIZE = 100  # UPPER_CASE for constants
 
 # Invalid names (would cause SyntaxError):
 # 2names = "bad"     # Can't start with number
@@ -47,6 +47,7 @@ MAX_SIZE = 100      # UPPER_CASE for constants
 
 # Python keywords (cannot be used as variable names):
 import keyword
+
 print(f"\nPython has {len(keyword.kwlist)} reserved keywords")
 print(f"Examples: {keyword.kwlist[:5]}...")
 
@@ -123,10 +124,12 @@ print(f"x = {x}, type: {type(x).__name__}")
 
 global_var = "I am global"
 
+
 def my_function():
     local_var = "I am local"
     print(f"Inside function: {global_var}")
     print(f"Inside function: {local_var}")
+
 
 my_function()
 print(f"Outside function: {global_var}")
@@ -140,14 +143,16 @@ print(f"Outside function: {global_var}")
 # Example 6: Using 'global' keyword
 counter = 0
 
+
 def increment():
     global counter
     counter += 1
     return counter
 
+
 print(f"\nCounter: {increment()}")  # Output: Counter: 1
-print(f"Counter: {increment()}")    # Output: Counter: 2
-print(f"Counter: {increment()}")    # Output: Counter: 3
+print(f"Counter: {increment()}")  # Output: Counter: 2
+print(f"Counter: {increment()}")  # Output: Counter: 3
 
 # ============================================================
 # Deleting Variables

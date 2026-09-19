@@ -31,8 +31,8 @@ from typing import Any, Callable
 # The universal shape: a list of {role, content} dicts. system sets
 # behavior, user is the request, assistant is prior turns.
 
-def build_messages(system: str, user: str,
-                   history: list[dict] | None = None) -> list[dict]:
+
+def build_messages(system: str, user: str, history: list[dict] | None = None) -> list[dict]:
     msgs = [{"role": "system", "content": system}]
     if history:
         msgs.extend(history)
@@ -57,6 +57,7 @@ assert msgs[0]["role"] == "system" and msgs[-1]["role"] == "user"
 # Simulates the OpenAI client surface: create() + streaming. A tiny
 # deterministic "model" so tests never hit the network.
 
+
 @dataclass
 class MockResponse:
     content: str
@@ -72,8 +73,9 @@ class MockClient:
         ]
         self.calls = 0
 
-    def create(self, model: str, messages: list[dict],
-               temperature: float = 0.7, **kwargs: Any) -> MockResponse:
+    def create(
+        self, model: str, messages: list[dict], temperature: float = 0.7, **kwargs: Any
+    ) -> MockResponse:
         self.calls += 1
         user = next((m["content"] for m in reversed(messages) if m["role"] == "user"), "")
         reply = self.replies[min(len(self.replies) - 1, max(0, len(user) % len(self.replies)))]
@@ -92,6 +94,7 @@ print(f"  response: {resp.content}")
 # 429 (rate limit) and 503 (overloaded) are transient - retry with
 # backoff and jitter. 4xx like 400 are permanent - fail fast.
 
+
 @dataclass
 class RetryPolicy:
     max_retries: int = 3
@@ -99,13 +102,14 @@ class RetryPolicy:
     max_delay_s: float = 2.0
 
     def retry_delay(self, attempt: int) -> float:
-        delay = min(self.base_delay_s * (2 ** attempt), self.max_delay_s)
+        delay = min(self.base_delay_s * (2**attempt), self.max_delay_s)
         # jitter within [0.5x, 1.0x] so backoff never exceeds the cap
         return delay * (0.5 + random.random() * 0.5)
 
 
-def call_with_retries(fn: Callable[[], Any], policy: RetryPolicy,
-                      transient_statuses: set[int]) -> Any:
+def call_with_retries(
+    fn: Callable[[], Any], policy: RetryPolicy, transient_statuses: set[int]
+) -> Any:
     """Call fn, retrying on transient failures with backoff."""
     attempt = 0
     while True:
@@ -127,11 +131,13 @@ class RateLimitError(Exception):
 # Example 3: transient failure is retried; permanent is not
 attempts = {"n": 0}
 
+
 def flaky_call() -> str:
     attempts["n"] += 1
     if attempts["n"] < 3:
         raise RateLimitError(429, "rate limited")
     return "ok"
+
 
 policy = RetryPolicy(max_retries=4, base_delay_s=0.01)
 result = call_with_retries(flaky_call, policy, transient_statuses={429, 503})
@@ -146,8 +152,10 @@ assert result == "ok" and attempts["n"] == 3
 # and its memory. Set a connect + read timeout and treat timeout as
 # a retryable (or fallback) event.
 
+
 def call_with_timeout(fn: Callable[[], Any], timeout_s: float) -> Any:
     import concurrent.futures
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
         future = ex.submit(fn)
         try:
@@ -178,15 +186,19 @@ assert timed_out
 # The production call path: build messages -> count tokens -> call
 # with retries and timeout -> inspect the result -> return or raise.
 
-def robust_completion(client: MockClient, system: str, user: str,
-                      retries: RetryPolicy, timeout_s: float,
-                      transient_statuses: set[int]) -> str:
+
+def robust_completion(
+    client: MockClient,
+    system: str,
+    user: str,
+    retries: RetryPolicy,
+    timeout_s: float,
+    transient_statuses: set[int],
+) -> str:
     messages = build_messages(system, user)
 
     def do_call() -> str:
-        return call_with_timeout(
-            lambda: client.create("gpt-4o-mini", messages), timeout_s
-        ).content
+        return call_with_timeout(lambda: client.create("gpt-4o-mini", messages), timeout_s).content
 
     return call_with_retries(do_call, retries, transient_statuses)
 
@@ -213,23 +225,29 @@ def _verify() -> None:
 
     # retry policy: transient retried
     n = {"calls": 0}
+
     def flaky() -> str:
         n["calls"] += 1
         if n["calls"] < 3:
             raise RateLimitError(503)
         return "done"
-    out = call_with_retries(flaky, RetryPolicy(max_retries=5, base_delay_s=0.0),
-                            transient_statuses={503})
+
+    out = call_with_retries(
+        flaky, RetryPolicy(max_retries=5, base_delay_s=0.0), transient_statuses={503}
+    )
     assert out == "done" and n["calls"] == 3, "transient retried"
 
     # permanent error fails fast
     n2 = {"calls": 0}
+
     def perm() -> str:
         n2["calls"] += 1
         raise RateLimitError(400)
+
     try:
-        call_with_retries(perm, RetryPolicy(max_retries=5, base_delay_s=0.0),
-                          transient_statuses={429, 503})
+        call_with_retries(
+            perm, RetryPolicy(max_retries=5, base_delay_s=0.0), transient_statuses={429, 503}
+        )
         raised = False
     except RateLimitError:
         raised = True
@@ -237,8 +255,9 @@ def _verify() -> None:
 
     assert RetryPolicy(base_delay_s=0.1).retry_delay(0) <= 0.1, "backoff bounded"
 
-    text = robust_completion(MockClient(["final"]), "s", "q",
-                             RetryPolicy(max_retries=1, base_delay_s=0.0), 5.0, {503})
+    text = robust_completion(
+        MockClient(["final"]), "s", "q", RetryPolicy(max_retries=1, base_delay_s=0.0), 5.0, {503}
+    )
     assert text == "final", "robust completion works"
     print("[OK] 02-api-clients: all checks passed")
 

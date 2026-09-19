@@ -54,7 +54,7 @@ print("\nOriginal:", arr)
 # Get permuted copy (original unchanged)
 permuted = np.random.permutation(arr)
 print("Permuted:", permuted)  # New array
-print("Original:", arr)       # Still [1 2 3 4 5 6 7 8 9 10]
+print("Original:", arr)  # Still [1 2 3 4 5 6 7 8 9 10]
 
 # Permutation of 2D - shuffles rows
 arr2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
@@ -129,7 +129,7 @@ print("Counts:", {x: np.sum(choices == x) for x in arr})
 
 # Shuffle training data
 X = np.arange(100).reshape(20, 5)  # 20 samples, 5 features
-y = np.arange(20)                   # 20 labels
+y = np.arange(20)  # 20 labels
 
 # Shuffle together
 indices = np.random.permutation(len(y))

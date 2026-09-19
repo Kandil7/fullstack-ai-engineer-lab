@@ -30,6 +30,7 @@ By the end of this lecture, you will be able to:
 ```python
 from fastapi import UploadFile, File
 
+
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
     content = await file.read()  # Read entire file
@@ -63,11 +64,13 @@ async def upload_file(file: UploadFile = File(...)):
 ```python
 from fastapi import File, UploadFile
 
+
 # Using UploadFile (recommended)
 @app.post("/upload/")
 async def upload(file: UploadFile = File(...)):
     content = await file.read()
     return {"size": len(content)}
+
 
 # Using bytes (loads entire file into memory)
 @app.post("/upload-raw/")
@@ -85,6 +88,7 @@ Validate file types using the `content_type` attribute:
 
 ```python
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
+
 
 @app.post("/upload/image/")
 async def upload_image(file: UploadFile = File(...)):
@@ -122,11 +126,13 @@ async def upload_multiple(files: list[UploadFile] = File(...)):
     results = []
     for file in files:
         content = await file.read()
-        results.append({
-            "filename": file.filename,
-            "content_type": file.content_type,
-            "size": len(content),
-        })
+        results.append(
+            {
+                "filename": file.filename,
+                "content_type": file.content_type,
+                "size": len(content),
+            }
+        )
     return {"total_files": len(results), "files": results}
 ```
 
@@ -136,6 +142,7 @@ Process large files in chunks to avoid memory issues:
 
 ```python
 import hashlib
+
 
 @app.post("/upload/large/")
 async def upload_large(file: UploadFile = File(...)):
@@ -191,6 +198,7 @@ Calculate file hash for integrity verification:
 ```python
 import hashlib
 
+
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
     content = await file.read()
@@ -216,6 +224,7 @@ app = FastAPI()
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
     content = await file.read()
@@ -234,6 +243,7 @@ async def upload_file(file: UploadFile = File(...)):
 ```python
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 MAX_SIZE = 5 * 1024 * 1024  # 5MB
+
 
 @app.post("/upload/image/")
 async def upload_image(file: UploadFile = File(...)):
@@ -265,11 +275,13 @@ async def upload_multiple(files: list[UploadFile] = File(...)):
         file_path = os.path.join(UPLOAD_DIR, file.filename)
         with open(file_path, "wb") as f:
             f.write(content)
-        results.append({
-            "filename": file.filename,
-            "content_type": file.content_type,
-            "size": len(content),
-        })
+        results.append(
+            {
+                "filename": file.filename,
+                "content_type": file.content_type,
+                "size": len(content),
+            }
+        )
     return {"total_files": len(results), "files": results}
 ```
 
@@ -277,6 +289,7 @@ async def upload_multiple(files: list[UploadFile] = File(...)):
 
 ```python
 import hashlib
+
 
 @app.post("/upload/large/")
 async def upload_large(file: UploadFile = File(...)):
@@ -294,7 +307,7 @@ async def upload_large(file: UploadFile = File(...)):
     return {
         "filename": file.filename,
         "total_size": total_size,
-        "total_size_human": f"{total_size / (1024*1024):.2f} MB",
+        "total_size_human": f"{total_size / (1024 * 1024):.2f} MB",
         "md5": md5.hexdigest(),
     }
 ```
@@ -329,6 +342,7 @@ def upload(file: UploadFile = File(...)):
     content = file.read()  # Blocking!
     return {"size": len(content)}
 
+
 # Fix: Use async
 @app.post("/upload/")
 async def upload(file: UploadFile = File(...)):
@@ -354,6 +368,7 @@ async def upload(file: UploadFile = File(...)):
     # Could be an executable!
     content = await file.read()
 
+
 # Fix: Validate content_type
 ALLOWED = {"image/jpeg", "image/png"}
 if file.content_type not in ALLOWED:
@@ -368,7 +383,8 @@ file_path = os.path.join(UPLOAD_DIR, file.filename)
 
 # Fix: Sanitize filename
 import re
-safe_name = re.sub(r'[^\w\-_\. ]', '', file.filename)
+
+safe_name = re.sub(r"[^\w\-_\. ]", "", file.filename)
 file_path = os.path.join(UPLOAD_DIR, safe_name)
 ```
 
@@ -433,16 +449,19 @@ import os
 
 app = FastAPI()
 
+
 # Single upload
 @app.post("/upload/")
 async def upload(file: UploadFile = File(...)):
     content = await file.read()
     return {"filename": file.filename, "size": len(content)}
 
+
 # Multiple upload
 @app.post("/upload/multiple/")
 async def upload_multiple(files: list[UploadFile] = File(...)):
     return {"count": len(files)}
+
 
 # With validation
 @app.post("/upload/image/")

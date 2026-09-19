@@ -18,8 +18,7 @@ from tests.unit.helpers import (
 PANDAS_FILES = discover_phase_files("03-libraries/pandas", skip=PANDAS_CASE_STUDY_SKIP)
 PANDAS_DIR = PROJECT_ROOT / "03-libraries" / "pandas"
 CASE_STUDIES = sorted(
-    f for f in PANDAS_DIR.glob("*.py")
-    if f.name in PANDAS_CASE_STUDY_SKIP and f.is_file()
+    f for f in PANDAS_DIR.glob("*.py") if f.name in PANDAS_CASE_STUDY_SKIP and f.is_file()
 )
 
 
@@ -27,9 +26,7 @@ CASE_STUDIES = sorted(
 def test_pandas_example_runs(filepath):
     """Every pandas exercise must execute without errors."""
     result = run_py_file(filepath, timeout=120)
-    assert result.returncode == 0, (
-        f"{filepath.name} failed:\n{result.stderr[-500:]}"
-    )
+    assert result.returncode == 0, f"{filepath.name} failed:\n{result.stderr[-500:]}"
 
 
 @pytest.mark.parametrize("filepath", CASE_STUDIES, ids=lambda p: p.name)

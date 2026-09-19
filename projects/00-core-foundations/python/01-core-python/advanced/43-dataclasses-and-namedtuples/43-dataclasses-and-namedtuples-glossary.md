@@ -31,12 +31,14 @@
 ```python
 from dataclasses import dataclass
 
+
 @dataclass
 class Token:
     text: str
     freq: int = 1
 
-print(Token("the"))       # Token(text='the', freq=1)
+
+print(Token("the"))  # Token(text='the', freq=1)
 ```
 **Complexity**: construction O(k), k = number of fields.
 **Related**: `field()`, `__post_init__`, `slots=True`
@@ -65,13 +67,15 @@ construction, giving each instance its own mutable default.
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class Batch:
     items: list = field(default_factory=list)
 
+
 a, b = Batch(), Batch()
 a.items.append("x")
-print(b.items)   # [] — no shared state
+print(b.items)  # [] — no shared state
 ```
 **Complexity**: O(1) per construction (list/dict factories).
 **Related**: `field()`, mutable-default trap
@@ -98,10 +102,11 @@ class Point:
     x: float
     y: float
 
+
 try:
     Point(1, 2).x = 5
 except Exception as e:
-    print(type(e).__name__)   # FrozenInstanceError
+    print(type(e).__name__)  # FrozenInstanceError
 ```
 **Related**: `FrozenInstanceError`, hashable records
 
@@ -120,6 +125,7 @@ class Hit:
     score: float
     doc: str
 
+
 print(sorted([Hit(0.3, "a"), Hit(0.9, "b")]))  # lowest score first
 ```
 **Complexity**: O(k) worst case per comparison.
@@ -132,11 +138,13 @@ fixed descriptors: smaller instances, faster access, no new attributes.
 ```python
 import sys
 
+
 @dataclass(slots=True)
 class V:
     x: float
 
-print(sys.getsizeof(V(0.0)))   # 48 — no dict attached
+
+print(sys.getsizeof(V(0.0)))  # 48 — no dict attached
 ```
 **Complexity**: O(1) attribute access, faster than dict lookup.
 **Related**: `__slots__`, memory efficiency
@@ -151,8 +159,9 @@ class Cfg:
     lr: float
     batch: int
 
-Cfg(lr=1e-3, batch=32)   # OK
-Cfg(1e-3, 32)            # TypeError
+
+Cfg(lr=1e-3, batch=32)  # OK
+Cfg(1e-3, 32)  # TypeError
 ```
 **Related**: `field(init=False)`
 
@@ -163,12 +172,14 @@ unpackable, with zero overhead beyond the tuple.
 ```python
 from typing import NamedTuple
 
+
 class Pair(NamedTuple):
     query: str
     score: float
 
+
 p = Pair("rag", 0.9)
-q, s = p              # unpacking
+q, s = p  # unpacking
 print(p.query, p[0])  # attribute and index access
 ```
 **Complexity**: O(k) to build, same as tuple.
@@ -181,9 +192,11 @@ generation, checked by mypy/Pyright.
 ```python
 from typing import TypedDict
 
+
 class Response(TypedDict):
     id: str
     ok: bool
+
 
 r: Response = {"id": "1", "ok": True}
 ```
@@ -194,6 +207,7 @@ r: Response = {"id": "1", "ok": True}
 **Example**:
 ```python
 from typing import TypedDict, NotRequired
+
 
 class Usage(TypedDict):
     tokens: int
@@ -208,10 +222,12 @@ useful for JSON serialization.
 ```python
 from dataclasses import asdict
 
+
 @dataclass
 class Node:
     name: str
     children: list
+
 
 print(asdict(Node("root", [Node("leaf", [])])))
 # {'name': 'root', 'children': [{'name': 'leaf', 'children': []}]}
@@ -229,12 +245,14 @@ immutable-friendly way to "modify" frozen records.
 ```python
 from dataclasses import replace
 
+
 @dataclass(frozen=True)
 class Cfg:
     lr: float
     seed: int = 0
 
-new_cfg = replace(Cfg(1e-3), lr=1e-4)   # Cfg(lr=0.0001, seed=0)
+
+new_cfg = replace(Cfg(1e-3), lr=1e-4)  # Cfg(lr=0.0001, seed=0)
 ```
 **Related**: `frozen=True`
 

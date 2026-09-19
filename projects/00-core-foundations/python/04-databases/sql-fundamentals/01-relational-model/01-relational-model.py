@@ -74,7 +74,9 @@ print()
 # Postgres/MySQL they are on by default; always write code that assumes they
 # are enforced.
 
-conn.execute("CREATE TABLE posts (id INTEGER PRIMARY KEY, user_id INTEGER REFERENCES users(id), title TEXT)")
+conn.execute(
+    "CREATE TABLE posts (id INTEGER PRIMARY KEY, user_id INTEGER REFERENCES users(id), title TEXT)"
+)
 conn.execute("INSERT INTO posts (user_id, title) VALUES (?, ?)", (1, "hello world"))
 conn.execute("INSERT INTO posts (user_id, title) VALUES (?, ?)", (1, "second post"))
 
@@ -95,7 +97,9 @@ print(f"alice's posts (1:N): {post_rows}")
 
 # Many-to-many needs a junction (associative) table
 conn.execute("CREATE TABLE tags (id INTEGER PRIMARY KEY, name TEXT)")
-conn.execute("CREATE TABLE post_tags (post_id INTEGER REFERENCES posts(id), tag_id INTEGER REFERENCES tags(id), PRIMARY KEY (post_id, tag_id))")
+conn.execute(
+    "CREATE TABLE post_tags (post_id INTEGER REFERENCES posts(id), tag_id INTEGER REFERENCES tags(id), PRIMARY KEY (post_id, tag_id))"
+)
 conn.execute("INSERT INTO tags (name) VALUES (?)", ("sql",))
 conn.execute("INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)", (1, 1))
 print("Junction table post_tags links posts <-> tags (N:M)")
@@ -163,6 +167,7 @@ print()
 # CORRECT:
 #   CREATE TABLE log (id INTEGER PRIMARY KEY, msg TEXT)
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -175,15 +180,18 @@ def _verify() -> None:
         conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)")
 
         # 1. NULL comparison is never true (NULL != NULL)
-        assert conn.execute("SELECT 1 WHERE NULL = NULL").fetchone() is None, \
+        assert conn.execute("SELECT 1 WHERE NULL = NULL").fetchone() is None, (
             "NULL = NULL must be UNKNOWN, not true"
+        )
 
         # 2. IS NULL is the correct test
         conn.execute("INSERT INTO t (name, age) VALUES (?, ?)", ("a", None))
-        assert conn.execute("SELECT COUNT(*) FROM t WHERE age IS NULL").fetchone()[0] == 1, \
+        assert conn.execute("SELECT COUNT(*) FROM t WHERE age IS NULL").fetchone()[0] == 1, (
             "IS NULL must match the NULL row"
-        assert conn.execute("SELECT COUNT(*) FROM t WHERE age = ?", (None,)).fetchone()[0] == 0, \
+        )
+        assert conn.execute("SELECT COUNT(*) FROM t WHERE age = ?", (None,)).fetchone()[0] == 0, (
             "= NULL must match nothing"
+        )
 
         # 3. PRIMARY KEY uniqueness is enforced by the engine
         conn.execute("INSERT INTO t (name, age) VALUES (?, ?)", ("b", 1))
@@ -225,4 +233,4 @@ if __name__ == "__main__":
         print("2. PRIMARY KEY uniqueness and FOREIGN KEY integrity are engine-enforced")
         print("3. NULL is UNKNOWN: use IS NULL / IS NOT NULL, never = NULL")
         print("4. SELECT returns a bag; DISTINCT converts it to a set")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

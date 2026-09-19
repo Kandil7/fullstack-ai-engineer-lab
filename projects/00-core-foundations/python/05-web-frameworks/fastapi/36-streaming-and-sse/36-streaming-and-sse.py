@@ -33,8 +33,8 @@ async def token_stream(text: str, chunk: int = 2):
     """Yield chunks as they become available — the shape of LLM token
     streaming. The client renders the first chunk in ms, not seconds."""
     for i in range(0, len(text), chunk):
-        yield text[i:i + chunk]
-        await asyncio.sleep(0.01)     # simulate generation latency
+        yield text[i : i + chunk]
+        await asyncio.sleep(0.01)  # simulate generation latency
 
 
 @app.get("/stream/text")
@@ -72,8 +72,7 @@ async def stream_events() -> StreamingResponse:
 async def llm_stream(request: Request):
     """A streamed completion. On disconnect, generation must stop —
     otherwise you burn tokens/money serving a client that left."""
-    tokens = ["The", " quick", " brown", " fox", " jumps", " over", " the",
-              " lazy", " dog."]
+    tokens = ["The", " quick", " brown", " fox", " jumps", " over", " the", " lazy", " dog."]
     for tok in tokens:
         if await request.is_disconnected():
             print("  [client disconnected — stopping generation]")
@@ -95,7 +94,7 @@ async def backpressured_stream():
     is slow; unbounded buffering of a fast producer is the failure mode."""
     for i in range(10):
         yield f"chunk {i}\n"
-        await asyncio.sleep(0.005)   # natural pacing = backpressure
+        await asyncio.sleep(0.005)  # natural pacing = backpressure
 
 
 @app.get("/stream/backpressure")
@@ -150,6 +149,7 @@ def _verify() -> None:
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run("36-streaming-and-sse:app", host="127.0.0.1", port=8000)
     else:
         _verify()

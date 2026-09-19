@@ -199,19 +199,14 @@ s = pd.Series([72, 68, 75], index=["Mon", "Tue", "Wed"])
 import pandas as pd
 
 # From dictionary of lists
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Age": [28, 35]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob"], "Age": [28, 35]})
 
 # From list of dictionaries
-df = pd.DataFrame([
-    {"Name": "Alice", "Age": 28},
-    {"Name": "Bob", "Age": 35}
-])
+df = pd.DataFrame([{"Name": "Alice", "Age": 28}, {"Name": "Bob", "Age": 35}])
 
 # From NumPy array
 import numpy as np
+
 df = pd.DataFrame(np.array([[1, 2], [3, 4]]), columns=["A", "B"])
 ```
 
@@ -222,11 +217,11 @@ import pandas as pd
 
 df = pd.read_csv("data.csv")
 
-print(df.head())        # First 5 rows
-print(df.info())        # Column info
-print(df.describe())    # Statistics
-print(df.shape)         # Dimensions
-print(df.dtypes)        # Data types
+print(df.head())  # First 5 rows
+print(df.info())  # Column info
+print(df.describe())  # Statistics
+print(df.shape)  # Dimensions
+print(df.dtypes)  # Data types
 ```
 
 ---

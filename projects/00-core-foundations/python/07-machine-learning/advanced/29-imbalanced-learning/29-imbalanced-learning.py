@@ -23,15 +23,25 @@ from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
-    recall_score, precision_score, f1_score, roc_auc_score,
-    average_precision_score, confusion_matrix,
+    recall_score,
+    precision_score,
+    f1_score,
+    roc_auc_score,
+    average_precision_score,
+    confusion_matrix,
 )
 
 rng = np.random.RandomState(0)
 
 # 2% positive class — classic fraud setup
-X, y = make_classification(n_samples=10000, n_features=20, n_informative=8,
-                           n_redundant=4, weights=[0.98, 0.02], random_state=0)
+X, y = make_classification(
+    n_samples=10000,
+    n_features=20,
+    n_informative=8,
+    n_redundant=4,
+    weights=[0.98, 0.02],
+    random_state=0,
+)
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, stratify=y, random_state=0)
 
 # ============================================================
@@ -54,6 +64,7 @@ print("\nExample 2: class_weight='balanced'")
 print(f"  recall   : {recall_score(yte, pred_w):.3f}")
 print(f"  precision: {precision_score(yte, pred_w):.3f}")
 print(f"  F1       : {f1_score(yte, pred_w):.3f}")
+
 
 # ============================================================
 # 3. Manual SMOTE-lite — synthesize minority samples
@@ -90,10 +101,12 @@ print(f"  precision: {precision_score(yte, smoted.predict(Xte)):.3f}")
 proba = weighted.predict_proba(Xte)[:, 1]
 for th in [0.5, 0.2, 0.1, 0.05]:
     pred_th = (proba >= th).astype(int)
-    print(f"\n  threshold {th:.2f}: "
-          f"recall {recall_score(yte, pred_th):.3f}, "
-          f"precision {precision_score(yte, pred_th):.3f}, "
-          f"F1 {f1_score(yte, pred_th):.3f}")
+    print(
+        f"\n  threshold {th:.2f}: "
+        f"recall {recall_score(yte, pred_th):.3f}, "
+        f"precision {precision_score(yte, pred_th):.3f}, "
+        f"F1 {f1_score(yte, pred_th):.3f}"
+    )
 
 # ============================================================
 # 5. Evaluation under imbalance — the honest numbers

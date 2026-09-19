@@ -33,8 +33,10 @@ from datetime import datetime
 # SECTION 1: ReAct Core Concepts
 # ============================================================
 
+
 class ActionType(Enum):
     """Types of actions an agent can take."""
+
     TOOL_CALL = "tool_call"
     THINK = "think"
     ANSWER = "answer"
@@ -46,6 +48,7 @@ class ActionType(Enum):
 @dataclass
 class Thought:
     """Represents the agent's internal reasoning."""
+
     content: str
     reasoning: str = ""
     confidence: float = 0.5
@@ -62,6 +65,7 @@ class Thought:
 @dataclass
 class Action:
     """Represents an action the agent takes."""
+
     action_type: ActionType
     tool_name: str = ""
     arguments: dict = field(default_factory=dict)
@@ -80,6 +84,7 @@ class Action:
 @dataclass
 class Observation:
     """Represents the result of an action."""
+
     content: str
     success: bool = True
     metadata: dict = field(default_factory=dict)
@@ -96,6 +101,7 @@ class Observation:
 @dataclass
 class ReActStep:
     """A single step in the ReAct loop."""
+
     step_number: int
     thought: Thought
     action: Action
@@ -115,6 +121,7 @@ class ReActStep:
 # ============================================================
 # SECTION 2: Action Space Definition
 # ============================================================
+
 
 class ActionSpace:
     """
@@ -158,19 +165,23 @@ class ActionSpace:
         for name, info in self._actions.items():
             if category and info["category"] != category:
                 continue
-            actions.append({
-                "name": name,
-                "description": info["description"],
-                "category": info["category"],
-                "parameters": info["parameters"],
-            })
+            actions.append(
+                {
+                    "name": name,
+                    "description": info["description"],
+                    "category": info["category"],
+                    "parameters": info["parameters"],
+                }
+            )
         return actions
 
     def to_prompt(self) -> str:
         """Generate a prompt describing available actions."""
         lines = ["Available actions:"]
         for name, info in self._actions.items():
-            params = ", ".join(info["parameters"].keys()) if info["parameters"] else "none"
+            params = (
+                ", ".join(info["parameters"].keys()) if info["parameters"] else "none"
+            )
             lines.append(f"  - {name}: {info['description']} (params: {params})")
         return "\n".join(lines)
 
@@ -190,11 +201,16 @@ class ActionSpace:
 # SECTION 3: Built-in Actions/Tools
 # ============================================================
 
+
 def calculator_action(expression: str = "0") -> Any:
     """Calculate a mathematical expression."""
     allowed = {
-        "sqrt": math.sqrt, "abs": abs, "round": round,
-        "sin": math.sin, "cos": math.cos, "pi": math.pi,
+        "sqrt": math.sqrt,
+        "abs": abs,
+        "round": round,
+        "sin": math.sin,
+        "cos": math.cos,
+        "pi": math.pi,
     }
     return eval(expression, {"__builtins__": {}}, allowed)
 
@@ -231,7 +247,11 @@ def code_analysis_action(code: str = "") -> dict:
     lines = code.split("\n")
     functions = [l.strip() for l in lines if l.strip().startswith("def ")]
     classes = [l.strip() for l in lines if l.strip().startswith("class ")]
-    imports = [l.strip() for l in lines if l.strip().startswith("import ") or l.strip().startswith("from ")]
+    imports = [
+        l.strip()
+        for l in lines
+        if l.strip().startswith("import ") or l.strip().startswith("from ")
+    ]
     return {
         "line_count": len(lines),
         "function_count": len(functions),
@@ -245,32 +265,48 @@ def code_analysis_action(code: str = "") -> dict:
 def create_standard_action_space() -> ActionSpace:
     """Create an action space with common tools."""
     space = ActionSpace()
-    space.register("calculator", calculator_action,
-                    "Evaluate mathematical expressions",
-                    {"expression": "Math expression to evaluate"},
-                    "computation")
-    space.register("search", search_action,
-                    "Search for information on a topic",
-                    {"query": "Search query"},
-                    "information")
-    space.register("analyze_text", text_analysis_action,
-                    "Analyze text for statistics",
-                    {"text": "Text to analyze"},
-                    "text")
-    space.register("summarize", summary_action,
-                    "Create a summary of text",
-                    {"text": "Text to summarize", "max_length": "Max summary length"},
-                    "text")
-    space.register("analyze_code", code_analysis_action,
-                    "Analyze code structure",
-                    {"code": "Code to analyze"},
-                    "code")
+    space.register(
+        "calculator",
+        calculator_action,
+        "Evaluate mathematical expressions",
+        {"expression": "Math expression to evaluate"},
+        "computation",
+    )
+    space.register(
+        "search",
+        search_action,
+        "Search for information on a topic",
+        {"query": "Search query"},
+        "information",
+    )
+    space.register(
+        "analyze_text",
+        text_analysis_action,
+        "Analyze text for statistics",
+        {"text": "Text to analyze"},
+        "text",
+    )
+    space.register(
+        "summarize",
+        summary_action,
+        "Create a summary of text",
+        {"text": "Text to summarize", "max_length": "Max summary length"},
+        "text",
+    )
+    space.register(
+        "analyze_code",
+        code_analysis_action,
+        "Analyze code structure",
+        {"code": "Code to analyze"},
+        "code",
+    )
     return space
 
 
 # ============================================================
 # SECTION 4: ReAct Agent Implementation
 # ============================================================
+
 
 class ReActAgent:
     """
@@ -323,7 +359,9 @@ class ReActAgent:
         input_lower = user_input.lower()
 
         # Determine if we have enough info
-        if len(history) >= 2 and not any("error" in obs.lower() for obs in previous_observations):
+        if len(history) >= 2 and not any(
+            "error" in obs.lower() for obs in previous_observations
+        ):
             return Thought(
                 content="I have gathered enough information to provide a final answer.",
                 reasoning=f"Used {len(history)} steps, tools: {tools_used}",
@@ -331,7 +369,11 @@ class ReActAgent:
             )
 
         # Decide what to do next
-        if "calculate" in input_lower or "math" in input_lower or any(c.isdigit() for c in user_input):
+        if (
+            "calculate" in input_lower
+            or "math" in input_lower
+            or any(c.isdigit() for c in user_input)
+        ):
             if "calculator" not in tools_used:
                 return Thought(
                     content="I should calculate the mathematical expression.",
@@ -347,7 +389,11 @@ class ReActAgent:
                     confidence=0.8,
                 )
 
-        if "analyze" in input_lower or "count" in input_lower or "statistics" in input_lower:
+        if (
+            "analyze" in input_lower
+            or "count" in input_lower
+            or "statistics" in input_lower
+        ):
             if "analyze_text" not in tools_used:
                 return Thought(
                     content="I should analyze the text for statistics.",
@@ -394,7 +440,7 @@ class ReActAgent:
         # Map thought to action
         if "calculate" in thought.content.lower():
             # Extract numbers from input
-            numbers = re.findall(r'\d+\.?\d*', user_input)
+            numbers = re.findall(r"\d+\.?\d*", user_input)
             if len(numbers) >= 2:
                 expression = f"{numbers[0]} + {numbers[1]}"
             elif numbers:
@@ -416,7 +462,10 @@ class ReActAgent:
                 description="Searching for information",
             )
 
-        if "analyze" in thought.content.lower() and "code" not in thought.content.lower():
+        if (
+            "analyze" in thought.content.lower()
+            and "code" not in thought.content.lower()
+        ):
             return Action(
                 action_type=ActionType.TOOL_CALL,
                 tool_name="analyze_text",
@@ -465,7 +514,11 @@ class ReActAgent:
         for obs in self.observations_history:
             if obs.success:
                 try:
-                    data = json.loads(obs.content) if isinstance(obs.content, str) else obs.content
+                    data = (
+                        json.loads(obs.content)
+                        if isinstance(obs.content, str)
+                        else obs.content
+                    )
                     if isinstance(data, dict):
                         if "result" in data:
                             answers.append(f"Result: {data['result']}")
@@ -524,9 +577,9 @@ class ReActAgent:
         self._iteration = 0
 
         if verbose:
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print(f"ReAct Agent: {user_input[:80]}")
-            print(f"{'='*60}")
+            print(f"{'=' * 60}")
 
         for step_num in range(1, self.max_steps + 1):
             self._iteration = step_num
@@ -546,7 +599,9 @@ class ReActAgent:
                 print(f"  ACTION: {action.action_type.value}")
                 if action.tool_name:
                     print(f"    Tool: {action.tool_name}")
-                    print(f"    Args: {json.dumps(action.arguments, default=str)[:100]}")
+                    print(
+                        f"    Args: {json.dumps(action.arguments, default=str)[:100]}"
+                    )
 
             # OBSERVATION
             observation = self._execute_action(action)
@@ -594,20 +649,25 @@ class ReActAgent:
         tools_used = {}
         for step in self.steps:
             if step.action.tool_name:
-                tools_used[step.action.tool_name] = tools_used.get(step.action.tool_name, 0) + 1
+                tools_used[step.action.tool_name] = (
+                    tools_used.get(step.action.tool_name, 0) + 1
+                )
 
         return {
             "steps": len(self.steps),
             "total_time_ms": round(total_time, 2),
             "avg_step_time_ms": round(total_time / len(self.steps), 2),
             "tools_used": tools_used,
-            "final_answer": self.steps[-1].observation.content[:100] if self.steps else None,
+            "final_answer": self.steps[-1].observation.content[:100]
+            if self.steps
+            else None,
         }
 
 
 # ============================================================
 # SECTION 5: Advanced ReAct — With Error Recovery
 # ============================================================
+
 
 class ResilientReActAgent(ReActAgent):
     """
@@ -620,7 +680,9 @@ class ResilientReActAgent(ReActAgent):
         self.failed_actions: list[str] = []
         self.backtrack_count: int = 0
 
-    def _think_with_recovery(self, user_input: str, history: list[ReActStep]) -> Thought:
+    def _think_with_recovery(
+        self, user_input: str, history: list[ReActStep]
+    ) -> Thought:
         """Enhanced thinking that considers failures."""
         # Check if we have failures to recover from
         if self.failed_actions:
@@ -637,7 +699,13 @@ class ResilientReActAgent(ReActAgent):
         """Enhanced action decision that avoids failed tools."""
         if self.failed_actions:
             # Try a different tool
-            available_tools = ["calculator", "search", "analyze_text", "summarize", "analyze_code"]
+            available_tools = [
+                "calculator",
+                "search",
+                "analyze_text",
+                "summarize",
+                "analyze_code",
+            ]
             failed_tools = set(self.failed_actions)
             alternative_tools = [t for t in available_tools if t not in failed_tools]
 
@@ -646,7 +714,11 @@ class ResilientReActAgent(ReActAgent):
                 return Action(
                     action_type=ActionType.TOOL_CALL,
                     tool_name=tool,
-                    arguments={"text": user_input, "query": user_input, "expression": "1+1"}.get(tool, {"text": user_input}),
+                    arguments={
+                        "text": user_input,
+                        "query": user_input,
+                        "expression": "1+1",
+                    }.get(tool, {"text": user_input}),
                     description=f"Trying alternative tool: {tool}",
                 )
 
@@ -658,9 +730,9 @@ class ResilientReActAgent(ReActAgent):
         self.backtrack_count = 0
 
         if verbose:
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print(f"Resilient ReAct Agent: {user_input[:80]}")
-            print(f"{'='*60}")
+            print(f"{'=' * 60}")
 
         for step_num in range(1, self.max_steps + 1):
             step_start = time.time()
@@ -674,7 +746,9 @@ class ResilientReActAgent(ReActAgent):
             # ACTION (with recovery awareness)
             action = self._decide_action_with_recovery(thought, user_input)
             if verbose:
-                print(f"    ACTION: {action.action_type.value} ({action.tool_name or 'direct'})")
+                print(
+                    f"    ACTION: {action.action_type.value} ({action.tool_name or 'direct'})"
+                )
 
             # OBSERVE
             observation = self._execute_action(action)
@@ -684,17 +758,24 @@ class ResilientReActAgent(ReActAgent):
                 self.backtrack_count += 1
                 if verbose:
                     print(f"    OBSERVE: FAILED - {observation.content}")
-                    print(f"    [RECOVERY] Backtracking (attempt {self.backtrack_count})")
+                    print(
+                        f"    [RECOVERY] Backtracking (attempt {self.backtrack_count})"
+                    )
             else:
                 self.observations_history.append(observation)
                 if verbose:
                     print(f"    OBSERVE: {observation.content[:120]}...")
 
             duration = (time.time() - step_start) * 1000
-            self.steps.append(ReActStep(
-                step_number=step_num, thought=thought, action=action,
-                observation=observation, duration_ms=duration,
-            ))
+            self.steps.append(
+                ReActStep(
+                    step_number=step_num,
+                    thought=thought,
+                    action=action,
+                    observation=observation,
+                    duration_ms=duration,
+                )
+            )
 
             if action.action_type == ActionType.ANSWER:
                 return observation.content
@@ -705,6 +786,7 @@ class ResilientReActAgent(ReActAgent):
 # ============================================================
 # SECTION 6: ReAct Pattern Variants
 # ============================================================
+
 
 class PlanAndExecuteAgent:
     """
@@ -721,21 +803,84 @@ class PlanAndExecuteAgent:
         plan = []
 
         if "calculate" in goal_lower or "compute" in goal_lower:
-            plan.append({"step": 1, "action": "calculator", "args": {"expression": "1+1"}, "purpose": "Perform calculation"})
-            plan.append({"step": 2, "action": "summarize", "args": {"text": "Calculation result"}, "purpose": "Format result"})
+            plan.append(
+                {
+                    "step": 1,
+                    "action": "calculator",
+                    "args": {"expression": "1+1"},
+                    "purpose": "Perform calculation",
+                }
+            )
+            plan.append(
+                {
+                    "step": 2,
+                    "action": "summarize",
+                    "args": {"text": "Calculation result"},
+                    "purpose": "Format result",
+                }
+            )
 
         elif "analyze" in goal_lower:
-            plan.append({"step": 1, "action": "analyze_text", "args": {"text": goal}, "purpose": "Analyze content"})
-            plan.append({"step": 2, "action": "summarize", "args": {"text": "Analysis results"}, "purpose": "Summarize findings"})
+            plan.append(
+                {
+                    "step": 1,
+                    "action": "analyze_text",
+                    "args": {"text": goal},
+                    "purpose": "Analyze content",
+                }
+            )
+            plan.append(
+                {
+                    "step": 2,
+                    "action": "summarize",
+                    "args": {"text": "Analysis results"},
+                    "purpose": "Summarize findings",
+                }
+            )
 
         elif "search" in goal_lower or "find" in goal_lower:
-            plan.append({"step": 1, "action": "search", "args": {"query": goal}, "purpose": "Search for information"})
-            plan.append({"step": 2, "action": "summarize", "args": {"text": "Search results"}, "purpose": "Summarize findings"})
+            plan.append(
+                {
+                    "step": 1,
+                    "action": "search",
+                    "args": {"query": goal},
+                    "purpose": "Search for information",
+                }
+            )
+            plan.append(
+                {
+                    "step": 2,
+                    "action": "summarize",
+                    "args": {"text": "Search results"},
+                    "purpose": "Summarize findings",
+                }
+            )
 
         else:
-            plan.append({"step": 1, "action": "search", "args": {"query": goal}, "purpose": "Initial research"})
-            plan.append({"step": 2, "action": "analyze_text", "args": {"text": "Research findings"}, "purpose": "Analyze results"})
-            plan.append({"step": 3, "action": "summarize", "args": {"text": "Analysis"}, "purpose": "Create final summary"})
+            plan.append(
+                {
+                    "step": 1,
+                    "action": "search",
+                    "args": {"query": goal},
+                    "purpose": "Initial research",
+                }
+            )
+            plan.append(
+                {
+                    "step": 2,
+                    "action": "analyze_text",
+                    "args": {"text": "Research findings"},
+                    "purpose": "Analyze results",
+                }
+            )
+            plan.append(
+                {
+                    "step": 3,
+                    "action": "summarize",
+                    "args": {"text": "Analysis"},
+                    "purpose": "Create final summary",
+                }
+            )
 
         return plan
 
@@ -762,9 +907,9 @@ class PlanAndExecuteAgent:
     def run(self, goal: str, verbose: bool = True) -> str:
         """Plan and execute a goal."""
         if verbose:
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print(f"Plan & Execute Agent: {goal}")
-            print(f"{'='*60}")
+            print(f"{'=' * 60}")
 
         plan = self.plan(goal)
         if verbose:
@@ -781,25 +926,31 @@ class MultiToolReActAgent(ReActAgent):
     Demonstrates parallel tool execution within the ReAct loop.
     """
 
-    def _decide_parallel_actions(self, thought: Thought, user_input: str) -> list[Action]:
+    def _decide_parallel_actions(
+        self, thought: Thought, user_input: str
+    ) -> list[Action]:
         """Decide on multiple actions to execute in parallel."""
         actions = []
         input_lower = user_input.lower()
 
         # If the input has multiple aspects, use multiple tools
         if "analyze" in input_lower and "search" in input_lower:
-            actions.append(Action(
-                action_type=ActionType.TOOL_CALL,
-                tool_name="analyze_text",
-                arguments={"text": user_input},
-                description="Analyzing text",
-            ))
-            actions.append(Action(
-                action_type=ActionType.TOOL_CALL,
-                tool_name="search",
-                arguments={"query": user_input},
-                description="Searching for info",
-            ))
+            actions.append(
+                Action(
+                    action_type=ActionType.TOOL_CALL,
+                    tool_name="analyze_text",
+                    arguments={"text": user_input},
+                    description="Analyzing text",
+                )
+            )
+            actions.append(
+                Action(
+                    action_type=ActionType.TOOL_CALL,
+                    tool_name="search",
+                    arguments={"query": user_input},
+                    description="Searching for info",
+                )
+            )
         else:
             # Default to single action
             actions.append(self._decide_action(thought, user_input))
@@ -809,9 +960,9 @@ class MultiToolReActAgent(ReActAgent):
     def run_parallel(self, user_input: str, verbose: bool = True) -> str:
         """Execute ReAct loop with parallel tool calls."""
         if verbose:
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print(f"Multi-Tool ReAct Agent: {user_input[:80]}")
-            print(f"{'='*60}")
+            print(f"{'=' * 60}")
 
         for step_num in range(1, self.max_steps + 1):
             thought = self._think(user_input, self.steps)
@@ -829,10 +980,14 @@ class MultiToolReActAgent(ReActAgent):
                 if verbose:
                     print(f"      → {action.tool_name}: {observation.content[:80]}...")
 
-                self.steps.append(ReActStep(
-                    step_number=step_num, thought=thought, action=action,
-                    observation=observation,
-                ))
+                self.steps.append(
+                    ReActStep(
+                        step_number=step_num,
+                        thought=thought,
+                        action=action,
+                        observation=observation,
+                    )
+                )
 
             # Check if we should stop
             if any(a.action_type == ActionType.ANSWER for a in actions):
@@ -844,6 +999,7 @@ class MultiToolReActAgent(ReActAgent):
 # ============================================================
 # SECTION 7: Running the Exercises
 # ============================================================
+
 
 def exercise_1_react_basics():
     """Exercise 4.1: Basic ReAct loop."""
@@ -870,7 +1026,9 @@ def exercise_2_react_tracing():
     for step in agent.get_trace():
         print(f"\n  Step {step['step']}:")
         print(f"    Thought: {step['thought']['content']}")
-        print(f"    Action: {step['action']['action_type']} ({step['action']['tool_name']})")
+        print(
+            f"    Action: {step['action']['action_type']} ({step['action']['tool_name']})"
+        )
         print(f"    Observation: {step['observation']['content'][:80]}...")
 
     stats = agent.get_stats()
@@ -911,15 +1069,24 @@ def exercise_3_action_space():
             "sum": round(sum(nums), 2),
         }
 
-    data_space.register("parse_csv", csv_parser, "Parse CSV data", {"data": "CSV string"})
-    data_space.register("calc_stats", stats_calculator, "Calculate statistics", {"values": "Comma-separated numbers"})
+    data_space.register(
+        "parse_csv", csv_parser, "Parse CSV data", {"data": "CSV string"}
+    )
+    data_space.register(
+        "calc_stats",
+        stats_calculator,
+        "Calculate statistics",
+        {"values": "Comma-separated numbers"},
+    )
 
     print("  Custom Action Space:")
     for action in data_space.list_actions():
         print(f"    {action['name']}: {action['description']}")
 
     # Test
-    result = data_space.execute("parse_csv", data="name,age,score\nAlice,30,95\nBob,25,87")
+    result = data_space.execute(
+        "parse_csv", data="name,age,score\nAlice,30,95\nBob,25,87"
+    )
     print(f"\n  CSV Parse: {result}")
 
     result = data_space.execute("calc_stats", values="10, 20, 30, 40, 50")
@@ -933,7 +1100,9 @@ def exercise_4_resilient_agent():
     print("=" * 60)
 
     agent = ResilientReActAgent(max_steps=5)
-    agent.run_with_recovery("Analyze this text: The quick brown fox jumps over the lazy dog", verbose=True)
+    agent.run_with_recovery(
+        "Analyze this text: The quick brown fox jumps over the lazy dog", verbose=True
+    )
 
     print(f"\n  Failed actions: {agent.failed_actions}")
     print(f"  Backtracks: {agent.backtrack_count}")
@@ -946,7 +1115,9 @@ def exercise_5_plan_execute():
     print("=" * 60)
 
     agent = PlanAndExecuteAgent()
-    result = agent.run("Analyze and summarize this data: 10, 20, 30, 40, 50", verbose=True)
+    result = agent.run(
+        "Analyze and summarize this data: 10, 20, 30, 40, 50", verbose=True
+    )
     print(f"\n  Final Result: {result[:200]}")
 
 
@@ -1008,7 +1179,9 @@ def exercise_8_react_visualization():
 
         # Action
         if step.action.tool_name:
-            print(f"  │ ⚡ ACTION: {step.action.tool_name}({json.dumps(step.action.arguments, default=str)[:40]})")
+            print(
+                f"  │ ⚡ ACTION: {step.action.tool_name}({json.dumps(step.action.arguments, default=str)[:40]})"
+            )
         else:
             print(f"  │ ⚡ ACTION: {step.action.action_type.value}")
 

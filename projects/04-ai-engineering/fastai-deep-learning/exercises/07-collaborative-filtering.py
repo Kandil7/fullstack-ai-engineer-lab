@@ -28,9 +28,24 @@ Y_RANGE: tuple[float, float] = (0.0, 5.5)
 
 # (user_idx, movie_idx, rating) triples — most of the 6x8 grid is unobserved.
 RATINGS: list[tuple[int, int, float]] = [
-    (0, 0, 5.0), (0, 1, 4.0), (0, 4, 1.0), (1, 1, 5.0), (1, 2, 4.0), (1, 5, 2.0),
-    (2, 0, 4.0), (2, 3, 5.0), (2, 6, 1.0), (3, 2, 5.0), (3, 4, 4.0), (3, 7, 2.0),
-    (4, 3, 4.0), (4, 5, 5.0), (4, 6, 3.0), (5, 0, 2.0), (5, 4, 5.0), (5, 7, 4.0),
+    (0, 0, 5.0),
+    (0, 1, 4.0),
+    (0, 4, 1.0),
+    (1, 1, 5.0),
+    (1, 2, 4.0),
+    (1, 5, 2.0),
+    (2, 0, 4.0),
+    (2, 3, 5.0),
+    (2, 6, 1.0),
+    (3, 2, 5.0),
+    (3, 4, 4.0),
+    (3, 7, 2.0),
+    (4, 3, 4.0),
+    (4, 5, 5.0),
+    (4, 6, 3.0),
+    (5, 0, 2.0),
+    (5, 4, 5.0),
+    (5, 7, 4.0),
 ]
 
 
@@ -45,17 +60,16 @@ def make_tensors() -> tuple[torch.Tensor, torch.Tensor]:
 # 2. Embedding = One-Hot Matrix Multiply (the key insight)
 # ---------------------------------------------------------------------------
 
+
 def show_embedding_is_matmul() -> None:
     """Demonstrate that indexing an embedding == multiplying by a one-hot row."""
-    weight = torch.tensor(
-        [[0.1, 0.4], [0.9, 0.1], [-0.3, 0.6]], dtype=torch.float32
-    )
+    weight = torch.tensor([[0.1, 0.4], [0.9, 0.1], [-0.3, 0.6]], dtype=torch.float32)
     idx = 1
     one_hot = torch.zeros(3)
     one_hot[idx] = 1.0
 
-    via_index = weight[idx]          # embedding lookup
-    via_matmul = one_hot @ weight    # equivalent matrix multiply
+    via_index = weight[idx]  # embedding lookup
+    via_matmul = one_hot @ weight  # equivalent matrix multiply
     print(f"lookup:  {via_index.tolist()}")
     print(f"one-hot: {via_matmul.tolist()}")
     print(f"equal:   {torch.allclose(via_index, via_matmul)}")
@@ -67,6 +81,7 @@ def show_embedding_is_matmul() -> None:
 # ---------------------------------------------------------------------------
 # 3. DotProductBias Model From Scratch
 # ---------------------------------------------------------------------------
+
 
 class DotProductBias(nn.Module):
     """Matrix factorization with latent factors + per-entity bias + y_range."""
@@ -102,6 +117,7 @@ class DotProductBias(nn.Module):
 # 4. A Minimal Training Loop With Weight Decay
 # ---------------------------------------------------------------------------
 
+
 def train(
     model: nn.Module,
     x: torch.Tensor,
@@ -131,6 +147,7 @@ def train(
 # 5. Interpreting the Learned Embeddings
 # ---------------------------------------------------------------------------
 
+
 def interpret(model: DotProductBias) -> None:
     """Rank movies by bias and find similar movies via factor distance."""
     movie_bias = model.movie_bias.weight.detach().squeeze()
@@ -150,6 +167,7 @@ def interpret(model: DotProductBias) -> None:
 # ---------------------------------------------------------------------------
 # 6. Optional: The Real fast.ai Path (needs `fastai` + a download)
 # ---------------------------------------------------------------------------
+
 
 def fastai_reference() -> None:
     """Print the equivalent fast.ai high-level recipe (not executed here)."""
@@ -172,6 +190,7 @@ def fastai_reference() -> None:
 # ---------------------------------------------------------------------------
 # 7. Main Entry Point
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     torch.manual_seed(42)

@@ -28,8 +28,14 @@ from sklearn.metrics import brier_score_loss, log_loss
 rng = np.random.RandomState(0)
 
 # SVC is chosen because its raw decision_function is NOT a probability.
-X, y = make_classification(n_samples=3000, n_features=10, n_informative=6,
-                           n_redundant=2, weights=[0.7, 0.3], random_state=0)
+X, y = make_classification(
+    n_samples=3000,
+    n_features=10,
+    n_informative=6,
+    n_redundant=2,
+    weights=[0.7, 0.3],
+    random_state=0,
+)
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.4, random_state=0)
 
 # ============================================================
@@ -82,8 +88,12 @@ decisions_iso = iso_proba < 0.2
 actual_rate_raw = yte[decisions_raw].mean() if decisions_raw.sum() else np.nan
 actual_rate_iso = yte[decisions_iso].mean() if decisions_iso.sum() else np.nan
 print("\nExample 5: downstream cost decision")
-print(f"  auto-approve share: raw {decisions_raw.mean():.2f}  calibrated {decisions_iso.mean():.2f}")
-print(f"  actual return rate among approved: raw {actual_rate_raw:.2f}  calib {actual_rate_iso:.2f}")
+print(
+    f"  auto-approve share: raw {decisions_raw.mean():.2f}  calibrated {decisions_iso.mean():.2f}"
+)
+print(
+    f"  actual return rate among approved: raw {actual_rate_raw:.2f}  calib {actual_rate_iso:.2f}"
+)
 
 # ============================================================
 # Summary

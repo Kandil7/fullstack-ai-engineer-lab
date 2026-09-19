@@ -15,8 +15,10 @@ Valid values: -1, 0, 1
 # 1. AVL TREE IMPLEMENTATION
 # =============================================================================
 
+
 class AVLNode:
     """Node in an AVL tree"""
+
     def __init__(self, key):
         self.key = key
         self.left = None
@@ -44,8 +46,7 @@ class AVLTree:
 
     def update_height(self, node):
         """Update height after modification"""
-        node.height = 1 + max(self.get_height(node.left),
-                              self.get_height(node.right))
+        node.height = 1 + max(self.get_height(node.left), self.get_height(node.right))
 
     # ---- ROTATIONS ----
 
@@ -262,8 +263,7 @@ class AVLTree:
             node = self.root
         if node:
             balance = self.get_balance(node)
-            print(" " * (level * 4) + prefix + str(node.key) +
-                  f" (h={node.height}, b={balance})")
+            print(" " * (level * 4) + prefix + str(node.key) + f" (h={node.height}, b={balance})")
             if node.left or node.right:
                 if node.left:
                     self.display(node.left, level + 1, "L--- ")
@@ -336,6 +336,7 @@ rl.display()
 # 3. AVL TREE HEIGHT PROOF
 # =============================================================================
 
+
 def demonstrate_height_bound():
     """Show AVL tree height is O(log n)"""
     print("\n=== Height Bound Demonstration ===")
@@ -352,12 +353,16 @@ def demonstrate_height_bound():
             avl.insert(key)
 
         import math
+
         theoretical_max = 1.44 * math.log2(n + 2) - 0.328
         actual_height = avl.height()
 
-        print(f"n={n:>5}: actual_height={actual_height:>3}, "
-              f"theoretical_max={theoretical_max:.1f}, "
-              f"log2(n)={math.log2(n):.1f}")
+        print(
+            f"n={n:>5}: actual_height={actual_height:>3}, "
+            f"theoretical_max={theoretical_max:.1f}, "
+            f"log2(n)={math.log2(n):.1f}"
+        )
+
 
 demonstrate_height_bound()
 
@@ -365,6 +370,7 @@ demonstrate_height_bound()
 # =============================================================================
 # 4. RANGE QUERY
 # =============================================================================
+
 
 def range_query_avl(root, low, high):
     """Find all keys in range [low, high]. O(log n + k)"""
@@ -383,6 +389,7 @@ def range_query_avl(root, low, high):
     traverse(root)
     return result
 
+
 print("\n=== Range Query ===")
 avl2 = AVLTree()
 for k in range(1, 21):
@@ -394,6 +401,7 @@ print(f"Range [5, 15]: {range_query_avl(avl2.root, 5, 15)}")
 # =============================================================================
 # 5. KTH SMALLEST ELEMENT
 # =============================================================================
+
 
 def kth_smallest_avl(root, k):
     """Find kth smallest using inorder. O(k)"""
@@ -413,6 +421,7 @@ def kth_smallest_avl(root, k):
     inorder(root)
     return result[0]
 
+
 print("\n=== Kth Smallest ===")
 print(f"5th smallest: {kth_smallest_avl(avl2.root, 5)}")
 print(f"10th smallest: {kth_smallest_avl(avl2.root, 10)}")
@@ -421,6 +430,7 @@ print(f"10th smallest: {kth_smallest_avl(avl2.root, 10)}")
 # =============================================================================
 # 6. CLOSEST VALUE
 # =============================================================================
+
 
 def closest_value_avl(root, target):
     """Find closest value to target. O(log n)"""
@@ -442,6 +452,7 @@ def closest_value_avl(root, target):
 
     return closest
 
+
 print("\n=== Closest Value ===")
 print(f"Closest to 23: {closest_value_avl(avl2.root, 23)}")
 print(f"Closest to 100: {closest_value_avl(avl2.root, 100)}")
@@ -450,6 +461,7 @@ print(f"Closest to 100: {closest_value_avl(avl2.root, 100)}")
 # =============================================================================
 # 7. CEILING AND FLOOR
 # =============================================================================
+
 
 def ceiling_avl(root, key):
     """Find smallest element >= key. O(log n)"""
@@ -467,6 +479,7 @@ def ceiling_avl(root, key):
 
     return ceiling
 
+
 def floor_avl(root, key):
     """Find largest element <= key. O(log n)"""
     floor_val = None
@@ -483,6 +496,7 @@ def floor_avl(root, key):
 
     return floor_val
 
+
 print("\n=== Ceiling and Floor ===")
 print(f"Ceiling of 17: {ceiling_avl(avl2.root, 17)}")
 print(f"Floor of 17: {floor_avl(avl2.root, 17)}")
@@ -491,6 +505,7 @@ print(f"Floor of 17: {floor_avl(avl2.root, 17)}")
 # =============================================================================
 # 8. MERGE TWO AVL TREES
 # =============================================================================
+
 
 def merge_avl_trees(t1, t2):
     """Merge two AVL trees. O(n + m)"""
@@ -507,14 +522,14 @@ def merge_avl_trees(t1, t2):
         node.left = build_balanced(arr, start, mid - 1)
         node.right = build_balanced(arr, mid + 1, end)
         node.height = 1 + max(
-            node.left.height if node.left else 0,
-            node.right.height if node.right else 0
+            node.left.height if node.left else 0, node.right.height if node.right else 0
         )
         return node
 
     merged = AVLTree()
     merged.root = build_balanced(elements, 0, len(elements) - 1)
     return merged
+
 
 print("\n=== Merge AVL Trees ===")
 avl3 = AVLTree()

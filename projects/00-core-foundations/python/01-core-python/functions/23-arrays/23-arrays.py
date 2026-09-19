@@ -36,11 +36,11 @@ print(f"Mixed: {mixed}")
 # Example 2: Indexing and slicing
 fruits = ["apple", "banana", "cherry", "date", "elderberry"]
 
-print(f"\nFirst: {fruits[0]}")      # apple
-print(f"Last: {fruits[-1]}")        # elderberry
+print(f"\nFirst: {fruits[0]}")  # apple
+print(f"Last: {fruits[-1]}")  # elderberry
 print(f"Slice [1:3]: {fruits[1:3]}")  # ['banana', 'cherry']
 print(f"Every other: {fruits[::2]}")  # ['apple', 'cherry', 'elderberry']
-print(f"Reversed: {fruits[::-1]}")   # ['elderberry', 'date', 'cherry', 'banana', 'apple']
+print(f"Reversed: {fruits[::-1]}")  # ['elderberry', 'date', 'cherry', 'banana', 'apple']
 
 # ============================================================
 # Modifying Array Items
@@ -125,7 +125,7 @@ print(f"After clear: {fruits}")
 import array
 
 # Create a typed array (all elements must be same type)
-arr = array.array('i', [1, 2, 3, 4, 5])  # 'i' = signed int
+arr = array.array("i", [1, 2, 3, 4, 5])  # 'i' = signed int
 print(f"\nTyped array: {arr}")
 print(f"Type: {type(arr)}")
 
@@ -150,19 +150,19 @@ print(f"After remove/pop: {arr}")
 print("\n--- Array Type Codes ---")
 
 # 'b' = signed char
-bytes_arr = array.array('b', [65, 66, 67])
+bytes_arr = array.array("b", [65, 66, 67])
 print(f"Char array: {bytes_arr}")
 
 # 'f' = float
-float_arr = array.array('f', [1.1, 2.2, 3.3])
+float_arr = array.array("f", [1.1, 2.2, 3.3])
 print(f"Float array: {float_arr}")
 
 # 'd' = double
-double_arr = array.array('d', [1.1, 2.2, 3.3])
+double_arr = array.array("d", [1.1, 2.2, 3.3])
 print(f"Double array: {double_arr}")
 
 # 'u' = Unicode character
-unicode_arr = array.array('u', ['a', 'b', 'c'])
+unicode_arr = array.array("u", ["a", "b", "c"])
 print(f"Unicode array: {unicode_arr}")
 
 # ============================================================
@@ -171,23 +171,23 @@ print(f"Unicode array: {unicode_arr}")
 # Example 9: If you have NumPy installed
 try:
     import numpy as np
-    
+
     # Create NumPy array
     arr = np.array([1, 2, 3, 4, 5])
     print(f"\nNumPy array: {arr}")
     print(f"Type: {type(arr)}")
-    
+
     # Operations are element-wise
     print(f"Double: {arr * 2}")
-    print(f"Squared: {arr ** 2}")
+    print(f"Squared: {arr**2}")
     print(f"Sum: {arr.sum()}")
     print(f"Mean: {arr.mean()}")
-    
+
     # 2D array (matrix)
     matrix = np.array([[1, 2, 3], [4, 5, 6]])
     print(f"\nMatrix:\n{matrix}")
     print(f"Shape: {matrix.shape}")
-    
+
 except ImportError:
     print("\nNumPy not installed. Install with: pip install numpy")
 
@@ -207,15 +207,18 @@ for num in numbers:
     seen.add(num)
 print(f"Duplicates: {duplicates}")
 
+
 # Rotate array
 def rotate_right(arr, k):
     """Rotate array k positions to the right."""
     k = k % len(arr)
     return arr[-k:] + arr[:-k]
 
+
 arr = [1, 2, 3, 4, 5]
 rotated = rotate_right(arr, 2)
 print(f"Rotated right by 2: {rotated}")
+
 
 # Find missing number
 def find_missing(arr):
@@ -223,6 +226,7 @@ def find_missing(arr):
     n = len(arr) + 1
     total = n * (n + 1) // 2
     return total - sum(arr)
+
 
 arr = [1, 2, 4, 5, 6]
 missing = find_missing(arr)

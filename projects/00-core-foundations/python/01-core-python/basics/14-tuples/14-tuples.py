@@ -16,7 +16,7 @@ numbers = (1, 2, 3, 4, 5)
 mixed = ("hello", 42, 3.14, True)
 nested = ((1, 2), (3, 4), (5, 6))
 single = ("hello",)  # Note: single item tuple needs trailing comma
-not_tuple = ("hello")  # This is just a string!
+not_tuple = "hello"  # This is just a string!
 
 print(f"Fruits: {fruits}")
 print(f"Numbers: {numbers}")
@@ -51,14 +51,14 @@ print(f"\nReassigned: {fruits}")
 # Example 3: Indexing and slicing (same as lists)
 fruits = ("apple", "banana", "cherry", "date", "elderberry")
 print(f"\nFruits: {fruits}")
-print(f"First: {fruits[0]}")      # apple
-print(f"Second: {fruits[1]}")     # banana
-print(f"Last: {fruits[-1]}")      # elderberry
+print(f"First: {fruits[0]}")  # apple
+print(f"Second: {fruits[1]}")  # banana
+print(f"Last: {fruits[-1]}")  # elderberry
 
 # Slicing
-print(f"First 3: {fruits[:3]}")    # ('apple', 'banana', 'cherry')
-print(f"Last 2: {fruits[-2:]}")    # ('date', 'elderberry')
-print(f"Middle: {fruits[1:4]}")    # ('banana', 'cherry', 'date')
+print(f"First 3: {fruits[:3]}")  # ('apple', 'banana', 'cherry')
+print(f"Last 2: {fruits[-2:]}")  # ('date', 'elderberry')
+print(f"Middle: {fruits[1:4]}")  # ('banana', 'cherry', 'date')
 print(f"Reversed: {fruits[::-1]}")  # ('elderberry', 'date', 'cherry', 'banana', 'apple')
 
 # ============================================================
@@ -119,7 +119,7 @@ print("\n--- Tuple vs List ---")
 locations = {
     (40.7128, -74.0060): "New York",
     (51.5074, -0.1278): "London",
-    (35.6762, 139.6503): "Tokyo"
+    (35.6762, 139.6503): "Tokyo",
 }
 
 # Can't use a list as a key:
@@ -167,8 +167,8 @@ print(f"Tuple to list: {my_list}, type: {type(my_list).__name__}")
 from collections import namedtuple
 
 # Create a named tuple type
-Point = namedtuple('Point', ['x', 'y'])
-Student = namedtuple('Student', 'name age grade')
+Point = namedtuple("Point", ["x", "y"])
+Student = namedtuple("Student", "name age grade")
 
 # Using named tuples
 p = Point(10, 20)

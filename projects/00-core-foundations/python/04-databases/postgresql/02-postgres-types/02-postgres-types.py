@@ -42,8 +42,10 @@ import uuid
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE models (name text, provider varchar(20))")
 conn.execute("INSERT INTO models (name, provider) VALUES (?, ?)", ("bert", "hf"))
-print("1. text and varchar(n) both store:",
-      conn.execute("SELECT name, provider FROM models").fetchone())
+print(
+    "1. text and varchar(n) both store:",
+    conn.execute("SELECT name, provider FROM models").fetchone(),
+)
 print()
 
 # ============================================================
@@ -59,6 +61,7 @@ print()
 print("=== 2. NUMERIC vs float ===")
 print(f"float sum: 0.1 + 0.2 = {0.1 + 0.2!r}  <- not 0.3!")
 from decimal import Decimal
+
 exact = Decimal("0.1") + Decimal("0.2")
 print(f"Decimal:   Decimal('0.1') + Decimal('0.2') = {exact}  <- exactly 0.3")
 print()
@@ -78,9 +81,7 @@ conn.executemany(
     "INSERT INTO runs (started_at) VALUES (?)",
     [("2026-08-06T10:15:30+00:00",), ("2026-08-05T23:59:59+00:00",)],
 )
-latest = conn.execute(
-    "SELECT started_at FROM runs ORDER BY started_at DESC LIMIT 1"
-).fetchone()[0]
+latest = conn.execute("SELECT started_at FROM runs ORDER BY started_at DESC LIMIT 1").fetchone()[0]
 print(f"3. lexicographic sort of ISO text finds latest: {latest}")
 print()
 
@@ -109,9 +110,7 @@ print()
 # extras). sqlite3's JSON1 extension gives us the same operators.
 
 # Example 5: JSON document column via JSON1
-conn.execute(
-    "CREATE TABLE model_cards (id INTEGER PRIMARY KEY, meta TEXT)"
-)
+conn.execute("CREATE TABLE model_cards (id INTEGER PRIMARY KEY, meta TEXT)")
 card = {
     "model": "gpt-mini",
     "params": {"layers": 12, "heads": 8},
@@ -119,9 +118,7 @@ card = {
     "score": 0.881,
 }
 conn.execute("INSERT INTO model_cards (meta) VALUES (?)", (json.dumps(card),))
-layers = conn.execute(
-    "SELECT json_extract(meta, '$.params.layers') FROM model_cards"
-).fetchone()[0]
+layers = conn.execute("SELECT json_extract(meta, '$.params.layers') FROM model_cards").fetchone()[0]
 print(f"5. json_extract('$.params.layers') -> {layers} (JSONB-style path query)")
 print()
 
@@ -164,10 +161,9 @@ print()
 # type; the overlap logic is demonstrated in Python, the type decision
 # taught for real Postgres.
 
+
 # Example 7: interval overlap logic (what tsrange && tsrange does)
-def overlaps(
-    a_start: str, a_end: str, b_start: str, b_end: str
-) -> bool:
+def overlaps(a_start: str, a_end: str, b_start: str, b_end: str) -> bool:
     """Return True when [a_start, a_end) and [b_start, b_end) overlap."""
     return a_start < b_end and b_start < a_end
 
@@ -178,14 +174,13 @@ print(
 )
 print()
 
+
 # ============================================================
 # 8. Real Postgres type catalog (guarded — skips when no server)
 # ============================================================
 def pg_demo() -> None:
     """Query the real pg_type catalog; print [skip] when unavailable."""
-    dsn = os.environ.get(
-        "PGDSN", "postgresql://postgres:postgres@localhost:5432/postgres"
-    )
+    dsn = os.environ.get("PGDSN", "postgresql://postgres:postgres@localhost:5432/postgres")
     try:
         import psycopg
     except ImportError:
@@ -235,6 +230,7 @@ print()
 # MISTAKE: varchar(255) everywhere out of MySQL habit -> pointless in PG
 #   CORRECT: text, plus CHECK when a real limit exists
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -244,8 +240,7 @@ def _verify() -> None:
 
     # 1. float is inexact for 0.1 + 0.2; Decimal is exact
     assert 0.1 + 0.2 != 0.3, "float addition must be inexact for 0.1+0.2"
-    assert Decimal("0.1") + Decimal("0.2") == Decimal("0.3"), \
-        "Decimal must be exact"
+    assert Decimal("0.1") + Decimal("0.2") == Decimal("0.3"), "Decimal must be exact"
 
     # 2. ISO-8601 text orders as time (UTC offset preserved)
     with sqlite3.connect(":memory:") as c:
@@ -260,11 +255,10 @@ def _verify() -> None:
     # 3. JSON1 path extraction reaches nested keys
     with sqlite3.connect(":memory:") as c:
         c.execute("CREATE TABLE m (id INTEGER PRIMARY KEY, meta TEXT)")
-        c.execute("INSERT INTO m (meta) VALUES (?)",
-                  (json.dumps({"params": {"layers": 12, "heads": 8}}),))
-        layers = c.execute(
-            "SELECT json_extract(meta, '$.params.layers') FROM m"
-        ).fetchone()[0]
+        c.execute(
+            "INSERT INTO m (meta) VALUES (?)", (json.dumps({"params": {"layers": 12, "heads": 8}}),)
+        )
+        layers = c.execute("SELECT json_extract(meta, '$.params.layers') FROM m").fetchone()[0]
         assert layers == 12, "json_extract must reach nested paths"
 
     # 4. CHECK constraint enforces the enum vocabulary
@@ -286,10 +280,10 @@ def _verify() -> None:
     assert all(len(i) == 36 for i in ids), "UUID text must be 36 chars"
 
     # 6. Range overlap semantics match tsrange && tsrange
-    assert overlaps("09:00", "10:00", "09:30", "09:45") is True, \
-        "contained interval must overlap"
-    assert overlaps("09:00", "10:00", "10:00", "11:00") is False, \
+    assert overlaps("09:00", "10:00", "09:30", "09:45") is True, "contained interval must overlap"
+    assert overlaps("09:00", "10:00", "10:00", "11:00") is False, (
         "half-open [start,end) intervals sharing an endpoint do not overlap"
+    )
 
     print("[OK] 02-postgres-types: all checks passed")
 
@@ -304,4 +298,4 @@ if __name__ == "__main__":
         print("3. timestamptz stores instants; write UTC everywhere")
         print("4. UUIDv7 ids survive merging and sharding")
         print("5. JSONB absorbs schema drift in model metadata")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

@@ -30,7 +30,9 @@ print(f"  x        : {x.tolist()}")
 print(f"  sigmoid  : {torch.round(torch.sigmoid(x) * 1000) / 1000}  (squashes to 0..1)")
 print(f"  tanh     : {torch.round(torch.tanh(x) * 1000) / 1000}  (squashes to -1..1)")
 print(f"  relu     : {torch.relu(x).tolist()}  (kills negatives)")
-print(f"  softmax  : {torch.round(torch.softmax(x, dim=0) * 1000) / 1000}  (probability distribution)")
+print(
+    f"  softmax  : {torch.round(torch.softmax(x, dim=0) * 1000) / 1000}  (probability distribution)"
+)
 
 # ============================================================
 # 2. Weight initialization — why it matters
@@ -38,13 +40,14 @@ print(f"  softmax  : {torch.round(torch.softmax(x, dim=0) * 1000) / 1000}  (prob
 print("\nExample 2: initialization controls gradient flow")
 lin = nn.Linear(512, 512)
 with torch.no_grad():
-    lin.weight.normal_(0, 10)          # BAD: huge weights
+    lin.weight.normal_(0, 10)  # BAD: huge weights
 std_bad = lin.weight.std().item()
 
-nn.init.kaiming_uniform_(lin.weight, a=0)   # GOOD (default for ReLU nets)
+nn.init.kaiming_uniform_(lin.weight, a=0)  # GOOD (default for ReLU nets)
 std_good = lin.weight.std().item()
 print(f"  bad init  std={std_bad:.2f}  -> activations explode / vanish")
 print(f"  kaiming   std={std_good:.4f} -> stable signal")
+
 
 # Demonstrate the vanishing gradient problem
 def grad_norm_depth(depth: int, init_fn) -> float:
@@ -58,6 +61,7 @@ def grad_norm_depth(depth: int, init_fn) -> float:
     z.sum().backward()
     norms = [l.weight.grad.norm().item() for l in layers]
     return norms[0], norms[-1]
+
 
 first, last = grad_norm_depth(10, lambda w: nn.init.xavier_uniform_(w))
 print(f"\n  gradient norm first layer: {first:.2e}")
@@ -74,7 +78,7 @@ data = torch.randn(4, 8)
 print(f"  bn mean per channel after norm: {torch.round(bn(data).mean(dim=0) * 10000) / 10000}")
 print(f"  dropout keeps ~{int((d(data) != 0).float().mean() * 100)}% alive (train mode)")
 
-bn.eval()   # eval uses running stats, not batch stats
+bn.eval()  # eval uses running stats, not batch stats
 print(f"  in eval, batchnorm uses running stats (stable for inference)")
 
 # ============================================================
@@ -102,7 +106,9 @@ w2 = torch.tensor(3.0, requires_grad=True)
 x = torch.tensor(1.5)
 loss = (w1 * w2 * x) ** 2
 loss.backward()
-print(f"  dL/dw1 = {w1.grad.item():.1f}  (expect 2*(w1*w2*x)*(w2*x) = {2*(w1.item()*w2.item()*x.item())*(w2.item()*x.item()):.1f})")
+print(
+    f"  dL/dw1 = {w1.grad.item():.1f}  (expect 2*(w1*w2*x)*(w2*x) = {2 * (w1.item() * w2.item() * x.item()) * (w2.item() * x.item()):.1f})"
+)
 
 # ============================================================
 # Summary

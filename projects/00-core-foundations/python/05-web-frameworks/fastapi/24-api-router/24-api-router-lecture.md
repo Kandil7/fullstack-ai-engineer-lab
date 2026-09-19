@@ -31,17 +31,21 @@ from fastapi import APIRouter
 # Create a router
 router = APIRouter()
 
+
 # Add endpoints to the router
 @router.get("/users/")
 async def get_users():
     return [{"name": "John"}, {"name": "Jane"}]
 
+
 @router.post("/users/")
 async def create_user(user: dict):
     return {"name": user["name"]}
 
+
 # Include in main app
 from fastapi import FastAPI
+
 app = FastAPI()
 app.include_router(router)
 ```
@@ -84,16 +88,14 @@ app/
 from fastapi import APIRouter, HTTPException
 from typing import List
 
-router = APIRouter(
-    prefix="/users",
-    tags=["users"],
-    responses={404: {"description": "Not found"}}
-)
+router = APIRouter(prefix="/users", tags=["users"], responses={404: {"description": "Not found"}})
+
 
 @router.get("/", response_model=List[dict])
 async def list_users():
     """List all users"""
     return [{"id": 1, "name": "John"}]
+
 
 @router.get("/{user_id}")
 async def get_user(user_id: int):
@@ -102,20 +104,24 @@ async def get_user(user_id: int):
         return {"id": 1, "name": "John"}
     raise HTTPException(status_code=404, detail="User not found")
 
+
 @router.post("/", status_code=201)
 async def create_user(user: dict):
     """Create a new user"""
     return {"id": 2, **user}
+
 
 @router.put("/{user_id}")
 async def update_user(user_id: int, user: dict):
     """Update a user"""
     return {"id": user_id, **user}
 
+
 @router.delete("/{user_id}", status_code=204)
 async def delete_user(user_id: int):
     """Delete a user"""
     return None
+
 
 # main.py
 from fastapi import FastAPI
@@ -132,30 +138,30 @@ app.include_router(users_router)
 from fastapi import APIRouter
 
 router = APIRouter(
-    prefix="/items",
-    tags=["items"],
-    responses={404: {"description": "Item not found"}}
+    prefix="/items", tags=["items"], responses={404: {"description": "Item not found"}}
 )
+
 
 @router.get("/")
 async def list_items():
     return [{"id": 1, "name": "Laptop"}]
 
+
 @router.get("/{item_id}")
 async def get_item(item_id: int):
     return {"id": item_id, "name": "Laptop"}
 
+
 # api/categories.py
 from fastapi import APIRouter
 
-router = APIRouter(
-    prefix="/categories",
-    tags=["categories"]
-)
+router = APIRouter(prefix="/categories", tags=["categories"])
+
 
 @router.get("/")
 async def list_categories():
     return [{"id": 1, "name": "Electronics"}]
+
 
 # api/__init__.py
 from fastapi import APIRouter
@@ -198,15 +204,18 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
+
 @router.get("/")
 async def list_users_v1():
     """V1: List users with basic info"""
     return [{"id": 1, "name": "John"}]
 
+
 @router.get("/{user_id}")
 async def get_user_v1(user_id: int):
     """V1: Get user by ID"""
     return {"id": user_id, "name": "John"}
+
 
 # api/v2/router.py
 from fastapi import APIRouter
@@ -222,24 +231,18 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
+
 @router.get("/")
 async def list_users_v2():
     """V2: List users with pagination"""
-    return {
-        "data": [{"id": 1, "name": "John"}],
-        "total": 1,
-        "page": 1,
-        "per_page": 10
-    }
+    return {"data": [{"id": 1, "name": "John"}], "total": 1, "page": 1, "per_page": 10}
+
 
 @router.get("/{user_id}")
 async def get_user_v2(user_id: int):
     """V2: Get user with profile"""
-    return {
-        "id": user_id,
-        "name": "John",
-        "profile": {"bio": "Developer"}
-    }
+    return {"id": user_id, "name": "John", "profile": {"bio": "Developer"}}
+
 
 # main.py
 from fastapi import FastAPI
@@ -264,27 +267,33 @@ from typing import List
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+
 # Dependency for admin authentication
-async def verify_admin(current_user = Depends(get_current_user)):
+async def verify_admin(current_user=Depends(get_current_user)):
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
 
+
 # All routes in this router require admin
 router.dependencies.append(Depends(verify_admin))
+
 
 @router.get("/users/")
 async def admin_list_users():
     return [{"id": 1, "name": "John"}]
 
+
 @router.delete("/users/{user_id}")
 async def admin_delete_user(user_id: int):
     return {"deleted": True}
+
 
 # Per-route dependency
 @router.get("/stats/", dependencies=[Depends(verify_admin)])
 async def get_stats():
     return {"users": 100, "items": 500}
+
 
 # main.py
 app.include_router(router, prefix="/api")
@@ -305,35 +314,43 @@ from .variants import router as variants_router
 router.include_router(reviews_router, prefix="/{product_id}/reviews")
 router.include_router(variants_router, prefix="/{product_id}/variants")
 
+
 @router.get("/")
 async def list_products():
     return [{"id": 1, "name": "Laptop"}]
 
+
 @router.get("/{product_id}")
 async def get_product(product_id: int):
     return {"id": product_id, "name": "Laptop"}
+
 
 # api/products/reviews.py
 from fastapi import APIRouter
 
 router = APIRouter()
 
+
 @router.get("/")
 async def list_reviews(product_id: int):
     return [{"id": 1, "rating": 5, "comment": "Great!"}]
 
+
 @router.post("/")
 async def create_review(product_id: int, review: dict):
     return {"product_id": product_id, **review}
+
 
 # api/products/variants.py
 from fastapi import APIRouter
 
 router = APIRouter()
 
+
 @router.get("/")
 async def list_variants(product_id: int):
     return [{"id": 1, "color": "Black", "price": 999}]
+
 
 # Resulting endpoints:
 # GET /products/
@@ -352,11 +369,9 @@ from fastapi import APIRouter
 router = APIRouter(
     prefix="/users",
     tags=["users"],
-    responses={
-        404: {"description": "Not found"},
-        403: {"description": "Forbidden"}
-    }
+    responses={404: {"description": "Not found"}, 403: {"description": "Forbidden"}},
 )
+
 
 @router.get(
     "/",
@@ -365,40 +380,32 @@ router = APIRouter(
     description="Retrieve a list of all users with pagination",
     responses={
         200: {"description": "Successful response"},
-        401: {"description": "Not authenticated"}
-    }
+        401: {"description": "Not authenticated"},
+    },
 )
-async def list_users(
-    skip: int = 0,
-    limit: int = 100
-):
+async def list_users(skip: int = 0, limit: int = 100):
     """
     List all users.
-    
+
     - **skip**: Number of users to skip
     - **limit**: Maximum number of users to return
     """
     return []
 
+
 @router.get(
     "/{user_id}",
     response_model=UserResponse,
     summary="Get user by ID",
-    responses={
-        200: {"description": "Successful response"},
-        404: {"description": "User not found"}
-    }
+    responses={200: {"description": "Successful response"}, 404: {"description": "User not found"}},
 )
 async def get_user(user_id: int):
     """Get a specific user by their ID."""
     return {"id": user_id}
 
+
 # main.py
-app = FastAPI(
-    title="My API",
-    description="API with organized routers",
-    version="1.0.0"
-)
+app = FastAPI(title="My API", description="API with organized routers", version="1.0.0")
 
 app.include_router(users_router, prefix="/api/v1")
 
@@ -419,6 +426,7 @@ from api.items import router as items_router  # Circular!
 # GOOD: Use late imports or separate shared code
 # api/shared.py
 from fastapi import APIRouter
+
 shared_router = APIRouter()
 
 # api/users.py
@@ -431,12 +439,15 @@ from api.shared import shared_router
 # BAD: Missing prefix
 users_router = APIRouter()
 
+
 @router.get("/users/")  # Endpoint will be /users/
 async def list_users():
     return []
 
+
 # GOOD: Use prefix
 users_router = APIRouter(prefix="/users")
+
 
 @router.get("/")  # Endpoint will be /users/
 async def list_users():
@@ -449,20 +460,25 @@ async def list_users():
 # BAD: Duplicate paths
 router = APIRouter()
 
+
 @router.get("/users/")
 async def list_users():
     return []
+
 
 @router.get("/users/")  # Conflict!
 async def get_all_users():
     return []
 
+
 # GOOD: Use different paths
 router = APIRouter()
+
 
 @router.get("/users/")
 async def list_users():
     return []
+
 
 @router.get("/users/all")  # Different path
 async def get_all_users():

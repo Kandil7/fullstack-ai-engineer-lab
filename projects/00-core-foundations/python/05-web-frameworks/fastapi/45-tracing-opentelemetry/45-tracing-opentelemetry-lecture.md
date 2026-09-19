@@ -57,9 +57,12 @@ answer:
 
 ```python
 with tracer.start_as_current_span("rag.query") as root:
-    with tracer.start_as_current_span("retrieval"): ...
-    with tracer.start_as_current_span("embedding"): ...
-    with tracer.start_as_current_span("llm.generate"): ...
+    with tracer.start_as_current_span("retrieval"):
+        ...
+    with tracer.start_as_current_span("embedding"):
+        ...
+    with tracer.start_as_current_span("llm.generate"):
+        ...
 ```
 
 "2.4 s total" becomes "retrieval 300 ms, embedding 120 ms, LLM 1.9 s".
@@ -74,8 +77,8 @@ propagator:
 
 ```python
 carrier = {}
-TraceContextTextMapPropagator().inject(carrier, context=ctx)   # caller
-ctx2 = TraceContextTextMapPropagator().extract(carrier)        # callee
+TraceContextTextMapPropagator().inject(carrier, context=ctx)  # caller
+ctx2 = TraceContextTextMapPropagator().extract(carrier)  # callee
 ```
 
 Extract at every service entry; a child that starts a *new* trace

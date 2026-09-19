@@ -39,22 +39,20 @@ databases = {
     "school": {
         "students": [
             {"_id": 1, "name": "Alice", "grade": "A"},
-            {"_id": 2, "name": "Bob", "grade": "B"}
+            {"_id": 2, "name": "Bob", "grade": "B"},
         ],
         "teachers": [
             {"_id": 1, "name": "Mr. Smith", "subject": "Math"},
-            {"_id": 2, "name": "Ms. Jones", "subject": "Science"}
-        ]
+            {"_id": 2, "name": "Ms. Jones", "subject": "Science"},
+        ],
     },
     "store": {
         "products": [
             {"_id": 1, "name": "Laptop", "price": 999.99},
-            {"_id": 2, "name": "Mouse", "price": 29.99}
+            {"_id": 2, "name": "Mouse", "price": 29.99},
         ],
-        "orders": [
-            {"_id": 1, "customer": "Alice", "total": 1029.98}
-        ]
-    }
+        "orders": [{"_id": 1, "customer": "Alice", "total": 1029.98}],
+    },
 }
 
 print("\nAvailable databases:", list(databases.keys()))
@@ -69,15 +67,18 @@ print("Teachers:", len(school_db["teachers"]))
 # Using Databases
 # ============================================================
 
+
 # Example 5: Database operations
 def list_databases(dbs):
     """List all databases"""
     print("Databases:", list(dbs.keys()))
 
+
 def create_database(dbs, name):
     """Create a new database"""
     dbs[name] = {}
     print(f"Created database: {name}")
+
 
 def drop_database(dbs, name):
     """Drop a database"""
@@ -86,6 +87,7 @@ def drop_database(dbs, name):
         print(f"Dropped database: {name}")
     else:
         print(f"Database {name} not found")
+
 
 # MongoDB equivalent:
 # show dbs
@@ -110,26 +112,30 @@ school_db = databases["school"]
 # Add a new collection
 school_db["courses"] = [
     {"_id": 1, "name": "Python 101", "credits": 3},
-    {"_id": 2, "name": "Data Science", "credits": 4}
+    {"_id": 2, "name": "Data Science", "credits": 4},
 ]
 
 print("\nSchool collections:", list(school_db.keys()))
+
 
 # Example 7: Collection operations
 def list_collections(db):
     """List all collections in a database"""
     return list(db.keys())
 
+
 def create_collection(db, name):
     """Create a new collection"""
     db[name] = []
     print(f"Created collection: {name}")
+
 
 def drop_collection(db, name):
     """Drop a collection"""
     if name in db:
         del db[name]
         print(f"Dropped collection: {name}")
+
 
 print("Collections:", list_collections(school_db))
 create_collection(school_db, "grades")
@@ -160,6 +166,7 @@ print("Invalid database names:", invalid_names)
 # Using Database and Collection
 # ============================================================
 
+
 # Example 9: Complete workflow
 def use_database(dbs, name):
     """Switch to a database (create if not exists)"""
@@ -170,6 +177,7 @@ def use_database(dbs, name):
         print(f"Switched to database: {name}")
     return dbs[name]
 
+
 def use_collection(db, name):
     """Switch to a collection (create if not exists)"""
     if name not in db:
@@ -178,6 +186,7 @@ def use_collection(db, name):
     else:
         print(f"Switched to collection: {name}")
     return db[name]
+
 
 # Workflow: use database, use collection, insert document
 db = use_database(databases, "inventory")
@@ -216,6 +225,7 @@ print("""
 7. Collections are created automatically when documents are inserted
 8. Use db.dropDatabase() to remove a database
 """)
+
 
 # ============================================================
 # Self-Verification  (MANDATORY)

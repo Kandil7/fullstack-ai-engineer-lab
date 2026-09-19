@@ -51,9 +51,7 @@ def big_tokens_file(tmp_path_factory) -> Path:
     n = 1_000_000
     with p.open("w", encoding="utf-8") as f:
         for start in range(1, n + 1, 50_000):
-            f.write(
-                "".join(f"tok-{i}\n" for i in range(start, start + 50_000))
-            )
+            f.write("".join(f"tok-{i}\n" for i in range(start, start + 50_000)))
     return p
 
 
@@ -131,8 +129,7 @@ def test_stats_million_values_streaming(big_ints_file):
     assert mean == pytest.approx((n + 1) / 2, rel=1e-9)
     assert var == pytest.approx((n * n - 1) / 12, rel=1e-6)
     assert peak < 2 * 1024 * 1024, (
-        f"peak {peak / 1024 / 1024:.1f} MiB >= 2 MiB ceiling — "
-        "did you materialize the values?"
+        f"peak {peak / 1024 / 1024:.1f} MiB >= 2 MiB ceiling — did you materialize the values?"
     )
 
 
@@ -178,17 +175,22 @@ def test_corpus_stats_million_tokens_streaming(big_tokens_file):
     assert stats["histogram"] == expected_hist
     assert sum(stats["histogram"].values()) == stats["lines"]
     assert peak < 50 * 1024 * 1024, (
-        f"peak {peak / 1024 / 1024:.1f} MiB >= 50 MiB ceiling — "
-        "did you materialize the tokens?"
+        f"peak {peak / 1024 / 1024:.1f} MiB >= 50 MiB ceiling — did you materialize the tokens?"
     )
 
 
 def test_budget_32gb_768_float32():
-    assert _call(mod.embedding_budget, 32_000_000_000, 8_000_000_000, 4_000_000_000, 768, 32) == 6_510_416
+    assert (
+        _call(mod.embedding_budget, 32_000_000_000, 8_000_000_000, 4_000_000_000, 768, 32)
+        == 6_510_416
+    )
 
 
 def test_budget_float16_doubles_batch():
-    assert _call(mod.embedding_budget, 32_000_000_000, 8_000_000_000, 4_000_000_000, 768, 16) == 13_020_833
+    assert (
+        _call(mod.embedding_budget, 32_000_000_000, 8_000_000_000, 4_000_000_000, 768, 16)
+        == 13_020_833
+    )
 
 
 def test_budget_no_room():

@@ -49,6 +49,7 @@ print()
 # Sargable = "Search ARGument ABLE": the indexed column stands alone on one
 # side of the comparison. Wrapping it in a function kills the index.
 
+
 def lookup_by_prefix(user_id_prefix: int) -> list:
     # NOT sargable: function around the indexed column
     return conn.execute(
@@ -72,7 +73,9 @@ plan_good = conn.execute(
 print("=== 2. Sargable predicates ===")
 print("function-wrapped:", plan_bad[0][3])
 print("bare comparison :", plan_good[0][3])
-print(f"range scan returns {len(lookup_by_range(10, 20))} rows; prefix fn returns {len(lookup_by_prefix(1))}")
+print(
+    f"range scan returns {len(lookup_by_range(10, 20))} rows; prefix fn returns {len(lookup_by_prefix(1))}"
+)
 print()
 
 # ============================================================
@@ -93,6 +96,7 @@ print()
 # OFFSET pagination rescans and discards skipped rows each page (O(offset)).
 # Keyset pagination remembers the last seen key and continues from there —
 # an indexed range scan, O(page size).
+
 
 def offset_page(limit: int, offset: int) -> list:
     return conn.execute(
@@ -121,6 +125,7 @@ print()
 # N+1: one query for the list, then one query PER ROW. With N rows that is
 # N+1 round trips. Fix: one query with a JOIN / IN-list.
 
+
 def n_plus_1(user_ids: list[int]) -> int:
     """BROKEN pattern: per-row round trips. Returns rows counted."""
     total = 0
@@ -138,11 +143,15 @@ def batched(user_ids: list[int]) -> int:
 
 
 ids = list(range(50))
-start = time.perf_counter(); n1 = n_plus_1(ids); t_n1 = time.perf_counter() - start
-start = time.perf_counter(); bt = batched(ids); t_batch = time.perf_counter() - start
+start = time.perf_counter()
+n1 = n_plus_1(ids)
+t_n1 = time.perf_counter() - start
+start = time.perf_counter()
+bt = batched(ids)
+t_batch = time.perf_counter() - start
 print("=== 5. N+1 vs batching ===")
-print(f"N+1  : {n1} rows in {t_n1*1000:.2f}ms ({len(ids)+1} round trips)")
-print(f"batch: {bt} rows in {t_batch*1000:.2f}ms (1 round trip)")
+print(f"N+1  : {n1} rows in {t_n1 * 1000:.2f}ms ({len(ids) + 1} round trips)")
+print(f"batch: {bt} rows in {t_batch * 1000:.2f}ms (1 round trip)")
 print()
 
 # ============================================================
@@ -161,6 +170,7 @@ print()
 # MISTAKE: SELECT * and filtering in application code
 # CORRECT: select needed columns; push filters into SQL
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -169,22 +179,23 @@ def _verify() -> None:
     db = sqlite3.connect(":memory:")
     try:
         db.execute("CREATE TABLE items (id INTEGER PRIMARY KEY, cat TEXT, v INTEGER)")
-        db.executemany("INSERT INTO items (cat, v) VALUES (?, ?)",
-                       [("a", i) for i in range(10)] + [("b", i) for i in range(5)])
+        db.executemany(
+            "INSERT INTO items (cat, v) VALUES (?, ?)",
+            [("a", i) for i in range(10)] + [("b", i) for i in range(5)],
+        )
         db.execute("CREATE INDEX idx_items_cat ON items(cat)")
 
         # 1. Plan uses the index for a sargable predicate
-        plan = db.execute(
-            "EXPLAIN QUERY PLAN SELECT v FROM items WHERE cat = 'a'"
-        ).fetchall()
+        plan = db.execute("EXPLAIN QUERY PLAN SELECT v FROM items WHERE cat = 'a'").fetchall()
         assert any("INDEX" in row[3] for row in plan), "indexed predicate must use the index"
 
         # 2. Function-wrapped predicate loses the index
         plan = db.execute(
             "EXPLAIN QUERY PLAN SELECT v FROM items WHERE upper(cat) = 'A'"
         ).fetchall()
-        assert all("INDEX" not in row[3] for row in plan), \
+        assert all("INDEX" not in row[3] for row in plan), (
             "function-wrapped predicate must not use the index"
+        )
 
         # 3. Keyset pagination returns exactly the offset page content
         db.executemany("INSERT INTO items (cat, v) VALUES ('c', ?)", range(20))
@@ -194,13 +205,12 @@ def _verify() -> None:
             "SELECT id FROM items WHERE id > ? ORDER BY id LIMIT 5",
             (page1[-1][0],),
         ).fetchall()
-        assert [r[0] for r in keyset2] == [r[0] for r in page2], \
+        assert [r[0] for r in keyset2] == [r[0] for r in page2], (
             "keyset after last-id must equal the next offset page"
+        )
 
         # 4. IN-list batching equals per-row aggregation
-        batch = db.execute(
-            "SELECT COUNT(*) FROM items WHERE cat IN ('a', 'b')"
-        ).fetchone()[0]
+        batch = db.execute("SELECT COUNT(*) FROM items WHERE cat IN ('a', 'b')").fetchone()[0]
         assert batch == 15, "batched IN must count both categories"
 
         # 5. SELECT of needed columns has fewer fields than SELECT *
@@ -222,4 +232,4 @@ if __name__ == "__main__":
         print("3. Project needed columns; never SELECT *")
         print("4. Keyset beats offset for deep pages")
         print("5. Batch with IN/JOIN instead of N+1 round trips")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

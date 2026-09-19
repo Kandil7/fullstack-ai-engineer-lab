@@ -24,11 +24,13 @@ from typing import Any
 # 1. OpenAI Embedding Generation
 # ---------------------------------------------------------------------------
 
+
 class OpenAIEmbedder:
     """Generate embeddings using OpenAI's embedding models."""
 
     def __init__(self, model: str = "text-embedding-3-small", dimensions: int = 1536):
         from openai import OpenAI
+
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.model = model
         self.dimensions = dimensions
@@ -47,7 +49,7 @@ class OpenAIEmbedder:
         all_embeddings = []
 
         for i in range(0, len(texts), batch_size):
-            batch = texts[i:i + batch_size]
+            batch = texts[i : i + batch_size]
             response = self.client.embeddings.create(
                 model=self.model,
                 input=batch,
@@ -62,11 +64,13 @@ class OpenAIEmbedder:
 # 2. Local Embedding (Sentence Transformers)
 # ---------------------------------------------------------------------------
 
+
 class LocalEmbedder:
     """Generate embeddings locally using sentence-transformers."""
 
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
         from sentence_transformers import SentenceTransformer
+
         self.model = SentenceTransformer(model_name)
         self.dimension = self.model.get_sentence_embedding_dimension()
 
@@ -83,6 +87,7 @@ class LocalEmbedder:
 # ---------------------------------------------------------------------------
 # 3. Embedding Cache
 # ---------------------------------------------------------------------------
+
 
 class EmbeddingCache:
     """Cache embeddings to avoid redundant API calls."""
@@ -146,11 +151,16 @@ class EmbeddingCache:
 # 4. Qdrant Vector Database Operations
 # ---------------------------------------------------------------------------
 
+
 class VectorStore:
     """Interface for Qdrant vector database operations."""
 
-    def __init__(self, collection_name: str = "documents", dimension: int = 1536,
-                 url: str | None = None):
+    def __init__(
+        self,
+        collection_name: str = "documents",
+        dimension: int = 1536,
+        url: str | None = None,
+    ):
         from qdrant_client import QdrantClient
         from qdrant_client.models import VectorParams, Distance
 
@@ -166,8 +176,12 @@ class VectorStore:
                 vectors_config=VectorParams(size=dimension, distance=Distance.COSINE),
             )
 
-    def upsert(self, ids: list[int], vectors: list[list[float]],
-               payloads: list[dict] | None = None):
+    def upsert(
+        self,
+        ids: list[int],
+        vectors: list[list[float]],
+        payloads: list[dict] | None = None,
+    ):
         """Insert or update vectors in the store."""
         from qdrant_client.models import PointStruct
 
@@ -178,8 +192,9 @@ class VectorStore:
 
         self.client.upsert(collection_name=self.collection_name, points=points)
 
-    def search(self, query_vector: list[float], top_k: int = 5,
-               filter_dict: dict | None = None) -> list[dict]:
+    def search(
+        self, query_vector: list[float], top_k: int = 5, filter_dict: dict | None = None
+    ) -> list[dict]:
         """Search for similar vectors."""
         from qdrant_client.models import Filter, FieldCondition, MatchValue
 
@@ -228,6 +243,7 @@ class VectorStore:
 # 5. Similarity Search Utilities
 # ---------------------------------------------------------------------------
 
+
 def cosine_similarity(a: list[float], b: list[float]) -> float:
     """Compute cosine similarity between two vectors."""
     a_arr = np.array(a)
@@ -245,8 +261,9 @@ def euclidean_distance(a: list[float], b: list[float]) -> float:
     return float(np.linalg.norm(np.array(a) - np.array(b)))
 
 
-def rank_by_similarity(query_vec: list[float], doc_vectors: list[dict],
-                       top_k: int = 5) -> list[dict]:
+def rank_by_similarity(
+    query_vec: list[float], doc_vectors: list[dict], top_k: int = 5
+) -> list[dict]:
     """Rank documents by similarity to query."""
     scored = []
     for doc in doc_vectors:
@@ -261,6 +278,7 @@ def rank_by_similarity(query_vec: list[float], doc_vectors: list[dict],
 # 6. Hybrid Search (Semantic + Keyword)
 # ---------------------------------------------------------------------------
 
+
 class HybridSearch:
     """Combine semantic (vector) search with keyword matching."""
 
@@ -268,12 +286,17 @@ class HybridSearch:
         self.embedder = embedder
         self.store = store
 
-    def search(self, query: str, *, top_k: int = 5,
-               semantic_weight: float = 0.7,
-               keyword_weight: float = 0.3) -> list[dict]:
+    def search(
+        self,
+        query: str,
+        *,
+        top_k: int = 5,
+        semantic_weight: float = 0.7,
+        keyword_weight: float = 0.3,
+    ) -> list[dict]:
         """
         Hybrid search combining semantic similarity and keyword matching.
-        
+
         Args:
             query: Search query
             top_k: Number of results
@@ -282,7 +305,9 @@ class HybridSearch:
         """
         # Semantic search
         query_embedding = self.embedder.embed(query)
-        semantic_results = self.store.search(query_vector=query_embedding, top_k=top_k * 2)
+        semantic_results = self.store.search(
+            query_vector=query_embedding, top_k=top_k * 2
+        )
 
         # Keyword scoring
         query_words = set(query.lower().split())
@@ -299,8 +324,7 @@ class HybridSearch:
 
             # Combined score
             result["combined_score"] = (
-                semantic_weight * result["score"] +
-                keyword_weight * keyword_score
+                semantic_weight * result["score"] + keyword_weight * keyword_score
             )
 
         # Sort by combined score
@@ -311,6 +335,7 @@ class HybridSearch:
 # ---------------------------------------------------------------------------
 # 7. Complete Embedding Pipeline
 # ---------------------------------------------------------------------------
+
 
 class EmbeddingPipeline:
     """End-to-end embedding pipeline with caching and vector storage."""
@@ -327,8 +352,12 @@ class EmbeddingPipeline:
         self.store = VectorStore(collection_name=collection, dimension=dimension)
         self.use_local = use_local
 
-    def index_texts(self, texts: list[str], ids: list[int] | None = None,
-                    metadata: list[dict] | None = None) -> int:
+    def index_texts(
+        self,
+        texts: list[str],
+        ids: list[int] | None = None,
+        metadata: list[dict] | None = None,
+    ) -> int:
         """Index a batch of texts into the vector store."""
         if ids is None:
             ids = list(range(len(texts)))
@@ -339,9 +368,7 @@ class EmbeddingPipeline:
         embeddings = []
         for text in texts:
             emb = self.cache.cached_embed(
-                text,
-                self.embedder.embed,
-                model="local" if self.use_local else "openai"
+                text, self.embedder.embed, model="local" if self.use_local else "openai"
             )
             embeddings.append(emb)
 
@@ -351,10 +378,14 @@ class EmbeddingPipeline:
 
         return len(texts)
 
-    def search(self, query: str, top_k: int = 5, filter_dict: dict | None = None) -> list[dict]:
+    def search(
+        self, query: str, top_k: int = 5, filter_dict: dict | None = None
+    ) -> list[dict]:
         """Search for similar texts."""
         query_emb = self.embedder.embed(query)
-        return self.store.search(query_vector=query_emb, top_k=top_k, filter_dict=filter_dict)
+        return self.store.search(
+            query_vector=query_emb, top_k=top_k, filter_dict=filter_dict
+        )
 
     def info(self) -> dict:
         """Get pipeline statistics."""
@@ -364,6 +395,7 @@ class EmbeddingPipeline:
 # ---------------------------------------------------------------------------
 # 8. Demo Functions
 # ---------------------------------------------------------------------------
+
 
 def demo_similarity():
     """Demo: Computing similarity between vectors."""
@@ -397,7 +429,11 @@ def demo_similarity():
     query_emb = embedder.embed(query)
     print(f"\nQuery: '{query}'")
     print("\nRankings:")
-    for text, emb in sorted(zip(texts, embeddings), key=lambda x: cosine_similarity(query_emb, x[1]), reverse=True):
+    for text, emb in sorted(
+        zip(texts, embeddings),
+        key=lambda x: cosine_similarity(query_emb, x[1]),
+        reverse=True,
+    ):
         sim = cosine_similarity(query_emb, emb)
         print(f"  {sim:.4f} | {text}")
 
@@ -440,7 +476,9 @@ def demo_vector_store():
 
     # Filtered search
     print("\nFiltered search (category=programming):")
-    results = store.search(query_vector=query_vec, top_k=3, filter_dict={"category": "programming"})
+    results = store.search(
+        query_vector=query_vec, top_k=3, filter_dict={"category": "programming"}
+    )
     for r in results:
         print(f"  Score: {r['score']:.4f} | {r['payload']['text']}")
 

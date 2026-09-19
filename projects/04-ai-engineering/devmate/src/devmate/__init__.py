@@ -6,8 +6,8 @@ A production-grade RAG + Agent system with evaluation, observability, and MCP su
 
 from devmate.config import settings
 from devmate.llm.client import LLMClient
-from devmate.obs.tracing import tracer
 from devmate.obs.cost import cost_tracker
+from devmate.obs.tracing import tracer
 
 __version__ = "0.1.0"
 

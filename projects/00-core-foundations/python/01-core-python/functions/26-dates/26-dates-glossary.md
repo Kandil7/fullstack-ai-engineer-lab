@@ -84,9 +84,9 @@ today = date.today()
 christmas = date(2026, 12, 25)
 
 # Access attributes
-print(today.year)   # 2026
+print(today.year)  # 2026
 print(today.month)  # 7
-print(today.day)    # 5
+print(today.day)  # 5
 print(today.weekday())  # 6 (Sunday)
 
 # Date arithmetic
@@ -131,6 +131,7 @@ from datetime import datetime, timezone, timedelta
 # UTC offset changes with DST
 # In practice, use pytz or zoneinfo for proper DST handling
 import zoneinfo
+
 ny_tz = zoneinfo.ZoneInfo("America/New_York")
 dt = datetime(2026, 7, 5, 12, 0, tzinfo=ny_tz)
 print(dt)  # Handles DST automatically
@@ -213,6 +214,7 @@ print(naive.tzinfo)  # None
 
 # Cannot compare with aware
 from datetime import timezone
+
 aware = datetime.now(timezone.utc)
 # naive == aware  # TypeError
 ```
@@ -233,6 +235,7 @@ dt = datetime.strptime("25/12/2026 10:30", "%d/%m/%Y %H:%M")
 
 # Using dateutil (more flexible)
 from dateutil import parser
+
 dt = parser.parse("December 25, 2026 10:30 AM")
 ```
 
@@ -249,11 +252,11 @@ from datetime import datetime
 
 dt = datetime(2026, 7, 5, 14, 30, 45)
 
-print(dt.strftime("%Y-%m-%d"))        # 2026-07-05
-print(dt.strftime("%d/%m/%Y"))        # 05/07/2026
-print(dt.strftime("%B %d, %Y"))       # July 05, 2026
-print(dt.strftime("%I:%M %p"))        # 02:30 PM
-print(dt.strftime("%A, %B %d %Y"))    # Sunday, July 05 2026
+print(dt.strftime("%Y-%m-%d"))  # 2026-07-05
+print(dt.strftime("%d/%m/%Y"))  # 05/07/2026
+print(dt.strftime("%B %d, %Y"))  # July 05, 2026
+print(dt.strftime("%I:%M %p"))  # 02:30 PM
+print(dt.strftime("%A, %B %d %Y"))  # Sunday, July 05 2026
 ```
 
 **Related**: strptime, format codes, string conversion
@@ -286,7 +289,7 @@ print(dt)  # 2026-12-25 22:30:00
 from datetime import time
 
 t = time(14, 30, 45)
-print(t.hour)    # 14
+print(t.hour)  # 14
 print(t.minute)  # 30
 print(t.second)  # 45
 
@@ -407,11 +410,12 @@ utc = local.astimezone(timezone.utc)
 from datetime import date
 
 d = date(2026, 7, 5)  # Sunday
-print(d.weekday())      # 6
-print(d.isoweekday())   # 7 (Monday=1, Sunday=7)
+print(d.weekday())  # 6
+print(d.isoweekday())  # 7 (Monday=1, Sunday=7)
 
 # Day name
 import calendar
+
 day_name = calendar.day_name[d.weekday()]
 print(day_name)  # Sunday
 ```
@@ -426,6 +430,7 @@ print(day_name)  # Sunday
 ```python
 from datetime import date, timedelta
 
+
 def business_days(start, end):
     days = 0
     current = start
@@ -434,6 +439,7 @@ def business_days(start, end):
             days += 1
         current += timedelta(days=1)
     return days
+
 
 start = date(2026, 7, 1)
 end = date(2026, 7, 31)
@@ -444,20 +450,22 @@ print(f"Business days: {business_days(start, end)}")
 ```python
 from datetime import date
 
+
 def age_details(birthdate):
     today = date.today()
     years = today.year - birthdate.year
     months = today.month - birthdate.month
     days = today.day - birthdate.day
-    
+
     if days < 0:
         months -= 1
         days += 30
     if months < 0:
         years -= 1
         months += 12
-    
+
     return years, months, days
+
 
 bd = date(1990, 5, 15)
 y, m, d = age_details(bd)

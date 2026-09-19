@@ -29,11 +29,18 @@ GROUP BY is present.
 **Example**:
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE sales (id INTEGER PRIMARY KEY, region TEXT, amt REAL)")
-conn.executemany("INSERT INTO sales (region, amt) VALUES (?, ?)",
-                 [("east", 10), ("west", 20), ("east", 5), ("west", 30)])
-print(conn.execute("SELECT region, COUNT(*) AS n, SUM(amt) AS total FROM sales GROUP BY region").fetchall())
+conn.executemany(
+    "INSERT INTO sales (region, amt) VALUES (?, ?)",
+    [("east", 10), ("west", 20), ("east", 5), ("west", 30)],
+)
+print(
+    conn.execute(
+        "SELECT region, COUNT(*) AS n, SUM(amt) AS total FROM sales GROUP BY region"
+    ).fetchall()
+)
 ```
 ```text
 [('east', 2, 15.0), ('west', 2, 50.0)]
@@ -77,8 +84,11 @@ are the only columns allowed in the select list without aggregation.
 `HAVING COUNT(*) > 1` keeps only groups with at least two rows.
 **Example**:
 ```python
-print(conn.execute(
-    "SELECT region, COUNT(*) n FROM sales GROUP BY region HAVING COUNT(*) >= 2").fetchall())
+print(
+    conn.execute(
+        "SELECT region, COUNT(*) n FROM sales GROUP BY region HAVING COUNT(*) >= 2"
+    ).fetchall()
+)
 ```
 ```text
 [('east', 2), ('west', 2)]

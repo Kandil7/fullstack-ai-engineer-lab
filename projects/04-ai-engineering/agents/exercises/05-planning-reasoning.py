@@ -33,8 +33,10 @@ from collections import deque
 # SECTION 1: Task Decomposition
 # ============================================================
 
+
 class TaskStatus(Enum):
     """Status of a task in the planning system."""
+
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -45,6 +47,7 @@ class TaskStatus(Enum):
 
 class TaskPriority(Enum):
     """Task priority levels."""
+
     LOW = 1
     MEDIUM = 2
     HIGH = 3
@@ -54,6 +57,7 @@ class TaskPriority(Enum):
 @dataclass
 class Task:
     """A single task in a plan."""
+
     id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     name: str = ""
     description: str = ""
@@ -106,6 +110,7 @@ class Task:
 # SECTION 2: Task Decomposer
 # ============================================================
 
+
 class TaskDecomposer:
     """
     Breaks down complex tasks into manageable subtasks.
@@ -121,7 +126,7 @@ class TaskDecomposer:
         for i, step in enumerate(steps):
             task = Task(
                 name=step,
-                description=f"Step {i+1} of the plan",
+                description=f"Step {i + 1} of the plan",
                 priority=TaskPriority.HIGH if i < 2 else TaskPriority.MEDIUM,
             )
             if prev_id:
@@ -143,7 +148,7 @@ class TaskDecomposer:
                 priority=TaskPriority.HIGH,
             )
             for i, step in enumerate(phase_steps):
-                subtask = Task(name=step, description=f"Step {i+1} in {phase_name}")
+                subtask = Task(name=step, description=f"Step {i + 1} in {phase_name}")
                 phase_task.subtasks.append(subtask)
             root.subtasks.append(phase_task)
 
@@ -152,7 +157,9 @@ class TaskDecomposer:
     @staticmethod
     def decompose_by_criteria(goal: str, criteria: list[str]) -> Task:
         """Decompose based on evaluation criteria."""
-        root = Task(name=f"Achieve: {goal}", description=f"Goal with {len(criteria)} criteria")
+        root = Task(
+            name=f"Achieve: {goal}", description=f"Goal with {len(criteria)} criteria"
+        )
 
         for criterion in criteria:
             task = Task(
@@ -178,9 +185,11 @@ class TaskDecomposer:
 # SECTION 3: Planner
 # ============================================================
 
+
 @dataclass
 class Plan:
     """A complete execution plan."""
+
     id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     goal: str = ""
     root_task: Task = None
@@ -245,13 +254,16 @@ class Planner:
         if steps:
             root_task = self.decomposer.decompose_by_steps(goal, steps)
         else:
-            root_task = self.decomposer.decompose_by_steps(goal, [
-                "Analyze the goal",
-                "Gather required resources",
-                "Execute core tasks",
-                "Verify results",
-                "Finalize",
-            ])
+            root_task = self.decomposer.decompose_by_steps(
+                goal,
+                [
+                    "Analyze the goal",
+                    "Gather required resources",
+                    "Execute core tasks",
+                    "Verify results",
+                    "Finalize",
+                ],
+            )
 
         plan = Plan(goal=goal, root_task=root_task)
         self.plans.append(plan)
@@ -274,8 +286,7 @@ class Planner:
         ]
 
         new_root = self.decomposer.decompose_by_steps(
-            f"Recover from: {failed_task.name}",
-            alternative_steps
+            f"Recover from: {failed_task.name}", alternative_steps
         )
 
         new_plan = Plan(
@@ -290,9 +301,11 @@ class Planner:
 # SECTION 4: Tree-of-Thought Reasoning
 # ============================================================
 
+
 @dataclass
 class ThoughtNode:
     """A node in the thought tree."""
+
     id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     content: str = ""
     score: float = 0.0
@@ -319,7 +332,9 @@ class TreeOfThought:
     Explores multiple reasoning paths and selects the best one.
     """
 
-    def __init__(self, max_depth: int = 3, branching_factor: int = 3, max_leaves: int = 10):
+    def __init__(
+        self, max_depth: int = 3, branching_factor: int = 3, max_leaves: int = 10
+    ):
         self.max_depth = max_depth
         self.branching_factor = branching_factor
         self.max_leaves = max_leaves
@@ -351,7 +366,7 @@ class TreeOfThought:
             )
             thoughts.append(child)
 
-        return thoughts[:self.branching_factor]
+        return thoughts[: self.branching_factor]
 
     def _evaluate_thought(self, node: ThoughtNode, problem: str) -> float:
         """Evaluate the quality of a thought (heuristic scoring)."""
@@ -389,9 +404,9 @@ class TreeOfThought:
         Returns the path of best thoughts.
         """
         if verbose:
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print(f"Tree-of-Thought: {problem[:80]}")
-            print(f"{'='*60}")
+            print(f"{'=' * 60}")
 
         # Initialize root
         self.root = ThoughtNode(
@@ -410,7 +425,9 @@ class TreeOfThought:
             # Evaluate current node
             current.score = self._evaluate_thought(current, problem)
             if verbose:
-                print(f"\n  Depth {current.depth}: {current.content[:60]}... (score: {current.score:.2f})")
+                print(
+                    f"\n  Depth {current.depth}: {current.content[:60]}... (score: {current.score:.2f})"
+                )
 
             # Check if terminal
             if self._is_terminal(current, problem):
@@ -436,7 +453,9 @@ class TreeOfThought:
         if verbose:
             print(f"\n  Best path ({len(path)} nodes):")
             for node in path:
-                print(f"    [{node.depth}] {node.content[:60]}... (score: {node.score:.2f})")
+                print(
+                    f"    [{node.depth}] {node.content[:60]}... (score: {node.score:.2f})"
+                )
 
         return path
 
@@ -477,6 +496,7 @@ class TreeOfThought:
 # SECTION 5: Backtracking and Replanning
 # ============================================================
 
+
 class BacktrackingPlanner:
     """
     Planner that supports backtracking when a step fails.
@@ -503,7 +523,7 @@ class BacktrackingPlanner:
 
         for i, step in enumerate(steps):
             if verbose:
-                print(f"\n  Step {i+1}: {step['name']}")
+                print(f"\n  Step {i + 1}: {step['name']}")
 
             success = False
             attempts = [step] + step.get("alternatives", [])
@@ -514,12 +534,14 @@ class BacktrackingPlanner:
 
                 try:
                     result = executor(attempt["name"], **attempt.get("args", {}))
-                    results.append({
-                        "step": attempt["name"],
-                        "result": result,
-                        "attempt": attempt_idx,
-                        "success": True,
-                    })
+                    results.append(
+                        {
+                            "step": attempt["name"],
+                            "result": result,
+                            "attempt": attempt_idx,
+                            "success": True,
+                        }
+                    )
                     completed_steps.add(attempt["name"])
                     success = True
 
@@ -538,12 +560,14 @@ class BacktrackingPlanner:
                         break
 
             if not success:
-                results.append({
-                    "step": step["name"],
-                    "result": None,
-                    "success": False,
-                    "error": "All attempts failed",
-                })
+                results.append(
+                    {
+                        "step": step["name"],
+                        "result": None,
+                        "success": False,
+                        "error": "All attempts failed",
+                    }
+                )
 
         self.execution_history = results
         return {
@@ -558,9 +582,11 @@ class BacktrackingPlanner:
 # SECTION 6: Self-Reflection and Evaluation
 # ============================================================
 
+
 @dataclass
 class ReflectionEntry:
     """A single reflection entry."""
+
     timestamp: datetime = field(default_factory=datetime.now)
     what_went_well: list[str] = field(default_factory=list)
     what_went_wrong: list[str] = field(default_factory=list)
@@ -589,9 +615,7 @@ class SelfReflector:
 
         # Analyze successes
         if completed:
-            reflection.what_went_well = [
-                f"Completed: {t.name}" for t in completed[:5]
-            ]
+            reflection.what_went_well = [f"Completed: {t.name}" for t in completed[:5]]
 
         # Analyze failures
         if failed:
@@ -623,7 +647,9 @@ class SelfReflector:
 
         return reflection
 
-    def reflect_on_step(self, step_name: str, success: bool, result: Any = None, error: str = "") -> ReflectionEntry:
+    def reflect_on_step(
+        self, step_name: str, success: bool, result: Any = None, error: str = ""
+    ) -> ReflectionEntry:
         """Reflect on a single step execution."""
         reflection = ReflectionEntry()
 
@@ -664,6 +690,7 @@ class SelfReflector:
 # SECTION 7: Plan Executor with Verification
 # ============================================================
 
+
 class PlanExecutor:
     """
     Executes plans with step verification, error handling,
@@ -676,12 +703,14 @@ class PlanExecutor:
         self.backtracker = BacktrackingPlanner(max_backtracks=3)
         self.execution_results: list[dict] = []
 
-    def execute_plan(self, plan: Plan, executor: Callable, verbose: bool = True) -> dict:
+    def execute_plan(
+        self, plan: Plan, executor: Callable, verbose: bool = True
+    ) -> dict:
         """Execute a plan with verification."""
         if verbose:
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print(f"Executing Plan: {plan.goal}")
-            print(f"{'='*60}")
+            print(f"{'=' * 60}")
 
         completed_tasks = set()
         results = []
@@ -716,12 +745,14 @@ class PlanExecutor:
                 task.actual_duration = duration
                 completed_tasks.add(task.id)
 
-                results.append({
-                    "task": task.name,
-                    "status": "completed",
-                    "result": str(result)[:100],
-                    "duration_ms": round(duration, 2),
-                })
+                results.append(
+                    {
+                        "task": task.name,
+                        "status": "completed",
+                        "result": str(result)[:100],
+                        "duration_ms": round(duration, 2),
+                    }
+                )
 
                 # Reflect on success
                 self.reflector.reflect_on_step(task.name, True, result)
@@ -732,11 +763,13 @@ class PlanExecutor:
             except Exception as e:
                 task.mark_failed(str(e))
 
-                results.append({
-                    "task": task.name,
-                    "status": "failed",
-                    "error": str(e),
-                })
+                results.append(
+                    {
+                        "task": task.name,
+                        "status": "failed",
+                        "error": str(e),
+                    }
+                )
 
                 # Reflect on failure
                 self.reflector.reflect_on_step(task.name, False, error=str(e))
@@ -789,6 +822,7 @@ class PlanExecutor:
 # SECTION 8: Complete Planning System
 # ============================================================
 
+
 class PlanningSystem:
     """
     Complete planning system combining decomposition, planning,
@@ -799,7 +833,9 @@ class PlanningSystem:
         self.executor = PlanExecutor()
         self.tot = TreeOfThought(max_depth=3, branching_factor=3)
 
-    def solve_problem(self, problem: str, steps: list[str] = None, verbose: bool = True) -> dict:
+    def solve_problem(
+        self, problem: str, steps: list[str] = None, verbose: bool = True
+    ) -> dict:
         """
         End-to-end problem solving:
         1. Tree-of-Thought reasoning
@@ -845,7 +881,9 @@ class PlanningSystem:
             time.sleep(0.01)  # Simulate work
             return f"Completed: {task_name}"
 
-        execution_result = self.executor.execute_plan(plan, mock_executor, verbose=verbose)
+        execution_result = self.executor.execute_plan(
+            plan, mock_executor, verbose=verbose
+        )
 
         # Step 4: Summary
         if verbose:
@@ -866,6 +904,7 @@ class PlanningSystem:
 # SECTION 9: Running the Exercises
 # ============================================================
 
+
 def exercise_1_task_decomposition():
     """Exercise 5.1: Task decomposition."""
     print("\n" + "=" * 60)
@@ -876,26 +915,32 @@ def exercise_1_task_decomposition():
 
     # Sequential decomposition
     print("\n  Sequential Decomposition:")
-    plan = decomposer.decompose_by_steps("Build a RAG system", [
-        "Design data pipeline",
-        "Implement document loader",
-        "Set up vector store",
-        "Create retrieval engine",
-        "Build generation pipeline",
-        "Test end-to-end",
-    ])
+    plan = decomposer.decompose_by_steps(
+        "Build a RAG system",
+        [
+            "Design data pipeline",
+            "Implement document loader",
+            "Set up vector store",
+            "Create retrieval engine",
+            "Build generation pipeline",
+            "Test end-to-end",
+        ],
+    )
 
     for i, task in enumerate(plan.subtasks):
         deps = f" (deps: {task.dependencies})" if task.dependencies else ""
-        print(f"    {i+1}. {task.name}{deps}")
+        print(f"    {i + 1}. {task.name}{deps}")
 
     # Phased decomposition
     print("\n  Phased Decomposition:")
-    phased = decomposer.decompose_by_phases("Launch product", {
-        "Planning": ["Define requirements", "Create timeline", "Assign resources"],
-        "Development": ["Build core features", "Write tests", "Code review"],
-        "Deployment": ["Set up CI/CD", "Deploy to staging", "Production release"],
-    })
+    phased = decomposer.decompose_by_phases(
+        "Launch product",
+        {
+            "Planning": ["Define requirements", "Create timeline", "Assign resources"],
+            "Development": ["Build core features", "Write tests", "Code review"],
+            "Deployment": ["Set up CI/CD", "Deploy to staging", "Production release"],
+        },
+    )
 
     for phase in phased.subtasks:
         print(f"\n    Phase: {phase.name}")
@@ -912,12 +957,15 @@ def exercise_2_planner():
     planner = Planner()
 
     # Create a plan
-    plan = planner.create_plan("Analyze customer feedback", [
-        "Collect feedback data",
-        "Clean and preprocess",
-        "Run sentiment analysis",
-        "Generate insights report",
-    ])
+    plan = planner.create_plan(
+        "Analyze customer feedback",
+        [
+            "Collect feedback data",
+            "Clean and preprocess",
+            "Run sentiment analysis",
+            "Generate insights report",
+        ],
+    )
 
     print(f"\n  Plan: {plan.goal}")
     print(f"  Tasks: {len(plan.get_all_tasks())}")
@@ -979,13 +1027,19 @@ def exercise_4_backtracking():
         call_count[task_name] = call_count.get(task_name, 0) + 1
         source = kwargs.get("source", "")
 
-        if task_name == "fetch_data" and source == "api" and call_count["fetch_data"] <= 1:
+        if (
+            task_name == "fetch_data"
+            and source == "api"
+            and call_count["fetch_data"] <= 1
+        ):
             raise ConnectionError("API unavailable")
 
         return f"Result from {task_name}({source})"
 
     result = planner.execute_with_backtrack(steps, mock_executor, verbose=True)
-    print(f"\n  Result: {json.dumps({k: v for k, v in result.items() if k != 'results'}, indent=4)}")
+    print(
+        f"\n  Result: {json.dumps({k: v for k, v in result.items() if k != 'results'}, indent=4)}"
+    )
 
 
 def exercise_5_self_reflection():
@@ -1006,9 +1060,13 @@ def exercise_5_self_reflection():
 
     for task_name, success, result_or_error in test_cases:
         if success:
-            reflection = reflector.reflect_on_step(task_name, True, result=result_or_error)
+            reflection = reflector.reflect_on_step(
+                task_name, True, result=result_or_error
+            )
         else:
-            reflection = reflector.reflect_on_step(task_name, False, error=result_or_error)
+            reflection = reflector.reflect_on_step(
+                task_name, False, error=result_or_error
+            )
         print(f"\n  Reflected on: {task_name}")
         print(f"    Score: {reflection.overall_score}")
         if reflection.lessons_learned:
@@ -1070,8 +1128,16 @@ def exercise_7_advanced_planning():
             """Create a hierarchical plan."""
             return {
                 "goal": goal,
-                "strategic": ["Define success criteria", "Identify resources", "Set timeline"],
-                "tactical": ["Break into phases", "Assign responsibilities", "Set milestones"],
+                "strategic": [
+                    "Define success criteria",
+                    "Identify resources",
+                    "Set timeline",
+                ],
+                "tactical": [
+                    "Break into phases",
+                    "Assign responsibilities",
+                    "Set milestones",
+                ],
                 "operational": ["Daily tasks", "Weekly reviews", "Monthly adjustments"],
             }
 
@@ -1093,19 +1159,36 @@ def exercise_7_advanced_planning():
             plan = {"goal": goal, "branches": []}
 
             for condition, steps in conditions.items():
-                plan["branches"].append({
-                    "condition": condition,
-                    "steps": steps,
-                })
+                plan["branches"].append(
+                    {
+                        "condition": condition,
+                        "steps": steps,
+                    }
+                )
 
             return plan
 
     c_planner = ConditionalPlanner()
-    c_plan = c_planner.plan_with_conditions("Deploy application", {
-        "if tests_pass": ["Deploy to staging", "Run smoke tests", "Deploy to production"],
-        "if tests_fail": ["Fix failing tests", "Re-run test suite", "Deploy to staging"],
-        "if performance_issue": ["Profile application", "Optimize bottlenecks", "Re-test"],
-    })
+    c_plan = c_planner.plan_with_conditions(
+        "Deploy application",
+        {
+            "if tests_pass": [
+                "Deploy to staging",
+                "Run smoke tests",
+                "Deploy to production",
+            ],
+            "if tests_fail": [
+                "Fix failing tests",
+                "Re-run test suite",
+                "Deploy to staging",
+            ],
+            "if performance_issue": [
+                "Profile application",
+                "Optimize bottlenecks",
+                "Re-test",
+            ],
+        },
+    )
 
     for branch in c_plan["branches"]:
         print(f"\n    IF {branch['condition']}:")
@@ -1139,11 +1222,13 @@ def exercise_7_advanced_planning():
                         improved.append(step)
 
                 current_plan = improved
-                self.iterations.append({
-                    "iteration": i + 1,
-                    "score": feedback["score"],
-                    "changes": len(feedback.get("weak_steps", [])),
-                })
+                self.iterations.append(
+                    {
+                        "iteration": i + 1,
+                        "score": feedback["score"],
+                        "changes": len(feedback.get("weak_steps", [])),
+                    }
+                )
 
             return current_plan
 
@@ -1152,7 +1237,10 @@ def exercise_7_advanced_planning():
 
     def feedback(plan):
         weak = [p for p in plan if "IMPROVED" not in p and p != plan[-1]]
-        return {"score": 0.5 + len([p for p in plan if "IMPROVED" in p]) * 0.2, "weak_steps": weak[:2]}
+        return {
+            "score": 0.5 + len([p for p in plan if "IMPROVED" in p]) * 0.2,
+            "weak_steps": weak[:2],
+        }
 
     refined = planner.refine(initial, feedback)
     print(f"\n    Initial: {initial}")

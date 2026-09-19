@@ -28,9 +28,9 @@ import numpy as np
 arr = np.array([10, 20, 30, 40, 50])
 
 # Positive indexing (0-based)
-print(arr[0])   # 10 (first element)
-print(arr[2])   # 30 (third element)
-print(arr[4])   # 50 (last element)
+print(arr[0])  # 10 (first element)
+print(arr[2])  # 30 (third element)
+print(arr[4])  # 50 (last element)
 
 # Negative indexing
 print(arr[-1])  # 50 (last element)
@@ -44,29 +44,26 @@ print(arr[-5])  # 10 (first element)
 ### 1.2 2D Array Indexing
 
 ```python
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Access by row, column
-print(matrix[0, 0])   # 1 (first row, first column)
-print(matrix[0, 2])   # 3 (first row, third column)
-print(matrix[2, 1])   # 8 (third row, second column)
+print(matrix[0, 0])  # 1 (first row, first column)
+print(matrix[0, 2])  # 3 (first row, third column)
+print(matrix[2, 1])  # 8 (third row, second column)
 
 # Negative indexing
-print(matrix[-1, -1]) # 9 (last row, last column)
+print(matrix[-1, -1])  # 9 (last row, last column)
 print(matrix[-2, 0])  # 4 (second row, first column)
 
 # Single index returns entire row
-print(matrix[0])      # [1 2 3]
-print(matrix[1])      # [4 5 6]
+print(matrix[0])  # [1 2 3]
+print(matrix[1])  # [4 5 6]
 ```
 
 ### 1.3 3D Array Indexing
 
 ```python
-tensor = np.array([[[1, 2], [3, 4]],
-                   [[5, 6], [7, 8]]])
+tensor = np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
 
 # Access by depth, row, column
 print(tensor[0, 0, 0])  # 1
@@ -75,7 +72,7 @@ print(tensor[1, 0, 1])  # 6
 print(tensor[1, 1, 0])  # 7
 
 # Access entire depth
-print(tensor[0])        # [[1 2] [3 4]]
+print(tensor[0])  # [[1 2] [3 4]]
 ```
 
 ---
@@ -85,21 +82,19 @@ print(tensor[0])        # [[1 2] [3 4]]
 ### 2.1 Row and Column Selection
 
 ```python
-matrix = np.array([[1, 2, 3, 4],
-                   [5, 6, 7, 8],
-                   [9, 10, 11, 12]])
+matrix = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]])
 
 # Select entire row
-print(matrix[0])       # [1 2 3 4]
-print(matrix[1])       # [5 6 7 8]
+print(matrix[0])  # [1 2 3 4]
+print(matrix[1])  # [5 6 7 8]
 
 # Select entire column
-print(matrix[:, 0])    # [1 5 9]
-print(matrix[:, 2])    # [3 7 11]
+print(matrix[:, 0])  # [1 5 9]
+print(matrix[:, 2])  # [3 7 11]
 
 # Select specific row and column
-print(matrix[0, 0])    # 1
-print(matrix[1, 2])    # 7
+print(matrix[0, 0])  # 1
+print(matrix[1, 2])  # 7
 ```
 
 ### 2.2 Axis-Based Indexing
@@ -109,8 +104,8 @@ print(matrix[1, 2])    # 7
 arr_3d = np.random.rand(2, 3, 4)  # 2 blocks, 3 rows, 4 columns
 
 # Axis 0 — blocks (depth)
-print(arr_3d[0].shape)   # (3, 4)
-print(arr_3d[1].shape)   # (3, 4)
+print(arr_3d[0].shape)  # (3, 4)
+print(arr_3d[1].shape)  # (3, 4)
 
 # Axis 1 — rows
 print(arr_3d[:, 0].shape)  # (2, 4)
@@ -140,9 +135,7 @@ print(arr[indices])  # [10 10 20 20 30 30]
 ### 3.2 2D Fancy Indexing
 
 ```python
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Select rows 0 and 2
 print(matrix[[0, 2]])
@@ -206,9 +199,7 @@ print(arr[(arr > 20) & (arr < 50)])  # [30 40]
 ### 4.2 2D Boolean Indexing
 
 ```python
-matrix = np.array([[1, 2, 3],
-                   [4, 5, 6],
-                   [7, 8, 9]])
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 # Boolean mask for entire matrix
 mask = matrix > 5
@@ -289,11 +280,11 @@ print(indices)  # (array([3, 4]),)
 arr = np.array([1, 2, 3, 4, 5])
 
 # Original shape
-print(arr.shape)       # (5,)
+print(arr.shape)  # (5,)
 
 # Add new axis at position 1 (column vector)
 col = arr[:, np.newaxis]
-print(col.shape)       # (5, 1)
+print(col.shape)  # (5, 1)
 print(col)
 # [[1]
 #  [2]
@@ -303,8 +294,8 @@ print(col)
 
 # Add new axis at position 0 (row vector)
 row = arr[np.newaxis, :]
-print(row.shape)       # (1, 5)
-print(row)             # [[1 2 3 4 5]]
+print(row.shape)  # (1, 5)
+print(row)  # [[1 2 3 4 5]]
 
 # Equivalent using reshape
 col = arr.reshape(-1, 1)
@@ -331,8 +322,8 @@ print(subset.shape)  # (2,)
 
 # Integer array indexing — returns an ARRAY
 fancy = arr[[0, 2]]
-print(type(fancy))   # <class 'numpy.ndarray'>
-print(fancy.shape)   # (2,)
+print(type(fancy))  # <class 'numpy.ndarray'>
+print(fancy.shape)  # (2,)
 
 # Boolean indexing — returns an ARRAY
 bool_arr = arr[arr > 2]
@@ -369,7 +360,7 @@ print(arr)  # [ 1 99  3  4  5] — arr is NOT modified
 ```python
 arr = np.array([10, 20, 30, 40, 50])
 # arr[1.5]  # IndexError: only integers can be used for indexing
-arr[1]      # Correct — returns 20
+arr[1]  # Correct — returns 20
 ```
 
 ### Mistake 2: Modifying a View
@@ -438,19 +429,16 @@ arr = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
 # e) Get elements at indices 0, 2, 4, 6, 8
 
 # Solutions:
-print(arr[0])        # 10
-print(arr[-1])       # 100
-print(arr[4])        # 50
-print(arr[-3])       # 80
-print(arr[0:9:2])    # [10 30 50 70 90]
+print(arr[0])  # 10
+print(arr[-1])  # 100
+print(arr[4])  # 50
+print(arr[-3])  # 80
+print(arr[0:9:2])  # [10 30 50 70 90]
 ```
 
 ### Exercise 2: 2D Indexing
 ```python
-matrix = np.array([[1, 2, 3, 4],
-                   [5, 6, 7, 8],
-                   [9, 10, 11, 12],
-                   [13, 14, 15, 16]])
+matrix = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]])
 
 # a) Get element at row 1, column 2
 # b) Get entire row 2
@@ -458,9 +446,9 @@ matrix = np.array([[1, 2, 3, 4],
 # d) Get submatrix rows 0-1, columns 1-2
 
 # Solutions:
-print(matrix[1, 2])    # 7
-print(matrix[2])       # [9 10 11 12]
-print(matrix[:, 0])    # [1 5 9 13]
+print(matrix[1, 2])  # 7
+print(matrix[2])  # [9 10 11 12]
+print(matrix[:, 0])  # [1 5 9 13]
 print(matrix[0:2, 1:3])
 # [[2 3]
 #  [6 7]]
@@ -476,9 +464,9 @@ arr = np.array([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
 # d) Replace all elements > 30 with 0
 
 # Solutions:
-print(arr[arr > 25])              # [30 35 40 45 50]
+print(arr[arr > 25])  # [30 35 40 45 50]
 print(arr[(arr >= 15) & (arr <= 35)])  # [15 20 25 30 35]
-print(arr[arr % 2 == 0])          # [10 20 30 40 50]
+print(arr[arr % 2 == 0])  # [10 20 30 40 50]
 arr_copy = arr.copy()
 arr_copy[arr_copy > 30] = 0
 print(arr_copy)

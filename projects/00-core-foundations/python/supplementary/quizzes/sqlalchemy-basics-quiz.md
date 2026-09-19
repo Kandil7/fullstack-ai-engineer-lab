@@ -35,6 +35,7 @@ class User(Base):
     name: Mapped[str] = mapped_column(unique=True)
     role: Mapped[str] = mapped_column(default="researcher")
 
+
 # The table is created. Which statement about the schema is TRUE?
 ```
 
@@ -213,10 +214,7 @@ D) The association table; defines its columns
 **What does this code output?**
 
 ```python
-rows = session.execute(
-    select(Experiment.model, func.count())
-    .group_by(Experiment.model)
-).all()
+rows = session.execute(select(Experiment.model, func.count()).group_by(Experiment.model)).all()
 ```
 
 A) A list of `Experiment` objects

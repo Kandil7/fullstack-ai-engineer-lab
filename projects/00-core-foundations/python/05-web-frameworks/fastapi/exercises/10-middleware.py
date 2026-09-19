@@ -87,8 +87,7 @@ async def rate_limit(request: Request, call_next):
 
     # Clean up old timestamps
     rate_limit_store[client_ip] = [
-        t for t in rate_limit_store[client_ip]
-        if now - t < WINDOW_SECONDS
+        t for t in rate_limit_store[client_ip] if now - t < WINDOW_SECONDS
     ]
 
     # Check limit

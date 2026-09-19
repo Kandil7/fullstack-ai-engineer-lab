@@ -3,14 +3,17 @@ Matplotlib Labels - W3Schools Exercises
 =========================================
 Title, xlabel, ylabel, and text customization.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -56,11 +59,15 @@ def exercise_03():
     counts = [25, 40, 30, 55, 20]
 
     plt.figure(figsize=(8, 5))
-    bars = plt.bar(fruits, counts, color=["#e74c3c", "#f1c40f", "#e91e63",
-                                           "#8d6e63", "#7e57c2"])
+    bars = plt.bar(fruits, counts, color=["#e74c3c", "#f1c40f", "#e91e63", "#8d6e63", "#7e57c2"])
     for bar, count in zip(bars, counts):
-        plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1,
-                 str(count), ha="center", fontweight="bold")
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 1,
+            str(count),
+            ha="center",
+            fontweight="bold",
+        )
     plt.title("Fruit Inventory")
     plt.xlabel("Fruit Type")
     plt.ylabel("Count")
@@ -75,7 +82,7 @@ def exercise_04():
     x = np.linspace(-2, 2, 200)
 
     plt.figure(figsize=(10, 5))
-    plt.plot(x, np.exp(-x**2), label=r"$e^{-x^2}$", linewidth=2)
+    plt.plot(x, np.exp(-(x**2)), label=r"$e^{-x^2}$", linewidth=2)
     plt.plot(x, 1 / (1 + x**2), label=r"$\frac{1}{1+x^2}$", linewidth=2, linestyle="--")
     plt.legend(fontsize=14)
     plt.title(r"Exercise 4: LaTeX Labels ($\sigma = 1$)", fontsize=14)
@@ -102,8 +109,15 @@ def exercise_05():
     ax.set_ylabel("Units Sold")
     ax.legend()
 
-    fig.text(0.5, 0.01, "Source: Internal Report Q1-Q2 2024", ha="center",
-             fontsize=9, fontstyle="italic", color="gray")
+    fig.text(
+        0.5,
+        0.01,
+        "Source: Internal Report Q1-Q2 2024",
+        ha="center",
+        fontsize=9,
+        fontstyle="italic",
+        color="gray",
+    )
     plt.tight_layout(rect=[0, 0.03, 1, 1])
     plt.savefig(OUTPUT_DIR / "06_exercise_05.png", dpi=100, bbox_inches="tight")
     plt.close()

@@ -25,11 +25,7 @@ def predicate_pushed(path: str, column: str, value: str) -> bool:
     SELECTION line at the scan node. Explaining is metadata-only — no
     data is read, which is exactly what the check is for.
     """
-    plan = (
-        pl.scan_parquet(path)
-        .filter(pl.col(column) == value)
-        .explain(optimized=True)
-    )
+    plan = pl.scan_parquet(path).filter(pl.col(column) == value).explain(optimized=True)
     return "SELECTION" in plan
 
 
@@ -42,18 +38,16 @@ def _projected_columns(plan: str) -> int:
     return -1
 
 
-def project_and_filter(path: str, keep: list[str], column: str, value: str) -> tuple[pl.DataFrame, int]:
+def project_and_filter(
+    path: str, keep: list[str], column: str, value: str
+) -> tuple[pl.DataFrame, int]:
     """Return (result, columns_read) with columns_read from the plan.
 
     Why this approach: building the whole pipeline on the lazy frame lets
     the optimizer push both the predicate and the projection into the
     parquet scan; the plan text then proves how many columns were read.
     """
-    lf = (
-        pl.scan_parquet(path)
-        .filter(pl.col(column) == value)
-        .select(keep)
-    )
+    lf = pl.scan_parquet(path).filter(pl.col(column) == value).select(keep)
     plan = lf.explain(optimized=True)
     result = lf.collect(engine="streaming")
     return result, _projected_columns(plan)

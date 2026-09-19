@@ -29,11 +29,14 @@
 class Store:
     def get(self, key: str) -> str: ...
 
+
 class RedisAdapter:
     def __init__(self) -> None:
         self._data: dict[str, str] = {}
-    def get(self, key: str) -> str:           # redis client would go here
+
+    def get(self, key: str) -> str:  # redis client would go here
         return self._data.get(key, "")
+
 
 print(RedisAdapter().get("k"))
 ```
@@ -49,10 +52,13 @@ print(RedisAdapter().get("k"))
 class InsertCommand:
     def __init__(self, buf: list[str], offset: int, text: str) -> None:
         self._buf, self._offset, self._text = buf, offset, text
+
     def execute(self) -> None:
         self._buf.insert(self._offset, self._text)
+
     def undo(self) -> None:
         del self._buf[self._offset]
+
 
 buf = ["a", "c"]
 cmd = InsertCommand(buf, 1, "b")
@@ -75,11 +81,14 @@ class Writer:
     def write(self, s: str) -> str:
         return s
 
+
 class Printer:
-    def __init__(self, writer: Writer) -> None:   # holds, not extends
+    def __init__(self, writer: Writer) -> None:  # holds, not extends
         self._writer = writer
+
     def print(self, s: str) -> str:
         return self._writer.write(s)
+
 
 print(Printer(Writer()).print("hi"))
 ```
@@ -93,10 +102,12 @@ hi
 **Example**:
 ```python
 class Greeter:
-    def __init__(self, name: str) -> None:   # injected, not global
+    def __init__(self, name: str) -> None:  # injected, not global
         self._name = name
+
     def greet(self) -> str:
         return f"hi {self._name}"
+
 
 print(Greeter("ana").greet())
 ```
@@ -113,11 +124,14 @@ class Engine:
     def move(self) -> str:
         return "moving"
 
+
 class Car:
-    def __init__(self, engine: Engine) -> None:   # decoupled from engine impl
+    def __init__(self, engine: Engine) -> None:  # decoupled from engine impl
         self._engine = engine
+
     def drive(self) -> str:
         return self._engine.move()
+
 
 print(Car(Engine()).drive())
 ```
@@ -134,12 +148,15 @@ class LLM:
     def complete(self, prompt: str) -> str:
         return "real:" + prompt
 
+
 class FakeLLM:
     def complete(self, prompt: str) -> str:
         return "fake:" + prompt
 
+
 def run(llm: LLM) -> str:
     return llm.complete("x")
+
 
 print(run(LLM()), run(FakeLLM()))
 ```
@@ -155,6 +172,7 @@ real:x fake:x
 class FakeLLMClient:
     def complete(self, prompt: str, temperature: float = 0.0) -> str:
         return f"FAKE:{prompt[:5]}:{temperature}"
+
 
 print(FakeLLMClient().complete("summarize this doc"))
 ```
@@ -174,11 +192,14 @@ class Tool:
         super().__init_subclass__(**kw)
         cls.registry[cls.__name__.lower()] = cls
 
+
 class Search(Tool):
     pass
 
+
 class Calculator(Tool):
     pass
+
 
 print(sorted(Tool.registry))
 ```
@@ -201,13 +222,16 @@ class Plugin:
     def run(self) -> str:
         raise NotImplementedError
 
+
 class A(Plugin):
     def run(self) -> str:
         return "A"
 
+
 class B(Plugin):
     def run(self) -> str:
         return "B"
+
 
 print([p().run() for p in Plugin.plugins])
 ```
@@ -230,9 +254,11 @@ class Tool:
     def run(self, args: dict) -> str:
         raise NotImplementedError
 
+
 class Calculator(Tool):
     def run(self, args: dict) -> str:
         return str(args.get("a", 0) + args.get("b", 0))
+
 
 tool = Tool.registry["calculator"]()
 print(tool.run({"a": 2, "b": 3}))
@@ -249,15 +275,19 @@ print(tool.run({"a": 2, "b": 3}))
 ```python
 from typing import Protocol
 
+
 class Sender(Protocol):
     def send(self, msg: str) -> str: ...
 
-def notify(s: Sender, msg: str) -> str:      # the seam: any Sender works
+
+def notify(s: Sender, msg: str) -> str:  # the seam: any Sender works
     return s.send(msg)
+
 
 class Email:
     def send(self, msg: str) -> str:
         return f"email:{msg}"
+
 
 print(notify(Email(), "hi"))
 ```
@@ -273,11 +303,14 @@ email:hi
 class FixedChunker:
     def __init__(self, size: int) -> None:
         self._size = size
+
     def chunk(self, text: str) -> list[str]:
-        return [text[i:i + self._size] for i in range(0, len(text), self._size)]
+        return [text[i : i + self._size] for i in range(0, len(text), self._size)]
+
 
 def index(text: str, chunker: FixedChunker) -> list[str]:
     return chunker.chunk(text)
+
 
 print(index("abcdef", FixedChunker(2)))
 ```
@@ -292,7 +325,8 @@ print(index("abcdef", FixedChunker(2)))
 ```python
 class Stub:
     def complete(self, prompt: str) -> str:
-        return "canned"          # same answer every time
+        return "canned"  # same answer every time
+
 
 print(Stub().complete("anything"))
 ```
@@ -308,10 +342,13 @@ canned
 class Append:
     def __init__(self, buf: list[str], item: str) -> None:
         self._buf, self._item = buf, item
+
     def execute(self) -> None:
         self._buf.append(self._item)
+
     def undo(self) -> None:
         self._buf.pop()
+
 
 buf: list[str] = []
 history: list[Append] = []
@@ -337,8 +374,10 @@ class Store:
     def put(self, k: str, v: str) -> str:
         return f"put {k}={v}"
 
-def save(s: Store, k: str, v: str) -> str:   # depends on OUR interface
+
+def save(s: Store, k: str, v: str) -> str:  # depends on OUR interface
     return s.put(k, v)
+
 
 print(save(Store(), "a", "1"))
 ```

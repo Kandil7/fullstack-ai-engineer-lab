@@ -11,12 +11,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
 starter_spec = importlib.util.spec_from_file_location(
-    "starter", Path(__file__).parent / "starter.py")
+    "starter", Path(__file__).parent / "starter.py"
+)
 starter_module = importlib.util.module_from_spec(starter_spec)
 starter_spec.loader.exec_module(starter_module)
 
 solution_spec = importlib.util.spec_from_file_location(
-    "solution", Path(__file__).parent / "solution.py")
+    "solution", Path(__file__).parent / "solution.py"
+)
 solution_module = importlib.util.module_from_spec(solution_spec)
 solution_spec.loader.exec_module(solution_module)
 
@@ -29,8 +31,7 @@ class TestPlanFor:
         conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, v TEXT)")
         conn.execute("CREATE INDEX idx_t_v ON t(v)")
         # enough rows that the planner prefers the index over a scan
-        conn.executemany("INSERT INTO t (v) VALUES (?)",
-                         [(f"v{i % 7}",) for i in range(2000)])
+        conn.executemany("INSERT INTO t (v) VALUES (?)", [(f"v{i % 7}",) for i in range(2000)])
         plans = solution_module.plan_for(conn, "SELECT * FROM t WHERE v = ?", ("v3",))
         assert any("SEARCH t USING" in p and "idx_t_v" in p for p in plans)
 

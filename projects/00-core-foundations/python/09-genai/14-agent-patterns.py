@@ -27,8 +27,8 @@ from typing import Any
 # Alternating: think (Reason), then act (tool call), observe, repeat.
 # The loop must ALWAYS have a max iteration count.
 
-def react_loop(problem: str, max_steps: int, tools: dict[str, Any],
-               reason_fn, act_fn) -> dict:
+
+def react_loop(problem: str, max_steps: int, tools: dict[str, Any], reason_fn, act_fn) -> dict:
     """A bounded ReAct loop. Returns the trail and final answer."""
     trail: list[dict] = []
     for step in range(max_steps):
@@ -39,19 +39,20 @@ def react_loop(problem: str, max_steps: int, tools: dict[str, Any],
         action = act_fn(thought, tools)
         trail.append({"step": step, "action": action})
         if action.get("error"):
-            return {"answer": f"failed: {action['error']}",
-                    "steps": step + 1, "trail": trail}
+            return {"answer": f"failed: {action['error']}", "steps": step + 1, "trail": trail}
     return {"answer": "MAX_STEPS reached - gave up", "steps": max_steps, "trail": trail}
 
 
 # Example 1: a toy ReAct agent
 TOOLS = {"add": lambda a, b: a + b, "mul": lambda a, b: a * b}
 
+
 def toy_reason(problem: str, trail: list[dict]) -> dict:
     # naive: if no multiplication yet, ask for it; else declare done
     if not any("mul" in str(t.get("action", {})) for t in trail):
         return {"tool": "mul", "args": {"a": 6, "b": 7}}
     return {"done": True, "answer": "42"}
+
 
 def toy_act(thought: dict, tools: dict[str, Any]) -> dict:
     name = thought.get("tool")
@@ -63,8 +64,7 @@ def toy_act(thought: dict, tools: dict[str, Any]) -> dict:
         return {"error": str(e)}
 
 
-result = react_loop("What is 6*7?", max_steps=5, tools=TOOLS,
-                    reason_fn=toy_reason, act_fn=toy_act)
+result = react_loop("What is 6*7?", max_steps=5, tools=TOOLS, reason_fn=toy_reason, act_fn=toy_act)
 print("Example 1: bounded ReAct loop")
 print(f"  answer={result['answer']} in {result['steps']} steps")
 assert result["answer"] == "42" and result["steps"] == 2
@@ -74,6 +74,7 @@ assert result["answer"] == "42" and result["steps"] == 2
 # ============================================================
 # An unbounded agent loops forever, spending tokens every turn. Cap
 # steps AND token budget; stop when either is exhausted.
+
 
 def runaway_agent(max_steps: int) -> int:
     """A bad agent that never finishes - the cap saves you."""
@@ -97,6 +98,7 @@ assert steps_taken == 10
 # Separate the planning (write the whole plan first) from execution
 # (run each step). Better for multi-step tasks; costs an extra call.
 
+
 def plan_and_execute(task: str, planner, executor, max_steps: int = 5) -> dict:
     plan = planner(task)
     results = []
@@ -107,6 +109,7 @@ def plan_and_execute(task: str, planner, executor, max_steps: int = 5) -> dict:
 
 def toy_planner(task: str) -> list[str]:
     return ["load data", "clean data", "train model"]
+
 
 def toy_executor(step: str) -> str:
     return f"done: {step}"
@@ -124,6 +127,7 @@ assert len(pe["plan"]) == 3 and len(pe["results"]) == 3
 # After producing an answer, ask the model to critique it, then improve.
 # Expensive (2-3x calls) but effective for hard tasks.
 
+
 def reflect(answer: str, critic) -> tuple[str, bool]:
     critique = critic(answer)
     if critique.get("ok"):
@@ -132,8 +136,7 @@ def reflect(answer: str, critic) -> tuple[str, bool]:
 
 
 def toy_critic(answer: str) -> dict:
-    return {"ok": False, "issue": "missing citation"} if "source" not in answer \
-        else {"ok": True}
+    return {"ok": False, "issue": "missing citation"} if "source" not in answer else {"ok": True}
 
 
 # Example 4: reflection cycle
@@ -147,6 +150,7 @@ assert not accepted and "revised" in final
 # ============================================================
 # If the steps are fixed and known, a pipeline is cheaper, faster, and
 # deterministic. Agents pay for flexibility you may not need.
+
 
 def architecture_advice(task_kind: str) -> str:
     if task_kind in ("fixed pipeline", "ETL", "rule-based"):
@@ -168,6 +172,7 @@ assert architecture_advice("open-ended research").startswith("AGENT")
 # ============================================================
 # The production agent: bounded loop, budget caps, state dict, and a
 # hard exit on repeated failure.
+
 
 def production_agent(task: str, max_steps: int, max_failures: int = 2) -> dict:
     state: dict[str, Any] = {"task": task, "failures": 0}
@@ -193,13 +198,13 @@ def production_agent(task: str, max_steps: int, max_failures: int = 2) -> dict:
 # ============================================================
 def _verify() -> None:
     # react loop with unknown tool -> graceful failure
-    bad = react_loop("x", 3, TOOLS,
-                     lambda p, t: {"tool": "ghost", "args": {}}, toy_act)
+    bad = react_loop("x", 3, TOOLS, lambda p, t: {"tool": "ghost", "args": {}}, toy_act)
     assert bad["answer"].startswith("failed"), "unknown tool handled"
 
     # loop that never finishes hits the cap
-    never = react_loop("x", 4, TOOLS,
-                       lambda p, t: {"tool": "add", "args": {"a": 1, "b": 1}}, toy_act)
+    never = react_loop(
+        "x", 4, TOOLS, lambda p, t: {"tool": "add", "args": {"a": 1, "b": 1}}, toy_act
+    )
     assert never["answer"] == "MAX_STEPS reached - gave up", "cap enforced"
 
     assert runaway_agent(3) == 3, "cap enforced"

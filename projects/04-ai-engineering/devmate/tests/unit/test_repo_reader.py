@@ -3,10 +3,7 @@
 import textwrap
 from pathlib import Path
 
-import pytest
-
 from devmate.ingest.repo_reader import RepoAnalyzer, analyze_repository
-
 
 SAMPLE_PY = textwrap.dedent(
     """\

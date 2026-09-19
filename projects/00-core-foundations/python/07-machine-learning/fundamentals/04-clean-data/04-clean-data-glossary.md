@@ -41,11 +41,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
 
-pipe = Pipeline([
-    ('imputer', SimpleImputer(strategy='mean')),
-    ('scaler', StandardScaler()),
-    ('model', LinearRegression())
-])
+pipe = Pipeline(
+    [
+        ("imputer", SimpleImputer(strategy="mean")),
+        ("scaler", StandardScaler()),
+        ("model", LinearRegression()),
+    ]
+)
 
 pipe.fit(X_train, y_train)
 score = pipe.score(X_test, y_test)
@@ -71,7 +73,7 @@ X_train, X_test = train_test_split(X_scaled, test_size=0.2)
 X_train, X_test = train_test_split(X, test_size=0.2)
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)  # Only training data
-X_test_scaled = scaler.transform(X_test)         # Use training statistics
+X_test_scaled = scaler.transform(X_test)  # Use training statistics
 ```
 
 **Related Terms:** Train/Test Split, Fit, Transform, Preprocessing
@@ -110,7 +112,7 @@ print(f"Outliers: {outliers}")  # [100]
 import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({'A': [1, np.nan, 3, np.nan, 5]})
+df = pd.DataFrame({"A": [1, np.nan, 3, np.nan, 5]})
 
 # Mean imputation
 df_mean = df.fillna(df.mean())
@@ -123,7 +125,8 @@ df_zero = df.fillna(0)
 
 # Using sklearn
 from sklearn.impute import SimpleImputer
-imputer = SimpleImputer(strategy='mean')
+
+imputer = SimpleImputer(strategy="mean")
 df_imputed = pd.DataFrame(imputer.fit_transform(df), columns=df.columns)
 ```
 
@@ -163,8 +166,8 @@ print("Log-transformed:", log_income)
 import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({'age': [25, 30, np.nan, 45, 50]})
-mean_val = df['age'].mean()
+df = pd.DataFrame({"age": [25, 30, np.nan, 45, 50]})
+mean_val = df["age"].mean()
 df_filled = df.fillna(mean_val)
 
 print(f"Mean: {mean_val:.1f}")  # 37.5
@@ -181,8 +184,8 @@ print(df_filled)
 import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({'salary': [50000, 60000, 75000, np.nan, 200000]})
-median_val = df['salary'].median()
+df = pd.DataFrame({"salary": [50000, 60000, 75000, np.nan, 200000]})
+median_val = df["salary"].median()
 df_filled = df.fillna(median_val)
 
 print(f"Median: {median_val:.0f}")  # 67500 (robust to 200000 outlier)
@@ -299,8 +302,8 @@ scaler = StandardScaler()
 scaled = scaler.fit_transform(data)
 
 print("Standardized:\n", scaled)
-print("Mean:", scaled.mean(axis=0))   # [0, 0]
-print("Std:", scaled.std(axis=0))     # [1, 1]
+print("Mean:", scaled.mean(axis=0))  # [0, 0]
+print("Std:", scaled.std(axis=0))  # [1, 1]
 ```
 
 **Related Terms:** MinMaxScaler, RobustScaler, Z-Score, Standardization
@@ -323,6 +326,7 @@ X_standardized = (X - mean) / std
 
 # Using sklearn
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
 X_standardized = scaler.fit_transform(X)
 ```

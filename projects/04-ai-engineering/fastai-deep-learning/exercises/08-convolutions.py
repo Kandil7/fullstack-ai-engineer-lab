@@ -43,9 +43,7 @@ def detect_vertical_edges(image: torch.Tensor) -> torch.Tensor:
     """Return the feature map from a vertical edge kernel over `image`."""
     # image arrives shaped (1, 1, H, W)
     kernel = torch.tensor(
-        [[-1.0, 0.0, 1.0],
-         [-2.0, 0.0, 2.0],
-         [-1.0, 0.0, 1.0]]
+        [[-1.0, 0.0, 1.0], [-2.0, 0.0, 2.0], [-1.0, 0.0, 1.0]]
     ).reshape(1, 1, 3, 3)
     return F.conv2d(image, kernel)
 
@@ -68,9 +66,7 @@ def conv_output_size(n: int, k: int, stride: int, padding: int) -> int:
 # EXERCISE: create an nn.Conv2d with `in_ch` input channels, `out_ch` filters,
 # a 3x3 kernel and padding=1 ('same' for stride 1), then apply it to `x`.
 # =============================================================================
-def apply_conv_layer(
-    x: torch.Tensor, in_ch: int, out_ch: int
-) -> torch.Tensor:
+def apply_conv_layer(x: torch.Tensor, in_ch: int, out_ch: int) -> torch.Tensor:
     """Run x (N, in_ch, H, W) through a same-size 3x3 conv layer."""
     conv = nn.Conv2d(in_ch, out_ch, kernel_size=3, padding=1)
     return conv(x)
@@ -97,12 +93,12 @@ def conv_block(in_ch: int, out_ch: int) -> nn.Sequential:
 def build_tiny_cnn(n_classes: int = 10) -> nn.Sequential:
     """A small CNN: 28 -> 14 -> 7 -> 4 -> 1, then a linear head."""
     return nn.Sequential(
-        conv_block(1, 16),          # 28 -> 14
-        conv_block(16, 32),         # 14 -> 7
-        conv_block(32, 64),         # 7  -> 4
-        nn.AdaptiveAvgPool2d(1),    # 4  -> 1 (any size -> 1x1)
-        nn.Flatten(),               # (N, 64, 1, 1) -> (N, 64)
-        nn.Linear(64, n_classes),   # classification head
+        conv_block(1, 16),  # 28 -> 14
+        conv_block(16, 32),  # 14 -> 7
+        conv_block(32, 64),  # 7  -> 4
+        nn.AdaptiveAvgPool2d(1),  # 4  -> 1 (any size -> 1x1)
+        nn.Flatten(),  # (N, 64, 1, 1) -> (N, 64)
+        nn.Linear(64, n_classes),  # classification head
     )
 
 
@@ -116,11 +112,13 @@ def main() -> None:
     print("=" * 60)
     print("Exercise 1: vertical edge detection")
     image = torch.tensor(
-        [[0.0, 0.0, 10.0, 10.0, 10.0],
-         [0.0, 0.0, 10.0, 10.0, 10.0],
-         [0.0, 0.0, 10.0, 10.0, 10.0],
-         [0.0, 0.0, 10.0, 10.0, 10.0],
-         [0.0, 0.0, 10.0, 10.0, 10.0]]
+        [
+            [0.0, 0.0, 10.0, 10.0, 10.0],
+            [0.0, 0.0, 10.0, 10.0, 10.0],
+            [0.0, 0.0, 10.0, 10.0, 10.0],
+            [0.0, 0.0, 10.0, 10.0, 10.0],
+            [0.0, 0.0, 10.0, 10.0, 10.0],
+        ]
     ).reshape(1, 1, 5, 5)
     feature_map = detect_vertical_edges(image)
     print("feature map:\n", feature_map[0, 0])
@@ -131,8 +129,8 @@ def main() -> None:
     # --- Exercise 2: output-size formula -------------------------------------
     print("=" * 60)
     print("Exercise 2: output-size formula")
-    print("n=5,k=3,s=1,p=0 ->", conv_output_size(5, 3, 1, 0))    # 3
-    print("n=5,k=3,s=1,p=1 ->", conv_output_size(5, 3, 1, 1))    # 5 (same)
+    print("n=5,k=3,s=1,p=0 ->", conv_output_size(5, 3, 1, 0))  # 3
+    print("n=5,k=3,s=1,p=1 ->", conv_output_size(5, 3, 1, 1))  # 5 (same)
     print("n=28,k=3,s=2,p=1 ->", conv_output_size(28, 3, 2, 1))  # 14
     assert conv_output_size(5, 3, 1, 0) == 3
     assert conv_output_size(5, 3, 1, 1) == 5
@@ -141,17 +139,17 @@ def main() -> None:
     # --- Exercise 3: channels ------------------------------------------------
     print("=" * 60)
     print("Exercise 3: C_in -> C_out")
-    x = torch.randn(4, 3, 16, 16)          # 4 RGB images
+    x = torch.randn(4, 3, 16, 16)  # 4 RGB images
     out = apply_conv_layer(x, in_ch=3, out_ch=8)
     print("input :", tuple(x.shape))
-    print("output:", tuple(out.shape))     # (4, 8, 16, 16), same H/W
+    print("output:", tuple(out.shape))  # (4, 8, 16, 16), same H/W
     assert out.shape == (4, 8, 16, 16)
 
     # --- Exercise 4: tiny CNN ------------------------------------------------
     print("=" * 60)
     print("Exercise 4: tiny CNN forward pass")
     model = build_tiny_cnn(n_classes=10)
-    batch = torch.randn(8, 1, 28, 28)      # fake MNIST batch
+    batch = torch.randn(8, 1, 28, 28)  # fake MNIST batch
     logits = model(batch)
     n_params = sum(p.numel() for p in model.parameters())
     print("logits:", tuple(logits.shape))  # (8, 10)

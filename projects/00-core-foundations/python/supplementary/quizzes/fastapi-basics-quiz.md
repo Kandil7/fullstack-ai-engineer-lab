@@ -65,6 +65,7 @@ D) Using a TypedDict
 ```python
 from pydantic import BaseModel
 
+
 class Item(BaseModel):
     name: str
     price: float
@@ -177,6 +178,7 @@ D) Using `list` type hint with `File()`
 
 ```python
 from fastapi import File, UploadFile
+
 
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
@@ -297,9 +299,11 @@ D) To manage database connections
 ```python
 from fastapi import BackgroundTasks
 
+
 def send_email(email: str, message: str):
     # Send email logic here
     pass
+
 
 @app.post("/send-notification/")
 async def send_notification(email: str, background_tasks: BackgroundTasks):

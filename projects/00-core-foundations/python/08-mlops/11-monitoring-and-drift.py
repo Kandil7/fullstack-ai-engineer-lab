@@ -28,6 +28,7 @@ from typing import Callable
 # Concept drift: the relationship changed (P(Y|X) moved).
 # They need different responses.
 
+
 @dataclass
 class DriftType:
     name: str
@@ -57,6 +58,7 @@ assert cases[1].response().startswith("re-examine")
 # ============================================================
 # PSI compares two distributions by bucketing them. Rule of thumb:
 #   < 0.1 stable, 0.1-0.25 moderate shift, > 0.25 major shift.
+
 
 def psi(reference: list[float], current: list[float], buckets: int = 10) -> float:
     """Population Stability Index between two 1-D distributions."""
@@ -90,6 +92,7 @@ def psi(reference: list[float], current: list[float], buckets: int = 10) -> floa
 
 # Example 2: PSI on stable vs drifted data
 import random
+
 random.seed(42)
 stable_ref = [random.gauss(0.0, 1.0) for _ in range(1000)]
 stable_cur = [random.gauss(0.05, 1.0) for _ in range(1000)]
@@ -102,6 +105,7 @@ print(f"  stable vs shifted-0.05: {psi_stable:.3f}")
 print(f"  stable vs shifted-2.0:  {psi_drifted:.3f}")
 assert psi_drifted > psi_stable, "bigger shift -> bigger PSI"
 
+
 def psi_status(score: float) -> str:
     if score < 0.1:
         return "stable"
@@ -109,10 +113,12 @@ def psi_status(score: float) -> str:
         return "moderate shift - investigate"
     return "major shift - alert"
 
+
 # ============================================================
 # 3. KS Test (two-sample)
 # ============================================================
 # KS measures the max gap between cumulative distributions.
+
 
 def ks_stat(reference: list[float], current: list[float]) -> float:
     """Two-sample Kolmogorov-Smirnov statistic (no scipy needed)."""
@@ -139,13 +145,18 @@ assert ks_d > ks_s, "drifted distributions have larger KS gap"
 # Real labels arrive late (fraud confirmed in 30 days). Monitor the
 # proxy metrics now, the true metrics when labels land.
 
+
 @dataclass
 class DelayedLabelMonitor:
     label_delay_days: int
     proxy_metrics: dict[str, Callable] = None  # type: ignore[assignment]
 
-    def report(self, predicted: list[float], actual_available: list[float] | None,
-               proxies: dict[str, float]) -> str:
+    def report(
+        self,
+        predicted: list[float],
+        actual_available: list[float] | None,
+        proxies: dict[str, float],
+    ) -> str:
         line = f"proxies: {proxies}"
         if actual_available:
             line += f" | true accuracy vs {len(actual_available)} labels"
@@ -165,6 +176,7 @@ print("  " + monitor.report([0.9, 0.8], [1, 0], {"null_rate": 0.02}))
 # ============================================================
 # Alerting thresholds must be set BEFORE deployment and reviewed - a
 # monitor that never fires is dead weight.
+
 
 @dataclass
 class DriftMonitor:
@@ -195,6 +207,7 @@ class DriftMonitor:
 # ============================================================
 def _verify() -> None:
     import random as _r
+
     _r.seed(7)
     base = [_r.gauss(0, 1) for _ in range(500)]
     same = [_r.gauss(0, 1) for _ in range(500)]

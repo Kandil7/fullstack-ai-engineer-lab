@@ -66,8 +66,8 @@ every other token — this is why it is called "self"-attention when Q=K=V.
 ## 2. Why Scale by sqrt(d_k)?
 
 ```python
-scores_small = torch.randn(4, 4)                     # d_k = 2
-scores_large = torch.randn(4, 4) * math.sqrt(128)    # d_k = 128
+scores_small = torch.randn(4, 4)  # d_k = 2
+scores_large = torch.randn(4, 4) * math.sqrt(128)  # d_k = 128
 ```
 
 Output:
@@ -88,8 +88,7 @@ class MultiHeadAttention(nn.Module):
         super().__init__()
         assert d_model % n_heads == 0
         self.d_k = d_model // n_heads
-        self.W_q, self.W_k, self.W_v, self.W_o = (
-            nn.Linear(d_model, d_model) for _ in range(4))
+        self.W_q, self.W_k, self.W_v, self.W_o = (nn.Linear(d_model, d_model) for _ in range(4))
 
     def _split(self, x):
         B, S, _ = x.shape
@@ -143,13 +142,12 @@ class TransformerBlock(nn.Module):
         super().__init__()
         self.attn = MultiHeadAttention(d_model, n_heads)
         self.norm1 = nn.LayerNorm(d_model)
-        self.ff = nn.Sequential(nn.Linear(d_model, ff_dim), nn.ReLU(),
-                                nn.Linear(ff_dim, d_model))
+        self.ff = nn.Sequential(nn.Linear(d_model, ff_dim), nn.ReLU(), nn.Linear(ff_dim, d_model))
         self.norm2 = nn.LayerNorm(d_model)
 
     def forward(self, x):
-        x = x + self.attn(self.norm1(x))     # pre-norm attention + residual
-        x = x + self.ff(self.norm2(x))       # pre-norm FFN + residual
+        x = x + self.attn(self.norm1(x))  # pre-norm attention + residual
+        x = x + self.ff(self.norm2(x))  # pre-norm FFN + residual
         return x
 ```
 

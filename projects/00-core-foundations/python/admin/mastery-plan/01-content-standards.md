@@ -97,6 +97,7 @@ code_example()
 # ============================================================
 # The idiomatic form a senior engineer would ship
 
+
 def production_function():
     """Docstring with purpose and reasoning."""
     pass

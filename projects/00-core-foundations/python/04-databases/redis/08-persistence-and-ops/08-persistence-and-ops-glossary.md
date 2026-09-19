@@ -73,8 +73,8 @@ dataset is captured without blocking the server.
 the first step of cluster routing.
 **Example**:
 ```python
-slot = crc16(key) % 16384      # which bucket?
-node = slot_owner[slot]        # which node owns it?
+slot = crc16(key) % 16384  # which bucket?
+node = slot_owner[slot]  # which node owns it?
 ```
 ```text
 # the client, not the server, does the routing in cluster mode

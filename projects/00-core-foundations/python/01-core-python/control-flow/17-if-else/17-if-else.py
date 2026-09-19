@@ -69,7 +69,8 @@ else:
 # ============================================================
 # Example 5: One-line if statement
 x = 10
-if x > 5: print("x is greater than 5")
+if x > 5:
+    print("x is greater than 5")
 # Output: x is greater than 5
 
 # ============================================================
@@ -153,7 +154,7 @@ elif quantity >= 50:
 elif quantity >= 10:
     discount = 0.10  # 10% off
 else:
-    discount = 0.0   # No discount
+    discount = 0.0  # No discount
 
 total = quantity * price_per_unit * (1 - discount)
 print(f"\nQuantity: {quantity}")

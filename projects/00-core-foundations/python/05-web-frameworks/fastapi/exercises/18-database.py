@@ -23,12 +23,16 @@ import re
 app = FastAPI(title="Database Integration Exercises")
 
 import pathlib
-DATABASE_URL = str(pathlib.Path(__file__).parent.parent.parent.parent / "outputs" / "dbs" / "exercises_18.db")
+
+DATABASE_URL = str(
+    pathlib.Path(__file__).parent.parent.parent.parent / "outputs" / "dbs" / "exercises_18.db"
+)
 
 
 # ============================================================
 # Exercise 18.1: Basic Database Connection & Setup
 # ============================================================
+
 
 def get_db():
     """Dependency that yields a database connection, auto-closing after request."""
@@ -83,6 +87,7 @@ async def health_check(db: sqlite3.Connection = Depends(get_db)):
 # Exercise 18.2: CRUD Operations for Tasks
 # ============================================================
 
+
 class TaskCreate(BaseModel):
     title: str
     description: Optional[str] = None
@@ -105,8 +110,7 @@ class TaskResponse(BaseModel):
 @app.post("/tasks", response_model=TaskResponse, status_code=201)
 async def create_task(task: TaskCreate, db: sqlite3.Connection = Depends(get_db)):
     cursor = db.execute(
-        "INSERT INTO tasks (title, description) VALUES (?, ?)",
-        (task.title, task.description)
+        "INSERT INTO tasks (title, description) VALUES (?, ?)", (task.title, task.description)
     )
     db.commit()
     task_id = cursor.lastrowid
@@ -120,7 +124,7 @@ async def list_tasks(
     limit: int = Query(10, ge=1, le=100),
     completed: Optional[bool] = None,
     search: Optional[str] = None,
-    db: sqlite3.Connection = Depends(get_db)
+    db: sqlite3.Connection = Depends(get_db),
 ):
     query = "SELECT * FROM tasks WHERE 1=1"
     params = []
@@ -200,6 +204,7 @@ async def delete_task(task_id: int, db: sqlite3.Connection = Depends(get_db)):
 # Exercise 18.4: Transactions and Bulk Operations
 # ============================================================
 
+
 class BulkTaskCreate(BaseModel):
     tasks: List[TaskCreate]
 
@@ -218,7 +223,7 @@ async def bulk_create_tasks(bulk: BulkTaskCreate, db: sqlite3.Connection = Depen
                 raise ValueError("Task title cannot be empty")
             cursor = db.execute(
                 "INSERT INTO tasks (title, description) VALUES (?, ?)",
-                (task.title, task.description)
+                (task.title, task.description),
             )
             task_id = cursor.lastrowid
             row = db.execute("SELECT * FROM tasks WHERE id = ?", (task_id,)).fetchone()
@@ -227,7 +232,9 @@ async def bulk_create_tasks(bulk: BulkTaskCreate, db: sqlite3.Connection = Depen
         return BulkTaskResponse(created=created, count=len(created))
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=f"Bulk insert failed, no tasks were created: {str(e)}")
+        raise HTTPException(
+            status_code=400, detail=f"Bulk insert failed, no tasks were created: {str(e)}"
+        )
 
 
 @app.post("/tasks/{task_id}/complete", response_model=TaskResponse)
@@ -245,6 +252,7 @@ async def complete_task(task_id: int, db: sqlite3.Connection = Depends(get_db)):
 # Exercise 18.5: Raw Query Endpoint (Advanced)
 # ============================================================
 
+
 class QueryRequest(BaseModel):
     query: str
     params: List = []
@@ -256,10 +264,7 @@ class QueryResponse(BaseModel):
 
 
 @app.post("/admin/query", response_model=QueryResponse)
-async def admin_query(
-    query_req: QueryRequest,
-    db: sqlite3.Connection = Depends(get_db)
-):
+async def admin_query(query_req: QueryRequest, db: sqlite3.Connection = Depends(get_db)):
     sql = query_req.query.strip().upper()
 
     # Only allow SELECT queries
@@ -270,7 +275,9 @@ async def admin_query(
     dangerous = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE", "EXEC"]
     for keyword in dangerous:
         if re.search(rf"\b{keyword}\b", sql):
-            raise HTTPException(status_code=400, detail=f"Dangerous keyword '{keyword}' not allowed")
+            raise HTTPException(
+                status_code=400, detail=f"Dangerous keyword '{keyword}' not allowed"
+            )
 
     try:
         start = time.time()

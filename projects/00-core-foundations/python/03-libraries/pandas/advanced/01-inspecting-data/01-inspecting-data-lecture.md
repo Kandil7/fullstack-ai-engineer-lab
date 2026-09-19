@@ -39,15 +39,17 @@ By the end of this lecture, you will be able to:
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "sentence": ["the cat", "a dog", "the bird", "a fish"],
-    "label": ["pos", "neg", "pos", "neg"],
-    "score": [0.9, 0.1, 0.8, 0.2],
-})
+df = pd.DataFrame(
+    {
+        "sentence": ["the cat", "a dog", "the bird", "a fish"],
+        "label": ["pos", "neg", "pos", "neg"],
+        "score": [0.9, 0.1, 0.8, 0.2],
+    }
+)
 
-df.shape          # (4, 3) — rows, columns
-df.head(2)        # first 2 rows
-df.tail(1)        # last row
+df.shape  # (4, 3) — rows, columns
+df.head(2)  # first 2 rows
+df.tail(1)  # last row
 ```
 
 `shape` is the first sanity check: does this match your expectation from the
@@ -62,7 +64,7 @@ df.dtypes
 # label       object
 # score      float64
 
-df.select_dtypes(include=["number"])   # only numeric columns
+df.select_dtypes(include=["number"])  # only numeric columns
 df.select_dtypes(exclude=["object"])
 ```
 
@@ -111,7 +113,7 @@ Numeric columns get count/mean/std/min/quartiles/max. Non-numeric columns are
 skipped by default; include them explicitly:
 
 ```python
-df.describe(include="object")   # count, unique, top, freq
+df.describe(include="object")  # count, unique, top, freq
 ```
 
 Mean >> median flags skew; a max 10x the 75th percentile flags outliers. This
@@ -120,12 +122,12 @@ is the statistical intake exam for every feature.
 ## 5. `nunique()` and `value_counts()` — Cardinality
 
 ```python
-df.nunique()          # unique values per column
+df.nunique()  # unique values per column
 df["label"].value_counts()
 # neg    2
 # pos    2
 
-df["label"].value_counts(normalize=True)   # proportions
+df["label"].value_counts(normalize=True)  # proportions
 ```
 
 Cardinality decides encoding strategy: 2 values -> binary; <20 values ->
@@ -136,8 +138,8 @@ any classifier (see imbalanced learning).
 ## 6. Missing Data Scan
 
 ```python
-df.isna().sum()       # missing per column
-df.isna().mean()      # missing fraction per column
+df.isna().sum()  # missing per column
+df.isna().mean()  # missing fraction per column
 ```
 
 `df.isna().mean()` is the better view: 0.01 vs 0.9 missing fraction call for
@@ -185,14 +187,14 @@ df.describe(include="object")
 
 ```python
 # WRONG — transposed intuition (rows vs columns)
-df.shape   # (4, 3) means 4 rows, 3 columns
+df.shape  # (4, 3) means 4 rows, 3 columns
 ```
 
 ### Mistake 4: Ignoring dtypes before modeling
 
 ```python
 # WRONG — a "numeric-looking" object column breaks vectorized ops
-df["score"].astype(float)   # later, painfully
+df["score"].astype(float)  # later, painfully
 # CORRECT — check dtypes at intake and convert once
 ```
 

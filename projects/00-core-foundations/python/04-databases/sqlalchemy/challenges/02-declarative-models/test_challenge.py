@@ -29,9 +29,7 @@ def _load(name: str):
     """
     parent = Path(__file__).parent.name.replace("-", "_")
     modname = f"{name}_{parent}"
-    spec = importlib.util.spec_from_file_location(
-        modname, Path(__file__).parent / f"{name}.py"
-    )
+    spec = importlib.util.spec_from_file_location(modname, Path(__file__).parent / f"{name}.py")
     module = importlib.util.module_from_spec(spec)
     sys.modules[modname] = module
     spec.loader.exec_module(module)
@@ -77,9 +75,7 @@ class TestSchemaShape:
         assert {"id", "model_name", "version", "artifact_uri"} <= cols
 
     def test_required_columns_not_null(self, env):
-        cols = {
-            c["name"]: c for c in inspect(env["engine"]).get_columns("model_versions")
-        }
+        cols = {c["name"]: c for c in inspect(env["engine"]).get_columns("model_versions")}
         assert cols["model_name"]["nullable"] is False
         assert cols["artifact_uri"]["nullable"] is False
 
@@ -118,17 +114,23 @@ class TestCheckConstraint:
 class TestEventRule:
     def test_non_s3_uri_raises_value_error(self, env):
         with pytest.raises(ValueError):
-            _add(env["engine"], env["model"], model_name="bert", version=1, artifact_uri="local/path")
+            _add(
+                env["engine"], env["model"], model_name="bert", version=1, artifact_uri="local/path"
+            )
 
     def test_s3_uri_accepted(self, env):
-        _add(env["engine"], env["model"], model_name="bert", version=1, artifact_uri="s3://models/bert/v1")
+        _add(
+            env["engine"],
+            env["model"],
+            model_name="bert",
+            version=1,
+            artifact_uri="s3://models/bert/v1",
+        )
 
     def test_event_fires_on_flush_not_commit(self, env):
         """The ValueError must surface during flush, inside the session."""
         with Session(bind=env["engine"]) as session:
-            session.add(
-                env["model"](model_name="x", version=1, artifact_uri="bad")
-            )
+            session.add(env["model"](model_name="x", version=1, artifact_uri="bad"))
             with pytest.raises(ValueError):
                 session.flush()
 

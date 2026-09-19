@@ -89,9 +89,9 @@ def is_rate_limited(user_id: str, limit: int = 100, window: int = 60) -> bool:
     now = time.time()
     pipe = redis.pipeline()
     pipe.zremrangebyscore(key, 0, now - window)  # Remove expired
-    pipe.zadd(key, {str(now): now})              # Add current request
-    pipe.zcard(key)                               # Count requests
-    pipe.expire(key, window)                      # Set TTL
+    pipe.zadd(key, {str(now): now})  # Add current request
+    pipe.zcard(key)  # Count requests
+    pipe.expire(key, window)  # Set TTL
     _, _, count, _ = pipe.execute()
     return count > limit
 ```

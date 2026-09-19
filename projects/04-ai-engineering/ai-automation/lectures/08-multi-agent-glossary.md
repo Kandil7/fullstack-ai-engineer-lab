@@ -30,10 +30,10 @@
 class MultiAgentSystem:
     def __init__(self):
         self.agents = {}
-    
+
     def add_agent(self, name, agent):
         self.agents[name] = agent
-    
+
     def execute(self, task):
         # Coordinate agents to complete task
         results = []
@@ -41,6 +41,7 @@ class MultiAgentSystem:
             result = agent.execute(task)
             results.append(result)
         return self.synthesize(results)
+
 
 # Create system
 system = MultiAgentSystem()
@@ -71,29 +72,31 @@ result = system.execute("Build a web scraper")
 class Orchestrator:
     def __init__(self, workers):
         self.workers = workers
-    
+
     def execute(self, task):
         # Decompose task
         subtasks = self.decompose(task)
-        
+
         # Assign to workers
         assignments = self.assign(subtasks)
-        
+
         # Collect results
         results = {}
         for assignment in assignments:
             worker = self.workers[assignment.worker]
             result = worker.execute(assignment.subtask)
             results[assignment.id] = result
-        
+
         # Synthesize
         return self.synthesize(results)
-    
+
     def decompose(self, task):
         # Break task into subtasks
-        return [{"id": 1, "task": "research"}, 
-                {"id": 2, "task": "implement"},
-                {"id": 3, "task": "review"}]
+        return [
+            {"id": 1, "task": "research"},
+            {"id": 2, "task": "implement"},
+            {"id": 3, "task": "review"},
+        ]
 ```
 
 **Related Terms:** Coordinator, Manager, Central
@@ -224,18 +227,19 @@ class MessageBus:
 ```python
 def decompose_task(task):
     """Break task into subtasks."""
-    
+
     subtasks = {
         "Build a web app": [
             {"id": 1, "task": "Design database schema", "agent": "architect"},
             {"id": 2, "task": "Build API endpoints", "agent": "backend"},
             {"id": 3, "task": "Create UI components", "agent": "frontend"},
             {"id": 4, "task": "Write tests", "agent": "tester"},
-            {"id": 5, "task": "Review code", "agent": "reviewer"}
+            {"id": 5, "task": "Review code", "agent": "reviewer"},
         ]
     }
-    
+
     return subtasks.get(task, [])
+
 
 # Usage
 subtasks = decompose_task("Build a web app")
@@ -310,22 +314,21 @@ class ConsensusSystem:
 ```python
 from concurrent.futures import ThreadPoolExecutor
 
+
 def execute_parallel(agents, task):
     """Execute task across agents in parallel."""
-    
+
     with ThreadPoolExecutor(max_workers=len(agents)) as executor:
-        futures = {
-            executor.submit(agent.execute, task): agent.name
-            for agent in agents
-        }
-        
+        futures = {executor.submit(agent.execute, task): agent.name for agent in agents}
+
         results = {}
         for future in futures:
             agent_name = futures[future]
             result = future.result()
             results[agent_name] = result
-    
+
     return results
+
 
 # Usage
 agents = [ResearchAgent(), CoderAgent(), ReviewAgent()]
@@ -351,30 +354,31 @@ class SharedState:
     def __init__(self):
         self.data = {}
         self.lock = None  # For thread safety
-    
+
     def get(self, key):
         return self.data.get(key)
-    
+
     def set(self, key, value):
         self.data[key] = value
-    
+
     def update(self, updates):
         self.data.update(updates)
+
 
 class StateAwareAgent:
     def __init__(self, shared_state):
         self.shared_state = shared_state
-    
+
     def execute(self, task):
         # Read from shared state
         context = self.shared_state.get("context")
-        
+
         # Do work
         result = self.process(task, context)
-        
+
         # Write to shared state
         self.shared_state.set("last_result", result)
-        
+
         return result
 ```
 
@@ -395,6 +399,7 @@ class StateAwareAgent:
 ```python
 from enum import Enum
 
+
 class AgentRole(Enum):
     ORCHESTRATOR = "orchestrator"
     RESEARCHER = "researcher"
@@ -403,12 +408,13 @@ class AgentRole(Enum):
     WRITER = "writer"
     TESTER = "tester"
 
+
 class Agent:
     def __init__(self, name, role):
         self.name = name
         self.role = role
         self.capabilities = self.get_capabilities()
-    
+
     def get_capabilities(self):
         capabilities = {
             AgentRole.RESEARCHER: ["search", "analyze", "summarize"],
@@ -436,12 +442,12 @@ class Agent:
 ```python
 def synthesize_results(results):
     """Combine agent results into final output."""
-    
+
     # Organize by agent
     research = results.get("researcher", "")
     code = results.get("coder", "")
     review = results.get("reviewer", "")
-    
+
     # Build synthesis
     synthesis = f"""
 ## Research Findings
@@ -456,14 +462,15 @@ def synthesize_results(results):
 ## Summary
 Based on the research, implementation, and review above...
 """
-    
+
     return synthesis
+
 
 # Usage
 results = {
     "researcher": "Found that we need X, Y, Z...",
     "coder": "Implemented using Python with...",
-    "reviewer": "Code looks good, minor suggestions..."
+    "reviewer": "Code looks good, minor suggestions...",
 }
 
 final = synthesize_results(results)
@@ -489,33 +496,33 @@ class Orchestrator:
     def __init__(self, agents):
         self.agents = agents
         self.workflow = []
-    
+
     def define_workflow(self, steps):
         """Define execution workflow."""
         self.workflow = steps
-    
+
     def execute(self, task):
         """Execute task following workflow."""
-        
+
         context = {"task": task}
-        
+
         for step in self.workflow:
             agent = self.agents[step["agent"]]
-            result = agent.execute(
-                step["task"],
-                context=context
-            )
+            result = agent.execute(step["task"], context=context)
             context[step["output_key"]] = result
-        
+
         return context
+
 
 # Usage
 orchestrator = Orchestrator(agents)
-orchestrator.define_workflow([
-    {"agent": "researcher", "task": "Research topic", "output_key": "research"},
-    {"agent": "coder", "task": "Implement solution", "output_key": "code"},
-    {"agent": "reviewer", "task": "Review code", "output_key": "review"}
-])
+orchestrator.define_workflow(
+    [
+        {"agent": "researcher", "task": "Research topic", "output_key": "research"},
+        {"agent": "coder", "task": "Implement solution", "output_key": "code"},
+        {"agent": "reviewer", "task": "Review code", "output_key": "review"},
+    ]
+)
 
 result = orchestrator.execute("Build a REST API")
 ```
@@ -544,14 +551,14 @@ workflow = {
             "name": "requirements",
             "agent": "analyst",
             "inputs": ["task"],
-            "outputs": ["requirements"]
+            "outputs": ["requirements"],
         },
         {
             "id": 2,
             "name": "design",
             "agent": "architect",
             "inputs": ["requirements"],
-            "outputs": ["design"]
+            "outputs": ["design"],
         },
         {
             "id": 3,
@@ -559,23 +566,23 @@ workflow = {
             "agent": "coder",
             "inputs": ["design"],
             "outputs": ["code"],
-            "parallel": True  # Can run in parallel with step 4
+            "parallel": True,  # Can run in parallel with step 4
         },
         {
             "id": 4,
             "name": "test",
             "agent": "tester",
             "inputs": ["code"],
-            "outputs": ["tests"]
+            "outputs": ["tests"],
         },
         {
             "id": 5,
             "name": "review",
             "agent": "reviewer",
             "inputs": ["code", "tests"],
-            "outputs": ["review"]
-        }
-    ]
+            "outputs": ["review"],
+        },
+    ],
 }
 ```
 
@@ -599,23 +606,24 @@ class AgentWithHandoff:
     def __init__(self, name):
         self.name = name
         self.next_agent = None
-    
+
     def set_next(self, agent):
         self.next_agent = agent
-    
+
     def execute(self, task, context):
         # Do my part
         result = self.do_work(task, context)
         context[f"{self.name}_result"] = result
-        
+
         # Handoff to next agent
         if self.next_agent:
             return self.next_agent.execute(task, context)
-        
+
         return result
-    
+
     def do_work(self, task, context):
         return f"{self.name} completed: {task}"
+
 
 # Chain agents
 researcher = AgentWithHandoff("researcher")
@@ -648,36 +656,36 @@ class Supervisor:
     def __init__(self, workers):
         self.workers = workers
         self.status = {}
-    
+
     def monitor(self):
         """Monitor worker status."""
         for name, worker in self.workers.items():
             self.status[name] = worker.get_status()
-    
+
     def handle_failure(self, worker_name, error):
         """Handle worker failure."""
         print(f"Worker {worker_name} failed: {error}")
-        
+
         # Retry or reassign
         worker = self.workers[worker_name]
         if worker.retries < 3:
             worker.retry()
         else:
             self.reassign_task(worker_name)
-    
+
     def reassign_task(self, failed_worker):
         """Reassign task to another worker."""
         # Find available worker
         for name, worker in self.workers.items():
             if name != failed_worker and worker.is_available():
                 return worker
-    
+
     def get_report(self):
         """Get status report."""
         return {
             "workers": self.status,
             "completed": sum(1 for s in self.status.values() if s == "done"),
-            "failed": sum(1 for s in self.status.values() if s == "failed")
+            "failed": sum(1 for s in self.status.values() if s == "failed"),
         }
 ```
 

@@ -109,8 +109,10 @@ from zoneinfo import ZoneInfo
 cairo = ZoneInfo("Africa/Cairo")
 tokyo = ZoneInfo("Asia/Tokyo")
 meeting_utc = datetime(2026, 8, 6, 9, 0, tzinfo=timezone.utc)
-print(f"Meeting at: {meeting_utc.astimezone(cairo).strftime('%H:%M %Z')} Cairo, "
-      f"{meeting_utc.astimezone(tokyo).strftime('%H:%M %Z')} Tokyo")
+print(
+    f"Meeting at: {meeting_utc.astimezone(cairo).strftime('%H:%M %Z')} Cairo, "
+    f"{meeting_utc.astimezone(tokyo).strftime('%H:%M %Z')} Tokyo"
+)
 ```
 
 ```
@@ -267,9 +269,7 @@ arithmetic in UTC with an injectable `now` so the logic is testable.
 from datetime import datetime, timedelta, timezone
 
 
-def is_fresh(
-    timestamp_utc: datetime, ttl_seconds: int, *, now: datetime | None = None
-) -> bool:
+def is_fresh(timestamp_utc: datetime, ttl_seconds: int, *, now: datetime | None = None) -> bool:
     """True if timestamp_utc is within ttl_seconds of now (both aware UTC)."""
     now = now or datetime.now(timezone.utc)
     age = now - timestamp_utc

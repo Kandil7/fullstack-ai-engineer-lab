@@ -198,7 +198,7 @@ import json
 data = {
     "users": [
         {"id": 1, "name": "Alice", "address": {"city": "NYC"}},
-        {"id": 2, "name": "Bob", "address": {"city": "London"}}
+        {"id": 2, "name": "Bob", "address": {"city": "London"}},
     ]
 }
 
@@ -214,10 +214,7 @@ print(df)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob"],
-    "Skills": [["Python", "SQL"], ["Java", "Go"]]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob"], "Skills": [["Python", "SQL"], ["Java", "Go"]]})
 
 df_exploded = df.explode("Skills")
 print(df_exploded)

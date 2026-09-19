@@ -74,7 +74,7 @@ effect — increasing, U-shaped, threshold — which permutation importance cann
 
 ```python
 pd_res = partial_dependence(rf, Xte, [0], kind="average")
-print(pd_res["average"][0])        # average prediction as f0 varies
+print(pd_res["average"][0])  # average prediction as f0 varies
 ```
 
 Output:
@@ -96,7 +96,7 @@ def lime_local(model, instance, background, n_samples=500, seed=0):
     noise = r.normal(0, np.std(background, axis=0), size=(n_samples, instance.shape[0]))
     X_pert = np.clip(instance + noise, background.min(0), background.max(0))
     dist = np.linalg.norm(X_pert - instance, axis=1)
-    kernel_w = np.exp(-(dist ** 2) / (2 * (np.median(dist) + 1e-9) ** 2))
+    kernel_w = np.exp(-(dist**2) / (2 * (np.median(dist) + 1e-9) ** 2))
     y_local = model.predict_proba(X_pert)[:, 1]
     surrogate = Ridge(alpha=1.0).fit(X_pert, y_local, sample_weight=kernel_w)
     return surrogate.coef_, surrogate.intercept_

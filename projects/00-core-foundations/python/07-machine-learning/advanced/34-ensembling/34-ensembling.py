@@ -20,7 +20,9 @@ import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.ensemble import (
-    VotingClassifier, StackingClassifier, RandomForestClassifier,
+    VotingClassifier,
+    StackingClassifier,
+    RandomForestClassifier,
     GradientBoostingClassifier,
 )
 from sklearn.linear_model import LogisticRegression
@@ -28,8 +30,9 @@ from sklearn.svm import SVC
 from sklearn.metrics import roc_auc_score, accuracy_score
 
 rng = np.random.RandomState(0)
-X, y = make_classification(n_samples=3000, n_features=25, n_informative=12,
-                           n_redundant=6, random_state=0)
+X, y = make_classification(
+    n_samples=3000, n_features=25, n_informative=12, n_redundant=6, random_state=0
+)
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.3, random_state=0)
 
 rf = RandomForestClassifier(n_estimators=100, random_state=0)
@@ -52,9 +55,11 @@ for name, s in scores.items():
 # 2. Hard voting — majority label
 # ============================================================
 voting_hard = VotingClassifier(
-    estimators=[("rf", RandomForestClassifier(n_estimators=100, random_state=0)),
-                ("gb", GradientBoostingClassifier(random_state=0)),
-                ("lr", LogisticRegression(max_iter=1000))],
+    estimators=[
+        ("rf", RandomForestClassifier(n_estimators=100, random_state=0)),
+        ("gb", GradientBoostingClassifier(random_state=0)),
+        ("lr", LogisticRegression(max_iter=1000)),
+    ],
     voting="hard",
 ).fit(Xtr, ytr)
 print("\nExample 2: hard voting")
@@ -64,9 +69,11 @@ print(f"  accuracy: {accuracy_score(yte, voting_hard.predict(Xte)):.4f}")
 # 3. Soft voting — average probabilities
 # ============================================================
 voting_soft = VotingClassifier(
-    estimators=[("rf", RandomForestClassifier(n_estimators=100, random_state=0)),
-                ("gb", GradientBoostingClassifier(random_state=0)),
-                ("lr", LogisticRegression(max_iter=1000))],
+    estimators=[
+        ("rf", RandomForestClassifier(n_estimators=100, random_state=0)),
+        ("gb", GradientBoostingClassifier(random_state=0)),
+        ("lr", LogisticRegression(max_iter=1000)),
+    ],
     voting="soft",
     weights=[1, 1, 1],
 ).fit(Xtr, ytr)
@@ -77,9 +84,11 @@ print(f"  AUC: {roc_auc_score(yte, voting_soft.predict_proba(Xte)[:, 1]):.4f}")
 # 4. Stacking — meta-model learns how to combine
 # ============================================================
 stack = StackingClassifier(
-    estimators=[("rf", RandomForestClassifier(n_estimators=100, random_state=0)),
-                ("gb", GradientBoostingClassifier(random_state=0)),
-                ("svc", SVC(probability=True, random_state=0))],
+    estimators=[
+        ("rf", RandomForestClassifier(n_estimators=100, random_state=0)),
+        ("gb", GradientBoostingClassifier(random_state=0)),
+        ("svc", SVC(probability=True, random_state=0)),
+    ],
     final_estimator=LogisticRegression(max_iter=1000),
     cv=5,
 ).fit(Xtr, ytr)
@@ -118,9 +127,11 @@ print("=" * 60)
 
 def _verify() -> None:
     assert scores["GB"] > 0.5
-    best_ensemble = max(roc_auc_score(yte, voting_soft.predict_proba(Xte)[:, 1]),
-                        roc_auc_score(yte, stack.predict_proba(Xte)[:, 1]),
-                        roc_auc_score(yte, blend))
+    best_ensemble = max(
+        roc_auc_score(yte, voting_soft.predict_proba(Xte)[:, 1]),
+        roc_auc_score(yte, stack.predict_proba(Xte)[:, 1]),
+        roc_auc_score(yte, blend),
+    )
     assert best_ensemble >= min(scores.values()) - 0.05, "ensemble should not be much worse"
     assert -1 <= corr_rf_gb <= 1
     print("ALL CHECKS PASSED")

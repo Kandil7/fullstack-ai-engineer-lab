@@ -44,6 +44,7 @@ from typing import Any, Callable
 #   pool_size = peak_concurrency * (query_time / request_time)
 # e.g. 200 concurrent users, 10ms query per 100ms request -> 20.
 
+
 # Example 1: measure the connect-vs-pool difference (sqlite3 as stand-in)
 def measure(label: str, work: Callable[[], Any], n: int = 300) -> float:
     """Return wall time in ms for n operations."""
@@ -59,6 +60,7 @@ def measure(label: str, work: Callable[[], Any], n: int = 300) -> float:
 # one (bounded by timeout); release() returns it. Sizes are bounded so
 # the database never sees more than `max_size` connections — this is
 # exactly what psycopg_pool and PgBouncer do, minus the polish.
+
 
 class MiniPool:
     """Thread-safe bounded pool of sqlite3 connections.
@@ -105,9 +107,7 @@ class MiniPool:
                 if self._open_count < self._max_size:
                     self._open_count += 1
                     return self._connect(self._db_path)
-            raise TimeoutError(
-                f"pool exhausted: {self._max_size} connections in use"
-            )
+            raise TimeoutError(f"pool exhausted: {self._max_size} connections in use")
 
     def release(self, conn: sqlite3.Connection) -> None:
         """Return a connection to the pool for reuse."""
@@ -135,7 +135,6 @@ try:
     results: list[int] = []
     lock = threading.Lock()
 
-
     def do_work(i: int) -> None:
         """Run one 'query' through the pool."""
         conn = pool.acquire()
@@ -145,8 +144,7 @@ try:
             with lock:
                 results.append(i)
         finally:
-            pool.release(conn)   # ALWAYS release — even on error
-
+            pool.release(conn)  # ALWAYS release — even on error
 
     threads = [threading.Thread(target=do_work, args=(i,)) for i in range(12)]
     for t in threads:
@@ -168,7 +166,7 @@ try:
     pool2 = MiniPool(db_path, max_size=3, timeout=0.2)
     held: list[sqlite3.Connection] = [pool2.acquire() for _ in range(3)]
     try:
-        pool2.acquire()   # 4th request -> must time out
+        pool2.acquire()  # 4th request -> must time out
         exhausted = False
     except TimeoutError:
         exhausted = True
@@ -179,7 +177,7 @@ try:
     print()
 finally:
     try:
-        os.remove(db_path)   # Windows: only after every connection is closed
+        os.remove(db_path)  # Windows: only after every connection is closed
     except OSError:
         pass
 
@@ -191,6 +189,7 @@ finally:
 # N app replicas, multiply by N. 50 replicas x 20 each = 1000 -> beyond
 # default Postgres -> PgBouncer territory.
 
+
 # Example 4: worked example
 def pool_size(concurrency: int, query_ms: float, request_ms: float) -> int:
     """Little's-law-style pool sizing (rounded up)."""
@@ -200,8 +199,11 @@ def pool_size(concurrency: int, query_ms: float, request_ms: float) -> int:
 
 print("4. sizing: 200 concurrent, 10ms query / 100ms request ->", end=" ")
 print(pool_size(200, 10.0, 100.0), "connections")
-print("   50 replicas x 20 ->", 50 * pool_size(200, 10.0, 100.0),
-      "-> needs PgBouncer or per-replica pools")
+print(
+    "   50 replicas x 20 ->",
+    50 * pool_size(200, 10.0, 100.0),
+    "-> needs PgBouncer or per-replica pools",
+)
 print()
 
 # ============================================================
@@ -237,24 +239,23 @@ print("   100 idle functions wake up -> 100 simultaneous pool warmups")
 print("   -> connection storm; solution: PgBouncer + min_size=0")
 print()
 
+
 # ============================================================
 # 7. Real psycopg_pool (guarded — skips when no server)
 # ============================================================
 def pg_demo() -> None:
     """Real ConnectionPool against Postgres; [skip] when unavailable."""
-    dsn = os.environ.get(
-        "PGDSN", "postgresql://postgres:postgres@localhost:5432/postgres"
-    )
+    dsn = os.environ.get("PGDSN", "postgresql://postgres:postgres@localhost:5432/postgres")
     try:
         import psycopg
         from psycopg_pool import ConnectionPool
     except ImportError:
-        print("[skip] psycopg/psycopg_pool not installed — pip install 'psycopg[binary]' 'psycopg-pool'")
+        print(
+            "[skip] psycopg/psycopg_pool not installed — pip install 'psycopg[binary]' 'psycopg-pool'"
+        )
         return
     try:
-        with ConnectionPool(
-            dsn, min_size=1, max_size=4, open=False, timeout=2
-        ) as pool:
+        with ConnectionPool(dsn, min_size=1, max_size=4, open=False, timeout=2) as pool:
             pool.wait(timeout=2.0)
             with pool.connection() as conn:
                 with conn.cursor() as cur:
@@ -289,6 +290,7 @@ print()
 #   real connections multiplexed; CORRECT: PgBouncer transaction mode
 #   for stateless HTTP workloads
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -310,6 +312,7 @@ def _verify() -> None:
     pool = MiniPool(db_path, max_size=2, timeout=2.0)
     try:
         done: list[int] = []
+
         def worker(i: int) -> None:
             conn = pool.acquire()
             try:
@@ -318,6 +321,7 @@ def _verify() -> None:
                 done.append(i)
             finally:
                 pool.release(conn)
+
         threads = [threading.Thread(target=worker, args=(i,)) for i in range(6)]
         for t in threads:
             t.start()
@@ -386,4 +390,4 @@ if __name__ == "__main__":
         print("3. Exhaustion surfaces as TimeoutError - design for it")
         print("4. Size = concurrency x (query/request) ; multiply by replicas")
         print("5. PgBouncer multiplexes; serverless needs min_size=0 pools")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

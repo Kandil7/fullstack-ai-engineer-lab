@@ -44,9 +44,9 @@ By the end of this lecture, you will be able to:
 
 ```python
 x = torch.linspace(-3, 3, 7)
-print(torch.sigmoid(x).round(decimals=3))   # 0..1
-print(torch.tanh(x).round(decimals=3))      # -1..1
-print(torch.relu(x))                        # max(0, x)
+print(torch.sigmoid(x).round(decimals=3))  # 0..1
+print(torch.tanh(x).round(decimals=3))  # -1..1
+print(torch.relu(x))  # max(0, x)
 ```
 
 Output:
@@ -73,7 +73,7 @@ they vanish.
 ```python
 lin = nn.Linear(512, 512)
 with torch.no_grad():
-    lin.weight.normal_(0, 10)              # BAD: std 10
+    lin.weight.normal_(0, 10)  # BAD: std 10
 std_bad = lin.weight.std().item()
 
 nn.init.kaiming_uniform_(lin.weight, a=0)  # GOOD: He init for ReLU nets
@@ -96,13 +96,15 @@ default — but you must know the *why* to diagnose custom architectures.
 def grad_norm_depth(depth, init_fn):
     layers = [nn.Linear(100, 100) for _ in range(depth)]
     for l in layers:
-        init_fn(l.weight); l.bias.data.zero_()
+        init_fn(l.weight)
+        l.bias.data.zero_()
     z = torch.randn(64, 100)
     for l in layers:
         z = torch.tanh(l(z))
     z.sum().backward()
     norms = [l.weight.grad.norm().item() for l in layers]
     return norms[0], norms[-1]
+
 
 first, last = grad_norm_depth(10, nn.init.xavier_uniform_)
 ```
@@ -124,8 +126,8 @@ connections, and modern activations.
 bn = nn.BatchNorm1d(8)
 d = nn.Dropout(p=0.5)
 data = torch.randn(4, 8)
-print(bn(data).mean(dim=0).round(decimals=4))     # ~0 per channel in train mode
-print((d(data) != 0).float().mean())              # ~50% alive in train mode
+print(bn(data).mean(dim=0).round(decimals=4))  # ~0 per channel in train mode
+print((d(data) != 0).float().mean())  # ~50% alive in train mode
 ```
 
 Output:
@@ -149,7 +151,8 @@ for lr in [1e-1, 1e-2, 1e-4]:
     for _ in range(5):
         opt.zero_grad()
         l = ((m(torch.randn(8, 4)) - 1) ** 2).mean()
-        l.backward(); opt.step()
+        l.backward()
+        opt.step()
     print(lr, l.item())
 ```
 
@@ -172,7 +175,7 @@ w2 = torch.tensor(3.0, requires_grad=True)
 x = torch.tensor(1.5)
 loss = (w1 * w2 * x) ** 2
 loss.backward()
-print(w1.grad.item())   # 2*(w1*w2*x)*(w2*x)
+print(w1.grad.item())  # 2*(w1*w2*x)*(w2*x)
 ```
 
 Output:

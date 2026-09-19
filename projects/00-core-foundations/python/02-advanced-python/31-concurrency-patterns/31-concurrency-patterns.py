@@ -45,13 +45,14 @@ q: queue.Queue[int] = queue.Queue(maxsize=2)
 q.put(1)
 q.put(2)
 try:
-    q.put(3, timeout=0.05)      # full -> blocks briefly, then raises
+    q.put(3, timeout=0.05)  # full -> blocks briefly, then raises
     print("put succeeded (unexpected)")
 except queue.Full as exc:
     print(f"producer blocked: {type(exc).__name__} after timeout")
 
 # Output:
 # producer blocked: Full after timeout
+
 
 # Example 1b: the R1.1-style deadlock, made safe
 # The original bug: producer() calls put() with NO timeout while no
@@ -79,9 +80,10 @@ print(f"bounded_put on full queue: {bounded_put(q, 3)}")
 # makes threads ideal for I/O-bound work (API calls, file reads) and
 # wrong for CPU-bound math.
 
+
 def fetch(url_id: int) -> int:
     """Simulated I/O: sleep-free, pure-ish work with a tiny delay."""
-    time.sleep(0.01)          # fake network latency
+    time.sleep(0.01)  # fake network latency
     return url_id * 2
 
 
@@ -100,10 +102,11 @@ print(f"pool results: {results}")
 # Fan-out: split one batch into chunks processed in parallel.
 # Fan-in: merge partial results back into one ordered result.
 
+
 def fan_out_fan_in(items: list[int], workers: int) -> list[int]:
     """Process chunks in parallel, then merge in original order. O(n)."""
     chunk_size = max(1, len(items) // workers)
-    chunks = [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]
+    chunks = [items[i : i + chunk_size] for i in range(0, len(items), chunk_size)]
     with ThreadPoolExecutor(max_workers=workers) as pool:
         partials = list(pool.map(lambda chunk: [x * 2 for x in chunk], chunks))
     merged: list[int] = []
@@ -126,10 +129,13 @@ print(f"fan-out/fan-in: {fan_out_fan_in(list(range(10)), 4)}")
 # request takes a token; when the bucket is empty, requests must wait.
 # The clock is INJECTED so tests never touch wall time.
 
+
 class TokenBucket:
     """A deterministic token bucket with an injectable clock."""
-    def __init__(self, capacity: int, rate: float,
-                 now: Callable[[], float] = time.monotonic) -> None:
+
+    def __init__(
+        self, capacity: int, rate: float, now: Callable[[], float] = time.monotonic
+    ) -> None:
         self.capacity = capacity
         self.rate = rate
         self._now = now
@@ -154,16 +160,18 @@ class TokenBucket:
 # Example 4: enforce a rate with a fake clock
 fake_now = {"t": 0.0}
 
+
 def fake_clock() -> float:
     """Injectable clock for deterministic rate limiting."""
     return fake_now["t"]
 
+
 bucket = TokenBucket(capacity=3, rate=1.0, now=fake_clock)
 print(f"burst of 3: {[bucket.try_acquire() for _ in range(3)]}")
 print(f"4th request: {bucket.try_acquire()}")
-fake_now["t"] += 0.5          # half a token earned
+fake_now["t"] += 0.5  # half a token earned
 print(f"after 0.5s: {bucket.try_acquire()}")
-fake_now["t"] += 0.5          # another half token -> full
+fake_now["t"] += 0.5  # another half token -> full
 print(f"after 1.0s: {bucket.try_acquire()}")
 
 # Output:
@@ -180,19 +188,26 @@ print(f"after 1.0s: {bucket.try_acquire()}")
 # calling the broken endpoint. After a cooldown, HALF-OPEN allows one
 # trial; success closes the circuit, failure reopens it.
 
+
 @dataclass
 class CircuitState:
     """Mutable state machine for the breaker. O(1) transitions."""
+
     failures: int = 0
     open_until: float = 0.0
-    state: str = "closed"     # closed | open | half_open
+    state: str = "closed"  # closed | open | half_open
 
 
 class CircuitBreaker:
     """Fail-fast wrapper around a fragile callable."""
-    def __init__(self, fn: Callable[[], int], threshold: int = 3,
-                 cooldown: float = 1.0,
-                 now: Callable[[], float] = time.monotonic) -> None:
+
+    def __init__(
+        self,
+        fn: Callable[[], int],
+        threshold: int = 3,
+        cooldown: float = 1.0,
+        now: Callable[[], float] = time.monotonic,
+    ) -> None:
         self.fn = fn
         self.threshold = threshold
         self.cooldown = cooldown
@@ -226,6 +241,7 @@ class CircuitBreaker:
 # Example 5: breaker opens after 3 failures, fails fast, then recovers
 calls = {"n": 0}
 
+
 def flaky() -> int:
     """Fails the first 3 calls, then succeeds (provider recovers)."""
     calls["n"] += 1
@@ -233,11 +249,14 @@ def flaky() -> int:
         raise ConnectionError("provider down")
     return 42
 
+
 fake_clock = {"t": 0.0}
+
 
 def breaker_clock() -> float:
     """Injectable clock for the breaker."""
     return fake_clock["t"]
+
 
 breaker = CircuitBreaker(flaky, threshold=3, cooldown=1.0, now=breaker_clock)
 for attempt in range(3):
@@ -251,9 +270,11 @@ try:
     breaker.call()
 except RuntimeError:
     pass
-print(f"short-circuited (open): {breaker.short_circuited}, "
-      f"provider untouched: {calls['n'] == calls_before}")
-fake_clock["t"] += 1.0          # cooldown elapsed -> half-open trial
+print(
+    f"short-circuited (open): {breaker.short_circuited}, "
+    f"provider untouched: {calls['n'] == calls_before}"
+)
+fake_clock["t"] += 1.0  # cooldown elapsed -> half-open trial
 print(f"recovered call: {breaker.call()}")
 print(f"state after recovery: {breaker.state.state}")
 
@@ -271,20 +292,24 @@ print(f"state after recovery: {breaker.state.state}")
 # clients does not re-stampede the provider. Sleep is INJECTED for
 # determinism.
 
-def retry_with_jitter(fn: Callable[[], int], attempts: int = 4,
-                      base_delay: float = 0.1,
-                      sleep: Callable[[float], None] = time.sleep,
-                      rng: random.Random | None = None) -> int:
+
+def retry_with_jitter(
+    fn: Callable[[], int],
+    attempts: int = 4,
+    base_delay: float = 0.1,
+    sleep: Callable[[float], None] = time.sleep,
+    rng: random.Random | None = None,
+) -> int:
     """Retry with exponential backoff + full jitter. O(attempts)."""
     rng = rng or random.Random(0)
     last_error: Exception | None = None
     for attempt in range(attempts):
         try:
             return fn()
-        except Exception as exc:          # noqa: BLE001 - retry is the point
+        except Exception as exc:  # noqa: BLE001 - retry is the point
             last_error = exc
             if attempt + 1 < attempts:
-                delay = rng.uniform(0.0, base_delay * (2 ** attempt))
+                delay = rng.uniform(0.0, base_delay * (2**attempt))
                 sleep(delay)
     raise RuntimeError(f"failed after {attempts} attempts: {last_error}")
 
@@ -292,11 +317,14 @@ def retry_with_jitter(fn: Callable[[], int], attempts: int = 4,
 # Example 6: succeeds on the 3rd try, jitter keeps delays bounded
 attempts_log: list[float] = []
 
+
 def log_sleep(delay: float) -> None:
     """Record injected delays instead of sleeping."""
     attempts_log.append(delay)
 
+
 state = {"n": 0}
+
 
 def flaky_twice() -> int:
     """Raise twice, then return."""
@@ -304,6 +332,7 @@ def flaky_twice() -> int:
     if state["n"] <= 2:
         raise TimeoutError("429")
     return 7
+
 
 print(f"retry result: {retry_with_jitter(flaky_twice, sleep=log_sleep)}")
 print(f"delays used: {[round(d, 3) for d in attempts_log]}")
@@ -320,8 +349,10 @@ print(f"delays used: {[round(d, 3) for d in attempts_log]}")
 # lose work. Idempotency: re-applying an operation gives the same
 # result, so retries and replays are safe.
 
+
 class Worker:
     """Drains a queue until stop() is called; exits after in-flight."""
+
     def __init__(self, q_: "queue.Queue[int]") -> None:
         self.q = q_
         self.stop_event = threading.Event()
@@ -356,8 +387,8 @@ for i in range(5):
 worker = Worker(work_q)
 t = threading.Thread(target=worker.run)
 t.start()
-time.sleep(0.01)               # let it consume a couple
-worker.stop()                  # graceful: no new work, drain the rest
+time.sleep(0.01)  # let it consume a couple
+worker.stop()  # graceful: no new work, drain the rest
 t.join(timeout=2.0)
 print(f"processed: {sorted(worker.processed)}")
 print(f"idempotent dedup: {apply_twice_equals_once(['a', 'b', 'a'])}")
@@ -397,6 +428,7 @@ lock_b.release()
 # Bulkhead: separate worker pools per dependency so one slow provider
 # cannot consume the pool of another (ship-compartment isolation).
 
+
 def run_bulkhead(chunks: list[list[int]]) -> list[int]:
     """Two isolated pools, merged deterministically. O(n) work."""
     results: list[int] = []
@@ -404,8 +436,7 @@ def run_bulkhead(chunks: list[list[int]]) -> list[int]:
     def process_chunk(chunk: list[int]) -> list[int]:
         return [x + 1 for x in chunk]
 
-    with ThreadPoolExecutor(max_workers=2) as pool_a, \
-            ThreadPoolExecutor(max_workers=2) as pool_b:
+    with ThreadPoolExecutor(max_workers=2) as pool_a, ThreadPoolExecutor(max_workers=2) as pool_b:
         # interleave chunks across pools to show isolation
         mid = len(chunks) // 2
         futs_a = [pool_a.submit(process_chunk, c) for c in chunks[:mid]]
@@ -454,22 +485,22 @@ def _verify() -> None:
     q_: queue.Queue[int] = queue.Queue(maxsize=2)
     q_.put(1)
     q_.put(2)
-    assert bounded_put(q_, 3) is False, \
+    assert bounded_put(q_, 3) is False, (
         "a full bounded queue must refuse the producer (backpressure)"
-    assert q_.get() == 1 and q_.get() == 2, \
-        "FIFO order must be preserved"
-    assert bounded_put(q_, 3) is True, \
-        "after draining, the producer must be unblocked"
+    )
+    assert q_.get() == 1 and q_.get() == 2, "FIFO order must be preserved"
+    assert bounded_put(q_, 3) is True, "after draining, the producer must be unblocked"
 
     # --- worker pool correctness ---
     with ThreadPoolExecutor(max_workers=4) as pool:
-        assert list(pool.map(fetch, range(4))) == [0, 2, 4, 6], \
+        assert list(pool.map(fetch, range(4))) == [0, 2, 4, 6], (
             "pool results must match sequential results"
+        )
 
     # --- fan-out/fan-in preserves order ---
-    assert fan_out_fan_in(list(range(10)), 4) == \
-        [0, 2, 4, 6, 8, 10, 12, 14, 16, 18], \
+    assert fan_out_fan_in(list(range(10)), 4) == [0, 2, 4, 6, 8, 10, 12, 14, 16, 18], (
         "fan-out/fan-in must preserve original order"
+    )
 
     # --- token bucket enforces the rate ---
     clock = {"t": 0.0}
@@ -478,15 +509,15 @@ def _verify() -> None:
         return clock["t"]
 
     bucket = TokenBucket(capacity=3, rate=1.0, now=fake)
-    assert [bucket.try_acquire() for _ in range(3)] == [True, True, True], \
+    assert [bucket.try_acquire() for _ in range(3)] == [True, True, True], (
         "the bucket must allow a burst up to its capacity"
-    assert bucket.try_acquire() is False, \
-        "a fourth request in the same instant must be refused"
+    )
+    assert bucket.try_acquire() is False, "a fourth request in the same instant must be refused"
     clock["t"] += 1.0
-    assert bucket.try_acquire() is True, \
+    assert bucket.try_acquire() is True, (
         "after one second at rate 1.0, exactly one token must exist"
-    assert bucket.try_acquire() is False, \
-        "the refilled token is consumed; the next is refused"
+    )
+    assert bucket.try_acquire() is False, "the refilled token is consumed; the next is refused"
 
     # --- circuit breaker opens after N failures ---
     calls = {"n": 0}
@@ -502,29 +533,23 @@ def _verify() -> None:
     def breaker_clock() -> float:
         return clock["t"]
 
-    breaker = CircuitBreaker(recovers, threshold=3, cooldown=1.0,
-                             now=breaker_clock)
+    breaker = CircuitBreaker(recovers, threshold=3, cooldown=1.0, now=breaker_clock)
     for _ in range(3):
         try:
             breaker.call()
         except ConnectionError:
             pass
-    assert breaker.state.state == "open", \
-        "three consecutive failures must open the circuit"
+    assert breaker.state.state == "open", "three consecutive failures must open the circuit"
     before = calls["n"]
     try:
         breaker.call()
     except RuntimeError:
         pass
-    assert calls["n"] == before, \
-        "while open, the underlying callable must not be invoked"
-    assert breaker.short_circuited == 1, \
-        "the call must be short-circuited, not executed"
+    assert calls["n"] == before, "while open, the underlying callable must not be invoked"
+    assert breaker.short_circuited == 1, "the call must be short-circuited, not executed"
     clock["t"] += 1.0
-    assert breaker.call() == 42, \
-        "the half-open trial must reach the recovered provider"
-    assert breaker.state.state == "closed", \
-        "a success in half-open must close the circuit"
+    assert breaker.call() == 42, "the half-open trial must reach the recovered provider"
+    assert breaker.state.state == "closed", "a success in half-open must close the circuit"
 
     # --- retry with jitter ---
     delays: list[float] = []
@@ -540,12 +565,13 @@ def _verify() -> None:
             raise TimeoutError("429")
         return 7
 
-    assert retry_with_jitter(flaky_twice, sleep=log_sleep) == 7, \
-        "retry must eventually succeed"
-    assert len(delays) == 2 and all(d >= 0.0 for d in delays), \
+    assert retry_with_jitter(flaky_twice, sleep=log_sleep) == 7, "retry must eventually succeed"
+    assert len(delays) == 2 and all(d >= 0.0 for d in delays), (
         "there must be one jittered delay per failed attempt"
-    assert delays[0] <= 0.1 and delays[1] <= 0.2, \
+    )
+    assert delays[0] <= 0.1 and delays[1] <= 0.2, (
         "delays must respect the exponential backoff window per attempt"
+    )
 
     # --- graceful shutdown drains in-flight work ---
     work_q: queue.Queue[int] = queue.Queue()
@@ -557,26 +583,29 @@ def _verify() -> None:
     time.sleep(0.01)
     worker.stop()
     t.join(timeout=2.0)
-    assert sorted(worker.processed) == [0, 10, 20, 30, 40], \
+    assert sorted(worker.processed) == [0, 10, 20, 30, 40], (
         "the worker must process everything enqueued before stopping"
+    )
 
     # --- idempotency ---
-    assert apply_twice_equals_once(["a", "b", "a"]) == ["a", "b"], \
+    assert apply_twice_equals_once(["a", "b", "a"]) == ["a", "b"], (
         "an idempotent operation applied twice equals applied once"
+    )
 
     # --- deadlock symptom via timeout ---
     lock_a = threading.Lock()
     lock_b = threading.Lock()
-    assert lock_a.acquire(timeout=0.05) is True, \
-        "an uncontended lock must be acquired"
-    assert lock_b.acquire(timeout=0.05) is True, \
+    assert lock_a.acquire(timeout=0.05) is True, "an uncontended lock must be acquired"
+    assert lock_b.acquire(timeout=0.05) is True, (
         "an independent lock must also be acquired (no deadlock here)"
+    )
     lock_a.release()
     lock_b.release()
 
     # --- bulkhead ---
-    assert run_bulkhead([[1, 2], [3, 4]]) == [2, 3, 4, 5], \
+    assert run_bulkhead([[1, 2], [3, 4]]) == [2, 3, 4, 5], (
         "bulkhead pools must produce merged, ordered results"
+    )
 
     print("[OK] 31-concurrency-patterns: all checks passed")
 

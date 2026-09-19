@@ -11,12 +11,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent))
 
 starter_spec = importlib.util.spec_from_file_location(
-    "starter", Path(__file__).parent / "starter.py")
+    "starter", Path(__file__).parent / "starter.py"
+)
 starter_module = importlib.util.module_from_spec(starter_spec)
 starter_spec.loader.exec_module(starter_module)
 
 solution_spec = importlib.util.spec_from_file_location(
-    "solution", Path(__file__).parent / "solution.py")
+    "solution", Path(__file__).parent / "solution.py"
+)
 solution_module = importlib.util.module_from_spec(solution_spec)
 solution_spec.loader.exec_module(solution_module)
 
@@ -28,8 +30,8 @@ def runs_conn() -> sqlite3.Connection:
     conn.execute("CREATE TABLE runs (id INTEGER PRIMARY KEY, model TEXT, run_ts INT, metric REAL)")
     conn.executemany(
         "INSERT INTO runs (model, run_ts, metric) VALUES (?, ?, ?)",
-        [("bert", 1, 0.9), ("bert", 2, 0.9), ("bert", 3, 0.8),
-         ("gpt", 1, 0.7), ("gpt", 2, 0.75)])
+        [("bert", 1, 0.9), ("bert", 2, 0.9), ("bert", 3, 0.8), ("gpt", 1, 0.7), ("gpt", 2, 0.75)],
+    )
     return conn
 
 
@@ -76,8 +78,7 @@ class TestFramesReport:
     def test_running_total(self):
         conn = runs_conn()
         bert = [r for r in solution_module.frames_report(conn) if r[0] == "bert"]
-        assert [r[3] for r in bert] == [pytest.approx(0.9), pytest.approx(1.8),
-                                        pytest.approx(2.6)]
+        assert [r[3] for r in bert] == [pytest.approx(0.9), pytest.approx(1.8), pytest.approx(2.6)]
 
     def test_moving_average_edges(self):
         conn = runs_conn()

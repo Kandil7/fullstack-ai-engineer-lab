@@ -18,18 +18,20 @@ app = FastAPI(title="Response Models in FastAPI")
 # ----- Models -----
 class UserIn(BaseModel):
     """What the client sends (request body)."""
+
     name: str
     email: str
-    password: str           # Sensitive — should NOT be in response
+    password: str  # Sensitive — should NOT be in response
     age: int = Field(ge=0, le=150)
 
 
 class UserDB(BaseModel):
     """Internal representation (includes stored data)."""
+
     id: int
     name: str
     email: str
-    password: str           # Still stored internally
+    password: str  # Still stored internally
     age: int
     is_active: bool = True
     created_at: str
@@ -38,6 +40,7 @@ class UserDB(BaseModel):
 
 class UserOut(BaseModel):
     """What the client receives (response). password is excluded."""
+
     id: int
     name: str
     email: str
@@ -48,6 +51,7 @@ class UserOut(BaseModel):
 
 class UserOutWithMeta(BaseModel):
     """Response with additional metadata."""
+
     id: int
     name: str
     email: str
@@ -59,6 +63,7 @@ class UserOutWithMeta(BaseModel):
 
 class ErrorResponse(BaseModel):
     """Standard error response model."""
+
     detail: str
     error_code: int
     timestamp: str
@@ -209,6 +214,7 @@ Testing with curl:
     # WARNING: No response_model — no filtering!
 """
 
+
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
     try:
@@ -267,6 +273,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

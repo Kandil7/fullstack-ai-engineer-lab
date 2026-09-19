@@ -13,6 +13,7 @@
 ```python
 from abc import ABC, abstractmethod
 
+
 class Shape(ABC):
     @abstractmethod
     def area(self):
@@ -40,6 +41,7 @@ class Shape(ABC):
 class Animal:  # Base class
     pass
 
+
 class Dog(Animal):  # Child class
     pass
 ```
@@ -54,6 +56,7 @@ class Dog(Animal):  # Child class
 ```python
 class Animal:
     pass
+
 
 class Dog(Animal):  # Dog is child of Animal
     pass
@@ -79,6 +82,7 @@ class Car:
 class Base:
     pass
 
+
 class Derived(Base):  # Derived inherits from Base
     pass
 ```
@@ -95,6 +99,7 @@ class Animal:
     def speak(self):
         pass
 
+
 class Dog(Animal):  # Dog inherits from Animal
     def speak(self):
         return "Woof!"
@@ -105,8 +110,8 @@ class Dog(Animal):  # Dog inherits from Animal
 **Definition:** Check if object is instance of a class (or its subclasses).
 ```python
 dog = Dog()
-print(isinstance(dog, Dog))      # True
-print(isinstance(dog, Animal))   # True (inheritance)
+print(isinstance(dog, Dog))  # True
+print(isinstance(dog, Animal))  # True (inheritance)
 ```
 **Related:** Type checking, inheritance, issubclass()
 
@@ -128,6 +133,7 @@ print(issubclass(Animal, Dog))  # False
 class D(B, C):
     pass
 
+
 print(D.mro())  # Shows resolution order
 ```
 **Related:** Multiple inheritance, super(), C3 linearization
@@ -138,7 +144,9 @@ print(D.mro())  # Shows resolution order
 class JsonMixin:
     def to_json(self):
         import json
+
         return json.dumps(self.__dict__)
+
 
 class User(JsonMixin):
     def __init__(self, name):
@@ -153,9 +161,11 @@ class Flyer:
     def fly(self):
         pass
 
+
 class Swimmer:
     def swim(self):
         pass
+
 
 class Duck(Flyer, Swimmer):  # Multiple inheritance
     pass
@@ -173,6 +183,7 @@ class Animal:
     def speak(self):
         return "..."
 
+
 class Dog(Animal):
     def speak(self):  # Overrides Animal.speak
         return "Woof!"
@@ -189,6 +200,7 @@ class Dog(Animal):
 class Animal:  # Parent class
     pass
 
+
 class Dog(Animal):  # Child class
     pass
 ```
@@ -203,6 +215,7 @@ class Dog(Animal):  # Child class
 ```python
 class Animal:  # Superclass
     pass
+
 
 class Dog(Animal):  # Subclass
     pass
@@ -245,6 +258,7 @@ class Animal:
     def speak(self):
         pass
 
+
 class Dog(Animal):
     def speak(self):
         return "Woof!"
@@ -256,6 +270,7 @@ class Parent:
     def __init__(self, name):
         self.name = name
 
+
 class Child(Parent):
     def __init__(self, name, age):
         super().__init__(name)
@@ -265,6 +280,7 @@ class Child(Parent):
 ### Pattern 3: Abstract Interface
 ```python
 from abc import ABC, abstractmethod
+
 
 class Interface(ABC):
     @abstractmethod
@@ -277,6 +293,7 @@ class Interface(ABC):
 class JsonMixin:
     def to_json(self):
         return json.dumps(self.__dict__)
+
 
 class MyClass(JsonMixin, OtherBase):
     pass

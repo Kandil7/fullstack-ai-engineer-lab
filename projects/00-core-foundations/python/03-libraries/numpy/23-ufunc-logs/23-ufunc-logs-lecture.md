@@ -91,19 +91,19 @@ import numpy as np
 arr = np.array([1, 2, 3, 4, 5])
 
 # Power
-print("\npower(x, 2):", np.power(arr, 2))    # [ 1  4  9 16 25]
-print("power(x, 3):", np.power(arr, 3))      # [  1   8  27  64 125]
+print("\npower(x, 2):", np.power(arr, 2))  # [ 1  4  9 16 25]
+print("power(x, 3):", np.power(arr, 3))  # [  1   8  27  64 125]
 print("power(x, 0.5):", np.power(arr, 0.5))  # [1.   1.41 1.73 2.   2.24]
 
 # Square and square root
-print("\nsquare():", np.square(arr))    # [ 1  4  9 16 25]
-print("sqrt():", np.sqrt(arr))          # [1.   1.41 1.73 2.   2.24]
+print("\nsquare():", np.square(arr))  # [ 1  4  9 16 25]
+print("sqrt():", np.sqrt(arr))  # [1.   1.41 1.73 2.   2.24]
 
 # Cube root
-print("cbrt():", np.cbrt(arr))          # [1.    1.26 1.44 1.59 1.71]
+print("cbrt():", np.cbrt(arr))  # [1.    1.26 1.44 1.59 1.71]
 
 # Inverse square root
-print("1/sqrt:", 1 / np.sqrt(arr))      # [1.    0.707 0.577 0.5   0.447]
+print("1/sqrt:", 1 / np.sqrt(arr))  # [1.    0.707 0.577 0.5   0.447]
 ```
 
 ### 4. Logarithmic Identities
@@ -126,7 +126,7 @@ print("log(a/b) = log(a) - log(b):", np.allclose(lhs, rhs))
 
 # log(a^n) = n * log(a)
 n = 3
-lhs = np.log(a ** n)
+lhs = np.log(a**n)
 rhs = n * np.log(a)
 print("log(a^n) = n*log(a):", np.allclose(lhs, rhs))
 
@@ -150,7 +150,7 @@ print(f"\nEntropy (uniform): {entropy:.4f} bits")  # 2.0
 
 probs = np.array([0.9, 0.05, 0.03, 0.02])  # Skewed
 entropy = -np.sum(probs * np.log2(probs))
-print(f"Entropy (skewed): {entropy:.4f} bits")    # ~1.0
+print(f"Entropy (skewed): {entropy:.4f} bits")  # ~1.0
 
 # Signal strength: decibels
 power_ratio = np.array([1, 10, 100, 1000])
@@ -198,12 +198,12 @@ import numpy as np
 x = 1e-10
 
 # For very small x, log(1+x) loses precision
-print("log(1 + x):", np.log(1 + x))        # May be 0.0
-print("log1p(x):", np.log1p(x))            # More accurate
+print("log(1 + x):", np.log(1 + x))  # May be 0.0
+print("log1p(x):", np.log1p(x))  # More accurate
 
 # Similarly for exp(x) - 1
-print("exp(x) - 1:", np.exp(x) - 1)        # May be 0.0
-print("expm1(x):", np.expm1(x))            # More accurate
+print("exp(x) - 1:", np.exp(x) - 1)  # May be 0.0
+print("expm1(x):", np.expm1(x))  # More accurate
 
 # Verify they're equivalent for larger values
 arr = np.array([0.1, 1.0, 10.0, 100.0])
@@ -216,6 +216,7 @@ print("expm1 vs exp(x)-1:", np.allclose(np.expm1(arr), np.exp(arr) - 1))
 ```python
 import numpy as np
 
+
 # Calculate Shannon entropy
 def shannon_entropy(probs):
     """Calculate Shannon entropy in bits."""
@@ -223,11 +224,12 @@ def shannon_entropy(probs):
     probs = probs[probs > 0]
     return -np.sum(probs * np.log2(probs))
 
+
 # Different probability distributions
 distributions = {
     "Fair coin": np.array([0.5, 0.5]),
     "Biased coin": np.array([0.9, 0.1]),
-    "Fair die": np.array([1/6] * 6),
+    "Fair die": np.array([1 / 6] * 6),
     "Skewed die": np.array([0.5, 0.1, 0.1, 0.1, 0.1, 0.1]),
 }
 
@@ -242,13 +244,16 @@ for name, probs in distributions.items():
 ```python
 import numpy as np
 
+
 # Power ratio to decibels
 def power_to_db(power_ratio):
     return 10 * np.log10(power_ratio)
 
+
 # Amplitude ratio to decibels
 def amplitude_to_db(amplitude_ratio):
     return 20 * np.log10(amplitude_ratio)
+
 
 # Examples
 power_ratios = np.array([1, 2, 5, 10, 100, 1000])
@@ -322,8 +327,8 @@ import numpy as np
 # result = np.log(100)  # Returns 4.605, not 2!
 
 # CORRECT - Use appropriate function
-print("log(100):", np.log(100))      # 4.605 (base e)
-print("log2(100):", np.log2(100))    # 6.644 (base 2)
+print("log(100):", np.log(100))  # 4.605 (base e)
+print("log2(100):", np.log2(100))  # 6.644 (base 2)
 print("log10(100):", np.log10(100))  # 2.0 (base 10)
 ```
 

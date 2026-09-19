@@ -57,11 +57,11 @@ import numpy as np
 from scipy import optimize, integrate, stats, linalg
 
 # 1. Find minimum of a function
-result = optimize.minimize(lambda x: x**2 + 10*np.sin(x), x0=0)
+result = optimize.minimize(lambda x: x**2 + 10 * np.sin(x), x0=0)
 print(f"Minimum at x={result.x[0]:.3f}")
 
 # 2. Integrate a function
-area, error = integrate.quad(lambda x: np.exp(-x**2), -np.inf, np.inf)
+area, error = integrate.quad(lambda x: np.exp(-(x**2)), -np.inf, np.inf)
 print(f"∫exp(-x²)dx from -∞ to ∞ = {area:.4f}")
 
 # 3. Statistical test

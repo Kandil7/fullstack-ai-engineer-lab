@@ -36,8 +36,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 
-X, y = make_classification(n_samples=200, n_features=2, 
-                           n_redundant=0, random_state=42)
+X, y = make_classification(n_samples=200, n_features=2, n_redundant=0, random_state=42)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -47,7 +46,7 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # Train SVM
-svm = SVC(kernel='rbf', C=1.0, gamma='scale', random_state=42)
+svm = SVC(kernel="rbf", C=1.0, gamma="scale", random_state=42)
 svm.fit(X_train_scaled, y_train)
 
 # Evaluate
@@ -69,10 +68,9 @@ from sklearn.svm import SVC
 from sklearn.datasets import make_classification
 import numpy as np
 
-X, y = make_classification(n_samples=200, n_features=2, 
-                           n_redundant=0, random_state=42)
+X, y = make_classification(n_samples=200, n_features=2, n_redundant=0, random_state=42)
 
-svm = SVC(kernel='linear', random_state=42)
+svm = SVC(kernel="linear", random_state=42)
 svm.fit(X, y)
 
 # For linear SVM, hyperplane is defined by coefficients
@@ -97,10 +95,9 @@ from sklearn.svm import SVC
 from sklearn.datasets import make_classification
 import numpy as np
 
-X, y = make_classification(n_samples=200, n_features=2, 
-                           n_redundant=0, random_state=42)
+X, y = make_classification(n_samples=200, n_features=2, n_redundant=0, random_state=42)
 
-svm = SVC(kernel='linear', random_state=42)
+svm = SVC(kernel="linear", random_state=42)
 svm.fit(X, y)
 
 # Decision function gives signed distance to hyperplane
@@ -130,10 +127,9 @@ from sklearn.svm import SVC
 from sklearn.datasets import make_classification
 import numpy as np
 
-X, y = make_classification(n_samples=200, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=200, n_features=10, n_informative=5, random_state=42)
 
-svm = SVC(kernel='rbf', random_state=42)
+svm = SVC(kernel="rbf", random_state=42)
 svm.fit(X, y)
 
 print(f"Number of support vectors per class: {svm.n_support_}")
@@ -171,12 +167,12 @@ X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # Linear kernel fails on non-linear data
-svm_linear = SVC(kernel='linear')
+svm_linear = SVC(kernel="linear")
 svm_linear.fit(X_train_scaled, y_train)
 acc_linear = accuracy_score(y_test, svm_linear.predict(X_test_scaled))
 
 # RBF kernel handles non-linearity
-svm_rbf = SVC(kernel='rbf')
+svm_rbf = SVC(kernel="rbf")
 svm_rbf.fit(X_train_scaled, y_train)
 acc_rbf = accuracy_score(y_test, svm_rbf.predict(X_test_scaled))
 
@@ -210,8 +206,8 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # Tune gamma for RBF kernel
-param_grid = {'C': [0.1, 1, 10], 'gamma': [0.1, 1, 10]}
-grid = GridSearchCV(SVC(kernel='rbf'), param_grid, cv=5)
+param_grid = {"C": [0.1, 1, 10], "gamma": [0.1, 1, 10]}
+grid = GridSearchCV(SVC(kernel="rbf"), param_grid, cv=5)
 grid.fit(X_scaled, y)
 
 print(f"Best parameters: {grid.best_params_}")
@@ -236,16 +232,15 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 
-X, y = make_classification(n_samples=200, n_features=10, 
-                           n_informative=5, random_state=42)
+X, y = make_classification(n_samples=200, n_features=10, n_informative=5, random_state=42)
 
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 print("Effect of C parameter:")
 for C in [0.001, 0.01, 0.1, 1, 10, 100, 1000]:
-    svm = SVC(kernel='rbf', C=C, random_state=42)
-    scores = cross_val_score(svm, X_scaled, y, cv=5, scoring='accuracy')
+    svm = SVC(kernel="rbf", C=C, random_state=42)
+    scores = cross_val_score(svm, X_scaled, y, cv=5, scoring="accuracy")
     print(f"  C={C:7.3f}: {scores.mean():.4f}")
 ```
 
@@ -274,8 +269,8 @@ X_scaled = scaler.fit_transform(X)
 
 print("Effect of gamma parameter:")
 for gamma in [0.001, 0.01, 0.1, 1, 10, 100]:
-    svm = SVC(kernel='rbf', gamma=gamma, random_state=42)
-    scores = cross_val_score(svm, X_scaled, y, cv=5, scoring='accuracy')
+    svm = SVC(kernel="rbf", gamma=gamma, random_state=42)
+    scores = cross_val_score(svm, X_scaled, y, cv=5, scoring="accuracy")
     print(f"  gamma={gamma:7.3f}: {scores.mean():.4f}")
 ```
 
@@ -295,8 +290,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-X, y = make_classification(n_samples=200, n_features=2, 
-                           n_redundant=0, random_state=42)
+X, y = make_classification(n_samples=200, n_features=2, n_redundant=0, random_state=42)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -304,7 +298,7 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-svm_linear = SVC(kernel='linear', C=1.0, random_state=42)
+svm_linear = SVC(kernel="linear", C=1.0, random_state=42)
 svm_linear.fit(X_train_scaled, y_train)
 
 accuracy = accuracy_score(y_test, svm_linear.predict(X_test_scaled))
@@ -325,15 +319,14 @@ from sklearn.svm import SVC
 from sklearn.datasets import make_classification
 from sklearn.preprocessing import StandardScaler
 
-X, y = make_classification(n_samples=200, n_features=2, 
-                           n_redundant=0, random_state=42)
+X, y = make_classification(n_samples=200, n_features=2, n_redundant=0, random_state=42)
 
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # Different polynomial degrees
 for degree in [2, 3, 4, 5]:
-    svm = SVC(kernel='poly', degree=degree, random_state=42)
+    svm = SVC(kernel="poly", degree=degree, random_state=42)
     svm.fit(X_scaled, y)
     n_sv = sum(svm.n_support_)
     print(f"Degree {degree}: Support vectors={n_sv}")
@@ -355,20 +348,20 @@ import numpy as np
 
 # Add some noise to make data not perfectly separable
 np.random.seed(42)
-X, y = make_classification(n_samples=200, n_features=2, 
-                           n_redundant=0, flip_y=0.1, random_state=42)
+X, y = make_classification(n_samples=200, n_features=2, n_redundant=0, flip_y=0.1, random_state=42)
 
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # Hard margin (large C) - tries to classify everything correctly
-svm_hard = SVC(kernel='linear', C=1000)
+svm_hard = SVC(kernel="linear", C=1000)
 svm_hard.fit(X_scaled, y)
 train_acc = (svm_hard.predict(X_scaled) == y).mean()
 
 # Soft margin (small C) - allows some errors
-svm_soft = SVC(kernel='linear', C=0.1)
+svm_soft = SVC(kernel="linear", C=0.1)
 svm_soft.fit(X_scaled, y)
 train_acc_soft = (svm_soft.predict(X_scaled) == y).mean()
 
@@ -403,7 +396,7 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-svr = SVR(kernel='rbf', C=1.0, epsilon=0.1)
+svr = SVR(kernel="rbf", C=1.0, epsilon=0.1)
 svr.fit(X_train_scaled, y_train)
 
 y_pred = svr.predict(X_test_scaled)
@@ -432,13 +425,15 @@ print(f"SVR R² Score: {r2:.4f}")
 ```python
 # SVM Classification
 from sklearn.svm import SVC
-svm = SVC(kernel='rbf', C=1.0, gamma='scale', random_state=42)
+
+svm = SVC(kernel="rbf", C=1.0, gamma="scale", random_state=42)
 svm.fit(X_train_scaled, y_train)
 y_pred = svm.predict(X_test_scaled)
 
 # SVM Regression
 from sklearn.svm import SVR
-svr = SVR(kernel='rbf', C=1.0, epsilon=0.1)
+
+svr = SVR(kernel="rbf", C=1.0, epsilon=0.1)
 svr.fit(X_train_scaled, y_train)
 
 # Support Vectors
@@ -449,13 +444,14 @@ print(svm.support_vectors_)
 distances = svm.decision_function(X_test_scaled)
 
 # Probability (requires Platt scaling)
-svm_prob = SVC(kernel='rbf', probability=True)
+svm_prob = SVC(kernel="rbf", probability=True)
 svm_prob.fit(X_train_scaled, y_train)
 probabilities = svm_prob.predict_proba(X_test_scaled)
 
 # Pipeline
 from sklearn.pipeline import Pipeline
-pipe = Pipeline([('scaler', StandardScaler()), ('svm', SVC())])
+
+pipe = Pipeline([("scaler", StandardScaler()), ("svm", SVC())])
 ```
 
 ---

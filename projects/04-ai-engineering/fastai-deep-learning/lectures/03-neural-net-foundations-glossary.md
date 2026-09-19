@@ -37,9 +37,9 @@ uses a random subset (mini-batch) of the data rather than all of it.
 opt = torch.optim.SGD(model.parameters(), lr=0.1)
 for xb, yb in dataloader:
     loss = loss_fn(model(xb), yb)
-    loss.backward()   # gradients
-    opt.step()        # step opposite the gradient
-    opt.zero_grad()   # reset for next step
+    loss.backward()  # gradients
+    opt.step()  # step opposite the gradient
+    opt.zero_grad()  # reset for next step
 ```
 
 **Related Terms:** Gradient, Learning rate, Mini-batch, Epoch
@@ -58,9 +58,9 @@ loss; SGD steps in the opposite direction.
 ## Example
 ```python
 x = torch.tensor(3.0).requires_grad_()
-y = x ** 2
+y = x**2
 y.backward()
-print(x.grad)   # tensor(6.)  because d(x^2)/dx = 2x = 6
+print(x.grad)  # tensor(6.)  because d(x^2)/dx = 2x = 6
 ```
 
 **Related Terms:** Backpropagation, Learning rate, `requires_grad`
@@ -79,7 +79,7 @@ step moves the parameters. Too high diverges; too low crawls.
 ```python
 lr = 1e-2
 with torch.no_grad():
-    params -= lr * params.grad   # step size = lr * gradient
+    params -= lr * params.grad  # step size = lr * gradient
 ```
 
 **Related Terms:** SGD, Gradient, Learning-rate finder
@@ -155,7 +155,7 @@ independent of the inputs.
 ```python
 w = torch.randn(3, 1).requires_grad_()
 b = torch.zeros(1).requires_grad_()
-y = x @ w + b   # b is the bias term
+y = x @ w + b  # b is the bias term
 ```
 
 **Related Terms:** Parameter / weight, Activation
@@ -172,7 +172,7 @@ opposed to "parameters" which are the learned weights.
 
 ## Example
 ```python
-h = relu(x @ w1 + b1)   # h holds the hidden-layer activations
+h = relu(x @ w1 + b1)  # h holds the hidden-layer activations
 ```
 
 **Related Terms:** ReLU, Parameter / weight
@@ -190,7 +190,7 @@ layers lets a network model curves, not just straight lines.
 ## Example
 ```python
 def relu(t):
-    return t.clamp(min=0)   # or torch.nn.functional.relu(t)
+    return t.clamp(min=0)  # or torch.nn.functional.relu(t)
 ```
 
 **Related Terms:** Activation, Universal approximation, Bias
@@ -207,7 +207,7 @@ a probability, e.g. for binary classification like 3-vs-7.
 
 ## Example
 ```python
-probs = preds.sigmoid()   # map raw outputs to (0, 1)
+probs = preds.sigmoid()  # map raw outputs to (0, 1)
 pred_class = probs > 0.5
 ```
 
@@ -225,7 +225,7 @@ in-place `requires_grad_()` method.
 
 ## Example
 ```python
-params = torch.randn(3).requires_grad_()   # now tracked by autograd
+params = torch.randn(3).requires_grad_()  # now tracked by autograd
 ```
 
 **Related Terms:** Backpropagation, Gradient, `zero_grad`
@@ -243,7 +243,7 @@ loss fills in `.grad` for every tensor with `requires_grad=True`.
 ## Example
 ```python
 loss = mse(model(x), y)
-loss.backward()          # backprop: fills param.grad for all params
+loss.backward()  # backprop: fills param.grad for all params
 ```
 
 **Related Terms:** Gradient, `requires_grad`, `zero_grad`
@@ -260,7 +260,7 @@ zero it mixes gradients from previous steps.
 
 ## Example
 ```python
-params.grad.zero_()   # by hand
+params.grad.zero_()  # by hand
 # or, with an optimizer:
 opt.zero_grad()
 ```
@@ -280,7 +280,7 @@ mini-batches.
 ## Example
 ```python
 for epoch in range(10):
-    for xb, yb in dataloader:   # one pass = one epoch
+    for xb, yb in dataloader:  # one pass = one epoch
         ...
 ```
 
@@ -300,8 +300,8 @@ far cheaper (and more parallel) than using the whole dataset at once.
 ```python
 batch_size = 64
 for i in range(0, len(x), batch_size):
-    xb = x[i:i + batch_size]      # one mini-batch
-    yb = y[i:i + batch_size]
+    xb = x[i : i + batch_size]  # one mini-batch
+    yb = y[i : i + batch_size]
 ```
 
 **Related Terms:** SGD, Epoch
@@ -319,8 +319,8 @@ Correct shapes are essential for matrix multiplication in layers.
 ## Example
 ```python
 x = torch.randn(64, 784)
-print(x.ndim)    # 2   (rank)
-print(x.shape)   # torch.Size([64, 784])  (batch of 64, 784 pixels each)
+print(x.ndim)  # 2   (rank)
+print(x.shape)  # torch.Size([64, 784])  (batch of 64, 784 pixels each)
 ```
 
 **Related Terms:** Parameter / weight, Activation

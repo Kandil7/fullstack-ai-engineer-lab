@@ -69,8 +69,8 @@ response = client.embeddings.create(
     input=[
         "The cat sat on the mat",
         "A feline rested on the rug",
-        "Python is a programming language"
-    ]
+        "Python is a programming language",
+    ],
 )
 
 # Compare similarities
@@ -78,9 +78,11 @@ import numpy as np
 
 embeddings = [item.embedding for item in response.data]
 
+
 # Cosine similarity
 def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
 
 # "cat" and "feline" should be similar
 sim_1_2 = cosine_similarity(embeddings[0], embeddings[1])
@@ -109,26 +111,20 @@ Different models produce different embedding dimensions and quality:
 from openai import OpenAI
 
 client = OpenAI()
-response = client.embeddings.create(
-    model="text-embedding-3-small",
-    input="Hello world"
-)
+response = client.embeddings.create(model="text-embedding-3-small", input="Hello world")
 embedding_openai = response.data[0].embedding  # 1536 dimensions
 
 # HuggingFace (open source)
 from sentence_transformers import SentenceTransformer
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer("all-MiniLM-L6-v2")
 embedding_hf = model.encode("Hello world")  # 384 dimensions
 
 # Cohere
 import cohere
 
 co = cohere.Client(api_key="your-key")
-response = co.embed(
-    texts=["Hello world"],
-    model="embed-english-v3.0"
-)
+response = co.embed(texts=["Hello world"], model="embed-english-v3.0")
 embedding_cohere = response.embeddings[0]  # 1024 dimensions
 ```
 
@@ -140,9 +136,11 @@ How to measure distance between vectors:
 ```python
 import numpy as np
 
+
 def cosine_similarity(a, b):
     """Measure angle between vectors (-1 to 1)."""
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
 
 # Perfect match
 print(cosine_similarity([1, 0, 0], [1, 0, 0]))  # 1.0
@@ -201,22 +199,19 @@ collection.add(
         "Python is a programming language",
         "JavaScript is used for web development",
         "Machine learning requires data",
-        "Deep learning uses neural networks"
+        "Deep learning uses neural networks",
     ],
     metadatas=[
         {"category": "programming", "language": "python"},
         {"category": "programming", "language": "javascript"},
         {"category": "ai", "topic": "ml"},
-        {"category": "ai", "topic": "dl"}
+        {"category": "ai", "topic": "dl"},
     ],
-    ids=["doc1", "doc2", "doc3", "doc4"]
+    ids=["doc1", "doc2", "doc3", "doc4"],
 )
 
 # Query
-results = collection.query(
-    query_texts=["What is Python used for?"],
-    n_results=2
-)
+results = collection.query(query_texts=["What is Python used for?"], n_results=2)
 
 print(results["documents"][0])
 # ['Python is a programming language', 'JavaScript is used for web development']
@@ -234,22 +229,15 @@ index = pinecone.Index("documents")
 # Generate embedding
 client = OpenAI()
 response = client.embeddings.create(
-    model="text-embedding-3-small",
-    input="Python programming"
+    model="text-embedding-3-small", input="Python programming"
 )
 embedding = response.data[0].embedding
 
 # Upsert
-index.upsert([
-    ("doc1", embedding, {"text": "Python is a programming language"})
-])
+index.upsert([("doc1", embedding, {"text": "Python is a programming language"})])
 
 # Query
-results = index.query(
-    vector=embedding,
-    top_k=5,
-    include_metadata=True
-)
+results = index.query(vector=embedding, top_k=5, include_metadata=True)
 
 for match in results["matches"]:
     print(f"Score: {match['score']:.3f} - {match['metadata']['text']}")
@@ -265,7 +253,7 @@ Using embeddings to find relevant documents based on meaning, not keywords.
 documents = [
     "The canine retrieved the ball",
     "The dog played fetch",
-    "Python is a snake"
+    "Python is a snake",
 ]
 
 query = "puppy playing"
@@ -278,7 +266,7 @@ query = "puppy playing"
 from sentence_transformers import SentenceTransformer
 import numpy as np
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Index documents
 doc_embeddings = model.encode(documents)
@@ -304,11 +292,11 @@ def chunk_fixed_size(text, chunk_size=500, overlap=50):
     """Split text into fixed-size chunks with overlap."""
     words = text.split()
     chunks = []
-    
+
     for i in range(0, len(words), chunk_size - overlap):
-        chunk = " ".join(words[i:i + chunk_size])
+        chunk = " ".join(words[i : i + chunk_size])
         chunks.append(chunk)
-    
+
     return chunks
 ```
 
@@ -316,15 +304,16 @@ def chunk_fixed_size(text, chunk_size=500, overlap=50):
 ```python
 import nltk
 
+
 def chunk_sentences(text, max_sentences=5):
     """Split text by sentences."""
     sentences = nltk.sent_tokenize(text)
     chunks = []
-    
+
     for i in range(0, len(sentences), max_sentences):
-        chunk = " ".join(sentences[i:i + max_sentences])
+        chunk = " ".join(sentences[i : i + max_sentences])
         chunks.append(chunk)
-    
+
     return chunks
 ```
 
@@ -334,22 +323,22 @@ def chunk_semantic(text, threshold=0.5):
     """Split where semantic similarity drops."""
     sentences = nltk.sent_tokenize(text)
     embeddings = model.encode(sentences)
-    
+
     chunks = []
     current_chunk = [sentences[0]]
-    
+
     for i in range(1, len(sentences)):
-        similarity = cosine_similarity(embeddings[i-1], embeddings[i])
-        
+        similarity = cosine_similarity(embeddings[i - 1], embeddings[i])
+
         if similarity < threshold:
             chunks.append(" ".join(current_chunk))
             current_chunk = [sentences[i]]
         else:
             current_chunk.append(sentences[i])
-    
+
     if current_chunk:
         chunks.append(" ".join(current_chunk))
-    
+
     return chunks
 ```
 
@@ -363,6 +352,7 @@ def chunk_semantic(text, threshold=0.5):
 """
 Production-ready semantic search with embeddings.
 """
+
 from dataclasses import dataclass
 from typing import List, Optional
 import numpy as np
@@ -373,6 +363,7 @@ import chromadb
 @dataclass
 class SearchResult:
     """A search result with metadata."""
+
     content: str
     score: float
     metadata: dict
@@ -381,114 +372,101 @@ class SearchResult:
 
 class SemanticSearchEngine:
     """Full-featured semantic search engine."""
-    
+
     def __init__(
         self,
         collection_name: str = "documents",
-        embedding_model: str = "text-embedding-3-small"
+        embedding_model: str = "text-embedding-3-small",
     ):
         self.client = OpenAI()
         self.embedding_model = embedding_model
-        
+
         # Initialize ChromaDB
         self.chroma_client = chromadb.Client()
         self.collection = self.chroma_client.create_collection(
-            name=collection_name,
-            metadata={"hnsw:space": "cosine"}
+            name=collection_name, metadata={"hnsw:space": "cosine"}
         )
-    
+
     def _get_embedding(self, text: str) -> List[float]:
         """Generate embedding for text."""
-        response = self.client.embeddings.create(
-            model=self.embedding_model,
-            input=text
-        )
+        response = self.client.embeddings.create(model=self.embedding_model, input=text)
         return response.data[0].embedding
-    
+
     def _get_embeddings_batch(self, texts: List[str]) -> List[List[float]]:
         """Generate embeddings for multiple texts."""
         response = self.client.embeddings.create(
-            model=self.embedding_model,
-            input=texts
+            model=self.embedding_model, input=texts
         )
         return [item.embedding for item in response.data]
-    
+
     def add_document(
         self,
         content: str,
         metadata: Optional[dict] = None,
-        doc_id: Optional[str] = None
+        doc_id: Optional[str] = None,
     ) -> str:
         """Add a document to the search index."""
-        
+
         # Generate ID if not provided
         if doc_id is None:
             doc_id = f"doc_{self.collection.count()}"
-        
+
         # Generate embedding
         embedding = self._get_embedding(content)
-        
+
         # Store in ChromaDB
         self.collection.add(
             documents=[content],
             embeddings=[embedding],
             metadatas=[metadata or {}],
-            ids=[doc_id]
+            ids=[doc_id],
         )
-        
+
         return doc_id
-    
-    def add_documents_batch(
-        self,
-        documents: List[dict]
-    ) -> List[str]:
+
+    def add_documents_batch(self, documents: List[dict]) -> List[str]:
         """Add multiple documents efficiently."""
-        
+
         texts = [doc["content"] for doc in documents]
         embeddings = self._get_embeddings_batch(texts)
-        
+
         ids = [doc.get("id", f"doc_{i}") for i, doc in enumerate(documents)]
         metadatas = [doc.get("metadata", {}) for doc in documents]
-        
+
         self.collection.add(
-            documents=texts,
-            embeddings=embeddings,
-            metadatas=metadatas,
-            ids=ids
+            documents=texts, embeddings=embeddings, metadatas=metadatas, ids=ids
         )
-        
+
         return ids
-    
+
     def search(
-        self,
-        query: str,
-        top_k: int = 5,
-        filters: Optional[dict] = None
+        self, query: str, top_k: int = 5, filters: Optional[dict] = None
     ) -> List[SearchResult]:
         """Search for similar documents."""
-        
+
         # Generate query embedding
         query_embedding = self._get_embedding(query)
-        
+
         # Query ChromaDB
         results = self.collection.query(
-            query_embeddings=[query_embedding],
-            n_results=top_k,
-            where=filters
+            query_embeddings=[query_embedding], n_results=top_k, where=filters
         )
-        
+
         # Format results
         search_results = []
         for i in range(len(results["ids"][0])):
-            search_results.append(SearchResult(
-                content=results["documents"][0][i],
-                score=1 - results["distances"][0][i],  # Convert distance to similarity
-                metadata=results["metadatas"][0][i],
-                id=results["ids"][0][i]
-            ))
-        
+            search_results.append(
+                SearchResult(
+                    content=results["documents"][0][i],
+                    score=1
+                    - results["distances"][0][i],  # Convert distance to similarity
+                    metadata=results["metadatas"][0][i],
+                    id=results["ids"][0][i],
+                )
+            )
+
         return search_results
-    
+
     def delete_document(self, doc_id: str) -> bool:
         """Remove a document from the index."""
         try:
@@ -496,12 +474,12 @@ class SemanticSearchEngine:
             return True
         except Exception:
             return False
-    
+
     def get_stats(self) -> dict:
         """Get collection statistics."""
         return {
             "total_documents": self.collection.count(),
-            "embedding_model": self.embedding_model
+            "embedding_model": self.embedding_model,
         }
 
 
@@ -509,24 +487,26 @@ class SemanticSearchEngine:
 engine = SemanticSearchEngine()
 
 # Add documents
-engine.add_documents_batch([
-    {
-        "content": "Python is great for data science and machine learning",
-        "metadata": {"category": "programming", "topic": "python"}
-    },
-    {
-        "content": "JavaScript is the language of the web",
-        "metadata": {"category": "programming", "topic": "javascript"}
-    },
-    {
-        "content": "Deep learning requires large datasets and GPU compute",
-        "metadata": {"category": "ai", "topic": "deep_learning"}
-    },
-    {
-        "content": "React is a popular frontend framework",
-        "metadata": {"category": "framework", "topic": "react"}
-    }
-])
+engine.add_documents_batch(
+    [
+        {
+            "content": "Python is great for data science and machine learning",
+            "metadata": {"category": "programming", "topic": "python"},
+        },
+        {
+            "content": "JavaScript is the language of the web",
+            "metadata": {"category": "programming", "topic": "javascript"},
+        },
+        {
+            "content": "Deep learning requires large datasets and GPU compute",
+            "metadata": {"category": "ai", "topic": "deep_learning"},
+        },
+        {
+            "content": "React is a popular frontend framework",
+            "metadata": {"category": "framework", "topic": "react"},
+        },
+    ]
+)
 
 # Search
 results = engine.search("machine learning frameworks", top_k=3)
@@ -541,6 +521,7 @@ for result in results:
 """
 Visualize embeddings in 2D/3D space.
 """
+
 import numpy as np
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
@@ -550,89 +531,75 @@ from typing import List, Tuple
 
 class EmbeddingVisualizer:
     """Visualize embeddings using dimensionality reduction."""
-    
+
     def __init__(self):
         self.client = OpenAI()
-    
+
     def get_embeddings(self, texts: List[str]) -> np.ndarray:
         """Get embeddings for texts."""
         response = self.client.embeddings.create(
-            model="text-embedding-3-small",
-            input=texts
+            model="text-embedding-3-small", input=texts
         )
         return np.array([item.embedding for item in response.data])
-    
+
     def reduce_dimensions(
-        self,
-        embeddings: np.ndarray,
-        n_components: int = 2,
-        perplexity: int = 30
+        self, embeddings: np.ndarray, n_components: int = 2, perplexity: int = 30
     ) -> np.ndarray:
         """Reduce dimensions using t-SNE."""
-        tsne = TSNE(
-            n_components=n_components,
-            perplexity=perplexity,
-            random_state=42
-        )
+        tsne = TSNE(n_components=n_components, perplexity=perplexity, random_state=42)
         return tsne.fit_transform(embeddings)
-    
+
     def plot_2d(
         self,
         texts: List[str],
         labels: List[str] = None,
-        title: str = "Embedding Visualization"
+        title: str = "Embedding Visualization",
     ):
         """Plot embeddings in 2D."""
-        
+
         # Get embeddings
         embeddings = self.get_embeddings(texts)
-        
+
         # Reduce to 2D
         reduced = self.reduce_dimensions(embeddings, n_components=2)
-        
+
         # Plot
         plt.figure(figsize=(12, 8))
-        
+
         if labels is None:
             labels = [t[:30] + "..." for t in texts]
-        
+
         scatter = plt.scatter(
-            reduced[:, 0],
-            reduced[:, 1],
-            c=range(len(texts)),
-            cmap='viridis',
-            s=100
+            reduced[:, 0], reduced[:, 1], c=range(len(texts)), cmap="viridis", s=100
         )
-        
+
         # Add labels
         for i, label in enumerate(labels):
             plt.annotate(
                 label,
                 (reduced[i, 0], reduced[i, 1]),
                 xytext=(5, 5),
-                textcoords='offset points',
-                fontsize=9
+                textcoords="offset points",
+                fontsize=9,
             )
-        
+
         plt.title(title)
         plt.colorbar(scatter)
         plt.tight_layout()
         plt.savefig("output/embeddings_2d.png", dpi=150)
         plt.show()
-    
+
     def find_clusters(
-        self,
-        texts: List[str],
-        n_clusters: int = 3
+        self, texts: List[str], n_clusters: int = 3
     ) -> List[Tuple[str, int]]:
         """Find clusters in embeddings."""
         from sklearn.cluster import KMeans
-        
+
         embeddings = self.get_embeddings(texts)
-        
+
         kmeans = KMeans(n_clusters=n_clusters, random_state=42)
         clusters = kmeans.fit_predict(embeddings)
-        
+
         return list(zip(texts, clusters))
 
 
@@ -649,7 +616,7 @@ texts = [
     "React components",
     "Natural language processing",
     "Computer vision",
-    "React hooks"
+    "React hooks",
 ]
 
 visualizer.plot_2d(texts, title="Tech Topics Embeddings")
@@ -661,6 +628,7 @@ visualizer.plot_2d(texts, title="Tech Topics Embeddings")
 """
 Combine semantic search with keyword matching.
 """
+
 from dataclasses import dataclass
 from typing import List, Optional
 import numpy as np
@@ -672,6 +640,7 @@ from rank_bm25 import BM25Okapi
 @dataclass
 class HybridResult:
     """Combined search result."""
+
     content: str
     semantic_score: float
     keyword_score: float
@@ -681,7 +650,7 @@ class HybridResult:
 
 class HybridSearchEngine:
     """Combine semantic and keyword search."""
-    
+
     def __init__(self, alpha: float = 0.7):
         """
         Args:
@@ -692,86 +661,81 @@ class HybridSearchEngine:
         self.client = OpenAI()
         self.chroma_client = chromadb.Client()
         self.collection = self.chroma_client.create_collection("hybrid_docs")
-        
+
         self.documents = []
         self.tokenized_docs = []
         self.bm25 = None
-    
+
     def _tokenize(self, text: str) -> List[str]:
         """Simple tokenization."""
         return text.lower().split()
-    
+
     def add_documents(self, documents: List[dict]):
         """Add documents with both indexing methods."""
-        
+
         texts = [doc["content"] for doc in documents]
-        
+
         # Generate embeddings for semantic search
         response = self.client.embeddings.create(
-            model="text-embedding-3-small",
-            input=texts
+            model="text-embedding-3-small", input=texts
         )
         embeddings = [item.embedding for item in response.data]
-        
+
         # Add to ChromaDB
         ids = [f"doc_{i}" for i in range(len(documents))]
         self.collection.add(
             documents=texts,
             embeddings=embeddings,
             metadatas=[doc.get("metadata", {}) for doc in documents],
-            ids=ids
+            ids=ids,
         )
-        
+
         # Build BM25 index for keyword search
         self.documents = texts
         self.tokenized_docs = [self._tokenize(doc) for doc in texts]
         self.bm25 = BM25Okapi(self.tokenized_docs)
-    
+
     def search(
-        self,
-        query: str,
-        top_k: int = 10,
-        filters: Optional[dict] = None
+        self, query: str, top_k: int = 10, filters: Optional[dict] = None
     ) -> List[HybridResult]:
         """Hybrid search combining semantic and keyword."""
-        
+
         # Semantic search
-        query_embedding = self.client.embeddings.create(
-            model="text-embedding-3-small",
-            input=query
-        ).data[0].embedding
-        
+        query_embedding = (
+            self.client.embeddings.create(model="text-embedding-3-small", input=query)
+            .data[0]
+            .embedding
+        )
+
         semantic_results = self.collection.query(
             query_embeddings=[query_embedding],
             n_results=top_k * 2,  # Get more for reranking
-            where=filters
+            where=filters,
         )
-        
+
         # Keyword search
         tokenized_query = self._tokenize(query)
         keyword_scores = self.bm25.get_scores(tokenized_query)
-        
+
         # Normalize scores
         semantic_scores = {
             doc_id: 1 - dist  # Convert distance to similarity
             for doc_id, dist in zip(
-                semantic_results["ids"][0],
-                semantic_results["distances"][0]
+                semantic_results["ids"][0], semantic_results["distances"][0]
             )
         }
-        
+
         max_keyword = max(keyword_scores) if max(keyword_scores) > 0 else 1
         keyword_scores_norm = {
-            i: score / max_keyword 
-            for i, score in enumerate(keyword_scores)
+            i: score / max_keyword for i, score in enumerate(keyword_scores)
         }
-        
+
         # Combine scores
         combined = {}
         for doc_id, sem_score in semantic_scores.items():
             doc_idx = int(doc_id.split("_")[1])
             kw_score = keyword_scores_norm.get(doc_idx, 0)
-            
+
             combined[doc_id] = {
                 "content": self.documents[doc_idx],
                 "semantic": sem_score,
@@ -779,23 +743,21 @@ class HybridSearchEngine:
                 "combined": self.alpha * sem_score + (1 - self.alpha) * kw_score,
                 "metadata": semantic_results["metadatas"][0][
                     semantic_results["ids"][0].index(doc_id)
-                ]
+                ],
             }
-        
+
         # Sort by combined score
         sorted_results = sorted(
-            combined.values(),
-            key=lambda x: x["combined"],
-            reverse=True
+            combined.values(), key=lambda x: x["combined"], reverse=True
         )[:top_k]
-        
+
         return [
             HybridResult(
                 content=r["content"],
                 semantic_score=r["semantic"],
                 keyword_score=r["keyword"],
                 combined_score=r["combined"],
-                metadata=r["metadata"]
+                metadata=r["metadata"],
             )
             for r in sorted_results
         ]
@@ -804,18 +766,25 @@ class HybridSearchEngine:
 # Usage
 engine = HybridSearchEngine(alpha=0.7)  # 70% semantic, 30% keyword
 
-engine.add_documents([
-    {"content": "Python is great for machine learning", "metadata": {"topic": "ml"}},
-    {"content": "JavaScript powers web applications", "metadata": {"topic": "web"}},
-    {"content": "Deep learning uses neural networks", "metadata": {"topic": "dl"}},
-    {"content": "TensorFlow is a ML framework", "metadata": {"topic": "framework"}}
-])
+engine.add_documents(
+    [
+        {
+            "content": "Python is great for machine learning",
+            "metadata": {"topic": "ml"},
+        },
+        {"content": "JavaScript powers web applications", "metadata": {"topic": "web"}},
+        {"content": "Deep learning uses neural networks", "metadata": {"topic": "dl"}},
+        {"content": "TensorFlow is a ML framework", "metadata": {"topic": "framework"}},
+    ]
+)
 
 results = engine.search("AI frameworks", top_k=3)
 
 for r in results:
-    print(f"Combined: {r.combined_score:.3f} "
-          f"(Sem: {r.semantic_score:.3f}, KW: {r.keyword_score:.3f})")
+    print(
+        f"Combined: {r.combined_score:.3f} "
+        f"(Sem: {r.semantic_score:.3f}, KW: {r.keyword_score:.3f})"
+    )
     print(f"  {r.content}\n")
 ```
 
@@ -857,7 +826,7 @@ results = collection.query(query_embedding, n_results=10)
 results = collection.query(
     query_embedding,
     n_results=10,
-    where={"category": "python"}  # Narrow search space
+    where={"category": "python"},  # Narrow search space
 )
 ```
 

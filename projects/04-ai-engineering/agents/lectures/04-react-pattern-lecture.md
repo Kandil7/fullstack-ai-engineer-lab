@@ -100,6 +100,7 @@ Final Answer: the final answer to the original input question
 Complete ReAct Agent Implementation
 Demonstrates the full ReAct pattern with tool use and reasoning.
 """
+
 import re
 import json
 from typing import Any, Callable, Dict, List, Optional
@@ -109,6 +110,7 @@ from enum import Enum
 
 class AgentState(Enum):
     """Possible states of the ReAct agent."""
+
     THINKING = "thinking"
     ACTING = "acting"
     OBSERVING = "observing"
@@ -119,11 +121,12 @@ class AgentState(Enum):
 @dataclass
 class AgentStep:
     """A single step in the ReAct trace."""
+
     thought: Optional[str] = None
     action: Optional[str] = None
     action_input: Optional[str] = None
     observation: Optional[str] = None
-    
+
     def __str__(self):
         parts = []
         if self.thought:
@@ -140,23 +143,28 @@ class AgentStep:
 class ReActAgent:
     """
     A ReAct agent that interleaves reasoning and acting.
-    
+
     Features:
     - Step-by-step reasoning with tool use
     - Full trace logging
     - Error handling and recovery
     - Configurable max steps
     """
-    
-    def __init__(self, llm_caller: Callable, tools: Dict[str, Callable],
-                 max_steps: int = 10, verbose: bool = True):
+
+    def __init__(
+        self,
+        llm_caller: Callable,
+        tools: Dict[str, Callable],
+        max_steps: int = 10,
+        verbose: bool = True,
+    ):
         self.llm = llm_caller
         self.tools = tools
         self.max_steps = max_steps
         self.verbose = verbose
         self.steps: List[AgentStep] = []
         self.state = AgentState.THINKING
-    
+
     def _build_system_prompt(self) -> str:
         """Build the ReAct system prompt."""
         tool_descriptions = "\n".join(
@@ -164,7 +172,7 @@ class ReActAgent:
             for name, func in self.tools.items()
         )
         tool_names = ", ".join(self.tools.keys())
-        
+
         return f"""You are a helpful assistant that uses tools to answer questions.
 
 You have access to the following tools:
@@ -188,134 +196,136 @@ Important rules:
 4. You may repeat Thought/Action/Observation multiple times
 5. Stop when you have the final answer
 """
-    
+
     def _parse_llm_response(self, response: str) -> Dict[str, Optional[str]]:
         """Parse the LLM response into components."""
         result = {
             "thought": None,
             "action": None,
             "action_input": None,
-            "final_answer": None
+            "final_answer": None,
         }
-        
+
         # Extract thought
-        thought_match = re.search(r"Thought:\s*(.+?)(?=Action:|Final Answer:|$)", 
-                                  response, re.DOTALL)
+        thought_match = re.search(
+            r"Thought:\s*(.+?)(?=Action:|Final Answer:|$)", response, re.DOTALL
+        )
         if thought_match:
             result["thought"] = thought_match.group(1).strip()
-        
+
         # Check for final answer
         if "Final Answer:" in response:
             final_match = re.search(r"Final Answer:\s*(.+)", response, re.DOTALL)
             if final_match:
                 result["final_answer"] = final_match.group(1).strip()
             return result
-        
+
         # Extract action
-        action_match = re.search(r"Action:\s*(.+?)(?=Action Input:|$)", 
-                                 response, re.DOTALL)
+        action_match = re.search(
+            r"Action:\s*(.+?)(?=Action Input:|$)", response, re.DOTALL
+        )
         if action_match:
             result["action"] = action_match.group(1).strip()
-        
+
         # Extract action input
         input_match = re.search(r"Action Input:\s*(.+)", response, re.DOTALL)
         if input_match:
             result["action_input"] = input_match.group(1).strip()
-        
+
         return result
-    
+
     def _execute_tool(self, tool_name: str, tool_input: str) -> str:
         """Execute a tool and return the result."""
         if tool_name not in self.tools:
             return f"Error: Unknown tool '{tool_name}'. Available: {list(self.tools.keys())}"
-        
+
         try:
             result = self.tools[tool_name](tool_input)
             return str(result)
         except Exception as e:
             return f"Error executing {tool_name}: {type(e).__name__}: {str(e)}"
-    
+
     def _log(self, message: str):
         """Log messages when verbose mode is enabled."""
         if self.verbose:
             print(message)
-    
+
     def run(self, question: str) -> str:
         """
         Run the ReAct agent on a question.
-        
+
         Args:
             question: The question to answer
-            
+
         Returns:
             The final answer
         """
         self.steps = []
         self.state = AgentState.THINKING
-        
+
         messages = [
             {"role": "system", "content": self._build_system_prompt()},
-            {"role": "user", "content": f"Question: {question}"}
+            {"role": "user", "content": f"Question: {question}"},
         ]
-        
-        self._log(f"\n{'='*60}")
+
+        self._log(f"\n{'=' * 60}")
         self._log(f"Question: {question}")
-        self._log(f"{'='*60}")
-        
+        self._log(f"{'=' * 60}")
+
         for step_num in range(1, self.max_steps + 1):
             self._log(f"\n--- Step {step_num} ---")
-            
+
             # Get LLM response
             response = self.llm(messages)
             self._log(f"\n{response}")
-            
+
             # Parse response
             parsed = self._parse_llm_response(response)
-            
+
             # Create step record
             step = AgentStep(
                 thought=parsed["thought"],
                 action=parsed["action"],
-                action_input=parsed["action_input"]
+                action_input=parsed["action_input"],
             )
-            
+
             # Check for final answer
             if parsed["final_answer"]:
                 self.state = AgentState.FINISHED
                 step.observation = "Final answer provided"
                 self.steps.append(step)
                 return parsed["final_answer"]
-            
+
             # Execute action
             if parsed["action"]:
                 self.state = AgentState.ACTING
                 observation = self._execute_tool(
-                    parsed["action"], 
-                    parsed["action_input"] or ""
+                    parsed["action"], parsed["action_input"] or ""
                 )
                 step.observation = observation
                 self._log(f"\nObservation: {observation}")
-                
+
                 # Add to messages for context
                 messages.append({"role": "assistant", "content": response})
-                messages.append({
-                    "role": "user", 
-                    "content": f"Observation: {observation}"
-                })
+                messages.append(
+                    {"role": "user", "content": f"Observation: {observation}"}
+                )
             else:
                 # No action or final answer - ask for clarification
                 messages.append({"role": "assistant", "content": response})
-                messages.append({
-                    "role": "user",
-                    "content": "Please provide either an Action or a Final Answer."
-                })
-            
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": "Please provide either an Action or a Final Answer.",
+                    }
+                )
+
             self.steps.append(step)
-        
+
         # Max steps reached
         self.state = AgentState.ERROR
         return "Maximum steps reached without completing the task."
-    
+
     def get_trace(self) -> str:
         """Get a formatted trace of all steps."""
         trace = ["ReAct Agent Trace:", "=" * 40]
@@ -327,6 +337,7 @@ Important rules:
 
 # === Usage Example ===
 
+
 # Define tools
 def search(query: str) -> str:
     """Search the web for information."""
@@ -334,13 +345,14 @@ def search(query: str) -> str:
     results = {
         "python": "Python is a programming language created by Guido van Rossum.",
         "react": "React is a JavaScript library for building user interfaces.",
-        "ai": "AI stands for Artificial Intelligence."
+        "ai": "AI stands for Artificial Intelligence.",
     }
-    
+
     for key, value in results.items():
         if key in query.lower():
             return value
     return f"No results found for: {query}"
+
 
 def calculate(expression: str) -> str:
     """Calculate a mathematical expression."""
@@ -353,23 +365,25 @@ def calculate(expression: str) -> str:
     except Exception as e:
         return f"Error: {str(e)}"
 
+
 # Simple LLM mock (replace with real LLM call)
 def mock_llm(messages):
     """Mock LLM that follows ReAct format."""
     last_msg = messages[-1]["content"]
-    
+
     if "Question:" in last_msg:
         return "Thought: I need to search for information about this topic.\nAction: search\nAction Input: python"
     elif "Observation:" in last_msg:
         return "Thought: I now have enough information to answer.\nFinal Answer: Python is a programming language created by Guido van Rossum."
     return "Thought: I need more information.\nFinal Answer: I don't have enough information."
 
+
 # Create and run agent
 agent = ReActAgent(
     llm_caller=mock_llm,
     tools={"search": search, "calculate": calculate},
     max_steps=5,
-    verbose=True
+    verbose=True,
 )
 
 answer = agent.run("What is Python?")
@@ -384,7 +398,9 @@ print(f"\n{agent.get_trace()}")
 ReAct Agent with Self-Correction
 Can detect and recover from reasoning errors.
 """
+
 from typing import List
+
 
 class SelfCorrectingReActAgent(ReActAgent):
     """
@@ -393,91 +409,90 @@ class SelfCorrectingReActAgent(ReActAgent):
     - Retry with different approaches
     - Reflect on failed attempts
     """
-    
+
     def __init__(self, *args, max_retries: int = 3, **kwargs):
         super().__init__(*args, **kwargs)
         self.max_retries = max_retries
         self.failed_attempts: List[str] = []
-    
+
     def _detect_loop(self) -> bool:
         """Detect if agent is repeating the same actions."""
         if len(self.steps) < 3:
             return False
-        
+
         # Check for repeated actions
         recent_actions = [s.action for s in self.steps[-3:]]
         if len(set(recent_actions)) == 1 and recent_actions[0] is not None:
             return True
-        
+
         # Check for repeated thoughts
         recent_thoughts = [s.thought for s in self.steps[-3:]]
         if len(set(recent_thoughts)) == 1 and recent_thoughts[0] is not None:
             return True
-        
+
         return False
-    
+
     def _generate_reflection(self) -> str:
         """Generate a reflection prompt when stuck."""
-        failed_actions = [s.action for s in self.steps if s.observation and "Error" in s.observation]
-        
+        failed_actions = [
+            s.action for s in self.steps if s.observation and "Error" in s.observation
+        ]
+
         return f"""I notice I'm repeating myself. Let me reflect:
 
 Previous attempts:
 {chr(10).join(f"- Tried: {a}" for a in failed_actions[-3:])}
 
 I should try a completely different approach. Let me think about what other tools or strategies I could use."""
-    
+
     def run_with_correction(self, question: str) -> str:
         """Run agent with self-correction capabilities."""
         self.steps = []
         retries = 0
-        
+
         messages = [
             {"role": "system", "content": self._build_system_prompt()},
-            {"role": "user", "content": f"Question: {question}"}
+            {"role": "user", "content": f"Question: {question}"},
         ]
-        
+
         for step_num in range(1, self.max_steps + 1):
             # Check for loops
             if self._detect_loop():
                 retries += 1
                 if retries > self.max_retries:
                     return "Unable to make progress after multiple attempts."
-                
+
                 reflection = self._generate_reflection()
-                messages.append({
-                    "role": "user",
-                    "content": reflection
-                })
+                messages.append({"role": "user", "content": reflection})
                 self._log(f"\n[Self-Correction] Retry {retries}")
-            
+
             # Continue with normal ReAct loop
             response = self.llm(messages)
             parsed = self._parse_llm_response(response)
-            
+
             # ... (rest of the logic same as parent)
-            
+
             if parsed["final_answer"]:
                 return parsed["final_answer"]
-            
+
             if parsed["action"]:
-                observation = self._execute_tool(parsed["action"], 
-                                                parsed["action_input"] or "")
-                
+                observation = self._execute_tool(
+                    parsed["action"], parsed["action_input"] or ""
+                )
+
                 step = AgentStep(
                     thought=parsed["thought"],
                     action=parsed["action"],
                     action_input=parsed["action_input"],
-                    observation=observation
+                    observation=observation,
                 )
                 self.steps.append(step)
-                
+
                 messages.append({"role": "assistant", "content": response})
-                messages.append({
-                    "role": "user",
-                    "content": f"Observation: {observation}"
-                })
-        
+                messages.append(
+                    {"role": "user", "content": f"Observation: {observation}"}
+                )
+
         return "Maximum steps reached."
 ```
 
@@ -488,20 +503,22 @@ I should try a completely different approach. Let me think about what other tool
 ReAct Agent with Structured Output
 Produces JSON-formatted traces for easy parsing.
 """
+
 import json
 from datetime import datetime
 
+
 class StructuredReActAgent(ReActAgent):
     """ReAct agent that produces structured JSON output."""
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.run_id = datetime.now().isoformat()
-    
+
     def run_structured(self, question: str) -> dict:
         """
         Run agent and return structured result.
-        
+
         Returns:
             {
                 "question": str,
@@ -512,56 +529,54 @@ class StructuredReActAgent(ReActAgent):
         """
         start_time = datetime.now()
         self.steps = []
-        
+
         messages = [
             {"role": "system", "content": self._build_system_prompt()},
-            {"role": "user", "content": f"Question: {question}"}
+            {"role": "user", "content": f"Question: {question}"},
         ]
-        
+
         answer = None
         error = None
-        
+
         for step_num in range(1, self.max_steps + 1):
             try:
                 response = self.llm(messages)
                 parsed = self._parse_llm_response(response)
-                
+
                 step_record = {
                     "step": step_num,
                     "thought": parsed["thought"],
                     "action": parsed["action"],
                     "action_input": parsed["action_input"],
                     "observation": None,
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
                 }
-                
+
                 if parsed["final_answer"]:
                     answer = parsed["final_answer"]
                     step_record["observation"] = "Final answer provided"
                     self.steps.append(step_record)
                     break
-                
+
                 if parsed["action"]:
                     observation = self._execute_tool(
-                        parsed["action"],
-                        parsed["action_input"] or ""
+                        parsed["action"], parsed["action_input"] or ""
                     )
                     step_record["observation"] = observation
-                    
+
                     messages.append({"role": "assistant", "content": response})
-                    messages.append({
-                        "role": "user",
-                        "content": f"Observation: {observation}"
-                    })
-                
+                    messages.append(
+                        {"role": "user", "content": f"Observation: {observation}"}
+                    )
+
                 self.steps.append(step_record)
-                
+
             except Exception as e:
                 error = str(e)
                 break
-        
+
         end_time = datetime.now()
-        
+
         return {
             "run_id": self.run_id,
             "question": question,
@@ -572,16 +587,16 @@ class StructuredReActAgent(ReActAgent):
                 "duration_seconds": (end_time - start_time).total_seconds(),
                 "completed": answer is not None,
                 "error": error,
-                "tools_used": list(set(
-                    s["action"] for s in self.steps if s.get("action")
-                ))
-            }
+                "tools_used": list(
+                    set(s["action"] for s in self.steps if s.get("action"))
+                ),
+            },
         }
+
 
 # Usage
 agent = StructuredReActAgent(
-    llm_caller=mock_llm,
-    tools={"search": search, "calculate": calculate}
+    llm_caller=mock_llm, tools={"search": search, "calculate": calculate}
 )
 
 result = agent.run_structured("What is Python?")
@@ -613,6 +628,7 @@ def agent_step():
     result = execute(action)
     # What happened? Agent doesn't know!
 
+
 # ✅ GOOD: Feed observations back
 def agent_step(messages):
     response = llm.generate(messages)
@@ -630,6 +646,7 @@ def run_agent(question):
         if done:
             break
 
+
 # ✅ GOOD: Always have limits
 def run_agent(question, max_steps=10):
     for i in range(max_steps):
@@ -642,17 +659,14 @@ def run_agent(question, max_steps=10):
 ### Mistake 4: Vague Tool Descriptions
 ```python
 # ❌ BAD: Agent doesn't know when to use tools
-tools = {
-    "search": "Searches",
-    "calc": "Calculates"
-}
+tools = {"search": "Searches", "calc": "Calculates"}
 
 # ✅ GOOD: Clear, specific descriptions
 tools = {
     "search": "Use this to find factual information from the web. "
-              "Good for: current events, definitions, data.",
+    "Good for: current events, definitions, data.",
     "calculate": "Use this for mathematical computations. "
-                 "Good for: arithmetic, statistics, conversions."
+    "Good for: arithmetic, statistics, conversions.",
 }
 ```
 

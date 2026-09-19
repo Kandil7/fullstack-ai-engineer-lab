@@ -49,6 +49,7 @@ ignored. Projection also enables covering indexes (topics 10 and 14).
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("CREATE TABLE samples (id INTEGER PRIMARY KEY, label TEXT, score REAL)")
 conn.executemany(
@@ -87,9 +88,7 @@ last. Never rely on NULL position — use `NULLS FIRST/LAST` (sqlite 3.30+,
 Postgres both support it) when it matters.
 
 ```python
-top3 = conn.execute(
-    "SELECT label, score FROM samples ORDER BY score DESC LIMIT ?", (3,)
-).fetchall()
+top3 = conn.execute("SELECT label, score FROM samples ORDER BY score DESC LIMIT ?", (3,)).fetchall()
 print(top3)
 ```
 

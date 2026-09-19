@@ -177,60 +177,60 @@ Arithmetic operations automatically handle arrays of different shapes through br
 
 ### Array Filtering
 ```python
-arr[arr > threshold]           # Boolean indexing
-np.where(condition, x, y)      # Conditional selection
-np.extract(condition, arr)     # Extract elements
-np.clip(arr, min, max)         # Limit range
+arr[arr > threshold]  # Boolean indexing
+np.where(condition, x, y)  # Conditional selection
+np.extract(condition, arr)  # Extract elements
+np.clip(arr, min, max)  # Limit range
 ```
 
 ### Random Numbers
 ```python
-np.random.random(n)            # Floats [0,1)
-np.random.randint(low, high, n) # Integers
-np.random.normal(μ, σ, n)      # Normal distribution
-np.random.seed(42)             # Reproducibility
+np.random.random(n)  # Floats [0,1)
+np.random.randint(low, high, n)  # Integers
+np.random.normal(μ, σ, n)  # Normal distribution
+np.random.seed(42)  # Reproducibility
 ```
 
 ### Arithmetic Ufuncs
 ```python
-np.add(a, b)                   # a + b
-np.subtract(a, b)              # a - b
-np.multiply(a, b)              # a * b
-np.divide(a, b)                # a / b
-np.power(a, b)                 # a ** b
+np.add(a, b)  # a + b
+np.subtract(a, b)  # a - b
+np.multiply(a, b)  # a * b
+np.divide(a, b)  # a / b
+np.power(a, b)  # a ** b
 ```
 
 ### Summation & Products
 ```python
-np.sum(arr)                    # Total sum
-np.cumsum(arr)                 # Cumulative sum
-np.prod(arr)                   # Total product
-np.cumprod(arr)                # Cumulative product
+np.sum(arr)  # Total sum
+np.cumsum(arr)  # Cumulative sum
+np.prod(arr)  # Total product
+np.cumprod(arr)  # Cumulative product
 ```
 
 ### Differences
 ```python
-np.diff(arr)                   # First difference
-np.diff(arr, n=2)              # Second difference
-np.diff(arr, prepend=0)        # With initial value
+np.diff(arr)  # First difference
+np.diff(arr, n=2)  # Second difference
+np.diff(arr, prepend=0)  # With initial value
 ```
 
 ### Trigonometric
 ```python
-np.sin(arr)                    # Sine (radians)
-np.cos(arr)                    # Cosine (radians)
-np.tan(arr)                    # Tangent (radians)
-np.radians(arr)                # Degrees to radians
-np.degrees(arr)                # Radians to degrees
+np.sin(arr)  # Sine (radians)
+np.cos(arr)  # Cosine (radians)
+np.tan(arr)  # Tangent (radians)
+np.radians(arr)  # Degrees to radians
+np.degrees(arr)  # Radians to degrees
 ```
 
 ### Set Operations
 ```python
-np.unique(arr)                 # Unique elements
-np.intersect1d(a, b)           # Common elements
-np.union1d(a, b)               # All unique elements
-np.setdiff1d(a, b)             # In A not B
-np.isin(arr, test)             # Membership test
+np.unique(arr)  # Unique elements
+np.intersect1d(a, b)  # Common elements
+np.union1d(a, b)  # All unique elements
+np.setdiff1d(a, b)  # In A not B
+np.isin(arr, test)  # Membership test
 ```
 
 ## Resources

@@ -27,6 +27,7 @@ from typing import Any, Callable
 # Components (compact forms of topic 03 + 18)
 # ============================================================
 
+
 @dataclass
 class Schema:
     fields: dict[str, str]
@@ -60,6 +61,7 @@ def parse_llm_json(text: str) -> dict:
 # The Extraction Service
 # ============================================================
 
+
 @dataclass
 class ExtractionService:
     schema: Schema
@@ -89,8 +91,9 @@ class ExtractionService:
         self.failures += 1
         return {}
 
-    def extract_many(self, docs: list[str],
-                     fallback: Callable[[str], dict] | None = None) -> list[dict]:
+    def extract_many(
+        self, docs: list[str], fallback: Callable[[str], dict] | None = None
+    ) -> list[dict]:
         """Batch extraction with a regex fallback for hard failures."""
         results = []
         for doc in docs:
@@ -118,6 +121,7 @@ docs = [f"Invoice #{i}: total 100.0" for i in range(10)]
 
 def regex_fallback(doc: str) -> dict:
     import re
+
     m = re.search(r"Invoice #(\d+).*?(\d+\.\d+)", doc)
     if m:
         return {"invoice_id": f"INV-{m.group(1)}", "amount": float(m.group(2))}
@@ -140,9 +144,13 @@ assert ok_count == len(docs), "fallback rescues every doc"
 # The production loop: validate -> retry -> fallback -> alert on
 # failures. Failures are surfaced, not silently swallowed.
 
-def production_extraction(docs: list[str], service: ExtractionService,
-                          fallback: Callable[[str], dict],
-                          alert: Callable[[list[str]], None]) -> list[dict]:
+
+def production_extraction(
+    docs: list[str],
+    service: ExtractionService,
+    fallback: Callable[[str], dict],
+    alert: Callable[[list[str]], None],
+) -> list[dict]:
     results = service.extract_many(docs, fallback=fallback)
     if service.failed_docs:
         alert(service.failed_docs)
@@ -170,8 +178,7 @@ def _verify() -> None:
     assert parse_llm_json('{"a": 1}') == {"a": 1}
     assert parse_llm_json('```json\n{"a": 2}\n```') == {"a": 2}
 
-    svc = ExtractionService(Schema({"invoice_id": "str", "amount": "float"}),
-                            max_retries=2)
+    svc = ExtractionService(Schema({"invoice_id": "str", "amount": "float"}), max_retries=2)
     r = svc.extract("doc")
     assert r["invoice_id"] == "INV-001", "happy path extracts"
 

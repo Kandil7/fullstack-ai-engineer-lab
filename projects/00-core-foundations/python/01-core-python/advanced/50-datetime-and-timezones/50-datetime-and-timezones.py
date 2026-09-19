@@ -63,8 +63,10 @@ print(f"\nnow(timezone.utc): {now_utc}  (aware: {now_utc.tzinfo is not None})")
 cairo = ZoneInfo("Africa/Cairo")
 tokyo = ZoneInfo("Asia/Tokyo")
 meeting_utc = datetime(2026, 8, 6, 9, 0, tzinfo=timezone.utc)
-print(f"Meeting at: {meeting_utc.astimezone(cairo).strftime('%H:%M %Z')} Cairo, "
-      f"{meeting_utc.astimezone(tokyo).strftime('%H:%M %Z')} Tokyo")
+print(
+    f"Meeting at: {meeting_utc.astimezone(cairo).strftime('%H:%M %Z')} Cairo, "
+    f"{meeting_utc.astimezone(tokyo).strftime('%H:%M %Z')} Tokyo"
+)
 
 # Output:
 # now(timezone.utc): 2026-08-06 12:34:56.789012+00:00  (aware: True)
@@ -144,6 +146,7 @@ time.sleep(0.01)
 elapsed_ms = (time.monotonic() - start) * 1000
 print(f"\nElapsed (monotonic): {elapsed_ms:.1f} ms")
 
+
 # ============================================================
 # 7. Production Pattern — Age Check in UTC
 # ============================================================
@@ -185,6 +188,7 @@ print(f"Cache 30s old, TTL 10s: fresh={is_fresh(cached_at, 10)}")
 # CORRECT:
 #   good = last_seen.astimezone(timezone.utc) > datetime.now(timezone.utc)
 
+
 # ============================================================
 # Self-Verification
 # ============================================================
@@ -202,22 +206,24 @@ def _verify() -> None:
     if ZoneInfo is not None:
         la = ZoneInfo("America/Los_Angeles")
         utc = datetime(2026, 8, 6, 12, 0, tzinfo=timezone.utc)
-        assert utc.astimezone(la).astimezone(timezone.utc) == utc, \
+        assert utc.astimezone(la).astimezone(timezone.utc) == utc, (
             "zone round-trip must be lossless"
+        )
 
     # ISO round-trip
     orig = datetime(2026, 8, 6, 9, 30, 15, 123456, tzinfo=timezone.utc)
-    assert datetime.fromisoformat(orig.isoformat()) == orig, \
-        "ISO 8601 round-trip must be lossless"
+    assert datetime.fromisoformat(orig.isoformat()) == orig, "ISO 8601 round-trip must be lossless"
 
     # Unix timestamp round-trip
     ts = orig.timestamp()
-    assert datetime.fromtimestamp(ts, tz=timezone.utc) == orig, \
+    assert datetime.fromtimestamp(ts, tz=timezone.utc) == orig, (
         "timestamp round-trip must be lossless"
+    )
 
     # timedelta arithmetic
-    assert date(2026, 8, 1) - timedelta(days=30) == date(2026, 7, 2), \
+    assert date(2026, 8, 1) - timedelta(days=30) == date(2026, 7, 2), (
         "timedelta arithmetic on dates"
+    )
 
     # monotonic never decreases across two reads
     m1 = time.monotonic()
@@ -228,8 +234,7 @@ def _verify() -> None:
     now = datetime(2026, 8, 6, 12, 0, 0, tzinfo=timezone.utc)
     old = now - timedelta(seconds=90)
     assert not is_fresh(old, 60, now=now), "90s-old must exceed 60s TTL"
-    assert is_fresh(now - timedelta(seconds=30), 60, now=now), \
-        "30s-old must be within 60s TTL"
+    assert is_fresh(now - timedelta(seconds=30), 60, now=now), "30s-old must be within 60s TTL"
     assert is_fresh(now, 0, now=now), "exactly at TTL boundary is fresh"
 
     print("[OK] 50-datetime-and-timezones: all checks passed")

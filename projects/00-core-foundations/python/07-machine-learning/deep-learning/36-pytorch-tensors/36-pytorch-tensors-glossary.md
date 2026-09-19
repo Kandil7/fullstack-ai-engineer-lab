@@ -32,8 +32,8 @@ tensors with `requires_grad=True` are recorded so gradients can be computed by
 reverse-mode differentiation.
 **Example**:
 ```python
-y = w * x + b      # recorded
-y.backward()       # computed
+y = w * x + b  # recorded
+y.backward()  # computed
 ```
 **Related**: Computation graph, Backward
 
@@ -48,8 +48,9 @@ different shapes can be combined — identical to NumPy: align trailing
 dimensions, expand 1s.
 **Example**:
 ```python
-a = torch.randn(3, 1); b = torch.randn(1, 4)
-c = a * b          # (3, 4)
+a = torch.randn(3, 1)
+b = torch.randn(1, 4)
+c = a * b  # (3, 4)
 ```
 **Related**: Tensor
 
@@ -117,7 +118,7 @@ torch.arange(12).reshape(3, 4)
 **Definition**: Remove dimensions of size 1 from a tensor's shape.
 **Example**:
 ```python
-t.unsqueeze(0).squeeze()   # add then remove a size-1 dim
+t.unsqueeze(0).squeeze()  # add then remove a size-1 dim
 ```
 **Related**: Unsqueeze
 

@@ -12,6 +12,7 @@ import json
 
 try:
     import openpyxl  # noqa: F401
+
     HAS_OPENPYXL = True
 except ImportError:
     HAS_OPENPYXL = False
@@ -23,17 +24,19 @@ np.random.seed(42)
 # 1. CREATE SAMPLE DATA
 # =============================================================================
 
-df = pd.DataFrame({
-    'id': range(1, 101),
-    'name': [f'User_{i}' for i in range(1, 101)],
-    'email': [f'user{i}@example.com' for i in range(1, 101)],
-    'age': np.random.randint(18, 70, 100),
-    'salary': np.random.randint(30000, 150000, 100),
-    'department': np.random.choice(['Eng', 'Sales', 'HR', 'Marketing', 'Finance'], 100),
-    'join_date': pd.date_range('2020-01-01', periods=100, freq='W'),
-    'is_active': np.random.choice([True, False], 100, p=[0.8, 0.2]),
-    'score': np.random.uniform(1.0, 5.0, 100).round(2)
-})
+df = pd.DataFrame(
+    {
+        "id": range(1, 101),
+        "name": [f"User_{i}" for i in range(1, 101)],
+        "email": [f"user{i}@example.com" for i in range(1, 101)],
+        "age": np.random.randint(18, 70, 100),
+        "salary": np.random.randint(30000, 150000, 100),
+        "department": np.random.choice(["Eng", "Sales", "HR", "Marketing", "Finance"], 100),
+        "join_date": pd.date_range("2020-01-01", periods=100, freq="W"),
+        "is_active": np.random.choice([True, False], 100, p=[0.8, 0.2]),
+        "score": np.random.uniform(1.0, 5.0, 100).round(2),
+    }
+)
 
 print("Sample DataFrame:")
 print(df.head())
@@ -115,39 +118,38 @@ print("3. JSON")
 print("=" * 60)
 
 # Write JSON (different orientations)
-json_str_records = df.to_json(orient='records', date_format='iso')
+json_str_records = df.to_json(orient="records", date_format="iso")
 print("orient='records' (first 200 chars):")
 print(json_str_records[:200])
 print("...")
 print()
 
-json_str_split = df.to_json(orient='split')
+json_str_split = df.to_json(orient="split")
 print("orient='split' (first 200 chars):")
 print(json_str_split[:200])
 print("...")
 print()
 
-json_str_index = df.to_json(orient='index')
+json_str_index = df.to_json(orient="index")
 print("orient='index' (first 200 chars):")
 print(json_str_index[:200])
 print("...")
 print()
 
 # Read JSON
-df_json = pd.read_json(json_str_records, orient='records')
+df_json = pd.read_json(json_str_records, orient="records")
 print(f"Read JSON (records) shape: {df_json.shape}")
 print()
 
 # Read with date parsing
-df_json_dates = pd.read_json(json_str_records, orient='records', 
-                              convert_dates=['join_date'])
+df_json_dates = pd.read_json(json_str_records, orient="records", convert_dates=["join_date"])
 print(f"Join date dtype: {df_json_dates['join_date'].dtype}")
 print()
 
 # JSON Lines (one record per line)
-json_lines = df.to_json(orient='records', lines=True)
+json_lines = df.to_json(orient="records", lines=True)
 print("JSON Lines (first 2 lines):")
-print('\n'.join(json_lines.split('\n')[:2]))
+print("\n".join(json_lines.split("\n")[:2]))
 print()
 
 # =============================================================================
@@ -163,25 +165,25 @@ if not HAS_OPENPYXL:
 else:
     # Write to BytesIO buffer
     excel_buffer = io.BytesIO()
-    with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
-        df.to_excel(writer, sheet_name='Employees', index=False)
+    with pd.ExcelWriter(excel_buffer, engine="openpyxl") as writer:
+        df.to_excel(writer, sheet_name="Employees", index=False)
         # Multiple sheets
-        df.head(20).to_excel(writer, sheet_name='Sample', index=False)
+        df.head(20).to_excel(writer, sheet_name="Sample", index=False)
         # With formatting
-        summary = df.groupby('department').agg({'salary': 'mean', 'age': 'mean'}).round(2)
-        summary.to_excel(writer, sheet_name='Summary')
+        summary = df.groupby("department").agg({"salary": "mean", "age": "mean"}).round(2)
+        summary.to_excel(writer, sheet_name="Summary")
 
     excel_data = excel_buffer.getvalue()
     print(f"Excel file size: {len(excel_data)} bytes")
     print()
 
     # Read Excel
-    df_excel = pd.read_excel(io.BytesIO(excel_data), sheet_name='Employees')
+    df_excel = pd.read_excel(io.BytesIO(excel_data), sheet_name="Employees")
     print(f"Read Excel shape: {df_excel.shape}")
     print()
 
     # Read specific sheet
-    df_sample = pd.read_excel(io.BytesIO(excel_data), sheet_name='Sample')
+    df_sample = pd.read_excel(io.BytesIO(excel_data), sheet_name="Sample")
     print(f"Sample sheet shape: {df_sample.shape}")
     print()
 
@@ -225,7 +227,7 @@ df.to_parquet(parquet_buffer, index=False)
 parquet_data = parquet_buffer.getvalue()
 print(f"Parquet size: {len(parquet_data)} bytes")
 print(f"CSV size: {len(csv_content)} bytes")
-print(f"Compression ratio: {len(csv_content)/len(parquet_data):.1f}x")
+print(f"Compression ratio: {len(csv_content) / len(parquet_data):.1f}x")
 print()
 
 # Read Parquet
@@ -237,13 +239,13 @@ print()
 # Partitioned Parquet
 # NOTE: pyarrow cannot partition into a BytesIO file object ("Argument 'filesystem'
 # has incorrect type ... got NoneType"); write to a real directory under output/
-partition_dir = 'output/parquet_partitioned/'
-df.to_parquet(partition_dir, partition_cols=['department'], index=False)
+partition_dir = "output/parquet_partitioned/"
+df.to_parquet(partition_dir, partition_cols=["department"], index=False)
 print(f"Partitioned Parquet written to {partition_dir}")
 print()
 
 # Read with filters
-df_filtered = pd.read_parquet(partition_dir, filters=[('department', 'in', ['Eng', 'Sales'])])
+df_filtered = pd.read_parquet(partition_dir, filters=[("department", "in", ["Eng", "Sales"])])
 print(f"Filtered read (Eng, Sales): {df_filtered.shape}")
 print()
 
@@ -274,10 +276,10 @@ print("=" * 60)
 import sqlite3
 
 # Create in-memory database
-conn = sqlite3.connect(':memory:')
+conn = sqlite3.connect(":memory:")
 
 # Write DataFrame to SQL
-df.to_sql('employees', conn, index=False, if_exists='replace')
+df.to_sql("employees", conn, index=False, if_exists="replace")
 
 # Read from SQL
 df_sql = pd.read_sql('SELECT * FROM employees WHERE department = "Eng"', conn)
@@ -285,32 +287,39 @@ print(f"SQL query result: {df_sql.shape}")
 print()
 
 # Read with chunks
-chunk_iter = pd.read_sql('SELECT * FROM employees', conn, chunksize=30)
+chunk_iter = pd.read_sql("SELECT * FROM employees", conn, chunksize=30)
 sql_chunks = list(chunk_iter)
 print(f"SQL chunks: {len(sql_chunks)} chunks of ~30 rows")
 print()
 
 # Parameterized query
-dept = 'Sales'
-df_param = pd.read_sql('SELECT * FROM employees WHERE department = ?', conn, params=[dept])
+dept = "Sales"
+df_param = pd.read_sql("SELECT * FROM employees WHERE department = ?", conn, params=[dept])
 print(f"Parameterized query (Sales): {df_param.shape}")
 print()
 
 # Write with dtype specification
 from sqlalchemy import create_engine, Integer, String, Float, DateTime, Boolean
-engine = create_engine('sqlite:///:memory:')
 
-df.to_sql('employees_typed', engine, index=False, if_exists='replace', dtype={
-    'id': Integer(),
-    'name': String(50),
-    'email': String(100),
-    'age': Integer(),
-    'salary': Integer(),
-    'department': String(20),
-    'join_date': DateTime(),
-    'is_active': Boolean(),
-    'score': Float()
-})
+engine = create_engine("sqlite:///:memory:")
+
+df.to_sql(
+    "employees_typed",
+    engine,
+    index=False,
+    if_exists="replace",
+    dtype={
+        "id": Integer(),
+        "name": String(50),
+        "email": String(100),
+        "age": Integer(),
+        "salary": Integer(),
+        "department": String(20),
+        "join_date": DateTime(),
+        "is_active": Boolean(),
+        "score": Float(),
+    },
+)
 
 print("KEY SQL OPTIONS:")
 print("""
@@ -362,7 +371,7 @@ print(tables[0])
 print()
 
 # Write HTML
-html_output = df.head(10).to_html(index=False, classes='table table-striped', border=0)
+html_output = df.head(10).to_html(index=False, classes="table table-striped", border=0)
 print("HTML output (first 300 chars):")
 print(html_output[:300])
 print("...")
@@ -429,7 +438,7 @@ print()
 # HDF5
 try:
     hdf_buffer = io.BytesIO()
-    df.to_hdf(hdf_buffer, key='data', mode='w')
+    df.to_hdf(hdf_buffer, key="data", mode="w")
     print(f"HDF5 size: {len(hdf_buffer.getvalue())} bytes")
 except Exception as e:
     print(f"HDF5 not available: {e}")
@@ -447,13 +456,15 @@ import time
 import os
 
 # Larger DataFrame for testing
-large_df = pd.DataFrame({
-    'id': range(100000),
-    'value1': np.random.randn(100000),
-    'value2': np.random.randn(100000),
-    'category': np.random.choice(['A', 'B', 'C', 'D', 'E'], 100000),
-    'date': pd.date_range('2020-01-01', periods=100000, freq='min')
-})
+large_df = pd.DataFrame(
+    {
+        "id": range(100000),
+        "value1": np.random.randn(100000),
+        "value2": np.random.randn(100000),
+        "category": np.random.choice(["A", "B", "C", "D", "E"], 100000),
+        "date": pd.date_range("2020-01-01", periods=100000, freq="min"),
+    }
+)
 
 formats = {}
 
@@ -461,45 +472,45 @@ formats = {}
 start = time.time()
 csv_buf = io.StringIO()
 large_df.to_csv(csv_buf, index=False)
-formats['CSV_write'] = time.time() - start
+formats["CSV_write"] = time.time() - start
 
 start = time.time()
 pd.read_csv(io.StringIO(csv_buf.getvalue()))
-formats['CSV_read'] = time.time() - start
+formats["CSV_read"] = time.time() - start
 
 # Parquet
 start = time.time()
 pq_buf = io.BytesIO()
 large_df.to_parquet(pq_buf, index=False)
-formats['Parquet_write'] = time.time() - start
+formats["Parquet_write"] = time.time() - start
 
 start = time.time()
 pd.read_parquet(io.BytesIO(pq_buf.getvalue()))
-formats['Parquet_read'] = time.time() - start
+formats["Parquet_read"] = time.time() - start
 
 # Feather
 try:
     start = time.time()
     feather_buf = io.BytesIO()
     large_df.to_feather(feather_buf)
-    formats['Feather_write'] = time.time() - start
-    
+    formats["Feather_write"] = time.time() - start
+
     start = time.time()
     pd.read_feather(io.BytesIO(feather_buf.getvalue()))
-    formats['Feather_read'] = time.time() - start
+    formats["Feather_read"] = time.time() - start
 except:
-    formats['Feather_write'] = 'N/A'
-    formats['Feather_read'] = 'N/A'
+    formats["Feather_write"] = "N/A"
+    formats["Feather_read"] = "N/A"
 
 # Pickle
 start = time.time()
 pickle_buf = io.BytesIO()
 large_df.to_pickle(pickle_buf)
-formats['Pickle_write'] = time.time() - start
+formats["Pickle_write"] = time.time() - start
 
 start = time.time()
 pd.read_pickle(io.BytesIO(pickle_buf.getvalue()))
-formats['Pickle_read'] = time.time() - start
+formats["Pickle_read"] = time.time() - start
 
 print("Performance (100k rows, 5 cols):")
 for k, v in formats.items():

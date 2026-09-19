@@ -27,12 +27,13 @@ def add_status_and_backfill(conn: sqlite3.Connection) -> dict:
     while lo <= total:
         conn.execute(
             "UPDATE products SET status = CASE WHEN price > 50 THEN 'premium'"
-            " ELSE 'standard' END WHERE id BETWEEN ? AND ?", (lo, hi))
+            " ELSE 'standard' END WHERE id BETWEEN ? AND ?",
+            (lo, hi),
+        )
         lo += batch_size
         hi += batch_size
 
-    premium = conn.execute(
-        "SELECT COUNT(*) FROM products WHERE status = 'premium'").fetchone()[0]
+    premium = conn.execute("SELECT COUNT(*) FROM products WHERE status = 'premium'").fetchone()[0]
     return {"rows": total, "premium": premium}
 
 
@@ -51,9 +52,9 @@ def create_audit_schema(conn: sqlite3.Connection) -> dict:
     conn.execute("INSERT INTO orders DEFAULT VALUES")
     conn.executemany(
         "INSERT INTO order_items (order_id, qty, unit_price) VALUES (?, ?, ?)",
-        [(1, 1, 10.0), (1, 1, 4.5)])
-    generated = conn.execute(
-        "SELECT SUM(total) FROM order_items WHERE order_id = 1").fetchone()[0]
+        [(1, 1, 10.0), (1, 1, 4.5)],
+    )
+    generated = conn.execute("SELECT SUM(total) FROM order_items WHERE order_id = 1").fetchone()[0]
     conn.execute("DELETE FROM orders WHERE id = 1")
     items = conn.execute("SELECT COUNT(*) FROM order_items").fetchone()[0]
     return {"items": items, "generated": generated}

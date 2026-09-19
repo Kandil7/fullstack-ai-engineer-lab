@@ -17,9 +17,7 @@ def polars_filter_equivalent(pdf: pd.DataFrame, campaign: str, min_rev: float) -
     mask; Polars filters preserve input order, matching pandas row order.
     """
     plf = pl.from_pandas(pdf)
-    return plf.filter(
-        (pl.col("campaign") == campaign) & (pl.col("revenue") >= min_rev)
-    )
+    return plf.filter((pl.col("campaign") == campaign) & (pl.col("revenue") >= min_rev))
 
 
 def polars_groupby_equivalent(pdf: pd.DataFrame) -> pl.DataFrame:
@@ -50,17 +48,18 @@ def parity_suite(pdf: pd.DataFrame) -> dict[str, object]:
     stream the same steps at 10^8 rows.
     """
     meta_p = pd.DataFrame(
-        {"campaign": ["a", "b", "c", "d"],
-         "budget": [1000.0, 800.0, 1200.0, 600.0]}
+        {"campaign": ["a", "b", "c", "d"], "budget": [1000.0, 800.0, 1200.0, 600.0]}
     )
 
     # pandas reference pipeline
     step = pdf[pdf["revenue"] >= 5.0]
     step = step.merge(meta_p, on="campaign", how="left")
-    p_final = (step.groupby("campaign")
-               .agg(mean_revenue=("revenue", "mean"))
-               .reset_index()
-               .sort_values("campaign"))
+    p_final = (
+        step.groupby("campaign")
+        .agg(mean_revenue=("revenue", "mean"))
+        .reset_index()
+        .sort_values("campaign")
+    )
 
     # polars pipeline: same steps, expression-only
     meta_l = pl.from_pandas(meta_p)
@@ -76,9 +75,7 @@ def parity_suite(pdf: pd.DataFrame) -> dict[str, object]:
     p_rows = [tuple(row) for row in p_final.itertuples(index=False)]
     l_rows = [tuple(row) for row in l_final.rows()]
     verdict = len(p_rows) == len(l_rows) and all(
-        abs(a - b) < 1e-9 for a, b in zip(
-            [r[1] for r in p_rows], [r[1] for r in l_rows]
-        )
+        abs(a - b) < 1e-9 for a, b in zip([r[1] for r in p_rows], [r[1] for r in l_rows])
     )
     return {"verdict": bool(verdict), "pandas_rows": p_rows, "polars_rows": l_rows}
 
@@ -86,8 +83,10 @@ def parity_suite(pdf: pd.DataFrame) -> dict[str, object]:
 def _seeded_frame(n: int = 200_000) -> pd.DataFrame:
     """Deterministic clickstream frame shared by the gold tests."""
     rng = np.random.default_rng(42)
-    return pd.DataFrame({
-        "campaign": rng.choice(["a", "b", "c", "d"], n),
-        "converted": rng.integers(0, 2, n),
-        "revenue": rng.uniform(0.0, 50.0, n),
-    })
+    return pd.DataFrame(
+        {
+            "campaign": rng.choice(["a", "b", "c", "d"], n),
+            "converted": rng.integers(0, 2, n),
+            "revenue": rng.uniform(0.0, 50.0, n),
+        }
+    )

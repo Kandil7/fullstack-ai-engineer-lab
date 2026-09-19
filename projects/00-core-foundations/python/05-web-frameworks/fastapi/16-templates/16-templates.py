@@ -22,6 +22,7 @@ templates = Jinja2Templates(directory="templates")
 
 # Create templates directory if it doesn't exist
 import os
+
 os.makedirs("templates", exist_ok=True)
 
 # ----- Create template files programmatically -----
@@ -153,8 +154,20 @@ def dashboard(request: Request):
 def user_profile(request: Request, user_id: int):
     """Dynamic user profile page."""
     users = {
-        1: {"name": "Alice", "email": "alice@test.com", "age": 30, "bio": "Developer", "created_at": "2024-01"},
-        2: {"name": "Bob", "email": "bob@test.com", "age": 25, "bio": None, "created_at": "2024-03"},
+        1: {
+            "name": "Alice",
+            "email": "alice@test.com",
+            "age": 30,
+            "bio": "Developer",
+            "created_at": "2024-01",
+        },
+        2: {
+            "name": "Bob",
+            "email": "bob@test.com",
+            "age": 25,
+            "bio": None,
+            "created_at": "2024-03",
+        },
     }
     user = users.get(user_id)
     if not user:
@@ -186,9 +199,9 @@ def products_page(request: Request):
     <head><title>Products</title></head>
     <body>
         <h1>Products ({len(products)} items)</h1>
-        <h2>Categories: {', '.join(categories)}</h2>
+        <h2>Categories: {", ".join(categories)}</h2>
         <ul>
-        {''.join(f"<li>{p['name']} - ${p['price']} ({p['category']})</li>" for p in products)}
+        {"".join(f"<li>{p['name']} - ${p['price']} ({p['category']})</li>" for p in products)}
         </ul>
         <p>Rendered at: {datetime.now().isoformat()}</p>
     </body>
@@ -207,6 +220,7 @@ Testing with curl:
 
     Open in browser for best experience!
 """
+
 
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
@@ -244,6 +258,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

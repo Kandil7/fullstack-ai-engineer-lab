@@ -46,12 +46,15 @@ The standard pattern is to have different models for input and output:
 ```python
 class UserIn(BaseModel):
     """Client sends this."""
+
     name: str
     email: str
     password: str  # Sensitive — only in request
 
+
 class UserDB(BaseModel):
     """Internal representation."""
+
     id: int
     name: str
     email: str
@@ -59,8 +62,10 @@ class UserDB(BaseModel):
     is_active: bool
     created_at: str
 
+
 class UserOut(BaseModel):
     """Client receives this."""
+
     id: int
     name: str
     email: str
@@ -79,6 +84,7 @@ class Item(BaseModel):
     description: str | None = None
     price: float
     tax: float | None = None
+
 
 @app.post("/items/", response_model=Item, response_model_exclude_unset=True)
 def create_item(item: Item):
@@ -121,6 +127,7 @@ class UserOutWithMeta(BaseModel):
     email: str
     profile_url: str = ""  # Computed field
 
+
 @app.get("/users/{user_id}/profile", response_model=UserOutWithMeta)
 def get_user_profile(user_id: int):
     user = users_db[user_id].copy()
@@ -137,6 +144,7 @@ class ErrorResponse(BaseModel):
     detail: str
     error_code: int
     timestamp: str
+
 
 @app.get("/error-demo")
 def error_demo():
@@ -155,6 +163,7 @@ def error_demo():
 
 ```python
 from fastapi.responses import JSONResponse
+
 
 @app.get("/raw")
 def raw_response():
@@ -175,11 +184,13 @@ from datetime import datetime
 
 app = FastAPI()
 
+
 class UserIn(BaseModel):
     name: str
     email: str
     password: str
     age: int = Field(ge=0, le=150)
+
 
 class UserOut(BaseModel):
     id: int
@@ -188,8 +199,10 @@ class UserOut(BaseModel):
     age: int
     created_at: str
 
+
 users_db: dict[int, dict] = {}
 next_id = 1
+
 
 @app.post("/users/", response_model=UserOut, status_code=201)
 def create_user(user: UserIn):
@@ -202,11 +215,13 @@ def create_user(user: UserIn):
     next_id += 1
     return user_dict  # Password filtered by response_model
 
+
 @app.get("/users/{user_id}", response_model=UserOut)
 def get_user(user_id: int):
     if user_id not in users_db:
         raise HTTPException(status_code=404, detail="User not found")
     return users_db[user_id]
+
 
 @app.get("/users/", response_model=list[UserOut])
 def list_users():
@@ -220,6 +235,7 @@ def list_users():
 def create_item(item: Item):
     """Only explicitly set fields appear in response."""
     return item
+
 
 # Request: {"name": "Widget", "price": 9.99}
 # Response: {"name": "Widget", "price": 9.99}
@@ -235,6 +251,8 @@ def list_items():
         Item(name="Laptop", description="A laptop", price=999.99),
         Item(name="Phone", price=699.99),  # description=None, tax=None
     ]
+
+
 # Response: [
 #   {"name": "Laptop", "description": "A laptop", "price": 999.99},
 #   {"name": "Phone", "price": 699.99}  # No description/tax fields
@@ -249,6 +267,7 @@ class UserOutWithMeta(BaseModel):
     name: str
     email: str
     profile_url: str = ""
+
 
 @app.get("/users/{user_id}/profile", response_model=UserOutWithMeta)
 def get_user_profile(user_id: int):
@@ -268,6 +287,7 @@ def get_user_profile(user_id: int):
 def create_user(user: UserIn):
     return user.model_dump()  # Includes password!
 
+
 # Safe: response_model filters output
 @app.post("/users/", response_model=UserOut)
 def create_user(user: UserIn):
@@ -279,9 +299,11 @@ def create_user(user: UserIn):
 # Wrong: Can't use response_model with Response objects
 from fastapi.responses import Response
 
+
 @app.get("/raw", response_model=SomeModel)
 def raw():
     return Response(content="raw")  # Conflict!
+
 
 # Fix: Don't use response_model with Response
 @app.get("/raw")
@@ -295,6 +317,7 @@ def raw():
 @app.get("/items/")
 def list_items() -> list[Item]:  # Just a hint, no filtering!
     return items_db.values()
+
 
 # response_model actually filters
 @app.get("/items/", response_model=list[Item])
@@ -361,25 +384,30 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+
 class UserIn(BaseModel):
     name: str
     email: str
     password: str
+
 
 class UserOut(BaseModel):
     id: int
     name: str
     email: str
 
+
 # Filter response
 @app.post("/users/", response_model=UserOut)
 def create_user(user: UserIn):
     return {"id": 1, **user.model_dump()}
 
+
 # Exclude unset
 @app.post("/items/", response_model=Item, response_model_exclude_unset=True)
 def create_item(item: Item):
     return item
+
 
 # Exclude None
 @app.get("/items/", response_model=list[Item], response_model_exclude_none=True)

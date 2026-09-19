@@ -47,8 +47,8 @@ df = pd.read_csv("data.csv", parse_dates=["date_column"])
 df = pd.read_csv("data.csv", dtype={"id": str, "amount": float})
 
 # Skip rows
-df = pd.read_csv("data.csv", skiprows=3)        # Skip first 3 rows
-df = pd.read_csv("data.csv", skiprows=[1, 3])    # Skip specific rows
+df = pd.read_csv("data.csv", skiprows=3)  # Skip first 3 rows
+df = pd.read_csv("data.csv", skiprows=[1, 3])  # Skip specific rows
 
 # Select columns
 df = pd.read_csv("data.csv", usecols=["Name", "Age", "City"])
@@ -57,7 +57,7 @@ df = pd.read_csv("data.csv", usecols=["Name", "Age", "City"])
 df = pd.read_csv("data.csv", na_values=["N/A", "missing", ""])
 
 # Limit rows
-df = pd.read_csv("data.csv", nrows=100)          # Read only 100 rows
+df = pd.read_csv("data.csv", nrows=100)  # Read only 100 rows
 ```
 
 ### Writing CSV
@@ -180,11 +180,7 @@ df = pd.read_sql("SELECT * FROM users", engine)
 df = pd.read_sql("SELECT * FROM users WHERE age > 30", engine)
 
 # Read with parameters
-df = pd.read_sql(
-    "SELECT * FROM users WHERE age > :min_age",
-    engine,
-    params={"min_age": 30}
-)
+df = pd.read_sql("SELECT * FROM users WHERE age > :min_age", engine, params={"min_age": 30})
 
 # Read table by name
 df = pd.read_sql_table("users", engine)
@@ -298,12 +294,9 @@ first_chunk = True
 
 for chunk in pd.read_csv("large_file.csv", chunksize=10000):
     processed = chunk[chunk["amount"] > 100]
-    
+
     processed.to_csv(
-        "filtered_output.csv",
-        mode="a" if not first_chunk else "w",
-        header=first_chunk,
-        index=False
+        "filtered_output.csv", mode="a" if not first_chunk else "w", header=first_chunk, index=False
     )
     first_chunk = False
 ```
@@ -314,11 +307,14 @@ for chunk in pd.read_csv("large_file.csv", chunksize=10000):
 import pandas as pd
 
 # Optimize data types to reduce memory
-df = pd.read_csv("data.csv", dtype={
-    "id": "int32",           # Instead of int64
-    "category": "category",  # Instead of object
-    "flag": "bool"           # Instead of int
-})
+df = pd.read_csv(
+    "data.csv",
+    dtype={
+        "id": "int32",  # Instead of int64
+        "category": "category",  # Instead of object
+        "flag": "bool",  # Instead of int
+    },
+)
 
 # Check memory usage
 print(df.memory_usage(deep=True).sum())
@@ -338,8 +334,8 @@ import pandas as pd
 # Common encodings
 df = pd.read_csv("data.csv", encoding="utf-8")
 df = pd.read_csv("data.csv", encoding="latin-1")  # Common for legacy data
-df = pd.read_csv("data.csv", encoding="cp1252")   # Windows encoding
-df = pd.read_csv("data.csv", encoding="utf-8-sig") # BOM handling
+df = pd.read_csv("data.csv", encoding="cp1252")  # Windows encoding
+df = pd.read_csv("data.csv", encoding="utf-8-sig")  # BOM handling
 
 # Detect encoding
 # pip install chardet

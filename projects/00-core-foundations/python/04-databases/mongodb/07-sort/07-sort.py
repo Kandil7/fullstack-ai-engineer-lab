@@ -21,7 +21,7 @@ users = [
     {"_id": 3, "name": "Charlie", "age": 35, "city": "New York", "salary": 95000},
     {"_id": 4, "name": "Diana", "age": 28, "city": "Chicago", "salary": 70000},
     {"_id": 5, "name": "Eve", "age": 32, "city": "Boston", "salary": 90000},
-    {"_id": 6, "name": "Frank", "age": 45, "city": "Chicago", "salary": 110000}
+    {"_id": 6, "name": "Frank", "age": 45, "city": "Chicago", "salary": 110000},
 ]
 
 # ============================================================
@@ -31,9 +31,11 @@ users = [
 # Example 1: Sort by name ascending
 # MongoDB equivalent: db.users.find().sort("name", 1)
 
+
 def sort_ascending(collection, field):
     """Sort collection by field in ascending order"""
     return sorted(collection, key=lambda x: x.get(field, 0))
+
 
 sorted_by_name = sort_ascending(users, "name")
 print("Sorted by name (ascending):")
@@ -53,9 +55,11 @@ for user in sorted_by_age:
 # Example 3: Sort by age descending
 # MongoDB equivalent: db.users.find().sort("age", -1)
 
+
 def sort_descending(collection, field):
     """Sort collection by field in descending order"""
     return sorted(collection, key=lambda x: x.get(field, 0), reverse=True)
+
 
 sorted_by_age_desc = sort_descending(users, "age")
 print("\nSorted by age (descending):")
@@ -75,10 +79,12 @@ for user in sorted_by_salary:
 # Example 5: Sort with explicit direction
 # MongoDB equivalent: db.users.find().sort("age", 1)  // 1 = ASC, -1 = DESC
 
+
 def sort_by(collection, field, direction=1):
     """Sort collection by field with direction (1=ASC, -1=DESC)"""
-    reverse = (direction == -1)
+    reverse = direction == -1
     return sorted(collection, key=lambda x: x.get(field, 0), reverse=reverse)
+
 
 # ASC = 1
 ascending = sort_by(users, "name", 1)
@@ -99,10 +105,12 @@ for user in descending:
 # Example 6: Sort by city then by age
 # MongoDB equivalent: db.users.find().sort([("city", 1), ("age", 1)])
 
+
 def sort_multiple(collection, sort_keys):
     """Sort by multiple fields
     sort_keys: list of (field, direction) tuples
     """
+
     def sort_key(doc):
         keys = []
         for field, direction in sort_keys:
@@ -115,8 +123,9 @@ def sort_multiple(collection, sort_keys):
                     val = tuple([-ord(c) for c in str(val)])
             keys.append(val)
         return tuple(keys)
-    
+
     return sorted(collection, key=sort_key)
+
 
 # Sort by city ASC, then age ASC
 multi_sort = sort_multiple(users, [("city", 1), ("age", 1)])
@@ -138,6 +147,7 @@ for user in multi_sort2:
 # MongoDB equivalent:
 # db.users.find({"city": "New York"}).sort("age", 1)
 
+
 def find_and_sort(collection, query, sort_field, direction=1):
     """Find documents matching query, then sort"""
     # First filter
@@ -150,10 +160,11 @@ def find_and_sort(collection, query, sort_field, direction=1):
                 break
         if match:
             results.append(doc)
-    
+
     # Then sort
-    reverse = (direction == -1)
+    reverse = direction == -1
     return sorted(results, key=lambda x: x.get(sort_field, 0), reverse=reverse)
+
 
 # New York users sorted by age
 ny_sorted = find_and_sort(users, {"city": "New York"}, "age")
@@ -170,11 +181,13 @@ users_with_missing = [
     {"_id": 1, "name": "Alice", "age": 25},
     {"_id": 2, "name": "Bob"},  # No age
     {"_id": 3, "name": "Charlie", "age": 35},
-    {"_id": 4, "name": "Diana"}  # No age
+    {"_id": 4, "name": "Diana"},  # No age
 ]
+
 
 def sort_safe(collection, field, direction=1, default=None):
     """Sort with safe handling of missing values"""
+
     def sort_key(doc):
         val = doc.get(field, default)
         if val is None:
@@ -182,8 +195,9 @@ def sort_safe(collection, field, direction=1, default=None):
         if direction == -1 and isinstance(val, (int, float)):
             return (0, -val)
         return (0, val)
-    
+
     return sorted(collection, key=sort_key)
+
 
 sorted_safe = sort_safe(users_with_missing, "age", 1)
 print("\nSort with missing values:")
@@ -195,22 +209,26 @@ for user in sorted_safe:
 # Practical Examples
 # ============================================================
 
+
 # Example 10: Top N highest salaries
 def top_n(collection, field, n, direction=-1):
     """Get top N documents by field"""
     sorted_coll = sort_by(collection, field, direction)
     return sorted_coll[:n]
 
+
 top_3_salary = top_n(users, "salary", 3)
 print("\nTop 3 highest salaries:")
 for i, user in enumerate(top_3_salary, 1):
     print(f"  {i}. {user['name']}: ${user['salary']:,}")
+
 
 # Example 11: Sort and limit
 def sort_and_limit(collection, sort_field, limit, direction=-1):
     """Sort and return limited results"""
     sorted_coll = sort_by(collection, sort_field, direction)
     return sorted_coll[:limit]
+
 
 oldest_2 = sort_and_limit(users, "age", 2, -1)
 print("\n2 oldest users:")
@@ -234,6 +252,7 @@ print("""
 7. Combine sort with limit() for top-N queries
 8. Common patterns: sort by date, price, name, or custom field
 """)
+
 
 # ============================================================
 # Self-Verification  (MANDATORY)

@@ -27,6 +27,7 @@ conn.execute("CREATE TABLE logs (id INTEGER PRIMARY KEY, level TEXT, user_id INT
 
 # 100k rows, skewed: 'info' is 90%, 'error' 1%, user_ids concentrated
 import random
+
 rng = random.Random(42)
 rows = []
 for i in range(100_000):
@@ -58,14 +59,10 @@ print("  -> SEARCH via the index: O(log n) lookups instead of a scan")
 # ============================================================
 print("\n=== 3. Unselective Index (skewed data) ===")
 conn.execute("CREATE INDEX idx_logs_level ON logs(level)")
-plan = conn.execute(
-    "EXPLAIN QUERY PLAN SELECT * FROM logs WHERE level = 'info'"
-).fetchall()
+plan = conn.execute("EXPLAIN QUERY PLAN SELECT * FROM logs WHERE level = 'info'").fetchall()
 print(f"  'info' plan: {plan}")
 print("  -> 90% of rows match: the planner may prefer a scan (or still scan)")
-plan = conn.execute(
-    "EXPLAIN QUERY PLAN SELECT * FROM logs WHERE level = 'error'"
-).fetchall()
+plan = conn.execute("EXPLAIN QUERY PLAN SELECT * FROM logs WHERE level = 'error'").fetchall()
 print(f"  'error' plan: {plan}")
 print("  -> selective predicates use the index; broad ones don't pay")
 
@@ -82,9 +79,7 @@ plan = conn.execute(
     "EXPLAIN QUERY PLAN SELECT * FROM logs WHERE user_id = 5 AND level = 'error'"
 ).fetchall()
 print(f"  same WHERE, both keys:   {plan}")
-plan = conn.execute(
-    "EXPLAIN QUERY PLAN SELECT * FROM logs WHERE user_id = 5"
-).fetchall()
+plan = conn.execute("EXPLAIN QUERY PLAN SELECT * FROM logs WHERE user_id = 5").fetchall()
 print(f"  user_id ALONE:            {plan}")
 print("  -> a composite index serves the leading column; user_id alone")
 print("     cannot use idx_logs_level_user — column order decides coverage")
@@ -93,6 +88,8 @@ print("     cannot use idx_logs_level_user — column order decides coverage")
 # 5. The write cost — every index taxes INSERT
 # ============================================================
 print("\n=== 5. Write Cost of Indexes ===")
+
+
 def bench_inserts(indexed: bool) -> float:
     c2 = sqlite3.connect(":memory:")
     c2.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, k INTEGER)")
@@ -102,6 +99,7 @@ def bench_inserts(indexed: bool) -> float:
     c2.executemany("INSERT INTO t (k) VALUES (?)", [(i % 1000,) for i in range(20_000)])
     c2.commit()
     return time.perf_counter() - start
+
 
 no_idx = bench_inserts(False)
 with_idx = bench_inserts(True)
@@ -124,6 +122,7 @@ print("  -> every index must be maintained on write; indexes are a trade")
 # MISTAKE: ignoring write amplification on hot insert tables
 # CORRECT: index what queries need; measure the write cost
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -132,20 +131,19 @@ def _verify() -> None:
     conn = sqlite3.connect(":memory:")
     try:
         conn.execute("CREATE TABLE t (id INTEGER PRIMARY KEY, a INTEGER, b INTEGER)")
-        conn.executemany("INSERT INTO t (a, b) VALUES (?, ?)",
-                         [(i % 50, i % 100) for i in range(5_000)])
+        conn.executemany(
+            "INSERT INTO t (a, b) VALUES (?, ?)", [(i % 50, i % 100) for i in range(5_000)]
+        )
 
         def plan_sql(sql: str) -> str:
             return " ".join(str(r) for r in conn.execute(f"EXPLAIN QUERY PLAN {sql}").fetchall())
 
         # 1. No index -> SCAN
-        assert "SCAN" in plan_sql("SELECT * FROM t WHERE a = 5"), \
-            "must scan before indexing"
+        assert "SCAN" in plan_sql("SELECT * FROM t WHERE a = 5"), "must scan before indexing"
 
         # 2. Index -> SEARCH
         conn.execute("CREATE INDEX idx_t_a ON t(a)")
-        assert "SEARCH" in plan_sql("SELECT * FROM t WHERE a = 5"), \
-            "indexed predicate must SEARCH"
+        assert "SEARCH" in plan_sql("SELECT * FROM t WHERE a = 5"), "indexed predicate must SEARCH"
 
         # 3. Composite coverage: leading column alone uses the index
         conn.execute("CREATE INDEX idx_t_a_b ON t(a, b)")
@@ -165,8 +163,9 @@ def _verify() -> None:
         assert elapsed >= 0, "timing sanity only; never assert on wall-clock bounds"
 
         # 5. Correctness preserved by indexes
-        assert conn.execute("SELECT COUNT(*) FROM t WHERE a = 5").fetchone()[0] == 100, \
+        assert conn.execute("SELECT COUNT(*) FROM t WHERE a = 5").fetchone()[0] == 100, (
             "index must not change results"
+        )
     finally:
         conn.close()
     print("[OK] 10-indexes-and-plans: all checks passed")

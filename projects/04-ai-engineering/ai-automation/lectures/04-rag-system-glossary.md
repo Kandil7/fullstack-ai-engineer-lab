@@ -33,9 +33,7 @@ response = llm.generate("What is our company's vacation policy?")
 
 # With RAG (grounded in actual documents)
 relevant_docs = retrieve("vacation policy", company_documents)
-response = llm.generate(
-    f"Based on: {relevant_docs}\n\nWhat is our vacation policy?"
-)
+response = llm.generate(f"Based on: {relevant_docs}\n\nWhat is our vacation policy?")
 # Answer is grounded in actual policy documents
 ```
 
@@ -93,12 +91,13 @@ def chunk_text(text, chunk_size=500, overlap=50):
     """Split text into overlapping chunks."""
     words = text.split()
     chunks = []
-    
+
     for i in range(0, len(words), chunk_size - overlap):
-        chunk = " ".join(words[i:i + chunk_size])
+        chunk = " ".join(words[i : i + chunk_size])
         chunks.append(chunk)
-    
+
     return chunks
+
 
 # Example
 document = "This is a long document..." * 100
@@ -126,21 +125,15 @@ def retrieve(query, vector_db, top_k=5):
     """Retrieve relevant documents."""
     # Generate query embedding
     query_embedding = embed(query)
-    
+
     # Search vector database
-    results = vector_db.search(
-        query_embedding,
-        top_k=top_k
-    )
-    
+    results = vector_db.search(query_embedding, top_k=top_k)
+
     return results
 
+
 # Usage
-relevant_docs = retrieve(
-    "How do I reset my password?",
-    company_kb,
-    top_k=3
-)
+relevant_docs = retrieve("How do I reset my password?", company_kb, top_k=3)
 ```
 
 **Related Terms:** Similarity Search, Vector Database, Relevance
@@ -163,15 +156,16 @@ def build_context(query, retrieved_docs, max_tokens=3000):
     """Build context for generation."""
     context_parts = []
     current_tokens = 0
-    
+
     for doc in retrieved_docs:
         doc_tokens = len(doc["content"].split())
         if current_tokens + doc_tokens > max_tokens:
             break
         context_parts.append(doc["content"])
         current_tokens += doc_tokens
-    
+
     return "\n\n".join(context_parts)
+
 
 # Usage
 context = build_context(query, retrieved_docs)
@@ -240,9 +234,10 @@ Rate 0-1:
 - 1: Fully supported
 
 Score:"""
-    
+
     response = llm.generate(prompt, temperature=0.0)
     return float(response)
+
 
 # Usage
 score = evaluate_faithfulness(answer, context)
@@ -271,7 +266,7 @@ def evaluate_relevance(query, retrieved_docs):
     prompt = f"""Rate the relevance of these documents to the query.
 
 Query: {query}
-Documents: {[doc['content'][:200] for doc in retrieved_docs]}
+Documents: {[doc["content"][:200] for doc in retrieved_docs]}
 
 Rate 0-1:
 - 0: Completely irrelevant
@@ -279,9 +274,10 @@ Rate 0-1:
 - 1: Highly relevant
 
 Score:"""
-    
+
     response = llm.generate(prompt, temperature=0.0)
     return float(response)
+
 
 # Usage
 score = evaluate_relevance(query, retrieved_docs)
@@ -339,16 +335,10 @@ client = chromadb.Client()
 collection = client.create_collection("documents")
 
 # Add documents
-collection.add(
-    documents=["Doc 1", "Doc 2"],
-    ids=["doc1", "doc2"]
-)
+collection.add(documents=["Doc 1", "Doc 2"], ids=["doc1", "doc2"])
 
 # Query
-results = collection.query(
-    query_texts=["similar document"],
-    n_results=2
-)
+results = collection.query(query_texts=["similar document"], n_results=2)
 ```
 
 **Related Terms:** Embedding, Similarity Search, HNSW
@@ -380,7 +370,7 @@ Question: What is the return policy?
 Answer:"""
 
 # Response includes citations
-# "Our return policy allows returns within 30 days [1]. 
+# "Our return policy allows returns within 30 days [1].
 #  Items must be in original packaging [2]."
 ```
 
@@ -404,12 +394,13 @@ def chunk_with_overlap(text, chunk_size=500, overlap=50):
     """Create overlapping chunks."""
     words = text.split()
     chunks = []
-    
+
     for i in range(0, len(words), chunk_size - overlap):
-        chunk = " ".join(words[i:i + chunk_size])
+        chunk = " ".join(words[i : i + chunk_size])
         chunks.append(chunk)
-    
+
     return chunks
+
 
 # Without overlap
 # Chunk 1: [...words 1-500]
@@ -441,12 +432,13 @@ def calculate_precision(retrieved, relevant):
     """Calculate precision@k."""
     retrieved_set = set(retrieved)
     relevant_set = set(relevant)
-    
+
     if not retrieved_set:
         return 0.0
-    
+
     found = len(retrieved_set.intersection(relevant_set))
     return found / len(retrieved_set)
+
 
 # Example
 relevant_docs = {"doc1", "doc2", "doc3"}
@@ -474,12 +466,13 @@ def calculate_recall(retrieved, relevant):
     """Calculate recall@k."""
     retrieved_set = set(retrieved)
     relevant_set = set(relevant)
-    
+
     if not relevant_set:
         return 0.0
-    
+
     found = len(retrieved_set.intersection(relevant_set))
     return found / len(relevant_set)
+
 
 # Example
 relevant_docs = {"doc1", "doc2", "doc3", "doc4", "doc5"}
@@ -506,16 +499,17 @@ print(f"Recall: {recall:.2f}")  # 0.60 (found 3 of 5)
 def expand_query(query, llm):
     """Expand query with related terms."""
     prompt = f"""Generate 3 alternative phrasings of this query:
-    
+
 Query: {query}
 
 Return them as a list."""
-    
+
     response = llm.generate(prompt)
     # Parse response into list
     expanded_queries = [query] + parse_list(response)
-    
+
     return expanded_queries
+
 
 # Usage
 queries = expand_query("How do I reset my password?", llm)
@@ -545,22 +539,18 @@ def rerank(query, retrieved_docs, top_k=5):
     """Rerank retrieved documents."""
     # Using cross-encoder for reranking
     from sentence_transformers import CrossEncoder
-    
-    model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
-    
+
+    model = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+
     # Create query-document pairs
     pairs = [(query, doc["content"]) for doc in retrieved_docs]
-    
+
     # Get relevance scores
     scores = model.predict(pairs)
-    
+
     # Sort by score
-    ranked = sorted(
-        zip(retrieved_docs, scores),
-        key=lambda x: x[1],
-        reverse=True
-    )
-    
+    ranked = sorted(zip(retrieved_docs, scores), key=lambda x: x[1], reverse=True)
+
     return [doc for doc, score in ranked[:top_k]]
 ```
 
@@ -584,15 +574,13 @@ def rerank(query, retrieved_docs, top_k=5):
 class DocumentStore:
     def __init__(self):
         self.documents = {}
-    
+
     def add(self, doc_id, content, metadata):
-        self.documents[doc_id] = {
-            "content": content,
-            "metadata": metadata
-        }
-    
+        self.documents[doc_id] = {"content": content, "metadata": metadata}
+
     def get(self, doc_id):
         return self.documents.get(doc_id)
+
 
 # Vector store for retrieval
 vector_store.add(doc_id, embedding, metadata)
@@ -724,33 +712,32 @@ def hybrid_search(query, vector_db, keyword_index, alpha=0.7):
 class RAGEvaluator:
     def evaluate(self, test_cases):
         results = []
-        
+
         for case in test_cases:
             # Get RAG response
             response = self.rag.generate(case.question)
-            
+
             # Evaluate components
             retrieval_score = self.evaluate_retrieval(
-                case.question,
-                response["context_docs"]
+                case.question, response["context_docs"]
             )
-            
+
             generation_score = self.evaluate_generation(
-                response["answer"],
-                case.expected_answer
+                response["answer"], case.expected_answer
             )
-            
+
             faithfulness_score = self.evaluate_faithfulness(
-                response["answer"],
-                response["context_docs"]
+                response["answer"], response["context_docs"]
             )
-            
-            results.append({
-                "retrieval": retrieval_score,
-                "generation": generation_score,
-                "faithfulness": faithfulness_score
-            })
-        
+
+            results.append(
+                {
+                    "retrieval": retrieval_score,
+                    "generation": generation_score,
+                    "faithfulness": faithfulness_score,
+                }
+            )
+
         return results
 ```
 
@@ -786,8 +773,8 @@ Answer:"""
 
 # Usage
 prompt = RAG_TEMPLATE.format(
-    context="\n\n".join([f"[{i+1}] {doc}" for i, doc in enumerate(docs)]),
-    question=query
+    context="\n\n".join([f"[{i + 1}] {doc}" for i, doc in enumerate(docs)]),
+    question=query,
 )
 ```
 

@@ -21,6 +21,7 @@
 **Example**:
 ```python
 import hashlib
+
 addr = hashlib.sha256(b"x,y\n1,2\n").hexdigest()[:16]
 print(addr)  # deterministic for these exact bytes
 ```
@@ -41,6 +42,7 @@ executable path, and library versions.
 **Example**:
 ```python
 import platform
+
 print(platform.python_version())  # e.g. 3.13.1
 ```
 **Complexity**: O(deps).
@@ -57,6 +59,7 @@ from a seed. Python's `random` and NumPy's `default_rng` are separate PRNGs.
 **Example**:
 ```python
 import random
+
 random.seed(7)
 print([random.random() for _ in range(3)])
 ```
@@ -78,6 +81,7 @@ completely different digests.
 **Example**:
 ```python
 import hashlib
+
 print(hashlib.sha256(b"a").hexdigest()[:8])
 print(hashlib.sha256(b"b").hexdigest()[:8])  # totally different
 ```

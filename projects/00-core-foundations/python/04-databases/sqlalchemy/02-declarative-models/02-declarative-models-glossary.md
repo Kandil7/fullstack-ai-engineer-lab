@@ -31,12 +31,11 @@ validation is only a UX layer.
 ```python
 from sqlalchemy import CheckConstraint
 
+
 class Experiment(Base):
     __tablename__ = "experiments"
     score: Mapped[float] = mapped_column(default=0.0)
-    __table_args__ = (
-        CheckConstraint("score >= 0.0 AND score <= 1.0", name="ck_score_range"),
-    )
+    __table_args__ = (CheckConstraint("score >= 0.0 AND score <= 1.0", name="ck_score_range"),)
 ```
 **Related**: UniqueConstraint, IntegrityError
 
@@ -46,6 +45,8 @@ inherits it, and `Base.metadata` collects all tables.
 **Example**:
 ```python
 from sqlalchemy.orm import DeclarativeBase
+
+
 class Base(DeclarativeBase):
     pass
 ```
@@ -61,8 +62,10 @@ class Experiment(Base):
     __tablename__ = "experiments"
     version: Mapped[int] = mapped_column(default=1)
 
-exp = Experiment()          # version is None until flush
-session.add(exp); session.flush()
+
+exp = Experiment()  # version is None until flush
+session.add(exp)
+session.flush()
 print(exp.version)
 # Output:
 # 1
@@ -76,6 +79,8 @@ so it resolves lazily.
 **Example**:
 ```python
 from sqlalchemy import ForeignKey
+
+
 class EvalMetric(Base):
     __tablename__ = "eval_metrics"
     experiment_id: Mapped[int] = mapped_column(ForeignKey("experiments.id"))
@@ -89,6 +94,7 @@ indexed columns — the difference between a scan and a seek for
 **Example**:
 ```python
 from sqlalchemy import Index
+
 __table_args__ = (Index("ix_experiments_model", "model"),)
 ```
 **Complexity**: O(log n) lookups; O(n) storage.
@@ -100,6 +106,7 @@ verify what the model actually declared (columns, nullability, types).
 **Example**:
 ```python
 from sqlalchemy import create_engine, inspect
+
 engine = create_engine("sqlite://")
 Base.metadata.create_all(engine)
 cols = {c["name"] for c in inspect(engine).get_columns("experiments")}
@@ -116,10 +123,13 @@ the DB says no.
 **Example**:
 ```python
 from sqlalchemy.exc import IntegrityError
+
 with Session(bind=engine) as session:
-    session.add(Experiment(name="dupe")); session.commit()
+    session.add(Experiment(name="dupe"))
+    session.commit()
     try:
-        session.add(Experiment(name="dupe")); session.commit()
+        session.add(Experiment(name="dupe"))
+        session.commit()
     except IntegrityError:
         print("rejected")
 # Output:
@@ -202,9 +212,7 @@ class ModelVersion(Base):
     __tablename__ = "model_versions"
     model_name: Mapped[str] = mapped_column(String(60))
     version: Mapped[int] = mapped_column(default=1)
-    __table_args__ = (
-        UniqueConstraint("model_name", "version", name="uq_model_version"),
-    )
+    __table_args__ = (UniqueConstraint("model_name", "version", name="uq_model_version"),)
 ```
 **Related**: IntegrityError, CheckConstraint
 

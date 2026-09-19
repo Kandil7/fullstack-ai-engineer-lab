@@ -34,7 +34,7 @@ config = ChainMap(command_line, environment, defaults)
 
 # Priority: command_line > environment > defaults
 print(config["color"])  # blue (from command_line)
-print(config["user"])   # admin (from environment)
+print(config["user"])  # admin (from environment)
 print(config["debug"])  # KeyError (not in any)
 ```
 
@@ -91,14 +91,14 @@ from collections import deque
 dq = deque([1, 2, 3, 4, 5])
 
 # O(1) operations at both ends
-dq.append(6)      # Add to right
+dq.append(6)  # Add to right
 dq.appendleft(0)  # Add to left
 
-right = dq.pop()      # Remove from right
-left = dq.popleft()   # Remove from left
+right = dq.pop()  # Remove from right
+left = dq.popleft()  # Remove from left
 
 # Rotate elements
-dq.rotate(2)   # Rotate right by 2
+dq.rotate(2)  # Rotate right by 2
 dq.rotate(-2)  # Rotate left by 2
 
 # Bounded deque
@@ -168,7 +168,7 @@ Point = namedtuple("Point", ["x", "y"])
 # Create instances
 p = Point(3, 4)
 print(p.x, p.y)  # 3 4
-print(p)          # Point(x=3, y=4)
+print(p)  # Point(x=3, y=4)
 
 # Immutable
 try:
@@ -248,15 +248,17 @@ print(od1 == od2)  # False (different order)
 ```python
 from collections import UserDict
 
+
 class CaseInsensitiveDict(UserDict):
     def __getitem__(self, key):
         return super().__getitem__(key.lower())
-    
+
     def __setitem__(self, key, value):
         super().__setitem__(key.lower(), value)
-    
+
     def __contains__(self, key):
         return super().__contains__(key.lower())
+
 
 cid = CaseInsensitiveDict()
 cid["Name"] = "Alice"
@@ -280,15 +282,17 @@ print(cid["name"])  # Alice (case-insensitive access)
 ```python
 from collections import UserList
 
+
 class MaxSizeList(UserList):
     def __init__(self, maxsize, initlist=None):
         super().__init__(initlist)
         self.maxsize = maxsize
-    
+
     def append(self, item):
         if len(self) >= self.maxsize:
             raise OverflowError(f"List cannot exceed {self.maxsize} items")
         super().append(item)
+
 
 msl = MaxSizeList(3)
 msl.append(1)
@@ -312,15 +316,18 @@ except OverflowError as e:
 ```python
 from collections import UserString
 
+
 class ReversibleString(UserString):
     def reverse(self):
         return self.data[::-1]
-    
+
     def scramble(self):
         import random
+
         chars = list(self.data)
         random.shuffle(chars)
-        return ''.join(chars)
+        return "".join(chars)
+
 
 rs = ReversibleString("hello")
 print(rs.reverse())  # olleh
@@ -433,6 +440,7 @@ while queue:
 ```python
 from collections import deque
 
+
 def sliding_window(iterable, size):
     window = deque(maxlen=size)
     for item in iterable:
@@ -445,17 +453,18 @@ def sliding_window(iterable, size):
 ```python
 from collections import OrderedDict
 
+
 class LRUCache:
     def __init__(self, capacity):
         self.cache = OrderedDict()
         self.capacity = capacity
-    
+
     def get(self, key):
         if key in self.cache:
             self.cache.move_to_end(key)
             return self.cache[key]
         return -1
-    
+
     def put(self, key, value):
         if key in self.cache:
             self.cache.move_to_end(key)

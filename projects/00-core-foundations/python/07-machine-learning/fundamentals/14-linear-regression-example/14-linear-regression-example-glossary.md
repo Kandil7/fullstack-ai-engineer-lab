@@ -95,10 +95,7 @@ import pandas as pd
 import numpy as np
 
 np.random.seed(42)
-X = pd.DataFrame({
-    'sqft': [1000, 1500, 2000, 2500, 3000],
-    'bedrooms': [2, 3, 3, 4, 4]
-})
+X = pd.DataFrame({"sqft": [1000, 1500, 2000, 2500, 3000], "bedrooms": [2, 3, 3, 4, 4]})
 y = np.array([200000, 275000, 350000, 425000, 500000])
 
 model = LinearRegression()
@@ -233,9 +230,7 @@ X = np.random.randn(100, 5)
 y = np.random.randn(100)
 
 # 80/20 split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 print(f"Total samples: {len(X)}")
 print(f"Training samples: {len(X_train)}")
@@ -385,10 +380,7 @@ y = X @ np.array([1, 2, 3]) + np.random.randn(100) * 0.5
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
 # Create pipeline
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('model', LinearRegression())
-])
+pipeline = Pipeline([("scaler", StandardScaler()), ("model", LinearRegression())])
 
 # Train (automatically scales)
 pipeline.fit(X_train, y_train)
@@ -399,8 +391,9 @@ print(f"Pipeline R²: {score:.4f}")
 
 # Save and load
 import joblib
-joblib.dump(pipeline, 'model_pipeline.pkl')
-loaded_pipeline = joblib.load('model_pipeline.pkl')
+
+joblib.dump(pipeline, "model_pipeline.pkl")
+loaded_pipeline = joblib.load("model_pipeline.pkl")
 ```
 
 **Benefits:**
@@ -467,15 +460,16 @@ x1 = np.random.randn(n)
 x2 = x1 * 0.9 + np.random.randn(n) * 0.1  # Highly correlated with x1
 x3 = np.random.randn(n)  # Independent
 
-df = pd.DataFrame({'x1': x1, 'x2': x2, 'x3': x3})
+df = pd.DataFrame({"x1": x1, "x2": x2, "x3": x3})
+
 
 # Calculate VIF
 def calculate_vif(df):
     vif_data = pd.DataFrame()
     vif_data["feature"] = df.columns
-    vif_data["VIF"] = [variance_inflation_factor(df.values, i) 
-                       for i in range(df.shape[1])]
+    vif_data["VIF"] = [variance_inflation_factor(df.values, i) for i in range(df.shape[1])]
     return vif_data
+
 
 print(calculate_vif(df))
 # x1 and x2 will have high VIF (>5-10)
@@ -620,38 +614,45 @@ for degree in [1, 3, 5, 10, 15]:
 ```python
 # Linear Regression
 from sklearn.linear_model import LinearRegression
+
 model = LinearRegression()
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
 # Evaluation
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+
 r2 = r2_score(y_test, y_pred)
 rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 mae = mean_absolute_error(y_test, y_pred)
 
 # Train/Test Split
 from sklearn.model_selection import train_test_split
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
 # Feature Scaling
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
 # Pipeline
 from sklearn.pipeline import Pipeline
-pipeline = Pipeline([('scaler', StandardScaler()), ('model', LinearRegression())])
+
+pipeline = Pipeline([("scaler", StandardScaler()), ("model", LinearRegression())])
 
 # Cross-Validation
 from sklearn.model_selection import cross_val_score
-scores = cross_val_score(model, X, y, cv=5, scoring='r2')
+
+scores = cross_val_score(model, X, y, cv=5, scoring="r2")
 
 # Save Model
 import joblib
-joblib.dump(model, 'model.pkl')
-model = joblib.load('model.pkl')
+
+joblib.dump(model, "model.pkl")
+model = joblib.load("model.pkl")
 ```
 
 ---

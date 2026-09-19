@@ -32,11 +32,11 @@ import pandas as pd
 import numpy as np
 
 df = pd.read_csv("sales.csv", parse_dates=["date"])
-df.info()          # dtypes + non-null counts — always first
+df.info()  # dtypes + non-null counts — always first
 df.head(), df.tail()
-df.describe()      # numeric summaries: count, mean, std, quartiles
+df.describe()  # numeric summaries: count, mean, std, quartiles
 df.describe(include="object")  # categorical summary
-df.shape           # (rows, columns)
+df.shape  # (rows, columns)
 ```
 
 `df.info()` in 3 seconds tells you the dtypes and where the missing values

@@ -36,17 +36,24 @@
 ```python
 # a.py
 from b import func_b
+
+
 def func_a():
     return func_b()
 
+
 # b.py
 from a import func_a  # Circular!
+
+
 def func_b():
     return func_a()
+
 
 # SOLUTION: Lazy import
 def func_a():
     from b import func_b  # Import inside function
+
     return func_b()
 ```
 
@@ -81,8 +88,8 @@ from math import *
 
 **Example**:
 ```python
-import numpy as np           # Common alias
-import pandas as pd          # Common alias
+import numpy as np  # Common alias
+import pandas as pd  # Common alias
 from datetime import datetime as dt
 
 print(np.array([1, 2, 3]))
@@ -100,6 +107,7 @@ print(dt.now())
 ```python
 def process_data():
     import pandas as pd  # Only imported when function is called
+
     df = pd.read_csv("data.csv")
     return df
 ```
@@ -117,7 +125,9 @@ def process_data():
 def greet(name):
     return f"Hello, {name}!"
 
+
 PI = 3.14159
+
 
 class Circle:
     def __init__(self, radius):
@@ -134,6 +144,7 @@ class Circle:
 **Example**:
 ```python
 import sys
+
 print(sys.path)
 # ['', '/usr/lib/python3.x', '/usr/lib/python3.x/lib-dynload', ...]
 
@@ -152,10 +163,12 @@ sys.path.insert(0, "/my/modules")
 ```python
 # math namespace contains sqrt, pi, etc.
 import math
+
 print(math.sqrt)  # <built-in function sqrt>
 
 # Separate namespace
 import random
+
 print(random.sqrt)  # AttributeError — not in random namespace
 ```
 
@@ -289,11 +302,14 @@ deactivate
 # mymodule.py
 __all__ = ["public_func", "PublicClass"]
 
+
 def public_func():
     pass
 
+
 def _private_func():  # Not exported
     pass
+
 
 class PublicClass:
     pass
@@ -329,6 +345,7 @@ __all__ = ["Class1", "function2"]
 def main():
     print("Running directly!")
 
+
 if __name__ == "__main__":
     main()  # Only runs when executed, not imported
 
@@ -352,12 +369,13 @@ if __name__ == "__main__":
 This module provides utility functions for data processing.
 """
 
+
 def process(data):
     """Process the input data.
-    
+
     Args:
         data: Input data to process
-    
+
     Returns:
         Processed data
     """
@@ -377,6 +395,7 @@ def process(data):
 def main():
     print("Application started")
     # ... application logic
+
 
 if __name__ == "__main__":
     main()
@@ -411,11 +430,13 @@ import itertools
 # math_utils.py
 """Custom math utilities module."""
 
+
 def factorial(n):
     """Calculate factorial of n."""
     if n <= 1:
         return 1
     return n * factorial(n - 1)
+
 
 def is_prime(n):
     """Check if n is prime."""
@@ -425,6 +446,7 @@ def is_prime(n):
         if n % i == 0:
             return False
     return True
+
 
 if __name__ == "__main__":
     print(factorial(5))  # 120

@@ -38,10 +38,11 @@
 ```python
 # High bias (underfitting) — too simple
 from sklearn.linear_model import LinearRegression
+
 simple_model = LinearRegression()  # Degree 1
 simple_model.fit(X_train, y_train)
 print(f"Train R²: {simple_model.score(X_train, y_train):.2f}")  # Low
-print(f"Test R²: {simple_model.score(X_test, y_test):.2f}")    # Low
+print(f"Test R²: {simple_model.score(X_test, y_test):.2f}")  # Low
 
 # High variance (overfitting) — too complex
 poly15 = PolynomialFeatures(degree=15)
@@ -49,7 +50,7 @@ X_train_poly = poly15.fit_transform(X_train)
 complex_model = LinearRegression()
 complex_model.fit(X_train_poly, y_train)
 print(f"Train R²: {complex_model.score(X_train_poly, y_train):.2f}")  # High
-print(f"Test R²: {complex_model.score(X_test_poly, y_test):.2f}")     # Low
+print(f"Test R²: {complex_model.score(X_test_poly, y_test):.2f}")  # Low
 ```
 
 **Visual intuition:**
@@ -112,7 +113,7 @@ import numpy as np
 
 # Training data: x in [0, 10]
 X_train = np.linspace(0, 10, 100).reshape(-1, 1)
-y_train = 0.5 * X_train.squeeze()**2
+y_train = 0.5 * X_train.squeeze() ** 2
 
 # Extrapolation: x = 15 (outside training range)
 X_extrapolate = np.array([[15]])
@@ -165,7 +166,7 @@ train_r2 = r2_score(y_train, model.predict(X_train_poly))
 test_r2 = r2_score(y_test, model.predict(X_test_poly))
 
 print(f"Train R²: {train_r2:.4f}")  # Very high (e.g., 0.99)
-print(f"Test R²: {test_r2:.4f}")    # Low (e.g., -2.5)
+print(f"Test R²: {test_r2:.4f}")  # Low (e.g., -2.5)
 print("Gap indicates overfitting!")
 ```
 
@@ -232,10 +233,9 @@ from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 
 # Complete polynomial regression pipeline
-model = Pipeline([
-    ('poly', PolynomialFeatures(degree=2, include_bias=False)),
-    ('linear', LinearRegression())
-])
+model = Pipeline(
+    [("poly", PolynomialFeatures(degree=2, include_bias=False)), ("linear", LinearRegression())]
+)
 
 model.fit(X_train, y_train)
 r2 = model.score(X_test, y_test)
@@ -258,7 +258,7 @@ from sklearn.linear_model import LinearRegression
 
 # True relationship: quadratic
 X = np.linspace(0, 10, 100).reshape(-1, 1)
-y = 0.5 * X.squeeze()**2
+y = 0.5 * X.squeeze() ** 2
 
 # Fitting linear model (degree 1)
 model = LinearRegression()
@@ -308,10 +308,7 @@ from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.model_selection import train_test_split
 
 # Quick polynomial regression
-model = Pipeline([
-    ('poly', PolynomialFeatures(degree=2)),
-    ('linear', LinearRegression())
-])
+model = Pipeline([("poly", PolynomialFeatures(degree=2)), ("linear", LinearRegression())])
 model.fit(X_train, y_train)
 score = model.score(X_test, y_test)
 ```

@@ -36,7 +36,7 @@ x_mean = np.mean(x)
 y_mean = np.mean(y)
 
 numerator = np.sum((x - x_mean) * (y - y_mean))
-denominator = np.sqrt(np.sum((x - x_mean)**2) * np.sum((y - y_mean)**2))
+denominator = np.sqrt(np.sum((x - x_mean) ** 2) * np.sum((y - y_mean) ** 2))
 correlation = numerator / denominator
 
 print(f"X: {x}")
@@ -77,7 +77,7 @@ X3 = np.random.randn(n_samples)  # Independent
 X4 = -X1 * 0.6 + np.random.randn(n_samples) * 0.4  # Negatively correlated
 
 data = np.column_stack([X1, X2, X3, X4])
-df = pd.DataFrame(data, columns=['X1', 'X2', 'X3', 'X4'])
+df = pd.DataFrame(data, columns=["X1", "X2", "X3", "X4"])
 
 # Calculate correlation matrix
 corr_matrix = df.corr()
@@ -107,12 +107,12 @@ np.random.seed(42)
 X, y = make_regression(n_samples=200, n_features=5, noise=0.5, random_state=42)
 
 # Create DataFrame
-feature_names = [f'Feature_{i}' for i in range(X.shape[1])]
+feature_names = [f"Feature_{i}" for i in range(X.shape[1])]
 df = pd.DataFrame(X, columns=feature_names)
-df['target'] = y
+df["target"] = y
 
 # Calculate correlations with target
-target_corr = df.corr()['target'].drop('target')
+target_corr = df.corr()["target"].drop("target")
 print("Feature correlations with target:")
 print(target_corr.sort_values(ascending=False))
 
@@ -128,7 +128,7 @@ X1 = np.random.randn(100)
 X2 = X1 * 0.95 + np.random.randn(100) * 0.05  # Very high correlation
 X3 = np.random.randn(100)
 
-df_features = pd.DataFrame({'X1': X1, 'X2': X2, 'X3': X3})
+df_features = pd.DataFrame({"X1": X1, "X2": X2, "X3": X3})
 corr_matrix = df_features.corr()
 
 print("Correlation Matrix:")
@@ -137,13 +137,11 @@ print(corr_matrix)
 # Find pairs with correlation > 0.8
 high_corr_pairs = []
 for i in range(len(corr_matrix.columns)):
-    for j in range(i+1, len(corr_matrix.columns)):
+    for j in range(i + 1, len(corr_matrix.columns)):
         if abs(corr_matrix.iloc[i, j]) > 0.8:
-            high_corr_pairs.append((
-                corr_matrix.columns[i],
-                corr_matrix.columns[j],
-                corr_matrix.iloc[i, j]
-            ))
+            high_corr_pairs.append(
+                (corr_matrix.columns[i], corr_matrix.columns[j], corr_matrix.iloc[i, j])
+            )
 
 print("\nHighly correlated pairs (|corr| > 0.8):")
 for feat1, feat2, corr in high_corr_pairs:
@@ -158,12 +156,12 @@ print("\nExample 8: Using Correlation for Feature Selection")
 np.random.seed(42)
 X, y = make_regression(n_samples=200, n_features=10, n_informative=3, random_state=42)
 
-feature_names = [f'Feature_{i}' for i in range(X.shape[1])]
+feature_names = [f"Feature_{i}" for i in range(X.shape[1])]
 df = pd.DataFrame(X, columns=feature_names)
-df['target'] = y
+df["target"] = y
 
 # Calculate correlations
-target_corr = df.corr()['target'].drop('target').abs()
+target_corr = df.corr()["target"].drop("target").abs()
 
 # Select features with correlation > 0.1
 important_features = target_corr[target_corr > 0.1].index.tolist()
@@ -197,7 +195,7 @@ print("3. Use matplotlib for customization")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Correlation measures linear relationship between variables")
 print("- Range: -1 to +1")
@@ -205,4 +203,4 @@ print("- Correlation matrix shows pairwise relationships")
 print("- Use correlation for feature selection")
 print("- Remember: correlation != causation")
 print("- Visualize with heatmaps for better understanding")
-print("="*60)
+print("=" * 60)

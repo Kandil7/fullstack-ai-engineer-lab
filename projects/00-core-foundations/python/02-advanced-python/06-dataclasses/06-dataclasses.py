@@ -14,9 +14,11 @@ from datetime import datetime
 # 1. Basic Dataclass
 # =============================================================================
 
+
 @dataclass
 class Point:
     """Basic dataclass with auto-generated methods."""
+
     x: float
     y: float
 
@@ -27,6 +29,7 @@ class Point:
 @dataclass
 class Person:
     """Person with default values and computed property."""
+
     name: str
     age: int
     email: str
@@ -41,9 +44,11 @@ class Person:
 # 2. Field Customization
 # =============================================================================
 
+
 @dataclass
 class Product:
     """Product with field customizations."""
+
     name: str
     price: float
     quantity: int = 0
@@ -67,6 +72,7 @@ class Product:
 @dataclass(order=True)
 class RankedItem:
     """Dataclass with ordering based on rank."""
+
     rank: int
     name: str = field(compare=False)
     score: float = field(compare=False)
@@ -76,9 +82,11 @@ class RankedItem:
 # 3. Frozen Dataclass (Immutable)
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class Config:
     """Immutable configuration object."""
+
     host: str
     port: int
     debug: bool = False
@@ -92,6 +100,7 @@ class Config:
 @dataclass(frozen=True)
 class Vector3D:
     """Immutable 3D vector with operations."""
+
     x: float
     y: float
     z: float
@@ -104,16 +113,18 @@ class Vector3D:
 
     @property
     def magnitude(self) -> float:
-        return (self.x ** 2 + self.y ** 2 + self.z ** 2) ** 0.5
+        return (self.x**2 + self.y**2 + self.z**2) ** 0.5
 
 
 # =============================================================================
 # 4. Inheritance
 # =============================================================================
 
+
 @dataclass
 class Animal:
     """Base animal class."""
+
     name: str
     sound: str
 
@@ -124,6 +135,7 @@ class Animal:
 @dataclass
 class Dog(Animal):
     """Dog with breed."""
+
     breed: str
     is_good_boy: bool = True
 
@@ -134,6 +146,7 @@ class Dog(Animal):
 @dataclass
 class Cat(Animal):
     """Cat with indoor/outdoor status."""
+
     indoor: bool = True
 
     def __post_init__(self):
@@ -144,9 +157,11 @@ class Cat(Animal):
 # 5. Serialization
 # =============================================================================
 
+
 @dataclass
 class ApiResponse:
     """API response with serialization methods."""
+
     status: str
     data: Optional[Dict] = None
     errors: List[str] = field(default_factory=list)
@@ -162,6 +177,7 @@ class ApiResponse:
 
     def to_json(self) -> str:
         import json
+
         return json.dumps(asdict(self), default=str)
 
 
@@ -169,9 +185,11 @@ class ApiResponse:
 # 6. Slots Dataclass
 # =============================================================================
 
+
 @dataclass(slots=True)
 class CompactPoint:
     """Memory-efficient point with __slots__."""
+
     x: float
     y: float
 

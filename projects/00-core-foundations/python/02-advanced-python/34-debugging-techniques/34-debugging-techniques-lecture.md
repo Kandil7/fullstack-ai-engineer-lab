@@ -64,11 +64,14 @@ Read from the bottom up:
 def _inner():
     raise ValueError("chunk index out of range")
 
+
 def _middle():
     _inner()
 
+
 def _outer():
     _middle()
+
 
 try:
     _outer()
@@ -76,8 +79,8 @@ except ValueError:
     tb = traceback.format_exc()
 
 lines = tb.strip().splitlines()
-print(lines[0])     # Traceback (most recent call last):
-print(lines[-1])    # ValueError: chunk index out of range
+print(lines[0])  # Traceback (most recent call last):
+print(lines[-1])  # ValueError: chunk index out of range
 print("_inner" in tb)
 ```
 
@@ -99,8 +102,8 @@ stack:
 
 ```python
 def log_exception(logger, exc):
-    return "".join(traceback.format_exception(
-        type(exc), exc, exc.__traceback__))
+    return "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+
 
 try:
     _outer()
@@ -127,11 +130,13 @@ boundaries** are the detector:
 ```python
 def normalize_chunks(chunks):
     result = [c.strip() for c in chunks if c.strip()]
-    assert all(isinstance(c, str) and c for c in result), \
+    assert all(isinstance(c, str) and c for c in result), (
         "invariant: every chunk is a non-empty string"
+    )
     return result
 
-normalize_chunks(["  good  ", "", None, "ok"])   # None survives the filter
+
+normalize_chunks(["  good  ", "", None, "ok"])  # None survives the filter
 ```
 
 ```text
@@ -169,14 +174,15 @@ iteration order. Freeze everything:
 
 ```python
 def shuffly_score(items):
-    rng = random.Random(42)      # fixed seed -> fixed shuffle
+    rng = random.Random(42)  # fixed seed -> fixed shuffle
     result = items[:]
     rng.shuffle(result)
     return result
 
+
 print(shuffly_score(["a", "b", "c", "d"]))
 print(shuffly_score(["a", "b", "c", "d"]))
-print(list({"a", "b", "c"}))     # set order varies per process
+print(list({"a", "b", "c"}))  # set order varies per process
 ```
 
 ```text
@@ -198,7 +204,8 @@ signals and can dump manually:
 
 ```python
 import faulthandler
-faulthandler.enable()          # dumps on SIGSEGV/SIGABRT/Ctrl-C
+
+faulthandler.enable()  # dumps on SIGSEGV/SIGABRT/Ctrl-C
 
 # manual dump:
 faulthandler.dump_traceback(file=sys.stderr)
@@ -228,7 +235,7 @@ For scripts and CI, pdb is scriptable — the exercise drives it
 deterministically via `cmdqueue` and a `Pdb` subclass:
 
 ```python
-cap = _CapturingPdb()          # records "p x" output
+cap = _CapturingPdb()  # records "p x" output
 cap.cmdqueue = ["n", "p x", "n", "p y", "c"]
 cap.run("x = 10\ny = 32\nresult = x + y\n")
 ```
@@ -258,6 +265,7 @@ def bisect_bad(configs, bad_from):
             lo = mid + 1
     return lo
 
+
 configs = [f"cfg-{i}" for i in range(100)]
 print(configs[bisect_bad(configs, 42)])
 ```
@@ -284,8 +292,9 @@ The five steps, applied to "RAG returns wrong chunks, no traceback":
 
 ```python
 def retrieve(query, chunks, top_k):
-    scored = sorted(chunks, key=len)   # wrong metric
+    scored = sorted(chunks, key=len)  # wrong metric
     return scored[:top_k]
+
 
 print(retrieve("q", ["short", "a much longer chunk"], 1))
 ```
@@ -309,6 +318,7 @@ def isolate_stage(chunks):
     if len(stage2) != len(set(stage2)):
         return "stage-2: duplicates introduced"
     return "ok"
+
 
 print(isolate_stage([" ok ", ""]))
 print(isolate_stage(["b", "a", "a"]))

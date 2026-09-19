@@ -47,8 +47,8 @@ df[(df["Age"] > 25) & (df["Salary"] > 70000)]
 Selecting specific columns from a DataFrame.
 
 ```python
-df["Name"]              # Single column (Series)
-df[["Name", "Age"]]     # Multiple columns (DataFrame)
+df["Name"]  # Single column (Series)
+df[["Name", "Age"]]  # Multiple columns (DataFrame)
 ```
 
 ### I
@@ -57,9 +57,9 @@ df[["Name", "Age"]]     # Multiple columns (DataFrame)
 Position-based indexer — selects by integer position (0-indexed).
 
 ```python
-df.iloc[0]              # First row
-df.iloc[0:5]            # First 5 rows
-df.iloc[0, 1]           # Row 0, column 1
+df.iloc[0]  # First row
+df.iloc[0:5]  # First 5 rows
+df.iloc[0, 1]  # Row 0, column 1
 ```
 
 **Isin**
@@ -75,9 +75,9 @@ df[df["City"].isin(["New York", "London"])]
 Label-based indexer — selects by index label.
 
 ```python
-df.loc["emp1"]          # Row with label "emp1"
+df.loc["emp1"]  # Row with label "emp1"
 df.loc["emp1", "Name"]  # Row and column
-df.loc["emp1":"emp3"]   # Slice (inclusive)
+df.loc["emp1":"emp3"]  # Slice (inclusive)
 ```
 
 ### M
@@ -121,9 +121,9 @@ df.query("Age > @min_age")  # Using variables
 Selecting specific rows from a DataFrame.
 
 ```python
-df.loc["label"]         # By label
-df.iloc[0]              # By position
-df[condition]           # By boolean mask
+df.loc["label"]  # By label
+df.iloc[0]  # By position
+df[condition]  # By boolean mask
 ```
 
 ### W
@@ -144,11 +144,13 @@ df.where(df["Age"] > 30)
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42],
-    "City": ["New York", "London", "Paris"]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie"],
+        "Age": [28, 35, 42],
+        "City": ["New York", "London", "Paris"],
+    }
+)
 
 # Single column
 print(df["Name"])
@@ -157,8 +159,8 @@ print(df["Name"])
 print(df[["Name", "Age"]])
 
 # By position
-print(df.iloc[:, 0])     # First column
-print(df.iloc[:, 0:2])   # First two columns
+print(df.iloc[:, 0])  # First column
+print(df.iloc[:, 0:2])  # First two columns
 ```
 
 ### Example 2: Boolean Filtering
@@ -166,11 +168,13 @@ print(df.iloc[:, 0:2])   # First two columns
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie", "Diana"],
-    "Age": [28, 35, 42, 31],
-    "Salary": [75000, 82000, 95000, 68000]
-})
+df = pd.DataFrame(
+    {
+        "Name": ["Alice", "Bob", "Charlie", "Diana"],
+        "Age": [28, 35, 42, 31],
+        "Salary": [75000, 82000, 95000, 68000],
+    }
+)
 
 # Simple filter
 print(df[df["Age"] > 30])
@@ -187,10 +191,9 @@ print(df[df["Name"].isin(["Alice", "Charlie"])])
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42]
-}, index=["emp1", "emp2", "emp3"])
+df = pd.DataFrame(
+    {"Name": ["Alice", "Bob", "Charlie"], "Age": [28, 35, 42]}, index=["emp1", "emp2", "emp3"]
+)
 
 # loc — label-based
 print(df.loc["emp2"])

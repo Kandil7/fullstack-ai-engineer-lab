@@ -45,6 +45,7 @@ class FakeClock:
 # Bronze: Token Bucket
 # ============================================================
 
+
 def test_burst_up_to_capacity():
     clock = FakeClock()
     bucket = solution.TokenBucket(capacity=3, rate=1.0, now=clock)
@@ -66,7 +67,7 @@ def test_refill_exactly_rate():
 def test_tokens_never_exceed_capacity():
     clock = FakeClock()
     bucket = solution.TokenBucket(capacity=3, rate=5.0, now=clock)
-    clock.advance(100.0)          # 500 tokens would accrue; capped at 3
+    clock.advance(100.0)  # 500 tokens would accrue; capped at 3
     assert bucket.try_acquire() is True
     assert bucket.try_acquire() is True
     assert bucket.try_acquire() is True
@@ -91,6 +92,7 @@ def test_bucket_initial_burst():
 # ============================================================
 # Silver: Bounded Pipeline
 # ============================================================
+
 
 def test_backpressure_never_exceeds_maxsize():
     pipe = solution.BoundedPipeline(maxsize=2)
@@ -146,6 +148,7 @@ def test_roundtrip_no_loss():
 # Gold: Circuit Breaker
 # ============================================================
 
+
 def _counting_fail(fail_times: int):
     """Returns (fn, counter) where fn fails `fail_times` times then returns 42."""
     state = {"n": 0}
@@ -161,7 +164,7 @@ def _counting_fail(fail_times: int):
 
 def test_breaker_opens_after_threshold():
     clock = FakeClock()
-    fn, state = _counting_fail(10**6)          # always fails
+    fn, state = _counting_fail(10**6)  # always fails
     breaker = solution.CircuitBreaker(fn, threshold=3, cooldown=1.0, now=clock)
     for _ in range(3):
         with pytest.raises(ConnectionError):
@@ -185,28 +188,28 @@ def test_breaker_short_circuits_without_calling_fn():
 
 def test_breaker_recovers_half_open():
     clock = FakeClock()
-    fn, state = _counting_fail(3)               # succeeds on 4th call
+    fn, state = _counting_fail(3)  # succeeds on 4th call
     breaker = solution.CircuitBreaker(fn, threshold=3, cooldown=1.0, now=clock)
     for _ in range(3):
         with pytest.raises(ConnectionError):
             breaker.call()
     assert breaker.state == "open"
-    clock.advance(1.0)                          # cooldown elapsed
-    assert breaker.call() == 42                 # half-open trial succeeds
+    clock.advance(1.0)  # cooldown elapsed
+    assert breaker.call() == 42  # half-open trial succeeds
     assert breaker.state == "closed"
-    assert breaker.call() == 42                 # fully closed again
+    assert breaker.call() == 42  # fully closed again
 
 
 def test_breaker_half_open_failure_reopens():
     clock = FakeClock()
-    fn, state = _counting_fail(10**6)           # still failing
+    fn, state = _counting_fail(10**6)  # still failing
     breaker = solution.CircuitBreaker(fn, threshold=2, cooldown=1.0, now=clock)
     for _ in range(2):
         with pytest.raises(ConnectionError):
             breaker.call()
     clock.advance(1.0)
     with pytest.raises(ConnectionError):
-        breaker.call()                          # half-open trial fails
+        breaker.call()  # half-open trial fails
     assert breaker.state == "open"
 
 
@@ -219,21 +222,21 @@ def test_breaker_success_resets_failure_count():
             raise ConnectionError("down")
         return 42
 
-    breaker = solution.CircuitBreaker(controllable, threshold=3,
-                                      cooldown=1.0, now=clock)
+    breaker = solution.CircuitBreaker(controllable, threshold=3, cooldown=1.0, now=clock)
     with pytest.raises(ConnectionError):
-        breaker.call()                        # failure 1
+        breaker.call()  # failure 1
     state["fail"] = False
-    assert breaker.call() == 42               # success resets failures
+    assert breaker.call() == 42  # success resets failures
     state["fail"] = True
     with pytest.raises(ConnectionError):
-        breaker.call()                        # failure 1 again (reset!)
+        breaker.call()  # failure 1 again (reset!)
     assert breaker.state == "closed", "only 1 failure since last reset"
 
 
 # ============================================================
 # Gold: Retry with Jitter
 # ============================================================
+
 
 def test_retry_succeeds_and_records_delays():
     delays: list[float] = []
@@ -242,8 +245,7 @@ def test_retry_succeeds_and_records_delays():
         delays.append(d)
 
     fn, state = _counting_fail(2)
-    result = solution.retry_with_jitter(fn, attempts=4, base_delay=0.1,
-                                        sleep=log_sleep)
+    result = solution.retry_with_jitter(fn, attempts=4, base_delay=0.1, sleep=log_sleep)
     assert result == 42
     assert len(delays) == 2, "one jittered delay per failed attempt"
     assert delays[0] <= 0.1, "attempt 0 window is [0, base]"
@@ -259,8 +261,7 @@ def test_retry_exhausts_and_raises():
 
     fn, state = _counting_fail(10**6)
     with pytest.raises(RuntimeError):
-        solution.retry_with_jitter(fn, attempts=3, base_delay=0.1,
-                                   sleep=log_sleep)
+        solution.retry_with_jitter(fn, attempts=3, base_delay=0.1, sleep=log_sleep)
     assert state["n"] == 3, "exactly `attempts` invocations"
     assert len(delays) == 2, "no delay after the final attempt"
 
@@ -277,10 +278,8 @@ def test_retry_delays_are_randomized_not_fixed():
 
     fn1, _ = _counting_fail(1)
     fn2, _ = _counting_fail(1)
-    solution.retry_with_jitter(fn1, attempts=2, base_delay=0.5, sleep=log_a,
-                               rng=random.Random(1))
-    solution.retry_with_jitter(fn2, attempts=2, base_delay=0.5, sleep=log_b,
-                               rng=random.Random(2))
+    solution.retry_with_jitter(fn1, attempts=2, base_delay=0.5, sleep=log_a, rng=random.Random(1))
+    solution.retry_with_jitter(fn2, attempts=2, base_delay=0.5, sleep=log_b, rng=random.Random(2))
     assert delays_a[0] != delays_b[0], "different seeds -> different delays"
 
 

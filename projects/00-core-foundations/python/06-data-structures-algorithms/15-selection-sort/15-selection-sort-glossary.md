@@ -96,6 +96,7 @@ def selection_sort(arr):
         arr[i], arr[min_idx] = arr[min_idx], arr[i]
     return arr
 
+
 # Selection Sort Descending
 def selection_sort_desc(arr):
     n = len(arr)
@@ -106,6 +107,7 @@ def selection_sort_desc(arr):
                 max_idx = j
         arr[i], arr[max_idx] = arr[max_idx], arr[i]
     return arr
+
 
 # Count Operations
 def selection_sort_counting(arr):

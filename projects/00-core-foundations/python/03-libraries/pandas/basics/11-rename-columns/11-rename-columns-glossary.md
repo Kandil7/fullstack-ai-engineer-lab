@@ -98,18 +98,14 @@ df.columns.str.contains("pattern")
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "First Name": ["Alice", "Bob"],
-    "Last Name": ["Smith", "Jones"],
-    "Age Yrs": [28, 35]
-})
+df = pd.DataFrame(
+    {"First Name": ["Alice", "Bob"], "Last Name": ["Smith", "Jones"], "Age Yrs": [28, 35]}
+)
 
 # Rename specific columns
-df_renamed = df.rename(columns={
-    "First Name": "first_name",
-    "Last Name": "last_name",
-    "Age Yrs": "age"
-})
+df_renamed = df.rename(
+    columns={"First Name": "first_name", "Last Name": "last_name", "Age Yrs": "age"}
+)
 ```
 
 ### Example 2: Bulk Rename
@@ -117,11 +113,7 @@ df_renamed = df.rename(columns={
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Column A": [1, 2],
-    "Column B": [3, 4],
-    "Column C": [5, 6]
-})
+df = pd.DataFrame({"Column A": [1, 2], "Column B": [3, 4], "Column C": [5, 6]})
 
 # Lowercase and replace spaces
 df.columns = df.columns.str.lower().str.replace(" ", "_")
@@ -132,10 +124,10 @@ df.columns = df.columns.str.lower().str.replace(" ", "_")
 ```python
 import pandas as pd
 
+
 def clean_columns(df):
     df.columns = (
-        df.columns
-        .str.strip()
+        df.columns.str.strip()
         .str.lower()
         .str.replace(" ", "_")
         .str.replace(r"[^a-z0-9_]", "", regex=True)

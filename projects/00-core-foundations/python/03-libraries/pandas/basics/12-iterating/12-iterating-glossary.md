@@ -54,7 +54,7 @@ for row in df.itertuples():
 An anonymous function defined inline.
 
 ```python
-df["A"].apply(lambda x: x ** 2)
+df["A"].apply(lambda x: x**2)
 df.apply(lambda x: x.max() - x.min(), axis=1)
 ```
 
@@ -71,7 +71,7 @@ df["col"].map({"a": 1, "b": 2})
 df["col"].map(lambda x: x.upper())
 
 # DataFrame map (element-wise)
-df.map(lambda x: x ** 2)
+df.map(lambda x: x**2)
 ```
 
 ### V
@@ -80,8 +80,8 @@ df.map(lambda x: x ** 2)
 Operations applied to entire arrays at once without explicit loops. Much faster than iteration.
 
 ```python
-df["C"] = df["A"] + df["B"]          # Vectorized
-df["D"] = np.sqrt(df["A"])           # Vectorized
+df["C"] = df["A"] + df["B"]  # Vectorized
+df["D"] = np.sqrt(df["A"])  # Vectorized
 df["E"] = np.where(df["A"] > 5, "High", "Low")  # Vectorized
 ```
 
@@ -94,10 +94,7 @@ df["E"] = np.where(df["A"] > 5, "High", "Low")  # Vectorized
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Name": ["Alice", "Bob", "Charlie"],
-    "Age": [28, 35, 42]
-})
+df = pd.DataFrame({"Name": ["Alice", "Bob", "Charlie"], "Age": [28, 35, 42]})
 
 # iterrows
 for index, row in df.iterrows():
@@ -113,10 +110,7 @@ for row in df.itertuples():
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "A": [1, 2, 3],
-    "B": [4, 5, 6]
-})
+df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]})
 
 # Column-wise
 print(df.apply(lambda x: x.sum()))
@@ -124,9 +118,11 @@ print(df.apply(lambda x: x.sum()))
 # Row-wise
 print(df.apply(lambda x: x.sum(), axis=1))
 
+
 # Custom function
 def range_func(x):
     return x.max() - x.min()
+
 
 print(df.apply(range_func))
 ```
@@ -136,9 +132,7 @@ print(df.apply(range_func))
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    "Grade": ["A", "B", "C", "A"]
-})
+df = pd.DataFrame({"Grade": ["A", "B", "C", "A"]})
 
 # Map with dictionary
 grade_map = {"A": 4, "B": 3, "C": 2, "D": 1}

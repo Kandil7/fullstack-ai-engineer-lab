@@ -42,9 +42,9 @@ def timed(label: str, func) -> None:
 # Example 1: reading strides off an array
 arr = np.zeros((4, 6), dtype=np.float64)
 print("shape:  ", arr.shape)
-print("strides:", arr.strides)      # (48, 8)
-print("itemsize:", arr.itemsize)    # 8
-print("nbytes:  ", arr.nbytes)      # 192 = 4*6*8
+print("strides:", arr.strides)  # (48, 8)
+print("itemsize:", arr.itemsize)  # 8
+print("nbytes:  ", arr.nbytes)  # 192 = 4*6*8
 
 # Output:
 # shape:   (4, 6)
@@ -63,8 +63,8 @@ print("nbytes:  ", arr.nbytes)      # 192 = 4*6*8
 # Example 2: flags and stride patterns
 c_arr = np.zeros((3, 4), dtype=np.float32)
 f_arr = np.asfortranarray(c_arr)
-print("C-order strides:", c_arr.strides)     # (16, 4)
-print("F-order strides:", f_arr.strides)     # (4, 12)
+print("C-order strides:", c_arr.strides)  # (16, 4)
+print("F-order strides:", f_arr.strides)  # (4, 12)
 print("C contiguous  :", c_arr.flags.c_contiguous)
 print("F contiguous  :", f_arr.flags.f_contiguous)
 
@@ -87,7 +87,7 @@ row_view = base[1:3, :]
 t_view = base.T
 print("slice base is not None:", row_view.base is not None)
 print("transpose base:", t_view.base is not None)
-print("T strides swapped:", t_view.strides)   # (8, 48)
+print("T strides swapped:", t_view.strides)  # (8, 48)
 # A write through the view reaches the base buffer:
 row_view[0, 0] = -1
 print("base changed through view:", base[1, 0] == -1)
@@ -95,8 +95,8 @@ print("base changed through view:", base[1, 0] == -1)
 # Example 4: fancy indexing and astype copy
 fancy = base[[0, 2], :]
 cast = base.astype(np.float64)
-print("fancy base is None:", fancy.base is None)   # copy
-print("astype base is None:", cast.base is None)   # copy
+print("fancy base is None:", fancy.base is None)  # copy
+print("astype base is None:", cast.base is None)  # copy
 
 # Output:
 # slice base is not None: True
@@ -116,13 +116,11 @@ print("astype base is None:", cast.base is None)   # copy
 # only when you must.
 
 # Example 5: no-op on contiguous, copy on transposed
-t = base.T                       # F-order view of a C array
+t = base.T  # F-order view of a C array
 fix_t = np.ascontiguousarray(t)
-print("same object when already contiguous:",
-      np.ascontiguousarray(base) is base)      # True
-print("copies when not contiguous:",
-      np.ascontiguousarray(t) is not t)        # True
-print("fixed strides:", fix_t.strides)         # (48, 8)
+print("same object when already contiguous:", np.ascontiguousarray(base) is base)  # True
+print("copies when not contiguous:", np.ascontiguousarray(t) is not t)  # True
+print("fixed strides:", fix_t.strides)  # (48, 8)
 
 # Output:
 # same object when already contiguous: True
@@ -147,10 +145,9 @@ timed("row sum (contiguous axis)", lambda: big.sum(axis=1))
 timed("col sum (strided axis)  ", lambda: big.sum(axis=0))
 
 # Example 7: .T is free, but USING the transposed data is not
-big_t = big.T                     # view: O(1), no data moved
+big_t = big.T  # view: O(1), no data moved
 print("transpose is a view:", big_t.base is not None)
-timed("contiguous sum of .T copy",
-      lambda: np.ascontiguousarray(big_t).sum(axis=1))
+timed("contiguous sum of .T copy", lambda: np.ascontiguousarray(big_t).sum(axis=1))
 
 # Output (times vary by machine and NumPy build -- never assert them;
 # the transpose view is O(1) regardless):
@@ -169,11 +166,11 @@ timed("contiguous sum of .T copy",
 
 # Example 8: memory accounting
 a = np.zeros((1000, 1000), dtype=np.float64)
-b = a[:, 0]                       # view: 1000 floats
-c = a[:, :2].copy()               # copy: 2000 floats
-print("a.nbytes:", a.nbytes)                  # 8,000,000
-print("b.nbytes:", b.nbytes)                  # 8,000 (view shares buffer)
-print("c.nbytes:", c.nbytes)                  # 16,000 (owns buffer)
+b = a[:, 0]  # view: 1000 floats
+c = a[:, :2].copy()  # copy: 2000 floats
+print("a.nbytes:", a.nbytes)  # 8,000,000
+print("b.nbytes:", b.nbytes)  # 8,000 (view shares buffer)
+print("c.nbytes:", c.nbytes)  # 16,000 (owns buffer)
 print("b shares a's buffer:", b.base is a)
 
 # Output:
@@ -192,6 +189,7 @@ print("b shares a's buffer:", b.base is a)
 
 # Complexity: O(n*d) copy only when layout is wrong; O(1) when
 # the input is already C-contiguous.
+
 
 def require_c_contiguous(x: np.ndarray) -> np.ndarray:
     """Return a C-contiguous array, copying only if needed.
@@ -254,10 +252,10 @@ def _verify() -> None:
 
     # Transpose swaps strides, so ascontiguousarray must copy it.
     assert base.T.strides == (8, 48), "transposed strides must be (8, 48)"
-    assert np.ascontiguousarray(base) is base, \
-        "ascontiguousarray must not copy contiguous input"
-    assert np.ascontiguousarray(base.T) is not base.T, \
+    assert np.ascontiguousarray(base) is base, "ascontiguousarray must not copy contiguous input"
+    assert np.ascontiguousarray(base.T) is not base.T, (
         "ascontiguousarray must copy a transposed view"
+    )
 
     # Views share the buffer: writes propagate.
     view = base[1:3, :]
@@ -282,4 +280,4 @@ if __name__ == "__main__":
         print("1. Strides map axes to byte offsets; .T swaps them for free.")
         print("2. Views share buffers; fancy indexing and astype copy.")
         print("3. Strided access misses cache lines -- transpose costs at use.")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

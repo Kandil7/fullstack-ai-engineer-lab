@@ -32,7 +32,7 @@ rng = np.random.default_rng(19)
 # ============================================================
 a = np.array([1.0, 2.0, 3.0])
 b = np.array([3.0, 2.0, 1.0])
-c = np.array([10.0, 20.0, 30.0])          # same direction as a, 10x magnitude
+c = np.array([10.0, 20.0, 30.0])  # same direction as a, 10x magnitude
 
 print(f"dot(a, c)     = {a @ c:.1f}    (magnitude-sensitive)")
 print(f"cosine(a, c)  = {cosine_sim(a, c):.2f}   (direction only)")
@@ -91,6 +91,7 @@ for cos_val in (0.9, 0.5, 0.0):
 #   cos=0.5 -> angle ~ 60.0 deg
 #   cos=0.0 -> angle ~ 90.0 deg
 
+
 # ============================================================
 # 5. The curse of dimensionality — similarity concentration
 # ============================================================
@@ -129,11 +130,15 @@ corpus /= np.linalg.norm(corpus, axis=1, keepdims=True)
 q = corpus[0] + 0.15 * rng.normal(size=64)
 q /= np.linalg.norm(q)
 sims = np.array([cosine_sim(q, v) for v in corpus])
-sims[0] = 1.0                               # self-match
-print(f"\nquery vs 500-doc corpus: max={sims.max():.3f} "
-      f"min={sims.min():.3f} p95={np.percentile(sims, 95):.3f}")
-print(f"rank of the true match = 1 (top-k retrieval finds it, "
-      f"a fixed 0.9 cutoff would not: max={sims.max():.3f})")
+sims[0] = 1.0  # self-match
+print(
+    f"\nquery vs 500-doc corpus: max={sims.max():.3f} "
+    f"min={sims.min():.3f} p95={np.percentile(sims, 95):.3f}"
+)
+print(
+    f"rank of the true match = 1 (top-k retrieval finds it, "
+    f"a fixed 0.9 cutoff would not: max={sims.max():.3f})"
+)
 
 # Output:
 # query vs 500-doc corpus: max=1.000 min=-0.332 p95=0.212
@@ -172,33 +177,32 @@ print("  3. always normalize once, then cosine == dot ranking")
 # MISTAKE: using L2 on text embeddings and wondering why long docs
 #   rank far — that is magnitude, not meaning.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # cosine is magnitude-blind; L2 is not
-    assert np.isclose(cosine_sim(a, c), 1.0), \
+    assert np.isclose(cosine_sim(a, c), 1.0), (
         "parallel vectors must have cosine 1.0 regardless of magnitude"
-    assert l2_dist(a, c) > 10.0, \
-        "parallel vectors with 10x magnitude must be L2-far"
+    )
+    assert l2_dist(a, c) > 10.0, "parallel vectors with 10x magnitude must be L2-far"
 
     # the unit-vector identity holds exactly
-    assert np.isclose(lhs, rhs, atol=1e-9), \
-        "L2^2 must equal 2 - 2*cos for unit vectors"
+    assert np.isclose(lhs, rhs, atol=1e-9), "L2^2 must equal 2 - 2*cos for unit vectors"
 
     # concentration: std must collapse as dims grow
     stds = [random_cosine_stats(d, seed=1)[1] for d in (4, 32, 256, 1024)]
-    assert stds[0] > stds[1] > stds[2] > stds[3], \
+    assert stds[0] > stds[1] > stds[2] > stds[3], (
         "random-pair cosine std must shrink with dimension"
+    )
 
     # the true match must be the top-1 cosine hit
-    assert int(np.argmax(sims)) == 0, \
-        "self-match must rank first under cosine"
+    assert int(np.argmax(sims)) == 0, "self-match must rank first under cosine"
 
     # angle table sanity
-    assert np.isclose(math.degrees(math.acos(0.5)), 60.0), \
-        "acos(0.5) must be exactly 60 degrees"
+    assert np.isclose(math.degrees(math.acos(0.5)), 60.0), "acos(0.5) must be exactly 60 degrees"
 
     print("[OK] 08-cosine-similarity: all checks passed")
 

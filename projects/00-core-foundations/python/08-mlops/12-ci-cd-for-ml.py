@@ -28,6 +28,7 @@ from typing import Any, Callable
 # (b) data tests - is the input sane?
 # (c) behavioral tests - does the MODEL behave on known cases?
 
+
 @dataclass
 class TestResult:
     name: str
@@ -70,6 +71,7 @@ assert all(run_test(n, f).passed for n, f in behavioral_tests)
 # CI runs: unit tests -> data tests -> behavioral tests -> training ->
 # registry promotion. Each stage can fail the build.
 
+
 @dataclass
 class CIGate:
     stages: list[tuple[str, Callable[[], bool]]] = field(default_factory=list)
@@ -80,12 +82,14 @@ class CIGate:
 
 
 # Example 2: a failing stage stops the ship
-gate = CIGate([
-    ("unit: import ok", lambda: True),
-    ("data: no nulls", lambda: True),
-    ("behavioral: approves", lambda: rule_model_predict(30, 60000.0) == "APPROVE"),
-    ("behavioral: rejects minor", lambda: rule_model_predict(16, 1e9) == "REJECT"),
-])
+gate = CIGate(
+    [
+        ("unit: import ok", lambda: True),
+        ("data: no nulls", lambda: True),
+        ("behavioral: approves", lambda: rule_model_predict(30, 60000.0) == "APPROVE"),
+        ("behavioral: rejects minor", lambda: rule_model_predict(16, 1e9) == "REJECT"),
+    ]
+)
 ok, results = gate.run()
 print("\nExample 2: CI gate")
 for r in results:
@@ -108,9 +112,9 @@ GOLDEN_CASES = [
     ({"age": 16, "income": 60000.0}, "REJECT"),
 ]
 
+
 def golden_test() -> bool:
-    return all(rule_model_predict(**case) == expected
-               for case, expected in GOLDEN_CASES)
+    return all(rule_model_predict(**case) == expected for case, expected in GOLDEN_CASES)
 
 
 print("\nExample 3: golden data tests")
@@ -122,6 +126,7 @@ assert golden_test()
 # ============================================================
 # Even green CI is not deployment: a human (or a policy) approves the
 # promotion to production. CI proves "safe"; approval proves "wanted".
+
 
 @dataclass
 class ApprovalFlow:
@@ -145,11 +150,11 @@ ok, msg = flow.promote("alice")
 print(f"  {msg}")
 assert ok
 
+
 # ============================================================
 # Production Pattern
 # ============================================================
-def ci_entrypoint(tests: list[tuple[str, Callable[[], bool]]],
-                  reviewer: str | None = None) -> int:
+def ci_entrypoint(tests: list[tuple[str, Callable[[], bool]]], reviewer: str | None = None) -> int:
     """The CI entrypoint: run tests, then require approval."""
     gate = CIGate(tests)
     ok, results = gate.run()

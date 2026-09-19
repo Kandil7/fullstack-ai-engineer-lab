@@ -58,6 +58,7 @@ A queue is a FIFO (First In, First Out) data structure. Operations: enqueue (add
 ```python
 from collections import deque
 
+
 class MyStack:
     def __init__(self):
         self.q = deque()
@@ -120,17 +121,18 @@ class MyQueue:
 ```python
 def is_valid(s):
     stack = []
-    mapping = {')': '(', ']': '[', '}': '{'}
+    mapping = {")": "(", "]": "[", "}": "{"}
 
     for char in s:
         if char in mapping:
-            top = stack.pop() if stack else '#'
+            top = stack.pop() if stack else "#"
             if mapping[char] != top:
                 return False
         else:
             stack.append(char)
 
     return not stack
+
 
 # Test
 assert is_valid("()[]{}") == True
@@ -162,6 +164,7 @@ def next_greater_element(nums):
 
     return result
 
+
 # Test
 assert next_greater_element([2, 1, 2, 4, 3]) == [4, 2, 4, -1, -1]
 ```
@@ -175,6 +178,7 @@ assert next_greater_element([2, 1, 2, 4, 3]) == [4, 2, 4, -1, -1]
 **Answer:**
 ```python
 from collections import deque
+
 
 def max_sliding_window(nums, k):
     result = []
@@ -196,6 +200,7 @@ def max_sliding_window(nums, k):
 
     return result
 
+
 # Test
 assert max_sliding_window([1, 3, -1, -3, 5, 3, 6, 7], 3) == [3, 3, 5, 5, 6, 7]
 ```
@@ -211,17 +216,22 @@ def eval_postfix(tokens):
     stack = []
 
     for token in tokens:
-        if token in '+-*/':
+        if token in "+-*/":
             b = stack.pop()
             a = stack.pop()
-            if token == '+': stack.append(a + b)
-            elif token == '-': stack.append(a - b)
-            elif token == '*': stack.append(a * b)
-            elif token == '/': stack.append(int(a / b))  # truncate toward 0
+            if token == "+":
+                stack.append(a + b)
+            elif token == "-":
+                stack.append(a - b)
+            elif token == "*":
+                stack.append(a * b)
+            elif token == "/":
+                stack.append(int(a / b))  # truncate toward 0
         else:
             stack.append(int(token))
 
     return stack[0]
+
 
 # Test
 assert eval_postfix(["2", "1", "+", "3", "*"]) == 9  # (2+1)*3
@@ -238,7 +248,7 @@ Using the Shunting Yard algorithm:
 
 ```python
 def infix_to_postfix(expression):
-    precedence = {'+': 1, '-': 1, '*': 2, '/': 2, '^': 3}
+    precedence = {"+": 1, "-": 1, "*": 2, "/": 2, "^": 3}
     output = []
     stack = []
 
@@ -247,23 +257,27 @@ def infix_to_postfix(expression):
     for token in tokens:
         if token.isalnum():
             output.append(token)
-        elif token == '(':
+        elif token == "(":
             stack.append(token)
-        elif token == ')':
-            while stack and stack[-1] != '(':
+        elif token == ")":
+            while stack and stack[-1] != "(":
                 output.append(stack.pop())
             stack.pop()  # Remove '('
         else:  # Operator
-            while (stack and stack[-1] != '(' and
-                   stack[-1] in precedence and
-                   precedence[stack[-1]] >= precedence[token]):
+            while (
+                stack
+                and stack[-1] != "("
+                and stack[-1] in precedence
+                and precedence[stack[-1]] >= precedence[token]
+            ):
                 output.append(stack.pop())
             stack.append(token)
 
     while stack:
         output.append(stack.pop())
 
-    return ' '.join(output)
+    return " ".join(output)
+
 
 # Test
 assert infix_to_postfix("A + B * C") == "A B C * +"
@@ -293,6 +307,7 @@ def largest_rectangle_area(heights):
     heights.pop()  # Restore
     return max_area
 
+
 # Test
 assert largest_rectangle_area([2, 1, 5, 6, 2, 3]) == 10
 ```
@@ -309,12 +324,12 @@ A deque (double-ended queue) allows insertion and removal from both ends.
 from collections import deque
 
 dq = deque()
-dq.append(1)      # Add to right
+dq.append(1)  # Add to right
 dq.appendleft(2)  # Add to left
-dq.pop()          # Remove from right
-dq.popleft()      # Remove from left
-dq[0]             # Access front (O(1))
-dq[-1]            # Access back (O(1))
+dq.pop()  # Remove from right
+dq.popleft()  # Remove from left
+dq[0]  # Access front (O(1))
+dq[-1]  # Access back (O(1))
 ```
 
 **Difference from stack/queue:**
@@ -360,6 +375,7 @@ Store difference between current value and min. Reconstruct original when needed
 ```python
 from collections import deque
 
+
 def bfs(graph, start):
     visited = set([start])
     queue = deque([start])
@@ -376,16 +392,17 @@ def bfs(graph, start):
 
     return order
 
+
 # Test
 graph = {
-    'A': ['B', 'C'],
-    'B': ['A', 'D', 'E'],
-    'C': ['A', 'F'],
-    'D': ['B'],
-    'E': ['B', 'F'],
-    'F': ['C', 'E']
+    "A": ["B", "C"],
+    "B": ["A", "D", "E"],
+    "C": ["A", "F"],
+    "D": ["B"],
+    "E": ["B", "F"],
+    "F": ["C", "E"],
 }
-assert bfs(graph, 'A') == ['A', 'B', 'C', 'D', 'E', 'F']
+assert bfs(graph, "A") == ["A", "B", "C", "D", "E", "F"]
 ```
 
 ---
@@ -427,7 +444,8 @@ Recursion uses the call stack implicitly. Any recursive algorithm can be convert
 **Recursion:**
 ```python
 def factorial(n):
-    if n <= 1: return 1
+    if n <= 1:
+        return 1
     return n * factorial(n - 1)
 ```
 
@@ -454,7 +472,7 @@ def factorial_iterative(n):
 ```python
 def is_valid(s):
     stack = []
-    mapping = {')': '(', ']': '[', '}': '{'}
+    mapping = {")": "(", "]": "[", "}": "{"}
 
     for char in s:
         if char in mapping:
@@ -465,6 +483,7 @@ def is_valid(s):
             stack.append(char)
 
     return not stack
+
 
 # Test
 assert is_valid("()") == True
@@ -501,6 +520,7 @@ class MinStack:
     def get_min(self):
         return self.min_stack[-1]
 
+
 # Test
 ms = MinStack()
 ms.push(-2)
@@ -532,8 +552,9 @@ def daily_temperatures(temperatures):
 
     return result
 
+
 # Test
-assert daily_temperatures([73,74,75,71,69,72,76,73]) == [1,1,4,2,1,1,0,0]
+assert daily_temperatures([73, 74, 75, 71, 69, 72, 76, 73]) == [1, 1, 4, 2, 1, 1, 0, 0]
 ```
 **Time: O(n), Space: O(n)**
 
@@ -565,6 +586,7 @@ class MyQueue:
     def empty(self):
         return not self.in_stack and not self.out_stack
 
+
 # Test
 q = MyQueue()
 q.push(1)
@@ -592,6 +614,7 @@ def next_greater_element(nums):
 
     return result
 
+
 # Test
 assert next_greater_element([2, 1, 2, 4, 3]) == [4, 2, 4, -1, -1]
 ```
@@ -616,6 +639,7 @@ def largest_rectangle_area(heights):
     heights.pop()
     return max_area
 
+
 # Test
 assert largest_rectangle_area([2, 1, 5, 6, 2, 3]) == 10
 assert largest_rectangle_area([2, 4]) == 4
@@ -636,17 +660,18 @@ def decode_string(s):
     for char in s:
         if char.isdigit():
             current_num = current_num * 10 + int(char)
-        elif char == '[':
+        elif char == "[":
             stack.append((current_string, current_num))
             current_string = ""
             current_num = 0
-        elif char == ']':
+        elif char == "]":
             prev_string, num = stack.pop()
             current_string = prev_string + current_string * num
         else:
             current_string += char
 
     return current_string
+
 
 # Test
 assert decode_string("3[a2[c]]") == "accaccacc"
@@ -662,18 +687,19 @@ Simplify Unix-style file path.
 ```python
 def simplify_path(path):
     stack = []
-    components = path.split('/')
+    components = path.split("/")
 
     for component in components:
-        if component == '' or component == '.':
+        if component == "" or component == ".":
             continue
-        elif component == '..':
+        elif component == "..":
             if stack:
                 stack.pop()
         else:
             stack.append(component)
 
-    return '/' + '/'.join(stack)
+    return "/" + "/".join(stack)
+
 
 # Test
 assert simplify_path("/home//foo/") == "/home/foo"
@@ -691,26 +717,27 @@ Evaluate expression with +, -, *, /.
 def calculate(s):
     stack = []
     current_num = 0
-    operation = '+'
+    operation = "+"
 
     for i, char in enumerate(s):
         if char.isdigit():
             current_num = current_num * 10 + int(char)
 
-        if char in '+-*/' or i == len(s) - 1:
-            if operation == '+':
+        if char in "+-*/" or i == len(s) - 1:
+            if operation == "+":
                 stack.append(current_num)
-            elif operation == '-':
+            elif operation == "-":
                 stack.append(-current_num)
-            elif operation == '*':
+            elif operation == "*":
                 stack.append(stack.pop() * current_num)
-            elif operation == '/':
+            elif operation == "/":
                 stack.append(int(stack.pop() / current_num))
 
             operation = char
             current_num = 0
 
     return sum(stack)
+
 
 # Test
 assert calculate("3+2*2") == 7
@@ -733,15 +760,16 @@ def generate_parenthesis(n):
             result.append(current)
             return
         if open_count < n:
-            backtrack(current + '(', open_count + 1, close_count)
+            backtrack(current + "(", open_count + 1, close_count)
         if close_count < open_count:
-            backtrack(current + ')', open_count, close_count + 1)
+            backtrack(current + ")", open_count, close_count + 1)
 
     backtrack("", 0, 0)
     return result
 
+
 # Test
-assert generate_parenthesis(3) == ["((()))","(()())","(())()","()(())","()()()"]
+assert generate_parenthesis(3) == ["((()))", "(()())", "(())()", "()(())", "()()()"]
 ```
 **Time: O(4^n / √n) Catalan number, Space: O(n)**
 

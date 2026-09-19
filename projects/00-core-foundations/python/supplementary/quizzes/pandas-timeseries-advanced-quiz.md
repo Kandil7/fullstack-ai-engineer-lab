@@ -185,8 +185,8 @@ to the custom calendar.
 
 ```python
 import pandas as pd
-s = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0],
-              index=pd.date_range("2024-01-01", periods=5, freq="D"))
+
+s = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0], index=pd.date_range("2024-01-01", periods=5, freq="D"))
 print(s.asfreq("D").ffill().shape)
 ```
 
@@ -242,6 +242,7 @@ into training rows.
 
 ```python
 import pandas as pd
+
 s = pd.Series([10.0, 20.0, 30.0, 50.0])
 print(s.pct_change().round(3).tolist())
 ```
@@ -298,9 +299,11 @@ is exactly the property `verify_no_future_leak` asserts structurally.
 
 ```python
 import pandas as pd
-s = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0,
-               12.0, 13.0, 14.0],
-              index=pd.date_range("2024-01-01", periods=14, freq="D"))
+
+s = pd.Series(
+    [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0],
+    index=pd.date_range("2024-01-01", periods=14, freq="D"),
+)
 print(s.resample("W").mean().tolist())
 ```
 
@@ -320,8 +323,8 @@ default to the bin END (Jan 7, Jan 14) — values are 4.0 and 11.0.
 
 ```python
 import pandas as pd
-s = pd.Series([1.0, 2.0, 3.0],
-              index=pd.to_datetime(["2024-01-01", "2024-01-08", "2024-01-15"]))
+
+s = pd.Series([1.0, 2.0, 3.0], index=pd.to_datetime(["2024-01-01", "2024-01-08", "2024-01-15"]))
 print(s.resample("W").sum().tolist())
 ```
 

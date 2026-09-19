@@ -105,6 +105,7 @@ python-dotenv==1.0.0
 """
 Production-ready AI service with FastAPI.
 """
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
@@ -118,11 +119,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(
-    title="AI Service",
-    description="Production AI API",
-    version="1.0.0"
-)
+app = FastAPI(title="AI Service", description="Production AI API", version="1.0.0")
 
 # Initialize clients
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -154,9 +151,7 @@ class HealthResponse(BaseModel):
 async def health_check():
     """Health check endpoint."""
     return HealthResponse(
-        status="healthy",
-        timestamp=datetime.now().isoformat(),
-        version="1.0.0"
+        status="healthy", timestamp=datetime.now().isoformat(), version="1.0.0"
     )
 
 
@@ -164,60 +159,59 @@ async def health_check():
 async def query(request: QueryRequest):
     """Process a query using RAG."""
     start_time = datetime.now()
-    
+
     try:
         # Generate embedding
         embedding_response = openai_client.embeddings.create(
-            model="text-embedding-3-small",
-            input=request.query
+            model="text-embedding-3-small", input=request.query
         )
         query_embedding = embedding_response.data[0].embedding
-        
+
         # Retrieve relevant documents
         results = collection.query(
-            query_embeddings=[query_embedding],
-            n_results=request.top_k
+            query_embeddings=[query_embedding], n_results=request.top_k
         )
-        
+
         # Build context
-        context = "\n".join([
-            f"[{i+1}] {doc}"
-            for i, doc in enumerate(results["documents"][0])
-        ])
-        
+        context = "\n".join(
+            [f"[{i + 1}] {doc}" for i, doc in enumerate(results["documents"][0])]
+        )
+
         # Generate answer
         response = openai_client.chat.completions.create(
             model=request.model,
             messages=[
                 {
                     "role": "system",
-                    "content": "Answer questions based on the provided context. Cite sources."
+                    "content": "Answer questions based on the provided context. Cite sources.",
                 },
                 {
                     "role": "user",
-                    "content": f"Context:\n{context}\n\nQuestion: {request.query}"
-                }
+                    "content": f"Context:\n{context}\n\nQuestion: {request.query}",
+                },
             ],
-            temperature=0.3
+            temperature=0.3,
         )
-        
+
         answer = response.choices[0].message.content
         tokens_used = response.usage.total_tokens
-        
+
         # Calculate latency
         latency_ms = (datetime.now() - start_time).total_seconds() * 1000
-        
+
         # Log query
-        logger.info(f"Query processed: {request.query[:50]}... | Tokens: {tokens_used} | Latency: {latency_ms:.0f}ms")
-        
+        logger.info(
+            f"Query processed: {request.query[:50]}... | Tokens: {tokens_used} | Latency: {latency_ms:.0f}ms"
+        )
+
         return QueryResponse(
             answer=answer,
             sources=results["metadatas"][0] if results["metadatas"] else [],
             model=request.model,
             tokens_used=tokens_used,
-            latency_ms=latency_ms
+            latency_ms=latency_ms,
         )
-    
+
     except Exception as e:
         logger.error(f"Query failed: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -229,24 +223,23 @@ async def ingest_document(content: str, metadata: dict = None):
     try:
         # Generate embedding
         embedding_response = openai_client.embeddings.create(
-            model="text-embedding-3-small",
-            input=content
+            model="text-embedding-3-small", input=content
         )
         embedding = embedding_response.data[0].embedding
-        
+
         # Store in ChromaDB
         doc_id = f"doc_{collection.count()}"
         collection.add(
             documents=[content],
             embeddings=[embedding],
             metadatas=[metadata or {}],
-            ids=[doc_id]
+            ids=[doc_id],
         )
-        
+
         logger.info(f"Document ingested: {doc_id}")
-        
+
         return {"status": "success", "doc_id": doc_id}
-    
+
     except Exception as e:
         logger.error(f"Ingestion failed: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -254,6 +247,7 @@ async def ingest_document(content: str, metadata: dict = None):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
 ```
 
@@ -476,6 +470,7 @@ jobs:
 """
 Monitoring and metrics for AI service.
 """
+
 from prometheus_client import Counter, Histogram, Gauge, start_http_server
 from functools import wraps
 import time
@@ -484,65 +479,60 @@ from datetime import datetime
 
 # Metrics
 REQUEST_COUNT = Counter(
-    'ai_service_requests_total',
-    'Total number of requests',
-    ['endpoint', 'status']
+    "ai_service_requests_total", "Total number of requests", ["endpoint", "status"]
 )
 
 REQUEST_LATENCY = Histogram(
-    'ai_service_request_latency_seconds',
-    'Request latency in seconds',
-    ['endpoint'],
-    buckets=[0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
+    "ai_service_request_latency_seconds",
+    "Request latency in seconds",
+    ["endpoint"],
+    buckets=[0.1, 0.5, 1.0, 2.0, 5.0, 10.0],
 )
 
 TOKEN_USAGE = Counter(
-    'ai_service_tokens_total',
-    'Total tokens used',
-    ['model', 'type']  # type: input/output
+    "ai_service_tokens_total",
+    "Total tokens used",
+    ["model", "type"],  # type: input/output
 )
 
-ACTIVE_REQUESTS = Gauge(
-    'ai_service_active_requests',
-    'Number of active requests'
-)
+ACTIVE_REQUESTS = Gauge("ai_service_active_requests", "Number of active requests")
 
 MODEL_ERRORS = Counter(
-    'ai_service_model_errors_total',
-    'Total model errors',
-    ['error_type']
+    "ai_service_model_errors_total", "Total model errors", ["error_type"]
 )
 
 
 def monitor_endpoint(endpoint_name):
     """Decorator to monitor endpoint metrics."""
+
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
             ACTIVE_REQUESTS.inc()
             start_time = time.time()
-            
+
             try:
                 result = await func(*args, **kwargs)
-                REQUEST_COUNT.labels(endpoint=endpoint_name, status='success').inc()
+                REQUEST_COUNT.labels(endpoint=endpoint_name, status="success").inc()
                 return result
             except Exception as e:
-                REQUEST_COUNT.labels(endpoint=endpoint_name, status='error').inc()
+                REQUEST_COUNT.labels(endpoint=endpoint_name, status="error").inc()
                 MODEL_ERRORS.labels(error_type=type(e).__name__).inc()
                 raise
             finally:
                 latency = time.time() - start_time
                 REQUEST_LATENCY.labels(endpoint=endpoint_name).observe(latency)
                 ACTIVE_REQUESTS.dec()
-        
+
         return wrapper
+
     return decorator
 
 
 def track_tokens(model: str, input_tokens: int, output_tokens: int):
     """Track token usage."""
-    TOKEN_USAGE.labels(model=model, type='input').inc(input_tokens)
-    TOKEN_USAGE.labels(model=model, type='output').inc(output_tokens)
+    TOKEN_USAGE.labels(model=model, type="input").inc(input_tokens)
+    TOKEN_USAGE.labels(model=model, type="output").inc(output_tokens)
 
 
 # Start metrics server
@@ -562,6 +552,7 @@ def start_metrics_server(port=9090):
 """
 Complete deployment configuration and setup.
 """
+
 import os
 from dataclasses import dataclass
 from typing import Optional, Dict, List
@@ -572,96 +563,94 @@ import json
 @dataclass
 class DeploymentConfig:
     """Configuration for AI service deployment."""
-    
+
     # Service
     service_name: str = "ai-service"
     version: str = "1.0.0"
     port: int = 8000
-    
+
     # Resources
     cpu_request: str = "500m"
     cpu_limit: str = "2000m"
     memory_request: str = "1Gi"
     memory_limit: str = "4Gi"
     gpu_count: int = 1
-    
+
     # Scaling
     min_replicas: int = 2
     max_replicas: int = 10
     target_cpu_percent: int = 70
-    
+
     # Health checks
     health_check_path: str = "/health"
     health_check_interval: int = 30
     health_check_timeout: int = 10
-    
+
     # Environment
     env_vars: Dict[str, str] = None
     secrets: List[str] = None
-    
+
     def to_kubernetes_yaml(self) -> str:
         """Generate Kubernetes deployment YAML."""
-        
+
         deployment = {
             "apiVersion": "apps/v1",
             "kind": "Deployment",
             "metadata": {
                 "name": self.service_name,
-                "labels": {"app": self.service_name}
+                "labels": {"app": self.service_name},
             },
             "spec": {
                 "replicas": self.min_replicas,
-                "selector": {
-                    "matchLabels": {"app": self.service_name}
-                },
+                "selector": {"matchLabels": {"app": self.service_name}},
                 "template": {
-                    "metadata": {
-                        "labels": {"app": self.service_name}
-                    },
+                    "metadata": {"labels": {"app": self.service_name}},
                     "spec": {
-                        "containers": [{
-                            "name": self.service_name,
-                            "image": f"{self.service_name}:{self.version}",
-                            "ports": [{"containerPort": self.port}],
-                            "resources": {
-                                "requests": {
-                                    "cpu": self.cpu_request,
-                                    "memory": self.memory_request,
-                                    "nvidia.com/gpu": str(self.gpu_count)
+                        "containers": [
+                            {
+                                "name": self.service_name,
+                                "image": f"{self.service_name}:{self.version}",
+                                "ports": [{"containerPort": self.port}],
+                                "resources": {
+                                    "requests": {
+                                        "cpu": self.cpu_request,
+                                        "memory": self.memory_request,
+                                        "nvidia.com/gpu": str(self.gpu_count),
+                                    },
+                                    "limits": {
+                                        "cpu": self.cpu_limit,
+                                        "memory": self.memory_limit,
+                                        "nvidia.com/gpu": str(self.gpu_count),
+                                    },
                                 },
-                                "limits": {
-                                    "cpu": self.cpu_limit,
-                                    "memory": self.memory_limit,
-                                    "nvidia.com/gpu": str(self.gpu_count)
-                                }
-                            },
-                            "livenessProbe": {
-                                "httpGet": {
-                                    "path": self.health_check_path,
-                                    "port": self.port
+                                "livenessProbe": {
+                                    "httpGet": {
+                                        "path": self.health_check_path,
+                                        "port": self.port,
+                                    },
+                                    "initialDelaySeconds": 30,
+                                    "periodSeconds": self.health_check_interval,
                                 },
-                                "initialDelaySeconds": 30,
-                                "periodSeconds": self.health_check_interval
-                            },
-                            "readinessProbe": {
-                                "httpGet": {
-                                    "path": self.health_check_path,
-                                    "port": self.port
+                                "readinessProbe": {
+                                    "httpGet": {
+                                        "path": self.health_check_path,
+                                        "port": self.port,
+                                    },
+                                    "initialDelaySeconds": 5,
+                                    "periodSeconds": 5,
                                 },
-                                "initialDelaySeconds": 5,
-                                "periodSeconds": 5
                             }
-                        }]
-                    }
-                }
-            }
+                        ]
+                    },
+                },
+            },
         }
-        
+
         return yaml.dump(deployment, default_flow_style=False)
-    
+
     def to_docker_compose(self) -> str:
         """Generate Docker Compose YAML."""
-        
+
         compose = {
             "version": "3.8",
             "services": {
@@ -672,19 +661,21 @@ class DeploymentConfig:
                     "deploy": {
                         "resources": {
                             "reservations": {
-                                "devices": [{
-                                    "driver": "nvidia",
-                                    "count": self.gpu_count,
-                                    "capabilities": ["gpu"]
-                                }]
+                                "devices": [
+                                    {
+                                        "driver": "nvidia",
+                                        "count": self.gpu_count,
+                                        "capabilities": ["gpu"],
+                                    }
+                                ]
                             }
                         }
                     },
-                    "restart": "unless-stopped"
+                    "restart": "unless-stopped",
                 }
-            }
+            },
         }
-        
+
         return yaml.dump(compose, default_flow_style=False)
 
 
@@ -695,10 +686,7 @@ config = DeploymentConfig(
     gpu_count=1,
     min_replicas=2,
     max_replicas=8,
-    env_vars={
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
-        "LOG_LEVEL": "INFO"
-    }
+    env_vars={"OPENAI_API_KEY": "${OPENAI_API_KEY}", "LOG_LEVEL": "INFO"},
 )
 
 # Generate deployment files
@@ -715,6 +703,7 @@ with open("docker-compose.yml", "w") as f:
 """
 Comprehensive health check system.
 """
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Dict, List, Optional
@@ -727,6 +716,7 @@ import chromadb
 
 class HealthStatus(BaseModel):
     """Health status response."""
+
     status: str  # "healthy", "degraded", "unhealthy"
     timestamp: str
     version: str
@@ -736,91 +726,89 @@ class HealthStatus(BaseModel):
 
 class HealthChecker:
     """Comprehensive health checking."""
-    
+
     def __init__(self):
         self.start_time = datetime.now()
         self.checks = {}
-    
+
     async def check_openai(self) -> Dict:
         """Check OpenAI API connectivity."""
         try:
             client = OpenAI()
             # Simple test call
             response = client.embeddings.create(
-                model="text-embedding-3-small",
-                input="health check"
+                model="text-embedding-3-small", input="health check"
             )
             return {"status": "healthy", "latency_ms": 100}
         except Exception as e:
             return {"status": "unhealthy", "error": str(e)}
-    
+
     async def check_chromadb(self) -> Dict:
         """Check ChromaDB connectivity."""
         try:
             client = chromadb.Client()
             collection = client.create_collection("health_check")
-            collection.add(
-                documents=["test"],
-                ids=["test_id"]
-            )
+            collection.add(documents=["test"], ids=["test_id"])
             collection.delete(ids=["test_id"])
             return {"status": "healthy"}
         except Exception as e:
             return {"status": "unhealthy", "error": str(e)}
-    
+
     async def check_disk_space(self) -> Dict:
         """Check available disk space."""
         import shutil
+
         total, used, free = shutil.disk_usage("/")
         free_percent = (free / total) * 100
-        
+
         if free_percent < 10:
             return {"status": "unhealthy", "free_percent": free_percent}
         elif free_percent < 20:
             return {"status": "degraded", "free_percent": free_percent}
         else:
             return {"status": "healthy", "free_percent": free_percent}
-    
+
     async def check_memory(self) -> Dict:
         """Check memory usage."""
         import psutil
+
         memory = psutil.virtual_memory()
-        
+
         if memory.percent > 90:
             return {"status": "unhealthy", "used_percent": memory.percent}
         elif memory.percent > 80:
             return {"status": "degraded", "used_percent": memory.percent}
         else:
             return {"status": "healthy", "used_percent": memory.percent}
-    
+
     async def run_all_checks(self) -> HealthStatus:
         """Run all health checks."""
-        
+
         checks = {
             "openai": await self.check_openai(),
             "chromadb": await self.check_chromadb(),
             "disk": await self.check_disk_space(),
-            "memory": await self.check_memory()
+            "memory": await self.check_memory(),
         }
-        
+
         # Determine overall status
         statuses = [check["status"] for check in checks.values()]
-        
+
         if all(s == "healthy" for s in statuses):
             overall_status = "healthy"
         elif any(s == "unhealthy" for s in statuses):
             overall_status = "unhealthy"
         else:
             overall_status = "degraded"
-        
+
         uptime = (datetime.now() - self.start_time).total_seconds()
-        
+
         return HealthStatus(
             status=overall_status,
             timestamp=datetime.now().isoformat(),
             version="1.0.0",
             checks=checks,
-            uptime_seconds=uptime
+            uptime_seconds=uptime,
         )
 
 
@@ -833,10 +821,10 @@ health_checker = HealthChecker()
 async def health_check():
     """Detailed health check endpoint."""
     status = await health_checker.run_all_checks()
-    
+
     if status.status == "unhealthy":
         raise HTTPException(status_code=503, detail=status.dict())
-    
+
     return status
 
 
@@ -844,10 +832,10 @@ async def health_check():
 async def readiness_check():
     """Readiness probe - is the service ready to accept traffic?"""
     status = await health_checker.run_all_checks()
-    
+
     if status.status == "unhealthy":
         raise HTTPException(status_code=503, detail="Not ready")
-    
+
     return {"ready": True}
 ```
 
@@ -863,10 +851,12 @@ async def query(request: QueryRequest):
     # May fail silently
     return process(request)
 
+
 # ✅ GOOD: With health checks and error handling
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
 
 @app.get("/query")
 async def query(request: QueryRequest):
@@ -903,6 +893,7 @@ containers:
 @app.post("/query")
 async def query(request: QueryRequest):
     return process(request)
+
 
 # ✅ GOOD: With metrics
 @app.post("/query")

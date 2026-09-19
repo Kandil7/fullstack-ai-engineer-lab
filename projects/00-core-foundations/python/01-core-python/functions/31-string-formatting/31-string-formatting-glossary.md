@@ -11,9 +11,9 @@
 #### Alignment
 **Definition:** Positioning text within a field (left, right, center).
 ```python
-print(f"{'left':<10}|")     # left      |
-print(f"{'right':>10}|")    #      right|
-print(f"{'center':^10}|")   #   center  |
+print(f"{'left':<10}|")  # left      |
+print(f"{'right':>10}|")  #      right|
+print(f"{'center':^10}|")  #   center  |
 ```
 **Related:** `<`, `>`, `^`, width, padding
 
@@ -33,9 +33,9 @@ print(f"2 + 2 = {2 + 2}")  # 2 + 2 = 4
 #### Format Specification
 **Definition:** Controls how values are formatted within `{}`.
 ```python
-print(f"{3.14159:.2f}")   # 3.14
-print(f"{1234:,}")        # 1,234
-print(f"{'hi':^10}")      #     hi
+print(f"{3.14159:.2f}")  # 3.14
+print(f"{1234:,}")  # 1,234
+print(f"{'hi':^10}")  #     hi
 ```
 **Related:** Precision, alignment, type, width
 
@@ -59,8 +59,8 @@ print(f"Hello, {name}")  # Interpolates name variable
 #### Padding
 **Definition:** Adding characters (spaces, zeros) to fill a field to specified width.
 ```python
-print(f"{42:05d}")       # 00042 (zero-padded)
-print(f"{'hi':*^10}")    # ***hi**** (center-padded with *)
+print(f"{42:05d}")  # 00042 (zero-padded)
+print(f"{'hi':*^10}")  # ***hi**** (center-padded with *)
 ```
 **Related:** Width, fill character, alignment
 
@@ -68,17 +68,17 @@ print(f"{'hi':*^10}")    # ***hi**** (center-padded with *)
 **Definition:** Markers in format strings that get replaced with values.
 ```python
 # Different placeholder styles
-print("Hello %s" % "World")      # %-style
-print("Hello {}".format("World")) # str.format
-print(f"Hello {name}")            # f-string
+print("Hello %s" % "World")  # %-style
+print("Hello {}".format("World"))  # str.format
+print(f"Hello {name}")  # f-string
 ```
 **Related:** `%s`, `{}`, interpolation, substitution
 
 #### Precision
 **Definition:** Number of decimal places for floats in format specs.
 ```python
-print(f"{3.14159:.2f}")   # 3.14 (2 decimal places)
-print(f"{0.1:.10f}")      # 0.1000000000 (10 decimal places)
+print(f"{3.14159:.2f}")  # 3.14 (2 decimal places)
+print(f"{0.1:.10f}")  # 0.1000000000 (10 decimal places)
 ```
 **Related:** `.Nf`, format spec, float formatting
 
@@ -102,6 +102,7 @@ print("Hello {name}".format(name="World"))
 ```python
 # Template substitution
 from string import Template
+
 t = Template("Hello $name")
 print(t.substitute(name="World"))
 ```
@@ -115,6 +116,7 @@ print(t.substitute(name="World"))
 **Definition:** Simple string substitution using `string.Template`.
 ```python
 from string import Template
+
 t = Template("$name is $age years old")
 print(t.substitute(name="Alice", age=30))
 ```
@@ -127,8 +129,8 @@ print(t.substitute(name="Alice", age=30))
 #### Width
 **Definition:** Minimum field width for formatted output.
 ```python
-print(f"{42:10}")       #         42 (10-char field)
-print(f"{'hi':<10}|")   # hi        | (left-aligned in 10 chars)
+print(f"{42:10}")  #         42 (10-char field)
+print(f"{'hi':<10}|")  # hi        | (left-aligned in 10 chars)
 ```
 **Related:** Alignment, padding, format spec
 
@@ -205,16 +207,17 @@ print(f"{'hi':<10}|")   # hi        | (left-aligned in 10 chars)
 ### Currency
 ```python
 price = 1234.56
-print(f"${price:,.2f}")    # $1,234.56
-print(f"${price:.0f}")     # $1235
+print(f"${price:,.2f}")  # $1,234.56
+print(f"${price:.0f}")  # $1235
 ```
 
 ### Date/Time
 ```python
 from datetime import datetime
+
 now = datetime.now()
-print(f"{now:%Y-%m-%d}")    # 2024-01-15
-print(f"{now:%H:%M:%S}")    # 10:30:45
+print(f"{now:%Y-%m-%d}")  # 2024-01-15
+print(f"{now:%H:%M:%S}")  # 10:30:45
 ```
 
 ### Table Formatting

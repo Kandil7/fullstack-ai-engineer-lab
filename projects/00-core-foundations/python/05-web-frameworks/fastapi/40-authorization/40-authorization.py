@@ -29,11 +29,17 @@ from typing import Callable
 # chains scattered through endpoints. Adding a role = editing data.
 
 ROLES: dict[str, set[str]] = {
-    "admin": {"experiments.read", "experiments.write", "experiments.delete",
-              "users.manage", "runs.cancel"},
+    "admin": {
+        "experiments.read",
+        "experiments.write",
+        "experiments.delete",
+        "users.manage",
+        "runs.cancel",
+    },
     "engineer": {"experiments.read", "experiments.write", "runs.cancel"},
     "viewer": {"experiments.read"},
 }
+
 
 def role_has(role: str, permission: str) -> bool:
     return permission in ROLES.get(role, set())
@@ -51,6 +57,7 @@ print()
 # owner, tenant, time-of-day, budget caps. Model rules as functions
 # over (user, resource, context) — still data-driven, still testable.
 
+
 def abac_rule_can_cancel(user: dict, run: dict) -> bool:
     """Engineers cancel runs they own; admins cancel anything."""
     if user["role"] == "admin":
@@ -62,9 +69,15 @@ def abac_rule_can_cancel(user: dict, run: dict) -> bool:
 
 print("=== 2. ABAC: attribute rules ===")
 run = {"run_id": 10, "owner_id": "u1", "status": "running"}
-print(f"owner engineer cancels own run: {abac_rule_can_cancel({'role': 'engineer', 'user_id': 'u1'}, run)}")
-print(f"other engineer cancels run    : {abac_rule_can_cancel({'role': 'engineer', 'user_id': 'u2'}, run)}")
-print(f"admin cancels any run         : {abac_rule_can_cancel({'role': 'admin', 'user_id': 'u9'}, run)}")
+print(
+    f"owner engineer cancels own run: {abac_rule_can_cancel({'role': 'engineer', 'user_id': 'u1'}, run)}"
+)
+print(
+    f"other engineer cancels run    : {abac_rule_can_cancel({'role': 'engineer', 'user_id': 'u2'}, run)}"
+)
+print(
+    f"admin cancels any run         : {abac_rule_can_cancel({'role': 'admin', 'user_id': 'u9'}, run)}"
+)
 print()
 
 # ============================================================
@@ -80,6 +93,7 @@ EXPERIMENTS = [
     {"id": 2, "tenant_id": "globex", "name": "globex-rag-1"},
     {"id": 3, "tenant_id": "acme", "name": "acme-finetune-2"},
 ]
+
 
 def list_experiments(user: dict) -> list[dict]:
     """Tenant-scoped: the WHERE clause carries the user's tenant."""
@@ -111,6 +125,7 @@ print()
 # caller. One function, reused on every protected route — no scattered
 # checks, no "forgot the check on the new route".
 
+
 def require_permission(permission: str) -> Callable:
     """Factory returning a FastAPI-style dependency guard."""
 
@@ -124,7 +139,7 @@ def require_permission(permission: str) -> Callable:
 
 def create_experiment(current_user: dict, name: str) -> dict:
     """Endpoints receive the user and rely on the DI guard."""
-    require_permission("experiments.write")(current_user)   # simulated DI
+    require_permission("experiments.write")(current_user)  # simulated DI
     return {"id": 99, "tenant_id": current_user["tenant_id"], "name": name}
 
 
@@ -145,6 +160,7 @@ print()
 # "deputy" is confused about whose authority applies. Fix: carry the
 # caller's tenant/identity through, and scope every action to it.
 
+
 def copy_experiment_as_service(user: dict, exp_id: int) -> dict:
     """BROKEN version: service credential (admin) copies anything."""
     src = get_experiment({"user_id": "svc", "tenant_id": "acme", "role": "admin"}, exp_id)
@@ -156,7 +172,7 @@ def copy_experiment_as_service(user: dict, exp_id: int) -> dict:
 
 def copy_experiment_scoped(user: dict, exp_id: int) -> dict | None:
     """Correct: the action is scoped to the CALLER's tenant."""
-    src = get_experiment(user, exp_id)          # caller's tenant only
+    src = get_experiment(user, exp_id)  # caller's tenant only
     if src is None:
         return None
     return {"copied_from": exp_id, "tenant_id": user["tenant_id"]}
@@ -188,6 +204,7 @@ print()
 #   (confused deputy) — always scope actions to the caller's identity
 # CORRECT: carry user identity through; service creds only for service work
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -201,16 +218,21 @@ def _verify() -> None:
     assert not role_has("nobody", "experiments.read"), "unknown role has nothing"
 
     # 2. ABAC attribute rules
-    assert abac_rule_can_cancel({"role": "engineer", "user_id": "u1"},
-                                {"owner_id": "u1", "status": "running"})
-    assert not abac_rule_can_cancel({"role": "engineer", "user_id": "u2"},
-                                    {"owner_id": "u1", "status": "running"})
-    assert abac_rule_can_cancel({"role": "admin", "user_id": "u9"},
-                                {"owner_id": "u1", "status": "running"})
+    assert abac_rule_can_cancel(
+        {"role": "engineer", "user_id": "u1"}, {"owner_id": "u1", "status": "running"}
+    )
+    assert not abac_rule_can_cancel(
+        {"role": "engineer", "user_id": "u2"}, {"owner_id": "u1", "status": "running"}
+    )
+    assert abac_rule_can_cancel(
+        {"role": "admin", "user_id": "u9"}, {"owner_id": "u1", "status": "running"}
+    )
 
     # 3. Tenant isolation: list and get are both scoped
-    assert [e["name"] for e in list_experiments(acme_user)] == \
-        ["acme-finetune-1", "acme-finetune-2"]
+    assert [e["name"] for e in list_experiments(acme_user)] == [
+        "acme-finetune-1",
+        "acme-finetune-2",
+    ]
     assert list_experiments(globex_user) == [EXPERIMENTS[1]]
     assert get_experiment(acme_user, 2) is None, "cross-tenant get must 404"
     assert get_experiment(acme_user, 1) is not None, "own-tenant get must work"
@@ -224,10 +246,12 @@ def _verify() -> None:
     assert require_permission("experiments.read")({"role": "viewer"}) is not None
 
     # 5. Confused deputy fixed: service cannot cross tenant boundaries
-    assert copy_experiment_scoped(globex_user, 1) is None, \
+    assert copy_experiment_scoped(globex_user, 1) is None, (
         "scoped copy must refuse cross-tenant reads"
-    assert copy_experiment_scoped(acme_user, 1)["tenant_id"] == "acme", \
+    )
+    assert copy_experiment_scoped(acme_user, 1)["tenant_id"] == "acme", (
         "scoped copy stays in the caller's tenant"
+    )
 
     print("[OK] 40-authorization: all checks passed")
 
@@ -241,4 +265,4 @@ if __name__ == "__main__":
         print("2. Tenant isolation: tenant_id in EVERY query; 404 for others' rows")
         print("3. DI guards centralize enforcement; never scattered checks")
         print("4. Confused deputy: scope service actions to the caller")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

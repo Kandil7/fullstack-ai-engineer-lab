@@ -28,6 +28,7 @@ import sys
 # are one token; rare words split into several; "hello" is 1 token,
 # "hallucination" is ~4. A token is roughly 0.75 words for English.
 
+
 def estimate_tokens(text: str) -> int:
     """Rough token estimate: ~4 chars per token, or ~1.3 tokens/word."""
     chars = len(text)
@@ -51,8 +52,8 @@ for t in texts:
 # Context = prompt + completion. If your prompt is 90k tokens and the
 # window is 128k, the model has ~38k left to write.
 
-def completion_budget(context_window: int, prompt_tokens: int,
-                      reserved_output: int) -> int | None:
+
+def completion_budget(context_window: int, prompt_tokens: int, reserved_output: int) -> int | None:
     """Tokens left for the model to generate; None if prompt overflows."""
     if prompt_tokens + reserved_output > context_window:
         return None
@@ -73,10 +74,13 @@ assert completion_budget(128_000, 130_000, 4_096) is None, "overflow -> None"
 # time. It cannot "plan" beyond the next token - coherence emerges from
 # the strength of the probability distribution.
 
-def simple_autoregressive(probs: dict[str, float], steps: int,
-                          temperature: float = 1.0) -> list[str]:
+
+def simple_autoregressive(
+    probs: dict[str, float], steps: int, temperature: float = 1.0
+) -> list[str]:
     """Greedy-ish token-by-token generation for a tiny toy model."""
     import random
+
     random.seed(42)
     tokens = []
     for _ in range(steps):
@@ -109,6 +113,7 @@ print(f"  hot  (T=2.0): {hot}")
 # top-p (nucleus): keep the smallest set of tokens whose cumulative
 # probability reaches p. top-k: keep only the k most likely tokens.
 
+
 def top_p_filter(probs: dict[str, float], p: float) -> list[str]:
     """Return the token names in the top-p nucleus."""
     ranked = sorted(probs.items(), key=lambda kv: kv[1], reverse=True)
@@ -134,8 +139,8 @@ assert top_p_filter(probs, 0.7) == ["cat", "dog"]
 # 5. Cost per Token
 # ============================================================
 
-def prompt_cost(prompt_tokens: int, output_tokens: int,
-                price_in: float, price_out: float) -> float:
+
+def prompt_cost(prompt_tokens: int, output_tokens: int, price_in: float, price_out: float) -> float:
     """Cost of one call in dollars (prices per 1M tokens)."""
     return (prompt_tokens * price_in + output_tokens * price_out) / 1_000_000
 
@@ -152,15 +157,22 @@ assert abs(cost - (10_000 * 3 + 2_000 * 15) / 1_000_000) < 1e-9
 # Always count tokens BEFORE sending: refuse calls that would overflow
 # the context window, and log cost per call for observability.
 
-def prepare_request(prompt: str, context_window: int,
-                    max_output: int, price_in: float, price_out: float,
-                    estimate_fn=estimate_tokens) -> dict:
+
+def prepare_request(
+    prompt: str,
+    context_window: int,
+    max_output: int,
+    price_in: float,
+    price_out: float,
+    estimate_fn=estimate_tokens,
+) -> dict:
     """Validate a request against the context window and price it."""
     prompt_tokens = estimate_fn(prompt)
     budget = completion_budget(context_window, prompt_tokens, max_output)
     if budget is None:
-        raise ValueError(f"prompt {prompt_tokens} tokens exceeds window "
-                         f"with {max_output} reserved for output")
+        raise ValueError(
+            f"prompt {prompt_tokens} tokens exceeds window with {max_output} reserved for output"
+        )
     return {
         "prompt_tokens": prompt_tokens,
         "max_output": max_output,

@@ -31,8 +31,10 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import List, Optional
 
+
 class ContentCategory(Enum):
     """Categories of harmful content."""
+
     HATE_SPEECH = "hate_speech"
     HARASSMENT = "harassment"
     VIOLENCE = "violence"
@@ -44,30 +46,37 @@ class ContentCategory(Enum):
     ILLEGAL_ACTIVITY = "illegal_activity"
     COPYRIGHT_VIOLATION = "copyright_violation"
 
+
 class SeverityLevel(Enum):
     """Severity of content violation."""
+
     NONE = 0
     LOW = 1
     MEDIUM = 2
     HIGH = 3
     CRITICAL = 4
 
+
 @dataclass
 class ModerationResult:
     """Result of content moderation analysis."""
+
     category: ContentCategory
     severity: SeverityLevel
     confidence: float
     flagged: bool
     explanation: Optional[str] = None
 
+
 @dataclass
 class ModerationPolicy:
     """Content moderation policy configuration."""
+
     name: str
     categories: List[ContentCategory]
     threshold: float  # Confidence threshold for flagging
     action: str  # "block", "warn", "log", "human_review"
+
 
 # Example policy configuration
 default_policy = ModerationPolicy(
@@ -100,6 +109,7 @@ permissive_policy = ModerationPolicy(
 import re
 from typing import Dict, List
 
+
 class RuleBasedModerator:
     """Simple rule-based content moderation."""
 
@@ -107,21 +117,21 @@ class RuleBasedModerator:
         # Define patterns for different content categories
         self.patterns = {
             ContentCategory.HATE_SPEECH: [
-                r'\b(hate|kill|exterminate)\s+(all\s+)?(jews|muslims|christians|blacks|whites|asians|gays|lesbians)',
-                r'\b(heil|sieg)\s+',
+                r"\b(hate|kill|exterminate)\s+(all\s+)?(jews|muslims|christians|blacks|whites|asians|gays|lesbians)",
+                r"\b(heil|sieg)\s+",
                 # Add more patterns as needed (use responsibly)
             ],
             ContentCategory.HARASSMENT: [
-                r'\b(you\s+(are|should)\s+(die|kill\s+yourself|suffer))',
-                r'\b(stupid|idiot|moron)\s+(person|human|you)',
+                r"\b(you\s+(are|should)\s+(die|kill\s+yourself|suffer))",
+                r"\b(stupid|idiot|moron)\s+(person|human|you)",
             ],
             ContentCategory.SELF_HARM: [
-                r'\b(kill\s+myself|end\s+my\s+life|suicide\s+(method|ways|how))',
-                r'\b(cutting\s+myself|self[-\s]harm\s+(method|how))',
+                r"\b(kill\s+myself|end\s+my\s+life|suicide\s+(method|ways|how))",
+                r"\b(cutting\s+myself|self[-\s]harm\s+(method|how))",
             ],
             ContentCategory.ILLEGAL_ACTIVITY: [
-                r'\b(how\s+to\s+(make|build|create)\s+(bomb|explosive|drug))',
-                r'\b(buy\s+(drugs|weapons|stolen))',
+                r"\b(how\s+to\s+(make|build|create)\s+(bomb|explosive|drug))",
+                r"\b(buy\s+(drugs|weapons|stolen))",
             ],
         }
 
@@ -132,13 +142,15 @@ class RuleBasedModerator:
         for category, patterns in self.patterns.items():
             for pattern in patterns:
                 if re.search(pattern, text, re.IGNORECASE):
-                    results.append(ModerationResult(
-                        category=category,
-                        severity=SeverityLevel.HIGH,
-                        confidence=0.9,
-                        flagged=True,
-                        explanation=f"Matched pattern: {pattern[:50]}...",
-                    ))
+                    results.append(
+                        ModerationResult(
+                            category=category,
+                            severity=SeverityLevel.HIGH,
+                            confidence=0.9,
+                            flagged=True,
+                            explanation=f"Matched pattern: {pattern[:50]}...",
+                        )
+                    )
                     break  # One match per category is enough
 
         return results
@@ -150,6 +162,7 @@ class RuleBasedModerator:
 # Using a pre-trained toxicity classifier
 from transformers import pipeline
 
+
 class MLBasedModerator:
     """Machine learning based content moderation."""
 
@@ -158,7 +171,7 @@ class MLBasedModerator:
         self.classifier = pipeline(
             "text-classification",
             model="unitary/toxic-bert",
-            top_k=None  # Return all scores
+            top_k=None,  # Return all scores
         )
 
         # Thresholds for different categories
@@ -190,13 +203,15 @@ class MLBasedModerator:
             threshold = self.thresholds.get(label, 0.7)
 
             if score >= threshold:
-                results.append(ModerationResult(
-                    category=category,
-                    severity=self._score_to_severity(score),
-                    confidence=score,
-                    flagged=True,
-                    explanation=f"ML model detected '{label}' with confidence {score:.2f}",
-                ))
+                results.append(
+                    ModerationResult(
+                        category=category,
+                        severity=self._score_to_severity(score),
+                        confidence=score,
+                        flagged=True,
+                        explanation=f"ML model detected '{label}' with confidence {score:.2f}",
+                    )
+                )
 
         return results
 
@@ -229,6 +244,7 @@ class MLBasedModerator:
 ```python
 import openai
 import json
+
 
 class LLMModerator:
     """Use an LLM for nuanced content moderation."""
@@ -304,12 +320,10 @@ Only return the JSON, no other text."""
 
         return ModerationResult(
             category=category_map.get(
-                violation.get("category", "").lower(),
-                ContentCategory.HARASSMENT
+                violation.get("category", "").lower(), ContentCategory.HARASSMENT
             ),
             severity=severity_map.get(
-                violation.get("severity", "low").lower(),
-                SeverityLevel.LOW
+                violation.get("severity", "low").lower(), SeverityLevel.LOW
             ),
             confidence=float(violation.get("confidence", 0.5)),
             flagged=True,
@@ -326,9 +340,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class ModerationConfig:
     """Configuration for the moderation pipeline."""
+
     enable_rule_based: bool = True
     enable_ml_based: bool = True
     enable_llm_based: bool = False  # More expensive, use selectively
@@ -336,6 +352,7 @@ class ModerationConfig:
     action_on_flag: str = "block"  # "block", "warn", "log", "human_review"
     max_text_length: int = 10000
     log_all_results: bool = True
+
 
 class ModerationPipeline:
     """Multi-layer content moderation pipeline."""
@@ -376,18 +393,22 @@ class ModerationPipeline:
         for name, moderator in self.moderators:
             try:
                 results = moderator.check(text)
-                pipeline_log.append({
-                    "layer": name,
-                    "results_count": len(results),
-                    "flagged": any(r.flagged for r in results),
-                })
+                pipeline_log.append(
+                    {
+                        "layer": name,
+                        "results_count": len(results),
+                        "flagged": any(r.flagged for r in results),
+                    }
+                )
                 all_results.extend(results)
             except Exception as e:
                 logger.error(f"Moderation layer {name} failed: {e}")
-                pipeline_log.append({
-                    "layer": name,
-                    "error": str(e),
-                })
+                pipeline_log.append(
+                    {
+                        "layer": name,
+                        "error": str(e),
+                    }
+                )
 
         # Determine final action
         action = self._determine_action(all_results)
@@ -400,7 +421,9 @@ class ModerationPipeline:
             "action": action,
             "results": all_results,
             "pipeline_log": pipeline_log,
-            "flagged_categories": list(set(r.category.value for r in all_results if r.flagged)),
+            "flagged_categories": list(
+                set(r.category.value for r in all_results if r.flagged)
+            ),
             "max_severity": max((r.severity.value for r in all_results), default=0),
         }
 
@@ -426,12 +449,17 @@ class ModerationPipeline:
 
         return "allow"
 
-    def _log_moderation(self, text: str, results: List[ModerationResult],
-                        action: str, context: Optional[dict]):
+    def _log_moderation(
+        self,
+        text: str,
+        results: List[ModerationResult],
+        action: str,
+        context: Optional[dict],
+    ):
         """Log moderation results for audit."""
-        logger.info(f"Moderation: action={action}, "
-                    f"results={len(results)}, "
-                    f"context={context}")
+        logger.info(
+            f"Moderation: action={action}, results={len(results)}, context={context}"
+        )
 ```
 
 ### 4. Context-Aware Moderation
@@ -443,8 +471,9 @@ class ContextAwareModerator:
     def __init__(self):
         self.conversation_history = {}
 
-    def moderate_with_context(self, text: str, user_id: str,
-                              conversation_id: str) -> dict:
+    def moderate_with_context(
+        self, text: str, user_id: str, conversation_id: str
+    ) -> dict:
         """Moderate considering conversation context."""
 
         # Get conversation history
@@ -454,18 +483,18 @@ class ContextAwareModerator:
         context_analysis = self._analyze_context(text, history)
 
         # Adjust moderation based on context
-        adjusted_result = self._apply_context_adjustments(
-            text, context_analysis
-        )
+        adjusted_result = self._apply_context_adjustments(text, context_analysis)
 
         # Store in history
         if conversation_id not in self.conversation_history:
             self.conversation_history[conversation_id] = []
-        self.conversation_history[conversation_id].append({
-            "text": text,
-            "user_id": user_id,
-            "moderation_result": adjusted_result,
-        })
+        self.conversation_history[conversation_id].append(
+            {
+                "text": text,
+                "user_id": user_id,
+                "moderation_result": adjusted_result,
+            }
+        )
 
         return adjusted_result
 
@@ -484,7 +513,8 @@ class ContextAwareModerator:
             recent_texts = [h["text"] for h in history[-3:]]
             # Simple escalation detection
             violation_count = sum(
-                1 for h in history[-3:]
+                1
+                for h in history[-3:]
                 if h.get("moderation_result", {}).get("action") != "allow"
             )
             if violation_count >= 2:
@@ -527,6 +557,7 @@ from datetime import datetime
 from typing import Optional
 import uuid
 
+
 class HumanInTheLoopModerator:
     """Moderation system with human review queue."""
 
@@ -534,8 +565,9 @@ class HumanInTheLoopModerator:
         self.review_queue = []
         self.review_decisions = {}
 
-    def submit_for_review(self, content: str, automated_result: dict,
-                          context: Optional[dict] = None) -> str:
+    def submit_for_review(
+        self, content: str, automated_result: dict, context: Optional[dict] = None
+    ) -> str:
         """Submit content for human review."""
 
         review_id = str(uuid.uuid4())
@@ -557,13 +589,13 @@ class HumanInTheLoopModerator:
 
     def get_pending_reviews(self, limit: int = 10) -> list:
         """Get pending items for human review."""
-        return [
-            item for item in self.review_queue
-            if item["status"] == "pending"
-        ][:limit]
+        return [item for item in self.review_queue if item["status"] == "pending"][
+            :limit
+        ]
 
-    def submit_decision(self, review_id: str, reviewer: str,
-                        decision: str, notes: Optional[str] = None):
+    def submit_decision(
+        self, review_id: str, reviewer: str, decision: str, notes: Optional[str] = None
+    ):
         """Submit a human review decision."""
 
         for item in self.review_queue:
@@ -630,22 +662,22 @@ class ModerationEvaluator:
 
     def calculate_metrics(self) -> dict:
         """Calculate precision, recall, F1, and other metrics."""
-        tp = sum(1 for p, a in zip(self.predictions, self.ground_truth)
-                 if p and a)
-        fp = sum(1 for p, a in zip(self.predictions, self.ground_truth)
-                 if p and not a)
-        fn = sum(1 for p, a in zip(self.predictions, self.ground_truth)
-                 if not p and a)
-        tn = sum(1 for p, a in zip(self.predictions, self.ground_truth)
-                 if not p and not a)
+        tp = sum(1 for p, a in zip(self.predictions, self.ground_truth) if p and a)
+        fp = sum(1 for p, a in zip(self.predictions, self.ground_truth) if p and not a)
+        fn = sum(1 for p, a in zip(self.predictions, self.ground_truth) if not p and a)
+        tn = sum(
+            1 for p, a in zip(self.predictions, self.ground_truth) if not p and not a
+        )
 
         precision = tp / (tp + fp) if (tp + fp) > 0 else 0
         recall = tp / (tp + fn) if (tp + fn) > 0 else 0
-        f1 = 2 * (precision * recall) / (precision + recall) \
-            if (precision + recall) > 0 else 0
+        f1 = (
+            2 * (precision * recall) / (precision + recall)
+            if (precision + recall) > 0
+            else 0
+        )
 
-        accuracy = (tp + tn) / len(self.predictions) \
-            if self.predictions else 0
+        accuracy = (tp + tn) / len(self.predictions) if self.predictions else 0
 
         return {
             "true_positives": tp,
@@ -664,9 +696,7 @@ class ModerationEvaluator:
         false_positives = []
         false_negatives = []
 
-        for i, (pred, actual) in enumerate(
-            zip(self.predictions, self.ground_truth)
-        ):
+        for i, (pred, actual) in enumerate(zip(self.predictions, self.ground_truth)):
             if pred and not actual:
                 false_positives.append(i)
             elif not pred and actual:
@@ -676,9 +706,11 @@ class ModerationEvaluator:
             "false_positive_count": len(false_positives),
             "false_negative_count": len(false_negatives),
             "false_positive_rate": len(false_positives) / len(self.predictions)
-                if self.predictions else 0,
+            if self.predictions
+            else 0,
             "false_negative_rate": len(false_negatives) / len(self.predictions)
-                if self.predictions else 0,
+            if self.predictions
+            else 0,
         }
 ```
 

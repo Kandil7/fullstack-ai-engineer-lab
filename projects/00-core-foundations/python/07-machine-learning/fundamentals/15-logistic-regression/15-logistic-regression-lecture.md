@@ -71,9 +71,11 @@ This cost function penalizes confident wrong predictions heavily.
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def sigmoid(z):
     """Sigmoid activation function."""
     return 1 / (1 + np.exp(-z))
+
 
 # Sigmoid maps any value to 0-1
 z_values = np.linspace(-10, 10, 100)
@@ -87,15 +89,15 @@ print(f"  σ(10) = {sigmoid(10):.6f}")
 
 # Plot
 plt.figure(figsize=(8, 4))
-plt.plot(z_values, sigmoid_values, 'b-', linewidth=2)
-plt.axhline(y=0.5, color='r', linestyle='--', label='Decision Boundary (0.5)')
-plt.axvline(x=0, color='gray', linestyle='--')
-plt.xlabel('z')
-plt.ylabel('σ(z)')
-plt.title('Sigmoid Function')
+plt.plot(z_values, sigmoid_values, "b-", linewidth=2)
+plt.axhline(y=0.5, color="r", linestyle="--", label="Decision Boundary (0.5)")
+plt.axvline(x=0, color="gray", linestyle="--")
+plt.xlabel("z")
+plt.ylabel("σ(z)")
+plt.title("Sigmoid Function")
 plt.legend()
 plt.grid(True, alpha=0.3)
-plt.savefig('sigmoid_function.png', dpi=100)
+plt.savefig("sigmoid_function.png", dpi=100)
 plt.show()
 ```
 
@@ -120,8 +122,12 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 # Generate binary classification data
 np.random.seed(42)
 X, y = make_classification(
-    n_samples=300, n_features=2, n_redundant=0,
-    n_informative=2, random_state=42, n_clusters_per_class=1
+    n_samples=300,
+    n_features=2,
+    n_redundant=0,
+    n_informative=2,
+    random_state=42,
+    n_clusters_per_class=1,
 )
 
 print(f"Samples: {X.shape[0]}")
@@ -130,9 +136,7 @@ print(f"Classes: {np.unique(y)} (0 and 1)")
 print(f"Class distribution: {np.bincount(y)}")
 
 # Train/test split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Scale features
 scaler = StandardScaler()
@@ -158,9 +162,11 @@ y_prob = model.predict_proba(X_test_scaled)
 
 print("First 5 predictions:")
 for i in range(5):
-    print(f"  Sample {i+1}: Predicted class={y_pred[i]}, "
-          f"P(class 0)={y_prob[i, 0]:.3f}, "
-          f"P(class 1)={y_prob[i, 1]:.3f}")
+    print(
+        f"  Sample {i + 1}: Predicted class={y_pred[i]}, "
+        f"P(class 0)={y_prob[i, 0]:.3f}, "
+        f"P(class 1)={y_prob[i, 1]:.3f}"
+    )
 
 # How probabilities work
 print("\nProbability interpretation:")
@@ -258,13 +264,13 @@ print("  C: Inverse regularization strength (smaller = stronger)")
 print("  penalty: 'l1', 'l2', 'elasticnet', or 'none'")
 
 # L2 regularization (default)
-model_l2 = LogisticRegression(penalty='l2', C=1.0, random_state=42)
+model_l2 = LogisticRegression(penalty="l2", C=1.0, random_state=42)
 model_l2.fit(X_train_scaled, y_train)
 acc_l2 = accuracy_score(y_test, model_l2.predict(X_test_scaled))
 print(f"\nL2 regularization (C=1.0) accuracy: {acc_l2:.4f}")
 
 # L1 regularization (sparse solutions)
-model_l1 = LogisticRegression(penalty='l1', solver='liblinear', C=0.1, random_state=42)
+model_l1 = LogisticRegression(penalty="l1", solver="liblinear", C=0.1, random_state=42)
 model_l1.fit(X_train_scaled, y_train)
 acc_l1 = accuracy_score(y_test, model_l1.predict(X_test_scaled))
 print(f"L1 regularization (C=0.1) accuracy: {acc_l1:.4f}")
@@ -281,32 +287,33 @@ print(f"  L1 coefficients: {model_l1.coef_[0]}")
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def plot_decision_boundary(model, X, y, scaler=None):
     """Plot decision boundary for 2D data."""
     h = 0.02  # Step size
-    
+
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-    
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-                         np.arange(y_min, y_max, h))
-    
+
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+
     if scaler:
         mesh_points = scaler.transform(np.c_[xx.ravel(), yy.ravel()])
     else:
         mesh_points = np.c_[xx.ravel(), yy.ravel()]
-    
+
     Z = model.predict(mesh_points)
     Z = Z.reshape(xx.shape)
-    
+
     plt.figure(figsize=(8, 6))
     plt.contourf(xx, yy, Z, alpha=0.4, cmap=plt.cm.RdYlBu)
-    plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdYlBu, edgecolors='black')
-    plt.xlabel('Feature 1')
-    plt.ylabel('Feature 2')
-    plt.title('Logistic Regression Decision Boundary')
-    plt.savefig('decision_boundary.png', dpi=100)
+    plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdYlBu, edgecolors="black")
+    plt.xlabel("Feature 1")
+    plt.ylabel("Feature 2")
+    plt.title("Logistic Regression Decision Boundary")
+    plt.savefig("decision_boundary.png", dpi=100)
     plt.show()
+
 
 # Plot for our model
 plot_decision_boundary(model, X_test_scaled, y_test, scaler)
@@ -364,8 +371,7 @@ from sklearn.metrics import classification_report
 
 # Create imbalanced dataset
 X_imb, y_imb = make_classification(
-    n_samples=1000, n_features=10, weights=[0.9, 0.1],
-    random_state=42
+    n_samples=1000, n_features=10, weights=[0.9, 0.1], random_state=42
 )
 
 print(f"Class distribution: {np.bincount(y_imb)}")
@@ -377,7 +383,7 @@ print("\nWithout class weighting:")
 print(classification_report(y_test, model_wrong.predict(X_test)))
 
 # CORRECT: Use class_weight='balanced'
-model_correct = LogisticRegression(class_weight='balanced', random_state=42)
+model_correct = LogisticRegression(class_weight="balanced", random_state=42)
 model_correct.fit(X_train, y_train)
 print("\nWith class weighting:")
 print(classification_report(y_test, model_correct.predict(X_test)))
@@ -421,7 +427,7 @@ print(f"Logistic Regression baseline: {baseline_score:.4f}")
 from sklearn.model_selection import cross_val_score
 
 model = LogisticRegression(random_state=42)
-cv_scores = cross_val_score(model, X_train_scaled, y_train, cv=5, scoring='accuracy')
+cv_scores = cross_val_score(model, X_train_scaled, y_train, cv=5, scoring="accuracy")
 
 print(f"CV Accuracy: {cv_scores.mean():.4f} +/- {cv_scores.std():.4f}")
 ```
@@ -431,15 +437,10 @@ print(f"CV Accuracy: {cv_scores.mean():.4f} +/- {cv_scores.std():.4f}")
 ```python
 from sklearn.model_selection import GridSearchCV
 
-param_grid = {
-    'C': [0.01, 0.1, 1, 10, 100],
-    'penalty': ['l1', 'l2'],
-    'solver': ['liblinear']
-}
+param_grid = {"C": [0.01, 0.1, 1, 10, 100], "penalty": ["l1", "l2"], "solver": ["liblinear"]}
 
 grid_search = GridSearchCV(
-    LogisticRegression(random_state=42),
-    param_grid, cv=5, scoring='accuracy', n_jobs=-1
+    LogisticRegression(random_state=42), param_grid, cv=5, scoring="accuracy", n_jobs=-1
 )
 grid_search.fit(X_train_scaled, y_train)
 
@@ -476,6 +477,7 @@ Build a logistic regression model for email spam detection.
 3. Evaluate with appropriate metrics
 4. Interpret which features are most predictive
 """
+
 import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
@@ -486,8 +488,9 @@ from sklearn.metrics import classification_report
 np.random.seed(42)
 
 # Features: word_count, has_link, has_attachment, capital_ratio, exclamation_count
-X, y = make_classification(n_samples=500, n_features=5, n_informative=4,
-                          weights=[0.7, 0.3], random_state=42)
+X, y = make_classification(
+    n_samples=500, n_features=5, n_informative=4, weights=[0.7, 0.3], random_state=42
+)
 
 # Your code here
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -503,7 +506,7 @@ y_pred = model.predict(X_test_scaled)
 print(classification_report(y_test, y_pred))
 
 # Feature importance
-feature_names = ['word_count', 'has_link', 'has_attachment', 'capital_ratio', 'exclamation_count']
+feature_names = ["word_count", "has_link", "has_attachment", "capital_ratio", "exclamation_count"]
 for name, coef in zip(feature_names, model.coef_[0]):
     print(f"{name}: {coef:.4f}")
 ```
@@ -518,6 +521,7 @@ Experiment with different classification thresholds.
 3. Plot precision-recall tradeoff
 4. Choose threshold for business requirement
 """
+
 from sklearn.metrics import precision_recall_curve
 import matplotlib.pyplot as plt
 
@@ -539,14 +543,14 @@ print(f"Precision at this threshold: {precisions[idx]:.3f}")
 
 # Plot
 plt.figure(figsize=(8, 6))
-plt.plot(thresholds, precisions[:-1], label='Precision')
-plt.plot(thresholds, recalls[:-1], label='Recall')
-plt.xlabel('Threshold')
-plt.ylabel('Score')
-plt.title('Precision-Recall vs Threshold')
+plt.plot(thresholds, precisions[:-1], label="Precision")
+plt.plot(thresholds, recalls[:-1], label="Recall")
+plt.xlabel("Threshold")
+plt.ylabel("Score")
+plt.title("Precision-Recall vs Threshold")
 plt.legend()
 plt.grid(True)
-plt.savefig('precision_recall_threshold.png', dpi=100)
+plt.savefig("precision_recall_threshold.png", dpi=100)
 plt.show()
 ```
 
@@ -560,6 +564,7 @@ Solve a multi-class classification problem.
 3. Create confusion matrix
 4. Identify which classes are hardest to classify
 """
+
 from sklearn.datasets import load_iris
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
@@ -583,13 +588,18 @@ y_pred = model.predict(X_test_scaled)
 # Confusion matrix
 cm = confusion_matrix(y_test, y_pred)
 plt.figure(figsize=(8, 6))
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
-            xticklabels=iris.target_names,
-            yticklabels=iris.target_names)
-plt.xlabel('Predicted')
-plt.ylabel('Actual')
-plt.title('Confusion Matrix')
-plt.savefig('iris_confusion_matrix.png', dpi=100)
+sns.heatmap(
+    cm,
+    annot=True,
+    fmt="d",
+    cmap="Blues",
+    xticklabels=iris.target_names,
+    yticklabels=iris.target_names,
+)
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.title("Confusion Matrix")
+plt.savefig("iris_confusion_matrix.png", dpi=100)
 plt.show()
 
 # Classification report

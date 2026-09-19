@@ -128,11 +128,13 @@ async def upload_multiple(files: list[UploadFile] = File(...)):
         file_path = safe_upload_path(UPLOAD_DIR, file.filename)
         with open(file_path, "wb") as f:
             f.write(content)
-        results.append({
-            "filename": file.filename,
-            "content_type": file.content_type,
-            "size": len(content),
-        })
+        results.append(
+            {
+                "filename": file.filename,
+                "content_type": file.content_type,
+                "size": len(content),
+            }
+        )
 
     return {
         "total_files": len(results),
@@ -209,11 +211,13 @@ def list_uploads():
         for filename in filenames:
             filepath = os.path.join(root, filename)
             rel_path = os.path.relpath(filepath, UPLOAD_DIR)
-            files.append({
-                "name": filename,
-                "path": rel_path,
-                "size": os.path.getsize(filepath),
-            })
+            files.append(
+                {
+                    "name": filename,
+                    "path": rel_path,
+                    "size": os.path.getsize(filepath),
+                }
+            )
     return {"total": len(files), "files": files}
 
 
@@ -229,6 +233,7 @@ Testing with curl:
 
     curl http://127.0.0.1:8000/uploads/
 """
+
 
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
@@ -307,6 +312,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

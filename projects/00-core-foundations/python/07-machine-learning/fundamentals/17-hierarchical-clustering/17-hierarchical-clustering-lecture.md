@@ -62,9 +62,7 @@ from sklearn.datasets import make_blobs
 
 # Generate data
 np.random.seed(42)
-X, y = make_blobs(
-    n_samples=100, centers=3, cluster_std=1.0, random_state=42
-)
+X, y = make_blobs(n_samples=100, centers=3, cluster_std=1.0, random_state=42)
 
 print(f"Generated {X.shape[0]} points in {X.shape[1]} dimensions")
 
@@ -89,18 +87,18 @@ from sklearn.metrics import silhouette_score
 import numpy as np
 
 # Test different linkage methods
-linkage_methods = ['ward', 'complete', 'average', 'single']
+linkage_methods = ["ward", "complete", "average", "single"]
 results = []
 
 for method in linkage_methods:
     clustering = AgglomerativeClustering(n_clusters=3, linkage=method)
     labels = clustering.fit_predict(X)
     sil_score = silhouette_score(X, labels)
-    results.append({'method': method, 'silhouette': sil_score})
+    results.append({"method": method, "silhouette": sil_score})
     print(f"{method:>10}: Silhouette Score = {sil_score:.4f}")
 
 # Find best method
-best = max(results, key=lambda x: x['silhouette'])
+best = max(results, key=lambda x: x["silhouette"])
 print(f"\nBest linkage: {best['method']} (score={best['silhouette']:.4f})")
 ```
 
@@ -112,7 +110,7 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 import matplotlib.pyplot as plt
 
 # Create linkage matrix
-Z = linkage(X, method='ward')
+Z = linkage(X, method="ward")
 
 print("Linkage matrix shape:", Z.shape)
 print("\nFirst 5 rows of linkage matrix:")
@@ -121,15 +119,16 @@ print(Z[:5])
 
 # Plot dendrogram
 plt.figure(figsize=(10, 6))
-dendrogram(Z, truncate_mode='lastp', p=30, leaf_rotation=90,
-           leaf_font_size=10, show_contracted=True)
-plt.title('Hierarchical Clustering Dendrogram (Ward)')
-plt.xlabel('Cluster Size')
-plt.ylabel('Distance')
-plt.axhline(y=7, color='r', linestyle='--', label='Cut for 3 clusters')
+dendrogram(
+    Z, truncate_mode="lastp", p=30, leaf_rotation=90, leaf_font_size=10, show_contracted=True
+)
+plt.title("Hierarchical Clustering Dendrogram (Ward)")
+plt.xlabel("Cluster Size")
+plt.ylabel("Distance")
+plt.axhline(y=7, color="r", linestyle="--", label="Cut for 3 clusters")
 plt.legend()
 plt.tight_layout()
-plt.savefig('dendrogram.png', dpi=100)
+plt.savefig("dendrogram.png", dpi=100)
 plt.show()
 ```
 
@@ -150,10 +149,10 @@ for n_clusters in range(2, 8):
     clustering = AgglomerativeClustering(n_clusters=n_clusters)
     labels = clustering.fit_predict(X)
     sil_score = silhouette_score(X, labels)
-    results.append({'n_clusters': n_clusters, 'silhouette': sil_score})
+    results.append({"n_clusters": n_clusters, "silhouette": sil_score})
     print(f"K={n_clusters}: Silhouette Score = {sil_score:.4f}")
 
-best = max(results, key=lambda x: x['silhouette'])
+best = max(results, key=lambda x: x["silhouette"])
 print(f"\nBest K: {best['n_clusters']} (Silhouette={best['silhouette']:.4f})")
 ```
 
@@ -170,22 +169,22 @@ np.random.seed(42)
 # Generate customer data
 n_customers = 150
 X_customers = np.random.randn(n_customers, 2) * 2
-X_customers[:50] += [3, 3]   # Cluster 1
+X_customers[:50] += [3, 3]  # Cluster 1
 X_customers[50:100] += [-3, -3]  # Cluster 2
-X_customers[100:] += [3, -3]   # Cluster 3
+X_customers[100:] += [3, -3]  # Cluster 3
 
 # Scale
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X_customers)
 
 # Apply clustering
-clustering = AgglomerativeClustering(n_clusters=3, linkage='ward')
+clustering = AgglomerativeClustering(n_clusters=3, linkage="ward")
 labels = clustering.fit_predict(X_scaled)
 
 print(f"Segmented {n_customers} customers into 3 groups")
 for i in range(3):
     count = np.sum(labels == i)
-    print(f"  Segment {i+1}: {count} customers")
+    print(f"  Segment {i + 1}: {count} customers")
 
 # Evaluate
 sil = silhouette_score(X_scaled, labels)
@@ -225,6 +224,7 @@ print("  ✗ Assumes spherical clusters")
 
 # CORRECT: Use K-Means for large datasets
 from sklearn.cluster import KMeans
+
 kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
 labels = kmeans.fit_predict(X_large)  # Much faster
 ```
@@ -235,7 +235,7 @@ labels = kmeans.fit_predict(X_large)  # Much faster
 # Different linkage methods produce different results
 # Always compare multiple methods
 
-for method in ['ward', 'complete', 'average', 'single']:
+for method in ["ward", "complete", "average", "single"]:
     clustering = AgglomerativeClustering(n_clusters=3, linkage=method)
     labels = clustering.fit_predict(X)
     sil = silhouette_score(X, labels)
@@ -254,6 +254,7 @@ labels = clustering.fit_predict(X_unscaled)
 
 # CORRECT
 from sklearn.preprocessing import StandardScaler
+
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 clustering = AgglomerativeClustering(n_clusters=3)
@@ -268,7 +269,7 @@ labels = clustering.fit_predict(X_scaled)
 
 ```python
 # Ward linkage usually produces best results
-clustering = AgglomerativeClustering(n_clusters=3, linkage='ward')
+clustering = AgglomerativeClustering(n_clusters=3, linkage="ward")
 labels = clustering.fit_predict(X)
 ```
 
@@ -278,10 +279,10 @@ labels = clustering.fit_predict(X)
 from scipy.cluster.hierarchy import dendrogram, linkage
 import matplotlib.pyplot as plt
 
-Z = linkage(X, method='ward')
+Z = linkage(X, method="ward")
 plt.figure(figsize=(10, 6))
 dendrogram(Z)
-plt.title('Dendrogram')
+plt.title("Dendrogram")
 plt.show()
 ```
 
@@ -293,9 +294,11 @@ plt.show()
 
 if len(X) < 10000:
     from sklearn.cluster import AgglomerativeClustering
+
     model = AgglomerativeClustering(n_clusters=3)
 else:
     from sklearn.cluster import KMeans
+
     model = KMeans(n_clusters=3, random_state=42)
 ```
 
@@ -313,7 +316,7 @@ pca = PCA(n_components=2)
 X_pca = pca.fit_transform(X_scaled)
 
 # Cluster in reduced space
-clustering = AgglomerativeClustering(n_clusters=3, linkage='ward')
+clustering = AgglomerativeClustering(n_clusters=3, linkage="ward")
 labels = clustering.fit_predict(X_pca)
 ```
 
@@ -331,6 +334,7 @@ Create and analyze a dendrogram.
 3. Determine optimal K from dendrogram
 4. Compare with silhouette analysis
 """
+
 import numpy as np
 from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.cluster import AgglomerativeClustering
@@ -339,19 +343,20 @@ import matplotlib.pyplot as plt
 
 np.random.seed(42)
 from sklearn.datasets import make_blobs
+
 X, _ = make_blobs(n_samples=100, centers=3, random_state=42)
 
 # Your code here
-Z = linkage(X, method='ward')
+Z = linkage(X, method="ward")
 
 plt.figure(figsize=(10, 6))
-dendrogram(Z, truncate_mode='lastp', p=30)
-plt.title('Dendrogram')
-plt.xlabel('Sample Index')
-plt.ylabel('Distance')
-plt.axhline(y=7, color='r', linestyle='--', label='Cut line')
+dendrogram(Z, truncate_mode="lastp", p=30)
+plt.title("Dendrogram")
+plt.xlabel("Sample Index")
+plt.ylabel("Distance")
+plt.axhline(y=7, color="r", linestyle="--", label="Cut line")
 plt.legend()
-plt.savefig('exercise_dendrogram.png', dpi=100)
+plt.savefig("exercise_dendrogram.png", dpi=100)
 plt.show()
 
 # Compare with silhouette
@@ -372,6 +377,7 @@ Compare all linkage methods on the same dataset.
 3. Evaluate with silhouette score
 4. Visualize results
 """
+
 from sklearn.datasets import make_moons
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import silhouette_score
@@ -380,7 +386,7 @@ import numpy as np
 X, y = make_moons(n_samples=200, noise=0.1, random_state=42)
 
 # Your code here
-methods = ['ward', 'complete', 'average', 'single']
+methods = ["ward", "complete", "average", "single"]
 for method in methods:
     clustering = AgglomerativeClustering(n_clusters=2, linkage=method)
     labels = clustering.fit_predict(X)
@@ -398,6 +404,7 @@ Apply hierarchical clustering to a real-world scenario.
 3. Cluster with hierarchical clustering
 4. Analyze cluster characteristics
 """
+
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import AgglomerativeClustering
@@ -417,7 +424,7 @@ X_scaled = scaler.fit_transform(X)
 pca = PCA(n_components=2)
 X_pca = pca.fit_transform(X_scaled)
 
-clustering = AgglomerativeClustering(n_clusters=4, linkage='ward')
+clustering = AgglomerativeClustering(n_clusters=4, linkage="ward")
 labels = clustering.fit_predict(X_pca)
 
 print(f"Clusters: {len(np.unique(labels))}")

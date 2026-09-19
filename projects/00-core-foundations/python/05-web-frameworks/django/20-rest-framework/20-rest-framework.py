@@ -50,11 +50,12 @@ from rest_framework import serializers
 
 class AuthorSerializer(serializers.ModelSerializer):
     """Serialize Author model."""
+
     post_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Author
-        fields = ['id', 'name', 'bio', 'post_count']
+        fields = ["id", "name", "bio", "post_count"]
 
     def get_post_count(self, obj):
         return obj.posts.count()
@@ -62,11 +63,10 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     """Serialize Post model."""
+
     author = AuthorSerializer(read_only=True)
     author_id = serializers.PrimaryKeyRelatedField(
-        queryset=Author.objects.all(),
-        source='author',
-        write_only=True
+        queryset=Author.objects.all(), source="author", write_only=True
     )
     created_at = serializers.DateTimeField(read_only=True)
     word_count = serializers.SerializerMethodField()
@@ -74,14 +74,24 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
-            'id', 'title', 'slug', 'content', 'excerpt',
-            'author', 'author_id', 'category', 'status',
-            'is_featured', 'views_count', 'created_at',
-            'updated_at', 'word_count',
+            "id",
+            "title",
+            "slug",
+            "content",
+            "excerpt",
+            "author",
+            "author_id",
+            "category",
+            "status",
+            "is_featured",
+            "views_count",
+            "created_at",
+            "updated_at",
+            "word_count",
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'views_count']
+        read_only_fields = ["id", "created_at", "updated_at", "views_count"]
         extra_kwargs = {
-            'content': {'write_only': False},
+            "content": {"write_only": False},
         }
 
     def get_word_count(self, obj):
@@ -90,28 +100,25 @@ class PostSerializer(serializers.ModelSerializer):
     def validate_title(self, value):
         """Custom field validation."""
         if len(value) < 5:
-            raise serializers.ValidationError(
-                "Title must be at least 5 characters."
-            )
+            raise serializers.ValidationError("Title must be at least 5 characters.")
         return value
 
     def validate(self, data):
         """Custom object validation."""
-        if data.get('title') and data.get('content'):
-            if data['title'].lower() in data['content'].lower():
-                raise serializers.ValidationError(
-                    "Content should not contain the title."
-                )
+        if data.get("title") and data.get("content"):
+            if data["title"].lower() in data["content"].lower():
+                raise serializers.ValidationError("Content should not contain the title.")
         return data
 
 
 # Nested serializer:
 class PostDetailSerializer(PostSerializer):
     """Detailed post serializer with comments."""
+
     comments = serializers.SerializerMethodField()
 
     class Meta(PostSerializer.Meta):
-        fields = PostSerializer.Meta.fields + ['comments']
+        fields = PostSerializer.Meta.fields + ["comments"]
 
     def get_comments(self, obj):
         comments = obj.comments.filter(is_approved=True)
@@ -120,12 +127,14 @@ class PostDetailSerializer(PostSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """Serialize Comment model."""
-    author_name = serializers.CharField(source='author.username', read_only=True)
+
+    author_name = serializers.CharField(source="author.username", read_only=True)
 
     class Meta:
         model = Comment
-        fields = ['id', 'content', 'author_name', 'created_at']
-        read_only_fields = ['id', 'created_at']
+        fields = ["id", "content", "author_name", "created_at"]
+        read_only_fields = ["id", "created_at"]
+
 
 # ---------------------------------------------------------------------------
 # 3. Function-Based API Views
@@ -137,16 +146,16 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-@api_view(['GET', 'POST'])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticatedOrReadOnly])
 def post_list_create(request):
     """List all posts or create a new one."""
-    if request.method == 'GET':
-        posts = Post.objects.filter(status='published')
+    if request.method == "GET":
+        posts = Post.objects.filter(status="published")
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
 
-    elif request.method == 'POST':
+    elif request.method == "POST":
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(author=request.user)
@@ -154,32 +163,30 @@ def post_list_create(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(["GET", "PUT", "DELETE"])
 @permission_classes([IsAuthenticatedOrReadOnly])
 def post_detail(request, pk):
     """Retrieve, update, or delete a post."""
     try:
         post = Post.objects.get(pk=pk)
     except Post.DoesNotExist:
-        return Response(
-            {'error': 'Post not found'},
-            status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
+    if request.method == "GET":
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
-    elif request.method == 'PUT':
+    elif request.method == "PUT":
         serializer = PostSerializer(post, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
+    elif request.method == "DELETE":
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 # ---------------------------------------------------------------------------
 # 4. Class-Based API Views
@@ -199,23 +206,26 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 class PostListCreateView(ListCreateAPIView):
     """List posts or create a new one."""
-    queryset = Post.objects.filter(status='published')
+
+    queryset = Post.objects.filter(status="published")
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['author', 'category', 'status']
-    search_fields = ['title', 'content']
-    ordering_fields = ['created_at', 'views_count']
-    ordering = ['-created_at']
+    filterset_fields = ["author", "category", "status"]
+    search_fields = ["title", "content"]
+    ordering_fields = ["created_at", "views_count"]
+    ordering = ["-created_at"]
     pagination_class = None  # Disable pagination for this view
 
 
 class PostDetailView(RetrieveUpdateDestroyAPIView):
     """Retrieve, update, or delete a post."""
+
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
-    lookup_field = 'pk'
+    lookup_field = "pk"
+
 
 # ---------------------------------------------------------------------------
 # 5. ViewSets and Routers
@@ -229,41 +239,41 @@ from rest_framework.decorators import action
 
 class PostViewSet(viewsets.ModelViewSet):
     """Full CRUD for posts with extra actions."""
+
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    search_fields = ['title', 'content']
+    search_fields = ["title", "content"]
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def published(self, request):
         """Get only published posts."""
-        posts = Post.objects.filter(status='published')
+        posts = Post.objects.filter(status="published")
         serializer = self.get_serializer(posts, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=["post"])
     def publish(self, request, pk=None):
         """Publish a draft post."""
         post = self.get_object()
         if post.author != request.user:
-            return Response(
-                {'error': 'Not authorized'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        post.status = 'published'
+            return Response({"error": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
+        post.status = "published"
         post.save()
-        return Response({'status': 'published'})
+        return Response({"status": "published"})
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
     """CRUD for authors."""
+
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
 
 # URL configuration with routers:
 # from rest_framework.routers import DefaultRouter
@@ -350,6 +360,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return request.user and request.user.is_staff
+
 
 # Built-in permissions:
 # AllowAny              → Unrestricted access

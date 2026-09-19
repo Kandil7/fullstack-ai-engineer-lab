@@ -29,12 +29,15 @@
 ```python
 import asyncio
 
+
 async def fetch(name: str) -> str:
     await asyncio.sleep(0.01)
     return f"{name}:ok"
 
+
 async def main() -> list[str]:
     return await asyncio.gather(fetch("a"), fetch("b"), fetch("c"))
+
 
 print(asyncio.run(main()))
 ```
@@ -52,9 +55,11 @@ import threading, time
 
 results: list[str] = []
 
+
 def work(name: str) -> None:
     time.sleep(0.01)
     results.append(name)
+
 
 threads = [threading.Thread(target=work, args=(f"t{i}",)) for i in range(3)]
 for t in threads:
@@ -74,12 +79,14 @@ print(sorted(results))
 ```python
 import asyncio
 
+
 async def tick() -> str:
     await asyncio.sleep(0.01)
     return "tick"
 
-c = tick()                      # body has NOT run yet
-print(asyncio.run(c))           # loop drives it
+
+c = tick()  # body has NOT run yet
+print(asyncio.run(c))  # loop drives it
 ```
 ```text
 tick
@@ -92,8 +99,10 @@ tick
 ```python
 from concurrent.futures import ProcessPoolExecutor
 
+
 def burn(n: int) -> int:
-    return sum(i * i for i in range(n))     # pure CPU work
+    return sum(i * i for i in range(n))  # pure CPU work
+
 
 if __name__ == "__main__":
     with ProcessPoolExecutor(max_workers=2) as ex:
@@ -112,10 +121,12 @@ if __name__ == "__main__":
 ```python
 import asyncio
 
+
 async def main() -> float:
     start = asyncio.get_event_loop().time()
-    await asyncio.sleep(0.05)               # yields to the loop
+    await asyncio.sleep(0.05)  # yields to the loop
     return asyncio.get_event_loop().time() - start
+
 
 print(round(asyncio.run(main()), 3))
 ```
@@ -130,15 +141,20 @@ print(round(asyncio.run(main()), 3))
 ```python
 import threading, time
 
+
 def spin() -> None:
     s = 0
     for _ in range(3_000_000):
         s += 1
 
+
 start = time.perf_counter()
 t1 = threading.Thread(target=spin)
 t2 = threading.Thread(target=spin)
-t1.start(); t2.start(); t1.join(); t2.join()
+t1.start()
+t2.start()
+t1.join()
+t2.join()
 print(round(time.perf_counter() - start, 2), "s for two threads")
 ```
 ```text
@@ -152,13 +168,16 @@ print(round(time.perf_counter() - start, 2), "s for two threads")
 ```python
 import asyncio
 
+
 async def wait(t: float) -> None:
-    await asyncio.sleep(t)                  # simulated network wait
+    await asyncio.sleep(t)  # simulated network wait
+
 
 async def main() -> float:
     start = asyncio.get_event_loop().time()
-    await asyncio.gather(*(wait(0.05) for _ in range(20)))   # 20 waits overlap
+    await asyncio.gather(*(wait(0.05) for _ in range(20)))  # 20 waits overlap
     return asyncio.get_event_loop().time() - start
+
 
 print(round(asyncio.run(main()), 3), "s for 20 waits")
 ```
@@ -176,11 +195,13 @@ import threading
 counter = 0
 lock = threading.Lock()
 
+
 def bump() -> None:
     global counter
     for _ in range(10_000):
         with lock:
             counter += 1
+
 
 threads = [threading.Thread(target=bump) for _ in range(4)]
 for t in threads:
@@ -201,8 +222,10 @@ print(counter)
 ```python
 from multiprocessing import Pool
 
+
 def square(x: int) -> int:
     return x * x
+
 
 if __name__ == "__main__":
     with Pool(2) as pool:
@@ -221,8 +244,10 @@ if __name__ == "__main__":
 from concurrent.futures import ProcessPoolExecutor
 import os
 
+
 def pid() -> int:
     return os.getpid()
+
 
 if __name__ == "__main__":
     with ProcessPoolExecutor(max_workers=2) as ex:
@@ -239,8 +264,10 @@ if __name__ == "__main__":
 ```python
 from concurrent.futures import ProcessPoolExecutor
 
+
 def cube(x: int) -> int:
-    return x ** 3
+    return x**3
+
 
 if __name__ == "__main__":
     with ProcessPoolExecutor(max_workers=2) as ex:
@@ -260,10 +287,12 @@ import threading
 
 counter = 0
 
+
 def bump() -> None:
     global counter
     for _ in range(50_000):
-        counter += 1                # read + add + write: NOT atomic
+        counter += 1  # read + add + write: NOT atomic
+
 
 threads = [threading.Thread(target=bump) for _ in range(2)]
 for t in threads:
@@ -283,8 +312,10 @@ print(counter, "expected 100000")
 ```python
 import multiprocessing as mp
 
+
 def worker(x: int) -> int:
     return x + 1
+
 
 if __name__ == "__main__":
     ctx = mp.get_context("spawn")
@@ -302,8 +333,10 @@ if __name__ == "__main__":
 ```python
 import time
 
+
 def fetch(n: str) -> None:
     time.sleep(0.05)
+
 
 start = time.perf_counter()
 for i in range(3):
@@ -322,9 +355,11 @@ print(round(time.perf_counter() - start, 2), "s sequential")
 from concurrent.futures import ThreadPoolExecutor
 import time
 
+
 def fetch(url: str) -> str:
     time.sleep(0.05)
     return f"{url}:ok"
+
 
 with ThreadPoolExecutor(max_workers=3) as ex:
     start = time.perf_counter()
@@ -345,10 +380,12 @@ import threading, time
 results: list[str] = []
 lock = threading.Lock()
 
+
 def work(name: str) -> None:
     time.sleep(0.01)
     with lock:
         results.append(name)
+
 
 threads = [threading.Thread(target=work, args=(f"t{i}",)) for i in range(4)]
 for t in threads:
@@ -368,11 +405,13 @@ print(len(results))
 ```python
 import queue, threading
 
-q: queue.Queue[int] = queue.Queue()   # thread-safe by design
+q: queue.Queue[int] = queue.Queue()  # thread-safe by design
+
 
 def produce() -> None:
     for i in range(5):
         q.put(i)
+
 
 t = threading.Thread(target=produce)
 t.start()

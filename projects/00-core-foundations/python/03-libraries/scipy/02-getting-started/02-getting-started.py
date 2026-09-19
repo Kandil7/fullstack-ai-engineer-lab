@@ -46,19 +46,22 @@ print("=" * 60)
 
 from scipy import constants
 
+
 # Physical calculations using constants
 def kinetic_energy(mass_kg, velocity_ms):
     """Calculate kinetic energy: KE = 0.5 * m * v^2"""
     return 0.5 * mass_kg * velocity_ms**2
+
 
 def gravitational_force(m1_kg, m2_kg, distance_m):
     """Newton's gravitational force between two masses."""
     G = constants.G  # Gravitational constant
     return G * m1_kg * m2_kg / distance_m**2
 
+
 # Earth-Moon system
-earth_mass = 5.972e24   # kg
-moon_mass = 7.342e22    # kg
+earth_mass = 5.972e24  # kg
+moon_mass = 7.342e22  # kg
 earth_moon_dist = 3.844e8  # meters
 
 force = gravitational_force(earth_mass, moon_mass, earth_moon_dist)
@@ -68,7 +71,7 @@ print(f"Gravitational force Earth-Moon: {force:.4e} N")
 car_mass = 1500  # kg
 car_speed_ms = 30  # m/s (108 km/h)
 ke = kinetic_energy(car_mass, car_speed_ms)
-print(f"Kinetic energy of car at 108 km/h: {ke:.0f} J = {ke/1000:.1f} kJ")
+print(f"Kinetic energy of car at 108 km/h: {ke:.0f} J = {ke / 1000:.1f} kJ")
 
 # ============================================================
 # Example 3: Sparse Matrices (scipy.sparse)
@@ -80,18 +83,22 @@ print("=" * 60)
 from scipy import sparse
 
 # Dense matrix: most elements are zero
-dense = np.array([
-    [1, 0, 0, 0, 5],
-    [0, 0, 3, 0, 0],
-    [0, 0, 0, 0, 0],
-    [0, 2, 0, 0, 0],
-    [0, 0, 0, 7, 0],
-])
+dense = np.array(
+    [
+        [1, 0, 0, 0, 5],
+        [0, 0, 3, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 2, 0, 0, 0],
+        [0, 0, 0, 7, 0],
+    ]
+)
 
 # Convert to sparse (CSR format)
 sparse_mat = sparse.csr_matrix(dense)
 print(f"Dense matrix memory:  {dense.nbytes} bytes")
-print(f"Sparse matrix memory: {sparse_mat.data.nbytes + sparse_mat.indices.nbytes + sparse_mat.indptr.nbytes} bytes")
+print(
+    f"Sparse matrix memory: {sparse_mat.data.nbytes + sparse_mat.indices.nbytes + sparse_mat.indptr.nbytes} bytes"
+)
 print(f"Sparsity: {(dense == 0).sum() / dense.size * 100:.0f}% zeros")
 
 # Create a large sparse random matrix
@@ -99,7 +106,7 @@ rows, cols = 1000, 1000
 density = 0.01  # 1% non-zero
 large_sparse = sparse.random(rows, cols, density=density, format="csr")
 print(f"\nLarge sparse matrix ({rows}x{cols}):")
-print(f"  Non-zero elements: {large_sparse.nnz} / {rows*cols}")
+print(f"  Non-zero elements: {large_sparse.nnz} / {rows * cols}")
 print(f"  Memory saved vs dense: ~{(1 - density) * 100:.0f}%")
 
 # Sparse matrix operations
@@ -118,11 +125,13 @@ print("=" * 60)
 from scipy import linalg
 
 # Solve a system of linear equations: Ax = b
-A = np.array([
-    [3, 1, -1],
-    [1, 4, 2],
-    [-1, 2, 5],
-])
+A = np.array(
+    [
+        [3, 1, -1],
+        [1, 4, 2],
+        [-1, 2, 5],
+    ]
+)
 b = np.array([1, 2, 3])
 
 x = linalg.solve(A, b)
@@ -165,11 +174,8 @@ print(f"Kurtosis:        {desc.kurtosis:.4f}")
 print(f"Min, Max:        [{desc.minmax[0]:.2f}, {desc.minmax[1]:.2f}]")
 
 # Confidence interval for the mean
-ci = stats.t.interval(0.95, df=len(data)-1, 
-                       loc=np.mean(data), 
-                       scale=stats.sem(data))
+ci = stats.t.interval(0.95, df=len(data) - 1, loc=np.mean(data), scale=stats.sem(data))
 print(f"\n95% CI for mean: [{ci[0]:.2f}, {ci[1]:.2f}]")
 
 print("\n[OK] You're ready to use SciPy!")
 print("   Next: 03-basic-functions.py to explore core functions.")
-

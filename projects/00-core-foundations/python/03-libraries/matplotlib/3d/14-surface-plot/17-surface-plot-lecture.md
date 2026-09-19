@@ -26,17 +26,15 @@ Z = np.sin(np.sqrt(X**2 + Y**2))
 fig = plt.figure(figsize=(12, 5))
 
 # Surface
-ax1 = fig.add_subplot(1, 2, 1, projection='3d')
-surf1 = ax1.plot_surface(X, Y, Z, cmap='viridis', edgecolor='none')
-ax1.set_title('Surface Plot')
+ax1 = fig.add_subplot(1, 2, 1, projection="3d")
+surf1 = ax1.plot_surface(X, Y, Z, cmap="viridis", edgecolor="none")
+ax1.set_title("Surface Plot")
 fig.colorbar(surf1, ax=ax1, shrink=0.5)
 
 # Surface with shading
-ax2 = fig.add_subplot(1, 2, 2, projection='3d')
-surf2 = ax2.plot_surface(X, Y, Z, cmap='viridis',
-                         edgecolor='none', shade=True,
-                         antialiased=True)
-ax2.set_title('Shaded Surface')
+ax2 = fig.add_subplot(1, 2, 2, projection="3d")
+surf2 = ax2.plot_surface(X, Y, Z, cmap="viridis", edgecolor="none", shade=True, antialiased=True)
+ax2.set_title("Shaded Surface")
 fig.colorbar(surf2, ax=ax2, shrink=0.5)
 
 plt.tight_layout()
@@ -52,16 +50,15 @@ plt.show()
 ax.view_init(elev=25, azim=-60)
 
 # Custom colormap and alpha
-surf = ax.plot_surface(X, Y, Z, cmap='coolwarm', alpha=0.9,
-                       linewidth=0, antialiased=True)
+surf = ax.plot_surface(X, Y, Z, cmap="coolwarm", alpha=0.9, linewidth=0, antialiased=True)
 
 # Add contour projection
-ax.contour(X, Y, Z, zdir='z', offset=-1, cmap='viridis')
-ax.contour(X, Y, Z, zdir='x', offset=-6, cmap='viridis')
-ax.contour(X, Y, Z, zdir='y', offset=6, cmap='viridis')
+ax.contour(X, Y, Z, zdir="z", offset=-1, cmap="viridis")
+ax.contour(X, Y, Z, zdir="x", offset=-6, cmap="viridis")
+ax.contour(X, Y, Z, zdir="y", offset=6, cmap="viridis")
 
 # Adjust stride for performance
-ax.plot_surface(X, Y, Z, rstride=2, cstride=2, cmap='viridis')
+ax.plot_surface(X, Y, Z, rstride=2, cstride=2, cmap="viridis")
 ```
 
 ---

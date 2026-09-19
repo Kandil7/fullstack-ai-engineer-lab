@@ -27,11 +27,12 @@ from dataclasses import dataclass
 # The canonical unit. Everything else (instance size, utilization,
 # batching) reduces this number.
 
+
 @dataclass
 class ServingCost:
-    instance_per_hour: float   # $/hr
+    instance_per_hour: float  # $/hr
     predictions_per_second: float
-    utilization: float = 1.0   # fraction of the hour actually inferring
+    utilization: float = 1.0  # fraction of the hour actually inferring
 
     def per_1k(self) -> float:
         per_hour_predictions = self.predictions_per_second * 3600 * self.utilization
@@ -51,6 +52,7 @@ assert gpu.per_1k() < cpu.per_1k(), "GPU wins at high volume"
 # ============================================================
 # An idle GPU still bills. Autoscaling to zero and sharing instances
 # matter as much as the per-inference cost.
+
 
 @dataclass
 class UtilizationScenario:
@@ -77,10 +79,11 @@ assert scenarios[1].wasted_percent() < scenarios[0].wasted_percent()
 # If nothing needs the answer in 100ms, batch it. Batch processing
 # uses the same GPU at 10x the throughput.
 
+
 @dataclass
 class BatchDecision:
-    batch_job: float      # $ per batch run
-    realtime_job: float   # $ per realtime run
+    batch_job: float  # $ per batch run
+    realtime_job: float  # $ per realtime run
     latency_requirement_ms: float
     batch_latency_ms: float
 
@@ -91,10 +94,12 @@ class BatchDecision:
 
 
 # Example 3: latency decides the mode
-nightly = BatchDecision(batch_job=0.05, realtime_job=2.00,
-                        latency_requirement_ms=3600_000, batch_latency_ms=1800_000)
-chat = BatchDecision(batch_job=0.05, realtime_job=2.00,
-                     latency_requirement_ms=300, batch_latency_ms=1800_000)
+nightly = BatchDecision(
+    batch_job=0.05, realtime_job=2.00, latency_requirement_ms=3600_000, batch_latency_ms=1800_000
+)
+chat = BatchDecision(
+    batch_job=0.05, realtime_job=2.00, latency_requirement_ms=300, batch_latency_ms=1800_000
+)
 print("\nExample 3: batch vs realtime")
 print(f"  nightly report: {nightly.recommended()}")
 print(f"  chat inference: {chat.recommended()}")
@@ -106,6 +111,7 @@ assert chat.recommended().startswith("REALTIME")
 # ============================================================
 # Repeat queries are the cheapest queries. A cache hit costs ~$0.000001;
 # a model call costs ~$0.001+. Even a 20% hit rate changes the bill.
+
 
 @dataclass
 class CacheEconomics:
@@ -123,8 +129,10 @@ class CacheEconomics:
 cache = CacheEconomics(cache_hit_cost=0.000001, model_cost=0.001)
 print("\nExample 4: caching economics")
 for rate in [0.0, 0.2, 0.5, 0.8]:
-    print(f"  hit rate {rate:.0%}: cost={cache.effective_cost(rate):.6f} "
-          f"savings={cache.savings_percent(rate):.1f}%")
+    print(
+        f"  hit rate {rate:.0%}: cost={cache.effective_cost(rate):.6f} "
+        f"savings={cache.savings_percent(rate):.1f}%"
+    )
 assert cache.effective_cost(0.8) < cache.effective_cost(0.0)
 
 # ============================================================
@@ -132,6 +140,7 @@ assert cache.effective_cost(0.8) < cache.effective_cost(0.0)
 # ============================================================
 # Training tolerates interruption; serving does not. Spot for training,
 # on-demand for serving.
+
 
 @dataclass
 class SpotDecision:
@@ -148,6 +157,7 @@ class SpotDecision:
 print("\nExample 5: spot vs on-demand")
 print("  " + SpotDecision("training", interruptible=True).recommend())
 print("  " + SpotDecision("serving", interruptible=False).recommend())
+
 
 # ============================================================
 # Production Pattern
@@ -184,10 +194,12 @@ def _verify() -> None:
     assert ce.effective_cost(0.5) == 0.5, "50% hit rate halves cost"
     assert ce.savings_percent(0.5) == 50.0
 
-    assert BatchDecision(1, 10, 100.0, 500.0).recommended().startswith("REALTIME"), \
+    assert BatchDecision(1, 10, 100.0, 500.0).recommended().startswith("REALTIME"), (
         "batch slower than SLO -> realtime"
-    assert BatchDecision(1, 10, 100.0, 5.0).recommended().startswith("BATCH"), \
+    )
+    assert BatchDecision(1, 10, 100.0, 5.0).recommended().startswith("BATCH"), (
         "batch fits SLO -> batch"
+    )
 
     u = UtilizationScenario("x", 0.25)
     assert u.wasted_percent() == 75.0

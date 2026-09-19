@@ -57,7 +57,7 @@ original = [1, 2, 3]
 copied = original.copy()
 copied[0] = 99
 print(original)  # [1, 2, 3] (unchanged)
-print(copied)    # [99, 2, 3]
+print(copied)  # [99, 2, 3]
 ```
 
 ### D
@@ -126,7 +126,7 @@ print(fruits)  # ['apple', 'banana', 'cherry', 'date']
 ```python
 # Indexing
 fruits = ["apple", "banana", "cherry"]
-print(fruits[0])   # apple (first)
+print(fruits[0])  # apple (first)
 print(fruits[-1])  # cherry (last)
 ```
 
@@ -137,8 +137,8 @@ print(fruits[-1])  # cherry (last)
 ```python
 # Indexing examples
 numbers = [10, 20, 30, 40, 50]
-print(numbers[0])   # 10
-print(numbers[2])   # 30
+print(numbers[0])  # 10
+print(numbers[2])  # 30
 print(numbers[-1])  # 50
 ```
 
@@ -206,11 +206,7 @@ print(fruits)  # ['cherry', 'banana']
 - **Related terms**: 2D List, Matrix, Multi-dimensional
 ```python
 # Nested list (matrix)
-matrix = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9]
-]
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
 # Access elements
 print(matrix[0][0])  # 1
@@ -227,11 +223,11 @@ print(matrix[1][2])  # 6
 # pop() method
 fruits = ["apple", "banana", "cherry"]
 last = fruits.pop()
-print(last)    # cherry
+print(last)  # cherry
 print(fruits)  # ['apple', 'banana']
 
 first = fruits.pop(0)
-print(first)   # apple
+print(first)  # apple
 print(fruits)  # ['banana']
 ```
 
@@ -282,10 +278,10 @@ print(original)  # [[99, 2], [3, 4]] - Modified!
 ```python
 # Slicing
 numbers = [0, 1, 2, 3, 4, 5]
-print(numbers[1:3])   # [1, 2]
-print(numbers[:3])    # [0, 1, 2]
-print(numbers[3:])    # [3, 4, 5]
-print(numbers[::2])   # [0, 2, 4]
+print(numbers[1:3])  # [1, 2]
+print(numbers[:3])  # [0, 1, 2]
+print(numbers[3:])  # [3, 4, 5]
+print(numbers[::2])  # [0, 2, 4]
 ```
 
 **sort()**
@@ -311,8 +307,8 @@ print(numbers)  # [9, 6, 5, 4, 3, 2, 1, 1]
 # sorted() function
 original = [3, 1, 4, 1, 5]
 sorted_list = sorted(original)
-print(original)    # [3, 1, 4, 1, 5] (unchanged)
-print(sorted_list) # [1, 1, 3, 4, 5]
+print(original)  # [3, 1, 4, 1, 5] (unchanged)
+print(sorted_list)  # [1, 1, 3, 4, 5]
 ```
 
 ### T
@@ -323,10 +319,10 @@ print(sorted_list) # [1, 1, 3, 4, 5]
 - **Related terms**: Immutable, List, Ordered
 ```python
 # Tuple vs List
-my_list = [1, 2, 3]    # Mutable
-my_tuple = (1, 2, 3)   # Immutable
+my_list = [1, 2, 3]  # Mutable
+my_tuple = (1, 2, 3)  # Immutable
 
-my_list[0] = 99   # Works
+my_list[0] = 99  # Works
 # my_tuple[0] = 99  # TypeError!
 ```
 

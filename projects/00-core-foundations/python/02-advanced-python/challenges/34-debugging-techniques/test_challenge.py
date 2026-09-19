@@ -29,6 +29,7 @@ import pytest  # noqa: E402
 # Bronze: Full-Stack Logging
 # ============================================================
 
+
 def test_capture_success_returns_empty():
     assert solution.capture(lambda: None) == ""
 
@@ -40,8 +41,7 @@ def test_capture_failure_returns_full_traceback():
 
 
 def test_capture_never_raises():
-    assert isinstance(solution.capture(lambda: (_ for _ in ()).throw(
-        ValueError("boom"))), str)
+    assert isinstance(solution.capture(lambda: (_ for _ in ()).throw(ValueError("boom"))), str)
 
 
 def test_capture_includes_frames():
@@ -65,6 +65,7 @@ def test_format_exception_text():
 # ============================================================
 # Silver: Boundary-Asserting Pipeline
 # ============================================================
+
 
 def test_pipeline_normal():
     pipe = solution.DebugPipeline()
@@ -99,6 +100,7 @@ def test_pipeline_dedup_preserves_order():
 # Gold: Repro Harness
 # ============================================================
 
+
 def test_repro_same_seed_identical():
     a = solution.make_repro(42)(["a", "b", "c", "d", "e"])
     b = solution.make_repro(42)(["a", "b", "c", "d", "e"])
@@ -126,6 +128,7 @@ def test_repro_does_not_mutate_input():
 # ============================================================
 # Gold: Config Bisect
 # ============================================================
+
 
 def _bound(n: int) -> int:
     return math.ceil(math.log2(n)) + 1
@@ -162,8 +165,7 @@ def test_bisect_odd_size():
 def test_bisect_logarithmic_growth():
     # doubling n must add at most ~1 probe
     _, probes_small = solution.bisect_bad([f"c{i}" for i in range(128)], 50)
-    _, probes_large = solution.bisect_bad(
-        [f"c{i}" for i in range(10_000)], 5_000)
+    _, probes_large = solution.bisect_bad([f"c{i}" for i in range(10_000)], 5_000)
     assert probes_large <= _bound(10_000)
     assert probes_large <= probes_small + 8, "log growth: ~1 probe per doubling"
 

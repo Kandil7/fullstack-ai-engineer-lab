@@ -52,15 +52,16 @@ class TreeNode:
     def __init__(self, data):
         self.data = data
         self.children = []
-    
+
     def add_child(self, child):
         self.children.append(child)
-    
+
     def remove_child(self, child):
         self.children = [c for c in self.children if c != child]
-    
+
     def __repr__(self):
         return f"TreeNode({self.data})"
+
 
 # Build a tree
 root = TreeNode("A")
@@ -91,6 +92,7 @@ def preorder(node):
         result.extend(preorder(child))
     return result
 
+
 def postorder(node):
     """Visit: Left → Right → Root (bottom-up)"""
     if node is None:
@@ -100,6 +102,7 @@ def postorder(node):
         result.extend(postorder(child))
     result.append(node.data)
     return result
+
 
 def inorder_binary(node):
     """Visit: Left → Root → Right (in-order for BST)"""
@@ -111,6 +114,7 @@ def inorder_binary(node):
     result.extend(inorder_binary(node.right))
     return result
 
+
 # For general trees, "inorder" is less defined
 # Focus on preorder and postorder
 ```
@@ -120,27 +124,28 @@ def inorder_binary(node):
 ```python
 from collections import deque
 
+
 def level_order(root):
     """Visit level by level, left to right."""
     if not root:
         return []
-    
+
     result = []
     queue = deque([root])
-    
+
     while queue:
         level = []
         level_size = len(queue)
-        
+
         for _ in range(level_size):
             node = queue.popleft()
             level.append(node.data)
-            
+
             for child in node.children:
                 queue.append(child)
-        
+
         result.append(level)
-    
+
     return result
 ```
 
@@ -155,11 +160,13 @@ def tree_height(node):
         return 0
     return 1 + max(tree_height(child) for child in node.children)
 
+
 def tree_size(node):
     """Total number of nodes. O(n)."""
     if not node:
         return 0
     return 1 + sum(tree_size(child) for child in node.children)
+
 
 def tree_depth(node, target, current_depth=0):
     """Find depth of target node. O(n)."""
@@ -170,6 +177,7 @@ def tree_depth(node, target, current_depth=0):
         if result != -1:
             return result
     return -1  # Not found
+
 
 def count_leaves(node):
     """Count leaf nodes. O(n)."""
@@ -192,10 +200,12 @@ Serialize and deserialize an N-ary tree.
 Uses preorder with a marker for null children.
 """
 
+
 class NaryNode:
     def __init__(self, val=None, children=None):
         self.val = val
         self.children = children or []
+
 
 def serialize(root):
     """Serialize tree to list."""
@@ -207,25 +217,26 @@ def serialize(root):
     result.append(None)  # Marker for end of children
     return result
 
+
 def deserialize(data):
     """Deserialize list back to tree."""
     if not data:
         return None
-    
+
     def helper(index):
         if index[0] >= len(data) or data[index[0]] is None:
             index[0] += 1
             return None
-        
+
         node = NaryNode(data[index[0]])
         index[0] += 1
-        
+
         while index[0] < len(data) and data[index[0]] is not None:
             node.children.append(helper(index))
-        
+
         index[0] += 1  # Skip the None marker
         return node
-    
+
     return helper([0])
 ```
 
@@ -237,28 +248,29 @@ Find the lowest common ancestor of two nodes in a tree.
 Time: O(n), Space: O(h) where h = height
 """
 
+
 def find_lca(root, node1, node2):
     """Find LCA in a general tree."""
     if root is None:
         return None
-    
+
     if root.data == node1 or root.data == node2:
         return root
-    
+
     for child in root.children:
         lca = find_lca(child, node1, node2)
         if lca:
             # If both found in different subtrees, root is LCA
             # Count how many of node1, node2 we've found
             pass
-    
+
     # Simplified approach: find path from root to each node
     path1 = find_path(root, node1)
     path2 = find_path(root, node2)
-    
+
     if not path1 or not path2:
         return None
-    
+
     # LCA is the last common node in both paths
     lca = None
     for a, b in zip(path1, path2):
@@ -266,22 +278,23 @@ def find_lca(root, node1, node2):
             lca = a
         else:
             break
-    
+
     return lca
+
 
 def find_path(root, target):
     """Find path from root to target node."""
     if root is None:
         return None
-    
+
     if root.data == target:
         return [root]
-    
+
     for child in root.children:
         path = find_path(child, target)
         if path:
             return [root] + path
-    
+
     return None
 ```
 
@@ -293,24 +306,25 @@ Find the diameter of a tree (longest path between any two nodes).
 Time: O(n²) for general tree, O(n) for binary tree
 """
 
+
 def tree_diameter(root):
     """Diameter = longest path between any two leaves."""
     if not root:
         return 0
-    
+
     # Height of each subtree
     heights = [tree_height(child) for child in root.children]
-    
+
     # Diameter through this node: sum of two tallest subtrees + 2
     max_diameter = 0
     if len(heights) >= 2:
         sorted_heights = sorted(heights, reverse=True)
         max_diameter = sorted_heights[0] + sorted_heights[1] + 2
-    
+
     # Diameter in subtrees
     for child in root.children:
         max_diameter = max(max_diameter, tree_diameter(child))
-    
+
     return max_diameter
 ```
 
@@ -322,6 +336,7 @@ Check if two trees are mirror images of each other.
 Time: O(n), Space: O(h)
 """
 
+
 def are_mirrors(root1, root2):
     if not root1 and not root2:
         return True
@@ -329,15 +344,15 @@ def are_mirrors(root1, root2):
         return False
     if root1.data != root2.data:
         return False
-    
+
     # Children of root1 reversed should match children of root2
     if len(root1.children) != len(root2.children):
         return False
-    
+
     for c1, c2 in zip(root1.children, reversed(root2.children)):
         if not are_mirrors(c1, c2):
             return False
-    
+
     return True
 ```
 
@@ -350,6 +365,7 @@ def are_mirrors(root1, root2):
 # WRONG: Infinite recursion
 def tree_height(node):
     return 1 + max(tree_height(child) for child in node.children)
+
 
 # RIGHT: Handle None and leaves
 def tree_height(node):
@@ -377,6 +393,7 @@ def tree_height(node):
 def traverse(root):
     result = [root.data]  # AttributeError if root is None
     ...
+
 
 # RIGHT: Always check
 def traverse(root):

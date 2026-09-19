@@ -31,10 +31,12 @@ starter = _load("starter_06", os.path.join(HERE, "starter.py"))
 def csv_path(tmp_path):
     rng = np.random.default_rng(42)
     n = 100_000
-    df = pl.DataFrame({
-        "id": range(n),
-        "metric": rng.uniform(0.0, 1.0, n),
-    })
+    df = pl.DataFrame(
+        {
+            "id": range(n),
+            "metric": rng.uniform(0.0, 1.0, n),
+        }
+    )
     path = str(tmp_path / "events.csv")
     df.write_csv(path)
     return path, df
@@ -48,10 +50,12 @@ def shard_dir(tmp_path):
     d.mkdir()
     n = 50_000
     for i in range(4):
-        df = pl.DataFrame({
-            "id": range(i * n, (i + 1) * n),
-            "metric": rng.uniform(0.0, 1.0, n),
-        })
+        df = pl.DataFrame(
+            {
+                "id": range(i * n, (i + 1) * n),
+                "metric": rng.uniform(0.0, 1.0, n),
+            }
+        )
         df.write_parquet(d / f"part-{i}.parquet")
     return str(d)
 
@@ -61,15 +65,18 @@ def right_dir(tmp_path):
     """50k rows with unique id -> category for the gold join."""
     d = tmp_path / "right"
     d.mkdir()
-    df = pl.DataFrame({
-        "id": range(200_000),
-        "category": ["cat"] * 200_000,
-    })
+    df = pl.DataFrame(
+        {
+            "id": range(200_000),
+            "category": ["cat"] * 200_000,
+        }
+    )
     df.write_parquet(d / "part-0.parquet")
     return str(d)
 
 
 # ---------------------------------------------------------------- bronze
+
 
 def test_bronze_count_matches(csv_path):
     path, df = csv_path
@@ -98,6 +105,7 @@ def test_bronze_starter_raises(csv_path):
 
 # ---------------------------------------------------------------- silver
 
+
 def test_silver_counts_all_shards(shard_dir):
     report = solution.chunked_stats(shard_dir, "metric")
     assert report["rows"] == 200_000
@@ -122,6 +130,7 @@ def test_silver_starter_raises(shard_dir):
 
 # ---------------------------------------------------------------- gold
 
+
 def test_gold_join_rows(tmp_path, shard_dir, right_dir):
     out = str(tmp_path / "joined.parquet")
     rows = solution.sink_join(shard_dir, right_dir, "id", "id", out)
@@ -141,12 +150,13 @@ def test_gold_lazy_end_to_end():
     with open(os.path.join(HERE, "solution.py"), encoding="utf-8") as fh:
         source = fh.read()
     # limit the scan to the sink_join function body only
-    fn = source[source.find("def sink_join"):]
+    fn = source[source.find("def sink_join") :]
     sink_idx = fn.find("sink_parquet")
     assert sink_idx != -1, "must use sink_parquet"
     collect_idx = fn.find("collect(")
-    assert collect_idx == -1 or collect_idx > sink_idx, \
+    assert collect_idx == -1 or collect_idx > sink_idx, (
         "no collect() may run before the sink (that would materialize RAM)"
+    )
 
 
 def test_gold_starter_raises(tmp_path, shard_dir, right_dir):

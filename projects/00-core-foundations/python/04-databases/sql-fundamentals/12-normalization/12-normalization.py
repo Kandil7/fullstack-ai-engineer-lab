@@ -36,8 +36,7 @@ conn.execute("""
 """)
 conn.executemany(
     "INSERT INTO orders_bad (order_id, customer, customer_city, items) VALUES (?, ?, ?, ?)",
-    [(1, "ada", "london", "gpu,cpu"), (2, "ada", "london", "ram"),
-     (3, "bob", "paris", "gpu")],
+    [(1, "ada", "london", "gpu,cpu"), (2, "ada", "london", "ram"), (3, "bob", "paris", "gpu")],
 )
 print("  items column holds multiple values -> violates 1NF (no atomic cells)")
 print("  customer_city repeats per order -> violates 2NF/3NF (transitive dep)")
@@ -53,10 +52,14 @@ conn.execute("""
         PRIMARY KEY (order_id, item)
     )
 """)
-conn.executemany("INSERT INTO order_items (order_id, item) VALUES (?, ?)",
-                 [(1, "gpu"), (1, "cpu"), (2, "ram"), (3, "gpu")])
+conn.executemany(
+    "INSERT INTO order_items (order_id, item) VALUES (?, ?)",
+    [(1, "gpu"), (1, "cpu"), (2, "ram"), (3, "gpu")],
+)
 print("  each cell one value; queries can filter per item:")
-print(f"    orders containing gpu: {[r[0] for r in conn.execute('SELECT DISTINCT order_id FROM order_items WHERE item = ?', ('gpu',)).fetchall()]}")
+print(
+    f"    orders containing gpu: {[r[0] for r in conn.execute('SELECT DISTINCT order_id FROM order_items WHERE item = ?', ('gpu',)).fetchall()]}"
+)
 
 # ============================================================
 # 3. 2NF — no partial dependency on part of a composite key
@@ -68,8 +71,9 @@ print("""
   Fix: separate items table; order_items keeps only the link.
 """)
 conn.execute("CREATE TABLE items (item TEXT PRIMARY KEY, price INTEGER)")
-conn.executemany("INSERT INTO items (item, price) VALUES (?, ?)",
-                 [("gpu", 1000), ("cpu", 300), ("ram", 100)])
+conn.executemany(
+    "INSERT INTO items (item, price) VALUES (?, ?)", [("gpu", 1000), ("cpu", 300), ("ram", 100)]
+)
 print(f"  items: {conn.execute('SELECT * FROM items ORDER BY price').fetchall()}")
 
 # ============================================================
@@ -82,11 +86,14 @@ print("""
   Fix: customers table; orders reference customer_id.
 """)
 conn.execute("CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT)")
-conn.executemany("INSERT INTO customers (id, name, city) VALUES (?, ?, ?)",
-                 [(1, "ada", "london"), (2, "bob", "paris")])
+conn.executemany(
+    "INSERT INTO customers (id, name, city) VALUES (?, ?, ?)",
+    [(1, "ada", "london"), (2, "bob", "paris")],
+)
 conn.execute("CREATE TABLE orders (order_id INTEGER PRIMARY KEY, customer_id INTEGER)")
-conn.executemany("INSERT INTO orders (order_id, customer_id) VALUES (?, ?)",
-                 [(1, 1), (2, 1), (3, 2)])
+conn.executemany(
+    "INSERT INTO orders (order_id, customer_id) VALUES (?, ?)", [(1, 1), (2, 1), (3, 2)]
+)
 print("  city stored ONCE per customer; update one row, not three")
 
 # ============================================================
@@ -144,6 +151,7 @@ print("""
 # MISTAKE: natural key as PK (email changes, ISBN long)
 # CORRECT: surrogate PK + unique constraint on the natural key
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -153,25 +161,31 @@ def _verify() -> None:
     try:
         # 1NF: atomic cells allow item-level queries
         conn.execute("CREATE TABLE oi (order_id INTEGER, item TEXT, PRIMARY KEY (order_id, item))")
-        conn.executemany("INSERT INTO oi (order_id, item) VALUES (?, ?)",
-                         [(1, "gpu"), (1, "cpu"), (2, "ram")])
-        assert conn.execute("SELECT COUNT(*) FROM oi WHERE item = 'gpu'").fetchone()[0] == 1, \
+        conn.executemany(
+            "INSERT INTO oi (order_id, item) VALUES (?, ?)", [(1, "gpu"), (1, "cpu"), (2, "ram")]
+        )
+        assert conn.execute("SELECT COUNT(*) FROM oi WHERE item = 'gpu'").fetchone()[0] == 1, (
             "atomic cells must be filterable"
+        )
 
         # 2NF: item price depends on item, not the composite key
         conn.execute("CREATE TABLE it (item TEXT PRIMARY KEY, price INTEGER)")
-        conn.executemany("INSERT INTO it (item, price) VALUES (?, ?)",
-                         [("gpu", 1000), ("ram", 100)])
+        conn.executemany(
+            "INSERT INTO it (item, price) VALUES (?, ?)", [("gpu", 1000), ("ram", 100)]
+        )
         price = conn.execute("SELECT price FROM it WHERE item = 'gpu'").fetchone()[0]
         assert price == 1000, "item table stores the fact once"
 
         # 3NF: city moves with the customer, not the order
         conn.execute("CREATE TABLE cu (id INTEGER PRIMARY KEY, name TEXT, city TEXT)")
         conn.execute("CREATE TABLE or_ (order_id INTEGER PRIMARY KEY, customer_id INTEGER)")
-        conn.executemany("INSERT INTO cu (id, name, city) VALUES (?, ?, ?)",
-                         [(1, "ada", "london"), (2, "bob", "paris")])
-        conn.executemany("INSERT INTO or_ (order_id, customer_id) VALUES (?, ?)",
-                         [(1, 1), (2, 1), (3, 2)])
+        conn.executemany(
+            "INSERT INTO cu (id, name, city) VALUES (?, ?, ?)",
+            [(1, "ada", "london"), (2, "bob", "paris")],
+        )
+        conn.executemany(
+            "INSERT INTO or_ (order_id, customer_id) VALUES (?, ?)", [(1, 1), (2, 1), (3, 2)]
+        )
         # update city once; every order sees it
         conn.execute("UPDATE cu SET city = 'berlin' WHERE id = 1")
         rows = conn.execute(
@@ -183,8 +197,9 @@ def _verify() -> None:
         report = conn.execute(
             "SELECT o.order_id, c.name FROM or_ o JOIN cu c ON c.id = o.customer_id ORDER BY o.order_id"
         ).fetchall()
-        assert report == [(1, "ada"), (2, "ada"), (3, "bob")], \
+        assert report == [(1, "ada"), (2, "ada"), (3, "bob")], (
             "normalized joins must reconstruct the view"
+        )
 
         # Surrogate vs natural: uniqueness constraint on natural key
         try:

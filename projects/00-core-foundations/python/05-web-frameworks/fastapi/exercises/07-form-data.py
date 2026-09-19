@@ -114,9 +114,11 @@ def update_settings(
     newsletter: bool = Form(...),
 ):
     """Update user settings from form data."""
-    return {"settings": {
-        "theme": theme,
-        "language": language,
-        "notifications": notifications,
-        "newsletter": newsletter,
-    }}
+    return {
+        "settings": {
+            "theme": theme,
+            "language": language,
+            "notifications": notifications,
+            "newsletter": newsletter,
+        }
+    }

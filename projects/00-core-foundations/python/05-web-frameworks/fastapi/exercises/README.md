@@ -197,14 +197,17 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+
 # Request model
 class ItemCreate(BaseModel):
     name: str
     price: float
 
+
 # Response model
 class ItemResponse(ItemCreate):
     id: int
+
 
 # Endpoint
 @app.post("/items", response_model=ItemResponse, status_code=201)
@@ -217,6 +220,7 @@ async def create_item(item: ItemCreate):
 ```python
 from fastapi import Depends
 
+
 async def get_db():
     db = DatabaseConnection()
     try:
@@ -224,8 +228,9 @@ async def get_db():
     finally:
         db.close()
 
+
 @app.get("/items")
-async def list_items(db = Depends(get_db)):
+async def list_items(db=Depends(get_db)):
     return db.query("SELECT * FROM items")
 ```
 
@@ -234,10 +239,7 @@ async def list_items(db = Depends(get_db)):
 @app.get("/items/{item_id}")
 async def get_item(item_id: int):
     if item_id not in items:
-        raise HTTPException(
-            status_code=404,
-            detail="Item not found"
-        )
+        raise HTTPException(status_code=404, detail="Item not found")
     return items[item_id]
 ```
 

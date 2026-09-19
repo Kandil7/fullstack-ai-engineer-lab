@@ -20,9 +20,14 @@ import pandas as pd
 df = pd.DataFrame(
     {"sales": [120, 90, 200, 150, 80, 60]},
     index=pd.MultiIndex.from_tuples(
-        [("north", "Boston"), ("north", "NYC"),
-         ("south", "Atlanta"), ("south", "Miami"),
-         ("west", "Seattle"), ("west", "LA")],
+        [
+            ("north", "Boston"),
+            ("north", "NYC"),
+            ("south", "Atlanta"),
+            ("south", "Miami"),
+            ("west", "Seattle"),
+            ("west", "LA"),
+        ],
         names=["region", "city"],
     ),
 )
@@ -75,9 +80,9 @@ df.xs("north", level="region", drop_level=False)
 Compare with `.loc`:
 
 ```python
-df.loc[("north", "Boston")]        # exact tuple — must be fully specified
-df.loc["north"]                    # partial — works if level order matches
-df.loc[("north", slice(None))]     # explicit "all" for deeper levels
+df.loc[("north", "Boston")]  # exact tuple — must be fully specified
+df.loc["north"]  # partial — works if level order matches
+df.loc[("north", slice(None))]  # explicit "all" for deeper levels
 ```
 
 ## 4. Reordering & Swapping Levels
@@ -100,7 +105,7 @@ previously-outer level.
 
 ```python
 # unstack: move the innermost index level into columns
-wide = df.unstack()          # cities become columns
+wide = df.unstack()  # cities become columns
 # sales
 # city    Atlanta  Boston  LA  Miami  NYC  Seattle
 # region
@@ -122,7 +127,7 @@ pivot = df.groupby(["region", "month", "channel"])["revenue"].sum()
 
 # North vs South by channel
 north = pivot.xs("north", level="region")
-north.unstack()          # channels as columns, months as rows
+north.unstack()  # channels as columns, months as rows
 
 # Quarter-over-quarter comparison
 quarterly = pivot.unstack(level="month").T.swaplevel().sort_index()

@@ -78,11 +78,11 @@ result = value and "default"  # Returns value if truthy, else "default"
 command = "quit"
 
 match command:
-    case "quit":           # Pattern: literal string
+    case "quit":  # Pattern: literal string
         print("Exiting")
-    case "help":           # Pattern: literal string
+    case "help":  # Pattern: literal string
         print("Help")
-    case str() as cmd:     # Pattern: any string, captured as cmd
+    case str() as cmd:  # Pattern: any string, captured as cmd
         print(f"Unknown: {cmd}")
 ```
 
@@ -96,9 +96,9 @@ match command:
 **Example**:
 ```python
 x = 5
-print(1 < x < 10)      # True — (1 < 5) and (5 < 10)
-print(1 < x < 3)       # False — (1 < 5) and (5 < 3)
-print(1 < 2 < 3 < 4)   # True
+print(1 < x < 10)  # True — (1 < 5) and (5 < 10)
+print(1 < x < 3)  # False — (1 < 5) and (5 < 3)
+print(1 < 2 < 3 < 4)  # True
 
 # More complex chains
 print(1 <= x <= 10 <= 100)  # True
@@ -114,11 +114,11 @@ print(1 <= x <= 10 <= 100)  # True
 **Example**:
 ```python
 x = 10
-if x > 5:            # x > 5 is a condition (True)
+if x > 5:  # x > 5 is a condition (True)
     print("Big")
 
 name = "Alice"
-if len(name) > 3:    # len(name) > 3 is a condition (True)
+if len(name) > 3:  # len(name) > 3 is a condition (True)
     print("Long name")
 ```
 
@@ -204,10 +204,11 @@ def check_value(x):
         case _:
             return "Not an integer"
 
-print(check_value(5))   # Positive integer
+
+print(check_value(5))  # Positive integer
 print(check_value(-3))  # Negative integer
-print(check_value(0))   # Zero
-print(check_value("hi"))# Not an integer
+print(check_value(0))  # Zero
+print(check_value("hi"))  # Not an integer
 ```
 
 **Related**: `match`, `case`, pattern matching
@@ -223,13 +224,13 @@ a = [1, 2, 3]
 b = [1, 2, 3]
 c = a
 
-print(a == b)   # True — same value
-print(a is b)   # False — different objects
-print(a is c)   # True — same object
+print(a == b)  # True — same value
+print(a is b)  # False — different objects
+print(a is c)  # True — same object
 
 # Always use 'is' for None
 x = None
-if x is None:   # Correct
+if x is None:  # Correct
     print("None")
 # if x == None:  # Works but not Pythonic
 ```
@@ -246,8 +247,8 @@ if x is None:   # Correct
 temperature = 80
 
 if temperature > 75:
-    print("It's hot!")      # Executes
-    print("Turn on AC!")    # Also executes
+    print("It's hot!")  # Executes
+    print("Turn on AC!")  # Also executes
 ```
 
 **Related**: `elif`, `else`, condition, indentation
@@ -270,9 +271,10 @@ def describe(command):
         case _:
             return f"Unknown: {command}"
 
-print(describe("quit"))           # Exiting program
-print(describe(["move", "north"]))# Moving north
-print(describe("foo"))            # Unknown: foo
+
+print(describe("quit"))  # Exiting program
+print(describe(["move", "north"]))  # Moving north
+print(describe("foo"))  # Unknown: foo
 ```
 
 **Related**: `case`, guard, pattern, wildcard, Python 3.10
@@ -428,6 +430,7 @@ def response(code):
         case _:
             return f"Unknown code: {code}"
 
+
 print(response(200))  # OK
 print(response(418))  # Unknown code: 418
 ```
@@ -441,8 +444,8 @@ print(response(418))  # Unknown code: 418
 ### Example 1: BMI Calculator
 ```python
 def bmi_category(weight_kg, height_m):
-    bmi = weight_kg / (height_m ** 2)
-    
+    bmi = weight_kg / (height_m**2)
+
     if bmi < 18.5:
         return "Underweight"
     elif bmi < 25:
@@ -452,6 +455,7 @@ def bmi_category(weight_kg, height_m):
     else:
         return "Obese"
 
+
 print(bmi_category(70, 1.75))  # Normal weight
 ```
 
@@ -459,16 +463,17 @@ print(bmi_category(70, 1.75))  # Normal weight
 ```python
 def calculate_price(quantity):
     if quantity < 10:
-        return quantity * 10.00     # $10 each
+        return quantity * 10.00  # $10 each
     elif quantity < 50:
-        return quantity * 8.50      # $8.50 each
+        return quantity * 8.50  # $8.50 each
     elif quantity < 100:
-        return quantity * 7.00      # $7 each
+        return quantity * 7.00  # $7 each
     else:
-        return quantity * 5.50      # $5.50 each
+        return quantity * 5.50  # $5.50 each
 
-print(calculate_price(5))    # $50.00
-print(calculate_price(25))   # $212.50
+
+print(calculate_price(5))  # $50.00
+print(calculate_price(25))  # $212.50
 print(calculate_price(150))  # $825.00
 ```
 
@@ -488,6 +493,7 @@ def handle_http_status(status):
             return "Client Error"
         case _:
             return f"Unknown status: {status}"
+
 
 print(handle_http_status(200))  # Success
 print(handle_http_status(418))  # Client Error

@@ -18,12 +18,15 @@ Parameters are variables in function definitions. Arguments are values passed wh
 def greet(name, age):
     return f"Hello {name}, you are {age}"
 
+
 # "Alice" and 30 are ARGUMENTS
 greeting = greet("Alice", 30)
+
 
 # Types of arguments
 def func(a, b, c=10, *args, **kwargs):
     pass
+
 
 # Positional arguments
 func(1, 2, 3, 4, 5, x=6, y=7)
@@ -42,13 +45,16 @@ def flexible(*args, **kwargs):
     print(f"Positional: {args}")
     print(f"Keyword: {kwargs}")
 
+
 flexible(1, 2, 3, name="Alice", age=30)
 # Positional: (1, 2, 3)
 # Keyword: {'name': 'Alice', 'age': 30}
 
+
 # Unpacking in function calls
 def add(a, b, c):
     return a + b + c
+
 
 numbers = [1, 2, 3]
 print(add(*numbers))  # 6
@@ -56,9 +62,11 @@ print(add(*numbers))  # 6
 config = {"a": 1, "b": 2, "c": 3}
 print(add(**config))  # 6
 
+
 # Combining with regular parameters
 def func(a, b, *args, key1=None, **kwargs):
     pass
+
 
 func(1, 2, 3, 4, key1="value", extra="data")
 ```
@@ -76,8 +84,10 @@ def add_item(item, items=[]):
     items.append(item)
     return items
 
+
 print(add_item("a"))  # ['a']
 print(add_item("b"))  # ['a', 'b'] - NOT ['b']!
+
 
 # GOOD: Use None as default
 def add_item_safe(item, items=None):
@@ -86,8 +96,10 @@ def add_item_safe(item, items=None):
     items.append(item)
     return items
 
+
 print(add_item_safe("a"))  # ['a']
 print(add_item_safe("b"))  # ['b'] - Correct!
+
 
 # Immutable defaults are fine
 def greet(name, times=1):
@@ -105,30 +117,39 @@ A closure is a function that remembers variables from its enclosing scope, even 
 def outer(message):
     def inner():
         print(f"Message: {message}")
+
     return inner
+
 
 greeting = outer("Hello")
 greeting()  # Message: Hello
 # 'message' is remembered even though outer() has finished
 
+
 # Practical use: counter
 def make_counter(start=0):
     count = [start]  # List to allow mutation
+
     def counter():
         count[0] += 1
         return count[0]
+
     return counter
+
 
 counter = make_counter()
 print(counter())  # 1
 print(counter())  # 2
 print(counter())  # 3
 
+
 # Practical use: multiplier
 def make_multiplier(factor):
     def multiplier(x):
         return x * factor
+
     return multiplier
+
 
 double = make_multiplier(2)
 triple = make_multiplier(3)
@@ -147,6 +168,7 @@ Decorators are higher-order functions that modify other functions. They use the 
 import functools
 import time
 
+
 # Basic decorator
 def timer(func):
     @functools.wraps(func)
@@ -156,12 +178,15 @@ def timer(func):
         end = time.time()
         print(f"{func.__name__} took {end - start:.4f}s")
         return result
+
     return wrapper
+
 
 @timer
 def slow_function():
     time.sleep(1)
     return "Done"
+
 
 # Decorator with arguments
 def retry(max_attempts=3):
@@ -175,12 +200,16 @@ def retry(max_attempts=3):
                     if attempt == max_attempts - 1:
                         raise
                     print(f"Attempt {attempt + 1} failed: {e}")
+
         return wrapper
+
     return decorator
+
 
 @retry(max_attempts=3)
 def unreliable_function():
     import random
+
     if random.random() < 0.5:
         raise ValueError("Random failure")
     return "Success"
@@ -195,7 +224,7 @@ Lambda functions are anonymous, single-expression functions. They're limited to 
 
 ```python
 # Lambda syntax
-square = lambda x: x ** 2
+square = lambda x: x**2
 add = lambda a, b: a + b
 
 print(square(5))  # 25
@@ -246,17 +275,21 @@ print(evens)  # [2, 4]
 product = reduce(lambda x, y: x * y, nums)
 print(product)  # 120
 
+
 # Custom higher-order function
 def apply_to_each(func, iterable):
     return [func(item) for item in iterable]
 
+
 def create_validator(min_val, max_val):
     def validator(value):
         return min_val <= value <= max_val
+
     return validator
 
+
 is_valid_age = create_validator(0, 150)
-print(is_valid_age(25))   # True
+print(is_valid_age(25))  # True
 print(is_valid_age(200))  # False
 ```
 
@@ -270,11 +303,13 @@ Recursion is when a function calls itself. Python has a default recursion limit 
 ```python
 import sys
 
+
 # Basic recursion - factorial
 def factorial(n):
     if n <= 1:
         return 1
     return n * factorial(n - 1)
+
 
 # Fibonacci (inefficient without memoization)
 def fibonacci(n):
@@ -282,8 +317,10 @@ def fibonacci(n):
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
 
+
 # With memoization
 from functools import lru_cache
+
 
 @lru_cache(maxsize=None)
 def fibonacci_memo(n):
@@ -291,15 +328,18 @@ def fibonacci_memo(n):
         return n
     return fibonacci_memo(n - 1) + fibonacci_memo(n - 2)
 
+
 # Tail recursion (Python doesn't optimize it)
 def factorial_tail(n, accumulator=1):
     if n <= 1:
         return accumulator
     return factorial_tail(n - 1, n * accumulator)
 
+
 # Check recursion limit
 print(sys.getrecursionlimit())  # 1000
-sys.setrecursionlimit(2000)     # Increase if needed
+sys.setrecursionlimit(2000)  # Increase if needed
+
 
 # Convert recursion to iteration
 def factorial_iterative(n):
@@ -321,6 +361,7 @@ Python doesn't support traditional overloading but provides alternatives.
 def greet(name, greeting="Hello"):
     return f"{greeting}, {name}!"
 
+
 # Using *args and type checking
 def add(*args):
     if len(args) == 2:
@@ -329,28 +370,34 @@ def add(*args):
         return args[0] + args[1] + args[2]
     raise ValueError("Invalid number of arguments")
 
+
 # Using functools.singledispatch (Python 3.4+)
 from functools import singledispatch
+
 
 @singledispatch
 def process(value):
     raise TypeError(f"Cannot process {type(value)}")
 
+
 @process.register(int)
 def _(value):
     return value * 2
+
 
 @process.register(str)
 def _(value):
     return value.upper()
 
+
 @process.register(list)
 def _(value):
     return [process(item) for item in value]
 
-print(process(5))          # 10
-print(process("hello"))    # HELLO
-print(process([1, "a"]))   # [2, 'A']
+
+print(process(5))  # 10
+print(process("hello"))  # HELLO
+print(process([1, "a"]))  # [2, 'A']
 ```
 
 ---
@@ -363,35 +410,36 @@ Type hints document expected types without enforcing them (use mypy for enforcem
 ```python
 from typing import List, Dict, Optional, Union, Tuple
 
+
 # Basic annotations
 def greet(name: str, times: int = 1) -> str:
     return f"Hello {name}! " * times
 
+
 # Complex types
 def process_items(
-    items: List[int],
-    config: Dict[str, Union[int, str]],
-    callback: Optional[callable] = None
+    items: List[int], config: Dict[str, Union[int, str]], callback: Optional[callable] = None
 ) -> Tuple[List[int], int]:
     result = [x * 2 for x in items]
     if callback:
         result = callback(result)
     return result, len(result)
 
+
 # New syntax (Python 3.9+)
-def merge(
-    dict1: dict[str, int],
-    dict2: dict[str, int]
-) -> dict[str, int]:
+def merge(dict1: dict[str, int], dict2: dict[str, int]) -> dict[str, int]:
     return {**dict1, **dict2}
+
 
 # Using TypeVar for generics
 from typing import TypeVar, Sequence
 
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 def first(items: Sequence[T]) -> T:
     return items[0]
+
 
 # Type checking with mypy
 # $ mypy script.py
@@ -409,22 +457,27 @@ Pure functions always return the same output for the same input and don't modify
 def add(a: int, b: int) -> int:
     return a + b
 
+
 # Function with side effects
 total = 0
+
+
 def add_to_total(value):
     global total
     total += value  # Modifies external state
     return total
 
+
 # Avoiding side effects
 def calculate_discount(price: float, discount: float) -> float:
     return price * (1 - discount)
+
 
 # Instead of
 class ShoppingCart:
     def __init__(self):
         self.total = 0
-    
+
     def add_item(self, price):
         self.total += price  # Side effect: modifies state
 ```
@@ -439,38 +492,42 @@ class ShoppingCart:
 ```python
 def outer():
     count = 0
-    
+
     def inner():
         nonlocal count
         count += 1
         return count
-    
+
     return inner
+
 
 counter = outer()
 print(counter())  # 1
 print(counter())  # 2
 
+
 # Without nonlocal, this would fail
 def outer_bad():
     count = 0
-    
+
     def inner_bad():
         # count += 1  # UnboundLocalError
         count = count + 1  # Creates local variable
         return count
-    
+
     return inner_bad
+
 
 # Practical example: running average
 def make_averager():
     values = []
-    
+
     def averager(new_value):
         values.append(new_value)
         return sum(values) / len(values)
-    
+
     return averager
+
 
 avg = make_averager()
 print(avg(10))  # 10.0
@@ -488,22 +545,26 @@ Functions are first-class objects, so you can assign them to variables and creat
 ```python
 from functools import partial
 
+
 # Function alias
 def greet(name):
     return f"Hello, {name}!"
 
+
 hello = greet  # Alias
 print(hello("Alice"))
 
+
 # Partial functions
 def power(base, exponent):
-    return base ** exponent
+    return base**exponent
+
 
 square = partial(power, exponent=2)
 cube = partial(power, exponent=3)
 
 print(square(5))  # 25
-print(cube(5))    # 125
+print(cube(5))  # 125
 
 # Partial with built-in functions
 from operator import mul
@@ -511,9 +572,11 @@ from operator import mul
 double = partial(mul, 2)
 print(double(5))  # 10
 
+
 # Practical example
 def connect(host, port, protocol):
     return f"Connecting to {protocol}://{host}:{port}"
+
 
 http_connect = partial(connect, protocol="http")
 print(http_connect("localhost", 8080))  # http://localhost:8080
@@ -534,6 +597,7 @@ def count_up_to(n):
         yield i
         i += 1
 
+
 for num in count_up_to(5):
     print(num, end=" ")  # 1 2 3 4 5
 
@@ -541,22 +605,26 @@ for num in count_up_to(5):
 squares = (x**2 for x in range(1000000))
 print(sum(squares))  # Memory efficient
 
+
 # Generator pipeline
 def read_large_file(path):
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         for line in f:
             yield line.strip()
+
 
 def filter_lines(lines, pattern):
     for line in lines:
         if pattern in line:
             yield line
 
+
 # Chain of generators
 lines = read_large_file("large.txt")
 matches = filter_lines(lines, "error")
 for match in matches:
     print(match)
+
 
 # yield from - delegating to sub-generator
 def flatten(nested):
@@ -577,18 +645,20 @@ Python follows LEGB: Local, Enclosing, Global, Built-in scopes.
 ```python
 x = "global"
 
+
 def outer():
     x = "enclosing"
-    
+
     def inner():
         x = "local"
-        print(x)      # local
-    
+        print(x)  # local
+
     inner()
-    print(x)          # enclosing
+    print(x)  # enclosing
+
 
 outer()
-print(x)              # global
+print(x)  # global
 
 # Built-in scope
 print = lambda x: x  # Shadows built-in
@@ -596,19 +666,24 @@ print = lambda x: x  # Shadows built-in
 
 # Built-in functions
 import builtins
+
 print(dir(builtins))  # List all built-ins
+
 
 # Global keyword
 def modify_global():
     global x
     x = "modified"
 
+
 # nonlocal keyword
 def outer():
     x = "enclosing"
+
     def inner():
         nonlocal x
         x = "modified"
+
     inner()
     print(x)  # modified
 ```
@@ -625,19 +700,21 @@ def outer():
 ```python
 import functools
 
+
 def memoize(func):
     cache = {}
-    
+
     @functools.wraps(func)
     def wrapper(*args):
         if args not in cache:
             cache[args] = func(*args)
         return cache[args]
-    
+
     wrapper.cache = cache
     wrapper.cache_info = lambda: {"size": len(cache)}
     wrapper.cache_clear = lambda: cache.clear()
     return wrapper
+
 
 @memoize
 def fibonacci(n):
@@ -645,12 +722,14 @@ def fibonacci(n):
         return n
     return fibonacci(n - 1) + fibonacci(n - 2)
 
+
 # Test
 print(fibonacci(50))  # Fast!
 print(fibonacci.cache_info())
 
 # Alternative using lru_cache
 from functools import lru_cache
+
 
 @lru_cache(maxsize=128)
 def fibonacci_lru(n):
@@ -670,6 +749,7 @@ def fibonacci_lru(n):
 import functools
 import time
 
+
 def retry(max_attempts=3, delay=1, exceptions=(Exception,)):
     def decorator(func):
         @functools.wraps(func)
@@ -684,15 +764,20 @@ def retry(max_attempts=3, delay=1, exceptions=(Exception,)):
                         print(f"Attempt {attempt + 1} failed: {e}")
                         time.sleep(delay)
             raise last_exception
+
         return wrapper
+
     return decorator
+
 
 @retry(max_attempts=3, delay=0.1, exceptions=(ValueError, ConnectionError))
 def unreliable_api_call():
     import random
+
     if random.random() < 0.7:
         raise ConnectionError("API unavailable")
     return "Success!"
+
 
 # Test
 try:
@@ -713,6 +798,7 @@ except ConnectionError as e:
 import functools
 import time
 
+
 def timer(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -720,7 +806,7 @@ def timer(func):
         result = func(*args, **kwargs)
         end = time.perf_counter()
         duration = end - start
-        
+
         # Format duration
         if duration < 0.001:
             formatted = f"{duration * 1000000:.2f}µs"
@@ -728,20 +814,23 @@ def timer(func):
             formatted = f"{duration * 1000:.2f}ms"
         else:
             formatted = f"{duration:.2f}s"
-        
+
         print(f"{func.__name__} took {formatted}")
         return result
-    
+
     wrapper.timings = []
     return wrapper
+
 
 @timer
 def slow_function():
     time.sleep(0.1)
     return "Done"
 
+
 # Test
 slow_function()
+
 
 # More advanced: accumulate timings
 def timer_stats(func):
@@ -750,16 +839,17 @@ def timer_stats(func):
         start = time.perf_counter()
         result = func(*args, **kwargs)
         duration = time.perf_counter() - start
-        
-        if not hasattr(wrapper, 'stats'):
-            wrapper.stats = {'count': 0, 'total': 0, 'min': float('inf'), 'max': 0}
-        
-        wrapper.stats['count'] += 1
-        wrapper.stats['total'] += duration
-        wrapper.stats['min'] = min(wrapper.stats['min'], duration)
-        wrapper.stats['max'] = max(wrapper.stats['max'], duration)
-        
+
+        if not hasattr(wrapper, "stats"):
+            wrapper.stats = {"count": 0, "total": 0, "min": float("inf"), "max": 0}
+
+        wrapper.stats["count"] += 1
+        wrapper.stats["total"] += duration
+        wrapper.stats["min"] = min(wrapper.stats["min"], duration)
+        wrapper.stats["max"] = max(wrapper.stats["max"], duration)
+
         return result
+
     return wrapper
 ```
 
@@ -774,10 +864,11 @@ def timer_stats(func):
 import functools
 import time
 
+
 def throttle(interval):
     def decorator(func):
         last_called = [0]
-        
+
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             now = time.time()
@@ -787,13 +878,17 @@ def throttle(interval):
             else:
                 print(f"Throttled: {func.__name__} called too soon")
                 return None
+
         return wrapper
+
     return decorator
+
 
 @throttle(interval=1)
 def api_call():
     print("API called")
     return "response"
+
 
 # Test
 api_call()  # API called
@@ -817,36 +912,39 @@ def pipeline(*functions):
         for func in functions:
             result = func(result)
         return result
+
     return wrapper
+
 
 # Alternative with reduce
 from functools import reduce
 
+
 def pipeline_reduce(*functions):
     def wrapper(value):
         return reduce(lambda v, f: f(v), functions, value)
+
     return wrapper
+
 
 # Test
 def double(x):
     return x * 2
 
+
 def add_one(x):
     return x + 1
 
+
 def square(x):
-    return x ** 2
+    return x**2
+
 
 transform = pipeline(double, add_one, square)
 print(transform(3))  # (3 * 2 + 1)^2 = 49
 
 # Practical example: data processing
-clean_text = pipeline(
-    str.strip,
-    str.lower,
-    lambda s: s.replace("-", " "),
-    str.title
-)
+clean_text = pipeline(str.strip, str.lower, lambda s: s.replace("-", " "), str.title)
 print(clean_text("  hello-world  "))  # "Hello World"
 ```
 
@@ -862,30 +960,34 @@ import functools
 import time
 import threading
 
+
 def debounce(interval):
     def decorator(func):
         timer = None
-        
+
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             nonlocal timer
-            
+
             if timer is not None:
                 timer.cancel()
-            
+
             def call_func():
                 func(*args, **kwargs)
-            
+
             timer = threading.Timer(interval, call_func)
             timer.start()
-        
+
         wrapper.cancel = lambda: timer.cancel() if timer else None
         return wrapper
+
     return decorator
+
 
 @debounce(interval=0.5)
 def search(query):
     print(f"Searching for: {query}")
+
 
 # Test
 search("a")
@@ -906,35 +1008,36 @@ search("appl")
 import functools
 import time
 
+
 def memoize_with_ttl(ttl_seconds):
     def decorator(func):
         cache = {}
-        
+
         @functools.wraps(func)
         def wrapper(*args):
             now = time.time()
-            
+
             if args in cache:
                 result, timestamp = cache[args]
                 if now - timestamp < ttl_seconds:
                     return result
-            
+
             result = func(*args)
             cache[args] = (result, now)
             return result
-        
+
         wrapper.cache_clear = lambda: cache.clear()
-        wrapper.cache_info = lambda: {
-            "size": len(cache),
-            "entries": list(cache.keys())
-        }
+        wrapper.cache_info = lambda: {"size": len(cache), "entries": list(cache.keys())}
         return wrapper
+
     return decorator
+
 
 @memoize_with_ttl(ttl_seconds=5)
 def expensive_calculation(n):
     print(f"Computing {n}...")
-    return n ** 2
+    return n**2
+
 
 # Test
 print(expensive_calculation(5))  # Computes
@@ -953,26 +1056,34 @@ print(expensive_calculation(5))  # Computes again
 ```python
 from functools import reduce
 
+
 def compose(*functions):
     def wrapper(value):
         return reduce(lambda v, f: f(v), reversed(functions), value)
+
     return wrapper
+
 
 # Pipe (left-to-right)
 def pipe(*functions):
     def wrapper(value):
         return reduce(lambda v, f: f(v), functions, value)
+
     return wrapper
+
 
 # Test
 def add_one(x):
     return x + 1
 
+
 def double(x):
     return x * 2
 
+
 def square(x):
-    return x ** 2
+    return x**2
+
 
 # Compose: right to left
 transform = compose(square, double, add_one)
@@ -983,11 +1094,7 @@ transform_pipe = pipe(add_one, double, square)
 print(transform_pipe(3))  # square(double(add_one(3))) = 64
 
 # Practical example
-clean_email = compose(
-    str.lower,
-    str.strip,
-    lambda email: email.split("@")[0]
-)
+clean_email = compose(str.lower, str.strip, lambda email: email.split("@")[0])
 print(clean_email("  Alice@Example.com  "))  # "alice"
 ```
 

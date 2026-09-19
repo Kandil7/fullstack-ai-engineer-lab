@@ -33,16 +33,16 @@ By the end of this lecture, you will be able to:
 import numpy as np
 
 # Single values
-print("sin(0):", np.sin(0))          # 0.0
-print("cos(0):", np.cos(0))          # 1.0
-print("tan(0):", np.tan(0))          # 0.0
+print("sin(0):", np.sin(0))  # 0.0
+print("cos(0):", np.cos(0))  # 1.0
+print("tan(0):", np.tan(0))  # 0.0
 
 # pi/2 (90 degrees)
-print("\nsin(pi/2):", np.sin(np.pi/2))  # 1.0
-print("cos(pi/2):", np.cos(np.pi/2))   # 6.12e-17 ≈ 0
+print("\nsin(pi/2):", np.sin(np.pi / 2))  # 1.0
+print("cos(pi/2):", np.cos(np.pi / 2))  # 6.12e-17 ≈ 0
 
 # Arrays of angles (in radians)
-angles = np.array([0, np.pi/6, np.pi/4, np.pi/3, np.pi/2])
+angles = np.array([0, np.pi / 6, np.pi / 4, np.pi / 3, np.pi / 2])
 print("\nAngles:", np.round(angles, 4))
 print("sin:", np.sin(angles).round(4))
 print("cos:", np.cos(angles).round(4))
@@ -70,9 +70,9 @@ radians_back = np.degrees(radians)
 print("Back to degrees:", radians_back)
 
 # Trig functions with degrees
-print("\nsin(30):", np.sin(np.radians(30)))    # 0.5
-print("cos(60):", np.cos(np.radians(60)))      # 0.5
-print("tan(45):", np.tan(np.radians(45)))      # 1.0
+print("\nsin(30):", np.sin(np.radians(30)))  # 0.5
+print("cos(60):", np.cos(np.radians(60)))  # 0.5
+print("tan(45):", np.tan(np.radians(45)))  # 1.0
 
 # Convert then calculate
 angles_deg = np.array([0, 45, 90, 135, 180])
@@ -129,7 +129,7 @@ print("arctanh:", np.arctanh(values / 2).round(4))  # Need |x| < 1
 # Hyperbolic identities
 x = 1.5
 print(f"\nHyperbolic identity (x={x}):")
-print(f"  cosh^2 - sinh^2 = {np.cosh(x)**2 - np.sinh(x)**2:.6f}")  # 1.0
+print(f"  cosh^2 - sinh^2 = {np.cosh(x) ** 2 - np.sinh(x) ** 2:.6f}")  # 1.0
 ```
 
 ### 5. Practical Applications
@@ -157,11 +157,11 @@ print(f"  Max: {wave.max():.2f}, Min: {wave.min():.2f}")
 
 # Distance between points (using trigonometry)
 lat1, lon1 = np.radians(40.7128), np.radians(-74.0060)  # NYC
-lat2, lon2 = np.radians(51.5074), np.radians(-0.1278)   # London
+lat2, lon2 = np.radians(51.5074), np.radians(-0.1278)  # London
 
 dlat = lat2 - lat1
 dlon = lon2 - lon1
-a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
+a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
 c = 2 * np.arcsin(np.sqrt(a))
 r = 6371  # Earth radius in km
 distance = r * c
@@ -219,16 +219,18 @@ print(f"  Combined max: {combined.max():.2f}")
 ```python
 import numpy as np
 
+
 # Rotate points by angle theta
 def rotate_points(x, y, theta_deg):
     theta_rad = np.radians(theta_deg)
     cos_t = np.cos(theta_rad)
     sin_t = np.sin(theta_rad)
-    
+
     x_new = x * cos_t - y * sin_t
     y_new = x * sin_t + y * cos_t
-    
+
     return x_new, y_new
+
 
 # Original points
 x = np.array([1, 0, -1, 0])
@@ -247,27 +249,29 @@ for xi, yi, xr, yr in zip(x, y, x_rot, y_rot):
 ```python
 import numpy as np
 
+
 def haversine_distance(lat1, lon1, lat2, lon2):
     """Calculate distance between two points on Earth using haversine formula."""
     # Convert to radians
     lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
-    
+
     # Haversine formula
     dlat = lat2 - lat1
     dlon = lon2 - lon1
-    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
+    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
     c = 2 * np.arcsin(np.sqrt(a))
-    
+
     # Earth radius in km
     r = 6371
     return r * c
+
 
 # Calculate distances
 cities = {
     "New York": (40.7128, -74.0060),
     "London": (51.5074, -0.1278),
     "Tokyo": (35.6762, 139.6503),
-    "Sydney": (-33.8688, 151.2093)
+    "Sydney": (-33.8688, 151.2093),
 }
 
 print("Distance between cities (km):")
@@ -333,7 +337,7 @@ print("arcsin:", np.arcsin(values))
 import numpy as np
 
 # arctan only considers ratio, not quadrant
-print("arctan(1/-1):", np.arctan(1/-1))  # -0.785 (4th quadrant)
+print("arctan(1/-1):", np.arctan(1 / -1))  # -0.785 (4th quadrant)
 
 # arctan2 considers both x and y for correct quadrant
 print("arctan2(1, -1):", np.arctan2(1, -1))  # 2.356 (2nd quadrant)
@@ -347,6 +351,7 @@ print("arctan2(1, -1):", np.arctan2(1, -1))  # 2.356 (2nd quadrant)
 
 ```python
 import numpy as np
+
 
 def sin_degrees(angle_deg):
     """Calculate sine of angle in degrees."""
@@ -368,9 +373,9 @@ angle = np.arctan2(y_coord, x_coord)
 import numpy as np
 
 # Test with known trig values
-assert np.isclose(np.sin(np.pi/6), 0.5)
-assert np.isclose(np.cos(np.pi/3), 0.5)
-assert np.isclose(np.tan(np.pi/4), 1.0)
+assert np.isclose(np.sin(np.pi / 6), 0.5)
+assert np.isclose(np.cos(np.pi / 3), 0.5)
+assert np.isclose(np.tan(np.pi / 4), 1.0)
 ```
 
 ---
@@ -401,7 +406,7 @@ print(f"tan({angle_deg}°) = {tan_val:.4f}")
 import numpy as np
 
 # TODO: Generate 8 points on unit circle
-angles = np.linspace(0, 2*np.pi, 8, endpoint=False)
+angles = np.linspace(0, 2 * np.pi, 8, endpoint=False)
 x = np.cos(angles)
 y = np.sin(angles)
 
@@ -415,7 +420,7 @@ for angle, xi, yi in zip(np.degrees(angles), x, y):
 import numpy as np
 
 # TODO: Generate sine wave
-t = np.linspace(0, 2*np.pi, 100)
+t = np.linspace(0, 2 * np.pi, 100)
 amplitude = 2
 frequency = 3
 

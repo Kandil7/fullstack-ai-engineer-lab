@@ -3,14 +3,17 @@ Matplotlib 3D Scatter Plots - W3Schools Exercises
 ====================================================
 3D scatter visualization and point cloud techniques.
 """
+
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 
 import matplotlib
 import pathlib
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
 OUTPUT_DIR = pathlib.Path(os.path.dirname(__file__)) / "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -80,9 +83,15 @@ def exercise_03():
     ax = fig.add_subplot(111, projection="3d")
     for i in range(len(centers)):
         mask = np.array(labels_true) == i
-        ax.scatter(np.array(all_x)[mask], np.array(all_y)[mask],
-                   np.array(all_z)[mask], s=30, alpha=0.7, label=f"Cluster {i+1}",
-                   color=colors[i])
+        ax.scatter(
+            np.array(all_x)[mask],
+            np.array(all_y)[mask],
+            np.array(all_z)[mask],
+            s=30,
+            alpha=0.7,
+            label=f"Cluster {i + 1}",
+            color=colors[i],
+        )
     ax.legend()
     ax.set_title("Exercise 3: 3D Cluster Visualization")
     ax.set_xlabel("X")
@@ -126,8 +135,9 @@ def exercise_05():
 
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(111, projection="3d")
-    sc = ax.scatter(x, y, z, s=sizes, c=z, cmap="RdYlGn", alpha=0.6, edgecolors="gray",
-                    linewidth=0.3)
+    sc = ax.scatter(
+        x, y, z, s=sizes, c=z, cmap="RdYlGn", alpha=0.6, edgecolors="gray", linewidth=0.3
+    )
     fig.colorbar(sc, ax=ax, shrink=0.5, label="z = x·y")
     ax.set_title("Exercise 5: Variable Size 3D Scatter")
     ax.set_xlabel("X")

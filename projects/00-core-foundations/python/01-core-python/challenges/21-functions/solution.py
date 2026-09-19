@@ -91,9 +91,7 @@ def make_generate(
         **provider_options: Any,
     ) -> str:
         if state["total_tokens"] >= token_budget:
-            raise BudgetExhausted(
-                f"session used {state['total_tokens']} of {token_budget} tokens"
-            )
+            raise BudgetExhausted(f"session used {state['total_tokens']} of {token_budget} tokens")
         options: dict[str, Any] = {**base, **provider_options}
         response = client(prompt, model=model, max_tokens=max_tokens, **options)
         state["total_tokens"] += int(response["usage"]["total_tokens"])

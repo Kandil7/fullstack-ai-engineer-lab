@@ -29,12 +29,12 @@ print(f"PDF at 0 = {norm_dist.pdf(0):.4f}")
 samples = norm_dist.rvs(size=1000, random_state=42)
 
 # Other distributions
-stats.t(df=10)              # t-distribution
-stats.chi2(df=5)            # Chi-squared
-stats.f(dfn=3, dfd=20)      # F-distribution
-stats.expon(scale=1)        # Exponential
-stats.binom(n=10, p=0.5)    # Binomial
-stats.poisson(mu=3)         # Poisson
+stats.t(df=10)  # t-distribution
+stats.chi2(df=5)  # Chi-squared
+stats.f(dfn=3, dfd=20)  # F-distribution
+stats.expon(scale=1)  # Exponential
+stats.binom(n=10, p=0.5)  # Binomial
+stats.poisson(mu=3)  # Poisson
 ```
 
 ---
@@ -61,8 +61,8 @@ print(f"Paired t-test: t={t_stat:.3f}, p={p_value:.4f}")
 
 # ANOVA
 from scipy import stats as ss
-f_stat, p_value = ss.f_oneway(group1, group2, 
-                               stats.norm.rvs(loc=1, scale=1, size=50))
+
+f_stat, p_value = ss.f_oneway(group1, group2, stats.norm.rvs(loc=1, scale=1, size=50))
 print(f"ANOVA: F={f_stat:.3f}, p={p_value:.4f}")
 
 # Chi-squared test

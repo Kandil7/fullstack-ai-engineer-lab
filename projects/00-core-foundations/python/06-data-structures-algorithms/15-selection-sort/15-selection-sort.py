@@ -14,6 +14,7 @@ Stable: No (default implementation)
 # 1. BASIC SELECTION SORT
 # =============================================================================
 
+
 def selection_sort(arr):
     """Basic selection sort. O(n^2) time, O(1) space"""
     n = len(arr)
@@ -25,6 +26,7 @@ def selection_sort(arr):
         arr[i], arr[min_idx] = arr[min_idx], arr[i]
     return arr
 
+
 print("=== Basic Selection Sort ===")
 arr = [64, 25, 12, 22, 11]
 print(f"Original: {arr}")
@@ -34,6 +36,7 @@ print(f"Sorted: {selection_sort(arr.copy())}")
 # =============================================================================
 # 2. SELECTION SORT WITH STEPS
 # =============================================================================
+
 
 def selection_sort_steps(arr):
     """Selection sort showing each step"""
@@ -49,11 +52,12 @@ def selection_sort_steps(arr):
 
         if min_idx != i:
             arr[i], arr[min_idx] = arr[min_idx], arr[i]
-            steps.append(f"Pass {i+1}: Swap {arr[min_idx]} and {arr[i]}: {arr.copy()}")
+            steps.append(f"Pass {i + 1}: Swap {arr[min_idx]} and {arr[i]}: {arr.copy()}")
         else:
-            steps.append(f"Pass {i+1}: {arr[i]} already in place: {arr.copy()}")
+            steps.append(f"Pass {i + 1}: {arr[i]} already in place: {arr.copy()}")
 
     return arr, steps
+
 
 print("\n=== Selection Sort with Steps ===")
 arr = [29, 10, 14, 37, 13]
@@ -67,6 +71,7 @@ print(f"Final: {sorted_arr}")
 # 3. SELECTION SORT DESCENDING
 # =============================================================================
 
+
 def selection_sort_descending(arr):
     """Sort in descending order"""
     n = len(arr)
@@ -78,6 +83,7 @@ def selection_sort_descending(arr):
         arr[i], arr[max_idx] = arr[max_idx], arr[i]
     return arr
 
+
 print("\n=== Descending Selection Sort ===")
 arr = [64, 25, 12, 22, 11]
 print(f"Descending: {selection_sort_descending(arr.copy())}")
@@ -86,6 +92,7 @@ print(f"Descending: {selection_sort_descending(arr.copy())}")
 # =============================================================================
 # 4. COUNTING OPERATIONS
 # =============================================================================
+
 
 def selection_sort_counted(arr):
     """Selection sort counting comparisons and swaps"""
@@ -106,6 +113,7 @@ def selection_sort_counted(arr):
 
     return arr, comparisons, swaps
 
+
 print("\n=== Selection Sort Statistics ===")
 test_cases = [
     [64, 25, 12, 22, 11],
@@ -122,10 +130,12 @@ for arr in test_cases:
 # 5. SELECTION SORT ON LINKED LIST
 # =============================================================================
 
+
 class Node:
     def __init__(self, data):
         self.data = data
         self.next = None
+
 
 def selection_sort_linked_list(head):
     """Selection sort on linked list. O(n^2)"""
@@ -149,12 +159,14 @@ def selection_sort_linked_list(head):
 
     return head
 
+
 def linked_list_to_list(head):
     result = []
     while head:
         result.append(head.data)
         head = head.next
     return result
+
 
 print("\n=== Selection Sort on Linked List ===")
 values = [64, 25, 12, 22, 11]
@@ -171,6 +183,7 @@ print(f"Sorted: {linked_list_to_list(head)}")
 # =============================================================================
 # 6. STABLE SELECTION SORT
 # =============================================================================
+
 
 def selection_sort_stable(arr):
     """Stable selection sort using insertion"""
@@ -190,9 +203,10 @@ def selection_sort_stable(arr):
 
     return arr
 
+
 print("\n=== Stable Selection Sort ===")
 # Using tuples to demonstrate stability
-arr = [(3, 'a'), (1, 'b'), (3, 'c'), (2, 'd'), (1, 'e')]
+arr = [(3, "a"), (1, "b"), (3, "c"), (2, "d"), (1, "e")]
 print(f"Before: {arr}")
 sorted_arr = selection_sort_stable(arr.copy())
 print(f"After:  {sorted_arr}")
@@ -201,6 +215,7 @@ print(f"After:  {sorted_arr}")
 # =============================================================================
 # 7. DOUBLE SELECTION SORT
 # =============================================================================
+
 
 def double_selection_sort(arr):
     """Find both min and max in each pass"""
@@ -233,6 +248,7 @@ def double_selection_sort(arr):
 
     return arr
 
+
 print("\n=== Double Selection Sort ===")
 arr = [64, 25, 12, 22, 11, 90, 45]
 print(f"Original: {arr}")
@@ -242,6 +258,7 @@ print(f"Sorted: {double_selection_sort(arr.copy())}")
 # =============================================================================
 # 8. SELECTION SORT FOR STRINGS
 # =============================================================================
+
 
 def selection_sort_strings(arr):
     """Sort strings lexicographically"""
@@ -254,6 +271,7 @@ def selection_sort_strings(arr):
         arr[i], arr[min_idx] = arr[min_idx], arr[i]
     return arr
 
+
 print("\n=== Selection Sort Strings ===")
 words = ["banana", "apple", "cherry", "date", "elderberry"]
 print(f"Before: {words}")
@@ -263,6 +281,7 @@ print(f"After:  {selection_sort_strings(words.copy())}")
 # =============================================================================
 # 9. SELECTION SORT PERFORMANCE
 # =============================================================================
+
 
 def compare_with_other_sorts():
     """Compare selection sort with bubble and insertion sort"""
@@ -317,9 +336,10 @@ def compare_with_other_sorts():
         ins_time = time.time() - start
 
         print(f"\nn={size}:")
-        print(f"  Selection: {sel_time*1000:.2f}ms")
-        print(f"  Bubble:    {bub_time*1000:.2f}ms")
-        print(f"  Insertion: {ins_time*1000:.2f}ms")
+        print(f"  Selection: {sel_time * 1000:.2f}ms")
+        print(f"  Bubble:    {bub_time * 1000:.2f}ms")
+        print(f"  Insertion: {ins_time * 1000:.2f}ms")
+
 
 compare_with_other_sorts()
 
@@ -327,6 +347,7 @@ compare_with_other_sorts()
 # =============================================================================
 # 10. CYCLIC SORT (OPTIMIZED FOR 1-N)
 # =============================================================================
+
 
 def cyclic_sort(arr):
     """Optimized for arrays containing 1 to N. O(n) time, O(1) space"""
@@ -338,6 +359,7 @@ def cyclic_sort(arr):
         else:
             i += 1
     return arr
+
 
 print("\n=== Cyclic Sort (1-N) ===")
 arr = [3, 1, 5, 2, 4]

@@ -103,7 +103,7 @@ import numpy as np
 data = np.array([2, 8, 4])
 
 # Direct calculation
-geo_mean = np.prod(data) ** (1/len(data))
+geo_mean = np.prod(data) ** (1 / len(data))
 
 # Using logarithms (more stable)
 geo_mean_log = np.exp(np.mean(np.log(data)))
@@ -158,8 +158,10 @@ print(np.cumprod(arr, initial=1))
 ```python
 import numpy as np
 
+
 def permutation(n, r):
     return np.prod(np.arange(n - r + 1, n + 1))
+
 
 print("P(5,3):", permutation(5, 3))  # 60
 ```

@@ -77,9 +77,7 @@ print()
 
 # Example 3: sort deterministically
 print("=== 3. ORDER BY ===")
-top3 = conn.execute(
-    "SELECT label, score FROM samples ORDER BY score DESC LIMIT ?", (3,)
-).fetchall()
+top3 = conn.execute("SELECT label, score FROM samples ORDER BY score DESC LIMIT ?", (3,)).fetchall()
 print(f"top 3 by score: {top3}")
 print()
 
@@ -143,6 +141,7 @@ print()
 # MISTAKE: DISTINCT (label, score) != DISTINCT label — DISTINCT applies to
 #   the full projected row, not column by column
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -166,8 +165,9 @@ def _verify() -> None:
 
         # 3. ORDER BY is stable and respected
         rows = conn.execute("SELECT label FROM t ORDER BY score DESC").fetchall()
-        assert [r[0] for r in rows] == ["cat", "dog", "cat", "bird"], \
+        assert [r[0] for r in rows] == ["cat", "dog", "cat", "bird"], (
             "ORDER BY DESC must order from high to low"
+        )
 
         # 4. LIMIT/OFFSET slice the ordered result
         rows = conn.execute("SELECT id FROM t ORDER BY id LIMIT ? OFFSET ?", (2, 1)).fetchall()
@@ -185,8 +185,9 @@ def _verify() -> None:
 
         # 7. All queries parameterized: hostile values never break the query
         conn.execute("INSERT INTO t (label, score) VALUES (?, ?)", ("x' OR '1'='1", 0.1))
-        assert conn.execute("SELECT COUNT(*) FROM t").fetchone()[0] == 5, \
+        assert conn.execute("SELECT COUNT(*) FROM t").fetchone()[0] == 5, (
             "parameterized insert stores the literal"
+        )
     finally:
         conn.close()
     print("[OK] 04-select-basics: all checks passed")
@@ -201,4 +202,4 @@ if __name__ == "__main__":
         print("2. ORDER BY + LIMIT makes top-k deterministic")
         print("3. OFFSET pagination is simple but scales poorly (see topic 14)")
         print("4. DISTINCT is a set operation, not a column modifier")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

@@ -38,9 +38,9 @@ By the end of this lecture, you will be able to:
 ```python
 df["text"].str.upper()
 df["text"].str.strip()
-df["text"].str.len()           # per-cell length
+df["text"].str.len()  # per-cell length
 df["text"].str.pad(width=10, side="right")
-df["text"].str.zfill(8)        # zero-pad (IDs!)
+df["text"].str.zfill(8)  # zero-pad (IDs!)
 ```
 
 Key property: missing values propagate — `NaN.str.upper()` is `NaN`, never an
@@ -50,8 +50,8 @@ error. This is the vectorized-contract you can rely on.
 
 ```python
 df[df["text"].str.contains("error", case=False)]
-df[df["text"].str.contains(r"\d{3}-\d{4}", regex=True)]   # phone pattern
-df[df["text"].str.contains("a.b", regex=False)]           # literal "a.b"
+df[df["text"].str.contains(r"\d{3}-\d{4}", regex=True)]  # phone pattern
+df[df["text"].str.contains("a.b", regex=False)]  # literal "a.b"
 df[df["text"].str.startswith("http")]
 df[df["text"].str.endswith(".py")]
 ```
@@ -63,9 +63,9 @@ treated as "does not match" instead of NaN.
 ## 3. Splitting — `.str.split`
 
 ```python
-parts = df["text"].str.split(",")                # list of parts per cell
+parts = df["text"].str.split(",")  # list of parts per cell
 first, rest = df["text"].str.split(",", n=1, expand=True)
-cols = df["text"].str.split(r"\s+", expand=True) # whitespace tokenize
+cols = df["text"].str.split(r"\s+", expand=True)  # whitespace tokenize
 ```
 
 `expand=True` turns the split into real columns — the fastest way to split a
@@ -79,7 +79,7 @@ df["code"].str.extract(r"(?P<prefix>[A-Z]{2})-(?P<num>\d+)")
 # prefix   num
 # AB       123
 
-df["text"].str.extractall(r"@(\w+)")   # every mention per cell -> MultiIndex
+df["text"].str.extractall(r"@(\w+)")  # every mention per cell -> MultiIndex
 ```
 
 `extract` pulls named groups into columns; `extractall` finds every match per
@@ -89,9 +89,9 @@ workhorse for structured fields hiding inside text.
 ## 5. Replacing — `.str.replace`
 
 ```python
-df["text"].str.replace(r"\s+", " ", regex=True)    # collapse whitespace
+df["text"].str.replace(r"\s+", " ", regex=True)  # collapse whitespace
 df["text"].str.replace("Mr.", "Mister", regex=False)
-df["text"].str.replace(r"\d+", "#NUM#")            # redact numbers
+df["text"].str.replace(r"\d+", "#NUM#")  # redact numbers
 ```
 
 `replace` is regex by default (note: pandas 3.x will default to literal —
@@ -108,7 +108,7 @@ def clean_text_series(s: pd.Series) -> pd.Series:
         .str.lower()
         .str.strip()
         .str.replace(r"\s+", " ", regex=True)
-        .str.replace(r"[^\w\s]", "", regex=True)   # strip punctuation
+        .str.replace(r"[^\w\s]", "", regex=True)  # strip punctuation
         .str.strip()
     )
 ```

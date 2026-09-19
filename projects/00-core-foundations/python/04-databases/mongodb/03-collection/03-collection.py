@@ -23,7 +23,7 @@ Reference: https://www.w3schools.com/python/python_mongodb_get_started.asp
 users = [
     {"_id": 1, "name": "Alice", "age": 25},
     {"_id": 2, "name": "Bob", "age": 30, "email": "bob@mail.com"},
-    {"_id": 3, "name": "Charlie"}  # No age field - flexible schema
+    {"_id": 3, "name": "Charlie"},  # No age field - flexible schema
 ]
 print("Users collection:", len(users), "documents")
 print("Alice:", users[0])
@@ -40,6 +40,7 @@ database = {}
 # MongoDB equivalent:
 # db.createCollection("users")
 
+
 def create_collection(db, name):
     """Create a new empty collection"""
     if name not in db:
@@ -48,6 +49,7 @@ def create_collection(db, name):
     else:
         print(f"Collection '{name}' already exists")
     return db[name]
+
 
 # Create collections
 users_coll = create_collection(database, "users")
@@ -83,6 +85,7 @@ print("Invalid collection names:", invalid_names)
 # Dropping Collections
 # ============================================================
 
+
 # Example 5: Drop a collection
 def drop_collection(db, name):
     """Drop a collection from the database"""
@@ -93,6 +96,7 @@ def drop_collection(db, name):
     else:
         print(f"Collection '{name}' not found")
         return False
+
 
 # Create and then drop a collection
 temp_coll = create_collection(database, "temp_collection")
@@ -107,6 +111,7 @@ print("After drop:", list(database.keys()))
 # Collection Operations
 # ============================================================
 
+
 # Example 6: Collection info and stats
 def collection_count(db, name):
     """Get the number of documents in a collection"""
@@ -114,22 +119,20 @@ def collection_count(db, name):
         return len(db[name])
     return 0
 
+
 def list_collections(db):
     """List all collections in the database"""
     return list(db.keys())
+
 
 def collection_exists(db, name):
     """Check if a collection exists"""
     return name in db
 
+
 # Add some data
-database["users"] = [
-    {"_id": 1, "name": "Alice", "age": 25},
-    {"_id": 2, "name": "Bob", "age": 30}
-]
-database["products"] = [
-    {"_id": 1, "name": "Laptop", "price": 999.99}
-]
+database["users"] = [{"_id": 1, "name": "Alice", "age": 25}, {"_id": 2, "name": "Bob", "age": 30}]
+database["products"] = [{"_id": 1, "name": "Laptop", "price": 999.99}]
 
 print("\nCollection 'users' exists:", collection_exists(database, "users"))
 print("Collection 'users' count:", collection_count(database, "users"))
@@ -139,6 +142,7 @@ print("Collection 'orders' count:", collection_count(database, "orders"))
 # ============================================================
 # Renaming Collections
 # ============================================================
+
 
 # Example 7: Rename a collection
 def rename_collection(db, old_name, new_name):
@@ -151,6 +155,7 @@ def rename_collection(db, old_name, new_name):
         print(f"Cannot rename: old not found or new already exists")
         return False
 
+
 # MongoDB equivalent:
 # db.users.renameCollection("customers")
 
@@ -162,15 +167,18 @@ print("After rename:", list(database.keys()))
 # Working with Collection Documents
 # ============================================================
 
+
 # Example 8: Add and count documents
 def insert_document(coll, doc):
     """Insert a document into a collection"""
     coll.append(doc)
     return doc
 
+
 def count_documents(coll):
     """Count documents in a collection"""
     return len(coll)
+
 
 # Working with customers collection
 customers = database["customers"]
@@ -189,7 +197,7 @@ for customer in customers:
 mixed_collection = [
     {"_id": 1, "type": "user", "name": "Alice"},
     {"_id": 2, "type": "product", "name": "Laptop", "price": 999.99},
-    {"_id": 3, "type": "user", "name": "Bob", "email": "bob@mail.com"}
+    {"_id": 3, "type": "user", "name": "Bob", "email": "bob@mail.com"},
 ]
 
 print("\nMixed collection (flexible schema):")
@@ -214,6 +222,7 @@ print("""
 8. Collections can hold documents with different structures
 9. Collections are case-sensitive in some MongoDB deployments
 """)
+
 
 # ============================================================
 # Self-Verification  (MANDATORY)

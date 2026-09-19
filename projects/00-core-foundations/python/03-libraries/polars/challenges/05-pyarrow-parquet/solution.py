@@ -53,7 +53,5 @@ def roundtrip_zero_copy(df: pl.DataFrame, path: str) -> dict[str, object]:
     except RuntimeError:
         zero_copy = False
         arr = restored["score"].to_numpy()
-    match = bool(len(arr) == len(source) and all(
-        float(a) == float(b) for a, b in zip(arr, source)
-    ))
+    match = bool(len(arr) == len(source) and all(float(a) == float(b) for a, b in zip(arr, source)))
     return {"match": match, "zero_copy": zero_copy}

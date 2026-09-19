@@ -36,9 +36,7 @@ from sklearn.metrics import accuracy_score
 # Generate data
 X, y = make_classification(n_samples=200, n_features=4, random_state=42)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Train Naive Bayes
 model = GaussianNB()
@@ -71,11 +69,10 @@ p_positive_given_disease = 0.99  # Sensitivity: 99%
 p_positive_given_no_disease = 0.05  # False positive: 5%
 
 # P(positive)
-p_positive = (p_positive_given_disease * p_disease + 
-              p_positive_given_no_disease * (1 - p_disease))
+p_positive = p_positive_given_disease * p_disease + p_positive_given_no_disease * (1 - p_disease)
 
 # P(disease|positive) - Posterior
-p_disease_given_positive = (p_positive_given_disease * p_disease / p_positive)
+p_disease_given_positive = p_positive_given_disease * p_disease / p_positive
 
 print(f"Prior P(disease): {p_disease}")
 print(f"Posterior P(disease|positive): {p_disease_given_positive:.4f}")
@@ -96,8 +93,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.datasets import make_classification
 import numpy as np
 
-X, y = make_classification(n_samples=200, n_features=4, 
-                           weights=[0.7, 0.3], random_state=42)
+X, y = make_classification(n_samples=200, n_features=4, weights=[0.7, 0.3], random_state=42)
 
 model = GaussianNB()
 model.fit(X, y)
@@ -137,6 +133,7 @@ print(f"  Variance: {model.var_[1]}")
 
 # Likelihood of a point given class 0
 from scipy.stats import norm
+
 point = X[0]
 likelihood_0 = np.prod(norm.pdf(point, model.theta_[0], np.sqrt(model.var_[0])))
 print(f"\nLikelihood of point given class 0: {likelihood_0:.6f}")
@@ -167,8 +164,8 @@ y_prob = model.predict_proba(X_test)
 
 print("First 3 samples - Posterior probabilities:")
 for i in range(3):
-    print(f"  Sample {i+1}: P(class 0)={y_prob[i, 0]:.3f}, P(class 1)={y_prob[i, 1]:.3f}")
-    print(f"           Prediction: {model.predict(X_test[i:i+1])[0]}")
+    print(f"  Sample {i + 1}: P(class 0)={y_prob[i, 0]:.3f}, P(class 1)={y_prob[i, 1]:.3f}")
+    print(f"           Prediction: {model.predict(X_test[i : i + 1])[0]}")
 ```
 
 **Related Terms:** Prior, Likelihood, Evidence, Prediction
@@ -255,7 +252,7 @@ documents = [
     "meeting tomorrow at 3pm",
     "project deadline friday",
     "win free lottery",
-    "team standup meeting"
+    "team standup meeting",
 ]
 labels = [1, 1, 0, 0, 1, 0]  # 1=spam, 0=ham
 
@@ -294,12 +291,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 
 # Text data
-documents = [
-    "buy cheap viagra",
-    "free money now",
-    "meeting tomorrow",
-    "project deadline"
-]
+documents = ["buy cheap viagra", "free money now", "meeting tomorrow", "project deadline"]
 labels = [1, 1, 0, 0]
 
 # Vectorize (binary)
@@ -318,6 +310,7 @@ print(f"Prediction: {'spam' if prediction[0] == 1 else 'ham'}")
 
 # Compare with MultinomialNB
 from sklearn.naive_bayes import MultinomialNB
+
 model_multi = MultinomialNB()
 model_multi.fit(X, labels)
 print(f"MultinomialNB prediction: {'spam' if model_multi.predict(X_new)[0] == 1 else 'ham'}")
@@ -352,12 +345,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 
 # Documents with rare words
-documents = [
-    "buy viagra now",
-    "free money here",
-    "meeting tomorrow",
-    "project deadline"
-]
+documents = ["buy viagra now", "free money here", "meeting tomorrow", "project deadline"]
 labels = [1, 1, 0, 0]
 
 vectorizer = CountVectorizer()
@@ -396,8 +384,7 @@ from sklearn.datasets import make_classification
 import numpy as np
 
 # Imbalanced classes
-X, y = make_classification(n_samples=200, n_features=4,
-                           weights=[0.7, 0.3], random_state=42)
+X, y = make_classification(n_samples=200, n_features=4, weights=[0.7, 0.3], random_state=42)
 
 print(f"Class distribution: {np.bincount(y)}")
 print(f"Class proportions: {np.bincount(y) / len(y)}")
@@ -428,6 +415,7 @@ print(f"\nLearned priors: {model.class_prior_}")
 ```python
 # GaussianNB
 from sklearn.naive_bayes import GaussianNB
+
 model = GaussianNB()
 model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
@@ -435,16 +423,19 @@ y_prob = model.predict_proba(X_test)
 
 # MultinomialNB
 from sklearn.naive_bayes import MultinomialNB
+
 model = MultinomialNB(alpha=1.0)
 model.fit(X_train_counts, y_train)
 
 # BernoulliNB
 from sklearn.naive_bayes import BernoulliNB
+
 model = BernoulliNB()
 model.fit(X_binary, y_train)
 
 # Text Vectorization
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+
 vectorizer = CountVectorizer()
 X = vectorizer.fit_transform(documents)
 

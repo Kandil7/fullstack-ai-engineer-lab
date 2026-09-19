@@ -17,6 +17,7 @@ Operations:
 # 1. STACK IMPLEMENTATION USING LIST
 # =============================================================================
 
+
 class Stack:
     """Stack implementation using Python list"""
 
@@ -70,10 +71,12 @@ print(f"Size: {stack.size()}")
 # 2. STACK IMPLEMENTATION USING LINKED LIST
 # =============================================================================
 
+
 class Node:
     def __init__(self, data):
         self.data = data
         self.next = None
+
 
 class LinkedStack:
     """Stack using linked list - no capacity limit"""
@@ -133,28 +136,23 @@ print(f"After pop: {linked_stack}")
 # 3. BRACKET MATCHING
 # =============================================================================
 
+
 def is_balanced_brackets(expression):
     """Check if brackets are balanced. O(n) time."""
     stack = Stack()
-    matching = {')': '(', ']': '[', '}': '{'}
+    matching = {")": "(", "]": "[", "}": "{"}
 
     for char in expression:
-        if char in '([{':
+        if char in "([{":
             stack.push(char)
-        elif char in ')]}':
+        elif char in ")]}":
             if stack.is_empty() or stack.pop() != matching[char]:
                 return False
     return stack.is_empty()
 
+
 print("\n=== Bracket Matching ===")
-tests = [
-    "((1 + 2) * 3)",
-    "{[a + b] * (c - d)}",
-    "((a + b)",
-    "a + b]",
-    "[{()}]",
-    ""
-]
+tests = ["((1 + 2) * 3)", "{[a + b] * (c - d)}", "((a + b)", "a + b]", "[{()}]", ""]
 for expr in tests:
     result = is_balanced_brackets(expr)
     print(f"'{expr}': {'Balanced' if result else 'Not balanced'}")
@@ -164,27 +162,29 @@ for expr in tests:
 # 4. PREFIX EVALUATION
 # =============================================================================
 
+
 def evaluate_prefix(expression):
     """Evaluate prefix expression. O(n) time."""
     stack = Stack()
     tokens = expression.split()
 
     for token in reversed(tokens):
-        if token in '+-*/':
+        if token in "+-*/":
             a = stack.pop()
             b = stack.pop()
-            if token == '+':
+            if token == "+":
                 stack.push(a + b)
-            elif token == '-':
+            elif token == "-":
                 stack.push(a - b)
-            elif token == '*':
+            elif token == "*":
                 stack.push(a * b)
-            elif token == '/':
+            elif token == "/":
                 stack.push(a / b)
         else:
             stack.push(float(token))
 
     return stack.pop()
+
 
 print("\n=== Prefix Evaluation ===")
 print(f"+ 3 * 4 5 = {evaluate_prefix('+ 3 * 4 5')}")  # 3 + (4 * 5) = 23
@@ -195,27 +195,29 @@ print(f"* + 3 4 5 = {evaluate_prefix('* + 3 4 5')}")  # (3 + 4) * 5 = 35
 # 5. POSTFIX EVALUATION
 # =============================================================================
 
+
 def evaluate_postfix(expression):
     """Evaluate postfix expression. O(n) time."""
     stack = Stack()
     tokens = expression.split()
 
     for token in tokens:
-        if token in '+-*/':
+        if token in "+-*/":
             b = stack.pop()
             a = stack.pop()
-            if token == '+':
+            if token == "+":
                 stack.push(a + b)
-            elif token == '-':
+            elif token == "-":
                 stack.push(a - b)
-            elif token == '*':
+            elif token == "*":
                 stack.push(a * b)
-            elif token == '/':
+            elif token == "/":
                 stack.push(a / b)
         else:
             stack.push(float(token))
 
     return stack.pop()
+
 
 print("\n=== Postfix Evaluation ===")
 print(f"3 4 5 * + = {evaluate_postfix('3 4 5 * +')}")  # 3 + (4 * 5) = 23
@@ -226,39 +228,47 @@ print(f"3 4 + 5 * = {evaluate_postfix('3 4 + 5 *')}")  # (3 + 4) * 5 = 35
 # 6. INFIX TO POSTFIX CONVERSION
 # =============================================================================
 
+
 def infix_to_postfix(expression):
     """Convert infix to postfix. O(n) time."""
     stack = Stack()
     output = []
-    precedence = {'+': 1, '-': 1, '*': 2, '/': 2, '^': 3}
-    right_associative = {'^'}
+    precedence = {"+": 1, "-": 1, "*": 2, "/": 2, "^": 3}
+    right_associative = {"^"}
 
-    tokens = expression.replace('(', ' ( ').replace(')', ' ) ').split()
+    tokens = expression.replace("(", " ( ").replace(")", " ) ").split()
 
     for token in tokens:
         if token.isalnum():
             output.append(token)
-        elif token == '(':
+        elif token == "(":
             stack.push(token)
-        elif token == ')':
-            while not stack.is_empty() and stack.peek() != '(':
+        elif token == ")":
+            while not stack.is_empty() and stack.peek() != "(":
                 output.append(stack.pop())
             if not stack.is_empty():
                 stack.pop()  # Remove '('
         else:  # Operator
-            while (not stack.is_empty() and
-                   stack.peek() != '(' and
-                   stack.peek() in precedence and
-                   (precedence[stack.peek()] > precedence[token] or
-                    (precedence[stack.peek()] == precedence[token] and
-                     token not in right_associative))):
+            while (
+                not stack.is_empty()
+                and stack.peek() != "("
+                and stack.peek() in precedence
+                and (
+                    precedence[stack.peek()] > precedence[token]
+                    or (
+                        precedence[stack.peek()] == precedence[token]
+                        and token not in right_associative
+                    )
+                )
+            ):
                 output.append(stack.pop())
             stack.push(token)
 
     while not stack.is_empty():
         output.append(stack.pop())
 
-    return ' '.join(output)
+    return " ".join(output)
+
 
 print("\n=== Infix to Postfix ===")
 expressions = [
@@ -276,6 +286,7 @@ for expr in expressions:
 # 7. REVERSE A STRING USING STACK
 # =============================================================================
 
+
 def reverse_string(s):
     """Reverse string using stack. O(n) time, O(n) space."""
     stack = Stack()
@@ -287,6 +298,7 @@ def reverse_string(s):
         reversed_str += stack.pop()
     return reversed_str
 
+
 print("\n=== Reverse String ===")
 print(f"reverse('Hello World') = '{reverse_string('Hello World')}'")
 
@@ -294,6 +306,7 @@ print(f"reverse('Hello World') = '{reverse_string('Hello World')}'")
 # =============================================================================
 # 8. NEXT GREATER ELEMENT
 # =============================================================================
+
 
 def next_greater_element(arr):
     """Find next greater element for each item. O(n) time."""
@@ -308,6 +321,7 @@ def next_greater_element(arr):
 
     return result
 
+
 print("\n=== Next Greater Element ===")
 arr = [4, 5, 2, 25, 7, 8]
 print(f"Array: {arr}")
@@ -317,6 +331,7 @@ print(f"Next greater: {next_greater_element(arr)}")
 # =============================================================================
 # 9. MINIMUM STACK
 # =============================================================================
+
 
 class MinStack:
     """Stack that supports getMin in O(1)"""
@@ -343,6 +358,7 @@ class MinStack:
             raise IndexError("Stack is empty")
         return self.min_stack.peek()
 
+
 print("\n=== Minimum Stack ===")
 min_stack = MinStack()
 min_stack.push(5)
@@ -359,6 +375,7 @@ print(f"After pop: min = {min_stack.get_min()}")
 # 10. STACK SORT
 # =============================================================================
 
+
 def sort_stack(stack):
     """Sort a stack using another stack. O(n^2) time."""
     temp_stack = Stack()
@@ -373,6 +390,7 @@ def sort_stack(stack):
         stack.push(temp_stack.pop())
 
     return stack
+
 
 print("\n=== Stack Sort ===")
 unsorted_stack = Stack()
@@ -401,6 +419,7 @@ print(f"After sort (top to bottom): {' '.join(items)}")
 # 11. DECIMAL TO BINARY
 # =============================================================================
 
+
 def decimal_to_binary(n):
     """Convert decimal to binary using stack. O(log n) time."""
     if n == 0:
@@ -415,6 +434,7 @@ def decimal_to_binary(n):
     while not stack.is_empty():
         binary += str(stack.pop())
     return binary
+
 
 print("\n=== Decimal to Binary ===")
 for num in [10, 25, 100, 255]:

@@ -31,7 +31,7 @@ Before cleaning, understand what you have.
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv('raw_sales.csv')
+df = pd.read_csv("raw_sales.csv")
 
 # Shape and structure
 print(f"Rows: {df.shape[0]}, Columns: {df.shape[1]}")
@@ -47,7 +47,7 @@ df.tail(5)
 df.describe()
 
 # All columns including strings
-df.describe(include='all')
+df.describe(include="all")
 
 # Unique values per column
 for col in df.columns:
@@ -88,10 +88,10 @@ print(f"Rows with missing data: {len(missing_rows)}")
 df_clean = df.dropna()
 
 # Drop rows where ALL values are missing
-df_clean = df.dropna(how='all')
+df_clean = df.dropna(how="all")
 
 # Drop rows missing values in specific columns
-df_clean = df.dropna(subset=['price', 'quantity'])
+df_clean = df.dropna(subset=["price", "quantity"])
 
 # Drop columns with more than 50% missing
 threshold = len(df) * 0.5
@@ -102,29 +102,24 @@ df_clean = df.dropna(thresh=threshold, axis=1)
 
 ```python
 # Fill with a constant
-df['category'] = df['category'].fillna('Unknown')
+df["category"] = df["category"].fillna("Unknown")
 
 # Fill with mean/median/mode
-df['price'] = df['price'].fillna(df['price'].median())
-df['rating'] = df['rating'].fillna(df['rating'].mean())
-df['status'] = df['status'].fillna(df['status'].mode()[0])
+df["price"] = df["price"].fillna(df["price"].median())
+df["rating"] = df["rating"].fillna(df["rating"].mean())
+df["status"] = df["status"].fillna(df["status"].mode()[0])
 
 # Forward fill (useful for time series)
-df['temperature'] = df['temperature'].ffill()
+df["temperature"] = df["temperature"].ffill()
 
 # Backward fill
-df['temperature'] = df['temperature'].bfill()
+df["temperature"] = df["temperature"].bfill()
 
 # Interpolation (linear for numeric)
-df['stock_price'] = df['stock_price'].interpolate(method='linear')
+df["stock_price"] = df["stock_price"].interpolate(method="linear")
 
 # Fill with different values per column
-fill_values = {
-    'price': df['price'].median(),
-    'quantity': 0,
-    'category': 'Unknown',
-    'date': pd.NaT
-}
+fill_values = {"price": df["price"].median(), "quantity": 0, "category": "Unknown", "date": pd.NaT}
 df = df.fillna(fill_values)
 ```
 
@@ -132,11 +127,11 @@ df = df.fillna(fill_values)
 
 ```python
 # Replace common placeholders with actual NaN
-placeholders = ['N/A', 'n/a', 'NA', '-', '--', 'unknown', 'UNKNOWN', '']
+placeholders = ["N/A", "n/a", "NA", "-", "--", "unknown", "UNKNOWN", ""]
 df = df.replace(placeholders, np.nan)
 
 # Now handle NaN normally
-df = df.dropna(subset=['critical_column'])
+df = df.dropna(subset=["critical_column"])
 ```
 
 ---
@@ -153,7 +148,7 @@ print(f"Duplicate rows: {df.duplicated().sum()}")
 df[df.duplicated(keep=False)]
 
 # Duplicates based on specific columns
-df.duplicated(subset=['order_id', 'product_id']).sum()
+df.duplicated(subset=["order_id", "product_id"]).sum()
 ```
 
 ### 4.2 Removing Duplicates
@@ -163,7 +158,7 @@ df.duplicated(subset=['order_id', 'product_id']).sum()
 df = df.drop_duplicates()
 
 # Remove duplicates based on specific columns
-df = df.drop_duplicates(subset=['email'], keep='last')
+df = df.drop_duplicates(subset=["email"], keep="last")
 
 # Remove all duplicates (keep none)
 df = df.drop_duplicates(keep=False)
@@ -177,29 +172,29 @@ df = df.drop_duplicates(keep=False)
 
 ```python
 # Numeric stored as string
-df['price'] = pd.to_numeric(df['price'], errors='coerce')  # Invalid becomes NaN
+df["price"] = pd.to_numeric(df["price"], errors="coerce")  # Invalid becomes NaN
 
 # Date stored as string
-df['date'] = pd.to_datetime(df['date'], errors='coerce', format='%Y-%m-%d')
+df["date"] = pd.to_datetime(df["date"], errors="coerce", format="%Y-%m-%d")
 
 # Boolean stored as string
-df['is_active'] = df['is_active'].map({'Yes': True, 'No': False, True: True, False: False})
+df["is_active"] = df["is_active"].map({"Yes": True, "No": False, True: True, False: False})
 
 # Category (saves memory)
-df['region'] = df['region'].astype('category')
+df["region"] = df["region"].astype("category")
 ```
 
 ### 5.2 Handling Mixed Types
 
 ```python
 # Check what's actually in a column
-print(df['price'].apply(type).value_counts())
+print(df["price"].apply(type).value_counts())
 
 # Force conversion — bad values become NaN
-df['price'] = pd.to_numeric(df['price'], errors='coerce')
+df["price"] = pd.to_numeric(df["price"], errors="coerce")
 
 # Log what was converted
-bad_mask = df['price'].isna() & df['price_raw'].notna()
+bad_mask = df["price"].isna() & df["price_raw"].notna()
 print(f"Converted {bad_mask.sum()} invalid values to NaN")
 ```
 
@@ -211,27 +206,27 @@ print(f"Converted {bad_mask.sum()} invalid values to NaN")
 
 ```python
 # Strip leading/trailing whitespace
-df['name'] = df['name'].str.strip()
+df["name"] = df["name"].str.strip()
 
 # Normalize case
-df['email'] = df['email'].str.lower()
-df['name'] = df['name'].str.title()
+df["email"] = df["email"].str.lower()
+df["name"] = df["name"].str.title()
 
 # Remove extra spaces
-df['address'] = df['address'].str.replace(r'\s+', ' ', regex=True)
+df["address"] = df["address"].str.replace(r"\s+", " ", regex=True)
 ```
 
 ### 6.2 Pattern Cleaning
 
 ```python
 # Remove non-numeric characters from phone numbers
-df['phone'] = df['phone'].str.replace(r'[^\d]', '', regex=True)
+df["phone"] = df["phone"].str.replace(r"[^\d]", "", regex=True)
 
 # Extract numbers from mixed strings
-df['amount'] = df['amount_text'].str.extract(r'(\d+\.?\d*)').astype(float)
+df["amount"] = df["amount_text"].str.extract(r"(\d+\.?\d*)").astype(float)
 
 # Standardize email domains
-df['email_domain'] = df['email'].str.split('@').str[1]
+df["email_domain"] = df["email"].str.split("@").str[1]
 ```
 
 ---
@@ -240,17 +235,20 @@ df['email_domain'] = df['email'].str.split('@').str[1]
 
 ```python
 # Rename specific columns
-df = df.rename(columns={
-    'old_name': 'new_name',
-    'Price ($)': 'price_usd',
-    'Date of Birth': 'birth_date'
-})
+df = df.rename(
+    columns={"old_name": "new_name", "Price ($)": "price_usd", "Date of Birth": "birth_date"}
+)
 
 # Clean all column names at once
-df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_').str.replace('[^a-z0-9_]', '', regex=True)
+df.columns = (
+    df.columns.str.strip()
+    .str.lower()
+    .str.replace(" ", "_")
+    .str.replace("[^a-z0-9_]", "", regex=True)
+)
 
 # Using a function
-df.columns = [col.strip().lower().replace(' ', '_') for col in df.columns]
+df.columns = [col.strip().lower().replace(" ", "_") for col in df.columns]
 ```
 
 ---
@@ -268,7 +266,8 @@ def remove_outliers_iqr(df, column):
     upper = Q3 + 1.5 * IQR
     return df[(df[column] >= lower) & (df[column] <= upper)]
 
-df = remove_outliers_iqr(df, 'price')
+
+df = remove_outliers_iqr(df, "price")
 ```
 
 ### 8.2 Z-Score Method
@@ -276,7 +275,7 @@ df = remove_outliers_iqr(df, 'price')
 ```python
 from scipy import stats
 
-z_scores = np.abs(stats.zscore(df['price']))
+z_scores = np.abs(stats.zscore(df["price"]))
 df = df[z_scores < 3]  # Remove rows with z-score > 3
 ```
 
@@ -290,34 +289,35 @@ def clean_sales_data(df):
     df = df.copy()
 
     # 1. Replace placeholders
-    df = df.replace(['N/A', 'n/a', '-', '', 'unknown'], np.nan)
+    df = df.replace(["N/A", "n/a", "-", "", "unknown"], np.nan)
 
     # 2. Strip strings
-    for col in df.select_dtypes(include='object').columns:
+    for col in df.select_dtypes(include="object").columns:
         df[col] = df[col].str.strip()
 
     # 3. Fix types
-    df['price'] = pd.to_numeric(df['price'], errors='coerce')
-    df['date'] = pd.to_datetime(df['date'], errors='coerce')
-    df['quantity'] = pd.to_numeric(df['quantity'], errors='coerce').fillna(0).astype(int)
+    df["price"] = pd.to_numeric(df["price"], errors="coerce")
+    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df["quantity"] = pd.to_numeric(df["quantity"], errors="coerce").fillna(0).astype(int)
 
     # 4. Fill missing
-    df['category'] = df['category'].fillna('Uncategorized')
-    df['price'] = df['price'].fillna(df['price'].median())
+    df["category"] = df["category"].fillna("Uncategorized")
+    df["price"] = df["price"].fillna(df["price"].median())
 
     # 5. Remove duplicates
-    df = df.drop_duplicates(subset=['order_id'])
+    df = df.drop_duplicates(subset=["order_id"])
 
     # 6. Remove outliers
-    Q1 = df['price'].quantile(0.25)
-    Q3 = df['price'].quantile(0.75)
+    Q1 = df["price"].quantile(0.25)
+    Q3 = df["price"].quantile(0.75)
     IQR = Q3 - Q1
-    df = df[(df['price'] >= Q1 - 1.5 * IQR) & (df['price'] <= Q3 + 1.5 * IQR)]
+    df = df[(df["price"] >= Q1 - 1.5 * IQR) & (df["price"] <= Q3 + 1.5 * IQR)]
 
     # 7. Clean column names
-    df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
+    df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
     return df
+
 
 clean_df = clean_sales_data(raw_df)
 ```
@@ -352,10 +352,10 @@ clean_df = clean_sales_data(raw_df)
 Given this DataFrame, clean it completely:
 ```python
 data = {
-    'name': [' Alice ', 'BOB', 'charlie', None, 'Eve'],
-    'age': ['25', 'thirty', '28', '22', '35'],
-    'score': [88.5, None, 92.0, 76.5, None],
-    'grade': ['A', 'B', 'N/A', 'A', 'B']
+    "name": [" Alice ", "BOB", "charlie", None, "Eve"],
+    "age": ["25", "thirty", "28", "22", "35"],
+    "score": [88.5, None, 92.0, 76.5, None],
+    "grade": ["A", "B", "N/A", "A", "B"],
 }
 df = pd.DataFrame(data)
 ```

@@ -34,6 +34,7 @@ again in standard time. `fold=0` picks the first, `fold=1` the second.
 ```python
 from datetime import datetime
 from zoneinfo import ZoneInfo
+
 ny = ZoneInfo("America/New_York")
 print(datetime(2026, 11, 1, 1, 30, fold=0).replace(tzinfo=ny).utcoffset())  # -4:00 (first)
 print(datetime(2026, 11, 1, 1, 30, fold=1).replace(tzinfo=ny).utcoffset())  # -5:00 (second)
@@ -52,6 +53,7 @@ result is always aware.
 ```python
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
+
 utc = datetime(2026, 8, 6, 12, 0, tzinfo=timezone.utc)
 print(utc.astimezone(ZoneInfo("Asia/Tokyo")))  # 2026-08-06 21:00:00+09:00
 ```
@@ -68,6 +70,7 @@ aware datetimes are well-defined.
 **Example**:
 ```python
 from datetime import datetime, timezone
+
 d = datetime(2026, 8, 6, 12, 0, tzinfo=timezone.utc)
 print(d.tzinfo is not None)  # True
 ```
@@ -84,6 +87,7 @@ dates, retention cutoffs, and daily buckets.
 **Example**:
 ```python
 from datetime import date, timedelta
+
 print(date(2026, 8, 1) - timedelta(days=30))  # 2026-07-02
 ```
 
@@ -100,6 +104,7 @@ time that occurs twice: 0 = first occurrence (daylight), 1 = second
 ```python
 from datetime import datetime
 from zoneinfo import ZoneInfo
+
 ny = ZoneInfo("America/New_York")
 a = datetime(2026, 11, 1, 1, 30, fold=0).replace(tzinfo=ny)
 b = datetime(2026, 11, 1, 1, 30, fold=1).replace(tzinfo=ny)
@@ -118,6 +123,7 @@ it is naive — always include the offset.
 **Example**:
 ```python
 from datetime import datetime
+
 d = datetime.fromisoformat("2026-08-06T12:00:00+00:00")
 print(d.tzinfo is not None)  # True
 ```
@@ -134,6 +140,7 @@ get naive local time.
 **Example**:
 ```python
 from datetime import datetime, timezone
+
 print(datetime.fromtimestamp(0, tz=timezone.utc))  # 1970-01-01 00:00:00+00:00
 ```
 
@@ -151,6 +158,7 @@ converting back yields the shifted-forward time.
 ```python
 from datetime import datetime
 from zoneinfo import ZoneInfo
+
 ny = ZoneInfo("America/New_York")
 d = datetime(2026, 3, 8, 2, 30).replace(tzinfo=ny)
 print(d.utcoffset())  # -1 day, 19:00:00 == -05:00 (pre-transition)
@@ -168,6 +176,7 @@ future DST rules. `zoneinfo.ZoneInfo(name)` loads it.
 **Example**:
 ```python
 from zoneinfo import ZoneInfo
+
 z = ZoneInfo("Africa/Cairo")
 print(z)  # Africa/Cairo
 ```
@@ -184,6 +193,7 @@ for logs, APIs, and dataset metadata.
 **Example**:
 ```python
 from datetime import datetime, timezone
+
 print(datetime(2026, 8, 6, 12, 0, tzinfo=timezone.utc).isoformat())
 # 2026-08-06T12:00:00+00:00
 ```
@@ -200,6 +210,7 @@ The correct clock for measuring durations.
 **Example**:
 ```python
 import time
+
 start = time.monotonic()
 time.sleep(0.01)
 print(f"{(time.monotonic() - start) * 1000:.1f} ms")
@@ -217,7 +228,8 @@ design.
 **Example**:
 ```python
 from datetime import datetime, timezone
-n = datetime(2026, 8, 6, 12, 0)          # naive
+
+n = datetime(2026, 8, 6, 12, 0)  # naive
 a = datetime(2026, 8, 6, 12, 0, tzinfo=timezone.utc)  # aware
 try:
     n - a
@@ -237,6 +249,7 @@ returns an aware UTC datetime. It replaces the deprecated, naive
 **Example**:
 ```python
 from datetime import datetime, timezone
+
 now = datetime.now(timezone.utc)
 print(now.tzinfo is not None)  # True
 ```
@@ -253,6 +266,7 @@ elapsed time; local-time-of-day shifts across DST are *not* automatic.
 **Example**:
 ```python
 from datetime import date, timedelta
+
 print(date(2026, 3, 1) + timedelta(days=30))  # 2026-03-31
 ```
 
@@ -268,6 +282,7 @@ and compact storage.
 **Example**:
 ```python
 from datetime import datetime, timezone
+
 d = datetime(1970, 1, 1, 0, 0, 1, tzinfo=timezone.utc)
 print(d.timestamp())  # 1.0
 ```
@@ -283,6 +298,7 @@ datetimes and as the `tz` argument everywhere an aware UTC is required.
 **Example**:
 ```python
 from datetime import datetime, timezone
+
 d = datetime(2026, 8, 6, tzinfo=timezone.utc)
 print(d.utcoffset())  # 0:00:00
 ```
@@ -304,6 +320,7 @@ data-corruption bug.
 
 # CORRECT:
 from datetime import datetime, timezone
+
 now = datetime.now(timezone.utc)
 ```
 
@@ -320,6 +337,7 @@ and reuse.
 ```python
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
+
 tokyo = ZoneInfo("Asia/Tokyo")
 utc = datetime(2026, 8, 6, 3, 0, tzinfo=timezone.utc)
 print(utc.astimezone(tokyo))  # 2026-08-06 12:00:00+09:00

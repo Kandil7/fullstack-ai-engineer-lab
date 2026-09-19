@@ -25,14 +25,15 @@ def chrono_split(df: pd.DataFrame, frac: float) -> tuple[pd.DataFrame, pd.DataFr
     return df.iloc[:n_train].copy(), df.iloc[n_train:].copy()
 
 
-def fit_scale_train_test(X_train: pd.DataFrame, X_test: pd.DataFrame,
-                         scaler) -> tuple[pd.DataFrame, pd.DataFrame, object]:
+def fit_scale_train_test(
+    X_train: pd.DataFrame, X_test: pd.DataFrame, scaler
+) -> tuple[pd.DataFrame, pd.DataFrame, object]:
     """Fit scaler on train ONLY, transform both. Return scaled + fitted scaler."""
     scaler.fit(X_train)
-    train_scaled = pd.DataFrame(scaler.transform(X_train),
-                                index=X_train.index, columns=X_train.columns)
-    test_scaled = pd.DataFrame(scaler.transform(X_test),
-                               index=X_test.index, columns=X_test.columns)
+    train_scaled = pd.DataFrame(
+        scaler.transform(X_train), index=X_train.index, columns=X_train.columns
+    )
+    test_scaled = pd.DataFrame(scaler.transform(X_test), index=X_test.index, columns=X_test.columns)
     return train_scaled, test_scaled, scaler
 
 
@@ -40,22 +41,22 @@ def _rmse(y_true: pd.Series, y_pred: pd.Series) -> float:
     return float(np.sqrt(np.mean((y_true.to_numpy() - y_pred.to_numpy()) ** 2)))
 
 
-def _build_scaled_test(df: pd.DataFrame, target: str, frac: float,
-                       scaler, pooled: bool, alpha: float):
+def _build_scaled_test(
+    df: pd.DataFrame, target: str, frac: float, scaler, pooled: bool, alpha: float
+):
     train, test = chrono_split(df, frac)
     features = [c for c in df.columns if c != target]
     if pooled:
-        scaler.fit(df[features])                      # LEAK: sees test stats
+        scaler.fit(df[features])  # LEAK: sees test stats
         train_scaled = pd.DataFrame(
-            scaler.transform(train[features]),
-            index=train.index, columns=features)
+            scaler.transform(train[features]), index=train.index, columns=features
+        )
         test_scaled = pd.DataFrame(
-            scaler.transform(test[features]),
-            index=test.index, columns=features)
+            scaler.transform(test[features]), index=test.index, columns=features
+        )
     else:
-        train_scaled, test_scaled, _ = fit_scale_train_test(
-            train[features], test[features], scaler)
-    model = Ridge(alpha=alpha)   # scale-sensitive: the leak changes predictions
+        train_scaled, test_scaled, _ = fit_scale_train_test(train[features], test[features], scaler)
+    model = Ridge(alpha=alpha)  # scale-sensitive: the leak changes predictions
     model.fit(train_scaled, train[target])
     pred = pd.Series(model.predict(test_scaled), index=test.index)
     scaled_test = test_scaled.copy()

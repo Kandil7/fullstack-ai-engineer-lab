@@ -30,21 +30,24 @@ from datetime import datetime
 # SECTION 1: Core Concepts — Agent vs Chatbot vs Copilot
 # ============================================================
 
+
 class AgentType(Enum):
     """Classification of AI interaction patterns."""
-    CHATBOT = "chatbot"       # Stateless Q&A, no autonomy
-    COPILOT = "copilot"       # Suggests, user executes
-    AGENT = "agent"           # Autonomous perceive-think-act
+
+    CHATBOT = "chatbot"  # Stateless Q&A, no autonomy
+    COPILOT = "copilot"  # Suggests, user executes
+    AGENT = "agent"  # Autonomous perceive-think-act
 
 
 @dataclass
 class InteractionPattern:
     """Describes the behavioral differences between AI patterns."""
+
     agent_type: AgentType
-    autonomy_level: str       # "none", "partial", "full"
-    statefulness: bool        # Does it remember context?
-    tool_use: bool            # Can it call external tools?
-    goal_oriented: bool       # Does it pursue multi-step goals?
+    autonomy_level: str  # "none", "partial", "full"
+    statefulness: bool  # Does it remember context?
+    tool_use: bool  # Can it call external tools?
+    goal_oriented: bool  # Does it pursue multi-step goals?
     description: str
 
     def summary(self) -> str:
@@ -65,7 +68,7 @@ CHATBOT_PATTERN = InteractionPattern(
     statefulness=False,
     tool_use=False,
     goal_oriented=False,
-    description="Responds to prompts with no memory or action capability."
+    description="Responds to prompts with no memory or action capability.",
 )
 
 COPILOT_PATTERN = InteractionPattern(
@@ -74,7 +77,7 @@ COPILOT_PATTERN = InteractionPattern(
     statefulness=True,
     tool_use=True,
     goal_oriented=False,
-    description="Suggests actions or completions; user decides and executes."
+    description="Suggests actions or completions; user decides and executes.",
 )
 
 AGENT_PATTERN = InteractionPattern(
@@ -83,7 +86,7 @@ AGENT_PATTERN = InteractionPattern(
     statefulness=True,
     tool_use=True,
     goal_oriented=True,
-    description="Autonomously perceives, reasons, and acts to achieve goals."
+    description="Autonomously perceives, reasons, and acts to achieve goals.",
 )
 
 
@@ -101,8 +104,10 @@ def compare_patterns():
 # SECTION 2: Agent State Management
 # ============================================================
 
+
 class AgentState(Enum):
     """Possible states for an agent in its lifecycle."""
+
     IDLE = "idle"
     PERCEIVING = "perceiving"
     THINKING = "thinking"
@@ -115,7 +120,8 @@ class AgentState(Enum):
 @dataclass
 class Message:
     """A single message in agent conversation history."""
-    role: str               # "system", "user", "assistant", "tool"
+
+    role: str  # "system", "user", "assistant", "tool"
     content: str
     timestamp: datetime = field(default_factory=datetime.now)
     metadata: dict = field(default_factory=dict)
@@ -132,6 +138,7 @@ class Message:
 @dataclass
 class AgentMemory:
     """Manages agent's conversation history and context window."""
+
     messages: list[Message] = field(default_factory=list)
     max_messages: int = 50
     system_prompt: str = ""
@@ -164,6 +171,7 @@ class AgentMemory:
 @dataclass
 class AgentContext:
     """Complete agent runtime context."""
+
     agent_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     state: AgentState = AgentState.IDLE
     memory: AgentMemory = field(default_factory=AgentMemory)
@@ -178,7 +186,12 @@ class AgentContext:
             AgentState.IDLE: [AgentState.PERCEIVING],
             AgentState.PERCEIVING: [AgentState.THINKING, AgentState.ERROR],
             AgentState.THINKING: [AgentState.ACTING, AgentState.DONE, AgentState.ERROR],
-            AgentState.ACTING: [AgentState.WAITING, AgentState.THINKING, AgentState.DONE, AgentState.ERROR],
+            AgentState.ACTING: [
+                AgentState.WAITING,
+                AgentState.THINKING,
+                AgentState.DONE,
+                AgentState.ERROR,
+            ],
             AgentState.WAITING: [AgentState.PERCEIVING],
             AgentState.ERROR: [AgentState.IDLE],
             AgentState.DONE: [AgentState.IDLE],
@@ -202,6 +215,7 @@ class AgentContext:
 # SECTION 3: The Perceive-Think-Act Loop
 # ============================================================
 
+
 class Tool:
     """Base class for tools an agent can use."""
 
@@ -221,7 +235,7 @@ class Tool:
                 "name": self.name,
                 "description": self.description,
                 "parameters": self.parameters,
-            }
+            },
         }
 
 
@@ -237,16 +251,17 @@ class CalculatorTool(Tool):
                 "properties": {
                     "expression": {
                         "type": "string",
-                        "description": "Mathematical expression to evaluate, e.g. '2 + 3 * 4'"
+                        "description": "Mathematical expression to evaluate, e.g. '2 + 3 * 4'",
                     }
                 },
-                "required": ["expression"]
-            }
+                "required": ["expression"],
+            },
         )
 
     def execute(self, expression: str = "", **kwargs) -> str:
         """Evaluate a math expression safely."""
         import math
+
         allowed_names = {
             "sqrt": math.sqrt,
             "abs": abs,
@@ -272,20 +287,25 @@ class WebSearchTool(Tool):
             parameters={
                 "type": "object",
                 "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Search query string"
-                    }
+                    "query": {"type": "string", "description": "Search query string"}
                 },
-                "required": ["query"]
-            }
+                "required": ["query"],
+            },
         )
 
     def execute(self, query: str = "", **kwargs) -> str:
         """Simulate a web search (returns mock data)."""
         mock_results = [
-            {"title": f"Result about: {query}", "url": "https://example.com", "snippet": f"Information about {query}..."},
-            {"title": f"Guide to: {query}", "url": "https://guide.example.com", "snippet": f"A comprehensive guide to {query}..."},
+            {
+                "title": f"Result about: {query}",
+                "url": "https://example.com",
+                "snippet": f"Information about {query}...",
+            },
+            {
+                "title": f"Guide to: {query}",
+                "url": "https://guide.example.com",
+                "snippet": f"A comprehensive guide to {query}...",
+            },
         ]
         return json.dumps({"results": mock_results, "query": query})
 
@@ -302,16 +322,38 @@ class TextAnalysisTool(Tool):
                 "properties": {
                     "text": {"type": "string", "description": "Text to analyze"}
                 },
-                "required": ["text"]
-            }
+                "required": ["text"],
+            },
         )
 
     def execute(self, text: str = "", **kwargs) -> str:
         """Analyze text and return statistics."""
         words = text.split()
-        sentences = [s.strip() for s in text.replace("!", ".").replace("?", ".").split(".") if s.strip()]
-        positive_words = {"good", "great", "excellent", "happy", "love", "best", "amazing", "wonderful"}
-        negative_words = {"bad", "terrible", "hate", "worst", "awful", "poor", "horrible", "sad"}
+        sentences = [
+            s.strip()
+            for s in text.replace("!", ".").replace("?", ".").split(".")
+            if s.strip()
+        ]
+        positive_words = {
+            "good",
+            "great",
+            "excellent",
+            "happy",
+            "love",
+            "best",
+            "amazing",
+            "wonderful",
+        }
+        negative_words = {
+            "bad",
+            "terrible",
+            "hate",
+            "worst",
+            "awful",
+            "poor",
+            "horrible",
+            "sad",
+        }
         pos_count = sum(1 for w in words if w.lower() in positive_words)
         neg_count = sum(1 for w in words if w.lower() in negative_words)
 
@@ -321,19 +363,22 @@ class TextAnalysisTool(Tool):
         elif neg_count > pos_count:
             sentiment = "negative"
 
-        return json.dumps({
-            "word_count": len(words),
-            "sentence_count": len(sentences),
-            "character_count": len(text),
-            "sentiment": sentiment,
-            "positive_indicators": pos_count,
-            "negative_indicators": neg_count,
-        })
+        return json.dumps(
+            {
+                "word_count": len(words),
+                "sentence_count": len(sentences),
+                "character_count": len(text),
+                "sentiment": sentiment,
+                "positive_indicators": pos_count,
+                "negative_indicators": neg_count,
+            }
+        )
 
 
 # ============================================================
 # SECTION 4: Complete Agent Loop Implementation
 # ============================================================
+
 
 class BaseAgent:
     """
@@ -349,7 +394,9 @@ class BaseAgent:
         max_iterations: int = 10,
     ):
         self.context = AgentContext(max_iterations=max_iterations)
-        self.context.memory.system_prompt = system_prompt or self._default_system_prompt()
+        self.context.memory.system_prompt = (
+            system_prompt or self._default_system_prompt()
+        )
         self.tools = {tool.name: tool for tool in (tools or [])}
         self.model = model
         self._step_log: list[dict] = []
@@ -411,7 +458,9 @@ class BaseAgent:
             reasoning["tool_name"] = "analyze_text"
             reasoning["tool_args"]["text"] = perception["raw_input"]
         else:
-            reasoning["response"] = f"I understand: '{perception['raw_input']}'. How can I help you further?"
+            reasoning["response"] = (
+                f"I understand: '{perception['raw_input']}'. How can I help you further?"
+            )
 
         return reasoning
 
@@ -429,7 +478,7 @@ class BaseAgent:
                 self.context.memory.add_message(
                     "assistant",
                     f"Called {tool_name} with {reasoning['tool_args']}",
-                    metadata={"tool": tool_name, "result": result}
+                    metadata={"tool": tool_name, "result": result},
                 )
             else:
                 response = f"Tool '{tool_name}' not found in my toolkit."
@@ -478,14 +527,16 @@ class BaseAgent:
 
     def _log_step(self, user_input: str, reasoning: dict, response: str):
         """Log the step for debugging and analysis."""
-        self._step_log.append({
-            "iteration": self.context.iteration,
-            "input": user_input,
-            "reasoning": reasoning,
-            "response": response,
-            "state": self.context.state.value,
-            "timestamp": datetime.now().isoformat(),
-        })
+        self._step_log.append(
+            {
+                "iteration": self.context.iteration,
+                "input": user_input,
+                "reasoning": reasoning,
+                "response": response,
+                "state": self.context.state.value,
+                "timestamp": datetime.now().isoformat(),
+            }
+        )
 
     def get_history(self) -> list[dict]:
         """Get the full interaction history."""
@@ -495,6 +546,7 @@ class BaseAgent:
 # ============================================================
 # SECTION 5: Advanced — Self-Reflecting Agent
 # ============================================================
+
 
 class SelfReflectingAgent(BaseAgent):
     """
@@ -532,7 +584,9 @@ class SelfReflectingAgent(BaseAgent):
         if has_tool_result:
             reflection["score"] += 1
         else:
-            reflection["improvements"].append("Consider using tools for more accurate information.")
+            reflection["improvements"].append(
+                "Consider using tools for more accurate information."
+            )
 
         if len(response) > 50:
             reflection["score"] += 1
@@ -555,9 +609,9 @@ class SelfReflectingAgent(BaseAgent):
         best_score = -1
 
         for attempt in range(self.max_reflections + 1):
-            print(f"\n{'='*40}")
+            print(f"\n{'=' * 40}")
             print(f"  Attempt {attempt + 1}/{self.max_reflections + 1}")
-            print(f"{'='*40}")
+            print(f"{'=' * 40}")
 
             response = self.run(user_input)
             reflection = self.reflect(response, user_input)
@@ -583,6 +637,7 @@ class SelfReflectingAgent(BaseAgent):
 # ============================================================
 # SECTION 6: Running the Exercises
 # ============================================================
+
 
 def exercise_1_pattern_comparison():
     """Exercise 1.1: Compare agent interaction patterns."""
@@ -619,7 +674,9 @@ def exercise_2_state_management():
             print(f"  BLOCKED: {e}")
 
     print(f"\nFinal state: {ctx.state.value}")
-    print(f"Transition log: {json.dumps(ctx.metadata.get('last_transition', {}), indent=2)}")
+    print(
+        f"Transition log: {json.dumps(ctx.metadata.get('last_transition', {}), indent=2)}"
+    )
 
 
 def exercise_3_memory_management():
@@ -700,7 +757,9 @@ def exercise_5_self_reflecting_agent():
 
     print(f"\nReflection history:")
     for i, ref in enumerate(agent.reflections):
-        print(f"  Reflection {i+1}: score={ref['score']}/3, retry={ref['should_retry']}")
+        print(
+            f"  Reflection {i + 1}: score={ref['score']}/3, retry={ref['should_retry']}"
+        )
 
 
 def exercise_6_tool_registry():
@@ -721,11 +780,13 @@ def exercise_6_tool_registry():
         """List all registered tools with their schemas."""
         tools_info = []
         for name, tool in registry.items():
-            tools_info.append({
-                "name": name,
-                "description": tool.description,
-                "parameters": tool.parameters,
-            })
+            tools_info.append(
+                {
+                    "name": name,
+                    "description": tool.description,
+                    "parameters": tool.parameters,
+                }
+            )
         return tools_info
 
     def execute_tool(name: str, **kwargs) -> str:
@@ -755,7 +816,9 @@ def exercise_6_tool_registry():
     parsed = json.loads(result)
     print(f"  web_search('AI agents') = {len(parsed['results'])} results")
 
-    result = execute_tool("analyze_text", text="This is a great example of amazing code!")
+    result = execute_tool(
+        "analyze_text", text="This is a great example of amazing code!"
+    )
     parsed = json.loads(result)
     print(f"  analyze_text(...) = {parsed}")
 

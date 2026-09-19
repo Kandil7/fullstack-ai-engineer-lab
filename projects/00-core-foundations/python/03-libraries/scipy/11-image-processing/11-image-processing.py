@@ -12,11 +12,17 @@ Topics:
 """
 
 import numpy as np
+
 # Ensure output directory exists (Tier 0 fix: Windows + CI)
 import os
-os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
+os.makedirs(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy",
+    exist_ok=True,
+)
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import ndimage
@@ -33,9 +39,9 @@ np.random.seed(42)
 size = 200
 image = np.zeros((size, size))
 # Add some shapes
-image[40:80, 40:80] = 1.0    # White square
+image[40:80, 40:80] = 1.0  # White square
 image[120:160, 120:160] = 0.7  # Gray square
-image[60:140, 80:120] = 0.4   # Semi-transparent rectangle
+image[60:140, 80:120] = 0.4  # Semi-transparent rectangle
 # Add noise
 image_noisy = image + np.random.normal(0, 0.15, (size, size))
 
@@ -54,8 +60,13 @@ for ax in axes:
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_smoothing.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_smoothing.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_smoothing.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_smoothing.png"
+)
 
 # Edge detection with Sobel filter
 sx = ndimage.sobel(image, axis=0, mode="constant")
@@ -73,8 +84,13 @@ for ax in axes:
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_edges.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_edges.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_edges.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_edges.png"
+)
 
 # ============================================================
 # Example 2: Morphological Operations
@@ -86,7 +102,7 @@ print("=" * 60)
 # Create a binary image with noise
 np.random.seed(42)
 binary = np.zeros((150, 150), dtype=bool)
-binary[30:70, 30:70] = True   # Square
+binary[30:70, 30:70] = True  # Square
 binary[80:130, 80:130] = True  # Another square
 # Add noise
 noise = np.random.random((150, 150)) > 0.92
@@ -116,8 +132,13 @@ for ax in axes.flatten():
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_morphology.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_morphology.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_morphology.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_morphology.png"
+)
 
 # Count objects after cleaning
 labeled_opened, n_opened = ndimage.label(opened)
@@ -137,14 +158,14 @@ img_labels = np.zeros((200, 200), dtype=bool)
 
 # Object 1: circle
 y, x = np.ogrid[:200, :200]
-circle1 = (x - 50)**2 + (y - 50)**2 < 400
+circle1 = (x - 50) ** 2 + (y - 50) ** 2 < 400
 img_labels |= circle1
 
 # Object 2: rectangle
 img_labels[100:140, 30:90] = True
 
 # Object 3: ellipse
-ellipse = ((x - 150)**2 / 1500 + (y - 150)**2 / 500) < 1
+ellipse = ((x - 150) ** 2 / 1500 + (y - 150) ** 2 / 500) < 1
 img_labels |= ellipse
 
 # Label connected components
@@ -188,8 +209,13 @@ for ax in axes:
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_labeling.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_labeling.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_labeling.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_labeling.png"
+)
 
 # ============================================================
 # Example 4: Image Transformations
@@ -215,8 +241,8 @@ shifted = ndimage.shift(test_img, [10, -15], mode="constant")
 zoomed = ndimage.zoom(test_img, 1.5, mode="constant")
 
 # Flip
-flipped_h = np.flipud(test_img)   # Horizontal flip
-flipped_v = np.fliplr(test_img)   # Vertical flip
+flipped_h = np.flipud(test_img)  # Horizontal flip
+flipped_v = np.fliplr(test_img)  # Vertical flip
 
 fig, axes = plt.subplots(2, 3, figsize=(12, 8))
 axes[0, 0].imshow(test_img, cmap="gray")
@@ -235,8 +261,13 @@ for ax in axes.flatten():
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_transforms.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_transforms.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_transforms.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_transforms.png"
+)
 
 print(f"\nOriginal shape: {test_img.shape}")
 print(f"Rotated 45Â° shape: {rotated_45.shape}")
@@ -285,8 +316,13 @@ for ax in axes.flatten():
     ax.set_xticks([])
     ax.set_yticks([])
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_contrast.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_contrast.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_contrast.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_11_contrast.png"
+)
 
 # Print statistics
 print(f"\nImage statistics:")
@@ -296,4 +332,3 @@ print(f"  Adaptive:      mean={adaptive_enhanced.mean():.4f}, std={adaptive_enha
 
 print("\n[OK] SciPy image processing covered!")
 print("   Next: 12-io.py for file I/O operations.")
-

@@ -17,13 +17,13 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def post_list(request):
     """Paginated list of posts."""
-    post_list = Post.objects.filter(status='published').order_by('-created_at')
+    post_list = Post.objects.filter(status="published").order_by("-created_at")
 
     # Create paginator
     paginator = Paginator(post_list, 10)  # 10 posts per page
 
     # Get page number from request
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
 
     try:
         posts = paginator.page(page_number)
@@ -34,7 +34,8 @@ def post_list(request):
         # If page is out of range, deliver last page
         posts = paginator.page(paginator.num_pages)
 
-    return render(request, 'blog/post_list.html', {'posts': posts})
+    return render(request, "blog/post_list.html", {"posts": posts})
+
 
 # ---------------------------------------------------------------------------
 # 2. Paginator Object
@@ -78,15 +79,17 @@ def post_list(request):
 # ---------------------------------------------------------------------------
 # Django 2.0+ provides get_page() which handles exceptions automatically.
 
+
 def post_list_simple(request):
     """Simplified pagination using get_page()."""
-    post_list = Post.objects.filter(status='published').order_by('-created_at')
+    post_list = Post.objects.filter(status="published").order_by("-created_at")
     paginator = Paginator(post_list, 10)
 
-    page = paginator.get_page(request.GET.get('page'))
+    page = paginator.get_page(request.GET.get("page"))
     # Returns Page object, or first page if invalid, or last if out of range
 
-    return render(request, 'blog/post_list.html', {'posts': page})
+    return render(request, "blog/post_list.html", {"posts": page})
+
 
 # ---------------------------------------------------------------------------
 # 5. Pagination in Class-Based Views
@@ -218,25 +221,24 @@ def post_list_simple(request):
 # ---------------------------------------------------------------------------
 # Keep existing GET parameters (like search, filters) when paginating.
 
+
 def search_with_pagination(request):
     """Pagination that preserves search parameters."""
-    query = request.GET.get('q', '')
-    posts = Post.objects.filter(status='published')
+    query = request.GET.get("q", "")
+    posts = Post.objects.filter(status="published")
 
     if query:
-        posts = posts.filter(
-            Q(title__icontains=query) |
-            Q(content__icontains=query)
-        )
+        posts = posts.filter(Q(title__icontains=query) | Q(content__icontains=query))
 
     paginator = Paginator(posts, 10)
-    page = paginator.get_page(request.GET.get('page'))
+    page = paginator.get_page(request.GET.get("page"))
 
     context = {
-        'posts': page,
-        'search_query': query,
+        "posts": page,
+        "search_query": query,
     }
-    return render(request, 'blog/search_results.html', context)
+    return render(request, "blog/search_results.html", context)
+
 
 # In template, preserve query params:
 # {% if posts.has_previous %}
@@ -269,29 +271,30 @@ from django.http import JsonResponse
 
 def post_list_api(request):
     """API endpoint for infinite scroll pagination."""
-    page = int(request.GET.get('page', 1))
+    page = int(request.GET.get("page", 1))
     per_page = 10
 
-    posts = Post.objects.filter(status='published').order_by('-created_at')
+    posts = Post.objects.filter(status="published").order_by("-created_at")
     paginator = Paginator(posts, per_page)
     page_obj = paginator.get_page(page)
 
     data = {
-        'posts': [
+        "posts": [
             {
-                'id': post.id,
-                'title': post.title,
-                'excerpt': post.excerpt,
-                'url': post.get_absolute_url(),
+                "id": post.id,
+                "title": post.title,
+                "excerpt": post.excerpt,
+                "url": post.get_absolute_url(),
             }
             for post in page_obj
         ],
-        'has_next': page_obj.has_next(),
-        'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
-        'total_pages': paginator.num_pages,
+        "has_next": page_obj.has_next(),
+        "next_page": page_obj.next_page_number() if page_obj.has_next() else None,
+        "total_pages": paginator.num_pages,
     }
 
     return JsonResponse(data)
+
 
 # JavaScript for infinite scroll:
 # let page = 1;

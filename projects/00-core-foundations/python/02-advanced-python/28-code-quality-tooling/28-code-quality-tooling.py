@@ -35,8 +35,10 @@ from dataclasses import dataclass, field
 # Example 1: the AST is a tree of nodes, not text
 sample = "def f(x):\n    return x + 1\n"
 tree = ast.parse(sample)
-print(f"Module body has {len(tree.body)} statement(s): "
-      f"{type(tree.body[0]).__name__} at line {tree.body[0].lineno}")
+print(
+    f"Module body has {len(tree.body)} statement(s): "
+    f"{type(tree.body[0]).__name__} at line {tree.body[0].lineno}"
+)
 
 # Output:
 # Module body has 1 statement(s): FunctionDef at line 1
@@ -48,6 +50,7 @@ print(f"Module body has {len(tree.body)} statement(s): "
 # def f(items=[]): ... shares ONE list across all calls. The classic
 # notebook bug. Detect: defaults that are list/dict/set literals or
 # calls to list()/dict()/set().
+
 
 def find_mutable_defaults(source: str) -> list[tuple[int, str]]:
     """Return [(line, function_name)] for functions with mutable defaults.
@@ -89,6 +92,7 @@ print(f"Mutable defaults found: {find_mutable_defaults(bad_source)}")
 # except: catches KeyboardInterrupt and SystemExit too, swallowing
 # Ctrl-C during a long training job. Always name the exception.
 
+
 def find_bare_excepts(source: str) -> list[int]:
     """Return line numbers of bare `except:` handlers. O(N) AST walk."""
     tree = ast.parse(source)
@@ -105,11 +109,11 @@ def find_bare_excepts(source: str) -> list[int]:
 except_source = (
     "try:\n"
     "    risky()\n"
-    "except:\n"          # BARE — swallows KeyboardInterrupt
+    "except:\n"  # BARE — swallows KeyboardInterrupt
     "    pass\n"
     "try:\n"
     "    risky()\n"
-    "except ValueError:\n"   # named — correct
+    "except ValueError:\n"  # named — correct
     "    pass\n"
 )
 print(f"Bare excepts at lines: {find_bare_excepts(except_source)}")
@@ -125,12 +129,14 @@ print(f"Bare excepts at lines: {find_bare_excepts(except_source)}")
 # and/or/ternary). Roughly: "how many independent paths". Teams gate
 # at 10; anything above ~15 is untestable.
 
+
 def _count_decisions(node: ast.AST) -> int:
     """Count decision points in a subtree. O(subtree size)."""
     count = 0
     for child in ast.walk(node):
-        if isinstance(child, (ast.If, ast.For, ast.While,
-                              ast.ExceptHandler, ast.IfExp, ast.Assert)):
+        if isinstance(
+            child, (ast.If, ast.For, ast.While, ast.ExceptHandler, ast.IfExp, ast.Assert)
+        ):
             count += 1
         elif isinstance(child, ast.BoolOp):
             count += len(child.values) - 1
@@ -147,8 +153,7 @@ def complexity_by_function(source: str) -> dict[str, int]:
     return result
 
 
-def complexity_violations(source: str, max_complexity: int = 10
-                          ) -> list[tuple[int, str]]:
+def complexity_violations(source: str, max_complexity: int = 10) -> list[tuple[int, str]]:
     """Return [(lineno, message)] for functions over the cap. O(N)."""
     tree = ast.parse(source)
     hits: list[tuple[int, str]] = []
@@ -156,9 +161,9 @@ def complexity_violations(source: str, max_complexity: int = 10
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             complexity = 1 + _count_decisions(node)
             if complexity > max_complexity:
-                hits.append((node.lineno,
-                             f"{node.name}: complexity {complexity} > "
-                             f"{max_complexity}"))
+                hits.append(
+                    (node.lineno, f"{node.name}: complexity {complexity} > {max_complexity}")
+                )
     return hits
 
 
@@ -186,6 +191,7 @@ print(f"Complexities: {complexity_by_function(complex_source)}")
 # D100: public functions need docstrings. E501: lines > max length.
 # W291: trailing whitespace (invisible diffs in review).
 
+
 def missing_docstrings(source: str) -> list[tuple[int, str]]:
     """Return [(line, name)] for functions/classes without docstrings."""
     tree = ast.parse(source)
@@ -199,15 +205,12 @@ def missing_docstrings(source: str) -> list[tuple[int, str]]:
 
 def line_length_violations(source: str, max_len: int = 88) -> list[tuple[int, int]]:
     """Return [(line, actual_length)] for lines over max_len. O(L)."""
-    return [(i + 1, len(line))
-            for i, line in enumerate(source.splitlines())
-            if len(line) > max_len]
+    return [(i + 1, len(line)) for i, line in enumerate(source.splitlines()) if len(line) > max_len]
 
 
 def trailing_whitespace_lines(source: str) -> list[int]:
     """Return line numbers ending in space/tab. O(L)."""
-    return [i + 1 for i, line in enumerate(source.splitlines())
-            if line != line.rstrip()]
+    return [i + 1 for i, line in enumerate(source.splitlines()) if line != line.rstrip()]
 
 
 # Example 5: three text-level rules at once
@@ -215,7 +218,7 @@ messy_source = (
     "def no_doc(a):\n"
     "    return a\n"
     "\n"
-    "x = 1  \n"      # trailing spaces
+    "x = 1  \n"  # trailing spaces
     "y = 'a line that is definitely longer than eighty eight characters for sure'\n"
 )
 print(f"Missing docstrings: {missing_docstrings(messy_source)}")
@@ -235,10 +238,10 @@ print(f"Trailing whitespace: {trailing_whitespace_lines(messy_source)}")
 # only what you understand, always with a reason on the same line.
 # A blanket `# noqa` on a file hides future bugs.
 
+
 def suppressed_lines(source: str) -> set[int]:
     """Return line numbers carrying a noqa comment. O(L)."""
-    return {i + 1 for i, line in enumerate(source.splitlines())
-            if "# noqa" in line}
+    return {i + 1 for i, line in enumerate(source.splitlines()) if "# noqa" in line}
 
 
 # Example 6: noqa scoped to one line
@@ -270,6 +273,7 @@ RULES = ("B006", "E722", "C901", "D100", "E501", "W291")
 @dataclass
 class LintConfig:
     """Which rules run, and the thresholds. Matches ruff's select/ignore."""
+
     select: set[str] = field(default_factory=lambda: set(RULES))
     ignore: set[str] = field(default_factory=set)
     max_line_length: int = 88
@@ -279,6 +283,7 @@ class LintConfig:
 @dataclass
 class LintReport:
     """A machine-readable result for the CI gate."""
+
     violations: dict[str, list[tuple[int, str]]] = field(default_factory=dict)
     clean: bool = True
 
@@ -315,25 +320,29 @@ def lint_source(source: str, config: LintConfig | None = None) -> LintReport:
     check("B006", find_mutable_defaults(source))
     check("E722", [(line, "bare except") for line in find_bare_excepts(source)])
     check("D100", missing_docstrings(source))
-    check("E501", [(line, f"{length} chars") for line, length
-                   in line_length_violations(source, config.max_line_length)])
-    check("W291", [(line, "trailing whitespace")
-                   for line in trailing_whitespace_lines(source)])
+    check(
+        "E501",
+        [
+            (line, f"{length} chars")
+            for line, length in line_length_violations(source, config.max_line_length)
+        ],
+    )
+    check("W291", [(line, "trailing whitespace") for line in trailing_whitespace_lines(source)])
     check("C901", complexity_violations(source, config.max_complexity))
     return report
 
 
 # Example 7: gating a bad file vs a clean one
 bad_file = (
-    "def process(data=[]):\n"          # B006
+    "def process(data=[]):\n"  # B006
     "    try:\n"
     "        return data.pop()\n"
-    "    except:\n"                    # E722
+    "    except:\n"  # E722
     "        pass\n"
 )
 clean_file = (
     "def process(data: list[int]) -> int:\n"
-    "    \"\"\"Pop the last item; return 0 on empty input.\"\"\"\n"
+    '    """Pop the last item; return 0 on empty input."""\n'
     "    try:\n"
     "        return data.pop()\n"
     "    except IndexError:\n"
@@ -341,8 +350,7 @@ clean_file = (
 )
 report_bad = lint_source(bad_file)
 report_good = lint_source(clean_file)
-print(f"Bad file clean? {report_bad.clean}  violations: "
-      f"{sorted(report_bad.violations)}")
+print(f"Bad file clean? {report_bad.clean}  violations: {sorted(report_bad.violations)}")
 print(f"Good file clean? {report_good.clean}")
 
 # Output:
@@ -358,6 +366,7 @@ print(f"Good file clean? {report_good.clean}")
 # pre-commit runs all of it locally, bandit scans for security
 # smells, pip-audit checks dependencies against CVE feeds.
 # The gate() below is what a CI pipeline calls.
+
 
 def gate(path: str, config: LintConfig | None = None) -> bool:
     """Lint a file from disk; True = ship it. Reads file, O(file size)."""
@@ -400,53 +409,60 @@ print(f"Self-lint passes the gate? {gate(SELF)}")
 # ============================================================
 def _verify() -> None:  # noqa: C901 - 12 asserts are flat, not nested; suppress with reason
     """Assert every claim this file makes. Silent on success."""
-    assert find_mutable_defaults("def f(a=[]):\n    return a\n") == [(1, "f")], \
+    assert find_mutable_defaults("def f(a=[]):\n    return a\n") == [(1, "f")], (
         "mutable default argument must be detected"
-    assert find_mutable_defaults("def f(a=None):\n    return a\n") == [], \
+    )
+    assert find_mutable_defaults("def f(a=None):\n    return a\n") == [], (
         "None default must NOT be flagged as mutable"
-    assert find_mutable_defaults("def f(a=list()):\n    return a\n") == [(1, "f")], \
+    )
+    assert find_mutable_defaults("def f(a=list()):\n    return a\n") == [(1, "f")], (
         "list() call default must be detected"
+    )
 
-    assert find_bare_excepts("try:\n    x()\nexcept ValueError:\n    pass\n") == [], \
+    assert find_bare_excepts("try:\n    x()\nexcept ValueError:\n    pass\n") == [], (
         "named except must not be flagged"
-    assert find_bare_excepts("try:\n    x()\nexcept:\n    pass\n") == [3], \
+    )
+    assert find_bare_excepts("try:\n    x()\nexcept:\n    pass\n") == [3], (
         "bare except must be flagged at its own line"
+    )
 
-    assert complexity_by_function("def f(x):\n    return x\n") == {"f": 1}, \
+    assert complexity_by_function("def f(x):\n    return x\n") == {"f": 1}, (
         "linear function has complexity 1"
-    assert complexity_by_function(
-        "def f(x):\n    if x:\n        return 1\n    return 0\n") == {"f": 2}, \
-        "one branch adds one point of complexity"
+    )
+    assert complexity_by_function("def f(x):\n    if x:\n        return 1\n    return 0\n") == {
+        "f": 2
+    }, "one branch adds one point of complexity"
 
-    assert missing_docstrings("def f():\n    pass\n") == [(1, "f")], \
+    assert missing_docstrings("def f():\n    pass\n") == [(1, "f")], (
         "missing docstring must be reported"
-    assert missing_docstrings('def f():\n    """doc."""\n    pass\n') == [], \
+    )
+    assert missing_docstrings('def f():\n    """doc."""\n    pass\n') == [], (
         "docstring presence must be respected"
+    )
 
-    assert line_length_violations("x = '0123456789'\n", 5) == [(1, 16)], \
+    assert line_length_violations("x = '0123456789'\n", 5) == [(1, 16)], (
         "overlong line must be reported with actual length"
-    assert trailing_whitespace_lines("a = 1  \nb = 2\n") == [1], \
-        "trailing whitespace must be found"
+    )
+    assert trailing_whitespace_lines("a = 1  \nb = 2\n") == [1], "trailing whitespace must be found"
 
     bad = lint_source("def f(x=[]):\n    return x\n")
-    assert not bad.clean and "B006" in bad.violations, \
-        "gate must fail on mutable defaults"
+    assert not bad.clean and "B006" in bad.violations, "gate must fail on mutable defaults"
 
     suppressed_ok = lint_source(
-        "def f(x=[]):  # noqa: B006 - API contract requires a shared list\n"
-        "    return x\n")
-    assert suppressed_ok.clean, \
-        "noqa with a rule code must suppress that rule on that line"
+        "def f(x=[]):  # noqa: B006 - API contract requires a shared list\n    return x\n"
+    )
+    assert suppressed_ok.clean, "noqa with a rule code must suppress that rule on that line"
 
     gated = LintConfig(ignore={"E722"})
-    assert lint_source("try:\n    x()\nexcept:\n    pass\n", gated).clean, \
+    assert lint_source("try:\n    x()\nexcept:\n    pass\n", gated).clean, (
         "config ignore must disable a rule"
+    )
 
-    assert lint_source("def broken(:\n").violations.get("E999"), \
+    assert lint_source("def broken(:\n").violations.get("E999"), (
         "syntax errors must be reported, not crash the gate"
+    )
 
-    assert gate(__file__), \
-        "this file must pass its own gate (self-lint)"
+    assert gate(__file__), "this file must pass its own gate (self-lint)"
 
     print("[OK] 28-code-quality-tooling: all checks passed")
 

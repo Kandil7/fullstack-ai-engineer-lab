@@ -5,9 +5,11 @@ W3Schools: https://www.w3schools.com/python/pandas_dataframe_corr.asp
 Correlation measures the linear relationship between two variables.
 Values range from -1 (perfect negative) to +1 (perfect positive).
 """
+
 import pandas as pd
 import numpy as np
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
@@ -26,13 +28,15 @@ exam_score = 40 + 5 * study_hours + np.random.normal(0, 8, n)
 sleep_hours = np.random.uniform(4, 9, n)
 gpa = 1.0 + 0.3 * study_hours - 0.1 * sleep_hours + np.random.normal(0, 0.5, n)
 
-df = pd.DataFrame({
-    "study_hours": study_hours.round(1),
-    "exam_score": exam_score.round(1),
-    "sleep_hours": sleep_hours.round(1),
-    "gpa": gpa.round(2),
-    "age": np.random.randint(18, 25, n),
-})
+df = pd.DataFrame(
+    {
+        "study_hours": study_hours.round(1),
+        "exam_score": exam_score.round(1),
+        "sleep_hours": sleep_hours.round(1),
+        "gpa": gpa.round(2),
+        "age": np.random.randint(18, 25, n),
+    }
+)
 
 print("Sample data (first 5 rows):")
 print(df.head())
@@ -64,10 +68,11 @@ exam_corr = df.corr()["exam_score"].drop("exam_score").sort_values(ascending=Fal
 print(exam_corr.round(3))
 print()
 
-print("Strongest positive correlation: study_hours + exam_score =", 
-      df["study_hours"].corr(df["exam_score"]).round(3))
-print("Weakest correlation: age + exam_score =",
-      df["age"].corr(df["exam_score"]).round(3))
+print(
+    "Strongest positive correlation: study_hours + exam_score =",
+    df["study_hours"].corr(df["exam_score"]).round(3),
+)
+print("Weakest correlation: age + exam_score =", df["age"].corr(df["exam_score"]).round(3))
 print()
 
 # ---------------------------------------------------------------------------
@@ -89,7 +94,9 @@ ax.set_yticklabels(corr.columns)
 for i in range(len(corr)):
     for j in range(len(corr)):
         color = "white" if abs(corr.values[i, j]) > 0.5 else "black"
-        ax.text(j, i, f"{corr.values[i, j]:.2f}", ha="center", va="center", color=color, fontsize=10)
+        ax.text(
+            j, i, f"{corr.values[i, j]:.2f}", ha="center", va="center", color=color, fontsize=10
+        )
 
 plt.colorbar(im, label="Correlation Coefficient")
 ax.set_title("Correlation Heatmap")
@@ -111,8 +118,13 @@ print("=" * 60)
 from pandas.plotting import scatter_matrix
 
 fig, axes = plt.subplots(1, 1, figsize=(10, 8))
-scatter_matrix(df[["study_hours", "exam_score", "sleep_hours", "gpa"]],
-               alpha=0.4, ax=axes, diagonal="hist", color="steelblue")
+scatter_matrix(
+    df[["study_hours", "exam_score", "sleep_hours", "gpa"]],
+    alpha=0.4,
+    ax=axes,
+    diagonal="hist",
+    color="steelblue",
+)
 plt.suptitle("Scatter Matrix", y=1.02, fontsize=14)
 plt.tight_layout()
 path4 = os.path.join(tempfile.gettempdir(), "pandas_ex23_scatter_matrix.png")
@@ -147,8 +159,8 @@ y = np.sin(x) + np.random.normal(0, 0.1, 100)
 df_nonlinear = pd.DataFrame({"x": x, "y": y})
 
 print("Non-linear data (sin wave):")
-print(f"  Pearson:  {df_nonlinear.corr(method='pearson').iloc[0,1]:.3f}")
-print(f"  Spearman: {df_nonlinear.corr(method='spearman').iloc[0,1]:.3f}")
+print(f"  Pearson:  {df_nonlinear.corr(method='pearson').iloc[0, 1]:.3f}")
+print(f"  Spearman: {df_nonlinear.corr(method='spearman').iloc[0, 1]:.3f}")
 print()
 
 print("Done!")

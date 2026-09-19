@@ -27,19 +27,20 @@ class Rectangle:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-    
+
     @property
     def area(self):
         """Computed from width and height."""
         return self.width * self.height
-    
+
     @property
     def perimeter(self):
         """Computed from width and height."""
         return 2 * (self.width + self.height)
 
+
 r = Rectangle(5, 3)
-print(r.area)      # 15 (computed)
+print(r.area)  # 15 (computed)
 print(r.perimeter)  # 16 (computed)
 ```
 
@@ -90,30 +91,31 @@ class Circle:
 ```python
 class Property:
     """Simplified property descriptor."""
-    
+
     def __init__(self, fget=None, fset=None):
         self.fget = fget
         self.fset = fset
-    
+
     def __get__(self, obj, objtype=None):
         if obj is None:
             return self
         return self.fget(obj)
-    
+
     def __set__(self, obj, value):
         if self.fset is None:
             raise AttributeError("can't set attribute")
         self.fset(obj, value)
 
+
 # Usage
 class Temperature:
     def __init__(self, celsius):
         self._celsius = celsius
-    
+
     @Property
     def celsius(self):
         return self._celsius
-    
+
     @celsius.setter
     def celsius(self, value):
         self._celsius = value
@@ -137,20 +139,21 @@ class User:
     def __init__(self, first_name, last_name):
         self._first_name = first_name
         self._last_name = last_name
-    
+
     @property
     def full_name(self):
         """Getter for full name."""
         return f"{self._first_name} {self._last_name}"
-    
+
     @property
     def email(self):
         """Getter for email."""
         return f"{self._first_name.lower()}@example.com"
 
+
 user = User("John", "Doe")
 print(user.full_name)  # John Doe (getter called)
-print(user.email)      # john@example.com (getter called)
+print(user.email)  # john@example.com (getter called)
 ```
 
 **Related Terms**: property, accessor, read-only
@@ -173,20 +176,21 @@ class BankAccount:
     def __init__(self, owner, balance):
         self.owner = owner
         self._balance = balance  # Private by convention
-    
+
     @property
     def balance(self):
         """Public access to private balance."""
         return self._balance
-    
+
     def deposit(self, amount):
         if amount <= 0:
             raise ValueError("Amount must be positive")
         self._balance += amount
 
+
 account = BankAccount("Alice", 1000)
-print(account.balance)    # OK (uses property)
-print(account._balance)   # Works but discouraged
+print(account.balance)  # OK (uses property)
+print(account._balance)  # Works but discouraged
 ```
 
 **Related Terms**: encapsulation, name mangling, convention
@@ -207,28 +211,29 @@ print(account._balance)   # Works but discouraged
 class Circle:
     def __init__(self, radius):
         self._radius = radius
-    
+
     @property
     def radius(self):
         """Get the radius."""
         return self._radius
-    
+
     @radius.setter
     def radius(self, value):
         """Set the radius with validation."""
         if value < 0:
             raise ValueError("Radius cannot be negative")
         self._radius = value
-    
+
     @radius.deleter
     def radius(self):
         """Delete the radius."""
         del self._radius
 
+
 c = Circle(5)
-print(c.radius)   # 5 (getter)
-c.radius = 10     # setter called
-del c.radius      # deleter called
+print(c.radius)  # 5 (getter)
+c.radius = 10  # setter called
+del c.radius  # deleter called
 ```
 
 **Related Terms**: descriptor, getter, setter, deleter, managed attribute
@@ -251,11 +256,11 @@ class Temperature:
     def __init__(self, celsius):
         self._celsius = None
         self.celsius = celsius  # Uses setter
-    
+
     @property
     def celsius(self):
         return self._celsius
-    
+
     @celsius.setter
     def celsius(self, value):
         """Set temperature with validation."""
@@ -265,10 +270,11 @@ class Temperature:
             raise ValueError("Temperature below absolute zero")
         self._celsius = value
 
+
 t = Temperature(100)
-t.celsius = 37.5      # OK
-t.celsius = -300      # ValueError
-t.celsius = "hot"     # TypeError
+t.celsius = 37.5  # OK
+t.celsius = -300  # ValueError
+t.celsius = "hot"  # TypeError
 ```
 
 **Related Terms**: property, validation, mutator
@@ -289,15 +295,17 @@ t.celsius = "hot"     # TypeError
 from functools import cached_property
 import math
 
+
 class Circle:
     def __init__(self, radius):
         self.radius = radius
-    
+
     @cached_property
     def area(self):
         """Expensive calculation, cached after first access."""
         print("Computing area...")
-        return math.pi * self.radius ** 2
+        return math.pi * self.radius**2
+
 
 c = Circle(5)
 print(c.area)  # "Computing area..." then 78.54
@@ -324,26 +332,27 @@ class Employee:
         self.name = name
         self.hourly_rate = hourly_rate
         self.hours_worked = hours_worked
-    
+
     @property
     def gross_pay(self):
         """Computed: hourly_rate * hours_worked"""
         return self.hourly_rate * self.hours_worked
-    
+
     @property
     def tax(self):
         """Computed: 20% of gross pay"""
         return self.gross_pay * 0.20
-    
+
     @property
     def net_pay(self):
         """Computed: gross_pay - tax"""
         return self.gross_pay - self.tax
 
+
 emp = Employee("Alice", 25, 40)
 print(emp.gross_pay)  # 1000 (computed)
-print(emp.tax)        # 200 (computed)
-print(emp.net_pay)    # 800 (computed)
+print(emp.tax)  # 200 (computed)
+print(emp.net_pay)  # 800 (computed)
 ```
 
 **Related Terms**: property, derived value, calculation
@@ -416,6 +425,7 @@ Properties
 def age(self):
     return self._age
 
+
 @age.setter
 def age(self, value):
     if not isinstance(value, int):
@@ -445,6 +455,8 @@ def expensive_computation(self):
 @property
 def id(self):
     return self._id
+
+
 # No setter - read-only
 ```
 
@@ -453,6 +465,7 @@ def id(self):
 @property
 def name(self):
     return self._user.name
+
 
 @name.setter
 def name(self, value):

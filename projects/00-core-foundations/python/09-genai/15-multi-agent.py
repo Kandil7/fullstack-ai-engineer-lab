@@ -28,6 +28,7 @@ from typing import Any, Callable
 # One orchestrator decides WHAT and assigns; workers execute. The
 # orchestrator holds the plan; workers are interchangeable.
 
+
 @dataclass
 class Agent:
     name: str
@@ -66,11 +67,13 @@ coder = Agent("coder", "code", cost_per_call=0.03)
 reviewer = Agent("reviewer", "review", cost_per_call=0.01)
 orch = Orchestrator([researcher, coder, reviewer])
 
-outputs = orch.run([
-    ("find best libraries", "research"),
-    ("implement the solution", "code"),
-    ("review the solution", "review"),
-])
+outputs = orch.run(
+    [
+        ("find best libraries", "research"),
+        ("implement the solution", "code"),
+        ("review the solution", "review"),
+    ]
+)
 print("Example 1: orchestrator/worker")
 for out in outputs:
     print(f"  {out}")
@@ -83,6 +86,7 @@ assert abs(orch.total_cost() - (0.02 + 0.03 + 0.01)) < 1e-9, "cost sums"
 # A worker can hand its output to the next worker. Handoffs carry
 # context, so state must be explicit.
 
+
 @dataclass
 class Handoff:
     from_agent: str
@@ -90,8 +94,9 @@ class Handoff:
     payload: Any
 
 
-def handoff_chain(start: Agent, chain: list[tuple[Agent, Callable[[Any], Any]]],
-                  initial: Any) -> list[Handoff]:
+def handoff_chain(
+    start: Agent, chain: list[tuple[Agent, Callable[[Any], Any]]], initial: Any
+) -> list[Handoff]:
     """Run a chain of agents, handing results forward."""
     handoffs: list[Handoff] = []
     payload = initial
@@ -120,6 +125,7 @@ assert handoffs[-1].to_agent == "reviewer"
 # ============================================================
 # Agents share a state dict. Reads and writes must be explicit or
 # workers silently work on stale information.
+
 
 class SharedState:
     def __init__(self) -> None:
@@ -151,15 +157,16 @@ assert state.get("query") == "scraper design" and state.get("code") == "done"
 # N agents x M turns x tokens = bill shock. Always model the cost
 # BEFORE building the team.
 
-def multi_agent_cost(n_agents: int, turns_per_agent: int,
-                     tokens_per_turn: int, price_per_1m: float) -> float:
+
+def multi_agent_cost(
+    n_agents: int, turns_per_agent: int, tokens_per_turn: int, price_per_1m: float
+) -> float:
     total_tokens = n_agents * turns_per_agent * tokens_per_turn
     return total_tokens / 1_000_000 * price_per_1m
 
 
 # Example 4: cost model
-cost = multi_agent_cost(n_agents=4, turns_per_agent=5, tokens_per_turn=2000,
-                        price_per_1m=15.0)
+cost = multi_agent_cost(n_agents=4, turns_per_agent=5, tokens_per_turn=2000, price_per_1m=15.0)
 print("\nExample 4: cost multiplication")
 print(f"  4 agents x 5 turns x 2k tokens -> ${cost:.2f} per task")
 assert cost == 4 * 5 * 2000 / 1_000_000 * 15.0
@@ -173,6 +180,7 @@ assert cost == 4 * 5 * 2000 / 1_000_000 * 15.0
 
 STATES = ["init", "research", "code", "review", "done"]
 
+
 def valid_transition(frm: str, to: str) -> bool:
     """Guarded transitions: research -> code -> review -> done."""
     order = {s: i for i, s in enumerate(STATES)}
@@ -184,12 +192,17 @@ def valid_transition(frm: str, to: str) -> bool:
 
 # Example 5: guarded transitions
 print("\nExample 5: state machine")
-for frm, to in [("init", "research"), ("research", "code"),
-                ("review", "init"), ("code", "research")]:
+for frm, to in [
+    ("init", "research"),
+    ("research", "code"),
+    ("review", "init"),
+    ("code", "research"),
+]:
     print(f"  {frm} -> {to}: {'OK' if valid_transition(frm, to) else 'BLOCKED'}")
 assert valid_transition("init", "research")
 assert not valid_transition("review", "init"), "no going back"
 assert not valid_transition("code", "research"), "no skipping back"
+
 
 # ============================================================
 # Production Pattern

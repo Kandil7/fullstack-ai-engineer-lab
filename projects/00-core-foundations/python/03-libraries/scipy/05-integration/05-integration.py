@@ -12,11 +12,17 @@ Topics:
 """
 
 import numpy as np
+
 # Ensure output directory exists (Tier 0 fix: Windows + CI)
 import os
-os.makedirs('K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy', exist_ok=True)
+
+os.makedirs(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy",
+    exist_ok=True,
+)
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy import integrate
@@ -39,19 +45,21 @@ print(f"  Error est: {error:.2e}")
 result2, err2 = integrate.quad(lambda x: x**2, 0, 1)
 print(f"\nIntegral from 0 to 1 of x^2 dx")
 print(f"  Numerical: {result2:.10f}")
-print(f"  Exact:     {1/3:.10f}")
+print(f"  Exact:     {1 / 3:.10f}")
 print(f"  Error est: {err2:.2e}")
 
 # Gaussian integral: exp(-x^2) from -inf to inf = sqrt(pi)
-result3, err3 = integrate.quad(lambda x: np.exp(-x**2), -np.inf, np.inf)
+result3, err3 = integrate.quad(lambda x: np.exp(-(x**2)), -np.inf, np.inf)
 print(f"\nIntegral from -inf to inf of exp(-x^2) dx")
 print(f"  Numerical: {result3:.10f}")
 print(f"  Exact:     {np.sqrt(np.pi):.10f}")
 print(f"  Error est: {err3:.2e}")
 
+
 # More complex integrand
 def complicated(x):
     return np.exp(-x) * np.sin(10 * x) * np.log(1 + x**2)
+
 
 result4, err4 = integrate.quad(complicated, 0, 10)
 print(f"\nIntegral from 0 to 10 of e^(-x)*sin(10x)*ln(1+x^2) dx")
@@ -69,8 +77,13 @@ ax.set_xlabel("x")
 ax.set_ylabel("f(x)")
 ax.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_quad.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_quad.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_quad.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_quad.png"
+)
 
 # ============================================================
 # Example 2: Double Integration with dblquad
@@ -79,38 +92,44 @@ print("\n" + "=" * 60)
 print("Example 2: Double Integration with dblquad()")
 print("=" * 60)
 
+
 # Integrate f(x,y) = x^2 + y^2 over the unit square [0,1]x[0,1]
 def integrand_2d(y, x):
     return x**2 + y**2
+
 
 # Note: dblquad signature is dblquad(func, a, b, gfun, hfun)
 # where func(y, x), a,b are x limits, gfun,hfun are y limits
 result_2d, error_2d = integrate.dblquad(
     integrand_2d,
-    0, 1,       # x limits
-    0, 1        # y limits (functions of x, here constants)
+    0,
+    1,  # x limits
+    0,
+    1,  # y limits (functions of x, here constants)
 )
 
 # Exact: âˆ«âˆ« (xÂ² + yÂ²) dx dy = 2/3
-exact_2d = 2/3
+exact_2d = 2 / 3
 print(f"Double integral of (x^2 + y^2) dx dy over [0,1]x[0,1]")
 print(f"  Numerical: {result_2d:.10f}")
 print(f"  Exact:     {exact_2d:.10f}")
 print(f"  Error est: {error_2d:.2e}")
 
+
 # Circular region: xÂ² + yÂ² <= 1
 def circular_integrand(y, x):
     return np.sqrt(x**2 + y**2)
 
+
 def y_lower(x):
     return -np.sqrt(max(0, 1 - x**2))
+
 
 def y_upper(x):
     return np.sqrt(max(0, 1 - x**2))
 
-result_circ, err_circ = integrate.dblquad(
-    circular_integrand, -1, 1, y_lower, y_upper
-)
+
+result_circ, err_circ = integrate.dblquad(circular_integrand, -1, 1, y_lower, y_upper)
 print(f"\nDouble integral of sqrt(x^2+y^2) dx dy over unit disk")
 print(f"  Result: {result_circ:.6f}")
 print(f"  (Volume under cone over unit circle)")
@@ -122,15 +141,15 @@ print("\n" + "=" * 60)
 print("Example 3: Solving Ordinary Differential Equations")
 print("=" * 60)
 
+
 # --- Example 3a: Simple exponential decay ---
 # dy/dt = -k*y, y(0) = y0  =>  y(t) = y0 * exp(-k*t)
 def decay(t, y, k=0.5):
     return -k * y[0]
 
+
 sol = integrate.solve_ivp(
-    decay, [0, 10], [1.0],
-    args=(0.5,), t_eval=np.linspace(0, 10, 200),
-    dense_output=True
+    decay, [0, 10], [1.0], args=(0.5,), t_eval=np.linspace(0, 10, 200), dense_output=True
 )
 
 print("Exponential decay: dy/dt = -0.5y, y(0) = 1")
@@ -139,18 +158,22 @@ idx_5 = np.argmin(np.abs(sol.t - 5))
 print(f"  t=5:  numerical={sol.y[0][idx_5]:.4f}, analytical={np.exp(-2.5):.4f}")
 print(f"  t=10: numerical={sol.y[0][-1]:.4f}, analytical={np.exp(-5):.4f}")
 
+
 # --- Example 3b: Lotka-Volterra (predator-prey) ---
 def lotka_volterra(t, z, a=1.5, b=1.0, c=3.0, d=1.0):
     x, y = z  # x=prey, y=predator
-    dxdt = a*x - b*x*y
-    dydt = -c*y + d*x*y
+    dxdt = a * x - b * x * y
+    dydt = -c * y + d * x * y
     return [dxdt, dydt]
 
+
 sol_lv = integrate.solve_ivp(
-    lotka_volterra, [0, 20], [1.0, 0.5],
+    lotka_volterra,
+    [0, 20],
+    [1.0, 0.5],
     args=(1.5, 1.0, 3.0, 1.0),
     t_eval=np.linspace(0, 20, 1000),
-    dense_output=True
+    dense_output=True,
 )
 
 print(f"\nLotka-Volterra predator-prey model:")
@@ -177,8 +200,13 @@ axes[1].set_ylabel("Predator population")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_ode.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_ode.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_ode.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_ode.png"
+)
 
 # ============================================================
 # Example 4: Spring-Mass-Damper System
@@ -186,6 +214,7 @@ print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-eng
 print("\n" + "=" * 60)
 print("Example 4: Spring-Mass-Damper ODE System")
 print("=" * 60)
+
 
 # m*x'' + c*x' + k*x = 0
 # Rewrite as: x' = v, v' = (-c*v - k*x) / m
@@ -195,10 +224,13 @@ def spring_mass(t, state, m=1.0, c=0.3, k=4.0):
     dvdt = (-c * v - k * x) / m
     return [dxdt, dvdt]
 
+
 sol_sm = integrate.solve_ivp(
-    spring_mass, [0, 15], [1.0, 0.0],  # x(0)=1, v(0)=0
+    spring_mass,
+    [0, 15],
+    [1.0, 0.0],  # x(0)=1, v(0)=0
     t_eval=np.linspace(0, 15, 500),
-    dense_output=True
+    dense_output=True,
 )
 
 # Calculate energy
@@ -230,8 +262,13 @@ axes[1].set_ylabel("Energy")
 axes[1].legend()
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_spring.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_spring.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_spring.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_spring.png"
+)
 
 # ============================================================
 # Example 5: Cumulative Integration (Area Under Curve)
@@ -241,8 +278,8 @@ print("Example 5: Cumulative Trapezoid Integration")
 print("=" * 60)
 
 # Integrate a discrete signal using cumulative_trapezoid
-t = np.linspace(0, 2*np.pi, 500)
-signal = np.sin(t) + 0.5 * np.sin(3*t)
+t = np.linspace(0, 2 * np.pi, 500)
+signal = np.sin(t) + 0.5 * np.sin(3 * t)
 
 cumulative = integrate.cumulative_trapezoid(signal, t, initial=0)
 total_area = cumulative[-1]
@@ -265,9 +302,13 @@ axes[1].set_xlabel("t")
 axes[1].set_ylabel("âˆ« f(t) dt")
 axes[1].grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig("K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_cumulative.png", dpi=100)
-print("Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_cumulative.png")
+plt.savefig(
+    "K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_cumulative.png",
+    dpi=100,
+)
+print(
+    "Plot saved: K:/learning/technical/ai-ml/01-main-projects/fullstack-ai-engineer-lab/projects/00-core-foundations/python/outputs/scipy/scipy_05_cumulative.png"
+)
 
 print("\n[OK] SciPy integration module covered!")
 print("   Next: 06-interpolation.py for interpolation techniques.")
-

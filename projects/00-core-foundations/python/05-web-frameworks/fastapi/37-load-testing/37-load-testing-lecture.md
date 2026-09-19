@@ -42,9 +42,17 @@ By the end of this lecture, you will be able to:
 ```python
 def summarize(latencies):
     lat = sorted(latencies)
-    def pct(p): return round(lat[int(p * len(lat))] * 1000, 2)
-    return {"mean_ms": ..., "p50_ms": pct(0.5), "p95_ms": pct(0.95),
-            "p99_ms": pct(0.99), "max_ms": ...}
+
+    def pct(p):
+        return round(lat[int(p * len(lat))] * 1000, 2)
+
+    return {
+        "mean_ms": ...,
+        "p50_ms": pct(0.5),
+        "p95_ms": pct(0.95),
+        "p99_ms": pct(0.99),
+        "max_ms": ...,
+    }
 ```
 
 Output:
@@ -60,9 +68,9 @@ in a hundred who hits it. SLOs are written against percentiles — "p99 < 200ms"
 ## 2. Open vs Closed Load Models
 
 ```python
-def run_open_model(n):      # fire as fast as possible — saturates the server
+def run_open_model(n):  # fire as fast as possible — saturates the server
     ...
-def run_closed_model(n, think_ms):   # each 'user' waits between requests
+def run_closed_model(n, think_ms):  # each 'user' waits between requests
     ...
 ```
 
@@ -117,7 +125,7 @@ Never guess — the answer is usually not what the team suspects.
 
 ```python
 # If p99 must stay < 200ms at 500 rps, and one node handles 300 rps at p99 150ms:
-nodes = ceil(500 / 300) + headroom   # 2 nodes, or 3 with 50% headroom
+nodes = ceil(500 / 300) + headroom  # 2 nodes, or 3 with 50% headroom
 ```
 
 Output:

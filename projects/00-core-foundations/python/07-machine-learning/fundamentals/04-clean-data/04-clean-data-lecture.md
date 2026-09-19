@@ -35,9 +35,9 @@ Missing data is one of the most common data quality issues. Values may be missin
 
 **Detection:**
 ```python
-df.isnull().sum()           # Count missing per column
-df.isnull().sum().sum()     # Total missing
-df.isnull().mean() * 100    # Percentage missing
+df.isnull().sum()  # Count missing per column
+df.isnull().sum().sum()  # Total missing
+df.isnull().mean() * 100  # Percentage missing
 ```
 
 **Handling Strategies:**
@@ -55,9 +55,9 @@ df.isnull().mean() * 100    # Percentage missing
 Duplicate rows can bias ML models by giving disproportionate weight to certain observations.
 
 ```python
-df.duplicated()           # Boolean mask of duplicates
-df.duplicated().sum()     # Count of duplicates
-df.drop_duplicates()      # Remove duplicates
+df.duplicated()  # Boolean mask of duplicates
+df.duplicated().sum()  # Count of duplicates
+df.drop_duplicates()  # Remove duplicates
 ```
 
 ### 3. Data Normalization
@@ -117,9 +117,9 @@ import numpy as np
 import pandas as pd
 
 data = {
-    'age': [25, 30, np.nan, 45, 50],
-    'salary': [50000, 60000, 75000, np.nan, 90000],
-    'experience': [2, 5, 8, 12, np.nan]
+    "age": [25, 30, np.nan, 45, 50],
+    "salary": [50000, 60000, 75000, np.nan, 90000],
+    "experience": [2, 5, 8, 12, np.nan],
 }
 df = pd.DataFrame(data)
 
@@ -158,9 +158,9 @@ print(df_median)
 
 ```python
 data = {
-    'name': ['Alice', 'Bob', 'Alice', 'Charlie', 'Bob'],
-    'age': [25, 30, 25, 35, 30],
-    'salary': [50000, 60000, 50000, 70000, 60000]
+    "name": ["Alice", "Bob", "Alice", "Charlie", "Bob"],
+    "age": [25, 30, 25, 35, 30],
+    "salary": [50000, 60000, 50000, 70000, 60000],
 }
 df = pd.DataFrame(data)
 
@@ -207,7 +207,7 @@ standardized = scaler.fit_transform(data)
 print("Standardized (mean=0, std=1):")
 print(standardized)
 print(f"\nMean: {standardized.mean(axis=0)}")  # ≈ [0, 0]
-print(f"Std: {standardized.std(axis=0)}")       # ≈ [1, 1]
+print(f"Std: {standardized.std(axis=0)}")  # ≈ [1, 1]
 ```
 
 **Explanation:**
@@ -258,11 +258,13 @@ from sklearn.preprocessing import StandardScaler
 
 # Create dirty data
 np.random.seed(42)
-df_dirty = pd.DataFrame({
-    'age': [25, 30, np.nan, 45, 50, 25, 30],
-    'salary': [50000, 60000, 75000, np.nan, 90000, 50000, 60000],
-    'experience': [2, 5, 8, 12, np.nan, 2, 5]
-})
+df_dirty = pd.DataFrame(
+    {
+        "age": [25, 30, np.nan, 45, 50, 25, 30],
+        "salary": [50000, 60000, 75000, np.nan, 90000, 50000, 60000],
+        "experience": [2, 5, 8, 12, np.nan, 2, 5],
+    }
+)
 
 print("Original dirty data:")
 print(df_dirty)

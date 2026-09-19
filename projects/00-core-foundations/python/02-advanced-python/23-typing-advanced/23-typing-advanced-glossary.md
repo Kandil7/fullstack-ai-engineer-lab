@@ -28,8 +28,10 @@
 ```python
 from typing import Any
 
+
 def passthrough(x: Any) -> Any:
     return x
+
 
 print(passthrough(1) + passthrough(2), passthrough("a") * 2)
 ```
@@ -44,8 +46,10 @@ print(passthrough(1) + passthrough(2), passthrough("a") * 2)
 ```python
 from typing import Callable
 
+
 def apply(f: Callable[[int], int], n: int) -> int:
     return f(n)
+
 
 print(apply(lambda x: x * 3, 4))
 ```
@@ -62,9 +66,11 @@ from typing import Generic, TypeVar
 
 T = TypeVar("T")
 
+
 class Box(Generic[T]):
     def __init__(self, value: T) -> None:
         self.value = value
+
 
 b: Box[int] = Box(42)
 print(b.value + 8)
@@ -80,8 +86,10 @@ print(b.value + 8)
 ```python
 import typing
 
+
 def f(x: int) -> str:
     return str(x)
+
 
 print(typing.get_type_hints(f))
 ```
@@ -96,8 +104,10 @@ print(typing.get_type_hints(f))
 ```python
 import inspect
 
+
 def call_llm(prompt: str, temperature: float = 0.0) -> str:
     return prompt
+
 
 sig = inspect.signature(call_llm)
 print(list(sig.parameters), sig.parameters["temperature"].default)
@@ -115,8 +125,10 @@ from typing import Literal
 
 Env = Literal["dev", "prod"]
 
+
 def server(env: Env) -> str:
     return f"starting {env}"
+
 
 print(server("dev"))
 ```
@@ -132,8 +144,10 @@ starting dev
 class Base:
     pass
 
+
 class Derived(Base):
     pass
+
 
 print(isinstance(Derived(), Base))
 ```
@@ -151,15 +165,19 @@ import functools
 
 P = ParamSpec("P")
 
+
 def logged(f: Callable[P, str]) -> Callable[P, str]:
     @functools.wraps(f)
     def wrapper(*args: P.args, **kwargs: P.kwargs) -> str:
         return f(*args, **kwargs)
+
     return wrapper
+
 
 @logged
 def greet(name: str) -> str:
     return f"hi {name}"
+
 
 print(greet("ana"))
 ```
@@ -172,10 +190,12 @@ hi ana
 **Definition**: The specification that brought type hints to Python (2015): annotation syntax, `typing` module, and how checkers treat them. Everything in this glossary stands on it; later PEPs (585, 604, 646, 695) modernized the syntax.
 **Example**:
 ```python
-from typing import Dict, List, Optional   # PEP 484 era
+from typing import Dict, List, Optional  # PEP 484 era
+
 
 def f(x: Optional[int]) -> List[int]:
     return [x if x is not None else 0]
+
 
 print(f(None))
 ```
@@ -190,15 +210,19 @@ print(f(None))
 ```python
 from typing import Protocol
 
+
 class Speaker(Protocol):
     def speak(self) -> str: ...
+
 
 class Dog:
     def speak(self) -> str:
         return "woof"
 
+
 def announce(s: Speaker) -> str:
     return s.speak()
+
 
 print(announce(Dog()))
 ```
@@ -213,13 +237,16 @@ woof
 ```python
 from typing import Protocol, runtime_checkable
 
+
 @runtime_checkable
 class Speaker(Protocol):
     def speak(self) -> str: ...
 
+
 class Wrong:
-    def speak(self, volume: int) -> str:    # wrong signature, right name
+    def speak(self, volume: int) -> str:  # wrong signature, right name
         return "x"
+
 
 print(isinstance(Wrong(), Speaker))
 ```
@@ -234,11 +261,14 @@ True   # shallow: name exists, signature unchecked
 ```python
 from typing import Protocol
 
+
 class HasLen(Protocol):
     def __len__(self) -> int: ...
 
+
 def size(x: HasLen) -> int:
     return len(x)
+
 
 print(size([1, 2]), size("abc"), size({1: 2}))
 ```
@@ -253,12 +283,15 @@ print(size([1, 2]), size("abc"), size({1: 2}))
 ```python
 from typing import TypeGuard
 
+
 class Real:
     def __init__(self) -> None:
         self.kind = "real"
 
+
 def is_real(obj: object) -> TypeGuard[Real]:
-    return hasattr(obj, "kind") and obj.kind == "real"   # distinguishing marker
+    return hasattr(obj, "kind") and obj.kind == "real"  # distinguishing marker
+
 
 print(is_real(Real()), is_real(object()))
 ```
@@ -275,8 +308,10 @@ from typing import TypeVar
 
 T = TypeVar("T")
 
+
 def identity(x: T) -> T:
     return x
+
 
 print(identity(10), identity("s"))
 ```
@@ -293,10 +328,12 @@ from typing import TypeVar
 
 Num = TypeVar("Num", bound=float)
 
+
 def scale(v: Num, factor: float) -> Num:
     return v * factor
 
-i: int = scale(10, 1.5)          # int in -> int out
+
+i: int = scale(10, 1.5)  # int in -> int out
 print(i, scale(2.5, 2.0))
 ```
 ```text

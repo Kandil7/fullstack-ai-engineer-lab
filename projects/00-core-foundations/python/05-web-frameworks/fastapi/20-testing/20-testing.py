@@ -174,12 +174,15 @@ def test_create_item_wrong_type():
 import pytest
 
 
-@pytest.mark.parametrize("name,price", [
-    ("Laptop", 999.99),
-    ("Phone", 699.99),
-    ("Tablet", 499.99),
-    ("Watch", 299.99),
-])
+@pytest.mark.parametrize(
+    "name,price",
+    [
+        ("Laptop", 999.99),
+        ("Phone", 699.99),
+        ("Tablet", 499.99),
+        ("Watch", 299.99),
+    ],
+)
 def test_create_various_items(name, price):
     """Parameterized test for creating different items."""
     response = client.post("/items/", json={"name": name, "price": price})
@@ -218,6 +221,7 @@ Testing with pytest:
     python 20-testing.py
 """
 
+
 def _verify():
     """Run the smoke tests in-process with the module-level TestClient."""
     try:
@@ -241,6 +245,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

@@ -21,7 +21,7 @@ users = [
     {"_id": 3, "name": "Charlie", "age": 35, "city": "New York", "status": "inactive"},
     {"_id": 4, "name": "Diana", "age": 28, "city": "Chicago", "status": "active"},
     {"_id": 5, "name": "Eve", "age": 32, "city": "Boston", "status": "inactive"},
-    {"_id": 6, "name": "Frank", "age": 45, "city": "Chicago", "status": "active"}
+    {"_id": 6, "name": "Frank", "age": 45, "city": "Chicago", "status": "active"},
 ]
 
 # ============================================================
@@ -31,6 +31,7 @@ users = [
 # Example 1: Delete one document by _id
 # MongoDB equivalent: db.users.delete_one({"_id": 1})
 
+
 def delete_one_by_id(collection, doc_id):
     """Delete one document by its _id"""
     for i, doc in enumerate(collection):
@@ -39,9 +40,11 @@ def delete_one_by_id(collection, doc_id):
             return {"deleted_count": 1, "deleted": deleted}
     return {"deleted_count": 0, "deleted": None}
 
+
 # Make a copy for demonstration
 users_copy = users.copy()
 users_copy = list(users_copy)  # Deep copy for safety
+
 
 # Actually, let's work with a fresh copy each time
 def reset_users():
@@ -51,8 +54,9 @@ def reset_users():
         {"_id": 3, "name": "Charlie", "age": 35, "city": "New York", "status": "inactive"},
         {"_id": 4, "name": "Diana", "age": 28, "city": "Chicago", "status": "active"},
         {"_id": 5, "name": "Eve", "age": 32, "city": "Boston", "status": "inactive"},
-        {"_id": 6, "name": "Frank", "age": 45, "city": "Chicago", "status": "active"}
+        {"_id": 6, "name": "Frank", "age": 45, "city": "Chicago", "status": "active"},
     ]
+
 
 users = reset_users()
 result = delete_one_by_id(users, 3)
@@ -65,6 +69,7 @@ print("Remaining users:", len(users))
 
 # Example 2: Delete first matching document
 # MongoDB equivalent: db.users.delete_one({"name": "Bob"})
+
 
 def delete_one_by_query(collection, query):
     """Delete the first document matching the query"""
@@ -79,6 +84,7 @@ def delete_one_by_query(collection, query):
             return {"deleted_count": 1, "deleted": deleted}
     return {"deleted_count": 0, "deleted": None}
 
+
 users = reset_users()
 result = delete_one_by_query(users, {"name": "Bob"})
 print("\nDelete one (name=Bob):", result)
@@ -90,6 +96,7 @@ print("Remaining users:", [u["name"] for u in users])
 
 # Example 3: Delete all matching documents
 # MongoDB equivalent: db.users.delete_many({"status": "inactive"})
+
 
 def delete_many_by_query(collection, query):
     """Delete all documents matching the query"""
@@ -105,12 +112,13 @@ def delete_many_by_query(collection, query):
             deleted.append(doc)
         else:
             remaining.append(doc)
-    
+
     # Replace collection contents
     collection.clear()
     collection.extend(remaining)
-    
+
     return {"deleted_count": len(deleted), "deleted": deleted}
+
 
 users = reset_users()
 result = delete_many_by_query(users, {"status": "inactive"})
@@ -127,15 +135,16 @@ for user in users:
 # Example 4: Delete users younger than 30
 # MongoDB equivalent: db.users.delete_many({"age": {"$lt": 30}})
 
+
 def delete_many_with_operator(collection, field, operator, value):
     """Delete documents using comparison operators"""
     deleted = []
     remaining = []
-    
+
     for doc in collection:
         doc_val = doc.get(field)
         should_delete = False
-        
+
         if operator == "$lt" and doc_val < value:
             should_delete = True
         elif operator == "$lte" and doc_val <= value:
@@ -146,16 +155,17 @@ def delete_many_with_operator(collection, field, operator, value):
             should_delete = True
         elif operator == "$ne" and doc_val != value:
             should_delete = True
-        
+
         if should_delete:
             deleted.append(doc)
         else:
             remaining.append(doc)
-    
+
     collection.clear()
     collection.extend(remaining)
-    
+
     return {"deleted_count": len(deleted), "deleted": deleted}
+
 
 users = reset_users()
 result = delete_many_with_operator(users, "age", "$lt", 30)
@@ -171,21 +181,23 @@ for user in users:
 # Example 5: Delete users in specific cities
 # MongoDB equivalent: db.users.delete_many({"city": {"$in": ["New York", "Chicago"]}})
 
+
 def delete_many_in(collection, field, values):
     """Delete documents where field is in values list"""
     deleted = []
     remaining = []
-    
+
     for doc in collection:
         if doc.get(field) in values:
             deleted.append(doc)
         else:
             remaining.append(doc)
-    
+
     collection.clear()
     collection.extend(remaining)
-    
+
     return {"deleted_count": len(deleted), "deleted": deleted}
+
 
 users = reset_users()
 result = delete_many_in(users, "city", ["New York", "Chicago"])
@@ -201,11 +213,13 @@ for user in users:
 # Example 6: Delete all documents in a collection
 # MongoDB equivalent: db.users.delete_many({})
 
+
 def delete_all(collection):
     """Delete all documents from a collection"""
     count = len(collection)
     collection.clear()
     return {"deleted_count": count}
+
 
 users = reset_users()
 result = delete_all(users)
@@ -220,17 +234,18 @@ print("Remaining:", len(users), "users")
 # MongoDB equivalent:
 # db.users.delete_many({"$and": [{"status": "active"}, {"age": {"$gt": 30}}]})
 
+
 def delete_many_complex(collection, conditions):
     """Delete documents matching complex conditions"""
     deleted = []
     remaining = []
-    
+
     for doc in collection:
         should_delete = True
         for condition in conditions:
             field = list(condition.keys())[0]
             value = condition[field]
-            
+
             if isinstance(value, dict):
                 for op, val in value.items():
                     doc_val = doc.get(field)
@@ -243,22 +258,20 @@ def delete_many_complex(collection, conditions):
             else:
                 if doc.get(field) != value:
                     should_delete = False
-        
+
         if should_delete:
             deleted.append(doc)
         else:
             remaining.append(doc)
-    
+
     collection.clear()
     collection.extend(remaining)
-    
+
     return {"deleted_count": len(deleted), "deleted": deleted}
 
+
 users = reset_users()
-result = delete_many_complex(users, [
-    {"status": "active"},
-    {"age": {"$gt": 30}}
-])
+result = delete_many_complex(users, [{"status": "active"}, {"age": {"$gt": 30}}])
 print("\nDelete active users older than 30:")
 print(f"  Deleted: {result['deleted_count']}")
 for user in users:
@@ -282,6 +295,7 @@ print(f"  Deleted document: {result['deleted']}")
 # Example 9: Soft delete vs hard delete
 users = reset_users()
 
+
 def soft_delete_one(collection, doc_id):
     """Soft delete - mark as deleted instead of removing"""
     for doc in collection:
@@ -291,22 +305,25 @@ def soft_delete_one(collection, doc_id):
             return {"deleted_count": 1, "deleted": doc}
     return {"deleted_count": 0}
 
+
 result = soft_delete_one(users, 2)
 print("\nSoft delete (Bob):")
 print(f"  Result: {result}")
 print("  Bob still in collection:", any(u["name"] == "Bob" for u in users))
 print("  Bob marked deleted:", result["deleted"].get("deleted"))
 
+
 # Example 10: Delete with confirmation
 def delete_with_confirm(collection, query, confirm=False):
     """Delete with optional confirmation"""
     count = len([doc for doc in collection if all(doc.get(k) == v for k, v in query.items())])
-    
+
     if not confirm:
         print(f"  Would delete {count} documents. Pass confirm=True to proceed.")
         return {"deleted_count": 0}
-    
+
     return delete_many_by_query(collection, query)
+
 
 users = reset_users()
 print("\nDelete without confirmation:")
@@ -334,6 +351,7 @@ print("""
 8. Always validate queries before delete_many()
 9. Back up data before bulk delete operations
 """)
+
 
 # ============================================================
 # Self-Verification  (MANDATORY)

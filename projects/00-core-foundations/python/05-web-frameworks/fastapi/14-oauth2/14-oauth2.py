@@ -21,6 +21,7 @@ import secrets
 # is not installed, while keeping the teaching code unchanged.
 try:
     from jose import JWTError, jwt
+
     JOSE_AVAILABLE = True
 except ImportError:
     JWTError = Exception
@@ -260,6 +261,7 @@ SCOPES = {
 
 def verify_scope(required_scope: str):
     """Dependency factory for scope checking."""
+
     def scope_checker(current_user: User = Depends(get_current_active_user)):
         # In production, scopes would be in the JWT
         # For demo, admin users get all scopes
@@ -268,6 +270,7 @@ def verify_scope(required_scope: str):
         if required_scope == "read":
             return current_user
         raise HTTPException(status_code=403, detail=f"Scope '{required_scope}' required")
+
     return scope_checker
 
 
@@ -290,6 +293,7 @@ Testing with curl:
     curl -X POST "http://127.0.0.1:8000/oauth/token-code?code=<CODE>&client_id=my-app&client_secret=app-secret-123&redirect_uri=http://localhost:8000/callback"
 """
 
+
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
     try:
@@ -303,7 +307,9 @@ def _verify():
     try:
         pwd_context.hash("verify-password")
     except Exception:
-        print("[skip] password hashing unavailable (passlib/bcrypt issue: pip install passlib[bcrypt])")
+        print(
+            "[skip] password hashing unavailable (passlib/bcrypt issue: pip install passlib[bcrypt])"
+        )
         return
 
     client = TestClient(app)
@@ -382,6 +388,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

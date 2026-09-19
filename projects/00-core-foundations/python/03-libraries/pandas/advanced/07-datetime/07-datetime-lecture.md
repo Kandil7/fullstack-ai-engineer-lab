@@ -40,10 +40,10 @@ By the end of this lecture, you will be able to:
 import pandas as pd
 
 ts = pd.Timestamp("2026-08-06 09:30")
-print(ts.year, ts.month, ts.day, ts.hour)     # 2026 8 6 9
+print(ts.year, ts.month, ts.day, ts.hour)  # 2026 8 6 9
 
 span = pd.Timedelta("2h 15m")
-print(ts + span)                              # 2026-08-06 11:45
+print(ts + span)  # 2026-08-06 11:45
 ```
 
 `Timestamp` is the scalar datetime; `Timedelta` is the duration. Arithmetic
@@ -52,10 +52,10 @@ between them behaves exactly as in the `datetime` module — but vectorized.
 ## 2. Parsing and the DatetimeIndex
 
 ```python
-df["created"] = pd.to_datetime(df["created"])     # parse strings
-df = df.set_index("created").sort_index()         # DatetimeIndex
+df["created"] = pd.to_datetime(df["created"])  # parse strings
+df = df.set_index("created").sort_index()  # DatetimeIndex
 
-df["2026-08"]                      # slice one month
+df["2026-08"]  # slice one month
 df.loc["2026-08-06":"2026-08-08"]  # date range slice (inclusive labels)
 ```
 
@@ -68,7 +68,7 @@ time-based ops assume monotonic order.
 ```python
 df["year"] = df["created"].dt.year
 df["month"] = df["created"].dt.month
-df["dow"] = df["created"].dt.dayofweek          # 0=Monday
+df["dow"] = df["created"].dt.dayofweek  # 0=Monday
 df["hour"] = df["created"].dt.hour
 df["is_weekend"] = df["created"].dt.dayofweek >= 5
 ```
@@ -80,8 +80,8 @@ high-value model inputs (seasonality, weekly cycles).
 ## 4. Timezones — Localize Then Convert
 
 ```python
-df["created"] = pd.to_datetime(df["created"]).dt.tz_localize("UTC")   # attach
-df["created_local"] = df["created"].dt.tz_convert("Asia/Tokyo")       # convert
+df["created"] = pd.to_datetime(df["created"]).dt.tz_localize("UTC")  # attach
+df["created_local"] = df["created"].dt.tz_convert("Asia/Tokyo")  # convert
 ```
 
 `tz_localize` attaches a zone to naive data (store in UTC); `tz_convert`
@@ -91,7 +91,7 @@ moves an aware column to another zone without changing the instant. Never
 ## 5. Resampling — The Centerpiece
 
 ```python
-hourly = df["count"].resample("1h").sum()       # hourly sums
+hourly = df["count"].resample("1h").sum()  # hourly sums
 daily_mean = df["count"].resample("1D").mean()  # daily means
 weekly = df["count"].resample("W").max()
 ```
@@ -104,10 +104,10 @@ downgrading high-frequency logs to any decision frequency.
 ## 6. Rolling Windows and Lags
 
 ```python
-df["rolling_7"] = df["count"].rolling(7).mean()         # trailing mean
-df["ewm_7"] = df["count"].ewm(span=7).mean()            # weighted
-df["lag_1"] = df["count"].shift(1)                      # previous value
-df["diff_1"] = df["count"].diff()                       # first difference
+df["rolling_7"] = df["count"].rolling(7).mean()  # trailing mean
+df["ewm_7"] = df["count"].ewm(span=7).mean()  # weighted
+df["lag_1"] = df["count"].shift(1)  # previous value
+df["diff_1"] = df["count"].diff()  # first difference
 ```
 
 Rolling/expanding/ewm windows (deep treatment in topic 11) plus `shift`/`diff`

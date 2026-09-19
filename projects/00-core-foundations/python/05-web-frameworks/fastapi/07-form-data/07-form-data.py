@@ -206,6 +206,7 @@ Testing with curl:
     http://127.0.0.1:8000/multi-form
 """
 
+
 def _verify():
     """Smoke-test the app in-process with TestClient (no real server)."""
     try:
@@ -233,8 +234,10 @@ def _verify():
     r = client.post(
         "/register/",
         data={
-            "username": "alice", "email": "alice@test.com",
-            "password": "password123", "confirm_password": "password123",
+            "username": "alice",
+            "email": "alice@test.com",
+            "password": "password123",
+            "confirm_password": "password123",
             "role": "user",
         },
     )
@@ -244,8 +247,10 @@ def _verify():
     r = client.post(
         "/register/",
         data={
-            "username": "bob", "email": "bob@test.com",
-            "password": "password123", "confirm_password": "different",
+            "username": "bob",
+            "email": "bob@test.com",
+            "password": "password123",
+            "confirm_password": "different",
         },
     )
     assert r.status_code == 400  # Password mismatch
@@ -274,6 +279,7 @@ def _verify():
 if __name__ == "__main__":
     if "--serve" in sys.argv:
         import uvicorn
+
         uvicorn.run(app, host="127.0.0.1", port=8000)
     else:
         _verify()

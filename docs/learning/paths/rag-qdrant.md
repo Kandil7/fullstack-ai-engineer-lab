@@ -270,8 +270,11 @@ Target: > 0.8
 
 ```python
 from qdrant_client.models import (
-    Distance, VectorParams, OptimizersConfigDiff,
-    HnswConfigDiff, QuantizationConfig
+    Distance,
+    VectorParams,
+    OptimizersConfigDiff,
+    HnswConfigDiff,
+    QuantizationConfig,
 )
 
 client.create_collection(
@@ -279,14 +282,14 @@ client.create_collection(
     vectors_config=VectorParams(
         size=1536,
         distance=Distance.COSINE,
-        on_disk=True,           # store vectors on disk for large collections
+        on_disk=True,  # store vectors on disk for large collections
     ),
     optimizers_config=OptimizersConfigDiff(
         indexing_threshold=20000,
     ),
     hnsw_config=HnswConfigDiff(
-        m=16,                   # connections per node
-        ef_construct=100,       # build-time search width
+        m=16,  # connections per node
+        ef_construct=100,  # build-time search width
         full_scan_threshold=10000,
     ),
 )

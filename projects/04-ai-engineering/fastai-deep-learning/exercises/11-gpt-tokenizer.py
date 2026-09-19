@@ -102,7 +102,7 @@ class BPE:
             stats = self._get_stats(ids)
             if not stats:
                 break
-            (pair, _), = stats.most_common(1)
+            ((pair, _),) = stats.most_common(1)
             self.merges[pair] = next_idx
             self._vocab[next_idx] = self._vocab[pair[0]] + self._vocab[pair[1]]
             ids = self._merge(ids, pair, next_idx)
@@ -154,7 +154,10 @@ def analyze_tokenization(
 
 def compression_report(results: list[dict]) -> str:
     """Generate a report comparing tokenization across methods/languages."""
-    lines = [f"{'Method':<20} {'Chars':>6} {'Tokens':>8} {'Ratio':>8} {'Match?':>8}", "=" * 50]
+    lines = [
+        f"{'Method':<20} {'Chars':>6} {'Tokens':>8} {'Ratio':>8} {'Match?':>8}",
+        "=" * 50,
+    ]
     for r in results:
         ok = "[OK]" if r["reconstructed_ok"] else "[FAIL]"
         lines.append(
@@ -170,7 +173,9 @@ def compression_report(results: list[dict]) -> str:
 # GPT-2 pre-tokenization uses Unicode property escapes (\p{L}, \p{N})
 # which require the ``regex`` library. The pattern is stored as a source
 # string so it can be compiled by whichever regex engine is available.
-GPT2_PATTERN_SOURCE = r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
+GPT2_PATTERN_SOURCE = (
+    r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
+)
 
 
 def gpt2_pretokenize(text: str) -> list[str]:
@@ -182,6 +187,7 @@ def gpt2_pretokenize(text: str) -> list[str]:
     """
     try:
         import regex as _rx
+
         return _rx.findall(GPT2_PATTERN_SOURCE, text)
     except ImportError:
         # Fallback: ASCII-only approximation of the GPT-2 pattern
@@ -197,6 +203,7 @@ def gpt2_pretokenize(text: str) -> list[str]:
 # ============================================================
 def main() -> None:
     from random import Random
+
     rng = Random(42)
     sample_text = (
         "The quick brown fox jumps over the lazy dog! "
@@ -230,7 +237,9 @@ def main() -> None:
     print(f"Trained {len(bpe.merges)} merges (vocab={bpe.vocab_size})")
     print(f"Tokens for sample: {len(bpe_tokens)}")
     print(f"Reconstruction OK: {sample_text == bpe_decoded}")
-    print(f"Compression: {len(bpe_tokens)} BPE tokens vs {len(sample_text.encode('utf-8'))} raw bytes")
+    print(
+        f"Compression: {len(bpe_tokens)} BPE tokens vs {len(sample_text.encode('utf-8'))} raw bytes"
+    )
     print()
 
     # Show the top 10 most common merges
@@ -258,17 +267,23 @@ def main() -> None:
         enc_gpt4 = tiktoken.get_encoding("cl100k_base")
 
         results = [
-            analyze_tokenization(sample_text, char_tokenizer.encode, char_tokenizer.decode, "Char-level"),
+            analyze_tokenization(
+                sample_text, char_tokenizer.encode, char_tokenizer.decode, "Char-level"
+            ),
             analyze_tokenization(sample_text, bpe.encode, bpe.decode, "DIY BPE"),
         ]
 
         if enc_gpt2:
             results.append(
-                analyze_tokenization(sample_text, enc_gpt2.encode, lambda t: enc_gpt2.decode(t), "GPT-2")
+                analyze_tokenization(
+                    sample_text, enc_gpt2.encode, lambda t: enc_gpt2.decode(t), "GPT-2"
+                )
             )
         if enc_gpt4:
             results.append(
-                analyze_tokenization(sample_text, enc_gpt4.encode, lambda t: enc_gpt4.decode(t), "GPT-4")
+                analyze_tokenization(
+                    sample_text, enc_gpt4.encode, lambda t: enc_gpt4.decode(t), "GPT-4"
+                )
             )
 
         print(compression_report(results))
@@ -276,7 +291,14 @@ def main() -> None:
 
         # Show how the GPT-2 tokenizer handles specific examples
         print("GPT-2 tokenization details:")
-        for example in ["hello world", "I don't know", "3.14159", "cafe", "globe", "1000000"]:
+        for example in [
+            "hello world",
+            "I don't know",
+            "3.14159",
+            "cafe",
+            "globe",
+            "1000000",
+        ]:
             tokens = enc_gpt2.encode(example)
             decoded_bytes = [enc_gpt2.decode_single_token_bytes(t) for t in tokens]
             print(f"  {example!r:25s} -> {str(tokens):30s} -> {str(decoded_bytes)}")
@@ -296,7 +318,9 @@ def main() -> None:
         for lang, text in languages.items():
             tokens = enc_gpt4.encode(text)
             ratio = len(tokens) / len(text)
-            print(f"  {lang:<12} {len(text):>4} chars -> {len(tokens):>3} tokens (ratio: {ratio:.3f})")
+            print(
+                f"  {lang:<12} {len(text):>4} chars -> {len(tokens):>3} tokens (ratio: {ratio:.3f})"
+            )
 
     except ImportError:
         print("tiktoken not installed. Install with: pip install tiktoken")
@@ -307,7 +331,12 @@ def main() -> None:
     print("=" * 60)
     print("4. GPT-2 Pre-tokenization Pattern")
     print("=" * 60)
-    for example in ["hello world", "  hello world  ", "I'm learning! #1", "123-456-7890"]:
+    for example in [
+        "hello world",
+        "  hello world  ",
+        "I'm learning! #1",
+        "123-456-7890",
+    ]:
         pieces = gpt2_pretokenize(example)
         print(f"  {example!r:25s} -> {pieces}")
     print()

@@ -31,9 +31,11 @@ By the end of this lecture, you will be able to:
 ```python
 class Node:
     """A single node in a linked list."""
+
     def __init__(self, data):
         self.data = data
         self.next = None  # Pointer to next node
+
 
 # Creating nodes
 node1 = Node(1)
@@ -54,7 +56,7 @@ class SinglyLinkedList:
     def __init__(self):
         self.head = None
         self._size = 0
-    
+
     def append(self, data):
         """Add node to end. O(n) — must traverse to end."""
         new_node = Node(data)
@@ -66,42 +68,42 @@ class SinglyLinkedList:
                 current = current.next
             current.next = new_node
         self._size += 1
-    
+
     def prepend(self, data):
         """Add node to beginning. O(1)."""
         new_node = Node(data)
         new_node.next = self.head
         self.head = new_node
         self._size += 1
-    
+
     def insert_at(self, index, data):
         """Insert at specific position. O(n)."""
         if index < 0 or index > self._size:
             raise IndexError("Index out of range")
-        
+
         if index == 0:
             self.prepend(data)
             return
-        
+
         new_node = Node(data)
         current = self.head
         for _ in range(index - 1):
             current = current.next
-        
+
         new_node.next = current.next
         current.next = new_node
         self._size += 1
-    
+
     def delete(self, data):
         """Delete first occurrence of data. O(n)."""
         if not self.head:
             return
-        
+
         if self.head.data == data:
             self.head = self.head.next
             self._size -= 1
             return
-        
+
         current = self.head
         while current.next:
             if current.next.data == data:
@@ -109,7 +111,7 @@ class SinglyLinkedList:
                 self._size -= 1
                 return
             current = current.next
-    
+
     def search(self, data):
         """Find node with given data. O(n)."""
         current = self.head
@@ -120,28 +122,28 @@ class SinglyLinkedList:
             current = current.next
             index += 1
         return -1
-    
+
     def get(self, index):
         """Get element at index. O(n)."""
         if index < 0 or index >= self._size:
             raise IndexError("Index out of range")
-        
+
         current = self.head
         for _ in range(index):
             current = current.next
         return current.data
-    
+
     def reverse(self):
         """Reverse the linked list in-place. O(n)."""
         prev = None
         current = self.head
         while current:
             next_node = current.next  # Save next
-            current.next = prev       # Reverse link
-            prev = current            # Move prev forward
-            current = next_node       # Move current forward
+            current.next = prev  # Reverse link
+            prev = current  # Move prev forward
+            current = next_node  # Move current forward
         self.head = prev
-    
+
     def to_list(self):
         """Convert to Python list for easy visualization."""
         result = []
@@ -150,10 +152,10 @@ class SinglyLinkedList:
             result.append(current.data)
             current = current.next
         return result
-    
+
     def __len__(self):
         return self._size
-    
+
     def __str__(self):
         return " → ".join(str(x) for x in self.to_list()) + " → None"
 ```
@@ -167,12 +169,13 @@ class DoublyNode:
         self.next = None
         self.prev = None
 
+
 class DoublyLinkedList:
     def __init__(self):
         self.head = None
         self.tail = None
         self._size = 0
-    
+
     def append(self, data):
         """Add to end. O(1) with tail pointer."""
         new_node = DoublyNode(data)
@@ -183,7 +186,7 @@ class DoublyLinkedList:
             self.tail.next = new_node
             self.tail = new_node
         self._size += 1
-    
+
     def prepend(self, data):
         """Add to beginning. O(1)."""
         new_node = DoublyNode(data)
@@ -194,21 +197,21 @@ class DoublyLinkedList:
             self.head.prev = new_node
             self.head = new_node
         self._size += 1
-    
+
     def delete(self, node):
         """Delete a given node. O(1) — direct access!"""
         if node.prev:
             node.prev.next = node.next
         else:
             self.head = node.next  # Deleting head
-        
+
         if node.next:
             node.next.prev = node.prev
         else:
             self.tail = node.prev  # Deleting tail
-        
+
         self._size -= 1
-    
+
     def to_list(self):
         result = []
         current = self.head
@@ -247,28 +250,30 @@ Two pointers: slow moves 1 step, fast moves 2 steps.
 If they meet, there's a cycle.
 """
 
+
 def has_cycle(head):
     if not head or not head.next:
         return False
-    
+
     slow = head
     fast = head.next
-    
+
     while slow != fast:
         if not fast or not fast.next:
             return False  # Reached end — no cycle
         slow = slow.next
         fast = fast.next.next
-    
+
     return True  # They met — cycle exists
+
 
 # To find the cycle start:
 def detect_cycle_start(head):
     if not head or not head.next:
         return None
-    
+
     slow = fast = head
-    
+
     # Phase 1: Detect if cycle exists
     while fast and fast.next:
         slow = slow.next
@@ -277,13 +282,13 @@ def detect_cycle_start(head):
             break
     else:
         return None  # No cycle
-    
+
     # Phase 2: Find cycle start
     slow = head
     while slow != fast:
         slow = slow.next
         fast = fast.next
-    
+
     return slow  # Start of cycle
 ```
 
@@ -296,12 +301,14 @@ If even length, return the second middle node.
 Time: O(n), Space: O(1)
 """
 
+
 def find_middle(head):
     slow = fast = head
     while fast and fast.next:
         slow = slow.next
         fast = fast.next.next
     return slow  # slow is at the middle
+
 
 # Test
 lst = SinglyLinkedList()
@@ -323,10 +330,11 @@ Merge two sorted linked lists into one sorted list.
 Time: O(n + m), Space: O(1)
 """
 
+
 def merge_sorted_lists(l1, l2):
     dummy = Node(0)  # Dummy node to simplify edge cases
     current = dummy
-    
+
     while l1 and l2:
         if l1.data <= l2.data:
             current.next = l1
@@ -335,10 +343,10 @@ def merge_sorted_lists(l1, l2):
             current.next = l2
             l2 = l2.next
         current = current.next
-    
+
     # Attach remaining nodes
     current.next = l1 if l1 else l2
-    
+
     return dummy.next  # Skip dummy node
 ```
 
@@ -353,24 +361,25 @@ Two-pointer technique: advance first pointer n steps,
 then move both until first reaches end.
 """
 
+
 def remove_nth_from_end(head, n):
     dummy = Node(0)
     dummy.next = head
-    
+
     fast = slow = dummy
-    
+
     # Advance fast pointer n+1 steps
     for _ in range(n + 1):
         fast = fast.next
-    
+
     # Move both until fast reaches end
     while fast:
         fast = fast.next
         slow = slow.next
-    
+
     # Slow is now at the node before the one to remove
     slow.next = slow.next.next
-    
+
     return dummy.next
 ```
 
@@ -387,20 +396,21 @@ If they intersect, they'll meet at the intersection node.
 Time: O(n + m), Space: O(1)
 """
 
+
 def get_intersection_node(headA, headB):
     if not headA or not headB:
         return None
-    
+
     pointerA = headA
     pointerB = headB
-    
+
     # When pointerA reaches end, redirect to headB
     # When pointerB reaches end, redirect to headA
     # They will meet at intersection (or both become None)
     while pointerA is not pointerB:
         pointerA = pointerA.next if pointerA else headB
         pointerB = pointerB.next if pointerB else headA
-    
+
     return pointerA  # Either intersection node or None
 ```
 
@@ -427,6 +437,7 @@ current.next = None  # Only disconnected current node
 def get_data(head):
     return head.data  # AttributeError if head is None
 
+
 # RIGHT: Check for None
 def get_data(head):
     if not head:
@@ -442,6 +453,7 @@ def add_node(head, data):
     if not head:
         return new_node  # Special case
     # ... handle insertion ...
+
 
 # RIGHT: Dummy node eliminates special cases
 def add_node(head, data):

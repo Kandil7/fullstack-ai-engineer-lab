@@ -30,24 +30,29 @@ from dataclasses import dataclass
 from typing import List, Dict, Optional
 from datetime import datetime
 
+
 class Regulation(Enum):
     """Major privacy regulations."""
-    GDPR = "gdpr"          # EU General Data Protection Regulation
-    CCPA = "ccpa"          # California Consumer Privacy Act
-    HIPAA = "hipaa"        # Health Insurance Portability and Accountability Act
-    PCI_DSS = "pci_dss"    # Payment Card Industry Data Security Standard
-    LGPD = "lgpd"          # Brazil's Lei Geral de Proteção de Dados
-    PIPL = "pipi"          # China's Personal Information Protection Law
+
+    GDPR = "gdpr"  # EU General Data Protection Regulation
+    CCPA = "ccpa"  # California Consumer Privacy Act
+    HIPAA = "hipaa"  # Health Insurance Portability and Accountability Act
+    PCI_DSS = "pci_dss"  # Payment Card Industry Data Security Standard
+    LGPD = "lgpd"  # Brazil's Lei Geral de Proteção de Dados
+    PIPL = "pipi"  # China's Personal Information Protection Law
+
 
 @dataclass
 class DataSubject:
     """Represents a data subject (individual)."""
+
     id: str
     name: Optional[str] = None
     email: Optional[str] = None
     consent_given: bool = False
     consent_date: Optional[datetime] = None
     data_categories: List[str] = None
+
 
 class PrivacyRegulation:
     """Base class for privacy regulations."""
@@ -62,10 +67,12 @@ class PrivacyRegulation:
 
         for requirement, details in self.requirements.items():
             if not self._check_requirement(data_processing, requirement):
-                violations.append({
-                    "requirement": requirement,
-                    "details": details,
-                })
+                violations.append(
+                    {
+                        "requirement": requirement,
+                        "details": details,
+                    }
+                )
 
         return {
             "compliant": len(violations) == 0,
@@ -76,6 +83,7 @@ class PrivacyRegulation:
         """Check a specific requirement."""
         # Simplified compliance check
         return True
+
 
 # GDPR requirements
 GDPR_REQUIREMENTS = {
@@ -111,6 +119,7 @@ import hashlib
 import random
 from typing import Any, Dict, List
 
+
 class DataAnonymizer:
     """Anonymize data to protect privacy."""
 
@@ -118,8 +127,9 @@ class DataAnonymizer:
         self.salt = salt
         self.mapping_cache = {}
 
-    def k_anonymize(self, data: List[Dict], quasi_identifiers: List[str],
-                    k: int = 5) -> List[Dict]:
+    def k_anonymize(
+        self, data: List[Dict], quasi_identifiers: List[str], k: int = 5
+    ) -> List[Dict]:
         """
         Apply k-anonymity to dataset.
 
@@ -129,7 +139,7 @@ class DataAnonymizer:
         # Group records by quasi-identifier values
         groups = {}
         for record in data:
-            key = tuple(record.get(qi, '') for qi in quasi_identifiers)
+            key = tuple(record.get(qi, "") for qi in quasi_identifiers)
             if key not in groups:
                 groups[key] = []
             groups[key].append(record)
@@ -165,8 +175,13 @@ class DataAnonymizer:
             return value[:3] + "***"
         return value
 
-    def l_diversity(self, data: List[Dict], sensitive_attr: str,
-                    quasi_identifiers: List[str], l: int = 3) -> List[Dict]:
+    def l_diversity(
+        self,
+        data: List[Dict],
+        sensitive_attr: str,
+        quasi_identifiers: List[str],
+        l: int = 3,
+    ) -> List[Dict]:
         """
         Apply l-diversity to dataset.
 
@@ -175,7 +190,7 @@ class DataAnonymizer:
         """
         groups = {}
         for record in data:
-            key = tuple(record.get(qi, '') for qi in quasi_identifiers)
+            key = tuple(record.get(qi, "") for qi in quasi_identifiers)
             if key not in groups:
                 groups[key] = []
             groups[key].append(record)
@@ -241,6 +256,7 @@ class DataAnonymizer:
 import numpy as np
 from typing import List, Callable
 
+
 class DifferentialPrivacy:
     """Implement differential privacy mechanisms."""
 
@@ -281,8 +297,7 @@ class DifferentialPrivacy:
         noise = np.random.normal(0, sigma)
         return value + noise
 
-    def exponential_mechanism(self, scores: List[float],
-                               sensitivity: float) -> int:
+    def exponential_mechanism(self, scores: List[float], sensitivity: float) -> int:
         """
         Select an item using exponential mechanism.
 
@@ -310,8 +325,9 @@ class DifferentialPrivacy:
         else:
             return np.random.random() > 0.5  # Random answer
 
-    def add_laplace_noise_to_dataset(self, data: List[float],
-                                      sensitivity: float) -> List[float]:
+    def add_laplace_noise_to_dataset(
+        self, data: List[float], sensitivity: float
+    ) -> List[float]:
         """Add Laplace noise to an entire dataset."""
         return [self.laplace_mechanism(x, sensitivity) for x in data]
 
@@ -320,8 +336,9 @@ class DifferentialPrivacy:
         true_count = sum(1 for item in data if condition(item))
         return int(self.laplace_mechanism(true_count, sensitivity=1.0))
 
-    def private_mean(self, data: List[float], lower_bound: float,
-                     upper_bound: float) -> float:
+    def private_mean(
+        self, data: List[float], lower_bound: float, upper_bound: float
+    ) -> float:
         """Compute mean with differential privacy."""
         # Clip data to bounds
         clipped = [max(lower_bound, min(upper_bound, x)) for x in data]
@@ -332,6 +349,7 @@ class DifferentialPrivacy:
         # Add noise
         sensitivity = (upper_bound - lower_bound) / len(data) if data else 0
         return self.laplace_mechanism(true_mean, sensitivity)
+
 
 # Usage example
 dp = DifferentialPrivacy(epsilon=0.5)
@@ -353,6 +371,7 @@ print(f"Private average age: {private_avg:.1f}")
 from typing import List, Dict, Any
 import numpy as np
 
+
 class FederatedLearning:
     """Implement federated learning for privacy-preserving ML."""
 
@@ -361,8 +380,7 @@ class FederatedLearning:
         self.global_model = model_params
         self.round_number = 0
 
-    def simulate_client_training(self, client_id: int,
-                                  local_data: List[Dict]) -> Dict:
+    def simulate_client_training(self, client_id: int, local_data: List[Dict]) -> Dict:
         """
         Simulate client-side training.
 
@@ -419,8 +437,7 @@ class FederatedLearning:
             "participating_clients": len(client_updates),
         }
 
-    def add_differential_privacy(self, gradients: Dict,
-                                  epsilon: float = 1.0) -> Dict:
+    def add_differential_privacy(self, gradients: Dict, epsilon: float = 1.0) -> Dict:
         """Add differential privacy noise to gradients."""
         dp = DifferentialPrivacy(epsilon)
 
@@ -429,8 +446,9 @@ class FederatedLearning:
             noisy_w = dp.laplace_mechanism(w, sensitivity=1.0)
             noisy_weights.append(noisy_w)
 
-        noisy_bias = [dp.laplace_mechanism(b, sensitivity=1.0)
-                      for b in gradients["bias"]]
+        noisy_bias = [
+            dp.laplace_mechanism(b, sensitivity=1.0) for b in gradients["bias"]
+        ]
 
         return {
             "weights": noisy_weights,
@@ -463,8 +481,10 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 from enum import Enum
 
+
 class ConsentType(Enum):
     """Types of consent."""
+
     DATA_COLLECTION = "data_collection"
     DATA_PROCESSING = "data_processing"
     DATA_SHARING = "data_sharing"
@@ -472,9 +492,11 @@ class ConsentType(Enum):
     ANALYTICS = "analytics"
     THIRD_PARTY = "third_party"
 
+
 @dataclass
 class ConsentRecord:
     """Record of user consent."""
+
     user_id: str
     consent_type: ConsentType
     granted: bool
@@ -483,15 +505,21 @@ class ConsentRecord:
     scope: Optional[str] = None
     method: str = "explicit"  # explicit, implied, opt-in, opt-out
 
+
 class ConsentManager:
     """Manage user consent for data processing."""
 
     def __init__(self):
         self.consent_records: List[ConsentRecord] = []
 
-    def record_consent(self, user_id: str, consent_type: ConsentType,
-                       granted: bool, scope: Optional[str] = None,
-                       expiry_days: Optional[int] = None) -> ConsentRecord:
+    def record_consent(
+        self,
+        user_id: str,
+        consent_type: ConsentType,
+        granted: bool,
+        scope: Optional[str] = None,
+        expiry_days: Optional[int] = None,
+    ) -> ConsentRecord:
         """Record user consent."""
         expires_at = None
         if expiry_days:
@@ -512,7 +540,8 @@ class ConsentManager:
     def has_consent(self, user_id: str, consent_type: ConsentType) -> bool:
         """Check if user has given consent."""
         user_consents = [
-            r for r in self.consent_records
+            r
+            for r in self.consent_records
             if r.user_id == user_id and r.consent_type == consent_type
         ]
 
@@ -548,10 +577,7 @@ class ConsentManager:
 
     def export_user_data(self, user_id: str) -> Dict:
         """Export all consent data for a user (GDPR right to portability)."""
-        user_records = [
-            r for r in self.consent_records
-            if r.user_id == user_id
-        ]
+        user_records = [r for r in self.consent_records if r.user_id == user_id]
 
         return {
             "user_id": user_id,
@@ -569,10 +595,7 @@ class ConsentManager:
     def delete_user_data(self, user_id: str) -> int:
         """Delete all consent data for a user (GDPR right to erasure)."""
         original_count = len(self.consent_records)
-        self.consent_records = [
-            r for r in self.consent_records
-            if r.user_id != user_id
-        ]
+        self.consent_records = [r for r in self.consent_records if r.user_id != user_id]
         return original_count - len(self.consent_records)
 ```
 
@@ -583,12 +606,15 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 from enum import Enum
 
+
 class RetentionPolicy(Enum):
     """Data retention policies."""
-    MINIMUM = "minimum"      # Keep for minimum required period
-    STANDARD = "standard"    # Standard retention period
-    EXTENDED = "extended"    # Extended retention for specific purposes
-    INDEFINITE = "indefinite" # Keep indefinitely (rarely appropriate)
+
+    MINIMUM = "minimum"  # Keep for minimum required period
+    STANDARD = "standard"  # Standard retention period
+    EXTENDED = "extended"  # Extended retention for specific purposes
+    INDEFINITE = "indefinite"  # Keep indefinitely (rarely appropriate)
+
 
 class DataRetentionPolicy:
     """Manage data retention and deletion."""
@@ -633,11 +659,14 @@ class DataRetentionPolicy:
 
     def get_retention_info(self, data_type: str) -> Dict:
         """Get retention information for a data type."""
-        return self.policies.get(data_type, {
-            "retention_days": 0,
-            "policy": RetentionPolicy.MINIMUM,
-            "legal_basis": "None specified",
-        })
+        return self.policies.get(
+            data_type,
+            {
+                "retention_days": 0,
+                "policy": RetentionPolicy.MINIMUM,
+                "legal_basis": "None specified",
+            },
+        )
 
     def schedule_deletion(self, data: List[Dict]) -> List[Dict]:
         """Schedule data for deletion based on retention policies."""
@@ -648,14 +677,17 @@ class DataRetentionPolicy:
             created_at = record.get("created_at")
 
             if created_at and self.should_delete(data_type, created_at):
-                to_delete.append({
-                    "record_id": record.get("id"),
-                    "data_type": data_type,
-                    "created_at": created_at.isoformat(),
-                    "reason": "retention_period_expired",
-                })
+                to_delete.append(
+                    {
+                        "record_id": record.get("id"),
+                        "data_type": data_type,
+                        "created_at": created_at.isoformat(),
+                        "reason": "retention_period_expired",
+                    }
+                )
 
         return to_delete
+
 
 class DataDeletionManager:
     """Manage data deletion requests."""
@@ -663,17 +695,21 @@ class DataDeletionManager:
     def __init__(self):
         self.deletion_requests = []
 
-    def request_deletion(self, user_id: str, data_types: Optional[List[str]] = None) -> str:
+    def request_deletion(
+        self, user_id: str, data_types: Optional[List[str]] = None
+    ) -> str:
         """Request deletion of user data."""
         request_id = f"del_{len(self.deletion_requests) + 1}"
 
-        self.deletion_requests.append({
-            "id": request_id,
-            "user_id": user_id,
-            "data_types": data_types or ["all"],
-            "status": "pending",
-            "requested_at": datetime.utcnow(),
-        })
+        self.deletion_requests.append(
+            {
+                "id": request_id,
+                "user_id": user_id,
+                "data_types": data_types or ["all"],
+                "status": "pending",
+                "requested_at": datetime.utcnow(),
+            }
+        )
 
         return request_id
 

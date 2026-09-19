@@ -39,16 +39,22 @@ from prometheus_client import CollectorRegistry, Counter, Gauge, Histogram
 reg = CollectorRegistry()
 REQUESTS = Counter("http_requests_total", "Total requests", ["path", "status"], registry=reg)
 IN_FLIGHT = Gauge("http_in_flight", "Requests currently executing", registry=reg)
-LATENCY = Histogram("http_request_duration_seconds", "Latency",
-                    buckets=(0.01, 0.05, 0.1, 0.5, 1.0, 2.5, 5.0), registry=reg)
-TOKENS = Histogram("llm_tokens_total", "Tokens generated", buckets=(16, 64, 256, 1024, 4096), registry=reg)
+LATENCY = Histogram(
+    "http_request_duration_seconds",
+    "Latency",
+    buckets=(0.01, 0.05, 0.1, 0.5, 1.0, 2.5, 5.0),
+    registry=reg,
+)
+TOKENS = Histogram(
+    "llm_tokens_total", "Tokens generated", buckets=(16, 64, 256, 1024, 4096), registry=reg
+)
 
 
 def simulate_request(path: str) -> float:
     """Simulate one request: record in-flight, latency, status, tokens."""
     IN_FLIGHT.inc()
     start = time.perf_counter()
-    time.sleep(random.uniform(0.001, 0.01))       # simulated work
+    time.sleep(random.uniform(0.001, 0.01))  # simulated work
     latency = time.perf_counter() - start
     status = "200" if random.random() > 0.05 else "500"
     tokens = int(random.choice([16, 64, 128, 512, 2048]))
@@ -78,16 +84,23 @@ print()
 # Errors   : counter of 5xx (rate)
 # Saturation: gauge of in-flight / queue depth / utilization
 
+
 def golden_signals(registry: CollectorRegistry) -> dict:
     """Compute the four signals from the metrics collected."""
-    counts = {("generate", "200"): REQUESTS.labels(path="/generate", status="200")._value.get(),
-              ("generate", "500"): REQUESTS.labels(path="/generate", status="500")._value.get(),
-              ("embed", "200"): REQUESTS.labels(path="/embed", status="200")._value.get(),
-              ("embed", "500"): REQUESTS.labels(path="/embed", status="500")._value.get()}
+    counts = {
+        ("generate", "200"): REQUESTS.labels(path="/generate", status="200")._value.get(),
+        ("generate", "500"): REQUESTS.labels(path="/generate", status="500")._value.get(),
+        ("embed", "200"): REQUESTS.labels(path="/embed", status="200")._value.get(),
+        ("embed", "500"): REQUESTS.labels(path="/embed", status="500")._value.get(),
+    }
     latency = LATENCY._sum.get() / max(LATENCY._count.get(), 1)
-    error_rate = (counts[("generate", "500")] + counts[("embed", "500")]) / \
-                 max(counts[("generate", "200")] + counts[("embed", "200")] +
-                     counts[("generate", "500")] + counts[("embed", "500")], 1)
+    error_rate = (counts[("generate", "500")] + counts[("embed", "500")]) / max(
+        counts[("generate", "200")]
+        + counts[("embed", "200")]
+        + counts[("generate", "500")]
+        + counts[("embed", "500")],
+        1,
+    )
     return {
         "latency_avg_s": round(latency, 4),
         "traffic_requests": int(REQUESTS._value.get()),
@@ -110,6 +123,7 @@ print()
 RED_LABELS = ["rate_requests_per_s", "errors_per_s", "duration_p95_s"]
 USE_LABELS = ["utilization", "saturation", "resource_errors"]
 
+
 def red_vs_use() -> dict:
     return {
         "RED (/generate)": {"rate": 120.0, "errors": 6.0, "duration_p95": 1.8},
@@ -130,15 +144,17 @@ print()
 # database dies while the app looks fine. Labels must be bounded
 # sets: path, status, model, tenant. NEVER free-form text.
 
+
 def label_cardinality_bad() -> int:
     """BROKEN: user_id in labels -> unbounded series."""
     return 0  # (would be: 1 series per user)
+
 
 def label_cardinality_good() -> int:
     """Correct: bounded labels. Models/tenants are small closed sets."""
     models = {"gpt-4o", "gpt-4o-mini", "claude-3.5", "llama-3-70b"}
     tenants = {"acme", "globex"}
-    return len(models) * len(tenants)   # 8 series, bounded
+    return len(models) * len(tenants)  # 8 series, bounded
 
 
 print("=== 4. Cardinality ===")
@@ -153,6 +169,7 @@ print()
 # requests). SLO: the target — "99% of /generate requests complete
 # under 2s over 30 days". The error budget is the allowed misses.
 
+
 def sli_passes(error_rate: float, p95: float, target: tuple) -> bool:
     """Check an SLI against its SLO target."""
     rate_target, latency_target = target
@@ -160,7 +177,7 @@ def sli_passes(error_rate: float, p95: float, target: tuple) -> bool:
 
 
 print("=== 5. SLI / SLO ===")
-slo = (0.01, 2.0)   # 1% errors, p95 < 2s
+slo = (0.01, 2.0)  # 1% errors, p95 < 2s
 print(f"current p95=1.8, errors=1.5% -> within SLO: {sli_passes(0.015, 1.8, slo)}")
 print(f"current p95=3.1, errors=0.5% -> within SLO: {sli_passes(0.005, 3.1, slo)}")
 print()
@@ -182,6 +199,7 @@ print()
 #   queue grows; USE covers resources, RED covers requests
 # CORRECT: both perspectives
 
+
 # ============================================================
 # Self-Verification  (MANDATORY — every file ends with this)
 # ============================================================
@@ -200,11 +218,15 @@ def _verify() -> None:
     assert c.labels(kind="b")._value.get() == 0, "labels are separate series"
 
     # 2. Gauge reflects a level
-    g.inc(); g.inc(); g.dec()
+    g.inc()
+    g.inc()
+    g.dec()
     assert g._value.get() == 1, "gauge goes up and down"
 
     # 3. Histogram records sum + count (latency math works)
-    h.observe(0.2); h.observe(0.6); h.observe(1.5)
+    h.observe(0.2)
+    h.observe(0.6)
+    h.observe(1.5)
     assert h._count.get() == 3
     assert abs(h._sum.get() - 2.3) < 1e-9
     assert h._buckets[0]._value.get() == 0, "nothing under 0.1"
@@ -236,4 +258,4 @@ if __name__ == "__main__":
         print("2. RED (requests) + USE (resources) = both perspectives")
         print("3. Cardinality: bounded labels or the TSDB dies")
         print("4. SLI measured, SLO targeted, budget spent deliberately")
-        _verify()          # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

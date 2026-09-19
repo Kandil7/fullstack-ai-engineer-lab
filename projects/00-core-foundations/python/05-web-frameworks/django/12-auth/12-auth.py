@@ -119,27 +119,28 @@ from django.contrib import messages
 
 def custom_login(request):
     """Custom login view with form handling."""
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
             login(request, user)
-            messages.success(request, f'Welcome back, {user.username}!')
-            next_url = request.GET.get('next', 'home')
+            messages.success(request, f"Welcome back, {user.username}!")
+            next_url = request.GET.get("next", "home")
             return redirect(next_url)
         else:
-            messages.error(request, 'Invalid username or password.')
+            messages.error(request, "Invalid username or password.")
 
-    return render(request, 'accounts/login.html')
+    return render(request, "accounts/login.html")
 
 
 def custom_logout(request):
     """Custom logout view."""
     logout(request)
-    messages.info(request, 'You have been logged out.')
-    return redirect('home')
+    messages.info(request, "You have been logged out.")
+    return redirect("home")
+
 
 # ---------------------------------------------------------------------------
 # 5. Registration View
@@ -149,17 +150,17 @@ from django.contrib.auth.forms import UserCreationForm
 
 def register_view(request):
     """User registration view."""
-    if request.method == 'POST':
+    if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)  # Auto-login after registration
-            messages.success(request, 'Account created successfully!')
-            return redirect('home')
+            messages.success(request, "Account created successfully!")
+            return redirect("home")
     else:
         form = UserCreationForm()
 
-    return render(request, 'accounts/register.html', {'form': form})
+    return render(request, "accounts/register.html", {"form": form})
 
 
 # Custom registration form:
@@ -185,15 +186,18 @@ def register_view(request):
 # --- Function-based views ---
 from django.contrib.auth.decorators import login_required
 
+
 @login_required
 def dashboard(request):
     """Only accessible to logged-in users."""
-    return render(request, 'dashboard.html')
+    return render(request, "dashboard.html")
 
-@login_required(login_url='/accounts/login/')
+
+@login_required(login_url="/accounts/login/")
 def profile(request):
     """Custom login URL."""
-    return render(request, 'profile.html')
+    return render(request, "profile.html")
+
 
 # --- Class-based views ---
 # from django.contrib.auth.mixins import LoginRequiredMixin
@@ -205,11 +209,13 @@ def profile(request):
 # --- Require specific permissions ---
 from django.contrib.auth.decorators import permission_required
 
+
 @login_required
-@permission_required('blog.add_post', raise_exception=True)
+@permission_required("blog.add_post", raise_exception=True)
 def create_post(request):
     """Only users with 'add_post' permission can access."""
-    return render(request, 'blog/post_form.html')
+    return render(request, "blog/post_form.html")
+
 
 # From class-based views:
 # from django.contrib.auth.mixins import PermissionRequiredMixin

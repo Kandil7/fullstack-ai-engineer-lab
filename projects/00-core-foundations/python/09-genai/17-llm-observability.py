@@ -31,6 +31,7 @@ from typing import Any, Callable
 # A request = a trace with spans: retrieval, prompt-building, generation.
 # Each span records duration, tokens, and cost.
 
+
 @dataclass
 class Span:
     name: str
@@ -56,24 +57,33 @@ class Trace:
         return sum(s.duration_ms for s in self.spans)
 
     def to_json(self) -> str:
-        return json.dumps({
-            "request_id": self.request_id,
-            "spans": [{"name": s.name, "duration_ms": round(s.duration_ms, 2),
-                       "meta": s.meta} for s in self.spans],
-            "total_cost": self.total_cost,
-            "total_duration_ms": round(self.total_duration_ms(), 2),
-        }, indent=2)
+        return json.dumps(
+            {
+                "request_id": self.request_id,
+                "spans": [
+                    {"name": s.name, "duration_ms": round(s.duration_ms, 2), "meta": s.meta}
+                    for s in self.spans
+                ],
+                "total_cost": self.total_cost,
+                "total_duration_ms": round(self.total_duration_ms(), 2),
+            },
+            indent=2,
+        )
 
 
 # ============================================================
 # 2. A Traced Request
 # ============================================================
 
+
 class TracedPipeline:
-    def __init__(self, retrieve_fn: Callable[[str], list[str]],
-                 generate_fn: Callable[[str], str],
-                 price_per_1m_in: float = 3.0,
-                 price_per_1m_out: float = 15.0) -> None:
+    def __init__(
+        self,
+        retrieve_fn: Callable[[str], list[str]],
+        generate_fn: Callable[[str], str],
+        price_per_1m_in: float = 3.0,
+        price_per_1m_out: float = 15.0,
+    ) -> None:
         self.retrieve_fn = retrieve_fn
         self.generate_fn = generate_fn
         self.price_in, self.price_out = price_per_1m_in, price_per_1m_out
@@ -99,9 +109,14 @@ class TracedPipeline:
         out_tokens = self.estimate_tokens(answer)
         cost = in_tokens / 1e6 * self.price_in + out_tokens / 1e6 * self.price_out
         trace.total_cost = cost
-        trace.add_span(Span("generation", t0, t1,
-                            {"in_tokens": in_tokens, "out_tokens": out_tokens,
-                             "cost": round(cost, 6)}))
+        trace.add_span(
+            Span(
+                "generation",
+                t0,
+                t1,
+                {"in_tokens": in_tokens, "out_tokens": out_tokens, "cost": round(cost, 6)},
+            )
+        )
 
         self.traces.append(trace)
         return answer, trace
@@ -112,9 +127,11 @@ def stub_retrieve(q: str) -> list[str]:
     time.sleep(0.002)
     return ["chunk about config", "chunk about deploy"]
 
+
 def stub_generate(q: str) -> str:
     time.sleep(0.003)
     return "Set the API key in the environment file."
+
 
 pipe = TracedPipeline(stub_retrieve, stub_generate)
 answer, trace = pipe.answer("where is the key?")
@@ -137,6 +154,7 @@ PII_PATTERNS = [
 
 def redact(text: str) -> str:
     import re
+
     for pattern, replacement in PII_PATTERNS:
         text = re.sub(pattern, replacement, text)
     return text
@@ -155,6 +173,7 @@ assert "jane@" not in redacted
 # ============================================================
 # Logging every request is expensive. Log 100% of errors and failures,
 # sample the success path (e.g. 10%).
+
 
 def should_log(request_id: str, has_error: bool, sample_rate: float = 0.1) -> bool:
     if has_error:
@@ -177,6 +196,7 @@ assert should_log("req-4", has_error=False, sample_rate=0.5), "ids ending <5 sam
 # ============================================================
 # The production logger: redact, then store the trace with a retention
 # policy. Attach the trace id to every downstream error message.
+
 
 def log_trace_safely(trace: Trace, prompt: str) -> dict:
     return {

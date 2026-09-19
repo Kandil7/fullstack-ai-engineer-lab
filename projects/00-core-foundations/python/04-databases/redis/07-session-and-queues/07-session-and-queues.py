@@ -38,7 +38,7 @@ print(f"session created, ttl={r.ttl('session:abc123')}s")
 # session created, ttl=1800s
 
 clock.advance(1500)
-r.expire("session:abc123", 1800)          # user active -> slide the window
+r.expire("session:abc123", 1800)  # user active -> slide the window
 print(f"ttl after activity at 1500s: {r.ttl('session:abc123')}s (slid back to 1800)")
 
 # Output:
@@ -55,6 +55,7 @@ print(f"idle > 30min -> session gone: {r.exists('session:abc123') == 0}")
 # ============================================================
 # Producer RPUSHes jobs; workers LPOP them. That is the whole RQ broker:
 # RQ = "simple" queue on lists (plus result keys and TTLs).
+
 
 class FIFOQueue:
     def __init__(self, client: RedisClient, name: str) -> None:
@@ -91,6 +92,7 @@ print(f"remaining: {q.size()}")
 # LOWEST score (most urgent). Celery's priority queues work this way.
 # Tie-break by enqueue sequence so FIFO holds within a priority level.
 
+
 class PriorityQueue:
     def __init__(self, client: RedisClient, name: str) -> None:
         self._c = client
@@ -117,8 +119,8 @@ class PriorityQueue:
 
 
 pq = PriorityQueue(r, "queue:index")
-pq.enqueue({"job": "reindex-all"}, priority=5)     # low priority
-pq.enqueue({"job": "index-new-doc"}, priority=1)   # high priority
+pq.enqueue({"job": "reindex-all"}, priority=5)  # low priority
+pq.enqueue({"job": "index-new-doc"}, priority=1)  # high priority
 pq.enqueue({"job": "reindex-since-yesterday"}, priority=3)
 print(f"\npriority queue: first = {pq.dequeue()['job']} (highest urgency)")
 print(f"priority queue: second = {pq.dequeue()['job']}")
@@ -134,9 +136,9 @@ print(f"priority queue: second = {pq.dequeue()['job']}")
 # due jobs into the live queue. (Celery ETA; RQ scheduler.)
 # NOTE: fresh client + clock so scheduled times are relative to t=0.
 
+
 class DelayedQueue:
-    def __init__(self, client: RedisClient, fifo: FIFOQueue,
-                 schedule_name: str) -> None:
+    def __init__(self, client: RedisClient, fifo: FIFOQueue, schedule_name: str) -> None:
         self._c = client
         self._fifo = fifo
         self._name = schedule_name
@@ -175,9 +177,9 @@ print(f"fifo now has {q2.size()} job(s)")
 # the lease expires and a sweeper re-enqueues the job — at-least-once,
 # the same guarantee Streams give (topic 05).
 
+
 class ReliableWorker:
-    def __init__(self, client: RedisClient, fifo: FIFOQueue,
-                 lease_s: float = 60) -> None:
+    def __init__(self, client: RedisClient, fifo: FIFOQueue, lease_s: float = 60) -> None:
         self._c = client
         self._fifo = fifo
         self._lease = lease_s
@@ -186,8 +188,9 @@ class ReliableWorker:
         job = self._fifo.dequeue()
         if job is not None:
             self._c.rpush("in-progress", repr(job))
-            self._c.set("lease:in-progress", str(self._c._clock()),
-                        ex=self._lease)   # heartbeat with TTL
+            self._c.set(
+                "lease:in-progress", str(self._c._clock()), ex=self._lease
+            )  # heartbeat with TTL
         return job
 
     def ack(self, job: dict) -> None:
@@ -202,7 +205,7 @@ class ReliableWorker:
     def recover_stale(self) -> int:
         """Re-enqueue jobs whose lease expired (worker crashed)."""
         if self._c.get("lease:in-progress") is not None:
-            return 0                                  # lease alive
+            return 0  # lease alive
         entries = self._c.lrange("in-progress", 0, -1)
         if not entries:
             return 0
@@ -215,7 +218,7 @@ class ReliableWorker:
 worker = ReliableWorker(qc, q2, lease_s=60)
 taken = worker.take()
 print(f"\nworker took: {taken['doc']}")
-qclock.advance(61)                       # worker dies before acking
+qclock.advance(61)  # worker dies before acking
 recovered = worker.recover_stale()
 print(f"worker crashed -> {recovered} job(s) recovered to queue")
 
@@ -240,22 +243,23 @@ print(f"worker crashed -> {recovered} job(s) recovered to queue")
 #   re-enqueue.
 # CORRECT: enqueue job ids; workers read the payload from the DB.
 
+
 # ============================================================
 # Self-Verification  (MANDATORY)
 # ============================================================
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     # sliding session: activity resets the idle window
-    assert r.exists("session:abc123") == 0, \
-        "Session must expire after 30+ idle minutes"
+    assert r.exists("session:abc123") == 0, "Session must expire after 30+ idle minutes"
 
     # FIFO order preserved
     vc = RedisClient(clock=ManualClock(0.0))
     fq = FIFOQueue(vc, "q")
     fq.enqueue({"n": 1})
     fq.enqueue({"n": 2})
-    assert fq.dequeue() == {"n": 1} and fq.dequeue() == {"n": 2}, \
+    assert fq.dequeue() == {"n": 1} and fq.dequeue() == {"n": 2}, (
         "FIFO must deliver in enqueue order"
+    )
 
     # priority: low score first, FIFO within priority
     vp = PriorityQueue(vc, "qp")

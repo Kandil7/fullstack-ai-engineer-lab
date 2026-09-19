@@ -3,6 +3,7 @@ Challenge 28: Code Quality Tooling — Hidden Tests
 ==================================================
 Correctness + edge cases + parse-once / single-pass / memory guards.
 """
+
 from __future__ import annotations
 
 import ast
@@ -29,6 +30,7 @@ starter = _load("starter")
 
 
 # --- Bronze: find_mutable_defaults -----------------------------------------
+
 
 def test_bronze_list_literal():
     assert solution.find_mutable_defaults("def f(a=[]):\n    pass\n") == [(1, "f")]
@@ -71,6 +73,7 @@ def test_bronze_mutable_default_in_string_is_safe():
 
 # --- Silver: analyze --------------------------------------------------------
 
+
 def test_silver_returns_all_rules():
     result = solution.analyze("def f(x=[]):\n    return x\n")
     assert set(result) == {"B006", "E722", "C901"}
@@ -104,8 +107,7 @@ def test_silver_parse_once_guard(monkeypatch):
         return original(source, *args, **kwargs)
 
     monkeypatch.setattr(ast, "parse", counting_parse)
-    solution.analyze(
-        "def f(x=[]):\n    try:\n        x()\n    except:\n        pass\n")
+    solution.analyze("def f(x=[]):\n    try:\n        x()\n    except:\n        pass\n")
     assert calls["n"] == 1, "analyze must parse the source exactly once"
 
 
@@ -117,6 +119,7 @@ def test_silver_does_not_execute_source():
 
 
 # --- Gold: lint_source ------------------------------------------------------
+
 
 def test_gold_empty_result_on_clean():
     src = 'def f(x: int) -> int:\n    """Add one."""\n    return x + 1\n'
@@ -161,14 +164,15 @@ def test_gold_single_pass_visit_count():
     src = "def f(a):\n    if a:\n        return 1\n    return 0\n"
     solution.lint_source(src)
     total_nodes = sum(1 for _ in ast.walk(ast.parse(src)))
-    assert solution.lint_source.last_visit_count == total_nodes, \
+    assert solution.lint_source.last_visit_count == total_nodes, (
         "every AST node visited exactly once (O(N) single pass)"
+    )
 
 
 def test_gold_large_source_performance():
     big = "\n".join(
-        p for i in range(2000) for p in
-        ('def f%d(a%d):' % (i, i), '    return a%d + 1' % i))
+        p for i in range(2000) for p in ("def f%d(a%d):" % (i, i), "    return a%d + 1" % i)
+    )
     solution.lint_source(big)
     total_nodes = sum(1 for _ in ast.walk(ast.parse(big)))
     assert solution.lint_source.last_visit_count == total_nodes
@@ -178,8 +182,8 @@ def test_gold_memory_guard():
     # The linter must be linear: peak memory within 2x of a bare ast.parse
     # on the same source (the AST dominates; 3.13 nodes are heavy).
     big = "\n".join(
-        p for i in range(2000) for p in
-        ('def f%d(a%d):' % (i, i), '    return a%d + 1' % i))
+        p for i in range(2000) for p in ("def f%d(a%d):" % (i, i), "    return a%d + 1" % i)
+    )
     tracemalloc.start()
     ast.parse(big)
     _, parse_peak = tracemalloc.get_traced_memory()
@@ -189,8 +193,9 @@ def test_gold_memory_guard():
     solution.lint_source(big)
     _, lint_peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
-    assert lint_peak < parse_peak * 2 + 1_000_000, \
+    assert lint_peak < parse_peak * 2 + 1_000_000, (
         f"lint peak {lint_peak} must stay ~2x parse peak {parse_peak}"
+    )
 
 
 def test_gold_edge_empty_and_comments():
@@ -199,6 +204,7 @@ def test_gold_edge_empty_and_comments():
 
 
 # --- Starter must be unimplemented -----------------------------------------
+
 
 def test_starter_not_implemented():
     with pytest.raises(NotImplementedError):

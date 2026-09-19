@@ -8,8 +8,7 @@ Reference: https://www.w3schools.com/python/ml_cross_validation.asp
 """
 
 import numpy as np
-from sklearn.model_selection import (KFold, cross_val_score, 
-                                   StratifiedKFold, train_test_split)
+from sklearn.model_selection import KFold, cross_val_score, StratifiedKFold, train_test_split
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.metrics import accuracy_score, r2_score
 from sklearn.datasets import make_classification, make_regression
@@ -26,13 +25,11 @@ X, y = make_classification(n_samples=200, n_features=10, random_state=42)
 # Multiple random splits give different results
 print("Different random splits give different accuracy scores:")
 for i in range(5):
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     model = LogisticRegression(random_state=42)
     model.fit(X_train, y_train)
     acc = accuracy_score(y_test, model.predict(X_test))
-    print(f"  Split {i+1}: {acc:.4f}")
+    print(f"  Split {i + 1}: {acc:.4f}")
 
 print("\nCross-validation gives more reliable estimates!")
 
@@ -54,7 +51,7 @@ scores = []
 for train_idx, val_idx in kf.split(X):
     X_train, X_val = X[train_idx], X[val_idx]
     y_train, y_val = y[train_idx], y[val_idx]
-    
+
     model = LogisticRegression(random_state=42)
     model.fit(X_train, y_train)
     score = accuracy_score(y_val, model.predict(X_val))
@@ -70,7 +67,7 @@ print(f"Mean: {np.mean(scores):.4f} +/- {np.std(scores):.4f}")
 # Example 4: Using cross_val_score
 print("\nExample 4: cross_val_score")
 model = LogisticRegression(random_state=42)
-cv_scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+cv_scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
 
 print(f"CV scores: {[f'{s:.4f}' for s in cv_scores]}")
 print(f"Mean: {cv_scores.mean():.4f}")
@@ -93,11 +90,11 @@ stratified_scores = []
 for train_idx, val_idx in skf.split(X, y):
     X_train, X_val = X[train_idx], X[val_idx]
     y_train, y_val = y[train_idx], y[val_idx]
-    
+
     # Check distribution
     train_dist = np.bincount(y_train)
     val_dist = np.bincount(y_val)
-    
+
     model = LogisticRegression(random_state=42)
     model.fit(X_train, y_train)
     score = accuracy_score(y_val, model.predict(X_val))
@@ -115,19 +112,19 @@ print("\nExample 6: Different Scoring Metrics")
 model = LogisticRegression(random_state=42)
 
 # Accuracy
-scores_acc = cross_val_score(model, X, y, cv=5, scoring='accuracy')
+scores_acc = cross_val_score(model, X, y, cv=5, scoring="accuracy")
 print(f"Accuracy: {scores_acc.mean():.4f}")
 
 # F1
-scores_f1 = cross_val_score(model, X, y, cv=5, scoring='f1')
+scores_f1 = cross_val_score(model, X, y, cv=5, scoring="f1")
 print(f"F1 Score: {scores_f1.mean():.4f}")
 
 # Precision
-scores_prec = cross_val_score(model, X, y, cv=5, scoring='precision')
+scores_prec = cross_val_score(model, X, y, cv=5, scoring="precision")
 print(f"Precision: {scores_prec.mean():.4f}")
 
 # Recall
-scores_rec = cross_val_score(model, X, y, cv=5, scoring='recall')
+scores_rec = cross_val_score(model, X, y, cv=5, scoring="recall")
 print(f"Recall: {scores_rec.mean():.4f}")
 
 # ============================================================
@@ -139,8 +136,8 @@ print("\nExample 7: Cross Validation for Regression")
 X_reg, y_reg = make_regression(n_samples=200, n_features=5, noise=0.5, random_state=42)
 
 model_reg = LinearRegression()
-cv_scores_r2 = cross_val_score(model_reg, X_reg, y_reg, cv=5, scoring='r2')
-cv_scores_neg_mse = cross_val_score(model_reg, X_reg, y_reg, cv=5, scoring='neg_mean_squared_error')
+cv_scores_r2 = cross_val_score(model_reg, X_reg, y_reg, cv=5, scoring="r2")
+cv_scores_neg_mse = cross_val_score(model_reg, X_reg, y_reg, cv=5, scoring="neg_mean_squared_error")
 
 print(f"R^2 scores: {[f'{s:.4f}' for s in cv_scores_r2]}")
 print(f"Mean R^2: {cv_scores_r2.mean():.4f}")
@@ -156,8 +153,8 @@ model = LogisticRegression(random_state=42)
 results = []
 
 for k in [3, 5, 10, 15, 20]:
-    scores = cross_val_score(model, X, y, cv=k, scoring='accuracy')
-    results.append({'k': k, 'mean': scores.mean(), 'std': scores.std()})
+    scores = cross_val_score(model, X, y, cv=k, scoring="accuracy")
+    results.append({"k": k, "mean": scores.mean(), "std": scores.std()})
     print(f"K={k:2d}: Mean={scores.mean():.4f} +/- {scores.std():.4f}")
 
 # ============================================================
@@ -194,7 +191,7 @@ print("6. Don't use CV for final evaluation (use test set)")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Cross-validation gives more reliable performance estimates")
 print("- K-Fold splits data into K folds")
@@ -202,4 +199,4 @@ print("- Stratified K-Fold preserves class distribution")
 print("- Use cross_val_score for easy implementation")
 print("- Use 5 or 10 folds for good balance")
 print("- Always report mean +/- std of CV scores")
-print("="*60)
+print("=" * 60)

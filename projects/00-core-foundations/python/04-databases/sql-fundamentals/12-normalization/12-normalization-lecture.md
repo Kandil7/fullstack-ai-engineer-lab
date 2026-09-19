@@ -42,6 +42,7 @@ By the end of this lecture, you will be able to:
 
 ```python
 import sqlite3
+
 conn = sqlite3.connect(":memory:")
 conn.execute("""
     CREATE TABLE orders_bad (
@@ -50,8 +51,10 @@ conn.execute("""
         items TEXT
     )
 """)
-conn.executemany("INSERT INTO orders_bad (order_id, customer, customer_city, items) VALUES (?, ?, ?, ?)",
-                 [(1, "ada", "london", "gpu,cpu"), (2, "ada", "london", "ram"), (3, "bob", "paris", "gpu")])
+conn.executemany(
+    "INSERT INTO orders_bad (order_id, customer, customer_city, items) VALUES (?, ?, ?, ?)",
+    [(1, "ada", "london", "gpu,cpu"), (2, "ada", "london", "ram"), (3, "bob", "paris", "gpu")],
+)
 ```
 
 ```
@@ -75,8 +78,10 @@ conn.execute("""
         PRIMARY KEY (order_id, item)
     )
 """)
-conn.executemany("INSERT INTO order_items (order_id, item) VALUES (?, ?)",
-                 [(1, "gpu"), (1, "cpu"), (2, "ram"), (3, "gpu")])
+conn.executemany(
+    "INSERT INTO order_items (order_id, item) VALUES (?, ?)",
+    [(1, "gpu"), (1, "cpu"), (2, "ram"), (3, "gpu")],
+)
 print(conn.execute("SELECT DISTINCT order_id FROM order_items WHERE item = 'gpu'").fetchall())
 ```
 
@@ -94,8 +99,9 @@ a partial dependency — price repeats per order and updates fan out.
 
 ```python
 conn.execute("CREATE TABLE items (item TEXT PRIMARY KEY, price INTEGER)")
-conn.executemany("INSERT INTO items (item, price) VALUES (?, ?)",
-                 [("gpu", 1000), ("cpu", 300), ("ram", 100)])
+conn.executemany(
+    "INSERT INTO items (item, price) VALUES (?, ?)", [("gpu", 1000), ("cpu", 300), ("ram", 100)]
+)
 ```
 
 ```
@@ -110,8 +116,10 @@ dependency. The fix: customers table.
 
 ```python
 conn.execute("CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT)")
-conn.executemany("INSERT INTO customers (id, name, city) VALUES (?, ?, ?)",
-                 [(1, "ada", "london"), (2, "bob", "paris")])
+conn.executemany(
+    "INSERT INTO customers (id, name, city) VALUES (?, ?, ?)",
+    [(1, "ada", "london"), (2, "bob", "paris")],
+)
 conn.execute("CREATE TABLE orders (order_id INTEGER PRIMARY KEY, customer_id INTEGER)")
 ```
 

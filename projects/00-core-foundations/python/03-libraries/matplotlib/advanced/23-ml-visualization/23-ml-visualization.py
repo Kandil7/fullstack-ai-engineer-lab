@@ -37,11 +37,14 @@ rng = np.random.default_rng(42)
 
 try:  # sklearn present -> use its metrics; else fall back to numpy
     from sklearn.metrics import auc, confusion_matrix, roc_curve
+
     HAS_SKLEARN = True
 except ImportError:  # pragma: no cover - fallback path
     HAS_SKLEARN = False
 
-    def roc_curve(y_true: np.ndarray, y_score: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def roc_curve(
+        y_true: np.ndarray, y_score: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Minimal ROC: sweep thresholds over sorted scores."""
         order = np.argsort(y_score)[::-1]
         y_s, y_t = y_score[order], y_true[order]
@@ -68,6 +71,7 @@ except ImportError:  # pragma: no cover - fallback path
 # ============================================================
 # Train/validation score vs training-set size. Converging curves mean
 # more data helps; a widening gap means overfitting.
+
 
 def learning_curve_data() -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Deterministic synthetic learning curve: train/val scores vs size."""
@@ -101,6 +105,7 @@ def plot_learning_curve() -> plt.Axes:
 # Heatmap of true vs predicted class. The diagonal is the win; off-diagonal
 # cells name the systematic confusion (e.g., 'cat' predicted as 'dog').
 
+
 def plot_confusion() -> None:
     """Draw a 3x3 confusion matrix heatmap."""
     labels = ["setosa", "versicolor", "virginica"]
@@ -117,8 +122,14 @@ def plot_confusion() -> None:
     ax.set_ylabel("true")
     for i in range(3):
         for j in range(3):
-            ax.text(j, i, str(cm[i, j]), ha="center", va="center",
-                    color="white" if cm[i, j] > cm.max() / 2 else "black")
+            ax.text(
+                j,
+                i,
+                str(cm[i, j]),
+                ha="center",
+                va="center",
+                color="white" if cm[i, j] > cm.max() / 2 else "black",
+            )
     ax.set_title("Confusion matrix")
     fig.tight_layout()
     fig.savefig(OUT_DIR / "23-confusion.png", dpi=120)
@@ -132,13 +143,12 @@ def plot_confusion() -> None:
 # rare positive classes). AUC summarizes the whole curve; the elbow is
 # where you pick the deployment threshold.
 
+
 def roc_pr_data() -> tuple[np.ndarray, np.ndarray, np.ndarray, float, float]:
     """Synthetic scores with a planted separation; return curves + AUCs."""
     n = 1000
     y_true = np.concatenate([np.zeros(700), np.ones(300)]).astype(int)
-    y_score = np.concatenate([
-        rng.normal(0.0, 1.0, 700), rng.normal(2.2, 1.0, 300)
-    ])
+    y_score = np.concatenate([rng.normal(0.0, 1.0, 700), rng.normal(2.2, 1.0, 300)])
     fpr, tpr, _ = roc_curve(y_true, y_score)
     # Precision-recall from the same threshold sweep.
     order = np.argsort(y_score)[::-1]
@@ -178,11 +188,12 @@ def plot_roc_pr() -> tuple[np.ndarray, np.ndarray]:
 # Residual = y_true - y_pred. A horizontal cloud around zero means the
 # model is unbiased; a funnel shape means variance grows with magnitude.
 
+
 def plot_residuals() -> plt.Axes:
     """Scatter of residuals against predictions with a zero line."""
     x = rng.normal(0, 1, 400)
     y_pred = 2.0 * x + rng.normal(0, 0.4, 400)
-    residual = y_pred - (2.0 * x)            # "true" model minus prediction noise
+    residual = y_pred - (2.0 * x)  # "true" model minus prediction noise
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.scatter(y_pred, residual, s=12, alpha=0.6, color="tab:blue")
     ax.axhline(0.0, color="tab:red", lw=1.2, ls="--")
@@ -200,6 +211,7 @@ def plot_residuals() -> plt.Axes:
 # ============================================================
 # Horizontal bar chart, top features first. This is the plot that goes
 # into the model card and the fairness review.
+
 
 def plot_feature_importance() -> plt.Axes:
     """Bar chart of synthetic feature importances."""
@@ -221,6 +233,7 @@ def plot_feature_importance() -> plt.Axes:
 # ============================================================
 # Two synthetic clusters projected to 2D (what t-SNE/UMAP would produce).
 # Color by label so structure is visible at a glance.
+
 
 def plot_embedding() -> plt.Axes:
     """Scatter of a synthetic 2D embedding, colored by class."""
@@ -258,8 +271,7 @@ def plot_embedding() -> plt.Axes:
 def _verify() -> None:
     """Assert every claim this file makes. Silent on success."""
     ax_lc = plot_learning_curve()
-    assert len(ax_lc.lines) == 2, \
-        "learning curve must draw train and validation lines"
+    assert len(ax_lc.lines) == 2, "learning curve must draw train and validation lines"
     sizes, train, valid = learning_curve_data()
     assert train[-1] > train[0], "train score must improve with data"
     assert valid[-1] > valid[0], "validation score must improve with data"
@@ -272,29 +284,26 @@ def _verify() -> None:
 
     fpr, tpr = plot_roc_pr()
     assert fpr[0] == 0.0 and tpr[0] == 0.0, "ROC must start at (0, 0)"
-    assert abs(fpr[-1] - 1.0) < 1e-12 and abs(tpr[-1] - 1.0) < 1e-12, \
-        "ROC must end at (1, 1)"
+    assert abs(fpr[-1] - 1.0) < 1e-12 and abs(tpr[-1] - 1.0) < 1e-12, "ROC must end at (1, 1)"
     _, _, _, _, pr_auc, roc_auc = roc_pr_data()
     assert 0.0 <= roc_auc <= 1.0, "AUC must lie in [0, 1]"
     assert roc_auc > 0.85, "planted separation must give a strong AUC"
     assert pr_auc > 0.85, "PR AUC must also be strong on this synthetic data"
 
     ax_res = plot_residuals()
-    assert len(ax_res.collections) == 1, \
-        "residual scatter must add exactly one collection"
+    assert len(ax_res.collections) == 1, "residual scatter must add exactly one collection"
 
     ax_imp = plot_feature_importance()
     assert len(ax_imp.patches) == 6, "one bar per feature"
 
     ax_emb = plot_embedding()
-    assert len(ax_emb.collections) == 1, \
-        "embedding scatter must add exactly one collection"
+    assert len(ax_emb.collections) == 1, "embedding scatter must add exactly one collection"
 
-    for name in ("learning-curve", "confusion", "roc-pr", "residuals",
-                 "importance", "embedding"):
+    for name in ("learning-curve", "confusion", "roc-pr", "residuals", "importance", "embedding"):
         png = OUT_DIR / f"23-{name}.png"
-        assert png.exists() and png.stat().st_size > 1000, \
+        assert png.exists() and png.stat().st_size > 1000, (
             f"{name} artifact must exist and be non-trivial"
+        )
 
     print("[OK] 23-ml-visualization: all checks passed")
 
@@ -313,4 +322,4 @@ if __name__ == "__main__":
         print("1. Six canonical ML plots: curve, matrix, ROC/PR, residuals, importance, embedding")
         print("2. All synthetic: no models fitted, deterministic with seed 42")
         print("3. sklearn metrics used when available; numpy fallback otherwise")
-        _verify()   # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

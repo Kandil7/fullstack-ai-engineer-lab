@@ -14,6 +14,7 @@ from typing import Coroutine, Any
 # 1. Basic Async Functions
 # =============================================================================
 
+
 async def fetch_data(name: str, delay: float) -> str:
     """Simulate an async HTTP request."""
     print(f"  Starting fetch: {name}")
@@ -34,6 +35,7 @@ async def count_up(name: str, count: int, delay: float):
 # 2. Task Management
 # =============================================================================
 
+
 async def demo_tasks():
     """Demonstrate asyncio.Task creation and management."""
     print("\n--- Creating Tasks ---")
@@ -53,10 +55,7 @@ async def demo_task_with_timeout():
     """Demonstrate task timeout handling."""
     print("\n--- Task Timeout ---")
     try:
-        result = await asyncio.wait_for(
-            fetch_data("Slow API", 5.0),
-            timeout=0.5
-        )
+        result = await asyncio.wait_for(fetch_data("Slow API", 5.0), timeout=0.5)
         print(f"  Result: {result}")
     except asyncio.TimeoutError:
         print(f"  Task timed out (as expected)")
@@ -65,6 +64,7 @@ async def demo_task_with_timeout():
 # =============================================================================
 # 3. Concurrency Patterns
 # =============================================================================
+
 
 async def producer(queue: asyncio.Queue, name: str, count: int):
     """Producer coroutine - puts items in queue."""
@@ -117,10 +117,7 @@ async def demo_semaphore():
             print(f"  {name} releasing semaphore")
             return f"Result from {name}"
 
-    tasks = [
-        asyncio.create_task(limited_fetch(f"Task-{i}", 0.2))
-        for i in range(5)
-    ]
+    tasks = [asyncio.create_task(limited_fetch(f"Task-{i}", 0.2)) for i in range(5)]
     results = await asyncio.gather(*tasks)
     print(f"  All completed: {len(results)} results")
 
@@ -128,6 +125,7 @@ async def demo_semaphore():
 # =============================================================================
 # 4. Async Iteration
 # =============================================================================
+
 
 class AsyncCounter:
     """Async iterable counter."""
@@ -158,6 +156,7 @@ async def demo_async_iteration():
 # =============================================================================
 # DEMO
 # =============================================================================
+
 
 async def main():
     print("=" * 60)

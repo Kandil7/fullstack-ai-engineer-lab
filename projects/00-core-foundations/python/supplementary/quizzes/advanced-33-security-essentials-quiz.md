@@ -162,6 +162,7 @@ class Evil:
     def __reduce__(self):
         return (os.system, ("echo PWNED",))
 
+
 payload = pickle.dumps(Evil())
 pickle.loads(payload)
 ```

@@ -13,8 +13,10 @@ from typing import List
 # 1. Basic __slots__
 # =============================================================================
 
+
 class PointRegular:
     """Regular class without __slots__."""
+
     def __init__(self, x: float, y: float):
         self.x = x
         self.y = y
@@ -22,7 +24,8 @@ class PointRegular:
 
 class PointSlots:
     """Class with __slots__ for memory efficiency."""
-    __slots__ = ('x', 'y')
+
+    __slots__ = ("x", "y")
 
     def __init__(self, x: float, y: float):
         self.x = x
@@ -32,6 +35,7 @@ class PointSlots:
 # =============================================================================
 # 2. Memory Comparison
 # =============================================================================
+
 
 def demo_memory_comparison():
     """Compare memory usage with and without __slots__."""
@@ -60,8 +64,10 @@ def demo_memory_comparison():
 # 3. Memory with Large Objects
 # =============================================================================
 
+
 class UserRegular:
     """Regular user class."""
+
     def __init__(self, id: int, name: str, email: str, age: int):
         self.id = id
         self.name = name
@@ -71,7 +77,8 @@ class UserRegular:
 
 class UserSlots:
     """User class with __slots__."""
-    __slots__ = ('id', 'name', 'email', 'age')
+
+    __slots__ = ("id", "name", "email", "age")
 
     def __init__(self, id: int, name: str, email: str, age: int):
         self.id = id
@@ -99,14 +106,17 @@ def demo_large_objects():
 # 4. __slots__ with Inheritance
 # =============================================================================
 
+
 class Base:
     """Base class with __slots__."""
-    __slots__ = ('id',)
+
+    __slots__ = ("id",)
 
 
 class Child(Base):
     """Child class adding more slots."""
-    __slots__ = ('name', 'value')
+
+    __slots__ = ("name", "value")
 
     def __init__(self, id: int, name: str, value: float):
         self.id = id
@@ -129,9 +139,11 @@ def demo_inheritance():
 # 5. __slots__ with Properties
 # =============================================================================
 
+
 class Circle:
     """Circle using __slots__ with property."""
-    __slots__ = ('_radius',)
+
+    __slots__ = ("_radius",)
 
     def __init__(self, radius: float):
         self._radius = radius
@@ -149,12 +161,14 @@ class Circle:
     @property
     def area(self) -> float:
         import math
-        return math.pi * self._radius ** 2
+
+        return math.pi * self._radius**2
 
 
 # =============================================================================
 # 6. Performance Benchmark
 # =============================================================================
+
 
 def benchmark_class(cls, n: int = 100000):
     """Benchmark object creation and attribute access."""
@@ -178,7 +192,7 @@ class ItemRegular:
 
 
 class ItemSlots:
-    __slots__ = ('x', 'name')
+    __slots__ = ("x", "name")
 
     def __init__(self, x: int, name: str):
         self.x = x
@@ -194,7 +208,9 @@ def demo_benchmark():
 
     print(f"  Regular - Create: {reg_create:.4f}s, Access: {reg_access:.4f}s")
     print(f"  Slots   - Create: {slot_create:.4f}s, Access: {slot_access:.4f}s")
-    print(f"  Speedup - Create: {reg_create/slot_create:.2f}x, Access: {reg_access/slot_access:.2f}x")
+    print(
+        f"  Speedup - Create: {reg_create / slot_create:.2f}x, Access: {reg_access / slot_access:.2f}x"
+    )
 
 
 # =============================================================================

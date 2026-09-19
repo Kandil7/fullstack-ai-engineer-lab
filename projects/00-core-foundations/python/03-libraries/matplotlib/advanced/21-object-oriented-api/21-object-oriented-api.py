@@ -43,9 +43,10 @@ rng = np.random.default_rng(42)
 # you can re-draw, re-style, and unit-test any panel in isolation.
 # Complexity: O(1) memory per figure; each Axes holds its own artists.
 
+
 def demo_fig_ax() -> tuple[plt.Figure, plt.Axes]:
     """Draw one line plot against explicit fig/ax objects."""
-    fig, ax = plt.subplots(figsize=(6, 4))          # one fig, one ax
+    fig, ax = plt.subplots(figsize=(6, 4))  # one fig, one ax
     x = np.linspace(0, 2 * np.pi, 100)
     ax.plot(x, np.sin(x), label="sin(x)")
     ax.set_title("Explicit fig/ax")
@@ -67,11 +68,12 @@ def demo_fig_ax() -> tuple[plt.Figure, plt.Axes]:
 # The state machine is convenient in a notebook; in code you ship, it is a
 # correctness hazard.
 
+
 def demo_state_machine_hazard() -> None:
     """Show that plt.gca() follows global state, unlike an explicit ax."""
     fig1, ax1 = plt.subplots()
     fig2, ax2 = plt.subplots()
-    plt.sca(ax2)                                     # "set current axes"
+    plt.sca(ax2)  # "set current axes"
     assert plt.gca() is ax2, "current axes must now be ax2"
     plt.sca(ax1)
     assert plt.gca() is ax1, "and back to ax1"
@@ -87,6 +89,7 @@ def demo_state_machine_hazard() -> None:
 # use: a wide top panel above a small bottom panel (e.g., raw signal
 # above its spectrogram).
 
+
 def demo_gridspec() -> plt.Figure:
     """Build a 2-row, 1-column layout with unequal row heights."""
     fig = plt.figure(figsize=(6, 5))
@@ -98,8 +101,7 @@ def demo_gridspec() -> plt.Figure:
     t = np.linspace(0, 4, 400)
     ax_top.plot(t, np.sin(2 * np.pi * t), lw=1.5)
     ax_top.set_title("Signal")
-    ax_bottom.fill_between(t, np.sign(np.sin(2 * np.pi * t)), step="mid",
-                           alpha=0.5)
+    ax_bottom.fill_between(t, np.sign(np.sin(2 * np.pi * t)), step="mid", alpha=0.5)
     ax_bottom.set_title("Step")
     fig.savefig(OUT_DIR / "21-gridspec.png", dpi=120)
     plt.close(fig)
@@ -113,11 +115,11 @@ def demo_gridspec() -> plt.Figure:
 # Axes keyed by that label. Layouts read like ASCII art, and you fetch
 # panels by name instead of by (row, col) arithmetic.
 
+
 def demo_mosaic() -> dict[str, plt.Axes]:
     """Build an 'A on top, B and C below' mosaic and return its axes dict."""
     fig, axd = plt.subplot_mosaic(
-        [["loss", "loss"],
-         ["grad", "hist"]],
+        [["loss", "loss"], ["grad", "hist"]],
         figsize=(8, 5),
         width_ratios=(2, 1),
     )
@@ -139,13 +141,14 @@ def demo_mosaic() -> dict[str, plt.Axes]:
 # sharex/sharey align tick ranges across panels, which makes comparisons
 # honest. Shared axes are *joined*: setting the limits on one propagates.
 
+
 def demo_shared_axes() -> tuple[plt.Axes, plt.Axes]:
     """Draw two panels sharing the x axis, and verify the join."""
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(6, 5))
     x = np.linspace(0, 10, 200)
     ax1.plot(x, np.cos(x))
     ax2.plot(x, np.sin(x))
-    ax1.set_xlim(2, 8)                     # propagates to ax2 via the join
+    ax1.set_xlim(2, 8)  # propagates to ax2 via the join
     fig.savefig(OUT_DIR / "21-shared.png", dpi=120)
     plt.close(fig)
     return ax1, ax2
@@ -186,18 +189,18 @@ def _verify() -> None:
     assert len(fig_g.axes) == 2, "GridSpec must produce two axes"
 
     axd = demo_mosaic()
-    assert set(axd) == {"loss", "grad", "hist"}, \
-        "mosaic keys must match the layout labels"
-    assert all(isinstance(a, plt.Axes) for a in axd.values()), \
+    assert set(axd) == {"loss", "grad", "hist"}, "mosaic keys must match the layout labels"
+    assert all(isinstance(a, plt.Axes) for a in axd.values()), (
         "every mosaic panel must be a real Axes"
+    )
 
     ax1, ax2 = demo_shared_axes()
-    assert ax1.get_shared_x_axes().joined(ax1, ax2), \
-        "sharex=True must join the two x axes"
+    assert ax1.get_shared_x_axes().joined(ax1, ax2), "sharex=True must join the two x axes"
 
     png = OUT_DIR / "21-mosaic.png"
-    assert png.exists() and png.stat().st_size > 1000, \
+    assert png.exists() and png.stat().st_size > 1000, (
         "mosaic figure must be saved as a non-trivial PNG"
+    )
 
     demo_state_machine_hazard()
     print("[OK] 21-object-oriented-api: all checks passed")
@@ -215,4 +218,4 @@ if __name__ == "__main__":
         print("1. Hold fig/ax explicitly; the plt.* state machine is implicit")
         print("2. GridSpec controls relative sizes; mosaic names panels")
         print("3. sharex/sharey join axes so limits and scales stay aligned")
-        _verify()   # always runs, so plain execution is also a test
+        _verify()  # always runs, so plain execution is also a test

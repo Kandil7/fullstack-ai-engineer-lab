@@ -57,9 +57,10 @@ def chunk_fixed(text: str, size: int = 500, overlap: int = 50) -> list[str]:
     chunks = []
     start = 0
     while start < len(text):
-        chunks.append(text[start:start + size])
+        chunks.append(text[start : start + size])
         start += size - overlap
     return chunks
+
 
 doc = "word " * 1200
 chunks = chunk_fixed(doc, 500, 50)
@@ -81,6 +82,7 @@ Split on sentence boundaries so each chunk is a complete thought:
 ```python
 import re
 
+
 def chunk_sentences(text: str, max_chars: int = 900) -> list[str]:
     """Group sentences into chunks under max_chars (respecting boundaries)."""
     sentences = re.split(r"(?<=[.!?])\s+", text.strip())
@@ -94,6 +96,7 @@ def chunk_sentences(text: str, max_chars: int = 900) -> list[str]:
     if cur:
         chunks.append(cur.strip())
     return chunks
+
 
 print(chunk_sentences("First sentence. Second sentence. " * 40, 400)[:1])
 ```
@@ -136,9 +139,11 @@ pattern) tries progressively finer separators so structure is respected as
 much as possible:
 
 ```python
-def chunk_recursive(text: str, max_chars: int = 1000,
-                    separators=("\n\n", "\n", ". ", " ")) -> list[str]:
+def chunk_recursive(
+    text: str, max_chars: int = 1000, separators=("\n\n", "\n", ". ", " ")
+) -> list[str]:
     """Split by the best available separator, recursively."""
+
     def split_on(seg: str, sep: str) -> list[str]:
         return [s for s in seg.split(sep) if s.strip()]
 
@@ -172,18 +177,19 @@ and the document context:
 ```python
 from dataclasses import dataclass
 
+
 @dataclass
 class Chunk:
     text: str
-    source: str          # document id / path
-    heading: str         # nearest heading, if any
-    idx: int             # position within the document
+    source: str  # document id / path
+    heading: str  # nearest heading, if any
+    idx: int  # position within the document
     char_start: int
     char_end: int
 
+
 def make_chunk(text, source, heading, idx, char_start) -> Chunk:
-    return Chunk(text, source, heading, idx, char_start,
-                 char_start + len(text))
+    return Chunk(text, source, heading, idx, char_start, char_start + len(text))
 ```
 
 Output:

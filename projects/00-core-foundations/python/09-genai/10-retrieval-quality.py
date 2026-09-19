@@ -26,6 +26,7 @@ from dataclasses import dataclass
 # ============================================================
 # For each query, the list of relevant document ids. Small but curated.
 
+
 @dataclass
 class EvalQuery:
     query: str
@@ -36,6 +37,7 @@ class EvalQuery:
 # 2. Recall@k
 # ============================================================
 # Of the relevant documents, what fraction appear in the top-k results?
+
 
 def recall_at_k(ranked_ids: list[str], relevant: set[str], k: int) -> float:
     """Fraction of relevant docs found in the top-k."""
@@ -49,9 +51,9 @@ def recall_at_k(ranked_ids: list[str], relevant: set[str], k: int) -> float:
 # Example 1: recall@k
 ranked = ["d3", "d1", "d2", "d4"]
 relevant = {"d1", "d4"}
-r1 = recall_at_k(ranked, relevant, 1)   # top-1 = d3 -> 0/2
-r2 = recall_at_k(ranked, relevant, 2)   # top-2 = d3,d1 -> 1/2
-r3 = recall_at_k(ranked, relevant, 4)   # all -> 2/2
+r1 = recall_at_k(ranked, relevant, 1)  # top-1 = d3 -> 0/2
+r2 = recall_at_k(ranked, relevant, 2)  # top-2 = d3,d1 -> 1/2
+r3 = recall_at_k(ranked, relevant, 4)  # all -> 2/2
 print("Example 1: recall@k")
 print(f"  recall@1={r1:.2f} recall@2={r2:.2f} recall@4={r3:.2f}")
 assert r1 == 0.0 and r2 == 0.5 and r3 == 1.0
@@ -61,6 +63,7 @@ assert r1 == 0.0 and r2 == 0.5 and r3 == 1.0
 # ============================================================
 # Where is the FIRST relevant doc? 1/rank. Rewards getting the answer
 # to the top - perfect when one hit satisfies the query.
+
 
 def reciprocal_rank(ranked_ids: list[str], relevant: set[str]) -> float:
     for i, doc_id in enumerate(ranked_ids, start=1):
@@ -92,14 +95,16 @@ assert abs(mrr - 0.75) < 1e-9
 # For graded relevance (not just binary). Heavily-relevant docs ranked
 # high earn more; NDCG normalizes by the ideal ordering.
 
+
 def ndcg(ranked_ids: list[str], graded: dict[str, float], k: int = 5) -> float:
     """NDCG@k with graded relevance (2 = highly relevant, 1 = partially)."""
+
     def dcg(order: list[str]) -> float:
         score = 0.0
         for i, doc_id in enumerate(order[:k], start=1):
             rel = graded.get(doc_id, 0.0)
             if rel > 0:
-                score += (2 ** rel - 1) / __import__("math").log2(i + 1)
+                score += (2**rel - 1) / __import__("math").log2(i + 1)
         return score
 
     actual = dcg(ranked_ids)
@@ -124,8 +129,10 @@ assert n_worst < n_perfect, "worse order scores lower"
 # Metrics tell you HOW BAD; failure analysis tells you WHY. For each
 # missed query, inspect the returned chunks and label the cause.
 
-def analyze_misses(query: str, ranked: list[str], relevant: set[str],
-                   labels: dict[str, str]) -> list[str]:
+
+def analyze_misses(
+    query: str, ranked: list[str], relevant: set[str], labels: dict[str, str]
+) -> list[str]:
     """Explain why the retriever failed for one query."""
     if ranked and ranked[0] in relevant:
         return ["hit"]
@@ -152,10 +159,12 @@ assert causes, "failure analysis produces reasons"
 # The eval harness: run the retriever over the labeled set, report the
 # three metrics, and surface the worst queries for inspection.
 
+
 def eval_retriever(retrieve_fn, queries: list[EvalQuery], k: int = 5) -> dict:
     ranked = [retrieve_fn(q.query, k) for q in queries]
-    recall = sum(recall_at_k(r, set(q.relevant_ids), k)
-                 for r, q in zip(ranked, queries)) / len(queries)
+    recall = sum(recall_at_k(r, set(q.relevant_ids), k) for r, q in zip(ranked, queries)) / len(
+        queries
+    )
     mrr = mean_reciprocal_rank(ranked, [set(q.relevant_ids) for q in queries])
     return {"recall@k": round(recall, 4), "mrr": round(mrr, 4), "k": k}
 
@@ -179,14 +188,14 @@ def _verify() -> None:
 
     assert reciprocal_rank(["a", "b", "c"], {"c"}) == 1 / 3
     assert reciprocal_rank(["a", "b"], {"z"}) == 0.0
-    assert abs(mean_reciprocal_rank([["x", "y"], ["y", "x"]],
-                                    [{"y"}, {"y"}]) - 0.75) < 1e-9
+    assert abs(mean_reciprocal_rank([["x", "y"], ["y", "x"]], [{"y"}, {"y"}]) - 0.75) < 1e-9
 
     assert ndcg(["a", "b"], {"a": 2.0, "b": 1.0}) == 1.0
     assert ndcg(["b", "a"], {"a": 2.0, "b": 1.0}) < 1.0
 
-    ev = eval_retriever(lambda q, k: ["d1", "d2"],
-                        [EvalQuery("q1", ["d1"]), EvalQuery("q2", ["d9"])], k=2)
+    ev = eval_retriever(
+        lambda q, k: ["d1", "d2"], [EvalQuery("q1", ["d1"]), EvalQuery("q2", ["d9"])], k=2
+    )
     assert ev["recall@k"] == 0.5 and ev["mrr"] == 0.5, "eval harness math"
 
     assert analyze_misses("q", ["d9"], {"d1"}, {"d9": "stale"}), "causes listed"

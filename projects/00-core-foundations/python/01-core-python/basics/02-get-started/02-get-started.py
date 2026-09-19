@@ -17,6 +17,7 @@ Reference: https://www.w3schools.com/python/python_getting_started.asp
 #         or: python3 --version
 
 import sys
+
 print(f"Python version: {sys.version}")
 print(f"Executable path: {sys.executable}")
 # Output: Python version: 3.x.x and the path to your python executable
@@ -81,11 +82,11 @@ else:
 # Example: Your first Python calculation
 # ============================================================
 print("\n--- Python as a Calculator ---")
-print(f"10 + 5 = {10 + 5}")       # Output: 10 + 5 = 15
-print(f"10 - 5 = {10 - 5}")       # Output: 10 - 5 = 5
-print(f"10 * 5 = {10 * 5}")       # Output: 10 * 5 = 50
-print(f"10 / 5 = {10 / 5}")       # Output: 10 / 5 = 2.0
-print(f"10 ** 2 = {10 ** 2}")     # Output: 10 ** 2 = 100
+print(f"10 + 5 = {10 + 5}")  # Output: 10 + 5 = 15
+print(f"10 - 5 = {10 - 5}")  # Output: 10 - 5 = 5
+print(f"10 * 5 = {10 * 5}")  # Output: 10 * 5 = 50
+print(f"10 / 5 = {10 / 5}")  # Output: 10 / 5 = 2.0
+print(f"10 ** 2 = {10**2}")  # Output: 10 ** 2 = 100
 
 # ============================================================
 # Summary

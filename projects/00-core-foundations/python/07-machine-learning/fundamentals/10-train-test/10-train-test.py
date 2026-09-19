@@ -39,9 +39,7 @@ print("(This is misleadingly high!)")
 
 # Example 2: Simple split
 print("\nExample 2: Basic Train/Test Split")
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 print(f"Original dataset size: {len(X)}")
 print(f"Training set size: {len(X_train)}")
@@ -69,21 +67,16 @@ test_sizes = [0.1, 0.2, 0.3, 0.4]
 results = []
 
 for test_size in test_sizes:
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=42
-    )
-    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+
     model = LinearRegression()
     model.fit(X_train, y_train)
     r2 = r2_score(y_test, model.predict(X_test))
-    
-    results.append({
-        'test_size': test_size,
-        'train_size': len(X_train),
-        'test_size_n': len(X_test),
-        'r2': r2
-    })
-    
+
+    results.append(
+        {"test_size": test_size, "train_size": len(X_train), "test_size_n": len(X_test), "r2": r2}
+    )
+
     print(f"Test size {test_size:.0%}: Train={len(X_train)}, Test={len(X_test)}, R^2={r2:.4f}")
 
 # ============================================================
@@ -94,17 +87,13 @@ for test_size in test_sizes:
 print("\nExample 5: Random State for Reproducibility")
 print("Without random_state, each split is different:")
 for i in range(3):
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2
-    )
-    print(f"  Split {i+1}: Test indices = {X_test[:3].flatten()}")
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    print(f"  Split {i + 1}: Test indices = {X_test[:3].flatten()}")
 
 print("\nWith random_state=42, splits are always the same:")
 for i in range(3):
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
-    print(f"  Split {i+1}: Test indices = {X_test[:3].flatten()}")
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    print(f"  Split {i + 1}: Test indices = {X_test[:3].flatten()}")
 
 # ============================================================
 # Stratified Split
@@ -115,16 +104,13 @@ print("\nExample 6: Stratified Split for Classification")
 from sklearn.datasets import make_classification
 
 X_clf, y_clf = make_classification(
-    n_samples=200, n_features=10, n_informative=5,
-    n_redundant=2, random_state=42
+    n_samples=200, n_features=10, n_informative=5, n_redundant=2, random_state=42
 )
 
 print(f"Original class distribution: {np.bincount(y_clf)}")
 
 # Without stratify
-X_train, X_test, y_train, y_test = train_test_split(
-    X_clf, y_clf, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X_clf, y_clf, test_size=0.2, random_state=42)
 print(f"Without stratify: Train {np.bincount(y_train)}, Test {np.bincount(y_test)}")
 
 # With stratify
@@ -139,9 +125,7 @@ print(f"With stratify: Train {np.bincount(y_train)}, Test {np.bincount(y_test)}"
 
 # Example 7: Splitting X and y together
 print("\nExample 7: Splitting Multiple Arrays")
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 print(f"X_train shape: {X_train.shape}")
 print(f"X_test shape: {X_test.shape}")
 print(f"y_train shape: {y_train.shape}")
@@ -160,7 +144,7 @@ print("Gives more reliable performance estimate")
 from sklearn.model_selection import cross_val_score
 
 model = LinearRegression()
-scores = cross_val_score(model, X, y, cv=5, scoring='r2')
+scores = cross_val_score(model, X, y, cv=5, scoring="r2")
 print(f"5-fold CV R^2 scores: {scores}")
 print(f"Mean R^2: {scores.mean():.4f} +/- {scores.std():.4f}")
 
@@ -191,7 +175,7 @@ print("5. Use cross-validation for model selection")
 # ============================================================
 # Summary
 # ============================================================
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("Summary:")
 print("- Always split data into train/test sets")
 print("- Use 20-30% for test set")
@@ -199,4 +183,4 @@ print("- Set random_state for reproducibility")
 print("- Use stratify for imbalanced classes")
 print("- Cross-validation gives more reliable estimates")
 print("- Never use test set for training decisions")
-print("="*60)
+print("=" * 60)

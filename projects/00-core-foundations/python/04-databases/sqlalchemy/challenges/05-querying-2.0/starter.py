@@ -28,9 +28,7 @@ class EvalMetric(Base):
     __tablename__ = "eval_metrics"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    experiment_id: Mapped[int] = mapped_column(
-        ForeignKey("experiments.id"), nullable=False
-    )
+    experiment_id: Mapped[int] = mapped_column(ForeignKey("experiments.id"), nullable=False)
     metric: Mapped[str] = mapped_column(String(30), nullable=False)
     value: Mapped[float] = mapped_column(nullable=False)
 

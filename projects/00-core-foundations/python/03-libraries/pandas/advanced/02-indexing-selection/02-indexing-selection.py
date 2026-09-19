@@ -10,16 +10,19 @@ import numpy as np
 
 # Create sample data
 np.random.seed(42)
-df = pd.DataFrame({
-    'id': range(1, 21),
-    'name': [f'Employee_{i}' for i in range(1, 21)],
-    'age': np.random.randint(22, 60, 20),
-    'salary': np.random.randint(50000, 150000, 20),
-    'department': np.random.choice(['Eng', 'Sales', 'HR', 'Marketing'], 20),
-    'years_exp': np.random.randint(1, 20, 20),
-    'is_remote': np.random.choice([True, False], 20),
-    'bonus': np.random.randint(0, 20000, 20)
-}, index=list('abcdefghijklmnopqrst'))  # Custom string index
+df = pd.DataFrame(
+    {
+        "id": range(1, 21),
+        "name": [f"Employee_{i}" for i in range(1, 21)],
+        "age": np.random.randint(22, 60, 20),
+        "salary": np.random.randint(50000, 150000, 20),
+        "department": np.random.choice(["Eng", "Sales", "HR", "Marketing"], 20),
+        "years_exp": np.random.randint(1, 20, 20),
+        "is_remote": np.random.choice([True, False], 20),
+        "bonus": np.random.randint(0, 20000, 20),
+    },
+    index=list("abcdefghijklmnopqrst"),
+)  # Custom string index
 
 print("Sample DataFrame:")
 print(df)
@@ -37,36 +40,36 @@ print("=" * 60)
 
 # Select row by label
 print("df.loc['e'] (single row as Series):")
-print(df.loc['e'])
+print(df.loc["e"])
 print()
 
 # Select multiple rows by label
 print("df.loc[['a', 'e', 'j']] (multiple rows):")
-print(df.loc[['a', 'e', 'j']])
+print(df.loc[["a", "e", "j"]])
 print()
 
 # Slice with labels (INCLUSIVE on both ends!)
 print("df.loc['c':'h'] (inclusive slice):")
-print(df.loc['c':'h'])
+print(df.loc["c":"h"])
 print()
 
 # Select columns by label
 print("df.loc[:, 'name'] (single column):")
-print(df.loc[:, 'name'])
+print(df.loc[:, "name"])
 print()
 
 print("df.loc[:, ['name', 'salary', 'department']] (multiple columns):")
-print(df.loc[:, ['name', 'salary', 'department']])
+print(df.loc[:, ["name", "salary", "department"]])
 print()
 
 # Select rows AND columns
 print("df.loc['c':'h', ['name', 'salary']] (rows + cols):")
-print(df.loc['c':'h', ['name', 'salary']])
+print(df.loc["c":"h", ["name", "salary"]])
 print()
 
 # Boolean array with loc
 print("df.loc[df['salary'] > 100000, ['name', 'salary']] (filter + select):")
-print(df.loc[df['salary'] > 100000, ['name', 'salary']])
+print(df.loc[df["salary"] > 100000, ["name", "salary"]])
 print()
 
 # =============================================================================
@@ -120,14 +123,14 @@ print("=" * 60)
 
 # Single column -> Series
 print("df['name'] (Series):")
-print(type(df['name']))
-print(df['name'].head())
+print(type(df["name"]))
+print(df["name"].head())
 print()
 
 # Multiple columns -> DataFrame
 print("df[['name', 'salary']] (DataFrame):")
-print(type(df[['name', 'salary']]))
-print(df[['name', 'salary']].head())
+print(type(df[["name", "salary"]]))
+print(df[["name", "salary"]].head())
 print()
 
 # Row slice (by position!)
@@ -144,7 +147,7 @@ print("4. BOOLEAN INDEXING")
 print("=" * 60)
 
 # Simple condition
-high_salary = df['salary'] > 100000
+high_salary = df["salary"] > 100000
 print("df['salary'] > 100000:")
 print(high_salary.head(10))
 print()
@@ -155,25 +158,25 @@ print()
 
 # Multiple conditions (use &, |, ~ with parentheses!)
 print("df[(df['salary'] > 100000) & (df['department'] == 'Eng')]:")
-print(df[(df['salary'] > 100000) & (df['department'] == 'Eng')])
+print(df[(df["salary"] > 100000) & (df["department"] == "Eng")])
 print()
 
 print("df[(df['age'] > 40) | (df['years_exp'] > 15)]:")
-print(df[(df['age'] > 40) | (df['years_exp'] > 15)])
+print(df[(df["age"] > 40) | (df["years_exp"] > 15)])
 print()
 
 print("df[~(df['department'] == 'HR')] (NOT HR):")
-print(df[~(df['department'] == 'HR')].head())
+print(df[~(df["department"] == "HR")].head())
 print()
 
 # isin
 print("df[df['department'].isin(['Eng', 'Sales'])]:")
-print(df[df['department'].isin(['Eng', 'Sales'])])
+print(df[df["department"].isin(["Eng", "Sales"])])
 print()
 
 # between
 print("df[df['salary'].between(80000, 120000)]:")
-print(df[df['salary'].between(80000, 120000)])
+print(df[df["salary"].between(80000, 120000)])
 print()
 
 # =============================================================================
@@ -190,9 +193,9 @@ print()
 
 # Use @ to reference variables
 threshold = 100000
-dept = 'Eng'
+dept = "Eng"
 print(f"df.query('salary > @threshold and department == @dept'):")
-print(df.query('salary > @threshold and department == @dept'))
+print(df.query("salary > @threshold and department == @dept"))
 print()
 
 # =============================================================================
@@ -205,12 +208,12 @@ print("=" * 60)
 
 # where - keep where True, NaN where False
 print("df.where(df['salary'] > 100000):")
-print(df.where(df['salary'] > 100000).head(10))
+print(df.where(df["salary"] > 100000).head(10))
 print()
 
 # mask - opposite of where
 print("df.mask(df['salary'] > 100000):")
-print(df.mask(df['salary'] > 100000).head(10))
+print(df.mask(df["salary"] > 100000).head(10))
 print()
 
 # =============================================================================
@@ -246,7 +249,7 @@ print("=" * 60)
 # Setting with enlargement
 # NOTE: the list must match the FULL column count (8 cols), or pandas raises
 # "cannot set a row with mismatched columns"
-df.loc['z'] = [21, 'Zoe', 28, 95000, 'Eng', 5, True, 5000]
+df.loc["z"] = [21, "Zoe", 28, 95000, "Eng", 5, True, 5000]
 print("After df.loc['z'] = [...]:")
 print(df.tail(3))
 

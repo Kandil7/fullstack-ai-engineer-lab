@@ -52,11 +52,11 @@ Path.cwd() / "outputs" / "run_001"
 ### Factory Methods
 
 ```python
-Path("relative/path")           # From string
-Path.cwd()                      # Current working directory
-Path.home()                     # User's home directory
-Path(__file__)                  # This script's path
-Path("/absolute/path")          # Absolute path
+Path("relative/path")  # From string
+Path.cwd()  # Current working directory
+Path.home()  # User's home directory
+Path(__file__)  # This script's path
+Path("/absolute/path")  # Absolute path
 ```
 
 ## 2. Path Properties
@@ -66,14 +66,14 @@ Every `Path` object exposes components as read-only properties:
 ```python
 p = Path("/home/user/data/train.csv")
 
-p.name        # "train.csv"      — final component
-p.stem        # "train"          — name without suffix
-p.suffix      # ".csv"           — last suffix
-p.suffixes    # [".csv"]         — all suffixes (e.g. [".tar", ".gz"])
-p.parent      # "/home/user/data" — parent directory
-p.parents     # ["/home/user/data", "/home/user", "/home", "/"] — immutable sequence
-p.root        # "/"              — root prefix
-p.drive       # "" (POSIX) or "C:" (Windows) — drive letter
+p.name  # "train.csv"      — final component
+p.stem  # "train"          — name without suffix
+p.suffix  # ".csv"           — last suffix
+p.suffixes  # [".csv"]         — all suffixes (e.g. [".tar", ".gz"])
+p.parent  # "/home/user/data" — parent directory
+p.parents  # ["/home/user/data", "/home/user", "/home", "/"] — immutable sequence
+p.root  # "/"              — root prefix
+p.drive  # "" (POSIX) or "C:" (Windows) — drive letter
 ```
 
 **Key distinction:** `parent` returns a single `Path`; `parents` is an iterable of all ancestors from immediate parent to root.
@@ -91,7 +91,7 @@ p.drive       # "" (POSIX) or "C:" (Windows) — drive letter
 p = Path("data/../models/model.pt")
 
 p.absolute()  # /home/user/project/data/../models/model.pt
-p.resolve()   # /home/user/project/models/model.pt  (normalized + symlinks followed)
+p.resolve()  # /home/user/project/models/model.pt  (normalized + symlinks followed)
 ```
 
 **Security note:** `resolve()` is critical when accepting user-supplied paths — it prevents directory traversal attacks by resolving `../../../etc/passwd` to its actual location.
@@ -101,10 +101,10 @@ p.resolve()   # /home/user/project/models/model.pt  (normalized + symlinks follo
 ```python
 p = Path("model.pt")
 
-p.exists()    # True if file or dir exists
-p.is_file()   # True only if regular file
-p.is_dir()    # True only if directory
-p.is_symlink() # True if symlink
+p.exists()  # True if file or dir exists
+p.is_file()  # True only if regular file
+p.is_dir()  # True only if directory
+p.is_symlink()  # True if symlink
 ```
 
 **Performance:** These are syscalls. In hot loops, cache the result or use `try/except` with `open()` (EAFP style).
@@ -184,6 +184,7 @@ def checkpoint_path(base: Path, model: str, epoch: int, metric: float) -> Path:
     """Generate sortable, informative checkpoint paths."""
     return base / model / f"epoch_{epoch:04d}_val_acc_{metric:.4f}.pt"
 
+
 # Produces: models/bert/epoch_0001_val_acc_0.9234.pt
 # Lexicographic sort = chronological sort
 ```
@@ -221,8 +222,8 @@ path = "models/" + model_name + "/checkpoint.pt"
 path = Path("models") / model_name / "checkpoint.pt"
 
 # Path.parts gives normalized components
-Path("a/b/c").parts    # ("a", "b", "c")
-Path("a//b/./c").parts # ("a", "b", "c") — normalized
+Path("a/b/c").parts  # ("a", "b", "c")
+Path("a//b/./c").parts  # ("a", "b", "c") — normalized
 ```
 
 ## 8. Common Mistakes
@@ -231,8 +232,8 @@ Path("a//b/./c").parts # ("a", "b", "c") — normalized
 
 ```python
 # WRONG
-path = "data/" + "train" + "/images.jpg"   # Hardcoded separator
-path = os.path.join("data", "train")       # Legacy, verbose
+path = "data/" + "train" + "/images.jpg"  # Hardcoded separator
+path = os.path.join("data", "train")  # Legacy, verbose
 
 # CORRECT
 path = Path("data") / "train" / "images.jpg"

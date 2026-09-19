@@ -48,11 +48,13 @@ import polars as pl
 import numpy as np
 
 rng = np.random.default_rng(42)
-table = pa.table({
-    "id": pa.array(np.arange(5)),
-    "score": pa.array(rng.normal(size=5)),
-    "label": pa.array(["pos", "neg", "pos", "neg", "pos"]),
-})
+table = pa.table(
+    {
+        "id": pa.array(np.arange(5)),
+        "score": pa.array(rng.normal(size=5)),
+        "label": pa.array(["pos", "neg", "pos", "neg", "pos"]),
+    }
+)
 print(table.schema)
 ```
 
@@ -132,16 +134,20 @@ from pathlib import Path
 import tempfile
 
 tmp = Path(tempfile.mkdtemp())
-df = pl.DataFrame({
-    "id": range(100_000),
-    "emb": pl.Series(range(100_000)).cast(pl.Float64) / 1000.0,
-    "label": ["pos" if i % 2 else "neg" for i in range(100_000)],
-})
+df = pl.DataFrame(
+    {
+        "id": range(100_000),
+        "emb": pl.Series(range(100_000)).cast(pl.Float64) / 1000.0,
+        "label": ["pos" if i % 2 else "neg" for i in range(100_000)],
+    }
+)
 
 sizes = {}
-for name, kwargs in (("none", {"compression": None}),
-                     ("snappy", {"compression": "snappy"}),
-                     ("zstd", {"compression": "zstd"})):
+for name, kwargs in (
+    ("none", {"compression": None}),
+    ("snappy", {"compression": "snappy"}),
+    ("zstd", {"compression": "zstd"}),
+):
     p = tmp / f"data-{name}.parquet"
     df.write_parquet(p, **kwargs)
     sizes[name] = p.stat().st_size
@@ -170,8 +176,7 @@ from pathlib import Path
 import tempfile
 
 tmp = Path(tempfile.mkdtemp())
-df = pl.DataFrame({"id": range(6),
-                   "label": ["pos", "neg", "pos", "neg", "pos", "neg"]})
+df = pl.DataFrame({"id": range(6), "label": ["pos", "neg", "pos", "neg", "pos", "neg"]})
 df.write_parquet(tmp / "part", partition_by="label")
 print(sorted(p.name for p in (tmp / "part").iterdir()))
 ```
@@ -188,11 +193,11 @@ from pathlib import Path
 import tempfile
 
 tmp = Path(tempfile.mkdtemp())
-pl.DataFrame({"id": range(4), "label": ["pos", "neg", "pos", "neg"]}) \
-  .write_parquet(tmp / "part", partition_by="label")
+pl.DataFrame({"id": range(4), "label": ["pos", "neg", "pos", "neg"]}).write_parquet(
+    tmp / "part", partition_by="label"
+)
 
-neg = (pl.scan_parquet(tmp / "part")
-       .filter(pl.col("label") == "neg").collect())
+neg = pl.scan_parquet(tmp / "part").filter(pl.col("label") == "neg").collect()
 print(neg.height)
 ```
 
@@ -217,9 +222,13 @@ from pathlib import Path
 import tempfile
 
 tmp = Path(tempfile.mkdtemp())
-df = pl.DataFrame({"id": range(100_000),
-                   "emb": pl.Series(range(100_000)).cast(pl.Float64) / 1000.0,
-                   "label": ["pos" if i % 2 else "neg" for i in range(100_000)]})
+df = pl.DataFrame(
+    {
+        "id": range(100_000),
+        "emb": pl.Series(range(100_000)).cast(pl.Float64) / 1000.0,
+        "label": ["pos" if i % 2 else "neg" for i in range(100_000)],
+    }
+)
 
 csv_size = (df.write_csv(tmp / "d.csv"), (tmp / "d.csv").stat().st_size)[1]
 df.write_parquet(tmp / "d.parquet", compression="zstd")
@@ -249,8 +258,7 @@ from pathlib import Path
 import tempfile
 
 tmp = Path(tempfile.mkdtemp())
-table = pa.table({"id": pa.array([1, 2, 3]),
-                  "score": pa.array([0.9, 0.4, 0.7])})
+table = pa.table({"id": pa.array([1, 2, 3]), "score": pa.array([0.9, 0.4, 0.7])})
 pq.write_table(table, tmp / "t.parquet", compression="zstd")
 
 back = pl.read_parquet(tmp / "t.parquet")

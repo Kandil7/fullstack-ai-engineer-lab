@@ -151,10 +151,7 @@ print(extracted)
 Filtering 2D arrays can target rows, columns, or individual elements.
 
 ```python
-arr2d = np.array([[1, 2, 3, 4],
-                  [5, 6, 7, 8],
-                  [9, 10, 11, 12],
-                  [13, 14, 15, 16]])
+arr2d = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]])
 
 # Filter rows where sum > 20
 row_sums = arr2d.sum(axis=1)
@@ -281,10 +278,11 @@ import numpy as np
 scores = np.array([85, 92, 78, 65, 45, 88, 72, 55])
 
 # Assign grades based on scores
-grades = np.where(scores >= 90, 'A',
-         np.where(scores >= 80, 'B',
-         np.where(scores >= 70, 'C',
-         np.where(scores >= 60, 'D', 'F'))))
+grades = np.where(
+    scores >= 90,
+    "A",
+    np.where(scores >= 80, "B", np.where(scores >= 70, "C", np.where(scores >= 60, "D", "F"))),
+)
 print("Grades:", grades)
 # Output: ['B' 'A' 'C' 'D' 'F' 'B' 'C' 'F']
 
@@ -305,12 +303,7 @@ print("With bonus:", np.round(bonus, 1))
 import numpy as np
 
 # Student data: [name_id, score, attendance]
-students = np.array([[1, 85, 90],
-                     [2, 92, 95],
-                     [3, 78, 85],
-                     [4, 65, 70],
-                     [5, 95, 88],
-                     [6, 88, 92]])
+students = np.array([[1, 85, 90], [2, 92, 95], [3, 78, 85], [4, 65, 70], [5, 95, 88], [6, 88, 92]])
 
 scores = students[:, 1]
 attendance = students[:, 2]
@@ -341,12 +334,16 @@ print("Good scores, poor attendance:\n", good_but_absent)
 import numpy as np
 
 # Sales data: [region, product, quantity, revenue]
-sales = np.array([[1, 101, 50, 5000],
-                  [1, 102, 30, 3600],
-                  [2, 101, 70, 7000],
-                  [2, 103, 45, 5400],
-                  [3, 102, 60, 7200],
-                  [3, 101, 25, 2500]])
+sales = np.array(
+    [
+        [1, 101, 50, 5000],
+        [1, 102, 30, 3600],
+        [2, 101, 70, 7000],
+        [2, 103, 45, 5400],
+        [3, 102, 60, 7200],
+        [3, 101, 25, 2500],
+    ]
+)
 
 # Filter by revenue > 5000
 high_revenue = sales[sales[:, 3] > 5000]
@@ -577,12 +574,9 @@ print("Capped scores:", capped)
 import numpy as np
 
 # Student data: [age, score, grade_points]
-students = np.array([[20, 85, 3.5],
-                     [22, 92, 3.8],
-                     [19, 78, 3.0],
-                     [21, 65, 2.5],
-                     [23, 95, 3.9],
-                     [20, 88, 3.6]])
+students = np.array(
+    [[20, 85, 3.5], [22, 92, 3.8], [19, 78, 3.0], [21, 65, 2.5], [23, 95, 3.9], [20, 88, 3.6]]
+)
 
 # TODO: Find students with score > 85
 high_scorers = students[students[:, 1] > 85]
@@ -649,7 +643,7 @@ filtered = arr[arr > threshold]
 # Multiple conditions
 filtered = arr[(cond1) & (cond2)]  # AND
 filtered = arr[(cond1) | (cond2)]  # OR
-filtered = arr[~(condition)]       # NOT
+filtered = arr[~(condition)]  # NOT
 
 # Conditional replacement
 result = np.where(condition, value_if_true, value_if_false)
@@ -661,9 +655,9 @@ extracted = np.extract(condition, arr)
 clipped = np.clip(arr, min_val, max_val)
 
 # 2D filtering
-filtered_rows = arr2d[row_mask]           # Filter rows
-filtered_cols = arr2d[:, col_mask]        # Filter columns
-filtered_elements = arr2d[element_mask]   # Filter elements
+filtered_rows = arr2d[row_mask]  # Filter rows
+filtered_cols = arr2d[:, col_mask]  # Filter columns
+filtered_elements = arr2d[element_mask]  # Filter elements
 ```
 
 ---

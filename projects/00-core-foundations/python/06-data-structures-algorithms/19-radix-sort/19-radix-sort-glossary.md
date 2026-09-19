@@ -160,48 +160,50 @@
 def radix_sort_lsd(arr):
     """
     LSD Radix Sort for non-negative integers.
-    
+
     Time Complexity: O(d × (n + b))
     Space Complexity: O(n + b)
-    
+
     Args:
         arr: List of non-negative integers
-    
+
     Returns:
         Sorted list
     """
     if not arr:
         return arr
-    
+
     max_val = max(arr)
     exp = 1
-    
+
     while max_val // exp > 0:
         counting_sort_by_digit(arr, exp)
         exp *= 10
-    
+
     return arr
+
 
 def counting_sort_by_digit(arr, exp):
     """Counting sort for a specific digit position."""
     n = len(arr)
     output = [0] * n
     count = [0] * 10
-    
+
     for num in arr:
         digit = (num // exp) % 10
         count[digit] += 1
-    
+
     for i in range(1, 10):
         count[i] += count[i - 1]
-    
+
     for i in range(n - 1, -1, -1):
         digit = (arr[i] // exp) % 10
         output[count[digit] - 1] = arr[i]
         count[digit] -= 1
-    
+
     for i in range(n):
         arr[i] = output[i]
+
 
 # Example usage
 arr = [170, 45, 75, 90, 802, 24, 2, 66]
@@ -215,38 +217,40 @@ def radix_sort_msd(arr):
     """MSD Radix Sort for non-negative integers."""
     if not arr:
         return arr
-    
+
     max_val = max(arr)
     max_digits = len(str(max_val))
-    
+
     msd_sort(arr, 0, len(arr), max_digits - 1)
     return arr
+
 
 def msd_sort(arr, start, end, digit_pos):
     """Recursive MSD sort for specific digit position."""
     if start >= end - 1 or digit_pos < 0:
         return
-    
+
     count = [0] * 10
     output = [0] * (end - start)
-    
+
     for i in range(start, end):
-        digit = (arr[i] // (10 ** digit_pos)) % 10
+        digit = (arr[i] // (10**digit_pos)) % 10
         count[digit] += 1
-    
+
     for i in range(1, 10):
         count[i] += count[i - 1]
-    
+
     for i in range(end - 1, start - 1, -1):
-        digit = (arr[i] // (10 ** digit_pos)) % 10
+        digit = (arr[i] // (10**digit_pos)) % 10
         output[count[digit] - 1] = arr[i]
         count[digit] -= 1
-    
+
     for i in range(start, end):
         arr[i] = output[i - start]
-    
+
     for i in range(9):
         msd_sort(arr, start + count[i], start + count[i + 1], digit_pos - 1)
+
 
 # Example usage
 arr = [170, 45, 75, 90, 802, 24, 2, 66]
@@ -260,36 +264,38 @@ def radix_sort_custom_base(arr, base=16):
     """Radix sort with configurable base (e.g., hexadecimal)."""
     if not arr:
         return arr
-    
+
     max_val = max(arr)
     exp = 1
-    
+
     while max_val // exp > 0:
         counting_sort_base(arr, exp, base)
         exp *= base
-    
+
     return arr
+
 
 def counting_sort_base(arr, exp, base):
     """Counting sort for specific digit in given base."""
     n = len(arr)
     output = [0] * n
     count = [0] * base
-    
+
     for num in arr:
         digit = (num // exp) % base
         count[digit] += 1
-    
+
     for i in range(1, base):
         count[i] += count[i - 1]
-    
+
     for i in range(n - 1, -1, -1):
         digit = (arr[i] // exp) % base
         output[count[digit] - 1] = arr[i]
         count[digit] -= 1
-    
+
     for i in range(n):
         arr[i] = output[i]
+
 
 # Example usage
 arr = [255, 16, 128, 64, 32, 1, 8, 4]
@@ -303,18 +309,19 @@ def radix_sort_negative(arr):
     """Radix sort that handles negative numbers."""
     if not arr:
         return []
-    
+
     negatives = [-x for x in arr if x < 0]
     non_negatives = [x for x in arr if x >= 0]
-    
+
     if negatives:
         negatives = radix_sort_lsd(negatives)
         negatives = [-x for x in reversed(negatives)]
-    
+
     if non_negatives:
         non_negatives = radix_sort_lsd(non_negatives)
-    
+
     return negatives + non_negatives
+
 
 # Example usage
 arr = [-5, -1, -3, 2, 4, -2, 1, 0]
