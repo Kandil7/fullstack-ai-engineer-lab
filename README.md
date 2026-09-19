@@ -1,6 +1,8 @@
 # Full-Stack AI Engineer Lab
 
-[![Code Intelligence](https://img.shields.io/badge/Code-Graph-53188%20nodes%20%2F%20125142%20edges-blue)](docs/CODEBASE-INTELLIGENCE.md)
+[![Code Intelligence](https://img.shields.io/badge/Structural%20Graph-53%2C218%20nodes%20%2F%20125%2C174%20edges-blue)](docs/CODEBASE-INTELLIGENCE.md)
+[![Review Graph](https://img.shields.io/badge/Review%20Graph-11%2C590%20nodes%20%2F%2087%2C721%20edges-green)](docs/CODEBASE-INTELLIGENCE.md)
+[![Multimodal Graph](https://img.shields.io/badge/Multimodal%20Graph-49%2C856%20nodes%20%2F%2054%2C483%20edges-purple)](docs/CODEBASE-INTELLIGENCE.md)
 
 A **Repo-Centric Agentic Workspace** — a learning + execution + review operating system for
 becoming a production-level Full-Stack AI Engineer. This is not a notes folder; it is an
@@ -52,6 +54,7 @@ See [`docs/product/ai-learning-operating-manual.md`](docs/product/ai-learning-op
 templates/         # Standardized artifact templates (ADR, review, plan, ...)
 registries/        # YAML inventories: prompts, workflows, templates, decisions, skills
 docs/
+  CODEBASE-INTELLIGENCE.md  # Multi-layer code intelligence (3 graphs + context pack)
   roadmap/         # active-track-10-week (PLAN OF RECORD), milestones, dashboard
   decisions/       # ADRs
   reference/       # LLM production architecture, clean code, ML map, interviews
@@ -63,12 +66,39 @@ docs/
 learning-sources/  # Source-driven learning (books, repos, notebooks, official-docs)
 evaluations/       # Golden cases, regressions, RAG datasets, eval reports
 projects/          # Phase folders 00→07 (devmate is the active project)
+  04-ai-engineering/
+    security/exercises/  # 10 security modules (94 files, directory-per-exercise)
 infra/             # docker-compose + PowerShell scripts
 tests/             # repo-structure, templates, workflows, prompts validation
 ```
 
 See [`docs/architecture/monorepo-structure.md`](docs/architecture/monorepo-structure.md) for the
 full tree and rationale.
+
+---
+
+## Code Intelligence
+
+Four-layer code intelligence for token-efficient, context-aware engineering:
+
+| Layer | Tool | What it does | Stats |
+|-------|------|--------------|-------|
+| **Structural Graph** | codebase-memory-mcp | Tree-sitter + LSP call graph, 155 languages | 53,218 nodes, 125,174 edges |
+| **Review Graph** | code-review-graph | PR blast-radius, community detection, impact analysis | 11,590 nodes, 87,721 edges, 23 communities |
+| **Multimodal Graph** | graphify | Code + docs + schemas, god nodes, shortest path | 49,856 nodes, 54,483 edges, 2,833 communities |
+| **Context Pack** | repomix | One-shot repo packing for ad-hoc LLM tasks | 1,244,995 tokens, 1,082 files |
+
+**Quick commands:**
+```text
+Who calls X?        → codebase-memory trace_path --function_name X --direction inbound
+Find by pattern     → codebase-memory search_graph --name_pattern ".*X.*"
+Impact of changes   → codebase-memory detect_changes
+Blast radius        → code-review-graph detect_changes_tool
+God nodes           → graphify god_nodes
+Pack for LLM        → repomix pack_codebase
+```
+
+Full reference: [`docs/CODEBASE-INTELLIGENCE.md`](docs/CODEBASE-INTELLIGENCE.md)
 
 ---
 
@@ -139,6 +169,13 @@ Target: a remote AI/LLM engineering role. Vehicle: **DevMate**.
 - [x] Phase 3 — Scale (scaffolding scripts, repo validation, deep dives)
 - [x] Phase 4 — Advanced (RAG eval harness, capstone structure, operating manual)
 
+### Code Intelligence (Complete ✅)
+- [x] Structural graph — codebase-memory-mcp indexed (53,218 nodes, 125,174 edges, 8 languages)
+- [x] Review graph — code-review-graph built (11,590 nodes, 87,721 edges, 23 communities)
+- [x] Multimodal graph — graphify built (49,856 nodes, 54,483 edges, 2,833 communities)
+- [x] Context pack — repomix ready (1,244,995 tokens, 1,082 files)
+- [x] Security exercises — 10 modules split into 94 files (directory-per-exercise)
+
 ### Learning Journey
 - [x] Python foundations — 1,128 files across 9 phases: core (41 topics), advanced (27), libraries (NumPy, Pandas, Matplotlib, SciPy), databases, web frameworks, DSA, ML, MLOps, GenAI
 - [x] AI curriculum — 6,947+ lines across LLM APIs, RAG, agents, evaluation, safety, security (10 lectures + quizzes)
@@ -163,4 +200,7 @@ cd projects/04-ai-engineering/devmate
 
 # 4. Start today's log
 ./infra/scripts/new-daily-log.ps1
+
+# 5. Query code intelligence
+# See docs/CODEBASE-INTELLIGENCE.md for full tool reference
 ```
