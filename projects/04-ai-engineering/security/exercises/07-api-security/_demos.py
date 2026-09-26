@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 def demo_rate_limiting():
     """Demonstrate rate limiting."""
     print("\n" + "=" * 60)
@@ -238,4 +239,3 @@ def demo_webhook_verification():
 # =============================================================
 # ATTACK PATTERNS & DEFENSES
 # =============================================================
-

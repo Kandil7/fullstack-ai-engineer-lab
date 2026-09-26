@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class WebhookVerifier:
     """
     Verify webhook authenticity using HMAC signatures.
@@ -115,5 +116,3 @@ class WebhookVerifier:
 # =============================================================
 # SECTION 7: Security Headers Middleware
 # =============================================================
-
-

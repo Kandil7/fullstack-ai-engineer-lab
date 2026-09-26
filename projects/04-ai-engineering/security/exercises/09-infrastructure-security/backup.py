@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 @dataclass
 class BackupJob:
     """Represents a backup job."""
@@ -131,5 +132,3 @@ class BackupSecurityManager:
 # =============================================================
 # SECTION 6: Disaster Recovery
 # =============================================================
-
-

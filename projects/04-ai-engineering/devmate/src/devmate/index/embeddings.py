@@ -221,11 +221,115 @@ class LocalEmbeddingProvider(BaseEmbeddingProvider):
             )
 
 
+class OllamaEmbeddingProvider(BaseEmbeddingProvider):
+    """Local embeddings via Ollama — runs fully offline, no API key required."""
+
+    _DIMENSIONS = {
+        "nomic-embed-text": 768,
+        "mxbai-embed-large": 1024,
+        "all-minilm": 384,
+    }
+
+    def __init__(self, model: str | None = None, base_url: str | None = None) -> None:
+        self._model = model or settings.ollama_embedding_model
+        self._dimensions = self._DIMENSIONS.get(self._model, settings.embedding_dimensions)
+        self.client = httpx.AsyncClient(
+            base_url=(base_url or settings.ollama_base_url).rstrip("/"),
+            timeout=httpx.Timeout(60.0, connect=5.0),
+        )
+
+    @property
+    def model_name(self) -> str:
+        return self._model
+
+    @property
+    def dimensions(self) -> int:
+        return self._dimensions
+
+    def count_tokens(self, text: str) -> int:
+        # Ollama exposes no tokenizer over HTTP; rough approximation.
+        return len(text) // 4
+
+    async def embed(self, texts: list[str]) -> EmbeddingResult:
+        """Generate embeddings for a batch of texts via /api/embed."""
+        if not texts:
+            return EmbeddingResult(
+                embeddings=[],
+                usage=TokenUsage(0, 0, 0),
+                model=self._model,
+                latency_ms=0,
+            )
+
+        import time
+
+        start_time = time.perf_counter()
+
+        async with tracer.trace("embedding.generate", model=self._model, count=len(texts)):
+            batch_size = settings.embedding_batch_size
+            all_embeddings: list[list[float]] = []
+            total_prompt_tokens = 0
+
+            for i in range(0, len(texts), batch_size):
+                batch = texts[i : i + batch_size]
+                response = await self.client.post(
+                    "/api/embed",
+                    json={"model": self._model, "input": batch},
+                )
+                response.raise_for_status()
+                data = response.json()
+                all_embeddings.extend(data.get("embeddings", []))
+                total_prompt_tokens += data.get("prompt_eval_count", 0)
+
+            latency_ms = (time.perf_counter() - start_time) * 1000
+
+            usage = TokenUsage(
+                prompt_tokens=total_prompt_tokens,
+                completion_tokens=0,
+                total_tokens=total_prompt_tokens,
+            )
+
+            # Local inference has no per-token cost
+            cost_tracker.record_usage("ollama", self._model, usage, latency_ms)
+
+            return EmbeddingResult(
+                embeddings=all_embeddings,
+                usage=usage,
+                model=self._model,
+                latency_ms=latency_ms,
+            )
+
+
+def get_embedding_provider() -> BaseEmbeddingProvider:
+    """Resolve the embedding provider from settings.
+
+    Offline-first: defaults to Ollama. If EMBEDDING_PROVIDER=openai but no
+    key is configured, falls back to Ollama instead of raising at import
+    time (which previously crashed every key-less environment).
+    """
+    import logging
+
+    name = settings.embedding_provider.lower()
+
+    if name == "openai" and not settings.openai_api_key:
+        logging.getLogger(__name__).warning(
+            "EMBEDDING_PROVIDER=openai but OPENAI_API_KEY is not set; using Ollama instead"
+        )
+        name = "ollama"
+
+    if name == "ollama":
+        return OllamaEmbeddingProvider()
+    if name == "openai":
+        return OpenAIEmbeddingProvider()
+    if name == "local":
+        return LocalEmbeddingProvider()
+    raise ValueError(f"Unknown embedding provider: {name!r}. Use 'ollama', 'openai', or 'local'.")
+
+
 class EmbeddingService:
     """Unified embedding service with caching and batching."""
 
     def __init__(self, provider: BaseEmbeddingProvider = None) -> None:
-        self.provider = provider or OpenAIEmbeddingProvider()
+        self.provider = provider or get_embedding_provider()
         self._cache: dict = {}
         self._cache_enabled = True
 

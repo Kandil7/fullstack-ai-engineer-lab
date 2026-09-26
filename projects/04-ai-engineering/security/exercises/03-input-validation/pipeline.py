@@ -9,6 +9,7 @@ from .path_traversal import PathTraversalValidator
 from .sql_injection import SQLInjectionValidator
 from .xss import XSSValidator
 
+
 class ValidationPipeline:
     """
     Comprehensive input validation pipeline combining multiple validators.
@@ -132,5 +133,3 @@ class ValidationPipeline:
 # =============================================================================
 # Section 8: Demonstration & Testing
 # =============================================================================
-
-

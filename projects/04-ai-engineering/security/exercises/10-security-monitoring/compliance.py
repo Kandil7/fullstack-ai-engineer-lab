@@ -5,6 +5,7 @@
 from ._types import *
 from .incident_response import Incident
 
+
 class ComplianceFramework(Enum):
     SOC2 = "soc2"
     GDPR = "gdpr"
@@ -236,5 +237,3 @@ class ComplianceAuditor:
 # =============================================================
 # DEMONSTRATIONS
 # =============================================================
-
-

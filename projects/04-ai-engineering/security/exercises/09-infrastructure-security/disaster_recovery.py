@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class DisasterRecoveryManager:
     """
     Disaster recovery planning and execution.
@@ -143,5 +144,3 @@ class DisasterRecoveryManager:
 # =============================================================
 # SECTION 7: Infrastructure Audit
 # =============================================================
-
-

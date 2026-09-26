@@ -5,6 +5,7 @@
 from ._types import *
 from .input_sanitizer import InputSanitizer
 
+
 @dataclass
 class DetectionResult:
     """Result of a prompt injection detection scan."""
@@ -197,5 +198,3 @@ class PromptInjectionDetector:
 # =============================================================================
 # Section 5: Conversation Guard (End-to-End Protection)
 # =============================================================================
-
-

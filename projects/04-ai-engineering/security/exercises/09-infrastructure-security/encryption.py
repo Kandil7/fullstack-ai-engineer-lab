@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class DatabaseEncryptionManager:
     """
     Database encryption for data at rest and in transit.
@@ -96,5 +97,3 @@ class DatabaseEncryptionManager:
 # =============================================================
 # SECTION 5: Backup Security
 # =============================================================
-
-

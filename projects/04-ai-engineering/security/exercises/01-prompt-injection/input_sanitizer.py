@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class InputSanitizer:
     """
     Sanitizes user input to prevent prompt injection attacks.
@@ -188,5 +189,3 @@ class InputSanitizer:
 # =============================================================================
 # Section 3: System Prompt Hardening
 # =============================================================================
-
-

@@ -5,6 +5,7 @@
 from ._types import *
 from .base_moderator import ContentModerator
 
+
 class SexualContentModerator(ContentModerator):
     """
     Detects explicit sexual content, with context awareness for
@@ -90,5 +91,3 @@ class SexualContentModerator(ContentModerator):
 # =============================================================================
 # Section 6: Self-Harm Detection
 # =============================================================================
-
-

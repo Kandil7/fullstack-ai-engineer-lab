@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class InfrastructureAuditor:
     """
     Comprehensive infrastructure security auditing.
@@ -134,5 +135,3 @@ class InfrastructureAuditor:
 # =============================================================
 # DEMONSTRATIONS
 # =============================================================
-
-

@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 def demo_jwt_security():
     """Demonstrate JWT security best practices."""
     print("\n" + "=" * 60)
@@ -201,4 +202,3 @@ def demo_session_management():
 # =============================================================
 # SECURITY ATTACK PATTERNS & DEFENSES
 # =============================================================
-

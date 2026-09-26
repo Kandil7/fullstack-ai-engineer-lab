@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class SecurityHeaders:
     """
     Security headers for API responses.
@@ -50,5 +51,3 @@ class SecurityHeaders:
 # =============================================================
 # SECTION 8: Request Signing
 # =============================================================
-
-

@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class PrivacyAuditLogger:
     """
     Comprehensive audit logging for privacy operations.
@@ -62,5 +63,3 @@ class PrivacyAuditLogger:
 # =============================================================================
 # Section 9: Demonstration & Testing
 # =============================================================================
-
-

@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 def demo_container_security():
     """Demonstrate container security scanning."""
     print("\n" + "=" * 60)
@@ -301,4 +302,3 @@ def demo_infrastructure_audit():
 # =============================================================
 # ATTACK PATTERNS & DEFENSES
 # =============================================================
-

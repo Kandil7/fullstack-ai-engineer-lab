@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class ModelWatermarker:
     """
     Embed watermarks in model outputs for ownership verification.
@@ -132,5 +133,3 @@ class ModelWatermarker:
 # =============================================================
 # SECTION 5: Backdoor Detection
 # =============================================================
-
-

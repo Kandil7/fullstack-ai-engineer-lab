@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 def demo_poisoning_detection():
     """Demonstrate data poisoning detection."""
     print("\n" + "=" * 60)
@@ -216,4 +217,3 @@ def demo_secure_serving():
 # =============================================================
 # ATTACK PATTERNS & DEFENSES
 # =============================================================
-

@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 def demo_security_logging():
     """Demonstrate security logging."""
     print("\n" + "=" * 60)
@@ -351,4 +352,3 @@ def demo_compliance_auditing():
 # =============================================================
 # ATTACK PATTERNS & DEFENSES
 # =============================================================
-

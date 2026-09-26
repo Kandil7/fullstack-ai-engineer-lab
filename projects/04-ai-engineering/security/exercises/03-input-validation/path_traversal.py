@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class PathTraversalValidator:
     """
     Detects and prevents path traversal attacks in file paths.
@@ -111,5 +112,3 @@ class PathTraversalValidator:
 # =============================================================================
 # Section 6: Input Length & Encoding Validation
 # =============================================================================
-
-

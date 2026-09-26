@@ -7,7 +7,14 @@
 
 DEVMATE   := projects/04-ai-engineering/devmate
 COMPOSE   := docker compose -f infra/docker/docker-compose.yml
-PY        := poetry run
+
+# Run tools from DevMate's venv (works on Windows Git Bash and Linux CI).
+# Poetry has no lockfile here and is not the environment of record.
+ifeq ($(OS),Windows_NT)
+PY        := cd $(DEVMATE) && .venv/Scripts/python
+else
+PY        := cd $(DEVMATE) && .venv/bin/python
+endif
 
 .DEFAULT_GOAL := help
 .PHONY: help ci lint fmt fmt-check types test test-int eval run cli \
@@ -25,33 +32,33 @@ ci: lint fmt-check types test docs-check fresh-check  ## Everything CI runs
 	@echo "CI passed."
 
 lint:  ## Lint DevMate (ruff)
-	cd $(DEVMATE) && $(PY) ruff check .
+	$(PY) -m ruff check .
 
 fmt:  ## Format DevMate in place
-	cd $(DEVMATE) && $(PY) ruff format .
+	$(PY) -m ruff format .
 
 fmt-check:  ## Verify formatting without writing
-	cd $(DEVMATE) && $(PY) ruff format --check .
+	$(PY) -m ruff format --check .
 
 types:  ## Type-check DevMate (mypy)
-	cd $(DEVMATE) && $(PY) mypy src/
+	$(PY) -m mypy src/
 
 test:  ## Unit tests with coverage
-	cd $(DEVMATE) && $(PY) pytest -q --cov=devmate --cov-report=term-missing
+	$(PY) -m pytest -q --cov=devmate --cov-report=term-missing
 
 test-int:  ## Integration tests (needs `make up`)
-	cd $(DEVMATE) && $(PY) pytest -q -m integration
+	$(PY) -m pytest -q -m integration
 
 ## ---------------------------------------------------------------- devmate
 
 eval:  ## Run the RAG evaluation harness (week 2+)
-	cd $(DEVMATE) && $(PY) python eval/run_ragas.py
+	$(PY) eval/run_ragas.py
 
 run:  ## Serve the DevMate API locally
-	cd $(DEVMATE) && $(PY) uvicorn devmate.api.main:app --reload
+	$(PY) -m uvicorn devmate.api.main:app --reload
 
 cli:  ## Run the DevMate CLI — make cli ARGS="stats ."
-	cd $(DEVMATE) && $(PY) devmate $(ARGS)
+	$(PY) -m devmate.cli.main $(ARGS)
 
 ## ---------------------------------------------------------------- infra
 

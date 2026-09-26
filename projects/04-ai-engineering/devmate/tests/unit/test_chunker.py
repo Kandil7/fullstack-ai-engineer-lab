@@ -23,7 +23,7 @@ def test_fixed_size_chunker_creates_chunks_with_metadata() -> None:
         assert doc.metadata["source"] == "test.md"
         assert doc.metadata["chunker"] == "fixed_size"
         assert doc.metadata["chunk_index"] >= 0
-        assert len(doc.id) == 16
+        assert len(doc.id) == 32
         assert len(doc.content) <= 100
 
 

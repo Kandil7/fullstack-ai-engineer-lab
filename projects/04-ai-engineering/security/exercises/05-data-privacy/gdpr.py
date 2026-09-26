@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class GDPRCompliance:
     """
     Implements GDPR compliance patterns for data handling.
@@ -182,5 +183,3 @@ class GDPRCompliance:
 # =============================================================================
 # Section 7: Privacy-Preserving Data Collection
 # =============================================================================
-
-

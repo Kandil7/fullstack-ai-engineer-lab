@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class ResponseSanitizer:
     """
     Protect against data leakage in API responses.
@@ -152,5 +153,3 @@ class ResponseSanitizer:
 # =============================================================
 # SECTION 6: Webhook Verification
 # =============================================================
-
-

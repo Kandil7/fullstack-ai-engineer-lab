@@ -5,6 +5,7 @@
 from ._types import *
 from .rbac import Role
 
+
 @dataclass
 class APIKey:
     key_id: str
@@ -140,5 +141,3 @@ class APIKeyManager:
 # =============================================================
 # SECTION 4: Role-Based Access Control (RBAC)
 # =============================================================
-
-

@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class GroundednessChecker:
     """
     Checks whether AI-generated responses are grounded in provided
@@ -113,5 +114,3 @@ class GroundednessChecker:
 # =============================================================================
 # Section 6: Output Quality Scorer
 # =============================================================================
-
-

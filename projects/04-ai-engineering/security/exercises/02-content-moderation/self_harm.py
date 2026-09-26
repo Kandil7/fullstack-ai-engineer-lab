@@ -5,6 +5,7 @@
 from ._types import *
 from .base_moderator import ContentModerator
 
+
 class SelfHarmModerator(ContentModerator):
     """
     Detects self-harm content and provides appropriate responses
@@ -76,5 +77,3 @@ class SelfHarmModerator(ContentModerator):
 # =============================================================================
 # Section 7: Custom Content Policy Engine
 # =============================================================================
-
-

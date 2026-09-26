@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 def require_auth(*required_scopes):
     """Decorator for requiring authentication and specific scopes."""
 
@@ -44,5 +45,3 @@ def require_role(role_name: str):
 # =============================================================
 # DEMONSTRATIONS
 # =============================================================
-
-

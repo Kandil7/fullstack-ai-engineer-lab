@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class IncidentPhase(Enum):
     PREPARATION = "preparation"
     DETECTION = "detection"
@@ -249,5 +250,3 @@ class IncidentResponseManager:
 # =============================================================
 # SECTION 6: Compliance Auditing
 # =============================================================
-
-

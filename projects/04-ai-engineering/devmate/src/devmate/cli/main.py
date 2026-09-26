@@ -4,7 +4,10 @@ CLI for DevMate - stats, ask, ingest commands.
 
 import asyncio
 import json
+import sys
+from collections.abc import AsyncIterator
 from pathlib import Path
+from typing import cast
 
 import typer
 from rich.console import Console
@@ -13,7 +16,19 @@ from rich.table import Table
 
 from devmate.index.vector_store import get_vector_store
 from devmate.ingest.chunker import DocumentLoader, get_chunker
+from devmate.llm.client import StreamingChunk
 from devmate.retrieve.rag import get_rag_pipeline
+
+
+def _force_utf8_console() -> None:
+    """Windows cp1252 consoles choke on Rich's braille spinner (\\u2807)."""
+    for stream in (sys.stdout, sys.stderr):
+        encoding = getattr(stream, "encoding", "") or ""
+        if encoding.lower() != "utf-8" and hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+
+
+_force_utf8_console()
 
 app = typer.Typer(name="devmate", help="AI Assistant for Code Repositories")
 console = Console()
@@ -164,6 +179,7 @@ async def _ask_async(question: str, stream: bool, repo: str) -> None:
     rag_pipeline = await get_rag_pipeline()
 
     from devmate.retrieve.rag import RAGRequest as InternalRAGRequest
+    from devmate.retrieve.rag import RAGResult
 
     request = InternalRAGRequest(query=question, stream=stream)
 
@@ -171,21 +187,21 @@ async def _ask_async(question: str, stream: bool, repo: str) -> None:
         console.print(f"\n[bold cyan]Question:[/bold cyan] {question}\n")
         console.print("[bold green]Answer:[/bold green]")
 
-        result = await rag_pipeline.query(request)
-        async for chunk in result:
+        stream_result = await rag_pipeline.query(request)
+        async for chunk in cast(AsyncIterator[StreamingChunk], stream_result):
             console.print(chunk.content, end="", highlight=False)
         console.print()
+    else:
+        raw_result = await rag_pipeline.query(request)
+        result = cast(RAGResult, raw_result)
+        console.print(f"\n[bold cyan]Question:[/bold cyan] {question}")
+        console.print(f"\n[bold green]Answer:[/bold green] {result.answer}")
 
-        # Show sources
-        if hasattr(result, "contexts") and result.contexts:
+        if result.contexts:
             console.print("\n[bold]Sources:[/bold]")
             for i, ctx in enumerate(result.contexts[:3], 1):
                 source = ctx.metadata.get("source", "unknown")
                 console.print(f"  [{i}] {source} (score: {ctx.score:.3f})")
-    else:
-        result = await rag_pipeline.query(request)
-        console.print(f"\n[bold cyan]Question:[/bold cyan] {question}")
-        console.print(f"\n[bold green]Answer:[/bold green] {result.answer}")
 
 
 @app.command()

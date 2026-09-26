@@ -5,6 +5,7 @@
 from ._types import *
 from .base_moderator import ContentModerator
 
+
 class HateSpeechModerator(ContentModerator):
     """
     Detects hate speech targeting individuals or groups based on
@@ -71,5 +72,3 @@ class HateSpeechModerator(ContentModerator):
 # =============================================================================
 # Section 4: Violence Detection
 # =============================================================================
-
-

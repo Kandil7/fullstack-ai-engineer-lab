@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 @dataclass
 class Session:
     session_id: str
@@ -175,5 +176,3 @@ class SessionManager:
 # =============================================================
 # SECTION 6: Authentication Decorators & Middleware
 # =============================================================
-
-

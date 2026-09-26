@@ -5,6 +5,7 @@
 from ._types import *
 from .adversarial import AdversarialDetector
 
+
 class SecureModelServer:
     """
     Secure model serving with multiple protection layers.
@@ -160,5 +161,3 @@ class InputValidator:
 # =============================================================
 # DEMONSTRATIONS
 # =============================================================
-
-

@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 @dataclass
 class SourceClaim:
     """A factual claim that can be verified against a source."""
@@ -103,5 +104,3 @@ class HallucinationDetector:
 # =============================================================================
 # Section 5: Groundedness Checker
 # =============================================================================
-
-

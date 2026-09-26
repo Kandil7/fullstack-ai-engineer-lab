@@ -7,6 +7,7 @@ from .anonymization import AnonymizationEngine
 from .gdpr import GDPRCompliance
 from .pii_detector import PIIDetector
 
+
 class PrivacyPreservingCollector:
     """
     Collects and processes data while preserving user privacy.
@@ -156,5 +157,3 @@ class PrivacyPreservingCollector:
 # =============================================================================
 # Section 8: Privacy Audit Logger
 # =============================================================================
-
-

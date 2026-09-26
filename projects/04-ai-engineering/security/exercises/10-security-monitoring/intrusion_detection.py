@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class IntrusionDetectionSystem:
     """
     Rule-based intrusion detection for AI systems.
@@ -166,5 +167,3 @@ class IntrusionDetectionSystem:
 # =============================================================
 # SECTION 3: Anomaly Detection
 # =============================================================
-
-

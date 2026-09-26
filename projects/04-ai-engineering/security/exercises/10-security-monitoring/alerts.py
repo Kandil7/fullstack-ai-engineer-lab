@@ -5,6 +5,7 @@
 from ._types import *
 from .incident_response import Incident
 
+
 class AlertSeverity(Enum):
     LOW = "low"
     MEDIUM = "medium"
@@ -182,5 +183,3 @@ class AlertManager:
 # =============================================================
 # SECTION 5: Incident Response
 # =============================================================
-
-

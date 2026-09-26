@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class DataMasker:
     """
     Implements various data masking strategies for different use cases.
@@ -141,5 +142,3 @@ class DataMasker:
 # =============================================================================
 # Section 6: GDPR Compliance Patterns
 # =============================================================================
-
-

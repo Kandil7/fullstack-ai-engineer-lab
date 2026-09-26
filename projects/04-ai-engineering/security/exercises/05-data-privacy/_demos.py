@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 def demo_pii_detection():
     """Demonstrate PII detection."""
     print("\n" + "=" * 72)
@@ -335,4 +336,3 @@ def demo_audit_logging():
 # =============================================================================
 # Section 10: Best Practices
 # =============================================================================
-

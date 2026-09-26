@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class OutputQualityScorer:
     """
     Scores the quality of AI-generated output based on multiple factors:
@@ -129,5 +130,3 @@ class OutputQualityScorer:
 # =============================================================================
 # Section 7: Citation Verifier
 # =============================================================================
-
-

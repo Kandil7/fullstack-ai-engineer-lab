@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 @dataclass
 class FirewallRule:
     """Represents a firewall rule."""
@@ -163,5 +164,3 @@ class NetworkSecurityManager:
 # =============================================================
 # SECTION 4: Database Encryption
 # =============================================================
-
-

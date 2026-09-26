@@ -4,7 +4,7 @@ Tracing and observability with Langfuse integration.
 
 import uuid
 from collections.abc import AsyncGenerator, Generator
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import AbstractContextManager, asynccontextmanager, contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
@@ -106,6 +106,41 @@ class Trace:
         }
 
 
+class _DualContext:
+    """Wrap a sync context manager so it also works with ``async with``.
+
+    Span tracking is purely in-memory, so there is nothing to await; this
+    lets the 18 ``async with tracer.trace(...)`` call sites work instead of
+    raising ``TypeError: _GeneratorContextManager does not support the
+    asynchronous context manager protocol``.
+    """
+
+    def __init__(self, cm: AbstractContextManager[Span]) -> None:
+        self._cm = cm
+
+    def __enter__(self) -> Span:
+        return self._cm.__enter__()
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: Any,
+    ) -> bool | None:
+        return self._cm.__exit__(exc_type, exc, tb)
+
+    async def __aenter__(self) -> Span:
+        return self.__enter__()
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: Any,
+    ) -> bool | None:
+        return self.__exit__(exc_type, exc, tb)
+
+
 class Tracer:
     """Tracing system with optional Langfuse export."""
 
@@ -161,7 +196,7 @@ class Tracer:
         return None
 
     @contextmanager
-    def trace(self, name: str, **attributes) -> Generator[Span, None, None]:
+    def _trace_sync(self, name: str, **attributes) -> Generator[Span, None, None]:
         """Context manager for synchronous tracing."""
         span = self.start_span(name, **attributes)
         try:
@@ -172,6 +207,10 @@ class Tracer:
             raise
         finally:
             self.end_span(span)
+
+    def trace(self, name: str, **attributes) -> _DualContext:
+        """Trace a block; works with both ``with`` and ``async with``."""
+        return _DualContext(self._trace_sync(name, **attributes))
 
     @asynccontextmanager
     async def trace_async(self, name: str, **attributes) -> AsyncGenerator[Span, None]:

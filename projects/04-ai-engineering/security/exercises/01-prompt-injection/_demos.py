@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 def demo_attack_patterns():
     """Demonstrate common attack patterns and detection results."""
     print("\n" + "=" * 72)
@@ -192,4 +193,3 @@ def demo_multi_layer_defense():
 # =============================================================================
 # Section 7: Best Practices Reference
 # =============================================================================
-

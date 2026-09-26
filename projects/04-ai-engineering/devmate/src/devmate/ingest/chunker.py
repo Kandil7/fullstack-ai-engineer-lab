@@ -38,9 +38,15 @@ class BaseChunker(ABC):
         pass
 
     def _generate_id(self, content: str, source: str, position: int) -> str:
-        """Generate deterministic ID from content hash."""
+        """Deterministic 32-hex ID (full md5).
+
+        Qdrant point ids must be integers or full UUIDs; a 16-hex prefix is
+        neither, and the server rejects the whole upsert with
+        ``Format error in JSON body: ... PointInsertOperations``.
+        A 32-hex string parses as a dashless UUID, which Qdrant accepts.
+        """
         hash_input = f"{source}:{position}:{content[:100]}"
-        return hashlib.md5(hash_input.encode()).hexdigest()[:16]
+        return hashlib.md5(hash_input.encode()).hexdigest()
 
 
 class FixedSizeChunker(BaseChunker):

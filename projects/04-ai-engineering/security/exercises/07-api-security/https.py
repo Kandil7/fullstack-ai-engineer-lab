@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class HTTPSEnforcer:
     """
     HTTPS enforcement with HSTS and redirect handling.
@@ -88,5 +89,3 @@ class HTTPSEnforcer:
 # =============================================================
 # SECTION 4: Request Validation
 # =============================================================
-
-

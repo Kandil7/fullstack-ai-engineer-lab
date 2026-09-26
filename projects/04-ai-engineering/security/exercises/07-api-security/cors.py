@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class CORSPolicy:
     """
     Configurable CORS policy for AI service APIs.
@@ -119,5 +120,3 @@ class CORSPolicy:
 # =============================================================
 # SECTION 3: HTTPS Enforcement
 # =============================================================
-
-

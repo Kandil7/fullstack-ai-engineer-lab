@@ -5,6 +5,7 @@
 from ._types import *
 from .detector import DetectionResult, PromptInjectionDetector
 
+
 @dataclass
 class ConversationTurn:
     """A single turn in a conversation."""
@@ -98,5 +99,3 @@ class ConversationGuard:
 # =============================================================================
 # Section 6: Demonstration & Testing
 # =============================================================================
-
-

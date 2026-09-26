@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 def demo_hate_speech_detection():
     """Demonstrate hate speech detection."""
     print("\n" + "=" * 72)
@@ -229,4 +230,3 @@ def demo_formatter():
 # =============================================================================
 # Section 11: Best Practices
 # =============================================================================
-

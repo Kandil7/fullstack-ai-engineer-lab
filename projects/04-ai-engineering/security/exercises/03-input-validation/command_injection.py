@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class CommandInjectionValidator:
     """
     Detects and prevents command injection attacks.
@@ -133,5 +134,3 @@ class CommandInjectionValidator:
 # =============================================================================
 # Section 5: Path Traversal Prevention
 # =============================================================================
-
-

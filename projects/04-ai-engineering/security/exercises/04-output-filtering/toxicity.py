@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class ToxicityFilter:
     """
     Detects toxic content including profanity, insults, threats,
@@ -77,5 +78,3 @@ class ToxicityFilter:
 # =============================================================================
 # Section 4: Hallucination Detection
 # =============================================================================
-
-

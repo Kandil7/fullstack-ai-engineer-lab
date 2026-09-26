@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class BackdoorDetector:
     """
     Detect backdoor/trojan attacks in neural networks.
@@ -165,5 +166,3 @@ class BackdoorDetector:
 # =============================================================
 # SECTION 6: Secure Model Serving
 # =============================================================
-
-

@@ -5,6 +5,7 @@
 from ._types import *
 from .sessions import Session
 
+
 @dataclass
 class Permission:
     resource: str
@@ -221,5 +222,3 @@ class RBACManager:
 # =============================================================
 # SECTION 5: Session Management & Token Rotation
 # =============================================================
-
-

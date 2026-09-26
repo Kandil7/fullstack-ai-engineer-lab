@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class SystemPromptHarden:
     """
     System prompt hardening techniques to resist injection attacks.
@@ -89,5 +90,3 @@ Your behavior is governed by the following inviolable rules:
 # =============================================================================
 # Section 4: Detection Engine
 # =============================================================================
-
-

@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class RequestSigner:
     """
     Sign API requests for mutual TLS alternative.
@@ -79,5 +80,3 @@ class RequestSigner:
 # =============================================================
 # DEMONSTRATIONS
 # =============================================================
-
-

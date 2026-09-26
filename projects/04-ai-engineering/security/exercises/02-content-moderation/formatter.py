@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class ModerationFormatter:
     """Formats moderation results for display or API responses."""
 
@@ -60,5 +61,3 @@ class ModerationFormatter:
 # =============================================================================
 # Section 10: Demonstration & Testing
 # =============================================================================
-
-

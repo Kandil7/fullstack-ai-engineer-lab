@@ -7,11 +7,11 @@ import uuid
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
 from devmate.config import settings
 from devmate.index.vector_store import get_vector_store
-from devmate.llm.client import StreamingChunk
+from devmate.llm.client import LLMResponse, StreamingChunk
 from devmate.obs.tracing import tracer
 from devmate.retrieve.retriever import RerankResult, get_retriever
 
@@ -67,8 +67,26 @@ class RAGPipeline:
         llm_client=None,
     ) -> None:
         self.retriever = retriever
-        self.embedding_service = embedding_service or embedding_service
-        self.llm_client = llm_client or llm_client
+        self._embedding_service = embedding_service
+        self._llm_client = llm_client
+
+    @property
+    def embedding_service(self):
+        """Lazy default to the global embedding service (Ollama offline)."""
+        if self._embedding_service is None:
+            from devmate.index.embeddings import embedding_service as _default_service
+
+            self._embedding_service = _default_service
+        return self._embedding_service
+
+    @property
+    def llm_client(self):
+        """Lazy default to the global LLM client (Ollama offline)."""
+        if self._llm_client is None:
+            from devmate.llm.client import get_llm_client
+
+            self._llm_client = get_llm_client()
+        return self._llm_client
 
     async def _ensure_initialized(self) -> None:
         """Ensure all components are initialized."""
@@ -113,8 +131,8 @@ class RAGPipeline:
 
         return messages
 
-    async def query(self, request: RAGRequest) -> RAGResult:
-        """Execute RAG query."""
+    async def query(self, request: RAGRequest) -> RAGResult | AsyncIterator[StreamingChunk]:
+        """Execute RAG query; returns RAGResult, or an async iterator when streaming."""
         await self._ensure_initialized()
 
         request_id = str(uuid.uuid4())[:8]
@@ -151,9 +169,9 @@ class RAGPipeline:
             )
 
             if request.stream:
-                # For streaming, we need a different approach
-                # This returns an async iterator
-                return await self._query_streaming(
+                # Calling an async-generator function returns the generator
+                # directly — awaiting it raises TypeError.
+                return self._query_streaming(
                     request_id=request_id,
                     messages=messages,
                     retrieved=retrieved,
@@ -162,11 +180,14 @@ class RAGPipeline:
                     temperature=temperature,
                 )
 
-            response = await self.llm_client.complete(
-                messages=messages,
-                max_tokens=max_tokens,
-                temperature=temperature,
-                stream=False,
+            response = cast(
+                LLMResponse,
+                await self.llm_client.complete(
+                    messages=messages,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    stream=False,
+                ),
             )
 
             latency_ms = (time.perf_counter() - start_time) * 1000
@@ -195,17 +216,17 @@ class RAGPipeline:
         temperature: float,
     ) -> AsyncIterator[StreamingChunk]:
         """Stream RAG response."""
-        async for chunk in self.llm_client.complete(
-            messages=messages,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            stream=True,
-        ):
+        stream = cast(
+            AsyncIterator[StreamingChunk],
+            await self.llm_client.complete(
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                stream=True,
+            ),
+        )
+        async for chunk in stream:
             yield chunk
-
-        (time.perf_counter() - start_time) * 1000
-        # Log completion
-        tracer.get_current_trace()
 
     async def ingest_documents(self, documents: list) -> int:
         """Ingest documents into the vector store."""

@@ -5,6 +5,7 @@
 from ._types import *
 from .alerts import Alert
 
+
 class AnomalyDetector:
     """
     Statistical anomaly detection for security monitoring.
@@ -155,5 +156,3 @@ class AnomalyDetector:
 # =============================================================
 # SECTION 4: Alert System
 # =============================================================
-
-

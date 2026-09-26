@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 def demo_pii_detection():
     """Demonstrate PII detection and masking."""
     print("\n" + "=" * 72)
@@ -266,4 +267,3 @@ def print_best_practices():
 # =============================================================================
 # Main Entry Point
 # =============================================================================
-

@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class PIIDetector:
     """
     Comprehensive PII detection engine supporting multiple data types
@@ -172,5 +173,3 @@ class PIIDetector:
 # =============================================================================
 # Section 3: Data Anonymization Engine
 # =============================================================================
-
-

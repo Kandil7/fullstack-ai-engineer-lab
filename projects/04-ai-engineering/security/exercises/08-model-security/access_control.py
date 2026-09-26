@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class ModelAccessController:
     """
     Control access to models to prevent theft and unauthorized use.
@@ -131,5 +132,3 @@ class ModelAccessController:
 # =============================================================
 # SECTION 4: Model Watermarking
 # =============================================================
-
-

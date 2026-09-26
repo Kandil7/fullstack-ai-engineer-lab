@@ -31,6 +31,7 @@ class LLMProvider(StrEnum):
 
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
+    OLLAMA = "ollama"
 
 
 class LLMError(Exception):
@@ -493,19 +494,171 @@ class OpenAIProvider(BaseLLMProvider):
             yield StreamingChunk(content="", is_final=True, usage=usage)
 
 
+class OllamaProvider(BaseLLMProvider):
+    """Local Ollama provider — runs fully offline, no API key required."""
+
+    @property
+    def provider_name(self) -> LLMProvider:
+        return LLMProvider.OLLAMA
+
+    def __init__(self) -> None:
+        self.base_url = settings.ollama_base_url.rstrip("/")
+        self.default_model = settings.ollama_model
+        self.client = httpx.AsyncClient(
+            base_url=self.base_url,
+            timeout=httpx.Timeout(300.0, connect=5.0),
+        )
+
+    def count_tokens(self, text: str, model: str) -> int:
+        """Estimate tokens with tiktoken (approximation for local models)."""
+        try:
+            encoding = tiktoken.get_encoding("cl100k_base")
+            return len(encoding.encode(text))
+        except Exception:
+            return len(text) // 4
+
+    @retry(
+        wait=wait_exponential_jitter(initial=1, max=30),
+        stop=stop_after_attempt(3),
+        retry=retry_if_exception_type((httpx.TimeoutException, httpx.NetworkError)),
+        reraise=True,
+    )
+    async def complete(
+        self,
+        messages: list[dict[str, str]],
+        model: str,
+        max_tokens: int,
+        temperature: float,
+        stream: bool = False,
+        response_model: type[BaseModel] | None = None,
+        **kwargs,
+    ) -> LLMResponse | AsyncIterator[StreamingChunk]:
+        """Complete a chat request against the local Ollama server."""
+        model = model or self.default_model
+        payload: dict[str, Any] = {
+            "model": model,
+            "messages": messages,
+            "stream": stream,
+            "options": {
+                "temperature": temperature,
+                "num_predict": max_tokens,
+            },
+        }
+        if response_model:
+            payload["format"] = response_model.model_json_schema()
+
+        start_time = time.perf_counter()
+
+        async with tracer.trace("llm.complete", provider=self.provider_name.value, model=model):
+            if stream:
+                return self._stream_complete(payload, model, start_time)
+            return await self._complete_once(payload, model, start_time, response_model)
+
+    async def _complete_once(
+        self,
+        payload: dict[str, Any],
+        model: str,
+        start_time: float,
+        response_model: type[BaseModel] | None = None,
+    ) -> LLMResponse:
+        """Single completion request."""
+        response = await self.client.post("/api/chat", json=payload)
+        response.raise_for_status()
+        data = response.json()
+
+        latency_ms = (time.perf_counter() - start_time) * 1000
+
+        content = data.get("message", {}).get("content", "")
+
+        if response_model:
+            try:
+                validated = response_model.model_validate_json(content)
+                content = validated.model_dump_json()
+            except (ValidationError, ValueError) as e:
+                raise LLMValidationError(f"Structured output validation failed: {e}")
+
+        prompt_tokens = data.get("prompt_eval_count", 0)
+        completion_tokens = data.get("eval_count", 0)
+        usage = TokenUsage(
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=prompt_tokens + completion_tokens,
+        )
+
+        llm_response = LLMResponse(
+            content=content,
+            usage=usage,
+            model=model,
+            provider=self.provider_name,
+            latency_ms=latency_ms,
+            raw_response=data,
+        )
+
+        cost_tracker.record_usage(self.provider_name.value, model, usage, latency_ms)
+
+        return llm_response
+
+    async def _stream_complete(
+        self,
+        payload: dict[str, Any],
+        model: str,
+        start_time: float,
+    ) -> AsyncIterator[StreamingChunk]:
+        """Streaming completion — Ollama emits newline-delimited JSON."""
+        payload = {**payload, "stream": True}
+        usage = TokenUsage(0, 0, 0)
+
+        async with self.client.stream("POST", "/api/chat", json=payload) as response:
+            response.raise_for_status()
+
+            async for line in response.aiter_lines():
+                if not line.strip():
+                    continue
+                try:
+                    data = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+
+                if data.get("done"):
+                    prompt_tokens = data.get("prompt_eval_count", 0)
+                    completion_tokens = data.get("eval_count", 0)
+                    usage = TokenUsage(
+                        prompt_tokens=prompt_tokens,
+                        completion_tokens=completion_tokens,
+                        total_tokens=prompt_tokens + completion_tokens,
+                    )
+                    continue
+
+                text = data.get("message", {}).get("content", "")
+                if text:
+                    yield StreamingChunk(content=text, is_final=False)
+
+        latency_ms = (time.perf_counter() - start_time) * 1000
+        cost_tracker.record_usage(self.provider_name.value, model, usage, latency_ms)
+
+        yield StreamingChunk(content="", is_final=True, usage=usage)
+
+
 class LLMClient:
     """Unified LLM client with provider abstraction, fallbacks, and observability."""
 
     def __init__(self) -> None:
         self.providers: dict[LLMProvider, BaseLLMProvider] = {}
         self._init_providers()
-        self.fallback_chain: list[LLMProvider] = [
-            LLMProvider.ANTHROPIC,
-            LLMProvider.OPENAI,
+        try:
+            default = LLMProvider(settings.default_llm_provider)
+        except ValueError:
+            default = LLMProvider.OLLAMA
+        # Try the configured default first, then every other registered provider.
+        self.fallback_chain: list[LLMProvider] = [default] + [
+            p for p in LLMProvider if p != default and p in self.providers
         ]
 
     def _init_providers(self) -> None:
-        """Initialize available providers."""
+        """Initialize available providers. Ollama needs no API key — always registered."""
+        with contextlib.suppress(Exception):
+            self.providers[LLMProvider.OLLAMA] = OllamaProvider()
+
         if settings.anthropic_api_key:
             with contextlib.suppress(Exception):
                 self.providers[LLMProvider.ANTHROPIC] = AnthropicProvider()
@@ -516,8 +669,17 @@ class LLMClient:
 
         if not self.providers:
             raise LLMAuthError(
-                "No LLM providers configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY"
+                "No LLM providers available. Start Ollama (ollama serve) "
+                "or set ANTHROPIC_API_KEY / OPENAI_API_KEY"
             )
+
+    def _resolve_model(self, provider: LLMProvider, model: str | None) -> str:
+        """Pick the model per provider — a Claude model name is meaningless to Ollama."""
+        if model:
+            return model
+        if provider == LLMProvider.OLLAMA:
+            return settings.ollama_model
+        return settings.default_model
 
     def get_provider(self, provider: LLMProvider | None = None) -> BaseLLMProvider:
         """Get provider instance, defaulting to configured default."""
@@ -546,21 +708,20 @@ class LLMClient:
     ) -> LLMResponse | AsyncIterator[StreamingChunk]:
         """Complete with automatic fallback on failure."""
 
-        model = model or settings.default_model
         max_tokens = max_tokens or settings.max_tokens
         temperature = temperature if temperature is not None else settings.temperature
 
         last_error = None
 
         for provider_name in [provider] + [p for p in self.fallback_chain if p != provider]:
-            if provider_name is None:
+            if provider_name is None or provider_name not in self.providers:
                 continue
 
             try:
-                llm_provider = self.get_provider(provider_name)
+                llm_provider = self.providers[provider_name]
                 return await llm_provider.complete(
                     messages=messages,
-                    model=model,
+                    model=self._resolve_model(provider_name, model),
                     max_tokens=max_tokens,
                     temperature=temperature,
                     stream=stream,

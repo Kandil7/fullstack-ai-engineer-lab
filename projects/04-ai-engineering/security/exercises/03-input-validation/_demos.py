@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 def demo_sql_injection():
     """Demonstrate SQL injection detection and prevention."""
     print("\n" + "=" * 72)
@@ -228,4 +229,3 @@ def demo_pipeline():
 # =============================================================================
 # Section 9: Best Practices
 # =============================================================================
-

@@ -10,6 +10,7 @@ from .pii_filter import PIIFilter
 from .quality_scorer import OutputQualityScorer
 from .toxicity import ToxicityFilter
 
+
 class OutputFilterPipeline:
     """
     Complete output filtering pipeline combining all filters.
@@ -159,5 +160,3 @@ class OutputFilterPipeline:
 # =============================================================================
 # Section 9: Demonstration & Testing
 # =============================================================================
-
-

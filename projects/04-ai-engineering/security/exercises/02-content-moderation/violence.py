@@ -5,6 +5,7 @@
 from ._types import *
 from .base_moderator import ContentModerator
 
+
 class ViolenceModerator(ContentModerator):
     """
     Detects violent content including threats, glorification of violence,
@@ -71,5 +72,3 @@ class ViolenceModerator(ContentModerator):
 # =============================================================================
 # Section 5: Sexual Content Detection
 # =============================================================================
-
-

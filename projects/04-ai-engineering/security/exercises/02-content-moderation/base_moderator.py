@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class ContentModerator(ABC):
     """Abstract base class for content moderators."""
 
@@ -22,5 +23,3 @@ class ContentModerator(ABC):
 # =============================================================================
 # Section 3: Hate Speech Detection
 # =============================================================================
-
-

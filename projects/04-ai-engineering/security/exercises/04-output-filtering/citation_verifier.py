@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class CitationVerifier:
     """
     Verifies citations and references in AI-generated content.
@@ -81,5 +82,3 @@ class CitationVerifier:
 # =============================================================================
 # Section 8: Output Filtering Pipeline
 # =============================================================================
-
-

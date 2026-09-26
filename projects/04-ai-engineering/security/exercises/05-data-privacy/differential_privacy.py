@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class DifferentialPrivacy:
     """
     Implements basic differential privacy mechanisms for data protection.
@@ -138,5 +139,3 @@ class DifferentialPrivacy:
 # =============================================================================
 # Section 5: Data Masking Strategies
 # =============================================================================
-
-

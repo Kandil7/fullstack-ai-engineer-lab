@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class XSSValidator:
     """
     Detects and prevents Cross-Site Scripting (XSS) attacks.
@@ -147,5 +148,3 @@ class XSSValidator:
 # =============================================================================
 # Section 4: Command Injection Prevention
 # =============================================================================
-
-

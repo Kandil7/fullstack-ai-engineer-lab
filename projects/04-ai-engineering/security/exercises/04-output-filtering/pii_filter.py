@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class PIIFilter:
     """
     Detects and masks Personally Identifiable Information (PII) in
@@ -113,5 +114,3 @@ class PIIFilter:
 # =============================================================================
 # Section 3: Toxicity Detection
 # =============================================================================
-
-

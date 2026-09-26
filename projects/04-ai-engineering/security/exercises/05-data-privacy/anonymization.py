@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class AnonymizationEngine:
     """
     Engine for anonymizing data using multiple techniques.
@@ -198,5 +199,3 @@ class AnonymizationEngine:
 # =============================================================================
 # Section 4: Differential Privacy
 # =============================================================================
-
-

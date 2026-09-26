@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class OAuth2Flow(Enum):
     AUTHORIZATION_CODE = "authorization_code"
     CLIENT_CREDENTIALS = "client_credentials"
@@ -254,5 +255,3 @@ class OAuth2Server:
 # =============================================================
 # SECTION 3: API Key Management
 # =============================================================
-
-

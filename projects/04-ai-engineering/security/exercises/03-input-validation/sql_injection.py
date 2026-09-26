@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class SQLInjectionValidator:
     """
     Detects and prevents SQL injection attacks in user inputs.
@@ -182,5 +183,3 @@ class SQLInjectionValidator:
 # =============================================================================
 # Section 3: XSS Prevention
 # =============================================================================
-
-

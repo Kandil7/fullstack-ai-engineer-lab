@@ -24,17 +24,22 @@ class Settings(BaseSettings):
     # LLM Providers
     anthropic_api_key: str | None = Field(default=None, alias="ANTHROPIC_API_KEY")
     openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
-    default_llm_provider: str = "anthropic"
-    default_model: str = "claude-3-5-sonnet-20241022"
+    default_llm_provider: str = Field(default="ollama", alias="DEFAULT_LLM_PROVIDER")
+    default_model: str = Field(default="claude-3-5-sonnet-20241022", alias="DEFAULT_MODEL")
     max_tokens: int = 4096
     temperature: float = 0.1
+
+    # Ollama (local, offline)
+    ollama_base_url: str = Field(default="http://localhost:11434", alias="OLLAMA_BASE_URL")
+    ollama_model: str = Field(default="qwen2.5-coder:7b", alias="OLLAMA_MODEL")
+    ollama_embedding_model: str = Field(default="nomic-embed-text", alias="OLLAMA_EMBEDDING_MODEL")
 
     # Qdrant
     qdrant_host: str = "localhost"
     qdrant_port: int = 6333
     qdrant_api_key: str | None = None
     qdrant_collection: str = "devmate_code"
-    qdrant_vector_size: int = 1536
+    qdrant_vector_size: int = Field(default=768, alias="QDRANT_VECTOR_SIZE")
     qdrant_distance: str = "cosine"
 
     # Redis
@@ -72,9 +77,10 @@ class Settings(BaseSettings):
     mcp_host: str = "0.0.0.0"
     mcp_port: int = 8001
 
-    # Embeddings
-    embedding_model: str = "text-embedding-3-small"
-    embedding_dimensions: int = 1536
+    # Embeddings — offline-first (Ollama); set EMBEDDING_PROVIDER=openai for cloud
+    embedding_provider: str = Field(default="ollama", alias="EMBEDDING_PROVIDER")
+    embedding_model: str = Field(default="text-embedding-3-small", alias="EMBEDDING_MODEL")
+    embedding_dimensions: int = Field(default=768, alias="EMBEDDING_DIMENSIONS")
     embedding_batch_size: int = 100
 
     # RAG

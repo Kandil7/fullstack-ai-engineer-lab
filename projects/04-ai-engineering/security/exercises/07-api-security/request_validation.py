@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class RequestValidator:
     """
     Comprehensive request validation for API security.
@@ -206,5 +207,3 @@ class RequestValidator:
 # =============================================================
 # SECTION 5: Response Sanitization
 # =============================================================
-
-

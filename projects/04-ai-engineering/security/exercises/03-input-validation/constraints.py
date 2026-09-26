@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 @dataclass
 class InputConstraints:
     """Configuration for input validation constraints."""
@@ -127,5 +128,3 @@ class ConstraintValidator:
 # =============================================================================
 # Section 7: Validation Pipeline
 # =============================================================================
-
-

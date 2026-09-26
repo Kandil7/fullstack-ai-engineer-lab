@@ -4,6 +4,7 @@
 
 from ._types import *
 
+
 class AdversarialDetector:
     """
     Detect adversarial examples in model inputs.
@@ -287,5 +288,3 @@ class AdversarialRobustnessTester:
 # =============================================================
 # SECTION 3: Model Theft Prevention
 # =============================================================
-
-
